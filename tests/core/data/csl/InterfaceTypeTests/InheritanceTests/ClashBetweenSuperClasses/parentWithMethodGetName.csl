@@ -1,0 +1,7 @@
+// interface used to check clash between supertypes
+interface parentWithMethodGetName 
+{
+	void getName();
+};
+
+

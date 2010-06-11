@@ -1,0 +1,4 @@
+interface IMammal
+{
+	readonly attribute bool ableToFly;
+};

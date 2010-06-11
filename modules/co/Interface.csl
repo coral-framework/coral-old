@@ -1,0 +1,20 @@
+/*
+	The co.Interface pseudo-interface, implicitly inherited by all interfaces.
+ */
+interface Interface
+{
+	// Object providing type introspection for this interface. 
+	readonly attribute InterfaceType interfaceType;
+
+	// The component providing this interface.
+	readonly attribute Component interfaceOwner;
+
+	// This interface's name within the interfaceOwner.
+	readonly attribute string interfaceName;
+
+	// Increment the interface owner's reference count.
+	void componentRetain();
+
+	// Decrement the interface owner's reference count.
+	void componentRelease();
+};

@@ -1,0 +1,7 @@
+################################################################################
+# About This Directory:
+#	This is the parent dir of the main deployable Coral targets.
+################################################################################
+
+ADD_SUBDIRECTORY( core )
+ADD_SUBDIRECTORY( compiler )

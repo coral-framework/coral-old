@@ -1,0 +1,8 @@
+interface ClashingParent
+{
+	attribute ClashingChild myClashingChild;
+	attribute string name;
+};
+
+
+

@@ -1,0 +1,4 @@
+struct struct5
+{
+	battribute redonly string name;
+};

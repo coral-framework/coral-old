@@ -1,0 +1,4 @@
+interface IHuman : IMammal
+{
+	readonly attribute string name;
+};

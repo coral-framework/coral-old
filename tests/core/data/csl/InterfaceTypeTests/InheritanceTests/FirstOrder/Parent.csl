@@ -1,0 +1,7 @@
+interface Parent
+{
+	attribute string name;
+};
+
+
+

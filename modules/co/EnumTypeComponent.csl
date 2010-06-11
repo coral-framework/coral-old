@@ -1,0 +1,7 @@
+/*
+	Component that implements co.EnumType.
+ */
+component EnumTypeComponent
+{
+	provides EnumType type;
+};

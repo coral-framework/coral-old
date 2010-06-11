@@ -1,0 +1,442 @@
+/*!
+
+\page csl2cpp Mapeamento de CSL para C++
+
+\section csl2cpp_basic_types Tipos Básicos
+
+Os tipos básicos de CSL são traduzidos para C++ seguindo a tabela abaixo:
+
+<table class="grid" border="0" width="400">
+<tr class="theader"> <td>CSL</td> <td>C++</td> </tr>
+<tr> <td>bool</td> <td>bool</td> </tr>
+<tr> <td>int8</td> <td>co::int8</td> </tr>
+<tr> <td>uint8</td> <td>co::uint8</td> </tr>
+<tr> <td>int16</td> <td>co::int16</td> </tr>
+<tr> <td>uint16</td> <td>co::uint16</td> </tr>
+<tr> <td>int32</td> <td>co::int32</td> </tr>
+<tr> <td>uint32</td> <td>co::uint32</td> </tr>
+<tr> <td>int64</td> <td>co::int64</td> </tr>
+<tr> <td>uint64</td> <td>co::uint64</td> </tr>
+<tr> <td>float</td> <td>float</td> </tr>
+<tr> <td>double</td> <td>double</td> </tr>
+<tr> <td>string</td> <td>std::string</td> </tr>
+<tr> <td>any</td> <td>co::Any</td> </tr>
+</table>
+
+<hr size="1">
+
+
+\section csl2cpp_array Arrays
+
+Arrays, quando aparecem em um método ou no tipo de um atributo de uma interface, são traduzidos como um co::ArrayRange, uma espécie de \b iterador que abstrai a representação de array utilizada internamente pela implementação de um componente.
+
+<table class="grid" border="0" width="400">
+<tr class="theader"> <td>CSL</td> <td>C++</td> </tr>
+<tr> <td>\e Type \c []</td> <td>\c co::ArrayRange< \e Type \c ></td> </tr>
+</table>
+
+Veja a documentação do \e co::ArrayRange para saber como iterá-lo ou construí-lo um a partir de um std::vector ou qualquer seqüência de elementos em memória. Observe que um co::ArrayRange é apenas um iterador &mdash; não é possível adicionar ou remover elementos de um array através de um co::ArrayRange!
+
+<hr size="1">
+
+
+\section csl2cpp_namespaces Namespaces
+
+O mapeamento de tipos para C++ respeita o local e o \e namespace onde os tipos em CSL são definidos. Por exemplo:
+
+<div class="codetrans_left">
+\code
+// CSL: foo/bar/EmptyStruct.csl
+struct EmptyStruct
+{
+};
+\endcode
+</div>
+<div class="codetrans_center">
+\image html arrow_right_64.png
+</div>
+<div class="codetrans_right">
+\code
+// mapeamento para C++: foo/bar/EmptyStruct.h
+namespace foo {
+namespace bar {
+
+struct EmptyStruct {};
+
+} // namespace bar
+} // namespace foo
+\endcode
+</div>
+<div style="clear:left"></div>
+
+\note O \e namespace de um tipo em CSL é definido implicitamente pelo diretório onde o arquivo CSL se encontra (vide a página de \ref model_fundamentals).
+
+<hr size="1">
+
+
+\section csl2cpp_enum Enumerações (enum)
+
+A tradução de um \c enum para C++ é feito trivialmente, mantendo a ordem dos elementos:
+
+<div class="codetrans_left">
+\code
+// em CSL
+enum Numbers
+{
+	One,
+	Two,
+	Three
+};
+\endcode
+</div>
+<div class="codetrans_center">
+\image html arrow_right_64.png
+</div>
+<div class="codetrans_right">
+\code
+// em C++
+enum Numbers
+{
+	One,
+	Two,
+	Three
+};
+\endcode
+</div>
+<div style="clear:left"></div>
+
+<hr size="1">
+
+
+\section csl2cpp_exception Exceções (exception)
+
+Um \c exception com um determinado nome é mapeado para uma classe em C++, de mesmo nome, que herda de co::UserException.
+
+<div class="codetrans_left">
+\code
+// especificação em CSL
+exception MyException;
+\endcode
+</div>
+<div class="codetrans_center">
+\image html arrow_right_64.png
+</div>
+<div class="codetrans_right">
+\code
+// mapeamento para C++
+class MyException : public co::UserException
+{
+public:
+    MyException();
+	MyException( const std::string& message );
+};
+\endcode
+</div>
+<div style="clear:left"></div>
+
+<hr size="1">
+
+
+\section csl2cpp_struct Estruturas (struct)
+
+Um \c struct em CSL é mapeado para um simples \c struct em C++, mantendo a ordem dos campos. Por exemplo:
+
+<div class="codetrans_left">
+\code
+// em CSL
+struct Account
+{
+	uint32 id;
+	string owner;
+	double balance;
+};
+\endcode
+</div>
+<div class="codetrans_center">
+\image html arrow_right_64.png
+</div>
+<div class="codetrans_right">
+\code
+// em C++
+struct Account
+{
+	co::uint32 id;
+	std::string owner;
+	double balance;
+};
+\endcode
+</div>
+<div style="clear:left"></div>
+
+O tipo dos campos são mapeados segundo as regras gerais, exceto quando o tipo é uma interface ou um array (veja abaixo).
+
+\subsection csl2cpp_struct_arrays Campos do tipo Array
+
+Todo campo do tipo array é mapeado como um \c std::vector, já que um \c co::ArrayRange não poderia armazenar elementos. Exemplo:
+
+<div class="codetrans_left">
+\code
+// em CSL
+struct Foo
+{
+	int8[] intArrayField;
+	string[] stringArrayField;
+};
+\endcode
+</div>
+<div class="codetrans_center">
+\image html arrow_right_64.png
+</div>
+<div class="codetrans_right">
+\code
+// em C++
+struct Foo
+{
+	std::vector<co::int8> intArrayField;
+	std::vector<std::string> stringArrayField;
+};
+\endcode
+</div>
+<div style="clear:left"></div>
+
+
+\subsection csl2cpp_struct_interfaces Campos do tipo Interface
+
+Todo campo do tipo interface é mapeado como um \c co::RefPtr (<em>smart pointer</em>) para que seja considerado na contagem de referências da interface. O mesmo se aplica caso o campo seja um array de interfaces &mdash; neste caso, o array é mapeado como um \c co::RefVector. Por exemplo:
+
+<div class="codetrans_left">
+\code
+// em CSL
+struct Foo
+{
+	co.Type aType;
+	co.MemberInfo[] someMembers;
+};
+\endcode
+</div>
+<div class="codetrans_center">
+\image html arrow_right_64.png
+</div>
+<div class="codetrans_right">
+\code
+// em C++
+struct Foo
+{
+	co::RefPtr<co::Type> aType;
+	co::RefVector<co::MemberInfo> someMembers;
+};
+\endcode
+</div>
+<div style="clear:left"></div>
+
+<hr size="1">
+
+
+\section csl2cpp_nativeclass Classes Nativas (native class)
+
+No caminho inverso dos outros tipos, classes nativas são classes <b>originalmente implementadas em C++</b> que deseja-se &ldquo;importar&rdquo; para dentro do sistema de tipos do Coral. A idéia é que a programação seja feita usando diretamente a classe original em C++, o que torna a geração de mapeamentos desnecessária.
+
+Embora o \ref compiler gere um \c .h de mapeamento para as classes nativas, o \e header gerado contém somente a declaração de operadores auxiliares como \c co::uuidOf, \c co::typeOf, etc., além de um \c \#include para o \e header original do tipo.
+
+Para informações sobre como implementar o adaptador de uma classe nativa, veja a página \ref model_nativeclasses.
+
+<hr size="1">
+
+
+\section csl2cpp_interface Interfaces (interface)
+
+Interfaces em CSL são mapeadas para classes puramente abstratas em C++. Todos os atributos e métodos da interface são mapeados para funções puramente virtuais. Por exemplo:
+
+<div class="codetrans_left">
+\code
+// em CSL
+interface Person
+{
+	attribute string name;
+
+	void say( in string message );
+};
+\endcode
+</div>
+<div class="codetrans_center">
+\image html arrow_right_64.png
+</div>
+<div class="codetrans_right">
+\code
+// em C++
+class Person
+{
+public:
+	virtual const std::string& getName() = 0;
+	virtual void setName( const std::string& name ) = 0;
+
+	virtual void say( const std::string& message ) = 0;
+};
+\endcode
+</div>
+<div style="clear:left"></div>
+
+As regras para passagem e retorno de parâmetros nos métodos foram definidas de forma a priorizar simplicidade e eficiência. Em alguns casos, o programador acostumado com C++ pode achar que as modalidades de passagem de parâmetro disponíveis são poucas ou restritivas, mas as restrições existem para simplificar o sistema de tipos. Com algum cuidado, deve ser possível projetar qualquer API de forma eficiente, dentro destas regras.
+
+\par Regras Gerais para Passagem de Parâmetros e Retorno de Métodos:
+\anchor csl2cpp_interface_parameters_generaltable
+<table class="grid" border="0">
+<tr class="theader"> <td>Categoria de Tipo</td> <td>Regra de Passagem Aplicada</td> </tr>
+	<tr>
+		<td>Valores Primitivos (\c bool, <tt>[u]int{N}</tt>, \c float, \c double e \c enums)</td>
+		<td>Passagem por valor (cópia)</td>
+	</tr>
+	<tr>
+		<td>Valores Complexos (\c string, \c any, \c structs e <tt>native classes</tt>)</td>
+		<td>Passagem por referência constante (<tt>const Type&</tt>)</td>
+	</tr>
+	<tr>
+		<td>Referências (\c interfaces)</td>
+		<td>Passagem por ponteiro (<tt>Type*</tt>)</td>
+	</tr>
+	<tr>
+		<td>Arrays de Valores</td>
+		<td>Passagem de um \c co::ArrayRange<const Type></td>
+	</tr>
+	<tr>
+		<td>Arrays de Referências</td>
+		<td>Passagem de um \c co::ArrayRange<Type* const></td>
+	</tr>
+</table>
+
+\subsection csl2cpp_interface_attributes Mapeamento de Atributos
+
+Atributos são mapeados para métodos de acesso (\e accessors) utilizando convenções semelhantes às de JavaBeans. Um atributo normalmente é mapeado para dois métodos, um \e getter e um \e setter &mdash; a menos que seja \c readonly, quando é mapeado apenas para um \e getter.
+
+Para um atributo &ldquo;myAttrib&rdquo; do tipo \c T, as convenções de nomenclatura aplicadas são:
+\par \e Getter:
+	<tt>virtual T getMyAttrib() = 0;</tt>
+\par \e Getter Booleano:
+	<tt>virtual bool isMyAttrib() = 0;</tt>
+\par \e Setter:
+	<tt>virtual void setMyAttrib( T myAttrib ) = 0;</tt>
+
+Observe que o padrão no Coral é o nome dos atributos começar com letra minúscula e seguir o padrão \e CamelCase. Para formar o nome de um método, o nome do atributo é modificado para começar com maíscula e concatenado com um dos prefixos \c 'get', \c 'is' ou \c 'set'.
+
+Exemplo de mapeamento de atributos \e read-only e \e read/write (o padrão):
+
+<div class="codetrans_left">
+\code
+// em CSL
+interface Account
+{
+	readonly attribute int32 id;
+	attribute string email;
+	attribute bool enabled;
+};
+\endcode
+</div>
+<div class="codetrans_center">
+\image html arrow_right_64.png
+</div>
+<div class="codetrans_right">
+\code
+// em C++
+class Account
+{
+public:
+	virtual co::int32 getId() = 0;
+
+	virtual const std::string& getEmail() = 0;
+	virtual void setEmail( const std::string& email ) = 0;
+
+	virtual bool isEnabled() = 0;
+	virtual void setEnabled( bool enabled ) = 0;
+};
+\endcode
+</div>
+<div style="clear:left"></div>
+
+\subsection csl2cpp_interface_methods Mapeamento de Métodos
+
+Cada método de uma interface é mapeado para um método puramente virtual da classe em C++. O retorno dos métodos (caso não seja \c void) e os parâmetros \c 'in' são mapeados segundo a \ref csl2cpp_interface_parameters_generaltable "tabela anterior" (<em>Regras Gerais para Passagem de Parâmetros e Retorno de Métodos</em>). Porém, caso o parâmetro seja \c 'out' ou \c 'inout', as regras utilizadas são as da tabela abaixo.
+
+\par Regras para Passagem de Parâmetros \c 'out':
+<table class="grid" border="0">
+<tr class="theader"> <td>Categoria de Tipo</td> <td>Regra de Passagem Aplicada</td> </tr>
+	<tr>
+		<td>Valores Primitivos (\c bool, <tt>[u]int{N}</tt>, \c float, \c double e \c enums)</td>
+		<td>Passagem por referência (<tt>Type&</tt>)</td>
+	</tr>
+	<tr>
+		<td>Valores Complexos (\c string, \c any, \c structs e <tt>native classes</tt>)</td>
+		<td>Passagem por referência (<tt>Type&</tt>)</td>
+	</tr>
+	<tr>
+		<td>Referências (\c interfaces)</td>
+		<td>Passagem por referência para ponteiro (<tt>Type*&</tt>)</td>
+	</tr>
+	<tr>
+		<td>Arrays de Valores</td>
+		<td>Passagem de um \c std::vector<Type>*</td>
+	</tr>
+	<tr>
+		<td>Arrays de Referências</td>
+		<td>Passagem de um \c co::RefVector<Type>*</td>
+	</tr>
+</table>
+
+\par Rationale:
+Para poderem ser modificados, todos os tipos &mdash; exceto arrays &mdash; são passados por referência. Arrays, no entanto, são passadas por ponteiro, para permitir que o parâmetro seja de passagem opcional. Assim, é possível evitar a criação desnecessária de um \c std::vector ou \c co::RefVector quando a função cliente não está interessada no resultado do parâmetro. Um efeito colateral desta medida é que todo método que recebe arrays \c out ou \c inout precisa verificar se o ponteiro é NULL &mdash; algo suscetível a bugs. Porém, estima-se que em geral os benefícios da passagem opcional de arrays superem as desvantagens.
+
+No exemplo de mapeamento a seguir, considere que \c RequestType é um \c enum, \c Request é um \c struct, \c ServiceDelegate é uma \c interface e \c Uuid é uma classe nativa.
+
+\code
+// em CSL
+interface Service
+{
+	readonly attribute co.Uuid[] forbiddenClientIds;
+
+	void registerDelegate( in RequestType t, in ServiceDelegate d )
+		raises IllegalArgumentException;
+
+	void getAllDelegates( out ServiceDelegate[] delegates );
+
+	void forbidRequestsFrom( in co.Uuid clientId );
+	void allowRequestsFrom( in co.Uuid clientId );
+
+	int32 filterForbiddenClients( inout co.Uuid[] clients );
+
+	bool getDelegateFor( in Request r, out ServiceDelegate d );
+
+	void handleRequest( inout Request r ) raises ForbiddenClientException;
+};
+\endcode
+
+\code
+// em C++
+class Service
+{
+public:
+	virtual co::ArrayRange<const co::Uuid> getForbiddenClientIds() = 0;
+
+	virtual void registerDelegate( RequestType t, ServiceDelegate* d ) = 0;
+
+	virtual void getAllDelegates( co::RefVector<ServiceDelegate>* delegates ) = 0;
+
+	virtual void forbidRequestsFrom( const co::Uuid& clientId ) = 0;
+	virtual void allowRequestsFrom( const co::Uuid& clientId ) = 0;
+
+	virtual co::int32 filterForbiddenClients( std::vector<co::Uuid>* clients ) = 0;
+
+	virtual bool getDelegateFor( const Request& r, ServiceDelegate*& d ) = 0;
+
+	virtual void handleRequest( Request& r ) = 0;
+};
+\endcode
+
+Observe que a declaração de exceções (\c raises) em CSL não são mapeadas diretamente para C++, uma vez que o suporte a este recurso pelos compiladores C++ é precário.
+
+<hr size="1">
+
+
+\section csl2cpp_componentsss Componentes (component)
+
+Componentes só podem ser manipulados através da API de reflexão ou de suas interfaces servidoras (e.g. \c co::IComponent). Por isso, não geram nenhum tipo de mapeamento para C++. Para informações sobre como implementar um componente, veja a página \ref model_components.
+
+*/

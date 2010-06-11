@@ -1,0 +1,51 @@
+/*
+	Keeps a database of loaded types and provides methods to load/create new types.
+ */
+interface TypeManager
+{
+	// The 'global' (root) namespace, which gives hierarchical access to all types, namespaces and modules.
+	readonly attribute Namespace rootNS;
+
+	/*
+		Searches the database of loaded types for a type with the specified fully-qualified name.
+		A suffix "[]" may be added to the name of a type to search for its corresponding co::ArrayType.
+		Returns null if a type with the given \c fullName is not currently loaded.
+	 */
+ 	Type findType( in string fullName );
+
+ 	/*
+ 		Searches the namespace hierarchy for a namespace with the given fully-qualified name.
+ 		Returns null if the namespace does not exist (i.e. has not been created yet).
+ 	 */
+ 	Namespace findNamespace( in string fullName );
+
+	/*
+		Either retrieves or tries to load the type with the given fully-qualified \c typeName.
+
+		This can also retrieve or create arrays: if \c typeName ends with "[]", this method will
+		call getArrayOf() passing as argument the element type specified in \c typeName.
+
+		\throw co::IllegalArgumentException if the passed \c typeName is empty.
+		\throw co::TypeLoadException if any error occurs while loading the type.
+		\throw co::IllegalArgumentException when dealing with arrays, this is thrown if \c typeName
+			specifies an invalid array element type (i.e. an array, exception or component).
+	 */
+	Type getType( in string typeName ) raises IllegalArgumentException, TypeLoadException;
+
+	/*
+		Creates or retrieves an existing co::ArrayType whose elements are of type \c elementType.
+		\throw co::IllegalArgumentException if \c elementType is null, an array, an exception or a component.
+	 */
+	ArrayType getArrayOf( in Type elementType ) raises IllegalArgumentException;
+
+	/*
+		A lower-level counterpart of getType() that either retrieves or tries to load a type
+		without raising exceptions.
+
+		In case of errors, this method will add detailed information to the \c errorStack
+		and return NULL. The \c errorStack is sorted from the outermost to the innermost error.
+
+		\note This method does NOT create arrays, but can retrieve existing array types.
+	 */
+	Type loadType( in string typeName, out CSLError[] errorStack );
+};

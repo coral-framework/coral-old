@@ -1,0 +1,7 @@
+interface DistantGrandParent : GreatGrandParent
+{
+	attribute string distantGrandParentName;
+};
+
+
+

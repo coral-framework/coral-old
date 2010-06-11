@@ -1,0 +1,7 @@
+/*
+	Component that implements co.Namespace.
+ */
+component NamespaceComponent
+{
+	provides Namespace namespace;
+};

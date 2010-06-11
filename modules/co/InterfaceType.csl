@@ -1,0 +1,17 @@
+/*
+	Interface type.
+ */
+interface InterfaceType : CompoundType, AttributeContainer, MethodContainer
+{
+	// List of all ancestors of this interface, including co.Interface.
+	readonly attribute InterfaceType[] interfaceAncestors;
+
+	// List of the interfaces directly inherited by this interface.
+	readonly attribute InterfaceType[] superInterfaces;
+
+	// List of the interfaces that inherit directly from this interface.
+	readonly attribute InterfaceType[] subInterfaces;
+
+	// Returns whether this InterfaceType descends from (or is equal to) a given InterfaceType.
+	bool isSubTypeOf( in InterfaceType itf );
+};

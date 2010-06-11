@@ -1,0 +1,8 @@
+native class TestNativeClass_invalid10 ( a::_ <a> ) 
+{
+attribute string[] a;	
+
+};
+
+*/ 
+

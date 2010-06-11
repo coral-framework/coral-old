@@ -1,0 +1,7 @@
+/*
+	Component that implements co.ExceptionType.
+ */
+component ExceptionTypeComponent
+{
+	provides ExceptionType type;
+};

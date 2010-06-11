@@ -1,0 +1,8 @@
+native class TestNativeClass8 ( a::_ <                           > ) 
+{
+
+
+attribute string[] a;	
+
+
+};

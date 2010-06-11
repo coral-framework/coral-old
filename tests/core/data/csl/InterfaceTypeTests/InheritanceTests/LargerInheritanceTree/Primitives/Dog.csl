@@ -1,0 +1,4 @@
+interface Dog
+{
+	attribute float size;
+};

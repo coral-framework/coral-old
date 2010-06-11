@@ -1,0 +1,4 @@
+interface parentInterface
+{
+	attribute Dependencies.parentEnum parentEnum;
+};

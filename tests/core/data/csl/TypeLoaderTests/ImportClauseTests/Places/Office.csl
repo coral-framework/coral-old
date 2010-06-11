@@ -1,0 +1,8 @@
+interface Office 
+{
+	attribute string foo;
+
+};
+
+
+

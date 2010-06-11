@@ -1,0 +1,76 @@
+/*
+	Represents an abstract set of extensions located in a Namespace. Modules are composed of one or more
+	ModuleParts, which are individual extension artifacts loaded from the module's directory.
+ */
+interface Module
+{
+	// Current module state. See the module life cycle control methods below.
+	readonly attribute ModuleState state;
+
+	// The module's namespace in the type repository.
+	readonly attribute Namespace namespace;
+
+	// List of ModuleParts that make up this module.
+	readonly attribute ModulePart[] parts;
+
+	//---------- Module Life Cycle Control Methods --------------------------//
+
+	/*
+		Runs the initialization phase on all module parts and leaves the module
+		in the ModuleState_Initialized state.
+
+		The module's state must be ModuleState_None when this method is called,
+		or a co::LifeCycleException will be raised.
+	 */
+	void initialize() raises LifeCycleException;
+
+	/*
+		Runs the integration phase on all module parts and leaves the module
+		in the ModuleState_Integrated state.
+
+		The module's state must be ModuleState_Initialized when this method is called,
+		or a co::LifeCycleException will be raised.
+	 */
+	void integrate() raises LifeCycleException, MissingServiceException;
+
+	/*
+		Runs the presentation integration phase on all module parts and leaves the
+		module in the ModuleState_PresentationIntegrated state.
+
+		The module's state must be ModuleState_Integrated when this method is called,
+		or a co::LifeCycleException will be raised.
+	 */
+	void integratePresentation() raises LifeCycleException;
+
+	/*
+		Runs the disintegration phase on all module parts and leaves the module
+		in the ModuleState_Disintegrated state.
+
+		The module's state must be ModuleState_PresentationIntegrated when this method
+		is called, or a co::LifeCycleException will be raised.
+	 */
+	void disintegrate() raises LifeCycleException;
+
+	/*
+		Runs the disposal phase on all module parts, unloads all module parts,
+		then leaves the module in the ModuleState_Disposed state.
+
+		The module's state must be ModuleState_Disintegrated when this method is
+		called, or a co::LifeCycleException will be raised.
+	 */
+	void dispose() raises LifeCycleException;
+
+	/*
+		Runs the disintegration and/or disposal phase on this module,
+		leaving it in the ModuleState_Aborted state.
+
+		Please notice that the disintegration phase is only run if the
+		integration phase had run successfully for the module.
+
+		The module's state must preceed ModuleState_Disintegrated when this
+		method is called, or a co::LifeCycleException will be raised.
+	 */
+	void abort() raises LifeCycleException;
+
+	//---------- End of Module Life Cycle Control Methods -------------------//
+};

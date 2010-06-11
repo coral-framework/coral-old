@@ -1,0 +1,4 @@
+interface parent
+{
+	attribute child myChild;
+};

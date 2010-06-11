@@ -1,0 +1,4 @@
+interface DogOwner : Primitives.Person
+{
+	attribute Primitives.Dog[] dogs;
+};

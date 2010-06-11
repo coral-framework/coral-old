@@ -1,0 +1,4 @@
+interface Developer : ComputerUser
+{
+	attribute string preferedLanguage;
+};

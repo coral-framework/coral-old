@@ -1,0 +1,38 @@
+/*
+	Controls the life cycle of an \e abstract \e artifact (such as a dynamic library or a script bundle)
+	that contributes with new services as part of a Module.
+ */
+interface ModulePart
+{
+	/*
+		Initialization Phase - registration of services provided by the ModulePart.
+
+		\note This phase should install Reflectors for all module types. If a
+			missing Reflector is detected after the initialization phase is
+			complete, the module will be aborted.
+	 */
+	void initialize( in Module module );
+
+	/*
+		Integration Phase - consumption of services provided by other modules.
+		May throw an exception to indicate the module cannot be loaded due to a missing service.
+		\throw co::MissingServiceException if a required service was not available.
+	 */
+	void integrate( in Module module ) raises MissingServiceException;
+
+	/*
+		Presentation Integration Phase - addition of user interface elements to the application.
+	 */
+	void integratePresentation( in Module module );
+
+	/*
+		Disintegration Phase - responsible for severing connections with other modules and
+		cleaning up presentation elements installed by the ModulePart.
+	 */
+	void disintegrate( in Module module );
+
+	/*
+		Disposal Phase - responsible for freeing resources allocated by the ModulePart.
+	 */
+	void dispose( in Module module );
+};

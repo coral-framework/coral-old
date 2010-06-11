@@ -1,0 +1,76 @@
+/*!
+
+\page model_types Tipos
+
+\section model_types_intro Introdução
+
+O Coral foi projetado para ser simples. Por esta razão, o seu sistema de tipos é <em>minimalista</em> &mdash; ou seja, contempla apenas os elementos absolutamente necessários para um bom projeto de aplicação.
+As espécies de tipos oferecidas pelo Coral são:
+- <b>Dados Primitivos</b> - booleano, inteiros, floats e string.
+- <b>array</b> - vetor unidimensional de elementos.
+- <b>enum</b> - enumeração de identificadores constantes, com valores de 0 a (n-1).
+- <b>exception</b> - exceção, identificada apenas por nome, que pode ser lançada por métodos.
+- <b>struct</b> - conjunto de campos de tipos diversos, identificados por nomes.
+- <b>native class</b> - importa uma classe nativa do C++ como uma espécie de "interface leve" no Coral.
+- <b>interface</b> - conjunto de métodos e atributos para acessar um serviço de um componente.
+- <b>any</b> - funciona como um \c union (ou \e variant), capaz de guardar qualquer tipo do Coral.
+
+\section model_types_categories Categorias de Tipos
+
+\subsection model_types_categories_values 1. Valores
+Os valores são subdivididos em duas sub-categorias: valores básicos e valores complexos.
+
+\subsubsection model_types_categories_values_basic 1.1 Valores Básicos
+São os tipos mais simples, que requerem pouco ou nenhum suporte a reflexão.
+- <b>Dados Primitivos</b> - xxx.
+- <b>array</b> - xxx.
+- <b>enum</b> - xxx.
+
+\subsubsection model_types_categories_values_complex 1.2 Valores Complexos
+São tipos compostos, mais complexos, com suporte completo a reflexão.
+- <b>struct</b> - xxx.
+- <b>native class</b> - xxx.
+
+\subsection model_types_categories_refs 2. Referências
+- <b>interface</b> - xxx.
+
+\subsection model_types_categories_specials 3. Especiais
+- <b>exception</b> - Só pode ser usado para lançar exceções; i.e. não pode ser o tipo de atributos e métodos.
+- <b>component</b> - xxx.
+
+\section model_types_array Arrays
+
+- Vetor unidimensional de tamanho variável.
+
+\section model_types_enum Enumerações (enum)
+
+- Exceção, identificada apenas por nome, que pode ser lançada por métodos.
+
+\section model_types_exception Exceções (exception)
+
+- Somente exceções podem ser lançadas (raises) por métodos.
+- Não podem ser passadas como parâmetro e nem fazer parte de outros tipos.
+- Toda exceção herda implicitamente de co::UserException.
+
+\section model_types_struct Estruturas (struct)
+
+- Podem conter campos de qualquer tipo, salvo exceções.
+- Não podem ter construtor, destrutor, métodos, atributos, e nem herança.
+- Tipos de interface são traduzidos como smart-pointers em C++.
+
+\section model_types_nativeclass Classes Nativas (native class)
+
+- Fornece interoperabilidade para classes implementadas fora do sistema de componentes, em C++.
+- Não tem herança. Só tem um construtor default.
+- É considerado um tipo de dado (copiado por valor), e não uma referência (i.e. não é ref-counted).
+- Não gera classe de interface em C++, funciona apenas como um "proxy" (headerfile/typename) e associa atributos (e.g. UUID) ao tipo.
+- Deve ser implementado através de um stub, estilo um componente, provendo:
+-- Implementação dos métodos / atributos (usado apenas pelo meta-objeto reflexivo).
+-- Serialização (pack/unpack).
+- O sistema de componentes fornece um meta-objeto para reflexão.
+
+\section model_types_interface Interfaces (interface)
+
+TODO
+
+*/

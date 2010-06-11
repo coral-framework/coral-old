@@ -1,0 +1,14 @@
+/*
+	Represents an interface/class method.
+ */
+interface MethodInfo : MemberInfo
+{
+	// The method's return type.
+	readonly attribute Type returnType;
+
+	// The list of parameters that this method takes.
+	readonly attribute ParameterInfo[] parameters;	
+
+	// The list of exceptions that might be thrown by this method.
+	readonly attribute ExceptionType[] exceptions;
+};

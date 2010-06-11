@@ -1,0 +1,7 @@
+/*
+	Component that implements co.TypeCreationTransaction.
+ */
+component TypeCreationTransactionComponent
+{
+	provides TypeCreationTransaction transaction;
+};

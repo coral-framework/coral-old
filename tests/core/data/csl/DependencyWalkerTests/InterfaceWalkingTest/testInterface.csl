@@ -1,0 +1,12 @@
+interface testInterface : parentInterface
+{
+	attribute Dependencies.anotherInterface anotherInterface;
+	attribute Dependencies.yetAnotherInterface[] arrayInterface;
+	readonly attribute Dependencies.testEnum testEnum;
+	attribute Dependencies.testStruct testStruct;
+
+	Dependencies.methodRetunType myMethod( in Dependencies.methodParameter param );
+	void foo();	
+	void zemuga( ) raises testException;
+};
+

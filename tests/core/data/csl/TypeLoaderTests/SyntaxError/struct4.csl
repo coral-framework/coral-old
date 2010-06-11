@@ -1,0 +1,5 @@
+// missing semicolon
+struct struct4
+{
+	attribute string name;
+}

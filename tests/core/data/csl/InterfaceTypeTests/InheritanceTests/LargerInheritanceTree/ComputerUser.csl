@@ -1,0 +1,4 @@
+interface ComputerUser : Primitives.Person
+{
+	attribute Primitives.Computer userComputer;
+};

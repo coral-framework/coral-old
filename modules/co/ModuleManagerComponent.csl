@@ -1,0 +1,7 @@
+/*
+	Component that implements co.ModuleManager.
+ */
+component ModuleManagerComponent
+{
+	provides ModuleManager moduleManager;
+};

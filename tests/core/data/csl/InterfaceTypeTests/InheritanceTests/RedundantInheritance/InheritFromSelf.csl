@@ -1,0 +1,7 @@
+// invalid self inheritance
+interface InheritFromSelf : InheritFromSelf
+{
+	readonly attribute string name;
+};
+
+

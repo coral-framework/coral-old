@@ -1,0 +1,11 @@
+/*
+	A component-specific member that describes how a component provides a certain interface.
+ */
+interface InterfaceInfo : MemberInfo
+{
+	// The interface type.
+	readonly attribute InterfaceType type;
+
+	//! True if this interface is 'provided' (server), or false if this interface is 'required' (client).
+	readonly attribute bool isProvided;
+};

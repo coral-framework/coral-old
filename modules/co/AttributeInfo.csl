@@ -1,0 +1,14 @@
+/*
+	Offers type introspection for an attribute in a struct/interface/class.
+ */
+interface AttributeInfo : MemberInfo
+{
+	// The attribute's type.
+	readonly attribute Type type;
+
+	/*
+		Whether the attribute is read-only.
+		\note For structs, this is always false (i.e. structs are always read/write).
+	 */
+	readonly attribute bool isReadOnly;
+};

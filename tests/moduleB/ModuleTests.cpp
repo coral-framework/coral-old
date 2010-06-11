@@ -1,0 +1,192 @@
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
+
+#include <gtest/gtest.h>
+
+#include <co/Coral.h>
+#include <co/Module.h>
+#include <co/System.h>
+#include <co/Component.h>
+#include <co/Reflector.h>
+#include <co/ModuleState.h>
+#include <co/CompoundType.h>
+#include <co/AttributeInfo.h>
+#include <co/ModuleManager.h>
+#include <co/LifeCycleException.h>
+#include <co/TypeCreationTransaction.h>
+#include <co/IllegalArgumentException.h>
+#include <moduleA/TestInterface.h>
+
+TEST( ModuleTests, setupSystemThenLoadModuleA )
+{
+	// shutdown and re-setup the system
+	co::shutdown();
+	co::System* system = co::getSystem();
+	system->setup();
+
+	// moduleA should not have been loaded yet
+	EXPECT_TRUE( system->getModules()->findModule( "moduleA" ) == NULL );
+
+	// load moduleA: first call should load, second call should just retrieve the module
+	co::Module* moduleA = system->getModules()->load( "moduleA" );
+	ASSERT_TRUE( moduleA != NULL );
+	EXPECT_EQ( moduleA, system->getModules()->load( "moduleA" ) );
+
+	// now moduleA should have been loaded
+	EXPECT_EQ( moduleA, system->getModules()->findModule( "moduleA" ) );
+
+	// and its types should have reflectors
+	co::Type* type = co::getType( "moduleA.TestInterface" );
+	EXPECT_TRUE( type->getReflector() != NULL );
+}
+
+TEST( ModuleTests, setupSystemRequiringModuleB )
+{
+	// shutdown and re-setup the system requiring moduleB
+	co::shutdown();
+	co::System* system = co::getSystem();
+
+	// moduleA should not have been loaded yet
+	EXPECT_TRUE( system->getModules()->findModule( "moduleA" ) == NULL );
+
+	// setup the system requiring moduleB
+	std::string requiredModule( "moduleB" );
+	system->setup( co::ArrayRange<std::string const>( &requiredModule, 1 ) );
+
+	// now moduleA should have been loaded, as a dependency of moduleB
+	ASSERT_TRUE( system->getModules()->findModule( "moduleA" ) != NULL );
+
+	// and its types should have reflectors
+	co::Type* type = co::getType( "moduleA.TestInterface" );
+	EXPECT_TRUE( type->getReflector() != NULL );
+}
+
+TEST( ModuleTests, systemAndModuleLifeCycles )
+{
+	// TODO test system life cycle transitions and module syncs
+
+	// fully restart the system
+	co::shutdown();
+	co::System* system = co::getSystem();
+
+	// cannot tearDown() before setting the system up
+	EXPECT_THROW( system->tearDown(), co::LifeCycleException );
+
+	// cannot setupPresentation() before setupBase()
+	EXPECT_THROW( system->setupPresentation(), co::LifeCycleException );
+
+	// setupBase() requiring moduleA
+	std::string requiredModule( "moduleA" );
+	system->setupBase( co::ArrayRange<std::string const>( &requiredModule, 1 ) );
+
+	// moduleA should have been loaded, but not moduleB
+	co::Module* moduleA = system->getModules()->findModule( "moduleA" );
+	co::Module* moduleB = system->getModules()->findModule( "moduleB" );
+	ASSERT_TRUE( moduleA != NULL );
+	ASSERT_TRUE( moduleB == NULL );
+
+	// moduleA's state should be ModuleState_Integrated
+	EXPECT_EQ( co::ModuleState_Integrated, moduleA->getState() );
+
+	// cannot tearDown() because the system was not fully set up yet (setupPresentation())
+	EXPECT_THROW( system->tearDown(), co::LifeCycleException );
+
+	// setupPresentation()
+	system->setupPresentation();
+
+	// moduleA's state should now be ModuleState_PresentationIntegrated
+	EXPECT_EQ( co::ModuleState_PresentationIntegrated, moduleA->getState() );
+
+	// moduleB should not have been loaded yet
+	ASSERT_TRUE( system->getModules()->findModule( "moduleB" ) == NULL );
+
+	// loading moduleB now should bring it directly to the ModuleState_PresentationIntegrated state
+	moduleB = system->getModules()->load( "moduleB" );
+	ASSERT_TRUE( moduleB != NULL );
+	EXPECT_EQ( co::ModuleState_PresentationIntegrated, moduleB->getState() );
+
+	// ok to tearDown() now
+	system->tearDown();
+
+	// all modules should now be in the ModuleState_Disposed state
+	EXPECT_EQ( co::ModuleState_Disposed, moduleA->getState() );
+	EXPECT_EQ( co::ModuleState_Disposed, moduleB->getState() );
+
+	// cannot load additional modules after the system is torn down
+	EXPECT_THROW( system->getModules()->load( "whatever" ), co::LifeCycleException );
+
+	// we need another full restart
+	co::shutdown();
+	system = co::getSystem();
+
+	// re-setup
+	system->setup();
+
+	// cannot setup() the system again before tearing it down
+	EXPECT_THROW( system->setup(), co::LifeCycleException );
+}
+
+TEST( ModuleTests, crossModuleInheritance )
+{
+	// instantiate a component from 'moduleA' that implements an interface from 'co'
+	co::Component* component = co::newInstance( "moduleA.TestComponent" );
+
+	// exercise dynamic_casts
+	moduleA::TestInterface* ti = component->getProvided<moduleA::TestInterface>();
+	EXPECT_EQ( component, ti->getInterfaceOwner() );
+
+	co::TypeCreationTransaction* tct = component->getProvided<co::TypeCreationTransaction>();
+	EXPECT_EQ( component, tct->getInterfaceOwner() );
+}
+
+TEST( ModuleTests, crossModuleReflection )
+{
+	// exercise the reflection API on one of moduleA's types
+	co::Type* type = co::getType( "moduleA.TestStruct" );
+	co::Reflector* reflector = type->getReflector();
+	ASSERT_TRUE( reflector != NULL );
+
+	const int size = reflector->getSize();
+	std::vector<co::uint8> instanceMemory( size );
+	void* instancePtr = &instanceMemory.front();
+	co::Any instanceAny( type, co::Any::VarIsPointer, instancePtr );
+
+	EXPECT_THROW( reflector->createValue( instancePtr, 1337 ), co::IllegalArgumentException );
+	EXPECT_NO_THROW( reflector->createValue( instancePtr, size ) );
+
+	// get an AttributeInfo
+	co::CompoundType* ct = dynamic_cast<co::CompoundType*>( type );
+	assert( ct );
+
+	co::AttributeInfo* anInt8Attrib = dynamic_cast<co::AttributeInfo*>( ct->getMember( "anInt8" ) );
+	assert( anInt8Attrib );
+
+	// exercise the reflection API
+	co::Any a1, a2;
+
+	reflector->getAttribute( instanceAny, anInt8Attrib, a1 );
+	EXPECT_EQ( 0, a1.get<int>() );
+
+	a2.set( 7 );
+	reflector->setAttribute( instanceAny, anInt8Attrib, a2 );
+
+	reflector->getAttribute( instanceAny, anInt8Attrib, a1 );
+	EXPECT_EQ( 7, a1.get<int>() );
+
+	// test exception catching
+	co::int32 garbage = -1;
+	instanceAny.set( garbage );
+	try
+	{
+		reflector->getAttribute( instanceAny, anInt8Attrib, a1 );		
+		ASSERT_FALSE( true );
+	}
+	catch( co::IllegalArgumentException& e )
+	{
+		EXPECT_EQ( "expected a valid moduleA::TestStruct*, but got (co::int32)-1", e.getMessage() );
+	}
+
+	reflector->destroyValue( instancePtr );
+}

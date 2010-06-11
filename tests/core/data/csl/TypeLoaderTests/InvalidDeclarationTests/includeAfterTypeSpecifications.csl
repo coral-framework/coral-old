@@ -1,0 +1,8 @@
+// this is the first specification
+interface includeAfterTypeSpecifications
+{
+	attribute string foo;
+};
+
+import Global.Person;
+

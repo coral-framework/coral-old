@@ -1,0 +1,4 @@
+interface IBat : IMammal
+{
+	readonly attribute bool bloodsucker;
+};

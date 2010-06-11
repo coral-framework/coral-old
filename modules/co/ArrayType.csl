@@ -1,0 +1,8 @@
+/*
+	Unidimensional array of elements.
+ */
+interface ArrayType : Type
+{
+	// The type of the array elements.
+	readonly attribute Type elementType;
+};

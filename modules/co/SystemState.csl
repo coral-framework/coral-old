@@ -1,0 +1,26 @@
+/*
+	Possible system states.
+ */
+enum SystemState
+{
+	// Pre-initialization state. The Coral core is considered the only module available.
+	SystemState_None,
+
+	// One or more modules are loading. They can use the Coral core, but cannot interact yet.
+	SystemState_Initializing,
+
+	// Modules are all loaded and can interact with each other.
+	SystemState_Integrating,
+
+	// All modules are integrated.
+	SystemState_Integrated,
+
+	// Modules can present user interface elements.
+	SystemState_IntegratingPresentation,
+
+	// System is running normally. The presentation is live.
+	SystemState_Running,
+
+	// System is being torn down. Presentation is closing. Modules are being disposed.
+	SystemState_Disintegrating
+};

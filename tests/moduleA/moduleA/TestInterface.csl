@@ -1,0 +1,32 @@
+interface TestInterface
+{
+	readonly attribute string nameReadonly;
+
+	attribute string name;
+
+	attribute string[] names;
+
+	attribute DummyInterface dummyInterfaceAttribute;
+
+	readonly attribute TestInterface selfReferenceAttrib;
+
+	<c++
+	inline int testCppBlock1()
+	{
+		return 1;
+	}
+	c++>
+
+	attribute DummyInterface[] dummyInterfaces;
+
+	void testInParameters( in float size, in TestEnum enumValue, in string text, in TestStruct testStruct, in DummyInterface dummyInterface, in int32[] intList, in DummyInterface[] interfaces );
+
+	void testOutParameters( out float size, out TestEnum enumValue, out string text, out TestStruct testStruct, out DummyInterface dummyInterface, out int32[] intList, out DummyInterface[] interfaces );
+
+	<c++
+	inline int testCppBlock2()
+	{
+		return 2;
+	}
+	c++>
+};

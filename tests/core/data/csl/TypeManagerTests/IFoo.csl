@@ -1,0 +1,4 @@
+interface IFoo
+{
+	attribute string name;
+};

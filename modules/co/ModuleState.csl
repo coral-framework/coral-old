@@ -1,0 +1,13 @@
+/*
+	Possible module states.
+ */
+enum ModuleState
+{
+	ModuleState_None,
+	ModuleState_Initialized,
+	ModuleState_Integrated,
+	ModuleState_PresentationIntegrated,
+	ModuleState_Disintegrated,
+	ModuleState_Disposed,
+	ModuleState_Aborted
+};

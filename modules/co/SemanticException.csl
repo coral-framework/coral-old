@@ -1,0 +1,2 @@
+// Raised in case of semantic inconsistencies (e.g. in a type definition; see the TypeCreationTransaction).
+exception SemanticException;

@@ -1,0 +1,4 @@
+interface UserClashWithPerson: DogOwner, Developer, Gamer, FutballPlayer
+{
+	string getName();
+};

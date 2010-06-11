@@ -1,0 +1,7 @@
+interface GreatGrandParent
+{
+	attribute string greatGrandParentName;
+};
+
+
+

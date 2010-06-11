@@ -1,0 +1,14 @@
+/*
+	Base interface for struct/interface/component members.
+ */
+interface MemberInfo
+{
+	// The name of the member (attribute, method, interface, etc.).
+	readonly attribute string name;
+
+	// The CompoundType that this member belongs to.
+	readonly attribute CompoundType owner;
+
+	// This member's index within its owner's \c members array.
+	readonly attribute uint32 index;
+};

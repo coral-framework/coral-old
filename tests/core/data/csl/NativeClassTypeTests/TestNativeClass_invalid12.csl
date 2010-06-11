@@ -1,0 +1,5 @@
+native banana TestNativeClass12 ( a::_ <a> ) 
+{
+attribute string[] a;	
+
+};

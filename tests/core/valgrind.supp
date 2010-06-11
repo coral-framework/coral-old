@@ -1,0 +1,15 @@
+
+{
+	google-glog-leaks
+	Memcheck:Leak
+	...
+	obj:*libglog*
+}
+
+{
+	google-gflags-leaks
+	Memcheck:Leak
+	...
+	obj:*libgflags*
+}
+

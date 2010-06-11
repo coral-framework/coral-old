@@ -1,0 +1,4 @@
+interface Person
+{
+	attribute string name;
+};

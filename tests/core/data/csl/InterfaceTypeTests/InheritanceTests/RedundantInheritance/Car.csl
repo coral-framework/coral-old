@@ -1,0 +1,6 @@
+interface Car 
+{
+	readonly attribute string carName;
+};
+
+

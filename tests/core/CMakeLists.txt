@@ -1,0 +1,86 @@
+################################################################################
+# About This Directory:
+#	tests/core contains unit tests for the classes that comprise the Coral
+#	core library.
+################################################################################
+
+PROJECT( TESTS_CORE )
+
+################################################################################
+# Build the tests_core executable
+################################################################################
+
+# Process subdirectories
+ADD_SUBDIRECTORY( tools )
+
+# Extract properties gathered from all subdirs
+GET_PROPERTY( HEADER_FILES DIRECTORY PROPERTY HEADER_FILES )
+GET_PROPERTY( SOURCE_FILES DIRECTORY PROPERTY SOURCE_FILES )
+
+# Gather files in the current directory
+FILE( GLOB _HEADER_FILES *.h )
+FILE( GLOB _SOURCE_FILES *.cpp )
+
+# Add source files in the current directory
+SET( HEADER_FILES ${_HEADER_FILES} ${HEADER_FILES} )
+SET( SOURCE_FILES ${_SOURCE_FILES} ${SOURCE_FILES} )
+
+# Pass the CORAL_PATH as a precompiler definition
+SET_PROPERTY( DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
+	"CORAL_PATH=\"${CMAKE_SOURCE_DIR}/modules,${CMAKE_CURRENT_SOURCE_DIR}/data/csl\""
+	"TESTS_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data\""
+)
+
+INCLUDE_DIRECTORIES(
+	${CORE_SOURCE_DIR}/generated
+	${CMAKE_SOURCE_DIR}/src
+	${GTEST_INCLUDE_DIRS}
+)
+
+ADD_EXECUTABLE( tests_core EXCLUDE_FROM_ALL ${HEADER_FILES} ${SOURCE_FILES} )
+
+SET_TARGET_PROPERTIES( tests_core PROPERTIES
+	PROJECT_LABEL "Tests - Core"
+)
+
+CORAL_TEST_TARGET_PROPERTIES( tests_core tests_core_EXECUTABLE )
+
+TARGET_LINK_LIBRARIES( tests_core
+	core
+	${GTEST_LIBRARIES}
+	${GFLAGS_LIBRARIES}
+)
+
+################################################################################
+# Register the test with CTest
+################################################################################
+
+FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output )
+ADD_TEST( tests_core ${tests_core_EXECUTABLE} --gtest_output=xml:../output/CoreTests.xml )
+
+################################################################################
+# Try to setup an extra memory-check test using Valgrind
+################################################################################
+FIND_PROGRAM( VALGRIND_COMMAND valgrind )
+IF( VALGRIND_COMMAND )
+	ADD_TEST( MemoryCheck ${VALGRIND_COMMAND}
+		--leak-check=full --show-reachable=yes --num-callers=15
+		--log-file=${CMAKE_BINARY_DIR}/valgrind.log --error-exitcode=13 --suppressions=${CMAKE_SOURCE_DIR}/tests/core/valgrind.supp ${tests_core_EXECUTABLE} )
+ELSE()
+	MESSAGE( "WARNING: Valgrind was NOT FOUND, unable to set up a memory check test." )
+ENDIF()
+
+################################################################################
+# Source Groups
+################################################################################
+
+FILE( GLOB testsFiles ${CMAKE_CURRENT_SOURCE_DIR}/*Tests.cpp )
+SOURCE_GROUP( "Core Tests" FILES ${testsFiles} )
+
+FILE( GLOB toolsFiles ${CMAKE_CURRENT_SOURCE_DIR}/tools/*.cpp )
+SOURCE_GROUP( "Tools Tests" FILES ${toolsFiles} )
+
+FILE( GLOB miscFiles ${CMAKE_CURRENT_SOURCE_DIR}/*.h ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp )
+LIST( REMOVE_ITEM miscFiles ${testsFiles} )
+
+SOURCE_GROUP( "@Misc" FILES ${miscFiles} )

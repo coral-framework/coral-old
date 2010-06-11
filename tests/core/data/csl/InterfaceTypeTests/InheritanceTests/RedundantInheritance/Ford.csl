@@ -1,0 +1,6 @@
+interface Ford : Car
+{
+	readonly attribute string fordName;
+};
+
+

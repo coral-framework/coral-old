@@ -1,0 +1,4 @@
+interface BallSport : Sport
+{
+	attribute bool indoor;
+};

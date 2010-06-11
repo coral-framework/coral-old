@@ -1,0 +1,7 @@
+// invalid inheritance sice Fiat is a subtype of Car
+interface FirstInheritanceIsSubtypeOftheSecond : Fiat, Car
+{
+	readonly attribute string unoName;
+};
+
+

@@ -1,0 +1,7 @@
+/*
+	Component that implements co.InterfaceType.
+ */
+component InterfaceTypeComponent
+{
+	provides InterfaceType type;
+};

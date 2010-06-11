@@ -1,0 +1,10 @@
+// This is the starting type which will call a dependency type 
+// and will fill the docmap too.
+
+interface StartingType 
+{
+	// this will cause load on the denpendency, and will fill its doc info.
+	attribute DependencyType dep;
+
+	
+};

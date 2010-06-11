@@ -1,0 +1,4 @@
+struct DependencieOfYetAnotherInterface
+{
+	string name;
+};

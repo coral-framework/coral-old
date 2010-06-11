@@ -1,0 +1,4 @@
+interface User: DogOwner, Developer, Gamer, FutballPlayer
+{
+	
+};

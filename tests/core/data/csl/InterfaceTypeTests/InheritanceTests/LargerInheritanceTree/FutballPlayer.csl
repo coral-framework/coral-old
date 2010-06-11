@@ -1,0 +1,4 @@
+interface FutballPlayer : Primitives.SportPlayer
+{
+	attribute string position;
+};

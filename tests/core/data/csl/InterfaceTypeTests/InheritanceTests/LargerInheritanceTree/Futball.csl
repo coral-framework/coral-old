@@ -1,0 +1,4 @@
+interface Futball : Primitives.BallSport
+{
+	attribute bool fieldMatch;
+};

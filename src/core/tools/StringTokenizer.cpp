@@ -1,0 +1,41 @@
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
+
+#include "StringTokenizer.h"
+
+namespace co {
+
+StringTokenizer::StringTokenizer( const std::string& str, const std::string& delimiters )
+	: _str( str ), _delimiters( delimiters )
+{
+	_offset = 0;
+}
+
+bool StringTokenizer::nextToken()
+{
+	// skip delimiters at beginning
+	std::size_t startPos = _str.find_first_not_of( _delimiters, _offset );
+	if( startPos == std::string::npos )
+	{
+		_offset = _str.length();
+		return false;
+	}
+
+	// find first delimiter after startPos
+	std::size_t endPos = _str.find_first_of( _delimiters, startPos );
+	if( endPos == std::string::npos )
+	{
+		_token = _str.substr( startPos );
+		_offset = _str.length();
+		return true;
+	}
+
+	_token = _str.substr( startPos, endPos - startPos );
+	_offset = endPos;
+
+	return true;
+}
+
+} // namespace co

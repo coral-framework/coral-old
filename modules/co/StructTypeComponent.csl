@@ -1,0 +1,7 @@
+/*
+	Component that implements co.StructType.
+ */
+component StructTypeComponent
+{
+	provides StructType type;
+};

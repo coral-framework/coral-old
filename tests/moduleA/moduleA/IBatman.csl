@@ -1,0 +1,4 @@
+interface IBatman : IHuman, IBat
+{
+	void fightCrime();
+};

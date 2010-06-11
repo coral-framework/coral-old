@@ -1,0 +1,8 @@
+interface Table
+{
+	attribute int32 width;
+	attribute int32 height;
+	attribute int32 depth;
+};
+
+

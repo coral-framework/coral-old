@@ -1,0 +1,30 @@
+/*
+	Identifies and loads a ModulePart from a certain kind of artifact in a module's directory.
+
+	Please notice that module names are fully-qualified namespace names, which when combined
+	with the list of type repositories indicate a set of directories in the file system.
+ */
+interface ModulePartLoader
+{
+	/*
+		Returns whether the specified module's dir contains an artifact that can be loaded by this ModulePartLoader.
+	 */
+	bool canLoadModulePart( in string moduleName );
+
+	/*
+		Returns a ModulePart loaded from an artifact found in the specified module's dir.
+		This method assumes canLoadModulePart() was called and returned true for the passed moduleName.
+		Any exception raised by this method will force the module's abortion.
+	 */
+	ModulePart loadModulePart( in string moduleName );
+
+	/*
+		Performs any cleanup task associated with the unloading of a ModulePart that was
+		created by this loader.
+
+		When this method is called, the ModulePart's dispose() method will already have
+		been called. Also, all references from the core to the ModulePart would already
+		have been released (hence the ModulePart may have been destroyed).
+	 */
+	void unloadModulePart( in string moduleName );
+};

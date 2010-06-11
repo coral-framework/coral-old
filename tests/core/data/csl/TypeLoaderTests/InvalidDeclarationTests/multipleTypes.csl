@@ -1,0 +1,12 @@
+// this is the first specification
+interface multipleTypes
+{
+	attribute string foo;
+};
+
+// this is the second specification
+interface secondType
+{
+	attribute string foo;
+};
+

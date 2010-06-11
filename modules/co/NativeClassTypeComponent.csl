@@ -1,0 +1,7 @@
+/*
+	Component that implements co.NativeClassType.
+ */
+component NativeClassTypeComponent
+{
+	provides NativeClassType type;
+};

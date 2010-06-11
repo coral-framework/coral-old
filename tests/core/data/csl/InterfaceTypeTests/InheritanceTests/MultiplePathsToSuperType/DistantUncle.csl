@@ -1,0 +1,7 @@
+interface DistantUncle : DistantGrandParent
+{
+	attribute string distantUncleName;
+};
+
+
+

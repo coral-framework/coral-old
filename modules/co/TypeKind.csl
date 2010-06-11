@@ -1,0 +1,27 @@
+/*
+	Enumeration containing all kinds of Types available in Coral.
+ */
+enum TypeKind
+{	
+	TK_NONE,			//< Invalid type kind.
+	TK_ANY,				//< The special 'any' (variant) type.
+	TK_BOOLEAN,			//< Boolean value; either true or false.
+	TK_INT8,			//< 8-bit signed integer.
+	TK_UINT8,			//< 8-bit unsigned integer.
+	TK_INT16,			//< 16-bit signed integer.
+	TK_UINT16,			//< 16-bit unsigned integer.
+	TK_INT32,			//< 32-bit signed integer.
+	TK_UINT32,			//< 32-bit unsigned integer.
+	TK_INT64,			//< 64-bit signed integer.
+	TK_UINT64,			//< 64-bit unsigned integer.
+	TK_FLOAT,			//< 32-bit (single-precision) IEEE 754 floating-point number.
+	TK_DOUBLE,			//< 64-bit (double-precision) IEEE 754 floating-point number.
+	TK_STRING,			//< 8-bit-clean string, encoded in ISO Latin-1.
+	TK_ARRAY,			//< Unidimensional array of elements.
+	TK_ENUM,			//< Enumeration of constant identifiers.
+	TK_EXCEPTION,		//< Named exception that can be thrown by methods.
+	TK_STRUCT,			//< A set of named fields of various types.
+	TK_NATIVECLASS,		//< Native class type.
+	TK_INTERFACE,		//< Interface type/pointer.
+	TK_COMPONENT		//< Concrete component type.
+};

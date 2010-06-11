@@ -1,0 +1,4 @@
+interface methodParameter : valueType
+{
+	attribute string name;
+};

@@ -1,0 +1,4 @@
+interface providedInterface
+{
+	attribute string foo;
+};

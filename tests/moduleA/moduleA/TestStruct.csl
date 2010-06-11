@@ -1,0 +1,12 @@
+struct TestStruct
+{
+	int8 anInt8;
+	int16 anInt16;
+
+	TestEnum testEnum;
+	co.Type aType;
+
+	float[] floatArray;
+	TestEnum[] enumArray;
+	co.Type[] typeArray;
+};

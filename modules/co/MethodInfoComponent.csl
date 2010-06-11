@@ -1,0 +1,7 @@
+/*
+	Component that implements co.MethodInfo.
+ */
+component MethodInfoComponent
+{
+	provides MethodInfo methodInfo;
+};

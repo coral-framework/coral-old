@@ -1,0 +1,2 @@
+// Raised to indicate that the requested interface is not available.
+exception NoSuchInterfaceException;

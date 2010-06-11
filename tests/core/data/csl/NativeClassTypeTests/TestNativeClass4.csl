@@ -1,0 +1,6 @@
+native 
+class TestNativeClass4 ( a::a <ba> ) 
+{
+attribute string[] a;	
+
+};

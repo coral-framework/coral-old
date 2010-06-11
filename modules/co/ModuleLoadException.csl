@@ -1,0 +1,2 @@
+// Raised to indicate an error while loading a module.
+exception ModuleLoadException;

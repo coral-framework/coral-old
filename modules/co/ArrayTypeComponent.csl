@@ -1,0 +1,7 @@
+/*
+	Component that implements co.ArrayType.
+ */
+component ArrayTypeComponent
+{
+	provides ArrayType type;
+};

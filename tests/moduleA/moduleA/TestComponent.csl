@@ -1,0 +1,11 @@
+component TestComponent
+{
+	provides TestInterface testInterface;
+
+	// dummy co.TypeCreationTransaction implementation, just to test cross-module inheritance
+	provides co.TypeCreationTransaction transaction;
+
+	// test 'requires'
+	requires co.Type type;
+	requires co.InterfaceType itfType;
+};

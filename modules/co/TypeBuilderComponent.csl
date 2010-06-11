@@ -1,0 +1,7 @@
+/*
+	Component that implements co.TypeBuilder.
+ */
+component TypeBuilderComponent
+{
+	provides TypeBuilder typeBuilder;
+};

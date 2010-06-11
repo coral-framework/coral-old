@@ -1,0 +1,7 @@
+/*
+	Component that implements co.AttributeInfo.
+ */
+component AttributeInfoComponent
+{
+	provides AttributeInfo attributeInfo;
+};

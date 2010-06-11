@@ -1,0 +1,6 @@
+component testComponent
+{
+	provides providedInterface providedInterface;
+
+	requires requiredInterface requiredInterface;
+};

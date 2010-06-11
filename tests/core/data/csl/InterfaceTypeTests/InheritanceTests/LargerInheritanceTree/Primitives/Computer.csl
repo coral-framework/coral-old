@@ -1,0 +1,4 @@
+interface Computer
+{
+ 	attribute ComputerType type;
+};

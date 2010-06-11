@@ -1,0 +1,4 @@
+interface TestInterface 
+{
+	attribute string name;
+};

@@ -1,0 +1,6 @@
+interface Fiat : Car
+{
+	readonly attribute string fiatName;
+};
+
+

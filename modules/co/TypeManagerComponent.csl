@@ -1,0 +1,7 @@
+/*
+	Component that implements co.TypeManager.
+ */
+component TypeManagerComponent
+{
+	provides TypeManager typeManager;
+};

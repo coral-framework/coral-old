@@ -1,0 +1,5 @@
+interface SuperInterfaceClash1
+{
+	void getName();
+};
+

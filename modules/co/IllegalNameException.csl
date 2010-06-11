@@ -1,0 +1,2 @@
+// Raised to indicate that a method has been passed an illegal name.
+exception IllegalNameException;

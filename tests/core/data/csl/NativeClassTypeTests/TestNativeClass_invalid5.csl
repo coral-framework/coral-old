@@ -1,0 +1,5 @@
+native class TestNativeClass_invalid5 ( ) 
+{
+attribute string[] a;
+
+};

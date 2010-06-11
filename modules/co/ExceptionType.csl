@@ -1,0 +1,6 @@
+/*
+	Named exception that can be thrown by methods.
+ */
+interface ExceptionType : Type
+{
+};

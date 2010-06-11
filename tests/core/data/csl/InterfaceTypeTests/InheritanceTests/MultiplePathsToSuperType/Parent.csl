@@ -1,0 +1,7 @@
+interface Parent : GrandParent
+{
+	attribute string parentName;
+};
+
+
+

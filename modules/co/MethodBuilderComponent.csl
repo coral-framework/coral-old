@@ -1,0 +1,7 @@
+/*
+	Component that implements co.MethodBuilder.
+ */
+component MethodBuilderComponent
+{
+	provides MethodBuilder methodBuilder;
+};

@@ -1,0 +1,4 @@
+interface yetAnotherInterface
+{
+	attribute DependencieOfYetAnotherInterface foo;
+};

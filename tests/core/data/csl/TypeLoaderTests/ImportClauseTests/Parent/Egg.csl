@@ -1,0 +1,6 @@
+import TypeLoaderTests.ImportClauseTests.Chicken;
+
+interface Egg
+{
+	attribute string eggName;
+};

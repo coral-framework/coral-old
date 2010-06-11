@@ -1,0 +1,9 @@
+// This test interface should raise an exeption as the attribute setter 
+//clashes with the name of the method.
+interface methodAndAttributeSetter 
+{
+	void setAddress();
+	attribute string address;
+};
+
+

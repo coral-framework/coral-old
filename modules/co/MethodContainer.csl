@@ -1,0 +1,8 @@
+/*
+	Interface for types that may have attributes.
+ */
+interface MethodContainer
+{	
+	// List of all member methods.
+	readonly attribute MethodInfo[] memberMethods;
+};

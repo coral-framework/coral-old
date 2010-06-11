@@ -1,0 +1,7 @@
+interface valueType 
+{
+	attribute string value;
+
+	// this type was already visited in the first level, and should not be visited again.
+	attribute testEnum foo;
+};

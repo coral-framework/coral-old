@@ -1,0 +1,4 @@
+interface Gamer : ComputerUser
+{
+	readonly attribute string favoriteGame;
+};

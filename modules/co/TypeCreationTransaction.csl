@@ -1,0 +1,25 @@
+/*
+	Transaction for creating a set of inter-dependent Coral types atomically.
+ */
+interface TypeCreationTransaction
+{
+	readonly attribute TypeBuilder[] typeBuilders;
+
+	/*
+		Effectively creates all types associated with this transaction, registering them with the TypeManager.
+
+		This validates any unvalidated type, which includes checking for missing data and semantic errors.
+		If any type fails any of the checks, an exception is thrown and the user is expected to call rollback().
+
+		\throw MissingInputException if any type is missing required input.
+		\throw SemanticException if one or more of the types contain semantic errors (e.g. cyclic inheritance).
+		\throw UnsupportedOperationException if a commit was already attempted, or if the transaction was rolled back.
+	 */
+	void commit() raises MissingInputException, UnsupportedOperationException;
+
+	/*
+		Destroys and removes all references to partially created types associated with this transaction.
+		\throw UnsupportedOperationException if the transaction is already dead (i.e. committed or rolled back).
+	 */
+	void rollback();
+};

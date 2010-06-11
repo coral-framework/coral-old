@@ -1,0 +1,7 @@
+interface Uncle : GrandParent
+{
+	attribute string uncleName;
+};
+
+
+

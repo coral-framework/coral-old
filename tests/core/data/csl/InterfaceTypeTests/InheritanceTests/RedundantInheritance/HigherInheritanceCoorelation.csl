@@ -1,0 +1,7 @@
+// invalid inheritance sice Uno is already a subtype of Car
+interface HigherInheritanceCoorelation : Car, Uno
+{
+	readonly attribute string unoName;
+};
+
+

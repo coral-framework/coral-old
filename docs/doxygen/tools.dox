@@ -1,0 +1,10 @@
+/*!
+
+\page tools Ferramentas
+
+Ferramentas para auxiliar no processo de desenvolvimento de aplicações com o Coral.
+
+- \subpage compiler
+- \subpage cmake
+
+*/

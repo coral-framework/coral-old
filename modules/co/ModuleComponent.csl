@@ -1,0 +1,7 @@
+/*
+	Component that implements co.Module.
+ */
+component ModuleComponent
+{
+	provides Module module;
+};

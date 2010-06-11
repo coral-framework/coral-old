@@ -1,0 +1,38 @@
+/*
+	The co.Component interface, implemented by all components.
+ */
+interface Component
+{
+	// Object providing type introspection for this component.
+	readonly attribute ComponentType componentType;
+
+	<c++
+		/*!
+			<tt>getProvided<T>()</tt>: convenience method that returns the instance of an interface 'T' provided
+			by this component. Please notice that this method only works for statically-defined components.
+			It will not retrieve proxy interfaces from dynamic components (such as those implemented in Lua).
+		 */
+		template<typename T> inline T* getProvided() { return dynamic_cast<T*>( this ); }
+	c++>
+
+	/*
+		Retrieves the interface instance "provided by" or "connected to" one of the component's interfaces.
+
+		If \c interfaceInfo identifies a \e server interface, this method returns the corresponding interface
+		instance <em>provided by</em> this component. Otherwise, if \c interfaceInfo is a \e client interface,
+		this method returns the server interface that is <em>connected to</em> the client interface (in this
+		case, the returned value is null if no server interface is currently bound to the client interface).
+
+		\throw NoSuchInterfaceException if \c interfaceInfo is not a valid interface of this component.
+	 */
+	Interface getInterface( in InterfaceInfo interfaceInfo ) raises NoSuchInterfaceException;
+
+	/*
+		Connects the given server interface instance to a client interface of this component.
+		If an interface instance is already bound to the client interface, it is replaced by the new \c instance.
+		\throw NoSuchInterfaceException if \c clientInterface is not a valid client interface of this component.
+		\throw IllegalArgumentException if the passed \c instance is incompatible with the client interface.
+	 */
+	void bindInterface( in InterfaceInfo clientInterface, in Interface instance )
+		raises NoSuchInterfaceException, IllegalArgumentException;
+};

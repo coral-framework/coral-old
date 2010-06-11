@@ -1,0 +1,6 @@
+interface Uno : Fiat
+{
+	readonly attribute string unoName;
+};
+
+

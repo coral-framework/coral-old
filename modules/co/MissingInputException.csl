@@ -1,0 +1,2 @@
+// Raised to indicate that some input is still missing in order to complete an operation.
+exception MissingInputException;
