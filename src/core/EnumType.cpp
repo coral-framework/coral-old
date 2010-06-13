@@ -23,7 +23,7 @@ co::ArrayRange<std::string const> EnumType::getIdentifiers()
 
 co::int32 EnumType::getValueOf( const std::string& identifier )
 {
-	co::int32 count = _identifiers.size();
+	co::int32 count = static_cast<co::int32>( _identifiers.size() );
 	for( co::int32 i = 0; i < count; ++i )
 	{
 		if( identifier == _identifiers[i] )

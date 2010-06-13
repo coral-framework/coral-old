@@ -53,10 +53,10 @@ void InterfaceType::updateAncestors()
 {
 	if( !_ancestors.empty() )
 		return;
-	
+
 	// add all ancestors from super-interfaces
-	unsigned int count = _superInterfaces.size();
-	for( unsigned int i = 0; i < count; ++i )
+	std::size_t count = _superInterfaces.size();
+	for( std::size_t i = 0; i < count; ++i )
 	{
 		co::InterfaceType* super = _superInterfaces[i];
 		_ancestors.push_back( super );

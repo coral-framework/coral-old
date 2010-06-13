@@ -63,7 +63,7 @@ public:
 			pos = 0;
 			return false;
 		}
-		return sortedFind( key, compare, 0, this->size() - 1, pos );
+		return sortedFind( key, compare, 0, static_cast<int>( this->size() ) - 1, pos );
 	}
 	//@}
 

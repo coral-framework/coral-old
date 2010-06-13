@@ -52,8 +52,8 @@ void AttributeAndMethodContainer::sortMembers( co::CompoundType* owner )
 	std::sort( _members.begin(), _members.end(), typeThenNameMemberInfoComparator );
 
 	// notify members about their owner/index
-	size_t count = _members.size();
-	for( size_t i = 0; i < count; ++i )
+	co::int32 count = static_cast<co::int32>( _members.size() );
+	for( co::int32 i = 0; i < count; ++i )
 	{
 		MemberInfoImpl* mii = dynamic_cast<MemberInfoImpl*>( _members[i].get() );
 		assert( mii );
@@ -81,7 +81,7 @@ co::MemberInfo* AttributeAndMethodContainer::getMember( const std::string& name 
 		return _members[pos].get();
 
 	// if it's not an attribute, look for a method
-	co::int32 membersSize = _members.size();
+	co::int32 membersSize = static_cast<co::int32>( _members.size() );
 	if( _firstMethodPos < membersSize && _members.sortedFind( name, memberInfoComparator, _firstMethodPos, membersSize - 1, pos ) )
 		return _members[pos].get();
 
@@ -113,7 +113,7 @@ co::ArrayRange<co::MethodInfo* const> AttributeAndMethodContainer::getMemberMeth
 {
 	assert( _firstMethodPos >= 0 );
 
-	co::int32 membersSize = _members.size();
+	co::int32 membersSize = static_cast<co::int32>( _members.size() );
 	if( _firstMethodPos >= membersSize )
 		return co::ArrayRange<co::MethodInfo* const>();
 

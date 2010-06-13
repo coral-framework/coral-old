@@ -2,7 +2,7 @@ syntax: glob
 
 *.swp
 .DS_Store
-/@*/
-/build/
-/Release/
-/Debug/
+@*
+build
+Release
+Debug

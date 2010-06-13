@@ -112,16 +112,16 @@ void init( Context* context )
 
 
 /* Run your data through this. */
-void update( Context* context, const uint8* data, const std::size_t length )
+void update( Context* context, const uint8* data, const uint32 length )
 {
-	std::size_t j = ( context->count[0] >> 3 ) & 63;
-
+	uint32 j = ( context->count[0] >> 3 ) & 63;
+	
 	if( ( context->count[0] += length << 3 ) < ( length << 3 ) )
 		context->count[1]++;
 
 	context->count[1] += ( length >> 29 );
 
-	std::size_t i = 0;
+	uint32 i = 0;
 	if( ( j + length ) > 63 )
 	{
 		i = 64 - j;

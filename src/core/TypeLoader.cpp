@@ -206,8 +206,8 @@ Type* TypeLoader::loadDependency( const std::string& typeName )
 		return NULL;
 
 	// convert slashes to dots in foundFilePath
-	unsigned int length = foundFilePath.length();
-	for( unsigned int i = 0; i < length; ++i )
+	std::size_t length = foundFilePath.length();
+	for( std::size_t i = 0; i < length; ++i )
 	{
 		if( foundFilePath[i] == '/' )
 			foundFilePath[i] = '.';

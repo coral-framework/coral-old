@@ -29,7 +29,7 @@ struct Context
 const uint8 DIGEST_SIZE = 20;
 
 void init( Context* context );
-void update( Context* context, const uint8* data, const std::size_t length );
+void update( Context* context, const uint8* data, const uint32 length );
 void final( Context* context, uint8 digest[DIGEST_SIZE] );
 
 } // namespace sha1

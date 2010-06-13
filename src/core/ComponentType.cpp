@@ -51,8 +51,8 @@ void ComponentType::sortInterfaces()
 	std::sort( _interfaces.begin(), _interfaces.end(), clientThenNameInterfaceInfoComparator );
 
 	// notify members about their owner/index
-	unsigned int count = _interfaces.size();
-	for( unsigned int i = 0; i < count; ++i )
+	co::int32 count = static_cast<co::int32>( _interfaces.size() );
+	for( co::int32 i = 0; i < count; ++i )
 	{
 		MemberInfoImpl* mii = dynamic_cast<MemberInfoImpl*>( _interfaces[i].get() );
 		assert( mii );
@@ -80,7 +80,7 @@ co::MemberInfo* ComponentType::getMember( const std::string& name )
 		return _interfaces[pos].get();
 	
 	// if it's not an attribute, look for a method
-	co::int32 interfacesSize = _interfaces.size();
+	co::int32 interfacesSize = static_cast<co::int32>( _interfaces.size() );
 	if( _firstProvidedPos < interfacesSize && _interfaces.sortedFind( name, interfaceInfoComparator, _firstProvidedPos, interfacesSize - 1, pos ) )
 		return _interfaces[pos].get();
 	
@@ -106,7 +106,7 @@ co::ArrayRange<co::InterfaceInfo* const> ComponentType::getServerInterfaces()
 {
 	assert( _firstProvidedPos >= 0 );
 
-	co::int32 interfacesSize = _interfaces.size();
+	co::int32 interfacesSize = static_cast<co::int32>( _interfaces.size() );
 	if( _firstProvidedPos >= interfacesSize )
 		return co::ArrayRange<co::InterfaceInfo* const>();
 

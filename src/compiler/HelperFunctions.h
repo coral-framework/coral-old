@@ -10,8 +10,8 @@
 
 inline void convertSeparators( std::string& str, char sep, char newSep )
 {
-	unsigned int len = str.length();
-	for( unsigned int i = 0; i < len; ++i )
+	std::size_t len = str.length();
+	for( std::size_t i = 0; i < len; ++i )
 		if( str[i] == sep )
 			str[i]  = newSep;
 }
@@ -33,7 +33,7 @@ inline void concatenate( const std::string& s1, const std::string& s2, const std
 inline std::string getCppName( const std::string& coralName )
 {
 	std::string cppName( coralName );
-	for( unsigned int i = 0; i < cppName.length(); ++i )
+	for( std::size_t i = 0; i < cppName.length(); ++i )
 		if( cppName[i] == '.' )
 			cppName.replace( i, 1, "::" );
 	return cppName;

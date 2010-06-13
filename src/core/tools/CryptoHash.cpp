@@ -9,6 +9,10 @@
 #include <cassert>
 #include <sstream>
 
+#ifdef UINT32_MAX
+#undef UINT32_MAX
+#endif
+
 namespace co {
 
 /************************************************************************/
@@ -21,7 +25,7 @@ public:
 	virtual ~CryptoHashAlgorithm()
 	{;}
 
-	virtual void addData( const uint8* data, int length ) = 0;
+	virtual void addData( const uint8* data, std::size_t length ) = 0;
 	virtual void getResult( CryptoHash::Result& res ) const = 0;
 
 	virtual void reset() = 0;
@@ -53,10 +57,11 @@ public:
 		//empty;
 	}
 
-	virtual void addData( const uint8* data, int length )
+	virtual void addData( const uint8* data, std::size_t length )
 	{
 		assertNoResult();
-		sha1::update( &_ctx, data, length );
+		assert( length < co::UINT32_MAX );
+		sha1::update( &_ctx, data, static_cast<co::uint32>( length ) );
 	}
 
 	virtual void getResult( CryptoHash::Result& res ) const
@@ -126,7 +131,7 @@ void CryptoHash::Result::toUuid( Uuid& uuid )
 	uuid.set( data.bytes, Uuid::Sha1 );
 }
 
-void CryptoHash::addData( const uint8* data, int length )
+void CryptoHash::addData( const uint8* data, std::size_t length )
 {
 	_algorithm->addData( data, length );
 }

@@ -242,8 +242,8 @@ void TypeDictionaryBuilder::fillForwardDeclarations()
 	{
 		// reflectors must actually include forward-declared types
 		std::string filename;
-		unsigned int count = _forwardDeclarations.size();
-		for( unsigned int i = 0; i < count; ++i )
+		std::size_t count = _forwardDeclarations.size();
+		for( std::size_t i = 0; i < count; ++i )
 		{
 			ctemplate::TemplateDictionary* headerList = _dict->AddSectionDictionary( "FW_DECL_LIST" );
 			filename = _forwardDeclarations[i]->getFullName();
@@ -261,8 +261,8 @@ void TypeDictionaryBuilder::fillNestedForwardDecls()
 
 	std::vector<co::Namespace*> typeNamespaces;
 
-	unsigned int count = _forwardDeclarations.size();
-	for( unsigned int i = 0; i < count; ++i )
+	std::size_t count = _forwardDeclarations.size();
+	for( std::size_t i = 0; i < count; ++i )
 	{
 		co::Type* type = _forwardDeclarations[i];
 		co::Namespace* ns = type->getNamespace();
@@ -285,8 +285,8 @@ void TypeDictionaryBuilder::fillNestedForwardDecls()
 			assert( forwardDeclStack[0].ns == typeNamespaces.back() );
 
 			// skip the common namespace levels
-			unsigned int commonLevels = 1;
-			for( unsigned int k = typeNamespaces.size() - 2; k > 0; --k )
+			std::size_t commonLevels = 1;
+			for( std::size_t k = typeNamespaces.size() - 2; k > 0; --k )
 			{
 				if( k >= count || typeNamespaces[k] != forwardDeclStack[commonLevels].ns )
 					break;
@@ -399,7 +399,7 @@ void TypeDictionaryBuilder::fillStructData( co::StructType* structType )
 
 	if( _mode == Mode_Mapping )
 	{
-		unsigned int fieldCount = attributes.getSize();
+		std::size_t fieldCount = attributes.getSize();
 
 		// first we must estimate the sizes of the struct's fields
 		std::vector<AttributeSize> fields;
@@ -414,7 +414,7 @@ void TypeDictionaryBuilder::fillStructData( co::StructType* structType )
 		std::sort( fields.begin(), fields.end() );
 
 		std::string typeName;
-		for( unsigned int i = 0; i < fieldCount; ++i )
+		for( std::size_t i = 0; i < fieldCount; ++i )
 		{
 			const AttributeSize& field = fields[i];
 
@@ -529,7 +529,7 @@ void computeAmbiguousBases( co::InterfaceType* itf, AmbiguousBases& res )
 	std::sort( res.begin(), res.end() );
 
 	co::InterfaceType* lastBase = 0;
-	for( unsigned int i = res.size() - 1; i > 0; --i )
+	for( std::size_t i = res.size() - 1; i > 0; --i )
 	{
 		AmbiguousBase& next = res[i - 1];
 		AmbiguousBase& current = res[i];
@@ -562,8 +562,8 @@ void TypeDictionaryBuilder::fillInterfaceData( co::InterfaceType* interfaceType 
 			_dict->ShowSection( "HAS_AMBIGUOUS_BASES" );
 			_dict->SetValue( "FIRST_SUPERTYPE", getCppName( superTypes.getFirst() ) );
 
-			unsigned int count = ambiguousBases.size();
-			for( unsigned int i = 0; i < count; ++i )
+			std::size_t count = ambiguousBases.size();
+			for( std::size_t i = 0; i < count; ++i )
 			{
 				AmbiguousBase& ab = ambiguousBases[i];
 				ctemplate::TemplateDictionary* baseDict = _dict->AddSectionDictionary( "AMBIGUOUS_BASE_LIST" );
@@ -706,7 +706,7 @@ void TypeDictionaryBuilder::fillMethods( co::MethodContainer* mc, ctemplate::Tem
 		co::ArrayRange<co::ParameterInfo* const> parameters = mi->getParameters();
 
 		if( _mode == Mode_Code )
-			methodDict->SetIntValue( "PARAMETER_COUNT", parameters.getSize() );
+			methodDict->SetIntValue( "PARAMETER_COUNT", static_cast<int>( parameters.getSize() ) );
 
 		methodDict->ShowSection( parameters.isEmpty() ? "HAS_PARAMETERS_FALSE" : "HAS_PARAMETERS_TRUE" );
 

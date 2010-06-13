@@ -44,15 +44,15 @@ void MappingGenerator::computeDir( co::Type* type, std::string& dir )
 {
 	const std::string& ns = type->getNamespace()->getFullName();
 	
-	unsigned int mappingsDirLen = _mappingsDir.length();
-	unsigned int totalLen = mappingsDirLen + ns.length() + 1;
+	std::size_t mappingsDirLen = _mappingsDir.length();
+	std::size_t totalLen = mappingsDirLen + ns.length() + 1;
 
 	dir.reserve( totalLen + 1 );
 	dir = _mappingsDir;
 	dir += '/';
 	dir += ns;
 
-	for( unsigned int i = mappingsDirLen + 1; i < totalLen; ++i )
+	for( std::size_t i = mappingsDirLen + 1; i < totalLen; ++i )
 		if( dir[i] == '.' )
 			dir[i] = '/';
 }

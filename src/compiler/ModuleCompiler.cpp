@@ -49,7 +49,7 @@ ModuleCompiler::ModuleCompiler( const std::string& moduleName, const std::string
 	_customModulePartDefined = false;
 
 	_moduleDirPath = _moduleName;
-	for( unsigned int i = 0; i < _moduleDirPath.length(); ++i )
+	for( std::size_t i = 0; i < _moduleDirPath.length(); ++i )
 		if( _moduleDirPath[i] == '.' )
 			_moduleDirPath[i] = '/';
 }
@@ -130,8 +130,8 @@ void ModuleCompiler::initialize()
 		std::vector<std::string> files;
 		dir.getEntryList( files );
 
-		unsigned int fileCount = files.size();
-		for( unsigned int i = 0; i < fileCount; ++i )
+		std::size_t fileCount = files.size();
+		for( std::size_t i = 0; i < fileCount; ++i )
 		{
 			const std::string& filename = files[i];
 

@@ -81,7 +81,7 @@ private:
 	std::string _path;
 
 	int _readFlag;
-	long _fileId;
+	intptr_t _fileId;
 	std::string _pattern;
 	struct _finddata_t _fileHandle;
 };
@@ -160,11 +160,11 @@ static bool isRootPath( const std::string& path )
 static void normalizeSeparators( std::string& s )
 {
 	// search for repeated slashes
-	int size = s.length();
+	std::size_t size = s.length();
 	bool found = false;
 
 	// this method is O(n), each while is complementary
-	int i = 0;
+	std::size_t i = 0;
 	while( i < size )
 	{
 		if( s[i] == '\\' )
@@ -180,10 +180,10 @@ static void normalizeSeparators( std::string& s )
 		}
 		++i;
 	}
+
 	if( found )
 	{
-
-		for( unsigned int i = 0; i < s.length(); ++i )
+		for( std::size_t i = 0; i < s.length(); ++i )
 		{
 			// replaces namespace separator with the folder separator
 			if( s[i] == '\\' )
@@ -370,7 +370,7 @@ bool Dir::makePath( const std::string& dirPath )
 	std::string path = cleanPath( dirPath );
 
 	// the position to the current '/'
-	int currentPos = 0;
+	std::size_t currentPos = 0;
 #ifdef CORAL_OS_UNIX
 	// absolute path contains a '/' at first pos, under unix.
 	if( isAbsolutePath( path ) )
@@ -381,7 +381,7 @@ bool Dir::makePath( const std::string& dirPath )
 	path += '/';
 
 	// O(n), search for each '/' that delimits subpaths
-	while( ( currentPos = path.find( '/', currentPos ) ) != -1 )
+	while( ( currentPos = path.find( '/', currentPos ) ) != std::string::npos )
 	{
 		std::string subPath( path.data(), currentPos );
 		// do not stop if some dir already exists.. keep creating
