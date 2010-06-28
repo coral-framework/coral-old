@@ -14,6 +14,7 @@
 #include <co/CompoundType.h>
 #include <co/AttributeInfo.h>
 #include <co/ModuleManager.h>
+#include <co/ServiceManager.h>
 #include <co/LifeCycleException.h>
 #include <co/TypeCreationTransaction.h>
 #include <co/IllegalArgumentException.h>
@@ -65,8 +66,6 @@ TEST( ModuleTests, setupSystemRequiringModuleB )
 
 TEST( ModuleTests, systemAndModuleLifeCycles )
 {
-	// TODO test system life cycle transitions and module syncs
-
 	// fully restart the system
 	co::shutdown();
 	co::System* system = co::getSystem();
@@ -131,14 +130,14 @@ TEST( ModuleTests, systemAndModuleLifeCycles )
 TEST( ModuleTests, crossModuleInheritance )
 {
 	// instantiate a component from 'moduleA' that implements an interface from 'co'
-	co::Component* component = co::newInstance( "moduleA.TestComponent" );
+	co::RefPtr<co::Component> component = co::newInstance( "moduleA.TestComponent" );
 
 	// exercise dynamic_casts
 	moduleA::TestInterface* ti = component->getProvided<moduleA::TestInterface>();
-	EXPECT_EQ( component, ti->getInterfaceOwner() );
+	EXPECT_EQ( component.get(), ti->getInterfaceOwner() );
 
 	co::TypeCreationTransaction* tct = component->getProvided<co::TypeCreationTransaction>();
-	EXPECT_EQ( component, tct->getInterfaceOwner() );
+	EXPECT_EQ( component.get(), tct->getInterfaceOwner() );
 }
 
 TEST( ModuleTests, crossModuleReflection )
@@ -180,7 +179,7 @@ TEST( ModuleTests, crossModuleReflection )
 	instanceAny.set( garbage );
 	try
 	{
-		reflector->getAttribute( instanceAny, anInt8Attrib, a1 );		
+		reflector->getAttribute( instanceAny, anInt8Attrib, a1 );
 		ASSERT_FALSE( true );
 	}
 	catch( co::IllegalArgumentException& e )
@@ -189,4 +188,51 @@ TEST( ModuleTests, crossModuleReflection )
 	}
 
 	reflector->destroyValue( instancePtr );
+}
+
+TEST( ModuleTests, serviceDependencies )
+{
+	// shutdown and re-setup the system
+	co::shutdown();
+	co::System* system = co::getSystem();
+	system->setup();
+
+	co::ServiceManager* sm = system->getServices();
+	co::InterfaceType* serviceType = co::typeOf<moduleA::TestInterface>::get();
+
+	// register a service provided by moduleA
+	ASSERT_TRUE( sm->getIsLazy() );
+	sm->addServiceImplementation( serviceType, "moduleA.TestComponent" );
+
+	// moduleA should not have been loaded yet
+	EXPECT_TRUE( system->getModules()->findModule( "moduleA" ) == NULL );
+
+	// now getting the service should cause moduleA to be loaded
+	EXPECT_TRUE( co::getService<moduleA::TestInterface>() != NULL );
+
+	// now moduleA should have been loaded
+	EXPECT_TRUE( system->getModules()->findModule( "moduleA" ) != NULL );
+
+	// we need another full restart
+	co::shutdown();
+	system = co::getSystem();
+	system->setup();
+
+	sm = system->getServices();
+	serviceType = co::typeOf<moduleA::TestInterface>::get();
+
+	// moduleA should not have been loaded yet
+	EXPECT_TRUE( system->getModules()->findModule( "moduleA" ) == NULL );
+
+	// re-register the service provided by moduleA, forcing its immediate instantiation
+	sm->setIsLazy( false );
+	ASSERT_FALSE( sm->getIsLazy() );
+	sm->addServiceImplementation( serviceType, "moduleA.TestComponent" );
+
+	// moduleA should already have been loaded now
+	EXPECT_TRUE( system->getModules()->findModule( "moduleA" ) != NULL );
+
+	// revert the isLazy option to its default value
+	sm->setIsLazy( true );
+	ASSERT_TRUE( sm->getIsLazy() );
 }
