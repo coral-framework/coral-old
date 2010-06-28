@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** C++ mapping generated for type 'co.System'
 **
-** Created: Thu Jun 10 20:53:30 2010
+** Created: Mon Jun 28 12:01:36 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -18,6 +18,7 @@
 // Forward Declarations:
 namespace co {
 	class ModuleManager;
+	class ServiceManager;
 	class TypeManager;
 } // namespace co
 // End Of Forward Declarations
@@ -45,6 +46,8 @@ public:
 	// End Of c++> Block
 
 	virtual co::ModuleManager* getModules() = 0;
+
+	virtual co::ServiceManager* getServices() = 0;
 
 	virtual co::SystemState getState() = 0;
 

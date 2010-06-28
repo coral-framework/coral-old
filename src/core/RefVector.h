@@ -37,9 +37,9 @@ public:
 	 */
 	//@{
 	template<class Key, class Comparator>
-	inline bool sortedFind( const Key& key, Comparator compare, int first, int last, int& pos )
+	inline bool sortedFind( const Key& key, Comparator compare, std::size_t first, std::size_t last, std::size_t& pos )
 	{
-		assert( first >= 0 && last < static_cast<int>( this->size() ) );
+		assert( last < this->size() );
 		while( first <= last )
 		{
 			pos = ( first + last ) / 2;
@@ -47,7 +47,11 @@ public:
 			if( comp < 0 )
 				first = pos + 1;	// repeat search in right half
 			else if( comp > 0 )
+			{
+				if( pos == 0 )
+					break;
 				last = pos - 1;		// repeat search in left half
+			}
 			else
 				return true;
 		}
@@ -56,14 +60,14 @@ public:
 	}
 
 	template<class Key, class Comparator>
-	inline bool sortedFind( const Key& key, Comparator compare, int& pos )
+	inline bool sortedFind( const Key& key, Comparator compare, std::size_t& pos )
 	{
 		if( this->empty() )
 		{
 			pos = 0;
 			return false;
 		}
-		return sortedFind( key, compare, 0, static_cast<int>( this->size() ) - 1, pos );
+		return sortedFind( key, compare, 0, this->size() - 1, pos );
 	}
 	//@}
 
@@ -80,7 +84,7 @@ public:
 	template<typename Key, typename Comparator>
 	inline bool sortedInsert( const Key& key, T* element, Comparator compare )
 	{
-		int pos;
+		std::size_t pos;
 		if( sortedFind( key, compare, pos ) )
 			return false;
 
@@ -88,7 +92,7 @@ public:
 		this->push_back( element );
 
 		// slide the new element to the correct position
-		for( int i = this->size() - 1; i > pos; --i )
+		for( std::size_t i = this->size() - 1; i > pos; --i )
 			(*this)[i - 1].swap( (*this)[i] );
 
 		return true;

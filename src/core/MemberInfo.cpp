@@ -15,10 +15,12 @@ void MemberInfoImpl::setName( const std::string& name )
 	_name = name;
 }
 
-void MemberInfoImpl::setOwner( co::CompoundType* owner, co::uint32 index )
+void MemberInfoImpl::setOwner( co::CompoundType* owner, std::size_t index )
 {
 	_owner = owner;
-	_index = index;
+
+	assert( index < co::MAX_UINT32 );
+	_index = static_cast<co::uint32>( index );
 }
 
 const std::string& MemberInfoImpl::getName()

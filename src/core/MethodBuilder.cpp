@@ -104,7 +104,7 @@ void MethodBuilder::createMethod()
 	_createdMethodInfo = mi.get();
 
 	// notice: the call to addMethod() below may throw an exception if the TB's type was already created
-	dynamic_cast<TypeBuilder*>( _typeBuilder.get() )->addMethod( _createdMethodInfo.get() );
+	static_cast<TypeBuilder*>( _typeBuilder.get() )->addMethod( _createdMethodInfo.get() );
 }
 
 CORAL_EXPORT_COMPONENT( MethodBuilder, MethodBuilderComponent );

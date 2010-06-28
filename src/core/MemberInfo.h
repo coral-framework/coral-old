@@ -18,7 +18,7 @@ public:
 
 	// internal methods:
 	void setName( const std::string& name );
-	void setOwner( co::CompoundType* owner, co::uint32 index );
+	void setOwner( co::CompoundType* owner, std::size_t index );
 
 	// co::MemberInfo methods:
 	const std::string& getName();

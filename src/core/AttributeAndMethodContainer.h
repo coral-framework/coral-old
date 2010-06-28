@@ -47,8 +47,8 @@ protected:
 
 private:
 	typedef co::RefVector<co::MemberInfo> MembersVector;
-	MembersVector _members;		// mixed container: attributes first, then methods.
-	co::int32 _firstMethodPos;	// dividing point: position of the first method in _members.
+	MembersVector _members;			// mixed container: attributes first, then methods.
+	std::size_t _firstMethodPos;	// dividing point: position of the first method in _members.
 };
 
 #define DELEGATE_CO_COMPOUNDTYPE_METHODS( DELEGATE ) \

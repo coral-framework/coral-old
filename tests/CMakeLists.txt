@@ -10,6 +10,12 @@ FIND_PACKAGE( GTest )
 # We can only add the test projects if GTest is available.
 IF( GTEST_FOUND )
 
+	# Check if Valgrind is available for the memory check tests
+	FIND_PROGRAM( VALGRIND_COMMAND valgrind )
+	IF( NOT VALGRIND_COMMAND )
+		MESSAGE( "WARNING: Valgrind was NOT FOUND - all memory tests have been disabled!" )
+	ENDIF()
+
 	ADD_SUBDIRECTORY( core )
 	ADD_SUBDIRECTORY( moduleA )
 	ADD_SUBDIRECTORY( moduleB )

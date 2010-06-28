@@ -66,7 +66,7 @@ void Namespace::addType( co::Type* type )
 	
 	const std::string& name = type->getName();
 
-	int pos;
+	std::size_t pos;
 	if( _childNamespaces.sortedFind( name, namespaceComparator, pos ) )
 		throwClashingNamespace( name );
 
@@ -80,7 +80,7 @@ void Namespace::removeType( co::Type* type )
 
 	const std::string& name = type->getName();
 
-	int pos;
+	std::size_t pos;
 	bool typeExists = _types.sortedFind( name, typeComparator, pos );
 	assert( typeExists );
 	CORAL_UNUSED( typeExists );
@@ -120,7 +120,7 @@ co::Module* Namespace::getModule()
 
 co::Type* Namespace::getType( const std::string& name )
 {
-	int pos;
+	std::size_t pos;
 	if( _types.sortedFind( name, typeComparator, pos ) )
 		return _types[pos].get();
 	return NULL;
@@ -128,7 +128,7 @@ co::Type* Namespace::getType( const std::string& name )
 
 co::Namespace* Namespace::getChildNamespace( const std::string& name )
 {
-	int pos;
+	std::size_t pos;
 	if( _childNamespaces.sortedFind( name, namespaceComparator, pos ) )
 		return _childNamespaces[pos].get();
 	return NULL;
@@ -146,7 +146,7 @@ co::TypeBuilder* Namespace::defineType( const std::string& name, co::TypeKind ty
 		CORAL_THROW( co::IllegalNameException, "'" << name << "' is not a valid identifier." );
 	}
 
-	int pos;
+	std::size_t pos;
 	if( _types.sortedFind( name, typeComparator, pos ) && _types[pos]->getFullName() != "co.Interface" )
 		throwClashingType( name );
 
@@ -154,11 +154,8 @@ co::TypeBuilder* Namespace::defineType( const std::string& name, co::TypeKind ty
 		throwClashingNamespace( name );
 
 	TypeBuilder* tb = TypeBuilder::create( typeKind, this, name );
-	
-	TypeCreationTransaction* tct = dynamic_cast<TypeCreationTransaction*>( transaction );
-	assert( tct );
 
-	tct->addTypeBuilder( tb );
+	static_cast<TypeCreationTransaction*>( transaction )->addTypeBuilder( tb );
 
 	return tb;
 }

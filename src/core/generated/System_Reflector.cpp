@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Reflection code generated for type 'co.System'
 **
-** Created: Thu Jun 10 20:53:30 2010
+** Created: Mon Jun 28 12:01:36 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -11,6 +11,7 @@
 #include <co/reserved/ReflectorBase.h>
 #include <co/DynamicProxyHandler.h>
 #include <co/ModuleManager.h>
+#include <co/ServiceManager.h>
 #include <co/TypeManager.h>
 #include <co/MethodInfo.h>
 #include <co/AttributeInfo.h>
@@ -51,17 +52,24 @@ public:
         return __res.get< co::ModuleManager* >();
 	}
 
-	co::SystemState getState()
+	co::ServiceManager* getServices()
 	{
 		co::Any __res;
 		_handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 1 ), __res );
+        return __res.get< co::ServiceManager* >();
+	}
+
+	co::SystemState getState()
+	{
+		co::Any __res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 2 ), __res );
         return __res.get< co::SystemState >();
 	}
 
 	co::TypeManager* getTypes()
 	{
 		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 2 ), __res );
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 3 ), __res );
         return __res.get< co::TypeManager* >();
 	}
 
@@ -70,21 +78,21 @@ public:
 		co::Any __res, __arg[1];
 		__arg[0].set< co::ArrayRange<std::string const> >( requiredModules );
 		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 3 ), __ar, __res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 4 ), __ar, __res );
 	}
 
 	void setupPresentation( )
 	{
 		co::Any __res;
 		co::ArrayRange<co::Any const> __ar;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 4 ), __ar, __res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 5 ), __ar, __res );
 	}
 
 	void tearDown( )
 	{
 		co::Any __res;
 		co::ArrayRange<co::Any const> __ar;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 5 ), __ar, __res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 6 ), __ar, __res );
 	}
 
 protected:
@@ -142,8 +150,9 @@ public:
 		switch( ai->getIndex() )
 		{
 		case 0:		value.set< co::ModuleManager* >( p->getModules() ); break;
-		case 1:		value.set< co::SystemState >( p->getState() ); break;
-		case 2:		value.set< co::TypeManager* >( p->getTypes() ); break;
+		case 1:		value.set< co::ServiceManager* >( p->getServices() ); break;
+		case 2:		value.set< co::SystemState >( p->getState() ); break;
+		case 3:		value.set< co::TypeManager* >( p->getTypes() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -156,6 +165,7 @@ public:
 		case 0:		raiseAttributeIsReadOnly( ai ); break;
 		case 1:		raiseAttributeIsReadOnly( ai ); break;
 		case 2:		raiseAttributeIsReadOnly( ai ); break;
+		case 3:		raiseAttributeIsReadOnly( ai ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 		CORAL_UNUSED( p );
@@ -171,19 +181,19 @@ public:
 		{
 			switch( mi->getIndex() )
 			{
-			case 3:
+			case 4:
 				{
 					co::ArrayRange<std::string const> requiredModules = args[++argIndex].get< co::ArrayRange<std::string const> >();
 					argIndex = -1;
 					p->setupBase( requiredModules );
 				}
 				break;
-			case 4:
+			case 5:
 				{
 					p->setupPresentation();
 				}
 				break;
-			case 5:
+			case 6:
 				{
 					p->tearDown();
 				}

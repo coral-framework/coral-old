@@ -129,7 +129,6 @@ void TypeSemanticChecker::checkMemberDeclarations( co::Type* type )
 	_visitedTypes.insert( type );
 
 	AttributeAndMethodContainer* container = dynamic_cast<AttributeAndMethodContainer*>( type );
-
 	if( container )
 	{
 		co::ArrayRange<co::MethodInfo* const> methods = container->getMemberMethods();

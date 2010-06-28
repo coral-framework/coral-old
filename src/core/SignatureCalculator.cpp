@@ -106,9 +106,7 @@ void SignatureCalculator::calculateSignatures()
 
 void SignatureCalculator::fillArraySignatureData()
 {
-	co::ArrayType* array = dynamic_cast<co::ArrayType*>( _type );
-	assert( array );
-
+	co::ArrayType* array = static_cast<co::ArrayType*>( _type );
 	co::Type* elementType = array->getElementType();
 	_fullSignatureHash.addData( elementType->getFullSignature() );
 	_binarySignatureHash.addData( elementType->getBinarySignature() );
@@ -116,9 +114,7 @@ void SignatureCalculator::fillArraySignatureData()
 
 void SignatureCalculator::fillEnumSignatureData()
 {
-	co::EnumType* enumType = dynamic_cast<co::EnumType*>( _type );
-	assert( enumType );
-
+	co::EnumType* enumType = static_cast<co::EnumType*>( _type );
 	co::ArrayRange<std::string const> range = enumType->getIdentifiers();
 	for( ; range; range.popFirst() )
 	{
@@ -131,9 +127,7 @@ void SignatureCalculator::fillEnumSignatureData()
 
 void SignatureCalculator::fillStructSignatureData()
 {
-	co::StructType* structType = dynamic_cast<co::StructType*>( _type );
-	assert( structType );
-
+	co::StructType* structType = static_cast<co::StructType*>( _type );
 	co::ArrayRange<co::AttributeInfo* const> fields = structType->getMemberAttributes();
 	for( ; fields; fields.popFirst() )
 	{
@@ -150,19 +144,15 @@ void SignatureCalculator::fillStructSignatureData()
 
 void SignatureCalculator::fillNativeClassSignatureData()
 {
-	co::NativeClassType* nativeType = dynamic_cast<co::NativeClassType*>( _type );
-	assert( nativeType );
-
+	co::NativeClassType* nativeType = static_cast<co::NativeClassType*>( _type );
 	_fullSignatureHash.addData( nativeType->getNativeName() );
 	_fullSignatureHash.addData( nativeType->getHeaderName() );
-
 	fillAttributeAndMethodContainerData();
 }
 
 void SignatureCalculator::fillInterfaceSignatureData()
 {
-	co::InterfaceType* interfaceType = dynamic_cast<co::InterfaceType*>( _type );
-	assert( interfaceType );
+	co::InterfaceType* interfaceType = static_cast<co::InterfaceType*>( _type );
 
 	_binarySignatureHash.addData( _type->getFullName() );
 
@@ -180,8 +170,7 @@ void SignatureCalculator::fillInterfaceSignatureData()
 
 void SignatureCalculator::fillComponentSignatureData()
 {
-	co::ComponentType* componentType = dynamic_cast<co::ComponentType*>( _type );
-	assert( componentType );
+	co::ComponentType* componentType = static_cast<co::ComponentType*>( _type );
 
 	co::ArrayRange<co::InterfaceInfo* const> interfaces = componentType->getInterfaces();
 	for( ; interfaces; interfaces.popFirst() )

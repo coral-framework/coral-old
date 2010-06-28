@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Reflection code generated for type 'co.ModuleManager'
 **
-** Created: Thu Jun 10 20:53:30 2010
+** Created: Mon Jun 28 12:01:36 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!

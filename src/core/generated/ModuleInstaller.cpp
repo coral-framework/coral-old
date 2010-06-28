@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** ModuleInstaller class generated for module 'co'
 **
-** Created: Thu Jun 10 20:53:30 2010
+** Created: Mon Jun 28 12:01:36 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -103,6 +103,8 @@ namespace __coral {
 	co::Reflector* createParameterInfoComponentReflector();
 	co::Reflector* createReflectorReflector();
 	co::Reflector* createSemanticExceptionReflector();
+	co::Reflector* createServiceManagerReflector();
+	co::Reflector* createServiceManagerComponentReflector();
 	co::Reflector* createStructTypeReflector();
 	co::Reflector* createStructTypeComponentReflector();
 	co::Reflector* createSystemReflector();
@@ -177,6 +179,8 @@ co::Reflector* co::ModuleInstaller::createReflector( TypeId typeId )
 	case TypeId_ParameterInfoComponent: res = __coral::createParameterInfoComponentReflector(); break;
 	case TypeId_Reflector: res = __coral::createReflectorReflector(); break;
 	case TypeId_SemanticException: res = __coral::createSemanticExceptionReflector(); break;
+	case TypeId_ServiceManager: res = __coral::createServiceManagerReflector(); break;
+	case TypeId_ServiceManagerComponent: res = __coral::createServiceManagerComponentReflector(); break;
 	case TypeId_StructType: res = __coral::createStructTypeReflector(); break;
 	case TypeId_StructTypeComponent: res = __coral::createStructTypeComponentReflector(); break;
 	case TypeId_System: res = __coral::createSystemReflector(); break;

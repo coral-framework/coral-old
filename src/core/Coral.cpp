@@ -20,6 +20,7 @@
 static std::vector<std::string> sg_paths;
 static co::RefPtr<System> sg_system;
 static co::TypeManager* sg_typeManager( NULL );
+static co::ServiceManager* sg_serviceManager( NULL );
 
 co::ArrayRange<const std::string> co::getPaths()
 {
@@ -74,6 +75,7 @@ void co::shutdown()
 
 	co::ModuleInstaller::instance().uninstall();
 
+	sg_serviceManager = NULL;
 	sg_typeManager = NULL;
 	sg_system = NULL;
 }
@@ -92,4 +94,24 @@ co::Component* co::newInstance( const std::string& fullName )
 	co::Reflector* reflector = type->getReflector();
 	assert( reflector );
 	return reflector->newInstance();
+}
+
+inline co::ServiceManager* getServices()
+{
+	if( !sg_serviceManager )
+		sg_serviceManager = co::getSystem()->getServices();
+	return sg_serviceManager;
+}
+
+co::Interface* co::getServiceForType( co::InterfaceType* serviceType, co::InterfaceType* clientType )
+{
+	if( clientType )
+		return getServices()->getServiceForType( serviceType, clientType );
+	else
+		return getServices()->getService( serviceType );
+}
+
+co::Interface* co::getServiceForInstance( co::InterfaceType* serviceType, co::Interface* clientInstance )
+{
+	return getServices()->getServiceForInstance( serviceType, clientInstance );
 }

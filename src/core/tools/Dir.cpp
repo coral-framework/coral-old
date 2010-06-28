@@ -172,7 +172,7 @@ static void normalizeSeparators( std::string& s )
 			// mark that a windows sep was found, so a replace is needed.
 			found = true;
 			++i;
-			while( s[i] == '\\' && i < size )
+			while( i < size && s[i] == '\\' )
 			{
 				s.erase( i, 1 );
 				--size;

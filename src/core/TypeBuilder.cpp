@@ -40,8 +40,7 @@ TypeBuilder::~TypeBuilder()
 
 void TypeBuilder::destroyType()
 {
-	Namespace* ns = dynamic_cast<Namespace*>( _namespace.get() );
-	assert( ns );
+	Namespace* ns = static_cast<Namespace*>( _namespace.get() );
 
 	// remove any array created for the type before we destroy it
 	co::Type* arrayType = ns->getType( _type->getName() + "[]" );
@@ -131,7 +130,7 @@ void TypeBuilder::initialize( co::Namespace* ns, const std::string& name )
 		type->setType( _namespace.get(), _name, _kind );
 
 		// add the type to its namespace (should be removed if it is rolled back)
-		dynamic_cast<Namespace*>( _namespace.get() )->addType( _type.get() );
+		static_cast<Namespace*>( _namespace.get() )->addType( _type.get() );
 	}
 
 	assert( _type.isValid() );

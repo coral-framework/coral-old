@@ -46,24 +46,25 @@ void AttributeAndMethodContainer::addMembers( co::ArrayRange<co::MemberInfo* con
 
 void AttributeAndMethodContainer::sortMembers( co::CompoundType* owner )
 {
-	assert( _firstMethodPos == -1 );
+	assert( _firstMethodPos == std::size_t( -1 ) );
 
 	// sort the members	vector
 	std::sort( _members.begin(), _members.end(), typeThenNameMemberInfoComparator );
 
 	// notify members about their owner/index
-	co::int32 count = static_cast<co::int32>( _members.size() );
-	for( co::int32 i = 0; i < count; ++i )
+	std::size_t count = _members.size();
+	for( std::size_t i = 0; i < count; ++i )
 	{
 		MemberInfoImpl* mii = dynamic_cast<MemberInfoImpl*>( _members[i].get() );
 		assert( mii );
 		mii->setOwner( owner, i );
 
-		if( _firstMethodPos == -1 && dynamic_cast<co::MethodInfo*>( _members[i].get() ) )
+		if( _firstMethodPos == std::size_t( -1 )
+				&& dynamic_cast<co::MethodInfo*>( _members[i].get() ) )
 			_firstMethodPos = i;
 	}
 
-	if( _firstMethodPos == -1 )
+	if( _firstMethodPos == std::size_t( -1 ) )
 		_firstMethodPos = count;
 }
 
@@ -74,14 +75,14 @@ co::ArrayRange<co::MemberInfo* const> AttributeAndMethodContainer::getMembers()
 
 co::MemberInfo* AttributeAndMethodContainer::getMember( const std::string& name )
 {
-	int pos;
+	std::size_t pos;
 
 	// first, look for an attribute
 	if( _firstMethodPos > 0 && _members.sortedFind( name, memberInfoComparator, 0, _firstMethodPos - 1, pos ) )
 		return _members[pos].get();
 
 	// if it's not an attribute, look for a method
-	co::int32 membersSize = static_cast<co::int32>( _members.size() );
+	std::size_t membersSize = _members.size();
 	if( _firstMethodPos < membersSize && _members.sortedFind( name, memberInfoComparator, _firstMethodPos, membersSize - 1, pos ) )
 		return _members[pos].get();
 
@@ -99,7 +100,7 @@ co::MemberInfo* AttributeAndMethodContainer::getMember( const std::string& name 
 
 co::ArrayRange<co::AttributeInfo* const> AttributeAndMethodContainer::getMemberAttributes()
 {
-	assert( _firstMethodPos >= 0 );
+	assert( _firstMethodPos != std::size_t( -1 ) );
 
 	if( _firstMethodPos < 1 )
 		return co::ArrayRange<co::AttributeInfo* const>();
@@ -111,9 +112,9 @@ co::ArrayRange<co::AttributeInfo* const> AttributeAndMethodContainer::getMemberA
 
 co::ArrayRange<co::MethodInfo* const> AttributeAndMethodContainer::getMemberMethods()
 {
-	assert( _firstMethodPos >= 0 );
+	assert( _firstMethodPos != std::size_t( -1 ) );
 
-	co::int32 membersSize = static_cast<co::int32>( _members.size() );
+	std::size_t membersSize = _members.size();
 	if( _firstMethodPos >= membersSize )
 		return co::ArrayRange<co::MethodInfo* const>();
 

@@ -51,18 +51,18 @@ void ComponentType::sortInterfaces()
 	std::sort( _interfaces.begin(), _interfaces.end(), clientThenNameInterfaceInfoComparator );
 
 	// notify members about their owner/index
-	co::int32 count = static_cast<co::int32>( _interfaces.size() );
-	for( co::int32 i = 0; i < count; ++i )
+	std::size_t count = _interfaces.size();
+	for( std::size_t i = 0; i < count; ++i )
 	{
 		MemberInfoImpl* mii = dynamic_cast<MemberInfoImpl*>( _interfaces[i].get() );
 		assert( mii );
 		mii->setOwner( this, i );
 
-		if( _firstProvidedPos == -1 && _interfaces[i]->getIsProvided() )
+		if( _firstProvidedPos == std::size_t( -1 ) && _interfaces[i]->getIsProvided() )
 			_firstProvidedPos = i;
 	}
 
-	if( _firstProvidedPos == -1 )
+	if( _firstProvidedPos == std::size_t( -1 ) )
 		_firstProvidedPos = count;
 }
 
@@ -73,14 +73,14 @@ co::ArrayRange<co::MemberInfo* const> ComponentType::getMembers()
 
 co::MemberInfo* ComponentType::getMember( const std::string& name )
 {
-	int pos;
+	std::size_t pos;
 
 	// first, look for a client interface
 	if( _firstProvidedPos > 0 && _interfaces.sortedFind( name, interfaceInfoComparator, 0, _firstProvidedPos - 1, pos ) )
 		return _interfaces[pos].get();
 	
 	// if it's not an attribute, look for a method
-	co::int32 interfacesSize = static_cast<co::int32>( _interfaces.size() );
+	std::size_t interfacesSize = _interfaces.size();
 	if( _firstProvidedPos < interfacesSize && _interfaces.sortedFind( name, interfaceInfoComparator, _firstProvidedPos, interfacesSize - 1, pos ) )
 		return _interfaces[pos].get();
 	
@@ -92,9 +92,9 @@ co::ArrayRange<co::InterfaceInfo* const> ComponentType::getInterfaces()
 	return _interfaces;
 }
 
-co::ArrayRange<co::InterfaceInfo* const> ComponentType::getClientInterfaces()
+co::ArrayRange<co::InterfaceInfo* const> ComponentType::getRequiredInterfaces()
 {
-	assert( _firstProvidedPos >= 0 );
+	assert( _firstProvidedPos != std::size_t( -1 ) );
 	
 	if( _firstProvidedPos < 1 )
 		return co::ArrayRange<co::InterfaceInfo* const>();
@@ -102,11 +102,11 @@ co::ArrayRange<co::InterfaceInfo* const> ComponentType::getClientInterfaces()
 	return co::ArrayRange<co::InterfaceInfo* const>( reinterpret_cast<co::InterfaceInfo**>( &_interfaces.front() ), _firstProvidedPos );
 }
 
-co::ArrayRange<co::InterfaceInfo* const> ComponentType::getServerInterfaces()
+co::ArrayRange<co::InterfaceInfo* const> ComponentType::getProvidedInterfaces()
 {
-	assert( _firstProvidedPos >= 0 );
+	assert( _firstProvidedPos != std::size_t( -1 ) );
 
-	co::int32 interfacesSize = static_cast<co::int32>( _interfaces.size() );
+	std::size_t interfacesSize = _interfaces.size();
 	if( _firstProvidedPos >= interfacesSize )
 		return co::ArrayRange<co::InterfaceInfo* const>();
 

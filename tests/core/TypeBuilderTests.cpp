@@ -195,12 +195,12 @@ TEST( TypeBuilderTests, componentGetInterfaces )
 
 	ASSERT_TRUE( componentType->getInterfaces().getSize() == 6 );
 
-	co::ArrayRange<co::InterfaceInfo* const>  clientInt = componentType->getClientInterfaces();
+	co::ArrayRange<co::InterfaceInfo* const>  clientInt = componentType->getRequiredInterfaces();
 	ASSERT_TRUE( clientInt.getSize() == 3 );
 	for( ; clientInt; clientInt.popFirst() )
 		ASSERT_FALSE( clientInt.getFirst()->getIsProvided() );
 
-	co::ArrayRange<co::InterfaceInfo* const>  serverInt = componentType->getServerInterfaces();
+	co::ArrayRange<co::InterfaceInfo* const>  serverInt = componentType->getProvidedInterfaces();
 	ASSERT_TRUE( serverInt.getSize() == 3 );
 
 	for( ; serverInt; serverInt.popFirst() )

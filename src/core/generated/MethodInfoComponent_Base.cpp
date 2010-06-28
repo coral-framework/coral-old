@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Base class generated for component 'co.MethodInfoComponent'
 **
-** Created: Thu Jun 10 20:53:30 2010
+** Created: Mon Jun 28 12:01:36 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -11,6 +11,7 @@
 #include <co/Coral.h>
 #include <co/ComponentType.h>
 #include <co/InterfaceInfo.h>
+#include <co/InterfaceType.h>
 
 // ------ co.MethodInfoComponent provides an interface named 'methodInfo', of type co.MethodInfo ------ //
 
@@ -55,9 +56,8 @@ void co::MethodInfoComponent_Base::componentRelease()
 co::ComponentType* co::MethodInfoComponent_Base::getComponentType()
 {
 	co::Type* type = co::getType( "co.MethodInfoComponent" );
-	co::ComponentType* componentType = dynamic_cast<co::ComponentType*>( type );
-	assert( componentType );
-	return componentType;
+	assert( dynamic_cast<co::ComponentType*>( type ) );
+	return static_cast<co::ComponentType*>( type );
 }
 
 co::Interface* co::MethodInfoComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )

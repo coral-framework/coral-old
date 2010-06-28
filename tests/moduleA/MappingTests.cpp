@@ -38,11 +38,11 @@ TEST( MappingTests, structFields )
 {
 	moduleA::TestStruct dummyStruct;
 	
-	dummyStruct.anInt8 = co::INT8_MAX;
-	ASSERT_EQ( dummyStruct.anInt8, co::INT8_MAX );
+	dummyStruct.anInt8 = co::MAX_INT8;
+	ASSERT_EQ( dummyStruct.anInt8, co::MAX_INT8 );
 
-	dummyStruct.anInt16 = co::INT16_MAX;
-	ASSERT_TRUE( dummyStruct.anInt16 == co::INT16_MAX );
+	dummyStruct.anInt16 = co::MAX_INT16;
+	ASSERT_TRUE( dummyStruct.anInt16 == co::MAX_INT16 );
 
 	dummyStruct.testEnum = moduleA::First;
 	ASSERT_TRUE( dummyStruct.testEnum == moduleA::First );

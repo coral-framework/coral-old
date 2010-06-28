@@ -59,9 +59,9 @@ ModuleCompiler::~ModuleCompiler()
 	// empty
 }
 
-co::uint32 countTypesIn( co::Namespace* ns )
+std::size_t countTypesIn( co::Namespace* ns )
 {
-	co::uint32 res = ns->getTypes().getSize();
+	std::size_t res = ns->getTypes().getSize();
 	for( co::ArrayRange<co::Namespace* const> r( ns->getChildNamespaces() ); r; r.popFirst() )
 		res += countTypesIn( r.getFirst() );
 	return res;
@@ -73,7 +73,7 @@ int ModuleCompiler::run()
 	{
 		initialize();
 
-		co::uint32 totalNumTypes = countTypesIn( co::getSystem()->getTypes()->getRootNS() );
+		std::size_t totalNumTypes = countTypesIn( co::getSystem()->getTypes()->getRootNS() );
 		LOG( INFO ) << "Loaded " << totalNumTypes << " types.";
 
 		// keep track of (and generate mappings for) all module dependencies
@@ -242,7 +242,7 @@ void ModuleCompiler::onTypeVisited( co::Type* type, co::uint32 depth )
 		co::ComponentType* componentType = dynamic_cast<co::ComponentType*>( type );
 		co::InterfaceType* modulePartInterface = co::typeOf<co::ModulePart>::get();
 
-		co::ArrayRange<co::InterfaceInfo* const> range = componentType->getServerInterfaces();
+		co::ArrayRange<co::InterfaceInfo* const> range = componentType->getProvidedInterfaces();
 		for( ; range; range.popFirst() )
 			if( range.getFirst()->getType()->isSubTypeOf( modulePartInterface ) )
 				break;

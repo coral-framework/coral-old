@@ -64,7 +64,7 @@ void DependencyWalker::enqueueDependencies( const Node& node )
 	uint32 nextDistance = node.distance + 1;
 
 	co::InterfaceType* interface = dynamic_cast<co::InterfaceType*>( node.type );
-	if( interface != NULL )
+	if( interface )
 	{
 		co::ArrayRange<co::InterfaceType* const> superTypes = interface->getSuperInterfaces();
 		for( ; superTypes; superTypes.popFirst() )
@@ -72,7 +72,7 @@ void DependencyWalker::enqueueDependencies( const Node& node )
 	}
 
 	co::AttributeContainer* attribContainer = dynamic_cast<co::AttributeContainer*>( node.type );
-	if( attribContainer!= NULL )
+	if( attribContainer )
 	{
 		co::ArrayRange<co::AttributeInfo* const> attributeList = attribContainer->getMemberAttributes();
 		for ( ; attributeList; attributeList.popFirst() )
@@ -80,7 +80,7 @@ void DependencyWalker::enqueueDependencies( const Node& node )
 	}
 
 	co::MethodContainer* methodContainer = dynamic_cast<co::MethodContainer*>( node.type );
-	if( methodContainer!= NULL )
+	if( methodContainer )
 	{
 		co::ArrayRange<co::MethodInfo* const> methodList = methodContainer->getMemberMethods();
 		for( ; methodList; methodList.popFirst() )
@@ -100,7 +100,7 @@ void DependencyWalker::enqueueDependencies( const Node& node )
 	}
 
 	co::ComponentType* componentType = dynamic_cast<co::ComponentType*>( node.type );
-	if( componentType != NULL )
+	if( componentType )
 	{
 		co::ArrayRange<co::InterfaceInfo* const> interfaceList = componentType->getInterfaces();
 		for ( ; interfaceList; interfaceList.popFirst() )

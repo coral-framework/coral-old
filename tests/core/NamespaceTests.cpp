@@ -51,7 +51,7 @@ TEST( NamespaceTests, defineType )
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_ARRAY, transaction.get() ), co::IllegalArgumentException );
 
 	// test collision with namespaces
-	ASSERT_TRUE( rootNS->defineChildNamespace( "DummyNamespace" ) );
+	rootNS->defineChildNamespace( "DummyNamespace" );
 	EXPECT_THROW( rootNS->defineType( "DummyNamespace", co::TK_ENUM, transaction.get() ), co::IllegalNameException );
 
 	// test collision with another type

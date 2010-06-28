@@ -7,6 +7,7 @@
 #include <co/Coral.h>
 #include <co/System.h>
 #include <co/CSLError.h>
+#include <co/ArrayType.h>
 #include <co/Namespace.h>
 #include <co/TypeManager.h>
 #include <co/TypeLoadException.h>
@@ -69,7 +70,7 @@ TEST( TypeManagerTests, arrays )
 
 	EXPECT_TRUE( tm->findType( "TypeManagerTests.BarStruct[]" ) == NULL );
 	EXPECT_EQ( tm->getArrayOf( tm->getType( "TypeManagerTests.BarStruct" ) ),
-				reinterpret_cast<co::ArrayType*>( tm->getType( "TypeManagerTests.BarStruct[]" ) ) );
+				static_cast<co::ArrayType*>( tm->getType( "TypeManagerTests.BarStruct[]" ) ) );
 	EXPECT_TRUE( tm->findType( "TypeManagerTests.BarStruct[]" ) != NULL );
 
 	EXPECT_THROW( tm->getArrayOf( NULL ), co::IllegalArgumentException );

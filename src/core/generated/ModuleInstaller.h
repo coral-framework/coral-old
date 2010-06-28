@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** ModuleInstaller class generated for module 'co'
 **
-** Created: Thu Jun 10 20:53:30 2010
+** Created: Mon Jun 28 12:01:36 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -70,6 +70,8 @@ public:
 		TypeId_ParameterInfoComponent,
 		TypeId_Reflector,
 		TypeId_SemanticException,
+		TypeId_ServiceManager,
+		TypeId_ServiceManagerComponent,
 		TypeId_StructType,
 		TypeId_StructTypeComponent,
 		TypeId_System,

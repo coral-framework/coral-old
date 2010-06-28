@@ -57,7 +57,7 @@ public:
 		If \c maxDistance is specified, the traversal excludes types at distances greater than \c maxDistance.
 		\warning This method should only be called once during the lifetime of a DependencyWalker.
 	 */
-	void walk( IDependencyVisitor* visitor, uint32 maxDistance = UINT32_MAX );
+	void walk( IDependencyVisitor* visitor, uint32 maxDistance = MAX_UINT32 );
 
 private:
 	/*!

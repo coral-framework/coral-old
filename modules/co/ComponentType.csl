@@ -1,6 +1,6 @@
 /*
 	Concrete component type.
-	
+
 	\note If you need to retrieve an InterfaceInfo given an interface name, use co::CompoundType::getMember().
  */
 interface ComponentType : CompoundType
@@ -9,8 +9,8 @@ interface ComponentType : CompoundType
 	readonly attribute InterfaceInfo[] interfaces;
 
 	// List of all client interfaces of this component.
-	readonly attribute InterfaceInfo[] clientInterfaces;
+	readonly attribute InterfaceInfo[] requiredInterfaces;
 
 	// List of all server interfaces of this component.
-	readonly attribute InterfaceInfo[] serverInterfaces;
+	readonly attribute InterfaceInfo[] providedInterfaces;
 };

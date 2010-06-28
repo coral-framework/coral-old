@@ -1,7 +1,7 @@
 ###############################################################################
 # About This Directory:
 #	src/core/csl/antlr3c contains a copy of the ANTLR 3 C runtime library.
-#	It is compiled as C++ into a static library and used by the Coral core.
+#	It is compiled as C++ into a static library and linked with the Coral core.
 #	ANTLR is licensed under the BSD license. See http://www.antlr.org/
 ###############################################################################
 
@@ -20,7 +20,7 @@ FILE( GLOB _SOURCE_FILES src/*.c )
 
 ADD_LIBRARY( antlr3c STATIC EXCLUDE_FROM_ALL ${_HEADER_FILES} ${_SOURCE_FILES} )
 
-# Forces compilation of the antlr3c library in C++
+# Forces compilation of the C source files as C++
 SET_SOURCE_FILES_PROPERTIES( ${_SOURCE_FILES} PROPERTIES LANGUAGE "CXX" )
 
 INCLUDE_DIRECTORIES( include )

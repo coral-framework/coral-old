@@ -421,26 +421,26 @@ TEST( AnyTests, setGetUInt16 )
 
 TEST( AnyTests, setGetInt32 )
 {
-	setAndGetTest<co::int32>( co::INT32_MIN, co::INT32_MIN + 1 );
-	setAndGetTest<co::int32>( co::INT32_MAX, co::INT32_MAX - 1 );
+	setAndGetTest<co::int32>( co::MIN_INT32, co::MIN_INT32 + 1 );
+	setAndGetTest<co::int32>( co::MAX_INT32, co::MAX_INT32 - 1 );
 }
 
 TEST( AnyTests, setGetUInt32 )
 {
 	setAndGetTest<co::uint32>( 0, -1 );
-	setAndGetTest<co::uint32>( co::UINT32_MAX, co::UINT32_MAX - 1 );
+	setAndGetTest<co::uint32>( co::MAX_UINT32, co::MAX_UINT32 - 1 );
 }
 
 TEST( AnyTests, setGetInt64 )
 {
-	setAndGetTest<co::int64>( co::INT64_MIN, co::INT64_MIN + 1 );
-	setAndGetTest<co::int64>( co::INT64_MAX, co::INT64_MAX - 1 );
+	setAndGetTest<co::int64>( co::MIN_INT64, co::MIN_INT64 + 1 );
+	setAndGetTest<co::int64>( co::MAX_INT64, co::MAX_INT64 - 1 );
 }
 
 TEST( AnyTests, setGetUInt64 )
 {
 	setAndGetTest<co::uint64>( 0, 1 );
-	setAndGetTest<co::uint64>( co::UINT64_MAX, co::UINT64_MAX - 1 );
+	setAndGetTest<co::uint64>( co::MAX_UINT64, co::MAX_UINT64 - 1 );
 }
 
 TEST( AnyTests, setGetFloat )
@@ -653,8 +653,8 @@ TEST( AnyTests, coercionsFromBool )
 TEST( AnyTests, coercionsFromUInt64 )
 {
 	co::Any a0; a0.set<co::uint64>( 0 );
-	co::Any a1; a1.set<co::uint64>( co::INT16_MAX );
-	co::Any a2; a2.set<co::uint64>( co::UINT64_MAX );
+	co::Any a1; a1.set<co::uint64>( co::MAX_INT16 );
+	co::Any a2; a2.set<co::uint64>( co::MAX_UINT64 );
 	
 	EXPECT_ANY_STREQ( a0, "(co::uint64)0" );
 	EXPECT_ANY_STREQ( a1, "(co::uint64)32767" );
@@ -667,13 +667,13 @@ TEST( AnyTests, coercionsFromUInt64 )
 
 	// to int16
 	EXPECT_EQ( 0, a0.get<co::int16>() );
-	EXPECT_EQ( co::INT16_MAX, a1.get<co::int16>() );
+	EXPECT_EQ( co::MAX_INT16, a1.get<co::int16>() );
 	EXPECT_EQ( -1, a2.get<co::int16>() ); // truncation + 2's complement = -1
 
 	// to double
 	EXPECT_EQ( 0.0, a0.get<double>() );
-	EXPECT_EQ( static_cast<double>( co::INT16_MAX ), a1.get<double>() );
-	EXPECT_EQ( static_cast<double>( co::UINT64_MAX ), a2.get<double>() );
+	EXPECT_EQ( static_cast<double>( co::MAX_INT16 ), a1.get<double>() );
+	EXPECT_EQ( static_cast<double>( co::MAX_UINT64 ), a2.get<double>() );
 	
 	// to enum (co::TypeKind)
 	EXPECT_EQ( co::TK_NONE, a0.get<co::TypeKind>() );

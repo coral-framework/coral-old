@@ -8,6 +8,7 @@
 
 #include "TypeManager.h"
 #include "ModuleManager.h"
+#include "ServiceManager.h"
 #include "SystemComponent_Base.h"
 #include <co/RefPtr.h>
 
@@ -27,6 +28,7 @@ public:
 	co::SystemState getState();
 	co::TypeManager* getTypes();
 	co::ModuleManager* getModules();
+	co::ServiceManager* getServices();
 	void setupBase( co::ArrayRange<std::string const> requiredModules );
 	void setupPresentation();
 	void tearDown();
@@ -35,6 +37,7 @@ private:
 	co::SystemState _state;
 	co::RefPtr<TypeManager> _types;
 	co::RefPtr<ModuleManager> _modules;
+	co::RefPtr<ServiceManager> _services;
 };
 
 #endif

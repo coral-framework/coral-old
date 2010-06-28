@@ -10,7 +10,7 @@
 PROJECT( TESTS_MODULEA )
 
 ################################################################################
-# Build the 'moduleA' library
+# Build the 'moduleA' module library
 ################################################################################
 
 # Run the coral compiler on the module

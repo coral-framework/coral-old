@@ -13,6 +13,7 @@
 #include <co/Coral.h>
 #include <co/ComponentType.h>
 #include <co/InterfaceInfo.h>
+#include <co/InterfaceType.h>
 
 {{NEWLINE}}
 
@@ -84,9 +85,8 @@ void {{NS}}::{{TYPE_NAME}}_Base::componentRelease()
 co::ComponentType* {{NS}}::{{TYPE_NAME}}_Base::getComponentType()
 {
 	co::Type* type = co::getType( "{{TYPE_NAME_FULL}}" );
-	co::ComponentType* componentType = dynamic_cast<co::ComponentType*>( type );
-	assert( componentType );
-	return componentType;
+	assert( dynamic_cast<co::ComponentType*>( type ) );
+	return static_cast<co::ComponentType*>( type );
 }
 
 {{NEWLINE}}

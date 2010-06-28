@@ -173,45 +173,27 @@ namespace co {
 
 // Limits for the portable integer types.
 // (current definitions are only valid for the x86_* architectures)
-#ifdef CORAL_OS_MAC
-	#undef INT8_MIN
-	#undef INT8_MAX
-	#undef UINT8_MAX
+const int8		MIN_INT8	= -127 - 1;
+const int8		MAX_INT8	=  127;
+const uint8		MAX_UINT8	=  0xFF;
 
-	#undef INT16_MIN
-	#undef INT16_MAX
-	#undef UINT16_MAX
+const int16		MIN_INT16	= -32767 - 1;
+const int16		MAX_INT16	=  32767;
+const uint16	MAX_UINT16	= 0xFFFF;
 
-	#undef INT32_MIN
-	#undef INT32_MAX
-	#undef UINT32_MAX
-
-	#undef INT64_MIN
-	#undef INT64_MAX
-	#undef UINT64_MAX
-#endif
-
-const int8		INT8_MIN	= -127 - 1;
-const int8		INT8_MAX	=  127;
-const uint8		UINT8_MAX	=  0xFF;
-
-const int16		INT16_MIN	= -32767 - 1;
-const int16		INT16_MAX	=  32767;
-const uint16	UINT16_MAX	= 0xFFFF;
-
-const int32		INT32_MIN	= -2147483647 - 1;
-const int32		INT32_MAX	=  2147483647;
-const uint32	UINT32_MAX	=  0xFFFFFFFF;
+const int32		MIN_INT32	= -2147483647 - 1;
+const int32		MAX_INT32	=  2147483647;
+const uint32	MAX_UINT32	=  0xFFFFFFFF;
 
 #if defined(CORAL_CC_MSVC)
-const int64		INT64_MAX	= 0x7FFFFFFFFFFFFFFF;
-const uint64	UINT64_MAX	= 0xFFFFFFFFFFFFFFFF;
+const int64		MAX_INT64	= 0x7FFFFFFFFFFFFFFF;
+const uint64	MAX_UINT64	= 0xFFFFFFFFFFFFFFFF;
 #else
-const int64		INT64_MAX	= 0x7FFFFFFFFFFFFFFFLL;
-const uint64	UINT64_MAX	= 0xFFFFFFFFFFFFFFFFULL;
+const int64		MAX_INT64	= 0x7FFFFFFFFFFFFFFFLL;
+const uint64	MAX_UINT64	= 0xFFFFFFFFFFFFFFFFULL;
 #endif
 
-const int64		INT64_MIN	= -INT64_MAX - 1;
+const int64		MIN_INT64	= -MAX_INT64 - 1;
 
 } // namespace co
 

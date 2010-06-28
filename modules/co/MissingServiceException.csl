@@ -1,2 +1,2 @@
-// Raised to indicate that some essential service is not available for a module to work properly.
+// Raised to indicate that some expected service is not available.
 exception MissingServiceException;

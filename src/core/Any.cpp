@@ -372,9 +372,8 @@ void castValue( const __any::State& from, __any::State& to )
 		case TK_ENUM:		to.data.u32 = from.data.u32;						break;
 		}
 
-		// check if the resuling value is well defined for the enum
-		EnumType* enumType = dynamic_cast<EnumType*>( to.type );
-		if( to.data.u32 >= enumType->getIdentifiers().getSize() )
+		// check if the resulting value is well defined for the enum
+		if( to.data.u32 >= static_cast<EnumType*>( to.type )->getIdentifiers().getSize() )
 			THROW_ILLEGAL_CAST( from, to, << ": value '" << to.data.u32 << "' is out of range for the enum" );
 		break;
 	}

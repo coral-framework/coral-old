@@ -15,6 +15,8 @@ namespace co {
 class Type;
 class System;
 class Component;
+class Interface;
+class InterfaceType;
 
 //! Returns the list of type repositories in use by the framework.
 CORAL_EXPORT ArrayRange<const std::string> getPaths();
@@ -41,7 +43,7 @@ CORAL_EXPORT void shutdown();
 /*!
 	Utility function to retrieve or load a type by name.
 	This is equivalent to calling <tt>co::getSystem()->getTypes()->getType( fullName )</tt>.
-	Please refer to co::TypeManager::getType() for the list of exceptions it may throw.
+	Please refer to co::TypeManager::getType() for the list of exceptions this function may throw.
  */
 CORAL_EXPORT Type* getType( const std::string& fullName );
 
@@ -51,6 +53,52 @@ CORAL_EXPORT Type* getType( const std::string& fullName );
 	Notice that this function may raise all exceptions raised by the aforementioned methods.
  */
 CORAL_EXPORT Component* newInstance( const std::string& fullName );
+
+/*!
+	Utility function to get the best provider of \c serviceType for clients of type \c clientType.
+	If \c clientType is null this function will retrieve the service's global instance.
+	Please refer to co::ServiceManager::getServiceForType() for the list of exceptions this function may throw.
+ */
+CORAL_EXPORT Interface* getServiceForType( InterfaceType* serviceType, InterfaceType* clientType );
+
+/*!
+	Utility function to get the best provider of \c serviceType for the given \c clientInstance.
+	This is equivalent to calling <tt>co::getSystem()->getServices()->getServiceForInstance()</tt>.
+	Please refer to co::ServiceManager::getServiceForInstance() for the list of exceptions this function may throw.
+ */
+CORAL_EXPORT Interface* getServiceForInstance( InterfaceType* serviceType, Interface* clientInstance );
+
+/*!
+	Template function to get a global service by its interface type.
+	Please refer to co::ServiceManager::getService() for the list of exceptions this function may throw.
+ */
+template<typename T>
+inline T* getService()
+{
+	return static_cast<T*>( getServiceForType( co::typeOf<T>::get(), NULL ) );
+}
+
+/*!
+	Template function to get a \c clientType-specialized service by its interface type.
+	This picks the most appropriate service instance available for clients of the given \c clientType.
+	Please refer to co::ServiceManager::getServiceForType() for the list of exceptions this function may throw.
+ */
+template<typename T>
+inline T* getService( co::InterfaceType* clientType )
+{
+	return static_cast<T*>( getServiceForType( co::typeOf<T>::get(), clientType ) );
+}
+
+/*!
+	Template function to get a \c clientInstance-specialized service by its interface type.
+	This picks the most appropriate service instance available for the given \c clientInstance.
+	Please refer to co::ServiceManager::getServiceForInstance() for the list of exceptions this function may throw.
+ */
+template<typename T>
+inline T* getService( co::Interface* clientInstance )
+{
+	return static_cast<T*>( getServiceForInstance( co::typeOf<T>::get(), clientInstance ) );
+}
 
 } // namespace co
 

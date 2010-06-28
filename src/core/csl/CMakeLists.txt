@@ -4,7 +4,8 @@
 #	semantically checking CSL files.
 ################################################################################
 
-# Build the embedded ANTLR 3 C runtime library as C++
+# Build the embedded ANTLR 3 C runtime as a dependency.
+# Altough it's a C library, it's compiled as C++ so we can throw exceptions.
 ADD_SUBDIRECTORY( antlr3c )
 
 # Gather sources from the current directory

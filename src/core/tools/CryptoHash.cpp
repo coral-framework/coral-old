@@ -9,10 +9,6 @@
 #include <cassert>
 #include <sstream>
 
-#ifdef UINT32_MAX
-#undef UINT32_MAX
-#endif
-
 namespace co {
 
 /************************************************************************/
@@ -60,7 +56,7 @@ public:
 	virtual void addData( const uint8* data, std::size_t length )
 	{
 		assertNoResult();
-		assert( length < co::UINT32_MAX );
+		assert( length < co::MAX_UINT32 );
 		sha1::update( &_ctx, data, static_cast<co::uint32>( length ) );
 	}
 

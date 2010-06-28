@@ -1,4 +1,3 @@
-
 {
 	google-glog-leaks
 	Memcheck:Leak
@@ -12,4 +11,3 @@
 	...
 	obj:*libgflags*
 }
-

@@ -738,11 +738,11 @@ void TypeDictionaryBuilder::fillComponentData( co::ComponentType* componentType 
 	if( _mode == Mode_Mapping )
 		return;
 
-	co::ArrayRange<co::InterfaceInfo* const> clientInterfaces = componentType->getClientInterfaces();
+	co::ArrayRange<co::InterfaceInfo* const> clientInterfaces = componentType->getRequiredInterfaces();
 	_dict->ShowSection( clientInterfaces.isEmpty() ? "HAS_CLIENT_INTERFACES_FALSE" : "HAS_CLIENT_INTERFACES_TRUE" );
 	fillInterfaceInfos( clientInterfaces, "CLIENT_INTERFACE_LIST" );
 
-	co::ArrayRange<co::InterfaceInfo* const> serverInterfaces = componentType->getServerInterfaces();
+	co::ArrayRange<co::InterfaceInfo* const> serverInterfaces = componentType->getProvidedInterfaces();
 	_dict->ShowSection( serverInterfaces.isEmpty() ? "HAS_SERVER_INTERFACES_FALSE" : "HAS_SERVER_INTERFACES_TRUE" );
 	fillInterfaceInfos( serverInterfaces, "SERVER_INTERFACE_LIST" );
 }

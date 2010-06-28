@@ -20,10 +20,10 @@ inline void generateRandomBytes( uint8* data )
 {
 #if defined(CORAL_OS_WIN)
 	HCRYPTPROV cryptProvider;
-	if( CryptAcquireContext( &cryptProvider, NULL, NULL, PROV_RSA_FULL, 0 ) )
+	if( CryptAcquireContext( &cryptProvider, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT ) )
 		if( CryptGenRandom( cryptProvider, 16, data ) )
 			if( CryptReleaseContext( cryptProvider, 0 ) )
-				return;	
+				return;
 	assert( false );
 	for( unsigned int i = 0; i < 16; ++i )
 		data[i] = 0;

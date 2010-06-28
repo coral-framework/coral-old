@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Reflection code generated for type 'co.ComponentType'
 **
-** Created: Thu Jun 10 20:53:30 2010
+** Created: Mon Jun 28 12:01:36 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -123,21 +123,21 @@ public:
 
 	// co::ComponentType Methods:
 
-	co::ArrayRange<co::InterfaceInfo* const> getClientInterfaces()
+	co::ArrayRange<co::InterfaceInfo* const> getInterfaces()
 	{
 		co::Any __res;
 		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ComponentType>( 0 ), __res );
         return __res.get< co::ArrayRange<co::InterfaceInfo* const> >();
 	}
 
-	co::ArrayRange<co::InterfaceInfo* const> getInterfaces()
+	co::ArrayRange<co::InterfaceInfo* const> getProvidedInterfaces()
 	{
 		co::Any __res;
 		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ComponentType>( 1 ), __res );
         return __res.get< co::ArrayRange<co::InterfaceInfo* const> >();
 	}
 
-	co::ArrayRange<co::InterfaceInfo* const> getServerInterfaces()
+	co::ArrayRange<co::InterfaceInfo* const> getRequiredInterfaces()
 	{
 		co::Any __res;
 		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ComponentType>( 2 ), __res );
@@ -198,9 +198,9 @@ public:
 		co::ComponentType* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
-		case 0:		value.set< co::ArrayRange<co::InterfaceInfo* const> >( p->getClientInterfaces() ); break;
-		case 1:		value.set< co::ArrayRange<co::InterfaceInfo* const> >( p->getInterfaces() ); break;
-		case 2:		value.set< co::ArrayRange<co::InterfaceInfo* const> >( p->getServerInterfaces() ); break;
+		case 0:		value.set< co::ArrayRange<co::InterfaceInfo* const> >( p->getInterfaces() ); break;
+		case 1:		value.set< co::ArrayRange<co::InterfaceInfo* const> >( p->getProvidedInterfaces() ); break;
+		case 2:		value.set< co::ArrayRange<co::InterfaceInfo* const> >( p->getRequiredInterfaces() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

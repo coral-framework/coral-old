@@ -96,9 +96,9 @@ struct typeOfBase
 {
 	static R* get()
 	{
-		R* type = reinterpret_cast<R*>( getType( nameOf<T>::get() ) );
-		assert( type );
-		return type;
+		Type* type = getType( nameOf<T>::get() );
+		assert( dynamic_cast<R*>( type ) );
+		return static_cast<R*>( type );
 	}
 };
 
@@ -262,7 +262,7 @@ struct typeOfArrayBase
 	{
 		co::Type* type = getType( nameOf<std::vector<ET> >::get() );
 		assert( dynamic_cast<ArrayType*>( type ) );
-		return reinterpret_cast<ArrayType*>( type );
+		return static_cast<ArrayType*>( type );
 	}
 };
 

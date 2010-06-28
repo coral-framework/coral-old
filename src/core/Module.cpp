@@ -41,9 +41,7 @@ void Module::initialize( const std::string& moduleName )
 
 	_namespace = ns;
 
-	Namespace* concreteNS = dynamic_cast<Namespace*>( ns );
-	assert( concreteNS );
-	concreteNS->setModule( this );
+	static_cast<Namespace*>( ns )->setModule( this );
 }
 
 void Module::addPart( co::ModulePart* part, co::ModulePartLoader* loader )

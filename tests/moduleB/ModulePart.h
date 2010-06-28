@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _MODULECOMPONENT_H_
-#define _MODULECOMPONENT_H_
+#ifndef _MODULEPART_H_
+#define _MODULEPART_H_
 
 #include "moduleB_Base.h"
 

@@ -1,5 +1,5 @@
 /*
-	Keeps a database of loaded types and provides methods to load/create new types.
+	Manages the database of loaded types and provides methods to load/create new types.
  */
 interface TypeManager
 {
@@ -43,7 +43,7 @@ interface TypeManager
 		without raising exceptions.
 
 		In case of errors, this method will add detailed information to the \c errorStack
-		and return NULL. The \c errorStack is sorted from the outermost to the innermost error.
+		and return null. The \c errorStack is sorted from the outermost to the innermost error.
 
 		\note This method does NOT create arrays, but can retrieve existing array types.
 	 */

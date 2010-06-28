@@ -35,15 +35,15 @@ public:
 
 	// co::ComponentType methods:
 	co::ArrayRange<co::InterfaceInfo* const> getInterfaces();
-	co::ArrayRange<co::InterfaceInfo* const> getClientInterfaces();
-	co::ArrayRange<co::InterfaceInfo* const> getServerInterfaces();
+	co::ArrayRange<co::InterfaceInfo* const> getRequiredInterfaces();
+	co::ArrayRange<co::InterfaceInfo* const> getProvidedInterfaces();
 
 	DELEGATE_CO_TYPE_METHODS( TypeImpl:: );
 
 private:
 	typedef co::RefVector<co::InterfaceInfo> InterfacesVector;
 	InterfacesVector _interfaces;	// dual sorted vector: client interfaces first, then server interfaces.
-	co::int32 _firstProvidedPos;	// dividing point: position of the first provided interface in _interfaces.
+	std::size_t _firstProvidedPos;	// dividing point: position of the first provided interface in _interfaces.
 };
 
 #endif

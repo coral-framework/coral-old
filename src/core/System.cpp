@@ -11,6 +11,7 @@ System::System()
 	_state = co::SystemState_None;
 	_types = new TypeManager;
 	_modules = new ModuleManager;
+	_services = new ServiceManager;
 }
 
 System::~System()
@@ -22,6 +23,7 @@ void System::initialize()
 {
 	_types->initialize();
 	_modules->initialize();
+	_services->initialize();
 }
 
 co::SystemState System::getState()
@@ -37,6 +39,11 @@ co::TypeManager* System::getTypes()
 co::ModuleManager* System::getModules()
 {
 	return _modules.get();
+}
+
+co::ServiceManager* System::getServices()
+{
+	return _services.get();
 }
 
 void System::setupBase( co::ArrayRange<std::string const> requiredModules )
@@ -81,6 +88,13 @@ void System::tearDown()
 	if( _state != co::SystemState_Running )
 		throw co::LifeCycleException( "the system's state is not SystemState_Running" );
 
+	// release all service instances
+	_services->tearDown();
+
+	/*
+		Module disposals should be the last tear down step, as it may unload shared libs
+		(and calling a destructor from an unloaded lib will generally cause a segfault).
+	 */
 	_modules->updateModules( co::ModuleState_Disposed );
 
 	_state = co::SystemState_None;

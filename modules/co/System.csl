@@ -4,7 +4,7 @@
  */
 interface System
 {
-	// Current system state. See the system life cycle control methods (setup(), tearDown(), etc.).
+	// Current system state. See the life cycle control methods: setup(), tearDown(), etc.
 	readonly attribute SystemState state;
 
 	// Interface responsible for maintaining the types database, as well as loading new types.
@@ -12,6 +12,9 @@ interface System
 
 	// Interface responsible for loading and maintaining the life cycle of all modules.
 	readonly attribute ModuleManager modules;
+
+	// Interface that manages the services database and provides contextualized service lookups.
+	readonly attribute ServiceManager services;
 
 	//---------- System Life Cycle Control Methods -------------------------//
 

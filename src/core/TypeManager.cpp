@@ -103,15 +103,14 @@ co::ArrayType* TypeManager::getArrayOf( co::Type* elementType )
 	arrayName.append( elementTypeName );
 	arrayName.append( "[]" );
 
-	Namespace* ns = dynamic_cast<Namespace*>( elementType->getNamespace() );
-	assert( ns );
+	Namespace* ns = static_cast<Namespace*>( elementType->getNamespace() );
 
 	// try to locate an existing array of this type
 	co::Type* existingArrayType = ns->getType( arrayName );
 	if( existingArrayType )
 	{
 		assert( dynamic_cast<co::ArrayType*>( existingArrayType ) );
-		return reinterpret_cast<co::ArrayType*>( existingArrayType );
+		return static_cast<co::ArrayType*>( existingArrayType );
 	}
 
 	// otherwise, try to create it

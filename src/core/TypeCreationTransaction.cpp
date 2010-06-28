@@ -77,9 +77,7 @@ void TypeCreationTransaction::commit()
 	// create all types not yet created
 	for( TypeBuilderList::iterator it = _typeBuilders.begin(); it != _typeBuilders.end(); ++it )
 	{
-		TypeBuilder* tb = dynamic_cast<TypeBuilder*>( it->get() );
-		assert( tb );
-		tb->createType();
+		static_cast<TypeBuilder*>( it->get() )->createType();
 	}
 
 	TypeManager* tm = dynamic_cast<TypeManager*>( co::getSystem()->getTypes() );
@@ -104,9 +102,7 @@ void TypeCreationTransaction::rollback()
 	// destroy all types
 	for( TypeBuilderList::iterator it = _typeBuilders.begin(); it != _typeBuilders.end(); ++it )
 	{
-		TypeBuilder* tb = dynamic_cast<TypeBuilder*>( (*it).get() );
-		assert( tb );
-		tb->destroyType();
+		static_cast<TypeBuilder*>( it->get() )->destroyType();
 	}
 
 	_rolledBack = true;

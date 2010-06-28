@@ -1,0 +1,7 @@
+/*
+	Component that implements co.ServiceManager.
+ */
+component ServiceManagerComponent
+{
+	provides ServiceManager serviceManager;
+};
