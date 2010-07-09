@@ -16,6 +16,7 @@
 #include <co/ModuleLoadException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/FileLookUp.h>
+#include <co/reserved/LibraryManager.h>
 #include <cstdio>
 #include <memory>
 #include <sstream>
@@ -49,14 +50,7 @@ ModulePartLoader::ModulePartLoader()
 
 ModulePartLoader::~ModulePartLoader()
 {
-	// under normal circumstances, all parts should have been unloaded
-	assert( _libs.empty() );
-
-	// unload any remaining module libraries
-	for( ModuleLibraryMap::iterator it = _libs.begin(); it != _libs.end(); ++it )
-	{
-		delete it->second;
-	}
+	// empty
 }
 
 bool ModulePartLoader::canLoadModulePart( const std::string& moduleName )
@@ -88,21 +82,9 @@ co::ModulePart* ModulePartLoader::loadModulePart( const std::string& moduleName 
 	if( !part )
 		throw co::ModuleLoadException( "library provided a null ModulePart" );
 
-	_libs.insert( ModuleLibraryMap::value_type( moduleName, lib.release() ) );
+	co::LibraryManager::add( part, lib.release() );
 
 	return part;
-}
-
-void ModulePartLoader::unloadModulePart( const std::string& moduleName )
-{
-	ModuleLibraryMap::iterator it = _libs.find( moduleName );
-	if( it == _libs.end() )
-		throw co::IllegalArgumentException( "either the passed ModulePart was not loaded "
-											"by this loader or was already unloaded" );
-
-	// unload the ModulePart's library
-	delete it->second;
-	_libs.erase( it );
 }
 
 bool ModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::string* filename )

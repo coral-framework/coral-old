@@ -1,7 +1,6 @@
 ################################################################################
 # About This Directory:
-#	tests/core contains unit tests for the classes that comprise the Coral
-#	core library.
+#	tests/core contains unit tests for the Coral core library.
 ################################################################################
 
 PROJECT( TESTS_CORE )

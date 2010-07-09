@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Base class generated for component 'co.NamespaceComponent'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -13,14 +13,16 @@
 #include <co/InterfaceInfo.h>
 #include <co/InterfaceType.h>
 
+namespace co {
+
 // ------ co.NamespaceComponent provides an interface named 'namespace', of type co.Namespace ------ //
 
-co::InterfaceType* co::NamespaceComponent_co_Namespace::getInterfaceType()
+co::InterfaceType* NamespaceComponent_co_Namespace::getInterfaceType()
 {
 	return co::typeOf<co::Namespace>::get();
 }
 
-const std::string& co::NamespaceComponent_co_Namespace::getInterfaceName()
+const std::string& NamespaceComponent_co_Namespace::getInterfaceName()
 {
 	static const std::string s_interfaceName( "namespace" );
 	return s_interfaceName;
@@ -28,39 +30,39 @@ const std::string& co::NamespaceComponent_co_Namespace::getInterfaceName()
 
 // ------ NamespaceComponent_Base ------ //
 
-co::NamespaceComponent_Base::NamespaceComponent_Base()
+NamespaceComponent_Base::NamespaceComponent_Base()
 {
 	// empty
 }
 
-co::NamespaceComponent_Base::~NamespaceComponent_Base()
+NamespaceComponent_Base::~NamespaceComponent_Base()
 {
 	// empty
 }
 
-co::Component* co::NamespaceComponent_Base::getInterfaceOwner()
+co::Component* NamespaceComponent_Base::getInterfaceOwner()
 {
 	return this;
 }
 
-void co::NamespaceComponent_Base::componentRetain()
+void NamespaceComponent_Base::componentRetain()
 {
 	incrementRefCount();
 }
 
-void co::NamespaceComponent_Base::componentRelease()
+void NamespaceComponent_Base::componentRelease()
 {
 	decrementRefCount();
 }
 
-co::ComponentType* co::NamespaceComponent_Base::getComponentType()
+co::ComponentType* NamespaceComponent_Base::getComponentType()
 {
 	co::Type* type = co::getType( "co.NamespaceComponent" );
 	assert( dynamic_cast<co::ComponentType*>( type ) );
 	return static_cast<co::ComponentType*>( type );
 }
 
-co::Interface* co::NamespaceComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
+co::Interface* NamespaceComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
 {
 	checkValidInterface( interfaceInfo );
 	co::Interface* res = NULL;
@@ -72,9 +74,11 @@ co::Interface* co::NamespaceComponent_Base::getInterface( co::InterfaceInfo* int
 	return res;
 }
 
-void co::NamespaceComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void NamespaceComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
 {
 	checkValidClientInterface( clientInterface );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }
+
+} // namespace co

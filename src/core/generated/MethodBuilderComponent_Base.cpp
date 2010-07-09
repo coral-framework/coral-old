@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Base class generated for component 'co.MethodBuilderComponent'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -13,14 +13,16 @@
 #include <co/InterfaceInfo.h>
 #include <co/InterfaceType.h>
 
+namespace co {
+
 // ------ co.MethodBuilderComponent provides an interface named 'methodBuilder', of type co.MethodBuilder ------ //
 
-co::InterfaceType* co::MethodBuilderComponent_co_MethodBuilder::getInterfaceType()
+co::InterfaceType* MethodBuilderComponent_co_MethodBuilder::getInterfaceType()
 {
 	return co::typeOf<co::MethodBuilder>::get();
 }
 
-const std::string& co::MethodBuilderComponent_co_MethodBuilder::getInterfaceName()
+const std::string& MethodBuilderComponent_co_MethodBuilder::getInterfaceName()
 {
 	static const std::string s_interfaceName( "methodBuilder" );
 	return s_interfaceName;
@@ -28,39 +30,39 @@ const std::string& co::MethodBuilderComponent_co_MethodBuilder::getInterfaceName
 
 // ------ MethodBuilderComponent_Base ------ //
 
-co::MethodBuilderComponent_Base::MethodBuilderComponent_Base()
+MethodBuilderComponent_Base::MethodBuilderComponent_Base()
 {
 	// empty
 }
 
-co::MethodBuilderComponent_Base::~MethodBuilderComponent_Base()
+MethodBuilderComponent_Base::~MethodBuilderComponent_Base()
 {
 	// empty
 }
 
-co::Component* co::MethodBuilderComponent_Base::getInterfaceOwner()
+co::Component* MethodBuilderComponent_Base::getInterfaceOwner()
 {
 	return this;
 }
 
-void co::MethodBuilderComponent_Base::componentRetain()
+void MethodBuilderComponent_Base::componentRetain()
 {
 	incrementRefCount();
 }
 
-void co::MethodBuilderComponent_Base::componentRelease()
+void MethodBuilderComponent_Base::componentRelease()
 {
 	decrementRefCount();
 }
 
-co::ComponentType* co::MethodBuilderComponent_Base::getComponentType()
+co::ComponentType* MethodBuilderComponent_Base::getComponentType()
 {
 	co::Type* type = co::getType( "co.MethodBuilderComponent" );
 	assert( dynamic_cast<co::ComponentType*>( type ) );
 	return static_cast<co::ComponentType*>( type );
 }
 
-co::Interface* co::MethodBuilderComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
+co::Interface* MethodBuilderComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
 {
 	checkValidInterface( interfaceInfo );
 	co::Interface* res = NULL;
@@ -72,9 +74,11 @@ co::Interface* co::MethodBuilderComponent_Base::getInterface( co::InterfaceInfo*
 	return res;
 }
 
-void co::MethodBuilderComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void MethodBuilderComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
 {
 	checkValidClientInterface( clientInterface );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }
+
+} // namespace co

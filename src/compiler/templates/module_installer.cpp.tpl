@@ -72,22 +72,13 @@ void {{NS}}::ModuleInstaller::uninstall()
 
 {{NEWLINE}}
 
-// declare all reflector creation functions:
-namespace __coral {
-{{#MODULE_TYPE_LIST}}
-	co::Reflector* create{{TYPE_NAME}}Reflector();
-{{/MODULE_TYPE_LIST}}
-} // namespace __coral
-
-{{NEWLINE}}
-
 co::Reflector* {{NS}}::ModuleInstaller::createReflector( TypeId typeId )
 {
 	co::Reflector* res = NULL;
 	switch( typeId )
 	{
 {{#MODULE_TYPE_LIST}}
-	case TypeId_{{TYPE_NAME}}: res = __coral::create{{TYPE_NAME}}Reflector(); break;
+	case TypeId_{{TYPE_NAME}}: res = {{NS}}::__create{{TYPE_NAME}}Reflector(); break;
 {{/MODULE_TYPE_LIST}}
 	default: assert( false );
 	};

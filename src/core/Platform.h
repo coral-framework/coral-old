@@ -153,6 +153,8 @@ namespace co {
 	typedef unsigned long		uint32;
 	typedef long long			int64;
 	typedef unsigned long long	uint64;
+	typedef int32				intptr;
+	typedef uint32				uintptr;
 #elif CORAL_POINTER_SIZE == 8
 	typedef char				int8;
 	typedef unsigned char		uint8;
@@ -167,6 +169,8 @@ namespace co {
 		typedef long				int64;
 		typedef unsigned long		uint64;
 	#endif
+	typedef int64				intptr;
+	typedef uint64				uintptr;
 #else
 	#error Portable integers were not defined because CORAL_POINTER_SIZE is invalid.
 #endif

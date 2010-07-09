@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Reflection code generated for type 'co.ArrayTypeComponent'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -14,12 +14,15 @@
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
 #include <sstream>
+#include <cassert>
 
-// ------ Reflector ------ //
-
-// Notice: the following two functions are implemented by CORAL_EXPORT_COMPONENT()
+// The following two functions are implemented by CORAL_EXPORT_COMPONENT()
 co::int32 __ArrayTypeComponent_getSize();
 co::Component* __ArrayTypeComponent_newInstance();
+
+namespace co {
+
+// ------ Reflector ------ //
 
 class ArrayTypeComponent_Reflector : public co::ReflectorBase
 {
@@ -39,17 +42,24 @@ public:
 		return co::getType( "co.ArrayTypeComponent" );
 	}
 
-	co::int32 getSize() { return __ArrayTypeComponent_getSize(); }
-	co::Component* newInstance() { return __ArrayTypeComponent_newInstance(); }
+	co::int32 getSize()
+	{
+		return __ArrayTypeComponent_getSize();
+	}
+
+	co::Component* newInstance()
+	{
+		co::Component* component = __ArrayTypeComponent_newInstance();
+		assert( component->getComponentType()->getFullName() == "co.ArrayTypeComponent" );
+		return component;
+	}
 };
 
 // ------ Reflector Creation Function ------ //
 
-namespace __coral {
-
-co::Reflector* createArrayTypeComponentReflector()
+co::Reflector* __createArrayTypeComponentReflector()
 {
     return new ArrayTypeComponent_Reflector;
 }
 
-} // namespace __coral
+} // namespace co

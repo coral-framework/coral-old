@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Reflection code generated for type 'co.UnsupportedOperationException'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -9,6 +9,9 @@
 
 #include <co/UnsupportedOperationException.h>
 #include <co/reserved/ReflectorBase.h>
+#include <cassert>
+
+namespace co {
 
 // ------ Reflector ------ //
 
@@ -38,11 +41,9 @@ public:
 
 // ------ Reflector Creation Function ------ //
 
-namespace __coral {
-
-co::Reflector* createUnsupportedOperationExceptionReflector()
+co::Reflector* __createUnsupportedOperationExceptionReflector()
 {
     return new UnsupportedOperationException_Reflector;
 }
 
-} // namespace __coral
+} // namespace co

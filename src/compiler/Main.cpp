@@ -10,6 +10,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+DEFINE_string( G, "", "generates code for the indicated module" );
 DEFINE_string( path, "./", "comma-separated list of type repositories" );
 DEFINE_string( outdir, "./generated", "output dir for generated files" );
 DEFINE_string( mappingsdir, "", "separate output dir for mappings" );
@@ -24,17 +25,18 @@ int main( int argc, char* argv[] )
 {
 	// modify default GFlags settings
 	FLAGS_help = false;
-	//FLAGS_helpmatch = "coral";
 	FLAGS_log_prefix = false;
 	FLAGS_logtostderr = true;
 
 	// set usage message
 	google::SetUsageMessage(
 		"Coral Compiler Usage:\n"
-		"    coralc [OPTIONS] moduleName [typeName, ...]\n"
+		"    coralc [OPTIONS] [-G moduleName] [typeName, ...]\n"
 		"\n"
-		"The list of typeNames following the moduleName indicates extra\n"
-		"module dependencies, for which the compiler will generate mappings.\n"
+		"Generates mappings for the list of types passed as command-line arguments.\n"
+		"If the -G option is specified (alongside a module name), the compiler will\n"
+		"generate code for a module. In this case, the passed list of types will be\n"
+		"considered extra module dependencies.\n"
 		"\n"
 		"Options Summary:\n"
 		"    -path extra,dirs (extra type repositories)\n"
@@ -48,12 +50,6 @@ int main( int argc, char* argv[] )
 
 	google::InitGoogleLogging( argv[0] );
 
-	if( argc < 2 )
-	{
-		LOG( ERROR ) << "Missing required argument 'moduleName'. For help, try \"-helpshort\".";
-		return -1;
-	}
-
 	LOG( INFO ) << "Coral Compiler v" << CORAL_VERSION_STR << " (" << CORAL_BUILD_KEY << ")";
 
 	co::TypeLoader::enableDocMap();
@@ -61,13 +57,14 @@ int main( int argc, char* argv[] )
 
 	co::addPath( fLS::FLAGS_path );
 
-	std::string moduleName = argv[1];
-	LOG( INFO )	<< "Processing module '" << moduleName << "'...";
+	const std::string& moduleName = fLS::FLAGS_G;
+	if( !moduleName.empty() )
+		LOG( INFO )	<< "Processing module '" << moduleName << "'...";
 
 	const std::string& mappingsDir = ( fLS::FLAGS_mappingsdir.empty() ? fLS::FLAGS_outdir : fLS::FLAGS_mappingsdir );
 	ModuleCompiler moduleCompiler( moduleName, fLS::FLAGS_outdir, mappingsDir );
 
-	for( int i = 2; i < argc; ++i )
+	for( int i = 1; i < argc; ++i )
 		moduleCompiler.addExtraDependency( argv[i] );
 
 	return moduleCompiler.run();

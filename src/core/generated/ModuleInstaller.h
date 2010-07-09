@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** ModuleInstaller class generated for module 'co'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -123,5 +123,76 @@ private:
 private:
 	co::RefPtr<co::Reflector> _reflectors[TypeCount];
 };
+
+// Module's reflector creation functions:
+co::Reflector* __createArrayTypeReflector();
+co::Reflector* __createArrayTypeComponentReflector();
+co::Reflector* __createAttributeContainerReflector();
+co::Reflector* __createAttributeInfoReflector();
+co::Reflector* __createAttributeInfoComponentReflector();
+co::Reflector* __createComponentReflector();
+co::Reflector* __createComponentTypeReflector();
+co::Reflector* __createComponentTypeComponentReflector();
+co::Reflector* __createCompoundTypeReflector();
+co::Reflector* __createCSLErrorReflector();
+co::Reflector* __createDynamicProxyHandlerReflector();
+co::Reflector* __createEnumTypeReflector();
+co::Reflector* __createEnumTypeComponentReflector();
+co::Reflector* __createExceptionTypeReflector();
+co::Reflector* __createExceptionTypeComponentReflector();
+co::Reflector* __createIllegalArgumentExceptionReflector();
+co::Reflector* __createIllegalCastExceptionReflector();
+co::Reflector* __createIllegalNameExceptionReflector();
+co::Reflector* __createInterfaceReflector();
+co::Reflector* __createInterfaceInfoReflector();
+co::Reflector* __createInterfaceInfoComponentReflector();
+co::Reflector* __createInterfaceTypeReflector();
+co::Reflector* __createInterfaceTypeComponentReflector();
+co::Reflector* __createLifeCycleExceptionReflector();
+co::Reflector* __createMemberInfoReflector();
+co::Reflector* __createMethodBuilderReflector();
+co::Reflector* __createMethodBuilderComponentReflector();
+co::Reflector* __createMethodContainerReflector();
+co::Reflector* __createMethodInfoReflector();
+co::Reflector* __createMethodInfoComponentReflector();
+co::Reflector* __createMissingInputExceptionReflector();
+co::Reflector* __createMissingServiceExceptionReflector();
+co::Reflector* __createModuleReflector();
+co::Reflector* __createModuleComponentReflector();
+co::Reflector* __createModuleLoadExceptionReflector();
+co::Reflector* __createModuleManagerReflector();
+co::Reflector* __createModuleManagerComponentReflector();
+co::Reflector* __createModulePartReflector();
+co::Reflector* __createModulePartLoaderReflector();
+co::Reflector* __createModulePartLoaderComponentReflector();
+co::Reflector* __createModuleStateReflector();
+co::Reflector* __createNamespaceReflector();
+co::Reflector* __createNamespaceComponentReflector();
+co::Reflector* __createNativeClassTypeReflector();
+co::Reflector* __createNativeClassTypeComponentReflector();
+co::Reflector* __createNoSuchInterfaceExceptionReflector();
+co::Reflector* __createParameterInfoReflector();
+co::Reflector* __createParameterInfoComponentReflector();
+co::Reflector* __createReflectorReflector();
+co::Reflector* __createSemanticExceptionReflector();
+co::Reflector* __createServiceManagerReflector();
+co::Reflector* __createServiceManagerComponentReflector();
+co::Reflector* __createStructTypeReflector();
+co::Reflector* __createStructTypeComponentReflector();
+co::Reflector* __createSystemReflector();
+co::Reflector* __createSystemComponentReflector();
+co::Reflector* __createSystemStateReflector();
+co::Reflector* __createTypeReflector();
+co::Reflector* __createTypeBuilderReflector();
+co::Reflector* __createTypeBuilderComponentReflector();
+co::Reflector* __createTypeComponentReflector();
+co::Reflector* __createTypeCreationTransactionReflector();
+co::Reflector* __createTypeCreationTransactionComponentReflector();
+co::Reflector* __createTypeKindReflector();
+co::Reflector* __createTypeLoadExceptionReflector();
+co::Reflector* __createTypeManagerReflector();
+co::Reflector* __createTypeManagerComponentReflector();
+co::Reflector* __createUnsupportedOperationExceptionReflector();
+co::Reflector* __createUuidReflector();
 
 } // namespace co

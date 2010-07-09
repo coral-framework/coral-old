@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Base class generated for component 'co.ModuleManagerComponent'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -13,14 +13,16 @@
 #include <co/InterfaceInfo.h>
 #include <co/InterfaceType.h>
 
+namespace co {
+
 // ------ co.ModuleManagerComponent provides an interface named 'moduleManager', of type co.ModuleManager ------ //
 
-co::InterfaceType* co::ModuleManagerComponent_co_ModuleManager::getInterfaceType()
+co::InterfaceType* ModuleManagerComponent_co_ModuleManager::getInterfaceType()
 {
 	return co::typeOf<co::ModuleManager>::get();
 }
 
-const std::string& co::ModuleManagerComponent_co_ModuleManager::getInterfaceName()
+const std::string& ModuleManagerComponent_co_ModuleManager::getInterfaceName()
 {
 	static const std::string s_interfaceName( "moduleManager" );
 	return s_interfaceName;
@@ -28,39 +30,39 @@ const std::string& co::ModuleManagerComponent_co_ModuleManager::getInterfaceName
 
 // ------ ModuleManagerComponent_Base ------ //
 
-co::ModuleManagerComponent_Base::ModuleManagerComponent_Base()
+ModuleManagerComponent_Base::ModuleManagerComponent_Base()
 {
 	// empty
 }
 
-co::ModuleManagerComponent_Base::~ModuleManagerComponent_Base()
+ModuleManagerComponent_Base::~ModuleManagerComponent_Base()
 {
 	// empty
 }
 
-co::Component* co::ModuleManagerComponent_Base::getInterfaceOwner()
+co::Component* ModuleManagerComponent_Base::getInterfaceOwner()
 {
 	return this;
 }
 
-void co::ModuleManagerComponent_Base::componentRetain()
+void ModuleManagerComponent_Base::componentRetain()
 {
 	incrementRefCount();
 }
 
-void co::ModuleManagerComponent_Base::componentRelease()
+void ModuleManagerComponent_Base::componentRelease()
 {
 	decrementRefCount();
 }
 
-co::ComponentType* co::ModuleManagerComponent_Base::getComponentType()
+co::ComponentType* ModuleManagerComponent_Base::getComponentType()
 {
 	co::Type* type = co::getType( "co.ModuleManagerComponent" );
 	assert( dynamic_cast<co::ComponentType*>( type ) );
 	return static_cast<co::ComponentType*>( type );
 }
 
-co::Interface* co::ModuleManagerComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
+co::Interface* ModuleManagerComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
 {
 	checkValidInterface( interfaceInfo );
 	co::Interface* res = NULL;
@@ -72,9 +74,11 @@ co::Interface* co::ModuleManagerComponent_Base::getInterface( co::InterfaceInfo*
 	return res;
 }
 
-void co::ModuleManagerComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void ModuleManagerComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
 {
 	checkValidClientInterface( clientInterface );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }
+
+} // namespace co

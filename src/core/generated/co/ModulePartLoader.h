@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** C++ mapping generated for type 'co.ModulePartLoader'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -30,8 +30,6 @@ public:
 	virtual bool canLoadModulePart( const std::string& moduleName ) = 0;
 
 	virtual co::ModulePart* loadModulePart( const std::string& moduleName ) = 0;
-
-	virtual void unloadModulePart( const std::string& moduleName ) = 0;
 };
 
 } // namespace co

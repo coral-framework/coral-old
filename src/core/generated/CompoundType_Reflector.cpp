@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Reflection code generated for type 'co.CompoundType'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -20,6 +20,9 @@
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
 #include <sstream>
+#include <cassert>
+
+namespace co {
 
 // ------ Proxy Interface ------ //
 
@@ -33,7 +36,7 @@ public:
 
 	virtual ~CompoundType_Proxy()
 	{
-		// empty destructor
+		// empty
 	}
 
 	// co::Interface Methods:
@@ -166,7 +169,7 @@ public:
 	co::Interface* newProxy( co::DynamicProxyHandler* handler )
 	{
 		checValidProxyHandler( handler );
-		return co::disambiguate<co::Interface, co::CompoundType>( new CompoundType_Proxy( handler ) );
+		return co::disambiguate<co::Interface, co::CompoundType>( new co::CompoundType_Proxy( handler ) );
 	}
 
 	void getAttribute( const co::Any& instance, co::AttributeInfo* ai, co::Any& value )
@@ -250,11 +253,9 @@ private:
 
 // ------ Reflector Creation Function ------ //
 
-namespace __coral {
-
-co::Reflector* createCompoundTypeReflector()
+co::Reflector* __createCompoundTypeReflector()
 {
     return new CompoundType_Reflector;
 }
 
-} // namespace __coral
+} // namespace co

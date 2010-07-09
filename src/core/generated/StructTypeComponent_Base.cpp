@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Base class generated for component 'co.StructTypeComponent'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -13,14 +13,16 @@
 #include <co/InterfaceInfo.h>
 #include <co/InterfaceType.h>
 
+namespace co {
+
 // ------ co.StructTypeComponent provides an interface named 'type', of type co.StructType ------ //
 
-co::InterfaceType* co::StructTypeComponent_co_StructType::getInterfaceType()
+co::InterfaceType* StructTypeComponent_co_StructType::getInterfaceType()
 {
 	return co::typeOf<co::StructType>::get();
 }
 
-const std::string& co::StructTypeComponent_co_StructType::getInterfaceName()
+const std::string& StructTypeComponent_co_StructType::getInterfaceName()
 {
 	static const std::string s_interfaceName( "type" );
 	return s_interfaceName;
@@ -28,39 +30,39 @@ const std::string& co::StructTypeComponent_co_StructType::getInterfaceName()
 
 // ------ StructTypeComponent_Base ------ //
 
-co::StructTypeComponent_Base::StructTypeComponent_Base()
+StructTypeComponent_Base::StructTypeComponent_Base()
 {
 	// empty
 }
 
-co::StructTypeComponent_Base::~StructTypeComponent_Base()
+StructTypeComponent_Base::~StructTypeComponent_Base()
 {
 	// empty
 }
 
-co::Component* co::StructTypeComponent_Base::getInterfaceOwner()
+co::Component* StructTypeComponent_Base::getInterfaceOwner()
 {
 	return this;
 }
 
-void co::StructTypeComponent_Base::componentRetain()
+void StructTypeComponent_Base::componentRetain()
 {
 	incrementRefCount();
 }
 
-void co::StructTypeComponent_Base::componentRelease()
+void StructTypeComponent_Base::componentRelease()
 {
 	decrementRefCount();
 }
 
-co::ComponentType* co::StructTypeComponent_Base::getComponentType()
+co::ComponentType* StructTypeComponent_Base::getComponentType()
 {
 	co::Type* type = co::getType( "co.StructTypeComponent" );
 	assert( dynamic_cast<co::ComponentType*>( type ) );
 	return static_cast<co::ComponentType*>( type );
 }
 
-co::Interface* co::StructTypeComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
+co::Interface* StructTypeComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
 {
 	checkValidInterface( interfaceInfo );
 	co::Interface* res = NULL;
@@ -72,9 +74,11 @@ co::Interface* co::StructTypeComponent_Base::getInterface( co::InterfaceInfo* in
 	return res;
 }
 
-void co::StructTypeComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void StructTypeComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
 {
 	checkValidClientInterface( clientInterface );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }
+
+} // namespace co

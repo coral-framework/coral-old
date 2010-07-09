@@ -19,7 +19,7 @@ SET( CORAL_PATH
 	"${CMAKE_SOURCE_DIR}/tests/moduleB"
 )
 
-CORAL_GENERATE( GENERATED_MODULEB_SOURCES moduleB
+CORAL_GENERATE_MODULE( GENERATED_MODULEB_SOURCES moduleB
 	co.TypeCreationTransaction
 	moduleA.TestInterface
 )

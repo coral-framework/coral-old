@@ -7,7 +7,12 @@
 #define _MODULEPART_H_
 
 #include "lua_Base.h"
+#include "LuaModulePartLoader.h"
+#include <co/RefPtr.h>
 
+/*!
+	The Lua module's co.ModulePart.
+ */
 class ModulePart : public lua::lua_Base
 {
 public:
@@ -20,6 +25,9 @@ public:
 	void integratePresentation( co::Module* module );
 	void disintegrate( co::Module* module );
 	void dispose( co::Module* module );
+
+private:
+	co::RefPtr<LuaModulePartLoader> _luaModulePartLoader;
 };
 
 #endif

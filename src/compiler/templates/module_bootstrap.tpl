@@ -11,6 +11,7 @@
 
 #include <co/RefPtr.h>
 #include <co/ModulePart.h>
+#include <co/reserved/LibraryManager.h>
 
 {{NEWLINE}}
 
@@ -52,6 +53,47 @@ const TypeDependency* coral_module_query_dependencies()
 
 {{NEWLINE}}
 
+{{#NAMESPACE_LIST}}
+namespace {{NAMESPACE}} {
+{{/NAMESPACE_LIST}}
+
+{{NEWLINE}}
+
+// The module's ModulePart instance
+co::RefPtr<co::ModulePart> sg_instance;
+
+{{NEWLINE}}
+
+// The module's internal reference count
+co::int32 sg_refCount( 0 );
+
+{{NEWLINE}}
+
+void moduleRetain()
+{
+	++sg_refCount;
+}
+
+{{NEWLINE}}
+
+void moduleRelease()
+{
+	// is the module's ModulePart the only active reference?
+	if( --sg_refCount == 1 )
+	{
+		assert( sg_instance.isValid() );
+		co::LibraryManager::release( sg_instance.get() );
+	}
+}
+
+{{NEWLINE}}
+
+{{#NAMESPACE_LIST}}
+} // namespace {{NAMESPACE}}
+{{/NAMESPACE_LIST}}
+
+{{NEWLINE}}
+
 // __createModulePart() is implemented by CORAL_EXPORT_MODULE_PART()
 co::ModulePart* __createModulePart();
 
@@ -60,8 +102,10 @@ co::ModulePart* __createModulePart();
 extern "C" CORAL_DLL_EXPORT
 co::ModulePart* coral_module_part_instance()
 {
-	static co::RefPtr<co::ModulePart> s_instance;
-	if( !s_instance.isValid() )
-		s_instance = __createModulePart();
-	return s_instance.get();
+	if( !{{NS}}::sg_instance.isValid() )
+	{
+		assert( {{NS}}::sg_refCount == 0 );
+		{{NS}}::sg_instance = __createModulePart();
+	}
+	return {{NS}}::sg_instance.get();
 }

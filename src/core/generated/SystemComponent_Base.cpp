@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Base class generated for component 'co.SystemComponent'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -13,14 +13,16 @@
 #include <co/InterfaceInfo.h>
 #include <co/InterfaceType.h>
 
+namespace co {
+
 // ------ co.SystemComponent provides an interface named 'system', of type co.System ------ //
 
-co::InterfaceType* co::SystemComponent_co_System::getInterfaceType()
+co::InterfaceType* SystemComponent_co_System::getInterfaceType()
 {
 	return co::typeOf<co::System>::get();
 }
 
-const std::string& co::SystemComponent_co_System::getInterfaceName()
+const std::string& SystemComponent_co_System::getInterfaceName()
 {
 	static const std::string s_interfaceName( "system" );
 	return s_interfaceName;
@@ -28,39 +30,39 @@ const std::string& co::SystemComponent_co_System::getInterfaceName()
 
 // ------ SystemComponent_Base ------ //
 
-co::SystemComponent_Base::SystemComponent_Base()
+SystemComponent_Base::SystemComponent_Base()
 {
 	// empty
 }
 
-co::SystemComponent_Base::~SystemComponent_Base()
+SystemComponent_Base::~SystemComponent_Base()
 {
 	// empty
 }
 
-co::Component* co::SystemComponent_Base::getInterfaceOwner()
+co::Component* SystemComponent_Base::getInterfaceOwner()
 {
 	return this;
 }
 
-void co::SystemComponent_Base::componentRetain()
+void SystemComponent_Base::componentRetain()
 {
 	incrementRefCount();
 }
 
-void co::SystemComponent_Base::componentRelease()
+void SystemComponent_Base::componentRelease()
 {
 	decrementRefCount();
 }
 
-co::ComponentType* co::SystemComponent_Base::getComponentType()
+co::ComponentType* SystemComponent_Base::getComponentType()
 {
 	co::Type* type = co::getType( "co.SystemComponent" );
 	assert( dynamic_cast<co::ComponentType*>( type ) );
 	return static_cast<co::ComponentType*>( type );
 }
 
-co::Interface* co::SystemComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
+co::Interface* SystemComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
 {
 	checkValidInterface( interfaceInfo );
 	co::Interface* res = NULL;
@@ -72,9 +74,11 @@ co::Interface* co::SystemComponent_Base::getInterface( co::InterfaceInfo* interf
 	return res;
 }
 
-void co::SystemComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void SystemComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
 {
 	checkValidClientInterface( clientInterface );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }
+
+} // namespace co

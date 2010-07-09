@@ -45,6 +45,8 @@ bool isStandardBuiltInType( const std::string& name )
 ModuleCompiler::ModuleCompiler( const std::string& moduleName, const std::string& codeDir, const std::string& mappingsDir )
 	: _moduleName( moduleName ), _codeDir( codeDir ), _mappingGenerator( mappingsDir )
 {
+	_isGeneratingModule = ( !_moduleName.empty() );
+
 	_numGeneratedMappings = 0;
 	_customModulePartDefined = false;
 
@@ -82,12 +84,15 @@ int ModuleCompiler::run()
 
 		LOG( INFO ) << "Created " << _numGeneratedMappings << " mappings.";
 
-		LOG( INFO ) << "Generating module code...";
+		if( _isGeneratingModule )
+		{
+			LOG( INFO ) << "Generating module code...";
 
-		generateCodeForTypes();
-		generateCodeForModule();
+			generateCodeForTypes();
+			generateCodeForModule();
 
-		LOG( INFO ) << "Done.";
+			LOG( INFO ) << "Done.";
+		}
 
 		return 0;
 	}
@@ -109,62 +114,8 @@ void ModuleCompiler::initialize()
 
 	setupCTemplate();
 
-	// these strings are reused in the loop below
-	std::string dirPath, typeName;
-
-	// fully search the Coral path looking for module types (i.e. CSL files)
-	co::ArrayRange<const std::string> pathsRange = co::getPaths();
-	for( ; pathsRange; pathsRange.popFirst() )
-	{
-		const std::string& path = pathsRange.getFirst();
-
-		dirPath.reserve( path.length() + _moduleDirPath.length() + 1 );
-		dirPath = path;
-		dirPath += "/";
-		dirPath += _moduleDirPath;
-
-		co::Dir dir( dirPath );
-		if( !dir.exists() )
-			continue;
-
-		std::vector<std::string> files;
-		dir.getEntryList( files );
-
-		std::size_t fileCount = files.size();
-		for( std::size_t i = 0; i < fileCount; ++i )
-		{
-			const std::string& filename = files[i];
-
-			// does it have a '.csl' extension?
-			std::size_t lastDotIndex = filename.rfind( '.' );
-			if( lastDotIndex == std::string::npos || filename.length() - lastDotIndex != 4 )
-				continue;
-
-			const char* ext = filename.c_str() + lastDotIndex;
-			if( tolower( ext[1] ) != 'c' || tolower( ext[2] ) != 's' || tolower( ext[3] ) != 'l' )
-				continue;
-
-			std::string typeName;
-			typeName.reserve( _moduleName.length() + filename.length() + 1 );
-			typeName += _moduleName;
-			typeName += ".";
-			typeName += filename;
-
-			// remove the '.csl' extension
-			typeName.resize( typeName.length() - 4 );
-
-			co::Type* type = co::getType( typeName );
-			_moduleTypes.push_back( type );
-
-			// add the type's type interface as an implicit module dependency
-			_moduleDependencies.insert( co::getType( std::string( "co." ) + getTypeInterfaceName( type ) ) );
-		}
-	}
-
-	LOG( INFO ) << "Found " << _moduleTypes.size() << " module types.";
-	
-	// add all module types as module dependencies
-	_moduleDependencies.insert( _moduleTypes.begin(), _moduleTypes.end() );
+	if( _isGeneratingModule )
+		loadModuleTypes();
 
 	// add the explicitly requested 'extra' module dependencies
 	for( StringList::iterator it = _extraDependencies.begin(); it != _extraDependencies.end(); ++it )
@@ -213,6 +164,64 @@ void ModuleCompiler::setupCTemplate()
 
 	sprintf( buffer, "%i", CORAL_COMPILER_OUTPUT_REVISION );
 	ctemplate::TemplateDictionary::SetGlobalValue( "OUTPUT_REVISION", buffer );
+}
+
+void ModuleCompiler::loadModuleTypes()
+{
+	// fully search the Coral path looking for module types (i.e. CSL files)
+	co::ArrayRange<const std::string> pathsRange = co::getPaths();
+	std::string dirPath, typeName;
+	for( ; pathsRange; pathsRange.popFirst() )
+	{
+		const std::string& path = pathsRange.getFirst();
+		
+		dirPath.reserve( path.length() + _moduleDirPath.length() + 1 );
+		dirPath = path;
+		dirPath += "/";
+		dirPath += _moduleDirPath;
+		
+		co::Dir dir( dirPath );
+		if( !dir.exists() )
+			continue;
+		
+		std::vector<std::string> files;
+		dir.getEntryList( files );
+		
+		std::size_t fileCount = files.size();
+		for( std::size_t i = 0; i < fileCount; ++i )
+		{
+			const std::string& filename = files[i];
+			
+			// does it have a '.csl' extension?
+			std::size_t lastDotIndex = filename.rfind( '.' );
+			if( lastDotIndex == std::string::npos || filename.length() - lastDotIndex != 4 )
+				continue;
+			
+			const char* ext = filename.c_str() + lastDotIndex;
+			if( tolower( ext[1] ) != 'c' || tolower( ext[2] ) != 's' || tolower( ext[3] ) != 'l' )
+				continue;
+			
+			std::string typeName;
+			typeName.reserve( _moduleName.length() + filename.length() + 1 );
+			typeName += _moduleName;
+			typeName += ".";
+			typeName += filename;
+			
+			// remove the '.csl' extension
+			typeName.resize( typeName.length() - 4 );
+			
+			co::Type* type = co::getType( typeName );
+			_moduleTypes.push_back( type );
+			
+			// add the type's type interface as an implicit module dependency
+			_moduleDependencies.insert( co::getType( std::string( "co." ) + getTypeInterfaceName( type ) ) );
+		}
+	}
+	
+	LOG( INFO ) << "Found " << _moduleTypes.size() << " module types.";
+
+	// add all module types as module dependencies
+	_moduleDependencies.insert( _moduleTypes.begin(), _moduleTypes.end() );
 }
 
 void ModuleCompiler::onTypeVisited( co::Type* type, co::uint32 depth )

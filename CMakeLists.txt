@@ -55,7 +55,7 @@ FIND_PACKAGE( GLog REQUIRED )
 # Google's commandline Flags library is required.
 FIND_PACKAGE( GFlags REQUIRED )
 
-# Include our own package, so we can use the CORAL_GENERATE() macro.
+# Include our own package, so we can use the CORAL_GENERATE_*() macros.
 SET( CORAL_ROOT ${CMAKE_SOURCE_DIR} )
 SET( CORAL_COMPILER coralc )
 FIND_PACKAGE( Coral QUIET )

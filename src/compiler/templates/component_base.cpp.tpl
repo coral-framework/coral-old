@@ -22,19 +22,31 @@
 {{NEWLINE}}
 {{/MODULE_IS_CO_FALSE}}
 
+{{#NAMESPACE_LIST}}
+namespace {{NAMESPACE}} {
+{{/NAMESPACE_LIST}}
+
+{{#MODULE_IS_CO_FALSE}}
+{{NEWLINE}}
+void moduleRetain();
+void moduleRelease();
+{{/MODULE_IS_CO_FALSE}}
+
+{{NEWLINE}}
+
 {{#SERVER_INTERFACE_LIST}}
 // ------ {{TYPE_NAME_FULL}} provides an interface named '{{NAME}}', of type {{ITF_TYPE_FULL}} ------ //
 
 {{NEWLINE}}
 
-co::InterfaceType* {{NS}}::{{TYPE_NAME}}_{{ITF_TYPE_FULL_UNDERSCORES}}::getInterfaceType()
+co::InterfaceType* {{TYPE_NAME}}_{{ITF_TYPE_FULL_UNDERSCORES}}::getInterfaceType()
 {
 	return co::typeOf<{{ITF_TYPE_CPP}}>::get();
 }
 
 {{NEWLINE}}
 
-const std::string& {{NS}}::{{TYPE_NAME}}_{{ITF_TYPE_FULL_UNDERSCORES}}::getInterfaceName()
+const std::string& {{TYPE_NAME}}_{{ITF_TYPE_FULL_UNDERSCORES}}::getInterfaceName()
 {
 	static const std::string s_interfaceName( "{{NAME}}" );
 	return s_interfaceName;
@@ -47,42 +59,52 @@ const std::string& {{NS}}::{{TYPE_NAME}}_{{ITF_TYPE_FULL_UNDERSCORES}}::getInter
 
 {{NEWLINE}}
 
-{{NS}}::{{TYPE_NAME}}_Base::{{TYPE_NAME}}_Base()
+{{TYPE_NAME}}_Base::{{TYPE_NAME}}_Base()
 {
+{{#MODULE_IS_CO_FALSE}}
+	moduleRetain();
+{{/MODULE_IS_CO_FALSE}}
+{{#MODULE_IS_CO_TRUE}}
 	// empty
+{{/MODULE_IS_CO_TRUE}}
 }
 
 {{NEWLINE}}
 
-{{NS}}::{{TYPE_NAME}}_Base::~{{TYPE_NAME}}_Base()
+{{TYPE_NAME}}_Base::~{{TYPE_NAME}}_Base()
 {
+{{#MODULE_IS_CO_FALSE}}
+	moduleRelease();
+{{/MODULE_IS_CO_FALSE}}
+{{#MODULE_IS_CO_TRUE}}
 	// empty
+{{/MODULE_IS_CO_TRUE}}
 }
 
 {{NEWLINE}}
 
-co::Component* {{NS}}::{{TYPE_NAME}}_Base::getInterfaceOwner()
+co::Component* {{TYPE_NAME}}_Base::getInterfaceOwner()
 {
 	return this;
 }
 
 {{NEWLINE}}
 
-void {{NS}}::{{TYPE_NAME}}_Base::componentRetain()
+void {{TYPE_NAME}}_Base::componentRetain()
 {
 	incrementRefCount();
 }
 
 {{NEWLINE}}
 
-void {{NS}}::{{TYPE_NAME}}_Base::componentRelease()
+void {{TYPE_NAME}}_Base::componentRelease()
 {
 	decrementRefCount();
 }
 
 {{NEWLINE}}
 
-co::ComponentType* {{NS}}::{{TYPE_NAME}}_Base::getComponentType()
+co::ComponentType* {{TYPE_NAME}}_Base::getComponentType()
 {
 	co::Type* type = co::getType( "{{TYPE_NAME_FULL}}" );
 	assert( dynamic_cast<co::ComponentType*>( type ) );
@@ -91,7 +113,7 @@ co::ComponentType* {{NS}}::{{TYPE_NAME}}_Base::getComponentType()
 
 {{NEWLINE}}
 
-co::Interface* {{NS}}::{{TYPE_NAME}}_Base::getInterface( co::InterfaceInfo* interfaceInfo )
+co::Interface* {{TYPE_NAME}}_Base::getInterface( co::InterfaceInfo* interfaceInfo )
 {
 	checkValidInterface( interfaceInfo );
 	co::Interface* res = NULL;
@@ -110,7 +132,7 @@ co::Interface* {{NS}}::{{TYPE_NAME}}_Base::getInterface( co::InterfaceInfo* inte
 
 {{NEWLINE}}
 
-void {{NS}}::{{TYPE_NAME}}_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void {{TYPE_NAME}}_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
 {
 	checkValidClientInterface( clientInterface );
 {{#HAS_CLIENT_INTERFACES_TRUE}}
@@ -127,3 +149,9 @@ void {{NS}}::{{TYPE_NAME}}_Base::bindInterface( co::InterfaceInfo* clientInterfa
 	CORAL_UNUSED( instance );
 {{/HAS_CLIENT_INTERFACES_FALSE}}
 }
+
+{{NEWLINE}}
+
+{{#NAMESPACE_LIST}}
+} // namespace {{NAMESPACE}}
+{{/NAMESPACE_LIST}}

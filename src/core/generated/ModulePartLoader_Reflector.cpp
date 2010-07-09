@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Reflection code generated for type 'co.ModulePartLoader'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -17,6 +17,9 @@
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
 #include <sstream>
+#include <cassert>
+
+namespace co {
 
 // ------ Proxy Interface ------ //
 
@@ -30,7 +33,7 @@ public:
 
 	virtual ~ModulePartLoader_Proxy()
 	{
-		// empty destructor
+		// empty
 	}
 
 	// co::Interface Methods:
@@ -59,14 +62,6 @@ public:
 		co::ArrayRange<co::Any const> __ar( __arg, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePartLoader>( 1 ), __ar, __res );
 		return __res.get< co::ModulePart* >();
-	}
-
-	void unloadModulePart( const std::string& moduleName )
-	{
-		co::Any __res, __arg[1];
-		__arg[0].set< const std::string& >( moduleName );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePartLoader>( 2 ), __ar, __res );
 	}
 
 protected:
@@ -115,7 +110,7 @@ public:
 	co::Interface* newProxy( co::DynamicProxyHandler* handler )
 	{
 		checValidProxyHandler( handler );
-		return co::disambiguate<co::Interface, co::ModulePartLoader>( new ModulePartLoader_Proxy( handler ) );
+		return co::disambiguate<co::Interface, co::ModulePartLoader>( new co::ModulePartLoader_Proxy( handler ) );
 	}
 
 	void getAttribute( const co::Any& instance, co::AttributeInfo* ai, co::Any& value )
@@ -153,13 +148,6 @@ public:
 					const std::string& moduleName = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
 					__res.set< co::ModulePart* >( p->loadModulePart( moduleName ) );
-				}
-				break;
-			case 2:
-				{
-					const std::string& moduleName = args[++argIndex].get< const std::string& >();
-					argIndex = -1;
-					p->unloadModulePart( moduleName );
 				}
 				break;
 			default:
@@ -205,11 +193,9 @@ private:
 
 // ------ Reflector Creation Function ------ //
 
-namespace __coral {
-
-co::Reflector* createModulePartLoaderReflector()
+co::Reflector* __createModulePartLoaderReflector()
 {
     return new ModulePartLoader_Reflector;
 }
 
-} // namespace __coral
+} // namespace co

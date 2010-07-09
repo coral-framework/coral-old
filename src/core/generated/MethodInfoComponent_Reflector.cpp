@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Reflection code generated for type 'co.MethodInfoComponent'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -14,12 +14,15 @@
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
 #include <sstream>
+#include <cassert>
 
-// ------ Reflector ------ //
-
-// Notice: the following two functions are implemented by CORAL_EXPORT_COMPONENT()
+// The following two functions are implemented by CORAL_EXPORT_COMPONENT()
 co::int32 __MethodInfoComponent_getSize();
 co::Component* __MethodInfoComponent_newInstance();
+
+namespace co {
+
+// ------ Reflector ------ //
 
 class MethodInfoComponent_Reflector : public co::ReflectorBase
 {
@@ -39,17 +42,24 @@ public:
 		return co::getType( "co.MethodInfoComponent" );
 	}
 
-	co::int32 getSize() { return __MethodInfoComponent_getSize(); }
-	co::Component* newInstance() { return __MethodInfoComponent_newInstance(); }
+	co::int32 getSize()
+	{
+		return __MethodInfoComponent_getSize();
+	}
+
+	co::Component* newInstance()
+	{
+		co::Component* component = __MethodInfoComponent_newInstance();
+		assert( component->getComponentType()->getFullName() == "co.MethodInfoComponent" );
+		return component;
+	}
 };
 
 // ------ Reflector Creation Function ------ //
 
-namespace __coral {
-
-co::Reflector* createMethodInfoComponentReflector()
+co::Reflector* __createMethodInfoComponentReflector()
 {
     return new MethodInfoComponent_Reflector;
 }
 
-} // namespace __coral
+} // namespace co

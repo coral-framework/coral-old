@@ -11,6 +11,7 @@
 #include <co/TypeManager.h>
 #include <co/ModulePartLoader.h>
 #include <co/LifeCycleException.h>
+#include <co/reserved/LibraryManager.h>
 #include <glog/logging.h>
 #include <cassert>
 
@@ -44,17 +45,13 @@ void Module::initialize( const std::string& moduleName )
 	static_cast<Namespace*>( ns )->setModule( this );
 }
 
-void Module::addPart( co::ModulePart* part, co::ModulePartLoader* loader )
+void Module::addPart( co::ModulePart* part )
 {
 	if( _state != co::ModuleState_None )
 		throw co::LifeCycleException( "cannot add a ModulePart to a Module after it has been initialized" );
 
-	assert( part && loader );
-
+	assert( part );
 	_parts.push_back( part );
-	_loaders.push_back( loader );
-
-	assert( _parts.size() == _loaders.size() );
 }
 
 co::ModuleState Module::getState()
@@ -125,7 +122,8 @@ void Module::dispose()
 	for( co::ArrayRange<co::ModulePart*> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->dispose( this );
 
-	unloadParts();
+	_parts.clear();
+	co::LibraryManager::flush();
 
 	_state = co::ModuleState_Disposed;
 }
@@ -156,34 +154,10 @@ void Module::abort()
 		}
 	}
 
-	unloadParts();
+	_parts.clear();
+	co::LibraryManager::flush();
 
 	_state = co::ModuleState_Aborted;
-}
-
-void Module::unloadParts()
-{
-	while( !_parts.empty() )
-	{
-		try
-		{
-			co::ModulePartLoader* loader = _loaders.back().get();
-
-			// release our reference to the part
-			_parts.pop_back();
-			_loaders.pop_back();
-
-			if( loader )
-				loader->unloadModulePart( _namespace->getFullName() );
-		}
-		catch( std::exception& e )
-		{
-			LOG( ERROR ) << "Exception ignored while unloading module '"
-							<< _namespace->getFullName() << "': " << e.what();
-		}
-	}
-	
-	assert( _parts.empty() && _loaders.empty() );
 }
 
 CORAL_EXPORT_COMPONENT( Module, ModuleComponent );

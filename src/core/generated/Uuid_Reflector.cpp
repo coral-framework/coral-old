@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Reflection code generated for type 'co.Uuid'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -15,6 +15,9 @@
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
 #include <sstream>
+#include <cassert>
+
+namespace co {
 
 // ------ Reflector ------ //
 
@@ -157,11 +160,9 @@ private:
 
 // ------ Reflector Creation Function ------ //
 
-namespace __coral {
-
-co::Reflector* createUuidReflector()
+co::Reflector* __createUuidReflector()
 {
     return new Uuid_Reflector;
 }
 
-} // namespace __coral
+} // namespace co

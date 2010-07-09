@@ -5,7 +5,7 @@
 
 #include "CSLTester.h"
 #include <co/Type.h>
-#include <co/reserved/DependencyWalker.h>
+#include <core/tools/DependencyWalker.h>
 #include <gtest/gtest.h>
 
 class DependencyCollector : public co::IDependencyVisitor

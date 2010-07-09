@@ -125,15 +125,15 @@ co::Module* ModuleManager::load( const std::string& moduleName )
 		{
 			try
 			{
-				co::ModulePart* part = loader->loadModulePart( moduleName );
-				if( !part )
+				co::RefPtr<co::ModulePart> part = loader->loadModulePart( moduleName );
+				if( !part.isValid() )
 					throw co::Exception( "loader returned a null ModulePart" );
 
 				// create the Module on demand
 				if( !module )
 					module = createModule( moduleName );
 
-				module->addPart( part, loader );
+				module->addPart( part.get() );
 			}
 			catch( std::exception& e )
 			{

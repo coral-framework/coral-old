@@ -91,6 +91,9 @@ void TypeDictionaryBuilder::buildCodeDict()
 	_dict->ShowSection( _type->getNamespace()->getFullName() == "co" ?
 							"MODULE_IS_CO_TRUE" : "MODULE_IS_CO_FALSE" );
 
+	ctemplate::TemplateDictionary* revCheckDict = _dict->AddIncludeDictionary( "REVISION_CHECK" );
+	revCheckDict->SetFilename( "revision_check.tpl" );
+
 	fill();
 }
 

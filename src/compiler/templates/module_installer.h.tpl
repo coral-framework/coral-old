@@ -88,6 +88,13 @@ private:
 
 {{NEWLINE}}
 
+// Module's reflector creation functions:
+{{#MODULE_TYPE_LIST}}
+co::Reflector* __create{{TYPE_NAME}}Reflector();
+{{/MODULE_TYPE_LIST}}
+
+{{NEWLINE}}
+
 {{#NAMESPACE_LIST}}
 } // namespace {{NAMESPACE}}
 {{/NAMESPACE_LIST}}

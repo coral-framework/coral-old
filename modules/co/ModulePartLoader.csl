@@ -17,14 +17,4 @@ interface ModulePartLoader
 		Any exception raised by this method will force the module's abortion.
 	 */
 	ModulePart loadModulePart( in string moduleName );
-
-	/*
-		Performs any cleanup task associated with the unloading of a ModulePart that was
-		created by this loader.
-
-		When this method is called, the ModulePart's dispose() method will already have
-		been called. Also, all references from the core to the ModulePart would already
-		have been released (hence the ModulePart may have been destroyed).
-	 */
-	void unloadModulePart( in string moduleName );
 };

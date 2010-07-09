@@ -39,6 +39,7 @@
 {{#IS_COMPOUND_TYPE}}
 #include <sstream>
 {{/IS_COMPOUND_TYPE}}
+#include <cassert>
 
 {{NEWLINE}}
 
@@ -54,6 +55,26 @@
 {{NEWLINE}}
 {{/MODULE_IS_CO_FALSE}}
 
+{{#IS_COMPONENT_TRUE}}
+// The following two functions are implemented by CORAL_EXPORT_COMPONENT()
+co::int32 __{{TYPE_NAME}}_getSize();
+co::Component* __{{TYPE_NAME}}_newInstance();
+
+{{NEWLINE}}
+{{/IS_COMPONENT_TRUE}}
+
+{{#NAMESPACE_LIST}}
+namespace {{NAMESPACE}} {
+{{/NAMESPACE_LIST}}
+
+{{#MODULE_IS_CO_FALSE}}
+{{NEWLINE}}
+void moduleRetain();
+void moduleRelease();
+{{/MODULE_IS_CO_FALSE}}
+
+{{NEWLINE}}
+
 {{#IS_INTERFACE_TRUE}}
 // ------ Proxy Interface ------ //
 
@@ -64,6 +85,9 @@ class {{TYPE_NAME}}_Proxy : public {{TYPE_NAME_CPP}}
 public:
 	{{TYPE_NAME}}_Proxy( co::DynamicProxyHandler* handler ) : _handler( handler )
 	{
+{{#MODULE_IS_CO_FALSE}}
+		moduleRetain();
+{{/MODULE_IS_CO_FALSE}}
 		_cookie = _handler->registerProxyInterface( co::disambiguate<co::Interface, {{TYPE_NAME_CPP}}>( this ) );
 	}
 
@@ -71,7 +95,12 @@ public:
 
 	virtual ~{{TYPE_NAME}}_Proxy()
 	{
-		// empty destructor
+{{#MODULE_IS_CO_FALSE}}
+		moduleRelease();
+{{/MODULE_IS_CO_FALSE}}
+{{#MODULE_IS_CO_TRUE}}
+		// empty
+{{/MODULE_IS_CO_TRUE}}
 	}
 
 {{NEWLINE}}
@@ -175,27 +204,29 @@ private:
 
 {{NEWLINE}}
 
-{{#IS_COMPONENT_TRUE}}
-// Notice: the following two functions are implemented by CORAL_EXPORT_COMPONENT()
-co::int32 __{{TYPE_NAME}}_getSize();
-co::Component* __{{TYPE_NAME}}_newInstance();
-
-{{NEWLINE}}
-{{/IS_COMPONENT_TRUE}}
-
 class {{TYPE_NAME}}_Reflector : public co::ReflectorBase
 {
 public:
 	{{TYPE_NAME}}_Reflector()
 	{
+{{#MODULE_IS_CO_FALSE}}
+		moduleRetain();
+{{/MODULE_IS_CO_FALSE}}
+{{#MODULE_IS_CO_TRUE}}
 		// empty
+{{/MODULE_IS_CO_TRUE}}
 	}
 
 {{NEWLINE}}
 
 	virtual ~{{TYPE_NAME}}_Reflector()
 	{
+{{#MODULE_IS_CO_FALSE}}
+		moduleRelease();
+{{/MODULE_IS_CO_FALSE}}
+{{#MODULE_IS_CO_TRUE}}
 		// empty
+{{/MODULE_IS_CO_TRUE}}
 	}
 
 {{NEWLINE}}
@@ -220,8 +251,17 @@ public:
 
 {{#IS_COMPONENT_TRUE}}
 {{NEWLINE}}
-	co::int32 getSize() { return __{{TYPE_NAME}}_getSize(); }
-	co::Component* newInstance() { return __{{TYPE_NAME}}_newInstance(); }
+	co::int32 getSize()
+	{
+		return __{{TYPE_NAME}}_getSize();
+	}
+{{NEWLINE}}
+	co::Component* newInstance()
+	{
+		co::Component* component = __{{TYPE_NAME}}_newInstance();
+		assert( component->getComponentType()->getFullName() == "{{TYPE_NAME_FULL}}" );
+		return component;
+	}
 {{/IS_COMPONENT_TRUE}}
 
 {{#IS_COMPLEX_VALUE}}
@@ -243,6 +283,6 @@ public:
 	co::Interface* newProxy( co::DynamicProxyHandler* handler )
 	{
 		checValidProxyHandler( handler );
-		return co::disambiguate<co::Interface, {{TYPE_NAME_CPP}}>( new {{TYPE_NAME}}_Proxy( handler ) );
+		return co::disambiguate<co::Interface, {{TYPE_NAME_CPP}}>( new {{NS}}::{{TYPE_NAME}}_Proxy( handler ) );
 	}
 {{/IS_INTERFACE_TRUE}}

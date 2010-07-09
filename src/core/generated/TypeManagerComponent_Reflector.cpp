@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Reflection code generated for type 'co.TypeManagerComponent'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -14,12 +14,15 @@
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
 #include <sstream>
+#include <cassert>
 
-// ------ Reflector ------ //
-
-// Notice: the following two functions are implemented by CORAL_EXPORT_COMPONENT()
+// The following two functions are implemented by CORAL_EXPORT_COMPONENT()
 co::int32 __TypeManagerComponent_getSize();
 co::Component* __TypeManagerComponent_newInstance();
+
+namespace co {
+
+// ------ Reflector ------ //
 
 class TypeManagerComponent_Reflector : public co::ReflectorBase
 {
@@ -39,17 +42,24 @@ public:
 		return co::getType( "co.TypeManagerComponent" );
 	}
 
-	co::int32 getSize() { return __TypeManagerComponent_getSize(); }
-	co::Component* newInstance() { return __TypeManagerComponent_newInstance(); }
+	co::int32 getSize()
+	{
+		return __TypeManagerComponent_getSize();
+	}
+
+	co::Component* newInstance()
+	{
+		co::Component* component = __TypeManagerComponent_newInstance();
+		assert( component->getComponentType()->getFullName() == "co.TypeManagerComponent" );
+		return component;
+	}
 };
 
 // ------ Reflector Creation Function ------ //
 
-namespace __coral {
-
-co::Reflector* createTypeManagerComponentReflector()
+co::Reflector* __createTypeManagerComponentReflector()
 {
     return new TypeManagerComponent_Reflector;
 }
 
-} // namespace __coral
+} // namespace co

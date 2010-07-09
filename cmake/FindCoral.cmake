@@ -16,14 +16,13 @@
 #			Controls the type repositories path passed to the Coral Compiler
 #			when it is invoked by one of the helper functions listed below.
 #
-#	The following utility function simplifies the task of invoking the Coral Compiler
-#	in order to generate source code for a module.
+#	The following utility functions simplify the task of invoking the Coral Compiler.
 #
-#	function CORAL_GENERATE( generatedSourceFiles moduleName [extra_coralc_arg, ...] )
+#	function CORAL_GENERATE_MODULE( generatedSourceFiles moduleName [typeName, ...] )
 #		Generates source code, plus all required mappings, to implement the Coral module specified
 #		by moduleName. All files are generated in a dir named "generated", relative to the current
-#		CMake binary dir. Generated files that should be added to the module's library target are
-#		added to the variable identified as generatedSourceFiles.
+#		CMake binary dir. Generated source files that should be added to the module's project are
+#		added to the list variable indicated as the first parameter.
 
 # Gets the current CORAL_PATH value.
 FUNCTION( CORAL_GET_PATH coralPath )
@@ -62,8 +61,8 @@ MACRO( CORAL_GATHER_MODULE_TYPES _moduleTypeNames _moduleName )
 			GET_FILENAME_COMPONENT( _name ${_file} NAME_WE )
 			LIST( APPEND _resultList ${_name} )
 
-			# Save the type's filename for later use in CORAL_GENERATE. We also issue
-			# a warning if the same type is gathered twice from two different files.
+			# Save the type's filename for later use in CORAL_GENERATE_MODULE.
+			# We issue a warning if the same type is gathered twice from two different files.
 			GET_FILENAME_COMPONENT( _filename ${_file} ABSOLUTE )
 			SET( _filenameKey "${_moduleName}_${_name}_FILENAME" )
 			IF( DEFINED ${_filenameKey} )
@@ -78,7 +77,7 @@ MACRO( CORAL_GATHER_MODULE_TYPES _moduleTypeNames _moduleName )
 	SET( ${_moduleTypeNames} ${_resultList} )
 ENDMACRO()
 
-FUNCTION( CORAL_GENERATE generatedSourceFiles moduleName )
+FUNCTION( CORAL_GENERATE_MODULE generatedSourceFiles moduleName )
 	SET( outDir "${CMAKE_CURRENT_BINARY_DIR}/generated" )
 
 	# Initialize the list with files that are always generated.
@@ -114,13 +113,38 @@ FUNCTION( CORAL_GENERATE generatedSourceFiles moduleName )
 	CORAL_GET_PATH_STRING( coralPathStr )
 
 	ADD_CUSTOM_COMMAND( OUTPUT ${resultList}
-		COMMAND ${CORAL_COMPILER} "-path=${coralPathStr}" ${moduleName} ${ARGN}
+		COMMAND ${CORAL_COMPILER} "-path=${coralPathStr}" -G ${moduleName} ${ARGN}
 		DEPENDS ${CORAL_COMPILER}
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-		COMMENT "Running the Coral Compiler on module '${moduleName}'..."
+		COMMENT "Generating code for module '${moduleName}'..."
 	)
 
 	SET( ${generatedSourceFiles} ${resultList} PARENT_SCOPE )
+ENDFUNCTION()
+
+FUNCTION( CORAL_GENERATE_MAPPINGS generatedHeaders )
+	SET( outDir "${CMAKE_CURRENT_BINARY_DIR}/generated" )
+
+	# Initialize the list with important files that are always generated.
+	SET( resultList
+		"${outDir}/co/System.h"
+	)
+
+	FOREACH( typeName ${ARGN} )
+		STRING( REPLACE "." "/" typePath ${typeName} )
+		LIST( APPEND resultList "${outDir}/${typePath}.h" )
+	ENDFOREACH()
+
+	CORAL_GET_PATH_STRING( coralPathStr )
+
+	ADD_CUSTOM_COMMAND( OUTPUT ${resultList}
+		COMMAND ${CORAL_COMPILER} "-path=${coralPathStr}" ${ARGN}
+		DEPENDS ${CORAL_COMPILER}
+		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+		COMMENT "Generating required mappings..."
+	)
+
+	SET( ${generatedHeaders} ${resultList} PARENT_SCOPE )
 ENDFUNCTION()
 
 FUNCTION( _coral_find_program _name)

@@ -17,12 +17,13 @@ IF( GTEST_FOUND )
 	ENDIF()
 
 	ADD_SUBDIRECTORY( core )
+	ADD_SUBDIRECTORY( lua )
 	ADD_SUBDIRECTORY( moduleA )
 	ADD_SUBDIRECTORY( moduleB )
 	ADD_SUBDIRECTORY( regen )
 
 	# Add a custom target to build all tests
-	ADD_CUSTOM_TARGET( tests DEPENDS tests_core tests_moduleA tests_moduleB tests_regen )
+	ADD_CUSTOM_TARGET( tests DEPENDS tests_core tests_lua tests_moduleA tests_moduleB tests_regen )
 
 ELSE()
 

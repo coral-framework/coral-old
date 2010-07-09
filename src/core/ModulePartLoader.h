@@ -7,7 +7,6 @@
 #define _MODULEPARTLOADER_H_
 
 #include "ModulePartLoaderComponent_Base.h"
-#include <map>
 
 // forward declarations:
 struct TypeDependency;
@@ -30,17 +29,12 @@ public:
 	// co::ModulePartLoader methods:
 	bool canLoadModulePart( const std::string& moduleName );
 	co::ModulePart* loadModulePart( const std::string& moduleName );
-	void unloadModulePart( const std::string& moduleName );
 
 private:
 	bool locateModuleLibrary( const std::string& moduleName, std::string* filename = 0 );
 	void resolveModuleFunctions( co::Library* lib, BootstrapFunctions& bf );
 	bool checkVerificationData( const std::string& data );
 	void checkTypeDependencies( const TypeDependency* td );
-
-private:
-	typedef std::map<std::string, co::Library*> ModuleLibraryMap;
-	ModuleLibraryMap _libs;
 };
 
 #endif

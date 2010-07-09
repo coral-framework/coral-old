@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Base class generated for component 'co.ModulePartLoaderComponent'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -13,14 +13,16 @@
 #include <co/InterfaceInfo.h>
 #include <co/InterfaceType.h>
 
+namespace co {
+
 // ------ co.ModulePartLoaderComponent provides an interface named 'loader', of type co.ModulePartLoader ------ //
 
-co::InterfaceType* co::ModulePartLoaderComponent_co_ModulePartLoader::getInterfaceType()
+co::InterfaceType* ModulePartLoaderComponent_co_ModulePartLoader::getInterfaceType()
 {
 	return co::typeOf<co::ModulePartLoader>::get();
 }
 
-const std::string& co::ModulePartLoaderComponent_co_ModulePartLoader::getInterfaceName()
+const std::string& ModulePartLoaderComponent_co_ModulePartLoader::getInterfaceName()
 {
 	static const std::string s_interfaceName( "loader" );
 	return s_interfaceName;
@@ -28,39 +30,39 @@ const std::string& co::ModulePartLoaderComponent_co_ModulePartLoader::getInterfa
 
 // ------ ModulePartLoaderComponent_Base ------ //
 
-co::ModulePartLoaderComponent_Base::ModulePartLoaderComponent_Base()
+ModulePartLoaderComponent_Base::ModulePartLoaderComponent_Base()
 {
 	// empty
 }
 
-co::ModulePartLoaderComponent_Base::~ModulePartLoaderComponent_Base()
+ModulePartLoaderComponent_Base::~ModulePartLoaderComponent_Base()
 {
 	// empty
 }
 
-co::Component* co::ModulePartLoaderComponent_Base::getInterfaceOwner()
+co::Component* ModulePartLoaderComponent_Base::getInterfaceOwner()
 {
 	return this;
 }
 
-void co::ModulePartLoaderComponent_Base::componentRetain()
+void ModulePartLoaderComponent_Base::componentRetain()
 {
 	incrementRefCount();
 }
 
-void co::ModulePartLoaderComponent_Base::componentRelease()
+void ModulePartLoaderComponent_Base::componentRelease()
 {
 	decrementRefCount();
 }
 
-co::ComponentType* co::ModulePartLoaderComponent_Base::getComponentType()
+co::ComponentType* ModulePartLoaderComponent_Base::getComponentType()
 {
 	co::Type* type = co::getType( "co.ModulePartLoaderComponent" );
 	assert( dynamic_cast<co::ComponentType*>( type ) );
 	return static_cast<co::ComponentType*>( type );
 }
 
-co::Interface* co::ModulePartLoaderComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
+co::Interface* ModulePartLoaderComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
 {
 	checkValidInterface( interfaceInfo );
 	co::Interface* res = NULL;
@@ -72,9 +74,11 @@ co::Interface* co::ModulePartLoaderComponent_Base::getInterface( co::InterfaceIn
 	return res;
 }
 
-void co::ModulePartLoaderComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void ModulePartLoaderComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
 {
 	checkValidClientInterface( clientInterface );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }
+
+} // namespace co

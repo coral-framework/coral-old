@@ -38,15 +38,13 @@ private:
 
 {{NEWLINE}}
 
-namespace __coral {
-
-{{NEWLINE}}
-
-co::Reflector* create{{TYPE_NAME}}Reflector()
+co::Reflector* __create{{TYPE_NAME}}Reflector()
 {
     return new {{TYPE_NAME}}_Reflector;
 }
 
 {{NEWLINE}}
 
-} // namespace __coral
+{{#NAMESPACE_LIST}}
+} // namespace {{NAMESPACE}}
+{{/NAMESPACE_LIST}}

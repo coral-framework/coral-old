@@ -5,6 +5,7 @@
 
 #include "System.h"
 #include <co/LifeCycleException.h>
+#include <co/reserved/LibraryManager.h>
 
 System::System()
 {
@@ -88,14 +89,14 @@ void System::tearDown()
 	if( _state != co::SystemState_Running )
 		throw co::LifeCycleException( "the system's state is not SystemState_Running" );
 
-	// release all service instances
+	// dispose all modules
+	_modules->updateModules( co::ModuleState_Disposed );
+
+	// release the remaining service instances
 	_services->tearDown();
 
-	/*
-		Module disposals should be the last tear down step, as it may unload shared libs
-		(and calling a destructor from an unloaded lib will generally cause a segfault).
-	 */
-	_modules->updateModules( co::ModuleState_Disposed );
+	// make sure all released library instances are unloaded
+	co::LibraryManager::flush();
 
 	_state = co::SystemState_None;
 }

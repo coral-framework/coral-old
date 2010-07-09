@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Base class generated for component 'co.ExceptionTypeComponent'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -13,14 +13,16 @@
 #include <co/InterfaceInfo.h>
 #include <co/InterfaceType.h>
 
+namespace co {
+
 // ------ co.ExceptionTypeComponent provides an interface named 'type', of type co.ExceptionType ------ //
 
-co::InterfaceType* co::ExceptionTypeComponent_co_ExceptionType::getInterfaceType()
+co::InterfaceType* ExceptionTypeComponent_co_ExceptionType::getInterfaceType()
 {
 	return co::typeOf<co::ExceptionType>::get();
 }
 
-const std::string& co::ExceptionTypeComponent_co_ExceptionType::getInterfaceName()
+const std::string& ExceptionTypeComponent_co_ExceptionType::getInterfaceName()
 {
 	static const std::string s_interfaceName( "type" );
 	return s_interfaceName;
@@ -28,39 +30,39 @@ const std::string& co::ExceptionTypeComponent_co_ExceptionType::getInterfaceName
 
 // ------ ExceptionTypeComponent_Base ------ //
 
-co::ExceptionTypeComponent_Base::ExceptionTypeComponent_Base()
+ExceptionTypeComponent_Base::ExceptionTypeComponent_Base()
 {
 	// empty
 }
 
-co::ExceptionTypeComponent_Base::~ExceptionTypeComponent_Base()
+ExceptionTypeComponent_Base::~ExceptionTypeComponent_Base()
 {
 	// empty
 }
 
-co::Component* co::ExceptionTypeComponent_Base::getInterfaceOwner()
+co::Component* ExceptionTypeComponent_Base::getInterfaceOwner()
 {
 	return this;
 }
 
-void co::ExceptionTypeComponent_Base::componentRetain()
+void ExceptionTypeComponent_Base::componentRetain()
 {
 	incrementRefCount();
 }
 
-void co::ExceptionTypeComponent_Base::componentRelease()
+void ExceptionTypeComponent_Base::componentRelease()
 {
 	decrementRefCount();
 }
 
-co::ComponentType* co::ExceptionTypeComponent_Base::getComponentType()
+co::ComponentType* ExceptionTypeComponent_Base::getComponentType()
 {
 	co::Type* type = co::getType( "co.ExceptionTypeComponent" );
 	assert( dynamic_cast<co::ComponentType*>( type ) );
 	return static_cast<co::ComponentType*>( type );
 }
 
-co::Interface* co::ExceptionTypeComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
+co::Interface* ExceptionTypeComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
 {
 	checkValidInterface( interfaceInfo );
 	co::Interface* res = NULL;
@@ -72,9 +74,11 @@ co::Interface* co::ExceptionTypeComponent_Base::getInterface( co::InterfaceInfo*
 	return res;
 }
 
-void co::ExceptionTypeComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void ExceptionTypeComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
 {
 	checkValidClientInterface( clientInterface );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }
+
+} // namespace co

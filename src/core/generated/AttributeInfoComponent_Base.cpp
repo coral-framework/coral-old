@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Base class generated for component 'co.AttributeInfoComponent'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -13,14 +13,16 @@
 #include <co/InterfaceInfo.h>
 #include <co/InterfaceType.h>
 
+namespace co {
+
 // ------ co.AttributeInfoComponent provides an interface named 'attributeInfo', of type co.AttributeInfo ------ //
 
-co::InterfaceType* co::AttributeInfoComponent_co_AttributeInfo::getInterfaceType()
+co::InterfaceType* AttributeInfoComponent_co_AttributeInfo::getInterfaceType()
 {
 	return co::typeOf<co::AttributeInfo>::get();
 }
 
-const std::string& co::AttributeInfoComponent_co_AttributeInfo::getInterfaceName()
+const std::string& AttributeInfoComponent_co_AttributeInfo::getInterfaceName()
 {
 	static const std::string s_interfaceName( "attributeInfo" );
 	return s_interfaceName;
@@ -28,39 +30,39 @@ const std::string& co::AttributeInfoComponent_co_AttributeInfo::getInterfaceName
 
 // ------ AttributeInfoComponent_Base ------ //
 
-co::AttributeInfoComponent_Base::AttributeInfoComponent_Base()
+AttributeInfoComponent_Base::AttributeInfoComponent_Base()
 {
 	// empty
 }
 
-co::AttributeInfoComponent_Base::~AttributeInfoComponent_Base()
+AttributeInfoComponent_Base::~AttributeInfoComponent_Base()
 {
 	// empty
 }
 
-co::Component* co::AttributeInfoComponent_Base::getInterfaceOwner()
+co::Component* AttributeInfoComponent_Base::getInterfaceOwner()
 {
 	return this;
 }
 
-void co::AttributeInfoComponent_Base::componentRetain()
+void AttributeInfoComponent_Base::componentRetain()
 {
 	incrementRefCount();
 }
 
-void co::AttributeInfoComponent_Base::componentRelease()
+void AttributeInfoComponent_Base::componentRelease()
 {
 	decrementRefCount();
 }
 
-co::ComponentType* co::AttributeInfoComponent_Base::getComponentType()
+co::ComponentType* AttributeInfoComponent_Base::getComponentType()
 {
 	co::Type* type = co::getType( "co.AttributeInfoComponent" );
 	assert( dynamic_cast<co::ComponentType*>( type ) );
 	return static_cast<co::ComponentType*>( type );
 }
 
-co::Interface* co::AttributeInfoComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
+co::Interface* AttributeInfoComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
 {
 	checkValidInterface( interfaceInfo );
 	co::Interface* res = NULL;
@@ -72,9 +74,11 @@ co::Interface* co::AttributeInfoComponent_Base::getInterface( co::InterfaceInfo*
 	return res;
 }
 
-void co::AttributeInfoComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void AttributeInfoComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
 {
 	checkValidClientInterface( clientInterface );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }
+
+} // namespace co

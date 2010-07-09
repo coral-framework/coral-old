@@ -70,9 +70,11 @@ TEST( ServiceManagerTests, lazyGlobalService )
 
 	// remove the service
 	co::TypeCreationTransaction* tct = dynamic_cast<co::TypeCreationTransaction*>( service );
-	ASSERT_TRUE( tct );
+	ASSERT_TRUE( tct != NULL );
+
 	tct->rollback();
 	sm->removeService( tctType );
+
 	EXPECT_THROW( sm->getService( tctType ), co::MissingServiceException );	
 }
 
@@ -192,7 +194,7 @@ TEST( ServiceManagerTests, serviceRemovals )
 	try
 	{
 		sm->getService( memberInfoType );
-		ASSERT_FALSE( true );
+		FAIL();
 	}
 	catch( co::MissingServiceException& e )
 	{

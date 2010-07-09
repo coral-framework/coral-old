@@ -180,7 +180,7 @@ TEST( ModuleTests, crossModuleReflection )
 	try
 	{
 		reflector->getAttribute( instanceAny, anInt8Attrib, a1 );
-		ASSERT_FALSE( true );
+		FAIL();
 	}
 	catch( co::IllegalArgumentException& e )
 	{

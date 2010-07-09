@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Base class generated for component 'co.TypeManagerComponent'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -13,14 +13,16 @@
 #include <co/InterfaceInfo.h>
 #include <co/InterfaceType.h>
 
+namespace co {
+
 // ------ co.TypeManagerComponent provides an interface named 'typeManager', of type co.TypeManager ------ //
 
-co::InterfaceType* co::TypeManagerComponent_co_TypeManager::getInterfaceType()
+co::InterfaceType* TypeManagerComponent_co_TypeManager::getInterfaceType()
 {
 	return co::typeOf<co::TypeManager>::get();
 }
 
-const std::string& co::TypeManagerComponent_co_TypeManager::getInterfaceName()
+const std::string& TypeManagerComponent_co_TypeManager::getInterfaceName()
 {
 	static const std::string s_interfaceName( "typeManager" );
 	return s_interfaceName;
@@ -28,39 +30,39 @@ const std::string& co::TypeManagerComponent_co_TypeManager::getInterfaceName()
 
 // ------ TypeManagerComponent_Base ------ //
 
-co::TypeManagerComponent_Base::TypeManagerComponent_Base()
+TypeManagerComponent_Base::TypeManagerComponent_Base()
 {
 	// empty
 }
 
-co::TypeManagerComponent_Base::~TypeManagerComponent_Base()
+TypeManagerComponent_Base::~TypeManagerComponent_Base()
 {
 	// empty
 }
 
-co::Component* co::TypeManagerComponent_Base::getInterfaceOwner()
+co::Component* TypeManagerComponent_Base::getInterfaceOwner()
 {
 	return this;
 }
 
-void co::TypeManagerComponent_Base::componentRetain()
+void TypeManagerComponent_Base::componentRetain()
 {
 	incrementRefCount();
 }
 
-void co::TypeManagerComponent_Base::componentRelease()
+void TypeManagerComponent_Base::componentRelease()
 {
 	decrementRefCount();
 }
 
-co::ComponentType* co::TypeManagerComponent_Base::getComponentType()
+co::ComponentType* TypeManagerComponent_Base::getComponentType()
 {
 	co::Type* type = co::getType( "co.TypeManagerComponent" );
 	assert( dynamic_cast<co::ComponentType*>( type ) );
 	return static_cast<co::ComponentType*>( type );
 }
 
-co::Interface* co::TypeManagerComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
+co::Interface* TypeManagerComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
 {
 	checkValidInterface( interfaceInfo );
 	co::Interface* res = NULL;
@@ -72,9 +74,11 @@ co::Interface* co::TypeManagerComponent_Base::getInterface( co::InterfaceInfo* i
 	return res;
 }
 
-void co::TypeManagerComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void TypeManagerComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
 {
 	checkValidClientInterface( clientInterface );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }
+
+} // namespace co

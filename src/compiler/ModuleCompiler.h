@@ -8,7 +8,7 @@
 
 #include "MappingGenerator.h"
 #include <core/TypeLoader.h>
-#include <co/reserved/DependencyWalker.h>
+#include <core/tools/DependencyWalker.h>
 
 namespace ctemplate {
 	class TemplateDictionary;
@@ -46,14 +46,17 @@ public:
 	int run();
 
 private:
-	/*!
-		General initialization steps. This includes loading all module types by locating CSL files
-		in the module's namespace (which may be scattered in several dirs in the path).
-	 */
+	//! General initialization steps.
 	void initialize();
 
 	//! Sets global ctemplate options, as well as values used in all files.
 	void setupCTemplate();
+
+	/*!
+		Loads all module types by locating CSL files in the module's namespace
+			(which may be scattered in several dirs in the path).
+	 */
+	void loadModuleTypes();
 
 	/*!
 		ITypeVisitor method - called for all module types and their dependencies.
@@ -74,6 +77,9 @@ private:
 	std::string _moduleName;
 	std::string _moduleDirPath;
 	std::string _codeDir;
+
+	// true if we're compiling a module; false if we're only generating mappings
+	bool _isGeneratingModule;
 
 	typedef std::vector<std::string> StringList;
 	StringList _extraDependencies;

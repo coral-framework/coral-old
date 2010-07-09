@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Base class generated for component 'co.ArrayTypeComponent'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -13,14 +13,16 @@
 #include <co/InterfaceInfo.h>
 #include <co/InterfaceType.h>
 
+namespace co {
+
 // ------ co.ArrayTypeComponent provides an interface named 'type', of type co.ArrayType ------ //
 
-co::InterfaceType* co::ArrayTypeComponent_co_ArrayType::getInterfaceType()
+co::InterfaceType* ArrayTypeComponent_co_ArrayType::getInterfaceType()
 {
 	return co::typeOf<co::ArrayType>::get();
 }
 
-const std::string& co::ArrayTypeComponent_co_ArrayType::getInterfaceName()
+const std::string& ArrayTypeComponent_co_ArrayType::getInterfaceName()
 {
 	static const std::string s_interfaceName( "type" );
 	return s_interfaceName;
@@ -28,39 +30,39 @@ const std::string& co::ArrayTypeComponent_co_ArrayType::getInterfaceName()
 
 // ------ ArrayTypeComponent_Base ------ //
 
-co::ArrayTypeComponent_Base::ArrayTypeComponent_Base()
+ArrayTypeComponent_Base::ArrayTypeComponent_Base()
 {
 	// empty
 }
 
-co::ArrayTypeComponent_Base::~ArrayTypeComponent_Base()
+ArrayTypeComponent_Base::~ArrayTypeComponent_Base()
 {
 	// empty
 }
 
-co::Component* co::ArrayTypeComponent_Base::getInterfaceOwner()
+co::Component* ArrayTypeComponent_Base::getInterfaceOwner()
 {
 	return this;
 }
 
-void co::ArrayTypeComponent_Base::componentRetain()
+void ArrayTypeComponent_Base::componentRetain()
 {
 	incrementRefCount();
 }
 
-void co::ArrayTypeComponent_Base::componentRelease()
+void ArrayTypeComponent_Base::componentRelease()
 {
 	decrementRefCount();
 }
 
-co::ComponentType* co::ArrayTypeComponent_Base::getComponentType()
+co::ComponentType* ArrayTypeComponent_Base::getComponentType()
 {
 	co::Type* type = co::getType( "co.ArrayTypeComponent" );
 	assert( dynamic_cast<co::ComponentType*>( type ) );
 	return static_cast<co::ComponentType*>( type );
 }
 
-co::Interface* co::ArrayTypeComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
+co::Interface* ArrayTypeComponent_Base::getInterface( co::InterfaceInfo* interfaceInfo )
 {
 	checkValidInterface( interfaceInfo );
 	co::Interface* res = NULL;
@@ -72,9 +74,11 @@ co::Interface* co::ArrayTypeComponent_Base::getInterface( co::InterfaceInfo* int
 	return res;
 }
 
-void co::ArrayTypeComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void ArrayTypeComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
 {
 	checkValidClientInterface( clientInterface );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }
+
+} // namespace co

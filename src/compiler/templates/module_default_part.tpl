@@ -20,9 +20,34 @@
 {{NEWLINE}}
 {{/MODULE_IS_CO_FALSE}}
 
+{{#NAMESPACE_LIST}}
+namespace {{NAMESPACE}} {
+{{/NAMESPACE_LIST}}
+	void moduleRetain();
+	void moduleRelease();
+{{#NAMESPACE_LIST}}
+} // namespace {{NAMESPACE}}
+{{/NAMESPACE_LIST}}
+
+{{NEWLINE}}
+
 class __ModulePart : public co::ModulePartBase
 {
 public:
+	__ModulePart()
+	{
+		{{NS}}::moduleRetain();
+	}
+
+{{NEWLINE}}
+
+	virtual ~__ModulePart()
+	{
+		{{NS}}::moduleRelease();
+	}
+
+{{NEWLINE}}
+
 	void initialize( co::Module* )
 	{
 		// install the module's Reflectors

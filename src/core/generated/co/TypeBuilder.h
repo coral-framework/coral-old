@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** C++ mapping generated for type 'co.TypeBuilder'
 **
-** Created: Mon Jun 28 12:01:36 2010
+** Created: Fri Jul 02 00:14:15 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
