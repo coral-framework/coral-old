@@ -178,9 +178,9 @@ void CompoundTypeBinding::checkType( lua_State* L, int narg, co::TypeKind expect
 
 struct Metamethods
 {
-	lua_CFunction __index;
-	lua_CFunction __newindex;
-	lua_CFunction __gc;
+	lua_CFunction index;
+	lua_CFunction newIndex;
+	lua_CFunction gc;
 };
 
 static const Metamethods TAG_MM[] = {
@@ -189,7 +189,7 @@ static const Metamethods TAG_MM[] = {
 	// native class
 	{ NULL, NULL, NULL },
 	// interface
-	{ InterfaceBinding::__index, InterfaceBinding::__newindex, InterfaceBinding::__gc },
+	{ InterfaceBinding::index, InterfaceBinding::newIndex, InterfaceBinding::gc },
 	// component
 	{ NULL, NULL, NULL }
 };
@@ -212,15 +212,15 @@ void CompoundTypeBinding::pushMetatable( lua_State* L, void* key, co::TypeKind t
 		const Metamethods& mms = TAG_MM[tag - co::TK_STRUCT];
 
 		lua_pushliteral( L, "__index" );
-		lua_pushcfunction( L, mms.__index );
+		lua_pushcfunction( L, mms.index );
 		lua_rawset( L, -3 );
 
 		lua_pushliteral( L, "__newindex" );
-		lua_pushcfunction( L, mms.__newindex );
+		lua_pushcfunction( L, mms.newIndex );
 		lua_rawset( L, -3 );
 
 		lua_pushliteral( L, "__gc" );
-		lua_pushcfunction( L, mms.__gc );
+		lua_pushcfunction( L, mms.gc );
 		lua_rawset( L, -3 );
 
 		// save the metatable in the registry
@@ -351,7 +351,7 @@ co::Interface* InterfaceBinding::checkInstance( lua_State* L, int narg )
 	return *reinterpret_cast<co::Interface**>( lua_touserdata( L, narg ) );
 }
 
-int InterfaceBinding::__index( lua_State* L )
+int InterfaceBinding::index( lua_State* L )
 {
 	__BEGIN_EXCEPTIONS_BARRIER__
 
@@ -372,7 +372,7 @@ int InterfaceBinding::__index( lua_State* L )
 	__END_EXCEPTIONS_BARRIER__
 }
 
-int InterfaceBinding::__newindex( lua_State* L )
+int InterfaceBinding::newIndex( lua_State* L )
 {
 	__BEGIN_EXCEPTIONS_BARRIER__
 
@@ -402,7 +402,7 @@ int InterfaceBinding::__newindex( lua_State* L )
 	__END_EXCEPTIONS_BARRIER__
 }
 
-int InterfaceBinding::__gc( lua_State* L )
+int InterfaceBinding::gc( lua_State* L )
 {
 	__BEGIN_EXCEPTIONS_BARRIER__
 

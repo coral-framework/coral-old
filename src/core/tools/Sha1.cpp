@@ -148,7 +148,8 @@ void final( Context* context, uint8 digest[DIGEST_SIZE] )
     for( uint8 i = 0; i < 8; ++i )
 	{
 		// endian independent
-        finalCount[i] = ( (context->count[i >= 4 ? 0 : 1] >> ( ( 3 - ( i & 3 ) ) * 8 ) ) & 255 );
+        finalCount[i] = static_cast<co::uint8>(
+			( context->count[i >= 4 ? 0 : 1] >> ( ( 3 - ( i & 3 ) ) * 8 ) ) & 255 );
     }
 
     update( context, reinterpret_cast<const uint8*>( "\200" ), 1 );
@@ -162,7 +163,7 @@ void final( Context* context, uint8 digest[DIGEST_SIZE] )
 
     for( uint8 i = 0; i < DIGEST_SIZE; ++i )
 	{
-		digest[i] = ( ( context->state[i >> 2] >> ( ( 3 - ( i & 3 ) ) * 8 ) ) & 255 );
+		digest[i] = static_cast<co::uint8>( ( context->state[i >> 2] >> ( ( 3 - ( i & 3 ) ) * 8 ) ) & 255 );
     }
 }
 
