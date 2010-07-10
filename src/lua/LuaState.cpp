@@ -97,10 +97,10 @@ void LuaState::push( const co::Any& any )
 		lua_pushnumber( _L, s.data.u32 );
 		break;
 	case co::TK_INT64:
-		lua_pushnumber( _L, s.data.i64 );
+		lua_pushnumber( _L, static_cast<lua_Number>( s.data.i64 ) );
 		break;
 	case co::TK_UINT64:
-		lua_pushnumber( _L, s.data.u64 );
+		lua_pushnumber( _L, static_cast<lua_Number>( s.data.u64 ) );
 		break;
 	case co::TK_FLOAT:
 		lua_pushnumber( _L, s.data.f );
@@ -176,7 +176,7 @@ void LuaState::toCoral( int index, LuaValue& value )
 		throw lua::Exception( "no conversion from Lua's nil" );
 
 	case LUA_TBOOLEAN:
-		value.any.set<bool>( lua_toboolean( _L, index ) );
+		value.any.set<bool>( lua_toboolean( _L, index ) != 0 );
 		break;
 
 	case LUA_TLIGHTUSERDATA:

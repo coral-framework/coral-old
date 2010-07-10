@@ -135,6 +135,8 @@ FUNCTION( CORAL_GENERATE_MAPPINGS generatedHeaders )
 		LIST( APPEND resultList "${outDir}/${typePath}.h" )
 	ENDFOREACH()
 
+	LIST( REMOVE_DUPLICATES resultList )
+
 	CORAL_GET_PATH_STRING( coralPathStr )
 
 	ADD_CUSTOM_COMMAND( OUTPUT ${resultList}

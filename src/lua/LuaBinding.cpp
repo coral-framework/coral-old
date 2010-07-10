@@ -35,7 +35,7 @@ static void handleException( lua_State* L )
 	{
 		throw;
 	}
-	catch( const lua::MsgOnStackException& e )
+	catch( const lua::MsgOnStackException& )
 	{
 		// message is already on the stack
 	}

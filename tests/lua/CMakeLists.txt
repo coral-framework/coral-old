@@ -20,6 +20,7 @@ SET( CORAL_PATH
 	"${CMAKE_SOURCE_DIR}/tests/moduleB"
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 )
+
 CORAL_GENERATE_MAPPINGS( GENERATED_HEADERS co.System )
 
 # Pass the CORAL_PATH as a precompiler definition
