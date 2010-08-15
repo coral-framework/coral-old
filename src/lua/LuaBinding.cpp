@@ -16,6 +16,7 @@
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/FileLookUp.h>
 #include <lua/Exception.h>
+#include <cstring>
 
 /*****************************************************************************/
 /*  Helper Macros to Shield Lua from C++ Exceptions                          */
