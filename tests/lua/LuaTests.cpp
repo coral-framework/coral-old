@@ -9,20 +9,22 @@
 #include <co/ModuleManager.h>
 #include <co/ModuleLoadException.h>
 
-#define EXPECT_NO_ERROR( moduleName ) \
+#define ASSERT_SUCCESS( moduleName ) \
 	try { co::getSystem()->getModules()->load( moduleName ); } \
-	catch( const std::exception& e ) { FAIL() << "Unexpected exception: " << e.what(); }
+	catch( const std::exception& e ) { FAIL() << e.what(); }
 
-#define EXPECT_ERROR( moduleName, expectedMsg ) \
+#define ASSERT_ERROR( moduleName, expectedMsg ) \
 	try { \
 		co::getSystem()->getModules()->load( moduleName ); \
 		FAIL() << "an exception should have been raised"; \
 	} catch( const std::exception& e ) { \
 		std::string raisedMsg( e.what() ); \
 		if( raisedMsg.find( expectedMsg ) == std::string::npos ) \
-			FAIL() << "Raised message (\"" << raisedMsg << "\") does not contain the expected message (\"" \
+			FAIL() << "raised message (\"" << raisedMsg << "\") does not contain the expected message (\"" \
 				<< expectedMsg << "\")"; \
 	}
+
+// --- Initialization --- //
 
 TEST( LuaTests, setup )
 {
@@ -40,43 +42,66 @@ TEST( LuaTests, setup )
 	}
 }
 
+// --- Sanity Tests --- //
+
 TEST( LuaTests, moduleInvalidScriptName )
 {
-	EXPECT_ERROR( "lua.moduleInvalidScriptName",
+	ASSERT_ERROR( "lua.moduleInvalidScriptName",
 					"none of the module loaders recognized 'lua.moduleInvalidScriptName' as a module" );
 }
 
 TEST( LuaTests, moduleInvalidReturn )
 {
-	EXPECT_ERROR( "lua.moduleInvalidReturn", "the module script must return a table" );
+	ASSERT_ERROR( "lua.moduleInvalidReturn", "the module script must return a table" );
 }
 
 TEST( LuaTests, moduleValid )
 {
-	EXPECT_NO_ERROR( "lua.moduleValid" );
+	ASSERT_SUCCESS( "lua.moduleValid" );
 }
 
-TEST( LuaTests, assertionTest )
+TEST( LuaTests, assertEq )
 {
-	EXPECT_ERROR( "lua.assertionTest", "my assertion message" );
+	ASSERT_ERROR( "lua.assertEq", "ASSERT_EQ failed: 1 != 2" );
 }
+
+TEST( LuaTests, assertErrorNoError )
+{
+	ASSERT_ERROR( "lua.assertErrorNoError", "ASSERT_ERROR failed: no error was raised, though one was expected" );
+}
+
+TEST( LuaTests, assertErrorMismatch )
+{
+	ASSERT_ERROR( "lua.assertErrorMismatch", "does not contain the expected message ('expected message')" );
+}
+
+TEST( LuaTests, assertTrue )
+{
+	ASSERT_ERROR( "lua.assertTrue", "ASSERT_TRUE failed (nil value)" );
+}
+
+// --- Package Tests --- //
 
 TEST( LuaTests, coPackage )
 {
-	EXPECT_NO_ERROR( "lua.coPackage" );
+	ASSERT_SUCCESS( "lua.coPackage" );
 }
+
+// --- Component Binding Tests --- //
+
+TEST( LuaTests, componentManipulation )
+{
+	ASSERT_SUCCESS( "lua.componentManipulation" );
+}
+
+// --- Interface Binding Tests --- //
 
 TEST( LuaTests, interfaceAttributes )
 {
-	EXPECT_NO_ERROR( "lua.interfaceAttributes" );
-}
-
-TEST( LuaTests, interfaceAttribReadOnly )
-{
-	EXPECT_ERROR( "lua.interfaceAttribReadOnly", "attribute 'state' is read-only and cannot be changed" );
+	ASSERT_SUCCESS( "lua.interfaceAttributes" );
 }
 
 TEST( LuaTests, interfaceMethods )
 {
-	EXPECT_NO_ERROR( "lua.interfaceMethods" );
+	ASSERT_SUCCESS( "lua.interfaceMethods" );
 }

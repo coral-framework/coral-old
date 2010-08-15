@@ -6,6 +6,11 @@
 #include "LuaState.h"
 #include "LuaBinding.h"
 #include <lua/Exception.h>
+#include <sstream>
+
+/*****************************************************************************/
+/*  LuaState Class                                                           */
+/*****************************************************************************/
 
 LuaState LuaState::sm_instance;
 
@@ -20,6 +25,12 @@ LuaState::~LuaState()
 	lua_close( _L );
 }
 
+static int traceback( lua_State* L )
+{
+	luaL_traceback( L, L, lua_tostring( L, 1 ), 1 );
+	return 1;
+}
+
 void LuaState::setup()
 {
 	assert( !_L );
@@ -32,6 +43,20 @@ void LuaState::setup()
 
 	// create the 'co' package
 	coPackage::open( _L );
+
+	/*
+		We install the co.packageLoader function into Lua's package.loaders table
+		in order to enable 'require' to load Lua scripts in the CORAL_PATH.
+	 */
+	if( luaL_dostring( _L, "table.insert( package.loaders, 2, co.packageLoader )" ) )
+	{
+		lua_pop( _L, 1 );
+		throw lua::Exception( "error installing the co.packageLoader into Lua's package.loaders table" );
+	}
+
+	// keep our stack-tracing function at the first stack position
+	lua_settop( _L, 0 );
+	lua_pushcfunction( _L, traceback );
 }
 
 void LuaState::tearDown()
@@ -43,6 +68,37 @@ void LuaState::tearDown()
 	lua_gc( _L, LUA_GCCOLLECT, 0 );
 }
 
+void LuaState::dumpStack()
+{
+	lua_State* L = _L;
+	int top = lua_gettop( L );
+	printf( "dumpStack -- START\n" );
+	for( int i = 1; i <= top; ++i )
+	{
+		printf( "%d\t%s\t", i, luaL_typename( L, i ) );
+		switch( lua_type( L, i ) )
+		{
+		case LUA_TNUMBER:
+			printf( "%g\n", lua_tonumber( L, i ) );
+			break;
+		case LUA_TSTRING:
+			printf( "%s\n", lua_tostring( L, i ) );
+			break;
+		case LUA_TBOOLEAN:
+			printf( "%s\n", lua_toboolean( L, i ) ? "true" : "false" );
+			break;
+		case LUA_TNIL:
+			printf( "%s\n", "nil" );
+			break;
+		default:
+			printf( "%p\n", lua_topointer( L, i ) );
+			break;
+		}
+	}
+	printf( "dumpStack -- END\n" );
+}
+
+
 void LuaState::loadFile( const std::string& filename )
 {
 	int res = luaL_loadfile( _L, filename.c_str() );
@@ -52,12 +108,13 @@ void LuaState::loadFile( const std::string& filename )
 
 void LuaState::call( int numArgs, int numResults )
 {
-	int res = lua_pcall( _L, numArgs, numResults, 0 );
+	assert( lua_isfunction( _L, 1 ) );
+	int res = lua_pcall( _L, numArgs, numResults, 1 );
 	if( res != LUA_OK )
 		raiseException( res );
 }
 
-void LuaState::push( const co::Any& any )
+void LuaState::push( const co::Any& any, int depth )
 {
 	const co::__any::State& s = any.getState();
 
@@ -75,6 +132,19 @@ void LuaState::push( const co::Any& any )
 
 	switch( s.kind )
 	{
+	case co::TK_ANY:
+		if( depth > 1 )
+		{
+			/*
+				Since a co::Any may reference any other co::Any,
+				we must limit the number of indirections to avoid cycles.
+			 */
+			assert( false );
+			lua_pushnil( _L );
+			break;
+		}
+		push( any.get<const co::Any&>(), depth + 1 );
+		break;
 	case co::TK_BOOLEAN:
 		lua_pushboolean( _L, s.data.b );
 		break;
@@ -116,7 +186,17 @@ void LuaState::push( const co::Any& any )
 		lua_pushnil( _L );
 		break;
 	case co::TK_ENUM:
-		lua_pushinteger( _L, s.data.u32 );
+		{
+			co::ArrayRange<std::string const> ids = static_cast<co::EnumType*>( s.type )->getIdentifiers();
+			if( s.data.u32 < ids.getSize() )
+				push( ids[s.data.u32] );
+			else
+			{
+				// enum value is out of bounds
+				assert( false );
+				lua_pushliteral( _L, "<invalid>" );
+			}
+		}
 		break;
 	case co::TK_STRUCT:
 	case co::TK_NATIVECLASS:
@@ -136,9 +216,10 @@ void LuaState::push( const std::string& str )
 	lua_pushlstring( _L, str.c_str(), str.length() );
 }
 
-void LuaState::push( co::Interface* itf )
+template<typename BindingClass, typename InstanceType>
+inline void LuaState::pushInstance( InstanceType* ptr )
 {
-	if( !itf )
+	if( !ptr )
 	{
 		lua_pushnil( _L );
 		return;
@@ -146,7 +227,7 @@ void LuaState::push( co::Interface* itf )
 
 	// try to get an existing object (userdata) from the instances table
 	pushInstancesTable();
-	lua_pushlightuserdata( _L, itf );
+	lua_pushlightuserdata( _L, ptr );
 	lua_rawget( _L, -2 );
 
 	// 'itf' not in the instances table yet?
@@ -155,10 +236,10 @@ void LuaState::push( co::Interface* itf )
 		lua_pop( _L, 1 );
 
 		// create the userdata ...
-		InterfaceBinding::create( _L, itf );
+		BindingClass::create( _L, ptr );
 
 		// ... and add it to the instances table
-		lua_pushlightuserdata( _L, itf );
+		lua_pushlightuserdata( _L, ptr );
 		lua_pushvalue( _L, -2 );
 		lua_rawset( _L, -4 );
 	}
@@ -167,31 +248,61 @@ void LuaState::push( co::Interface* itf )
 	lua_remove( _L, -2 );
 }
 
-void LuaState::toCoral( int index, LuaValue& value )
+void LuaState::push( co::Interface* itf )
 {
+	if( itf && itf->getInterfaceType() == co::typeOf<co::Component>::get() )
+		push( static_cast<co::Component*>( itf ) );
+	else
+		pushInstance<InterfaceBinding, co::Interface>( itf );
+}
+
+void LuaState::push( co::Component* component )
+{
+	pushInstance<ComponentBinding, co::Component>( component );
+}
+
+void LuaState::toCoral( int index, co::Type* expectedType, co::Any& value, Variant& data )
+{
+	assert( expectedType );	
 	int type = lua_type( _L, index );
 	switch( type )
 	{
 	case LUA_TNIL:
+		if( expectedType->getKind() == co::TK_INTERFACE )
+		{
+			value.setInterface( NULL, static_cast<co::InterfaceType*>( expectedType ) );
+			break;
+		}
 		throw lua::Exception( "no conversion from Lua's nil" );
 
 	case LUA_TBOOLEAN:
-		value.any.set<bool>( lua_toboolean( _L, index ) != 0 );
+		value.set<bool>( lua_toboolean( _L, index ) != 0 );
 		break;
 
 	case LUA_TLIGHTUSERDATA:
 		throw lua::Exception( "no conversion from a Lua light userdata" );
 
 	case LUA_TNUMBER:
-		value.any.set( lua_tonumber( _L, index ) );
+		value.set( lua_tonumber( _L, index ) );
 		break;
 
 	case LUA_TSTRING:
+		if( expectedType->getKind() == co::TK_ENUM )
+		{
+			const char* str = lua_tostring( _L, index );
+			co::int32 id = static_cast<co::EnumType*>( expectedType )->getValueOf( str );
+			if( id == -1 )
+				CORAL_THROW( lua::Exception, "invalid identifier '" << str << "' for enum '"
+								<< expectedType->getFullName() << "'" );
+			value.set( id );
+		}
+		else
 		{
 			size_t length;
 			const char* cstr = lua_tolstring( _L, index, &length );
-			value.str.assign( cstr, length );
-			value.any.set<const std::string&>( value.str );
+			data.createString();
+			data.getString().assign( cstr, length );
+			value.set<std::string&>( data.getString() );
 		}
 		break;
 
@@ -202,7 +313,7 @@ void LuaState::toCoral( int index, LuaValue& value )
 		throw lua::Exception( "no conversion from a Lua function" );
 
 	case LUA_TUSERDATA:
-		CompoundTypeBinding::getInstance( _L, index, value.any );
+		CompoundTypeBinding::getInstance( _L, index, value );
 		break;
 
 	case LUA_TTHREAD:
@@ -253,4 +364,145 @@ void LuaState::raiseException( int errorCode )
 	lua_pop( _L, 1 );
 
 	throw lua::Exception( msg );
+}
+
+/*****************************************************************************/
+/*  Variant Class                                                            */
+/*****************************************************************************/
+
+void Variant::makeOut( co::Type* type, co::Any& arg )
+{
+	co::TypeKind kind = type->getKind();
+	switch( kind )
+	{
+	case co::TK_ANY:
+		// if we had two Variants per parameter we could accept any value for
+		// an 'inout any' parameter; currenty we only accept real co::Any's.
+		createAny();
+		if( arg.isValid() )
+			getAny() = arg.get<const co::Any&>();
+		arg.set<co::Any&>( getAny() );
+		break;
+	case co::TK_BOOLEAN:
+		if( arg.isValid() )
+			data.b = arg.get<bool>();
+		arg.set<bool&>( data.b );
+		break;
+	case co::TK_INT8:
+		if( arg.isValid() )
+			data.i8 = arg.get<co::int8>();
+		arg.set<co::int8&>( data.i8 );
+		break;
+	case co::TK_UINT8:
+		if( arg.isValid() )
+			data.u8 = arg.get<co::uint8>();
+		arg.set<co::uint8&>( data.u8 );
+		break;
+	case co::TK_INT16:
+		if( arg.isValid() )
+			data.i16 = arg.get<co::int16>();
+		arg.set<co::int16&>( data.i16 );
+		break;
+	case co::TK_UINT16:
+		if( arg.isValid() )
+			data.u16 = arg.get<co::uint16>();
+		arg.set<co::uint16&>( data.u16 );
+		break;
+	case co::TK_INT32:
+		if( arg.isValid() )
+			data.i32 = arg.get<co::int32>();
+		arg.set<co::int32&>( data.i32 );
+		break;
+	case co::TK_UINT32:
+		if( arg.isValid() )
+			data.u32 = arg.get<co::uint32>();
+		arg.set<co::uint32&>( data.u32 );
+		break;
+	case co::TK_INT64:
+		if( arg.isValid() )
+			data.i64 = arg.get<co::int64>();
+		arg.set<co::int64&>( data.i64 );
+		break;
+	case co::TK_UINT64:
+		if( arg.isValid() )
+			data.u64 = arg.get<co::uint64>();
+		arg.set<co::uint64&>( data.u64 );
+		break;
+	case co::TK_FLOAT:
+		if( arg.isValid() )
+			data.f = arg.get<float>();
+		arg.set<float&>( data.f );
+		break;
+	case co::TK_DOUBLE:
+		if( arg.isValid() )
+			data.d = arg.get<double>();
+		arg.set<double&>( data.d );
+		break;
+	case co::TK_STRING:
+		assert( arg.getKind() == co::TK_STRING );
+		assert( arg.isConst() == false );
+		break;
+	case co::TK_ARRAY:
+		// TODO
+		break;
+	case co::TK_ENUM:
+		if( arg.isValid() )
+			data.u32 = arg.get<co::uint32>();
+		arg.set<co::uint32&>( data.u32 );
+		break;
+	case co::TK_STRUCT:
+	case co::TK_NATIVECLASS:
+		// TODO
+		break;
+	case co::TK_INTERFACE:
+		data.ptr = arg.getState().data.ptr;
+		arg.setVariable( type, ( co::Any::VarIsPointer | co::Any::VarIsReference ), &data.ptr );
+		break;
+	default:
+		assert( false );
+	}
+}
+
+void Variant::makeIn( co::Any& arg )
+{
+	co::TypeKind kind = arg.getKind();
+	switch( kind )
+	{
+	case co::TK_ANY:
+		arg = getAny();
+		break;
+	case co::TK_BOOLEAN:
+	case co::TK_INT8:
+	case co::TK_UINT8:
+	case co::TK_INT16:
+	case co::TK_UINT16:
+	case co::TK_INT32:
+	case co::TK_UINT32:
+	case co::TK_INT64:
+	case co::TK_UINT64:
+	case co::TK_FLOAT:
+	case co::TK_DOUBLE:
+		assert( arg.isReference() && !arg.isPointer() );
+		arg.setVariable( arg.getType(), co::Any::VarIsValue, arg.getState().data.ptr );
+		break;
+	case co::TK_STRING:
+		// empty
+		break;
+	case co::TK_ARRAY:
+		// TODO
+		break;
+	case co::TK_ENUM:
+		assert( arg.isReference() && !arg.isPointer() );
+		arg.setVariable( arg.getType(), co::Any::VarIsValue, arg.getState().data.ptr );
+		break;
+	case co::TK_STRUCT:
+	case co::TK_NATIVECLASS:
+		// TODO
+		break;
+	case co::TK_INTERFACE:
+		arg.setInterface( reinterpret_cast<co::Interface*>( data.ptr ), arg.getInterfaceType() );
+		break;
+	default:
+		assert( false );
+	}
 }

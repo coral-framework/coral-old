@@ -88,6 +88,5 @@ bool co::FileLookUp::fileExists( const std::string& filePath )
 	CORAL_STAT_STRUCT info;
 	if( CORAL_STAT_FUNC( filePath.c_str(), &info ) )
 		return false;
-
 	return S_ISREG( info.st_mode ) != 0;
 }

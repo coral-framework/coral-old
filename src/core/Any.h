@@ -40,7 +40,7 @@ namespace __any {
 
 struct State
 {
-	union
+	union Data
 	{
 		// Storage for primitive values:
 		bool b;
@@ -555,6 +555,9 @@ public:
 		setArray( arrayKind, elementType, flags, ptr, arraySize );
 	}
 
+	//! Returns whether this co::Any was initialized.
+	inline bool isValid() const { return _state.kind != co::TK_NONE; }
+
 	//! Returns the kind of variable stored in this object.
 	inline TypeKind getKind() const { return static_cast<TypeKind>( _state.kind ); }
 
@@ -620,21 +623,22 @@ public:
 
 	/*!
 		Stores an interface pointer.
-	 
+
 		The \c type parameter is optional. When it's not passed, the interface type is
 		extracted from the interface instance, which in this case cannot be NULL. Always
 		pass the interface \c type for cases where the interface instance could be null.
 
-		This method does not take variable flags, as it's always assumed to be VarIsPointer.
+		This method does not take variable flags, variables are always pointers. If you
+		want to create a reference to an interface pointer, use setVariable() instead.
 	 */
 	void setInterface( co::Interface* instance, co::InterfaceType* type = 0 );
 
 	/*!
-		Stores a single-value (non-array, non-interface) variable.
+		Stores a single-value (non-array) variable.
 
 		\param type The variable's type.
 		\param flags One or more flags from the \c VariableFlags enum OR'ed together.
-					Please note that when VarIsPointer is specified, \c ptr should
+					Please note that when \c VarIsPointer is specified, \c ptr should
 					be a pointer to the value, not a pointer to a pointer.
 		\param ptr The variable instance, which must really be an instance of \c type and
 					have the modifiers described in \c flags (otherwise, all hell will break

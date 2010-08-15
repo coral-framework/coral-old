@@ -525,9 +525,6 @@ void Any::setVariable( Type* type, uint32 flags, void* ptr )
 	// validate the type kind
 	assert( kind > TK_NONE && kind < TK_COMPONENT && kind != TK_EXCEPTION );
 
-	// for interfaces, use setInterface() instead
-	assert( kind != TK_INTERFACE );
-
 	// for arrays, use setArray() instead
 	assert( kind != TK_ARRAY );
 

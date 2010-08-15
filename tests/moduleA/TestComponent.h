@@ -7,6 +7,7 @@
 #define _TESTCOMPONENT_H_
 
 #include "TestComponent_Base.h"
+#include <moduleA/TestStruct.h>
 
 class TestComponent : public moduleA::TestComponent_Base
 {
@@ -32,6 +33,15 @@ public:
 
 	virtual moduleA::TestInterface* getSelfReferenceAttrib();
 
+	virtual moduleA::TestEnum getTestEnum();
+	virtual void setTestEnum( moduleA::TestEnum value );
+	
+	virtual const moduleA::TestStruct& getTestStruct();
+	virtual void setTestStruct( const moduleA::TestStruct& value );
+	
+	virtual co::ArrayRange<moduleA::TestStruct const> getTestStructArray();
+	virtual void setTestStructArray( co::ArrayRange<moduleA::TestStruct const> range );
+
 	virtual void testInParameters( float size, moduleA::TestEnum enumValue,
 		const std::string& text, const moduleA::TestStruct& testStruct,
 		moduleA::DummyInterface* dummyInterface, co::ArrayRange<co::int32 const> intList,
@@ -54,6 +64,9 @@ private:
 
 	std::vector<std::string> _names;
 	co::RefVector<moduleA::DummyInterface> _dummyInterfaces;
+	moduleA::TestEnum _testEnum;
+	moduleA::TestStruct _testStruct;
+	std::vector<moduleA::TestStruct> _testStructArray;
 };
 
 #endif

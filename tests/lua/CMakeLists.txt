@@ -34,7 +34,7 @@ INCLUDE_DIRECTORIES(
 
 # Create test executable
 ADD_EXECUTABLE( tests_lua EXCLUDE_FROM_ALL Main.cpp LuaTests.cpp ${GENERATED_HEADERS} )
-ADD_DEPENDENCIES( tests_lua lua )
+ADD_DEPENDENCIES( tests_lua lua moduleA )
 
 SET_TARGET_PROPERTIES( tests_lua PROPERTIES
 	PROJECT_LABEL "Tests - Lua"

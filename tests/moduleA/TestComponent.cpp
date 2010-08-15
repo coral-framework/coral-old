@@ -10,7 +10,7 @@
 
 TestComponent::TestComponent() : _name( "NOT SET" ), _readOnlyString( "READONLY" )
 {
-	// empty
+	_testEnum = moduleA::First;
 }
 
 TestComponent::~TestComponent()
@@ -70,6 +70,39 @@ void TestComponent::setNames( co::ArrayRange<std::string const> names )
 moduleA::TestInterface* TestComponent::getSelfReferenceAttrib()
 {
 	return this;
+}
+
+moduleA::TestEnum TestComponent::getTestEnum()
+{
+	return _testEnum;
+}
+
+void TestComponent::setTestEnum( moduleA::TestEnum value )
+{
+	_testEnum = value;
+}
+
+const moduleA::TestStruct& TestComponent::getTestStruct()
+{
+	return _testStruct;
+}
+
+void TestComponent::setTestStruct( const moduleA::TestStruct& value )
+{
+	_testStruct = value;
+}
+
+co::ArrayRange<moduleA::TestStruct const> TestComponent::getTestStructArray()
+{
+	return _testStructArray;
+}
+
+void TestComponent::setTestStructArray( co::ArrayRange<moduleA::TestStruct const> range )
+{
+	_testStructArray.clear();
+	_testStructArray.reserve( range.getSize() );
+	for( ; range; range.popFirst() )
+		_testStructArray.push_back( range.getFirst() );
 }
 
 void TestComponent::testInParameters( float size, moduleA::TestEnum enumValue,

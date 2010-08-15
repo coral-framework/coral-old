@@ -18,8 +18,8 @@ SET( LUA52_CORE_SOURCES
 )
 
 SET( LUA52_LIB_SOURCES
-	lauxlib.c lbaselib.c lbitlib.c ldblib.c liolib.c lmathlib.c loslib.c
-	lstrlib.c ltablib.c loadlib.c linit.c
+	lauxlib.c lbaselib.c lcorolib.c lbitlib.c ldblib.c liolib.c lmathlib.c
+	loslib.c lstrlib.c ltablib.c loadlib.c linit.c
 )
 
 ADD_LIBRARY( lua52 STATIC EXCLUDE_FROM_ALL ${LUA52_CORE_SOURCES} ${LUA52_LIB_SOURCES} )

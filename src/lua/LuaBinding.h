@@ -8,9 +8,10 @@
 
 #include <lua.hpp>
 #include <co/Any.h>
+#include <co/Component.h>
 
 /*!
-	Helper class for opening and closing the 'co' package, which
+	Static class for opening and closing the 'co' package, which
 	contains the Coral global functions and the 'co.system' singleton.
  */
 class coPackage
@@ -21,10 +22,12 @@ public:
 
 private:
 	static int newInstance( lua_State* L );
+	static int packageLoader( lua_State* L );
 };
 
 /*!
-	Class with re-usable functions for binding co::CompoundTypes to Lua.
+	Auxiliary static class containing re-usable functions for
+	binding co::CompoundTypes to Lua.
  */
 class CompoundTypeBinding
 {
@@ -37,12 +40,6 @@ public:
 	static void getInstance( lua_State* L, int index, co::Any& instance );
 
 protected:
-	//! Returns the literal type name of a co::CompoundType with the specified tag.
-	static const char* getTypeName( co::TypeKind tag );
-
-	//! Similar to luaL_checktype/luaL_typerror, but specialized for Coral userdata.
-	static void checkType( lua_State* L, int narg, co::TypeKind expectedTag );
-
 	/*!
 		Pushes a metatable for a co::CompoundType's userdata.
 		The userdata is cached in the registry under the specified 'key'.
@@ -77,7 +74,24 @@ protected:
 };
 
 /*!
-	Helper class for binding co::Interfaces to Lua.
+	Static class for binding co::Components to Lua.
+ */
+class ComponentBinding : public CompoundTypeBinding
+{
+public:
+	/*!
+		Pushes a new instance of a co::Interface* userdata onto the stack.
+	 */
+	static void create( lua_State* L, co::Component* component );
+
+	// --- Metamethods ---
+	static int index( lua_State* L );
+	static int newIndex( lua_State* L );
+	static int gc( lua_State* L );
+};
+
+/*!
+	Static class for binding co::Interfaces to Lua.
  */
 class InterfaceBinding : public CompoundTypeBinding
 {
@@ -87,13 +101,7 @@ public:
 	 */
 	static void create( lua_State* L, co::Interface* itf );
 
-	/*!
-		Retrieves a co::Interface* from the userdata at the given index.
-		For a userdata of the wrong type, generates a Lua error.
-	 */
-	static co::Interface* checkInstance( lua_State* L, int narg );
-
-	// Metamethod Implementations:
+	// --- Metamethods ---
 	static int index( lua_State* L );
 	static int newIndex( lua_State* L );
 	static int gc( lua_State* L );

@@ -10,6 +10,11 @@ interface TestInterface
 
 	readonly attribute TestInterface selfReferenceAttrib;
 
+	attribute TestEnum testEnum;
+
+	attribute TestStruct testStruct;
+	attribute TestStruct[] testStructArray;
+
 	<c++
 	inline int testCppBlock1()
 	{

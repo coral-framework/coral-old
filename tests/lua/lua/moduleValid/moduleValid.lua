@@ -1,4 +1,4 @@
--- A dummy valid Lua Module
+-- A simple Lua Module that prints when each method is called.
 local M = {}
 
 function M:initialize( module )
