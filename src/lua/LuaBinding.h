@@ -21,7 +21,8 @@ public:
 	static void close( lua_State* L );
 
 private:
-	static int newInstance( lua_State* L );
+	static int getType( lua_State* L );
+	static int genericNew( lua_State* L );
 	static int packageLoader( lua_State* L );
 };
 
@@ -39,13 +40,24 @@ public:
 	 */
 	static void getInstance( lua_State* L, int index, co::Any& instance );
 
+	/*!
+		Just like getInstance(), but does not raise exceptions (if the userdata
+		is invalid, 'instance' is left unmodified).
+	 */
+	static void tryGetInstance( lua_State* L, int index, co::Any& instance );
+
 protected:
 	/*!
-		Pushes a metatable for a co::CompoundType's userdata.
-		The userdata is cached in the registry under the specified 'key'.
-		The co::CompoundType's concrete type is identified by the given 'tag'
+		Pushes a metatable for a userdata of the specified co::CompoundType.
+		The metatable is cached in the registry, indexed by the co::CompoundType pointer.
 	 */
-	static void pushMetatable( lua_State* L, void* key, co::TypeKind tag );
+	static void pushMetatable( lua_State* L, co::CompoundType* ct );
+
+	/*!
+		Given a userdata's index, attempts to get its co::CompoundType* (from its
+		metatable). Returns NULL if the userdata is not a valid Coral object.
+	 */
+	static co::CompoundType* getType( lua_State* L, int index );
 
 	/*!
 		Assumes the CompoundType's udata is at index 1 and the member name is at index 2.
@@ -79,9 +91,7 @@ protected:
 class ComponentBinding : public CompoundTypeBinding
 {
 public:
-	/*!
-		Pushes a new instance of a co::Interface* userdata onto the stack.
-	 */
+	//! Pushes a new instance of a co::Component* userdata onto the stack.
 	static void create( lua_State* L, co::Component* component );
 
 	// --- Metamethods ---
@@ -96,15 +106,52 @@ public:
 class InterfaceBinding : public CompoundTypeBinding
 {
 public:
-	/*!
-		Pushes a new instance of a co::Interface* userdata onto the stack.
-	 */
+	//! Pushes a new instance of a co::Interface* userdata onto the stack.
 	static void create( lua_State* L, co::Interface* itf );
 
 	// --- Metamethods ---
 	static int index( lua_State* L );
 	static int newIndex( lua_State* L );
 	static int gc( lua_State* L );
+};
+
+/*!
+	Re-usable class for binding complex values to Lua.
+ */
+class ComplexValueBinding : public CompoundTypeBinding
+{
+public:
+	/*!
+		Pushes a userdata of the specified complex value type onto the stack.
+		If an instancePtr is provided, the pushed complex value will be a copy of it.
+		Otherwise, if instancePtr is NULL, a default-constructed complex value will be pushed.
+	 */
+	static void push( lua_State* L, co::Type* type, void* instancePtr );
+
+	// --- Metamethods ---
+	static int gc( lua_State* L );
+};
+
+/*!
+	Static class for binding native classes to Lua.
+ */
+class NativeClassBinding : public ComplexValueBinding
+{
+public:
+	// --- Metamethods ---
+	static int index( lua_State* L );
+	static int newIndex( lua_State* L );
+};
+
+/*!
+	Static class for binding structs to Lua.
+ */
+class StructBinding : public ComplexValueBinding
+{
+public:
+	// --- Metamethods ---
+	static int index( lua_State* L );
+	static int newIndex( lua_State* L );
 };
 
 #endif

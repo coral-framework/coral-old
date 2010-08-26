@@ -1,7 +1,7 @@
 /*
 	A 128-bit Universally Unique IDentifier (UUID).
  */
-native class Uuid ( co::Uuid <co/reserved/Uuid.h> )
+native class Uuid ( <co/reserved/Uuid.h> co::Uuid )
 {
 	// True if this is the null UUID (i.e. "00000000-0000-0000-0000000000000000").
 	readonly attribute bool isNull;

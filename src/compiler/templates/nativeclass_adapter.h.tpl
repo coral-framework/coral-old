@@ -36,7 +36,7 @@ public:
 {{#ATTRIBUTE_LIST}}
 {{#GETTER}}
 {{NEWLINE}}
-	static {{RETURN_TYPE}} {{METHOD_NAME}}( const {{TYPE_NAME_CPP}}& instance );
+	static {{RETURN_TYPE}} {{METHOD_NAME}}( {{TYPE_NAME_CPP}}& instance );
 {{/GETTER}}
 {{#SETTER}}
 	static void {{METHOD_NAME}}( {{TYPE_NAME_CPP}}& instance, {{PARAMETER_TYPE}} value );

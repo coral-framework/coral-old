@@ -519,18 +519,46 @@ inline void Any::setModifiers( uint32 flags )
 void Any::setVariable( Type* type, uint32 flags, void* ptr )
 {
 	assert( type );
-
 	TypeKind kind = type->getKind();
 
+	if( kind < TK_ARRAY )
+		return setBasic( kind, flags, ptr );
+
 	// validate the type kind
-	assert( kind > TK_NONE && kind < TK_COMPONENT && kind != TK_EXCEPTION );
+	assert( kind < TK_COMPONENT && kind != TK_EXCEPTION );
 
 	// for arrays, use setArray() instead
 	assert( kind != TK_ARRAY );
 
 	// set kind and type
 	_state.kind = kind;
-	_state.type = ( _state.kind < TK_ARRAY ? NULL : type );
+	_state.type = type;
+
+	// set modifiers
+	setModifiers( flags );
+
+	// set reference
+	if( _state.isPointer || _state.isReference )
+	{
+		_state.data.ptr = ptr;
+	}
+	else
+	{
+		assert( kind == co::TK_ENUM );
+		_state.data.u32 = *reinterpret_cast<uint32*>( ptr );
+	}
+}
+
+void Any::setBasic( co::TypeKind kind, uint32 flags, void* ptr )
+{
+	// invalid type kind?
+	assert( kind > TK_NONE );
+
+	// for non-primitive types, use setVariable() instead
+	assert( kind < TK_ARRAY );
+
+	_state.kind = kind;
+	_state.type = NULL;
 
 	// set modifiers
 	setModifiers( flags );
@@ -555,7 +583,6 @@ void Any::setVariable( Type* type, uint32 flags, void* ptr )
 		case TK_UINT64:		_state.data.u64 = *reinterpret_cast<uint64*>( ptr ); break;
 		case TK_FLOAT:		_state.data.f = *reinterpret_cast<float*>( ptr ); break;
 		case TK_DOUBLE:		_state.data.d = *reinterpret_cast<double*>( ptr ); break;
-		case TK_ENUM:		_state.data.u32 = *reinterpret_cast<uint32*>( ptr ); break;
 		default:
 			assert( false ); // forgot to pass a Ptr/Ref flag?
 		}

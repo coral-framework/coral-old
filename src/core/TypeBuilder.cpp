@@ -383,16 +383,16 @@ public:
 		_myType->sortMembers( _myType );
 	}
 
-	void defineNativeClass( const std::string& nativeName, const std::string& headerName )
+	void defineNativeClass( const std::string& headerName, const std::string& nativeName )
 	{
 		assertNotCreated();
-
-		if( nativeName.empty() )
-			CORAL_THROW( co::IllegalArgumentException, "illegal empty native type name" );
 
 		if( headerName.empty() )
 			CORAL_THROW( co::IllegalArgumentException, "illegal empty header name" );
 
+		if( nativeName.empty() )
+			CORAL_THROW( co::IllegalArgumentException, "illegal empty native type name" );
+		
 		_nativeClassName = nativeName;
 		_nativeClassHeaderName = headerName;
 	}

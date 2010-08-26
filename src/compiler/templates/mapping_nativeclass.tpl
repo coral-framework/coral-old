@@ -1,2 +1,3 @@
 	// This is a native class mapping.
-	// You should use the type '{{TYPE_NAME_CPP}}' directly!
+	// You may use type '{{NATIVE_NAME}}' directly, or through the typedef below.
+	typedef {{NATIVE_NAME}} {{TYPE_NAME}};

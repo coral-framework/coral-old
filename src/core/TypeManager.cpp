@@ -165,7 +165,7 @@ co::Type* TypeManager::loadTypeOrThrow( const std::string& fullName )
 
 	co::Type* type = loader.loadType();
 	if( !type )
-		CORAL_THROW( co::TypeLoadException, "Error loading type '" << fullName << "'.\n" << *loader.getError() );
+		CORAL_THROW( co::TypeLoadException, "error loading type '" << fullName << "':\n" << *loader.getError() );
 
 	return type;
 }

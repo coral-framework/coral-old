@@ -1006,7 +1006,7 @@ TEST( AnyTests, coercionsFromStdVector )
  *	Tests for the custom variable setters and constructors
  ****************************************************************************/
 
-TEST( AnyTests, customInterfaces )
+TEST( AnyTests, setInterface )
 {
 	co::InterfaceType* nsType = co::typeOf<co::Namespace>::get();
 	co::Interface* nsTypeAsItf = co::disambiguate<co::Interface>( nsType );
@@ -1021,7 +1021,7 @@ TEST( AnyTests, customInterfaces )
 	EXPECT_EQ( automatic, manual );
 }
 
-TEST( AnyTests, customValues )
+TEST( AnyTests, setVariable )
 {
 	co::int16 anInt16 = 5;
 	double aDouble = 3.14;
@@ -1045,7 +1045,26 @@ TEST( AnyTests, customValues )
 	EXPECT_EQ( automatic, manual );
 }
 
-TEST( AnyTests, customArrays )
+TEST( AnyTests, setBasic )
+{
+	co::int16 anInt16 = 5;
+	double aDouble = 3.14;
+	std::string aString( "Hey Joe" );
+
+	co::Any automatic( anInt16 );
+	co::Any manual( co::TK_INT16, co::Any::VarIsValue, &anInt16 );
+	EXPECT_EQ( automatic, manual );
+
+	automatic.set( &aDouble );
+	manual.setBasic( co::TK_DOUBLE, co::Any::VarIsPointer, &aDouble );
+	EXPECT_EQ( automatic, manual );
+
+	automatic.set<const std::string&>( aString );
+	manual.setBasic( co::TK_STRING, co::Any::VarIsConst | co::Any::VarIsReference, &aString );
+	EXPECT_EQ( automatic, manual );
+}
+
+TEST( AnyTests, setArray )
 {
 	std::vector<co::int8> int8Vec;
 	int8Vec.push_back( -1 );

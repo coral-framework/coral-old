@@ -1,7 +1,7 @@
-native class TestNativeClass9 ( vr::Vec3f <vr/Vec3f.h> ) 
+native class TestNativeClass9 ( <vr/Vec3f.h> vr::Vec3f )
 {
 
-attribute string[] a;	
+attribute string[] a;
 
 
 };

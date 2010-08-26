@@ -112,7 +112,7 @@ TEST( TypeBuilderTests, componentInvalidDefinitions )
 	EXPECT_THROW( cbuilder->defineSuperType( testInterfaceType ), co::UnsupportedOperationException );
 	EXPECT_THROW( cbuilder->defineInterface( "testIntMember", NULL, false ), co::IllegalArgumentException );
 	EXPECT_THROW( cbuilder->defineMethod( "testMethod" ), co::UnsupportedOperationException );
-	EXPECT_THROW( cbuilder->defineNativeClass( "testName", "testHeader" ), co::UnsupportedOperationException );
+	EXPECT_THROW( cbuilder->defineNativeClass( "testHeader", "testName" ), co::UnsupportedOperationException );
 
 	EXPECT_NO_THROW( tct->rollback() );
 }
@@ -370,7 +370,7 @@ TEST( TypeBuilderTests, interfaceInvalidDefinition )
 	EXPECT_THROW( ibuilder->defineInterface( "testIntMember", testInterfaceType, false ), co::UnsupportedOperationException );
 	EXPECT_THROW( ibuilder->defineMethod( "$testMethod" ), co::IllegalNameException );
 	EXPECT_THROW( ibuilder->defineMethod( "" ), co::IllegalNameException );
-	EXPECT_THROW( ibuilder->defineNativeClass( "testName", "testHeader" ), co::UnsupportedOperationException );
+	EXPECT_THROW( ibuilder->defineNativeClass( "testHeader", "testName" ), co::UnsupportedOperationException );
 
 	EXPECT_NO_THROW( tct->rollback() );
 }
@@ -470,7 +470,7 @@ TEST( TypeBuilderTests, nativeClassInvalidDefinitions )
 	EXPECT_THROW( nbuilder->defineSuperType( testInterfaceType ), co::UnsupportedOperationException );
 	EXPECT_THROW( nbuilder->defineInterface( "testIntMember", testInterfaceType, false ), co::UnsupportedOperationException );
 	EXPECT_THROW( nbuilder->defineMethod( "" ), co::IllegalNameException );
-	EXPECT_THROW( nbuilder->defineNativeClass( "", "header" ), co::IllegalArgumentException );
+	EXPECT_THROW( nbuilder->defineNativeClass( "header", "" ), co::IllegalArgumentException );
 
 	EXPECT_NO_THROW( tct->rollback() );
 }
@@ -480,8 +480,8 @@ TEST( TypeBuilderTests, nativeClassDefinition )
 	co::RefPtr<co::TypeCreationTransaction> tct = createTypeCreationTransaction();
 	co::RefPtr<co::TypeBuilder> builder = TestHelper::createBuilder( co::TK_NATIVECLASS, "NativeClassbuilderTest.BuilderTestNativeClass", tct.get() );
 
-	EXPECT_THROW( builder->defineNativeClass( "", "headerName" ), co::IllegalArgumentException );
-	EXPECT_THROW( builder->defineNativeClass( "nativeName", "" ), co::IllegalArgumentException );
+	EXPECT_THROW( builder->defineNativeClass( "headerName", "" ), co::IllegalArgumentException );
+	EXPECT_THROW( builder->defineNativeClass( "", "nativeName" ), co::IllegalArgumentException );
 
 	builder->defineAttribute( "testName", TestHelper::type( "string" ), true );
 
@@ -490,7 +490,7 @@ TEST( TypeBuilderTests, nativeClassDefinition )
 	co::RefPtr<co::MethodBuilder> mb = builder->defineMethod( "childMethod" );
 	mb->createMethod();
 
-	builder->defineNativeClass( "myNativeName", "MyHeaderName" );
+	builder->defineNativeClass( "MyHeaderName", "myNativeName" );
 
 	co::NativeClassType* nativeType = dynamic_cast<co::NativeClassType*>( builder->createType() );
 
@@ -514,7 +514,7 @@ TEST( TypeBuilderTests, nativeClassMemberClash )
 
 	co::RefPtr<co::MethodBuilder> mb = builder->defineMethod( "getTestName" );
 	mb->createMethod();
-	builder->defineNativeClass( "myNativeName", "MyHeaderName" );
+	builder->defineNativeClass( "MyHeaderName", "myNativeName" );
 
 	EXPECT_THROW( tct->commit(), co::SemanticException );
 	EXPECT_NO_THROW( tct->rollback() );
@@ -561,7 +561,7 @@ TEST( TypeBuilderTests, structInvalidDefinition )
 	EXPECT_THROW( sbuilder->defineSuperType( testInterfaceType ), co::UnsupportedOperationException );
 	EXPECT_THROW( sbuilder->defineInterface( "testIntMember", testInterfaceType, false ), co::UnsupportedOperationException );
 	EXPECT_THROW( sbuilder->defineMethod( "testMethod" ), co::UnsupportedOperationException );
-	EXPECT_THROW( sbuilder->defineNativeClass( "testName", "testHeader" ), co::UnsupportedOperationException );
+	EXPECT_THROW( sbuilder->defineNativeClass( "testHeader", "testName" ), co::UnsupportedOperationException );
 
 	EXPECT_NO_THROW( tct->rollback() );
 }

@@ -4,7 +4,7 @@ local M = {}
 
 function M:initialize( module )
 	-- create a test component
-	local testComponent = co.newInstance( "moduleA.TestComponent" )
+	local testComponent = co.new( "moduleA.TestComponent" )
 
 	-- test getting the 'componentType' attribute
 	ASSERT_EQ( testComponent.componentType.fullName, "moduleA.TestComponent" )

@@ -41,7 +41,7 @@ std::ostream& operator<<( std::ostream& out, const csl::Error& error )
 		const csl::Error* nextError = currentError->getInnerError();
 		bool nextIsNotLast = ( nextError != NULL && nextError->getLine() != -1 );
 
-		out << ( nextIsNotLast ? "From: " : "In file: " );
+		out << ( nextIsNotLast ? "From " : "In file " );
 		out << currentError->getFileName() << ":" << currentError->getLine() << ": " << currentError->getMessage();
 		out << ( nextIsNotLast ? ":\n" : ".\n" );
 

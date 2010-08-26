@@ -1,0 +1,32 @@
+/*
+	Proof-of-concept native class that wraps a std::pair<double,double>.
+ */
+native class Vec2D ( <utility> std::pair<double, double> )
+{
+	// X coordinate.
+	attribute double x;
+
+	// Y coordinate.
+	attribute double y;
+
+	// Vector length.
+	readonly attribute double length;
+
+	// Squared vector length.
+	readonly attribute double length2;
+
+	// Sets all coordinates.
+	void set( in double x, in double y );
+
+	// Gets all coordinates.
+	void get( out double x, out double y );
+
+	// Returns the dot product of this vector and 'other'.
+	double dot( in Vec2D other );
+
+	// Returns whether (x,y) == (other.x, other.y).
+	bool equals( in Vec2D other );
+
+	// Sets c with b; b with a, and returns this Vec2D.
+	Vec2D testInOut( in Vec2D a, inout Vec2D b, out Vec2D c );
+};

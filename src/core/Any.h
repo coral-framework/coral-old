@@ -545,6 +545,15 @@ public:
 	{
 		setVariable( type, flags, ptr );
 	}
+	
+	/*!
+		Custom constructor corresponding to a setBasic() call.
+		Please, see setBasic()'s documentation for more info.
+	 */
+	Any( co::TypeKind kind, uint32 flags, void* ptr )
+	{
+		setBasic( kind, flags, ptr );
+	}
 
 	/*!
 		Custom constructor corresponding to a setArray() call.
@@ -645,6 +654,13 @@ public:
 					loose). If \c flags specifies \c VarIsReference, \c ptr cannot be null.
 	 */
 	void setVariable( Type* type, uint32 flags, void* ptr );
+	
+	/*!
+		Alternative version of setVariable(), simplified for basic types.
+		Parameter 'kind' must range from co::TK_ANY to co::TK_STRING (i.e. types
+		that are uniquely identified by their co::TypeKind).
+	 */
+	void setBasic( co::TypeKind kind, uint32 flags, void* ptr );
 
 	/*!
 		Stores an array of any kind.

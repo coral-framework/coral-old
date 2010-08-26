@@ -169,6 +169,11 @@ public:
 		throw co::UnsupportedOperationException( "co::Reflector::createValue() cannot be called through a proxy interface." );
 	}
 {{NEWLINE}}
+	void copyValue( void*, void* )
+	{
+		throw co::UnsupportedOperationException( "co::Reflector::copyValue() cannot be called through a proxy interface." );
+	}
+{{NEWLINE}}
 	void destroyValue( void* )
 	{
 		throw co::UnsupportedOperationException( "co::Reflector::destroyValue() cannot be called through a proxy interface." );
@@ -270,6 +275,11 @@ public:
 	{
 		checkValidSize( sizeof({{TYPE_NAME_CPP}}), length );
 		new( address ) {{TYPE_NAME_CPP}};
+    }
+{{NEWLINE}}
+	void copyValue( void* fromAddress, void* toAddress )
+	{
+		*reinterpret_cast<{{TYPE_NAME_CPP}}*>( toAddress ) = *reinterpret_cast<{{TYPE_NAME_CPP}}*>( fromAddress );
     }
 {{NEWLINE}}
 	void destroyValue( void* address )

@@ -6,7 +6,7 @@
 #include "Uuid_Adapter.h"
 #include "tools/CryptoHash.h"
 	
-bool co::Uuid_Adapter::getIsNull( const co::Uuid& instance )
+bool co::Uuid_Adapter::getIsNull( co::Uuid& instance )
 {
 	return instance.isNull();
 }

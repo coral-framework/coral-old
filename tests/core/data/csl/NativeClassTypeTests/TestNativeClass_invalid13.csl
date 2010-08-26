@@ -1,6 +1,6 @@
 // <c++ is recognized as a CPP_BLOCK
-native class TestNativeClass_invalid13 ( a::_ <c++> ) 
+native class TestNativeClass_invalid13 ( <c++> a::_ )
 {
-attribute string[] a;	
+attribute string[] a;
 
-}; 
+};

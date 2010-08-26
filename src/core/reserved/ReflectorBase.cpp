@@ -86,6 +86,11 @@ void ReflectorBase::createValue( void*, size_t )
 	raiseUnsupportedOperationException();
 }
 
+void ReflectorBase::copyValue( void*, void* )
+{
+	raiseUnsupportedOperationException();
+}
+
 void ReflectorBase::destroyValue( void* )
 {
 	raiseUnsupportedOperationException();

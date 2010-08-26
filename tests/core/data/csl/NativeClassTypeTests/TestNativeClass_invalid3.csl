@@ -1,5 +1,5 @@
-native Class TestNativeClass_invalid3 ( a::_a <ba> ) 
+native Class TestNativeClass_invalid3 ( <ba> a::_a )
 {
-attribute string[] a;	
+attribute string[] a;
 
 };

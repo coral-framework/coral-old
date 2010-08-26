@@ -6,10 +6,9 @@
 #ifndef _LUASTATE_H_
 #define _LUASTATE_H_
 
+#include "Variant.h"
 #include <lua.hpp>
 #include <co/Any.h>
-
-class Variant;
 
 /*!
 	Singleton that manages a Lua universe and provides
@@ -56,6 +55,8 @@ public:
 	void toCoral( int index, co::Type* expectedType, co::Any& value, Variant& data );
 
 private:
+	void pushArray( const co::__any::State& s );
+
 	template<typename BindingClass, typename InstanceType>
 	inline void pushInstance( InstanceType* ptr );
 
@@ -68,88 +69,6 @@ private:
 private:
 	lua_State* _L;
 	int _instancesTableRegIdx;
-};
-
-/*!
-	Auxiliary struct for reading values from Lua.
- */
-struct Variant
-{
-	union
-	{
-		co::__any::State::Data data;
-		co::uint8 __anyArea[sizeof(co::Any)];
-		co::uint8 __stringArea[sizeof(std::string)];
-	};
-
-	co::TypeKind kind;
-
-	inline Variant() : kind( co::TK_NONE )
-	{
-		data.ptr = NULL;
-	}
-
-	inline ~Variant()
-	{
-		clear();
-	}
-
-	inline void clear()
-	{
-		switch( kind )
-		{
-		case co::TK_ANY:
-			reinterpret_cast<co::Any*>( __anyArea )->~Any();
-			break;
-		case co::TK_STRING:
-			reinterpret_cast<std::string*>( __stringArea )->~basic_string();
-			break;
-		default:
-			break;
-		}
-	}
-	
-	inline void createAny()
-	{
-		clear();
-		new( __anyArea ) co::Any();
-		kind = co::TK_ANY;
-	}
-
-	inline void createString()
-	{
-		clear();
-		new( __stringArea ) std::string();
-		kind = co::TK_STRING;
-	}
-
-	inline co::Any& getAny()
-	{
-		assert( kind == co::TK_ANY );
-		return *reinterpret_cast<co::Any*>( __anyArea );
-	}
-
-	inline std::string& getString()
-	{
-		assert( kind == co::TK_STRING );
-		return *reinterpret_cast<std::string*>( __stringArea );
-	}
-
-	/*!
-		Prepares a {co::Any,Variant} pair for use as an 'out' argument of the given type.
-		\param type the 'out' parameter type.
-		\param arg the co::Any that will be passed to the method; it may contain
-					a value (that must be preserved) if the parameter is 'inout'.
-		This method is allowed to raise exceptions.
-	 */
-	void makeOut( co::Type* type, co::Any& arg );
-
-	/*!
-		Converts a {co::Any,Variant} pair that's currently an 'out' argument into an 'in' argument.
-		\param arg the co::Any that will be passed to the method.
-		This method is NOT allowed to raise exceptions.
-	 */
-	void makeIn( co::Any& arg );
 };
 
 #endif

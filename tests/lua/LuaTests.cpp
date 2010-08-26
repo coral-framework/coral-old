@@ -105,3 +105,17 @@ TEST( LuaTests, interfaceMethods )
 {
 	ASSERT_SUCCESS( "lua.interfaceMethods" );
 }
+
+// --- Native Class Binding Tests --- //
+
+TEST( LuaTests, nativeClass )
+{
+	ASSERT_SUCCESS( "lua.nativeClass" );
+}
+
+// --- Struct Binding Tests --- //
+
+TEST( LuaTests, struct )
+{
+	ASSERT_SUCCESS( "lua.struct" );
+}

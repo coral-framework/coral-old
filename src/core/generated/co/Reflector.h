@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** C++ mapping generated for type 'co.Reflector'
 **
-** Created: Fri Jul 02 00:14:15 2010
+** Created: Wed Aug 25 16:31:31 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -35,7 +35,7 @@ public:
 
 	// Code From <c++ Block:
 	
-		// Placement construction and destruction of complex Coral values is only available in C++.
+		// Memory manipulation of complex Coral values is only available from C++.
 
 		/*!
 			Constructs an instance of a struct or native class in the specified memory area.
@@ -47,9 +47,16 @@ public:
 		virtual void createValue( void* address, size_t length ) = 0;
 
 		/*!
+			Sets the complex value at 'toAddress' with a copy of the complex value at 'fromAddress'.
+			The copy is done using the type's assignment operator.
+			\warning Both pointers must point to instances of this exact 'type'.
+		 */
+		virtual void copyValue( void* fromAddress, void* toAddress ) = 0;
+
+		/*!
 			Destroys the struct or native class instance located at \c address.
 			The instance should have been constructed using createValue().
-			\warning Expect the worst if \c address does not point to an instance of this exact same type.
+			\warning Expect the worst if \c address does not point to an instance of this exact type.
 			\throw UnsupportedOperationException if \c type is neither a co::StructType nor a co::NativeClassType.
 		 */
 		virtual void destroyValue( void* address ) = 0;

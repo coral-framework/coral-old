@@ -56,90 +56,82 @@ static void displayRecognitionError( ANTLR3_BASE_RECOGNIZER_struct*, pANTLR3_UIN
 	// empty, just to supress some AntLR messages
 }
 
+static void printToken( std::stringstream& sstream, pANTLR3_EXCEPTION ex, pANTLR3_UINT8* tokenNames )
+{
+	if( ex->expecting == ANTLR3_TOKEN_EOF )
+		sstream << "<EOF>";
+	else if( tokenNames == NULL )
+		sstream << "token (" << ex->expecting << ")";
+	else
+		sstream << tokenNames[ex->expecting];
+}
+
 static void formatErrorMessage( pANTLR3_BASE_RECOGNIZER recognizer, std::string& message )
 {
 	std::stringstream sstream;
 
-	pANTLR3_UINT8* tokenNames = recognizer->state->tokenNames;
-	pANTLR3_COMMON_TOKEN theToken = static_cast<pANTLR3_COMMON_TOKEN>( recognizer->state->exception->token );
-	pANTLR3_STRING ttext = NULL;
-
 	pANTLR3_EXCEPTION ex = recognizer->state->exception;
+	pANTLR3_UINT8* tokenNames = recognizer->state->tokenNames;
 
 	sstream << "syntax error";
-
 	assert( recognizer->type != ANTLR3_TYPE_TREE_PARSER );
 
+	// print location
 	if( recognizer->type == ANTLR3_TYPE_PARSER )
 	{
-		ttext = theToken->getText( theToken );
-		if( recognizer->state->exception->charPositionInLine >= 0 )
-			sstream << " at character " << recognizer->state->exception->charPositionInLine;
-
+		if( ex->charPositionInLine >= 0 )
+			sstream << " at character " << ex->charPositionInLine;
+		
+		pANTLR3_COMMON_TOKEN theToken = reinterpret_cast<pANTLR3_COMMON_TOKEN>( ex->token );
 		if( theToken != NULL )
 		{
 			if( theToken->type == ANTLR3_TOKEN_EOF )
-				sstream << ", at the end of file";
+				sstream << " at the end of file";
 			else
 			{
+				pANTLR3_STRING ttext = theToken->getText( theToken );
 				const char* chars = ( ttext == NULL ? "<no-text>" : (const char*)ttext->chars );
 
 				// missing tokens are already described with the "expected" below
-				if( std::string( chars ).find( "<missing" ) == std::string::npos )
+				if( strstr( chars, "<missing" ) == NULL )
 					sstream << ", near '" << chars << "'";
 			}
 		}
 	}
 
+	// print cause
 	switch( ex->type )
 	{
 	case ANTLR3_UNWANTED_TOKEN_EXCEPTION:
-		sstream << " extraneous input";
-
-		if( tokenNames == NULL )
-			break;
-
-		if( ex->expecting == ANTLR3_TOKEN_EOF )
-			sstream << ", <EOF> expected";
-		else
-			sstream << ", '" << tokenNames[ex->expecting] << "'" << " expected" ;
-
+		sstream << ": extraneous input (expected ";
+		printToken( sstream, ex, tokenNames );
+		sstream << ")";
 		break;
 
 	case ANTLR3_MISSING_TOKEN_EXCEPTION:
-		if( tokenNames == NULL)
-			sstream << ", missing token (" << ex->expecting << ")";
-		else
-		{
-			if( ex->expecting == ANTLR3_TOKEN_EOF )
-				sstream << ", <EOF> expected";
-			else
-				sstream << ", '" << tokenNames[ex->expecting] << "'" << " expected" ;
-		}
+		sstream << ": missing ";
+		printToken( sstream, ex, tokenNames );
 		break;
 
 	case ANTLR3_MISMATCHED_TOKEN_EXCEPTION:
-		if( ex->expecting == ANTLR3_TOKEN_EOF )
-				sstream << ", <EOF> expected";
-		else
-			sstream << ", '" << tokenNames[ex->expecting] << "'" << " expected" ;
+		sstream << ": expected ";
+		printToken( sstream, ex, tokenNames );
 		break;
 
 	case ANTLR3_NO_VIABLE_ALT_EXCEPTION:
-		sstream << ", cannot match to any predicted input";
+		sstream << ": cannot match to any predicted input";
 		break;
 
 	case ANTLR3_MISMATCHED_SET_EXCEPTION:
-		sstream << ", unexpected input ";
+		sstream << ": unexpected input ";
 		break;
 
 	case ANTLR3_EARLY_EXIT_EXCEPTION:
-		sstream << ", missing elements";
+		sstream << ": missing elements";
 		break;
 
 	default:
-		sstream << ", syntax not recognized";
-		break;
+		sstream << ": syntax not recognized";
 	}
 
 	message = sstream.str();
@@ -330,16 +322,16 @@ void Parser::onImportClause( const std::string& importTypeName )
 	_importedTypes.insert( ImportTypeMap::value_type( localTypeName, ImportInfo( importTypeName, _currentLine ) ) );
 }
 
-void Parser::onNativeClass( const std::string& cppType, const std::string& cppHeader )
+void Parser::onNativeClass( const std::string& cppHeader, const std::string& cppType )
 {
-	_typeBuilder->defineNativeClass( cppType, cppHeader );
+	_typeBuilder->defineNativeClass( cppHeader, cppType );
 }
 
 void Parser::onSuperType( const std::string& name )
 {
 	co::Type* type = resolveType( name );
 	if( !type )
-		CORAL_THROW( co::CoreException, "could not load super-type '" << name << "'. " );
+		CORAL_THROW( co::CoreException, "could not load super-type '" << name << "'" );
 
 	_typeBuilder->defineSuperType( type );
 }
@@ -435,7 +427,7 @@ void Parser::resolveImports()
 
 		it->second.type = resolveType( it->second.typeName.c_str() );
 		if( it->second.type == NULL )
-			CORAL_THROW( co::CoreException, "could not import '" << it->second.typeName << "'." );
+			CORAL_THROW( co::CoreException, "could not import '" << it->second.typeName << "'" );
 	}
 
 	// if no exceptions are raised, restore the original line.

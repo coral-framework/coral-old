@@ -225,7 +225,7 @@ void TypeDictionaryBuilder::fillForwardDeclarations()
 	if( _mode == Mode_Mapping )
 	{
 		_dict->SetValue( "BEGIN_FORWARD_DECLARATIONS", "\n// Forward Declarations:\n" );
-		_dict->SetValue( "END_FORWARD_DECLARATIONS", "\n// End Of Forward Declarations\n" );
+		_dict->SetValue( "END_FORWARD_DECLARATIONS", "// End Of Forward Declarations\n" );
 	}
 
 	// sort the _forwardDeclarations vector by namespace (full name), then type name
@@ -297,7 +297,7 @@ void TypeDictionaryBuilder::fillNestedForwardDecls()
 			}
 
 			// forwardDeclStack.pop_back() until we reach the common level
-			while( commonLevels > forwardDeclStack.size() )
+			while( commonLevels < forwardDeclStack.size() )
 			{
 				forwardDeclStack.pop_back();
 				currentFrame = &forwardDeclStack.back();
@@ -469,7 +469,7 @@ void TypeDictionaryBuilder::fillStructData( co::StructType* structType )
 void TypeDictionaryBuilder::fillNativeClassData( co::NativeClassType* nativeClassType )
 {
 	const std::string& nativeName = nativeClassType->getNativeName();
-	_dict->SetValue( "TYPE_NAME_CPP", nativeName );
+	_dict->SetValue( "NATIVE_NAME", nativeName );
 
 	std::string headerName = nativeClassType->getHeaderName();
 	headerName.erase( headerName.begin() );		// removes the '<'
@@ -909,7 +909,10 @@ void TypeDictionaryBuilder::includeType( co::Type* type )
 		break;
 
 	case co::TK_NATIVECLASS:
-		addForwardDeclaration( type );
+		if( _type->getKind() == co::TK_STRUCT )
+			includeHeader( type );
+		else
+			addForwardDeclaration( type );
 		break;
 
 	case co::TK_INTERFACE:

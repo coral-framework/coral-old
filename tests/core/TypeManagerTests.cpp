@@ -98,7 +98,7 @@ TEST( TypeManagerTests, loadType )
 	EXPECT_EQ( "error loading dependency 'ErroneousStruct2'", errorStack[0].message );
 
 	EXPECT_EQ( 3, errorStack[1].line );
-	EXPECT_EQ( "syntax error, cannot match to any predicted input", errorStack[1].message );
+	EXPECT_EQ( "syntax error: cannot match to any predicted input", errorStack[1].message );
 }
 
 struct TypeStatistics

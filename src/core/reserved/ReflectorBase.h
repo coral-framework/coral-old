@@ -43,6 +43,7 @@ public:
 
 	// co::Reflector methods:
 	void createValue( void* address, size_t length );
+    void copyValue( void* fromAddress, void* toAddress );
     void destroyValue( void* address );
     Component* newInstance();
     Interface* newProxy( DynamicProxyHandler* handler );

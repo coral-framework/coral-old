@@ -7,9 +7,9 @@
 
 #include <co/Coral.h>
 #include <co/Component.h>
+#include <moduleA/Vec2D.h>
 #include <moduleA/TestEnum.h>
 #include <moduleA/TestStruct.h>
-#include <moduleA/StringBuffer.h>
 #include <moduleA/TestException.h>
 #include <moduleA/TestInterface.h>
 #include <moduleA/DummyInterface.h>
@@ -172,8 +172,7 @@ TEST( MappingTests, interfaceDisambiguation )
 
 TEST( MappingTests, nativeClass )
 {
-	std::stringstream test;
- 	EXPECT_STREQ( "moduleA.StringBuffer", co::nameOf<std::stringstream>::get() );
+ 	EXPECT_STREQ( "moduleA.Vec2D", ( co::nameOf< std::pair<double, double> >::get() ) );
 }
 
 TEST( MappingTests, namespaces )

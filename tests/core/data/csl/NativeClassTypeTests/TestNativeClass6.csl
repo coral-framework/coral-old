@@ -1,5 +1,5 @@
-native class TestNativeClass6 ( a::_ <a> ) 
+native class TestNativeClass6 ( <a> a::_ )
 {
-attribute string[] a;	
+attribute string[] a;
 
 };

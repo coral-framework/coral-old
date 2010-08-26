@@ -75,9 +75,9 @@ native_class_specification
 		{
 			ctx->parser->onTypeSpecification( (const char*)$ID.text->chars, co::TK_NATIVECLASS );
 		}
-		OPEN_PAREN cpp_type CPP_HEADER CLOSE_PAREN
+		OPEN_PAREN CPP_TAG cpp_type CLOSE_PAREN
 		{
-			ctx->parser->onNativeClass( (const char*)$cpp_type.text->chars, (const char*)$CPP_HEADER.text->chars );
+			ctx->parser->onNativeClass( (const char*)$CPP_TAG.text->chars, (const char*)$cpp_type.text->chars );
 		}
 		OPEN_BLOCK native_class_member* CLOSE_BLOCK SEMICOLON
 	;
@@ -114,6 +114,10 @@ component_specification
 
 qualified_identifier
 	: ID ( DOT ID )*
+	;
+
+cpp_type
+	: ID ( CPP_SCOPE ID )* CPP_TAG?
 	;
 
 native_class_member
@@ -216,10 +220,6 @@ type_declaration
   			ctx->parser->onTypeDeclaration( qualifiedName, isArray );
   		}
   	;
-
-cpp_type
-	: ID ( CPP_SCOPE  ID )*
-	;
 
 pair_of_braces
 	: OPEN_BRACE CLOSE_BRACE
@@ -371,7 +371,7 @@ CLOSE_PAREN
 
 DOT	: '.' ;
 
-ID	: ( 'a'..'z' | 'A'..'Z' | '_' ) ( 'a'..'z' | 'A'..'Z' | '0'..'9' | '_' )*
+ID	: ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
 	;
 
 COMMENT
@@ -383,10 +383,10 @@ CPP_BLOCK
 	: '<c++' ( options { greedy = false; } : . )* 'c++>'
 	;
 
-CPP_HEADER
-	: '<' ( options { greedy = false; } :  ~('<'|'>') )* '>'
+CPP_TAG
+	: '<' ('a'..'z'|'A'..'Z'|'0'..'9'|'_'|':'|'.'|','|'/'|' ')* '>'
 	;
 
 WS
-	:  ( ' ' | '\t' | '\r' | '\n' ) {$channel=HIDDEN;}
+	:  (' '|'\t'|'\r'|'\n') { $channel = HIDDEN; }
     ;

@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Adapter generated for native class 'co.Uuid'
 **
-** Created: Fri Jul 02 00:14:15 2010
+** Created: Wed Aug 25 16:31:31 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -22,7 +22,7 @@ class Uuid_Adapter
 public:
 	// ------ Attributes ------
 
-	static bool getIsNull( const co::Uuid& instance );
+	static bool getIsNull( co::Uuid& instance );
 
 	// ------ Methods ------
 

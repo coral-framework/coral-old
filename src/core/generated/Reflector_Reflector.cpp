@@ -1,7 +1,7 @@
 /*******************************************************************************
 ** Reflection code generated for type 'co.Reflector'
 **
-** Created: Fri Jul 02 00:14:15 2010
+** Created: Wed Aug 25 16:31:31 2010
 **      by: Coral Compiler version 0.1.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling!
@@ -118,6 +118,11 @@ public:
 	void createValue( void*, size_t )
 	{
 		throw co::UnsupportedOperationException( "co::Reflector::createValue() cannot be called through a proxy interface." );
+	}
+
+	void copyValue( void*, void* )
+	{
+		throw co::UnsupportedOperationException( "co::Reflector::copyValue() cannot be called through a proxy interface." );
 	}
 
 	void destroyValue( void* )

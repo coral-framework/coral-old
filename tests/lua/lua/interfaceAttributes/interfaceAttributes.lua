@@ -11,7 +11,7 @@ function M:initialize( module )
 	ASSERT_EQ( co.system.services.isLazy, true )
 
 	-- instantiate some components to help with some tests
-	local testComponent = co.newInstance "moduleA.TestComponent"
+	local testComponent = co.new "moduleA.TestComponent"
 	local testInterface = testComponent.testInterface
 
 	-- test getting/setting an int8

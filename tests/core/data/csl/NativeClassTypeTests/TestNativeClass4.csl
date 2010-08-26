@@ -1,6 +1,6 @@
-native 
-class TestNativeClass4 ( a::a <ba> ) 
+native
+class TestNativeClass4 ( <ba> a::a )
 {
-attribute string[] a;	
+attribute string[] a;
 
 };

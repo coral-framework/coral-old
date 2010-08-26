@@ -1,8 +1,8 @@
-native class TestNativeClass8 ( a::_ <                           > ) 
+native class TestNativeClass8 ( <                           > a::_ )
 {
 
 
-attribute string[] a;	
+attribute string[] a;
 
 
 };

@@ -1,5 +1,5 @@
-native class TestNativeClass_invalid8 ( ::a <a> ) 
+native class TestNativeClass_invalid8 ( <a> ::a )
 {
-attribute string[] a;	
+attribute string[] a;
 
 };
