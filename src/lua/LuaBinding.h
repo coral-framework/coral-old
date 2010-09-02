@@ -46,6 +46,9 @@ public:
 	 */
 	static void tryGetInstance( lua_State* L, int index, co::Any& instance );
 
+	// --- Shared Metamethods ---
+	static int toString( lua_State* L );
+
 protected:
 	/*!
 		Pushes a metatable for a userdata of the specified co::CompoundType.
@@ -98,6 +101,7 @@ public:
 	static int index( lua_State* L );
 	static int newIndex( lua_State* L );
 	static int gc( lua_State* L );
+	static int toString( lua_State* L );
 };
 
 /*!

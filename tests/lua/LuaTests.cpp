@@ -87,6 +87,13 @@ TEST( LuaTests, coPackage )
 	ASSERT_SUCCESS( "lua.coPackage" );
 }
 
+// --- Array Binding Tests --- //
+
+TEST( LuaTests, array )
+{
+	ASSERT_SUCCESS( "lua.array" );
+}
+
 // --- Component Binding Tests --- //
 
 TEST( LuaTests, componentManipulation )

@@ -203,22 +203,29 @@ void CompoundTypeBinding::tryGetInstance( lua_State* L, int udataIdx, co::Any& i
 	}
 }
 
+int CompoundTypeBinding::toString( lua_State* L )
+{
+	co::CompoundType* ct = getType( L, 1 );
+	assert( ct );
+
+	lua_pushfstring( L, "%s: %p", ct->getFullName().c_str(), lua_touserdata( L, 1 ) );
+
+	return 1;
+}
+
 struct Metamethods
 {
 	lua_CFunction index;
 	lua_CFunction newIndex;
 	lua_CFunction gc;
+	lua_CFunction toString;
 };
 
 static const Metamethods METAMETHODS_TABLE[] = {
-	// struct
-	{ StructBinding::index, StructBinding::newIndex, StructBinding::gc },
-	// native class
-	{ NativeClassBinding::index, NativeClassBinding::newIndex, NativeClassBinding::gc },
-	// interface
-	{ InterfaceBinding::index, InterfaceBinding::newIndex, InterfaceBinding::gc },
-	// component
-	{ ComponentBinding::index, ComponentBinding::newIndex, ComponentBinding::gc }
+	{ StructBinding::index, StructBinding::newIndex, StructBinding::gc, StructBinding::toString },
+	{ NativeClassBinding::index, NativeClassBinding::newIndex, NativeClassBinding::gc, NativeClassBinding::toString },
+	{ InterfaceBinding::index, InterfaceBinding::newIndex, InterfaceBinding::gc, InterfaceBinding::toString },
+	{ ComponentBinding::index, ComponentBinding::newIndex, ComponentBinding::gc, ComponentBinding::toString }
 };
 
 void CompoundTypeBinding::pushMetatable( lua_State* L, co::CompoundType* ct )
@@ -238,7 +245,7 @@ void CompoundTypeBinding::pushMetatable( lua_State* L, co::CompoundType* ct )
 		const Metamethods& mms = METAMETHODS_TABLE[tag - co::TK_STRUCT];
 
 		lua_pop( L, 1 );
-		lua_createtable( L, 1, 3 );
+		lua_createtable( L, 1, 4 );
 
 		lua_pushlightuserdata( L, ct );
 		lua_rawseti( L, -2, 1 );
@@ -256,6 +263,11 @@ void CompoundTypeBinding::pushMetatable( lua_State* L, co::CompoundType* ct )
 		assert( mms.gc );
 		lua_pushliteral( L, "__gc" );
 		lua_pushcfunction( L, mms.gc );
+		lua_rawset( L, -3 );
+
+		assert( mms.toString );
+		lua_pushliteral( L, "__tostring" );
+		lua_pushcfunction( L, mms.toString );
 		lua_rawset( L, -3 );
 
 		// save the metatable in the registry
@@ -357,9 +369,9 @@ void CompoundTypeBinding::setAttribute( lua_State* L, const co::Any& instance )
 {
 	co::AttributeInfo* ai = checkAttributeInfo( L, -2 );
 	co::Reflector* reflector = ai->getOwner()->getReflector();
-	co::Any any; Variant var;
-	LuaState::instance().toCoral( -1, ai->getType(), any, var );
-	reflector->setAttribute( instance, ai, any );
+	co::Any var; co::AnyValue value;
+	LuaState::instance().toCoral( -1, ai->getType(), var, value );
+	reflector->setAttribute( instance, ai, var );
 	lua_pop( L, 2 );
 }
 
@@ -404,7 +416,7 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 	// prepare the argument list
 
 	co::Any args[MAX_NUM_PARAMETERS];
-	Variant data[MAX_NUM_PARAMETERS];
+	co::AnyValue values[MAX_NUM_PARAMETERS];
 	
 	LuaState& luaState = LuaState::instance();
 
@@ -419,12 +431,12 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 			co::Type* paramType = paramInfo->getType();
 
 			if( paramInfo->getIsIn() )
-				luaState.toCoral( i + 2, paramType, args[i], data[i] );
+				luaState.toCoral( i + 2, paramType, args[i], values[i] );
 			else
 				--numRequiredParams;
 
 			if( paramInfo->getIsOut() )
-				data[i].makeOut( paramType, args[i] );
+				values[i].makeOut( paramType, args[i] );
 		}
 	}
 	catch( const co::Exception& e )
@@ -463,7 +475,7 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 		if( paramList[i]->getIsOut() )
 		{
 			++numOut;
-			data[i].makeIn( args[i] );
+			values[i].makeIn( args[i] );
 			luaState.push( args[i] );
 		}
 	}
@@ -556,9 +568,9 @@ int ComponentBinding::newIndex( lua_State* L )
 			lua_concat( L, 3 );
 			throw lua::MsgOnStackException();
 		}
-		co::Any any; Variant var;
-		LuaState::instance().toCoral( 3, itfInfo->getInterfaceType(), any, var );
-		component->bindInterface( itfInfo, any.get<co::Interface*>() );
+		co::Any var; co::AnyValue value;
+		LuaState::instance().toCoral( 3, itfInfo->getInterfaceType(), var, value );
+		component->bindInterface( itfInfo, var.get<co::Interface*>() );
 	}
 
 	return 0;
@@ -568,7 +580,7 @@ int ComponentBinding::newIndex( lua_State* L )
 
 int ComponentBinding::gc( lua_State* L )
 {
-	co::Interface** ud = reinterpret_cast<co::Interface**>( lua_touserdata( L, 1 ) );
+	co::Component** ud = reinterpret_cast<co::Component**>( lua_touserdata( L, 1 ) );
 	assert( ud );
 
 	__BEGIN_EXCEPTIONS_BARRIER__
@@ -578,6 +590,17 @@ int ComponentBinding::gc( lua_State* L )
 	return 0;
 
 	__END_EXCEPTIONS_BARRIER__
+}
+
+int ComponentBinding::toString( lua_State* L )
+{
+	co::Component** ud = reinterpret_cast<co::Component**>( lua_touserdata( L, 1 ) );
+	assert( ud );
+
+	co::Component* comp = *ud;
+	lua_pushfstring( L, "%s: %p", comp->getComponentType()->getFullName().c_str(), comp );
+
+	return 1;
 }
 
 /*****************************************************************************/

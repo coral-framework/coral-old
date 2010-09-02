@@ -7,6 +7,7 @@
 #include <co/Type.h>
 #include <co/EnumType.h>
 #include <co/Namespace.h>
+#include <co/Reflector.h>
 #include <co/InterfaceType.h>
 #include <co/IllegalCastException.h>
 #include <iomanip>
@@ -102,7 +103,7 @@ std::ostream& operator<<( std::ostream& out, const co::__any::State& s )
 
 std::ostream& operator<<( std::ostream& out, const co::Any& a )
 {
-	const co::__any::State& s = a._state;
+	const co::__any::State& s = a.getState();
 
 	// type info
 	out << "(" << s << ")";
@@ -144,6 +145,42 @@ std::ostream& operator<<( std::ostream& out, const co::Any& a )
 }
 
 namespace co {
+
+int32 Any::getSize() const
+{
+	if( _state.isPointer )
+		return sizeof(void*);
+
+	int32 size = -1;
+	switch( _state.kind )
+	{
+	case co::TK_NONE:		break;
+	case co::TK_ANY:		size = sizeof(co::Any);		break;
+	case co::TK_BOOLEAN:	size = sizeof(bool);		break;
+	case co::TK_INT8:		size = sizeof(int8);		break;
+	case co::TK_UINT8:		size = sizeof(uint8);		break;
+	case co::TK_INT16:		size = sizeof(int16);		break;
+	case co::TK_UINT16:		size = sizeof(uint16);		break;
+	case co::TK_INT32:		size = sizeof(int32);		break;
+	case co::TK_UINT32:		size = sizeof(uint32);		break;
+	case co::TK_INT64:		size = sizeof(int64);		break;
+	case co::TK_UINT64:		size = sizeof(uint64);		break;
+	case co::TK_FLOAT:		size = sizeof(float);		break;
+	case co::TK_DOUBLE:		size = sizeof(double);		break;
+	case co::TK_STRING:		size = sizeof(std::string);	break;
+	case co::TK_ARRAY:
+		size = _state.type->getReflector()->getSize();
+		break;
+	case co::TK_ENUM:		size = sizeof(uint32);		break;
+	case co::TK_STRUCT:
+	case co::TK_NATIVECLASS:
+		size = _state.type->getReflector()->getSize();
+		break;
+	default:
+		assert( false );
+	}
+	return size;
+}
 
 #define THROW_ILLEGAL_CAST( from, to, MORE_MESSAGES ) \
 	{ std::stringstream sstream; \

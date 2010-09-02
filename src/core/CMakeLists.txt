@@ -29,6 +29,7 @@ FILE( GLOB CORAL_PUBLIC_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} reserved/*.
 
 SET( CORAL_PUBLIC_HEADERS
 	Any.h
+	AnyValue.h
 	ArrayRange.h
 	Coral.h
 	CoreException.h
@@ -122,7 +123,7 @@ FILE( GLOB moduleFiles Module*.* )
 SOURCE_GROUP( "Module" FILES ${moduleFiles} )
 
 # Reflection System Files
-FILE( GLOB reflectionFiles Any.* *Reflector.* )
+FILE( GLOB reflectionFiles Any* *Reflector* )
 SOURCE_GROUP( "Reflection" FILES ${reflectionFiles} )
 
 # Type System Files

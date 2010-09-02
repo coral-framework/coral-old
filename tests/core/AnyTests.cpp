@@ -75,6 +75,7 @@ void constructorValueTest( const co::TypeKind kind, const T& sampleValue, co::Ty
 	EXPECT_FALSE( a1.isPointer() );
 	EXPECT_FALSE( a1.isPointerConst() );
 	EXPECT_FALSE( a1.isReference() );
+	EXPECT_EQ( sizeof(T), a1.getSize() );
 	EXPECT_EQ( expectedType, a1.getType() );
 	EXPECT_EQ( v, a1.get<T>() );
 
@@ -86,6 +87,7 @@ void constructorValueTest( const co::TypeKind kind, const T& sampleValue, co::Ty
 	EXPECT_FALSE( a2.isPointer() );
 	EXPECT_FALSE( a2.isPointerConst() );
 	EXPECT_FALSE( a2.isReference() );
+	EXPECT_EQ( sizeof(T), a2.getSize() );
 	EXPECT_EQ( expectedType, a2.getType() );
 	EXPECT_EQ( cv, a2.get<const T>() );
 }
@@ -100,6 +102,7 @@ void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::Type* expe
 	EXPECT_TRUE( a3.isPointer() );
 	EXPECT_FALSE( a3.isPointerConst() );
 	EXPECT_FALSE( a3.isReference() );
+	EXPECT_EQ( sizeof(void*), a3.getSize() );
 	EXPECT_EQ( expectedType, a3.getType() );
 	EXPECT_EQ( p, a3.get<T*>() );
 	
@@ -110,6 +113,7 @@ void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::Type* expe
 	EXPECT_TRUE( a4.isPointer() );
 	EXPECT_FALSE( a4.isPointerConst() );
 	EXPECT_FALSE( a4.isReference() );
+	EXPECT_EQ( sizeof(void*), a4.getSize() );
 	EXPECT_EQ( expectedType, a4.getType() );
 	EXPECT_EQ( cp, a4.get<const T*>() );
 	
@@ -121,6 +125,7 @@ void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::Type* expe
 	EXPECT_TRUE( a5.isPointer() );
 	EXPECT_TRUE( a5.isPointerConst() );
 	EXPECT_FALSE( a5.isReference() );
+	EXPECT_EQ( sizeof(void*), a5.getSize() );
 	EXPECT_EQ( expectedType, a5.getType() );
 	EXPECT_EQ( pc, a5.get<T* const>() );
 	
@@ -132,6 +137,7 @@ void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::Type* expe
 	EXPECT_TRUE( a6.isPointer() );
 	EXPECT_TRUE( a6.isPointerConst() );
 	EXPECT_FALSE( a6.isReference() );
+	EXPECT_EQ( sizeof(void*), a6.getSize() );
 	EXPECT_EQ( expectedType, a6.getType() );
 	EXPECT_EQ( cpc, a6.get<const T* const>() );
 	
@@ -143,6 +149,7 @@ void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::Type* expe
 	EXPECT_TRUE( a9.isPointer() );
 	EXPECT_FALSE( a9.isPointerConst() );
 	EXPECT_TRUE( a9.isReference() );
+	EXPECT_EQ( sizeof(void*), a9.getSize() );
 	EXPECT_EQ( expectedType, a9.getType() );
 	EXPECT_EQ( pr, a9.get<T*&>() );
 	
@@ -154,6 +161,7 @@ void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::Type* expe
 	EXPECT_TRUE( a10.isPointer() );
 	EXPECT_FALSE( a10.isPointerConst() );
 	EXPECT_TRUE( a10.isReference() );
+	EXPECT_EQ( sizeof(void*), a10.getSize() );
 	EXPECT_EQ( expectedType, a10.getType() );
 	EXPECT_EQ( cpr, a10.get<const T*&>() );
 }
@@ -173,6 +181,7 @@ void constructorRefTest( const co::TypeKind kind, const T& sampleValue, co::Type
 	EXPECT_FALSE( a7.isPointer() );
 	EXPECT_FALSE( a7.isPointerConst() );
 	EXPECT_TRUE( a7.isReference() );
+	EXPECT_EQ( sizeof(T), a7.getSize() );
 	EXPECT_EQ( expectedType, a7.getType() );
 	EXPECT_EQ( r, a7.get<T&>() );
 
@@ -184,6 +193,7 @@ void constructorRefTest( const co::TypeKind kind, const T& sampleValue, co::Type
 	EXPECT_FALSE( a8.isPointer() );
 	EXPECT_FALSE( a8.isPointerConst() );
 	EXPECT_TRUE( a8.isReference() );
+	EXPECT_EQ( sizeof(T), a8.getSize() );
 	EXPECT_EQ( expectedType, a8.getType() );
 	EXPECT_EQ( cr, a8.get<const T&>() );
 	
@@ -286,14 +296,17 @@ TEST( AnyTests, constructArray )
 {
 	co::ArrayRange<const co::int16*> r1;
 	co::Any a1( r1 );
+	EXPECT_EQ( sizeof(void*), a1.getSize() );
 	EXPECT_ANY_TYPE_STREQ( a1, "co::ArrayRange<const co::int16*>" );
 
 	co::ArrayRange<std::string* const> r2;
 	co::Any a2( r2 );
+	EXPECT_EQ( sizeof(void*), a2.getSize() );
 	EXPECT_ANY_TYPE_STREQ( a2, "co::ArrayRange<std::string* const>" );
 
 	co::ArrayRange<const std::string> r3 = co::getPaths();
 	co::Any a3( r3 );
+	EXPECT_EQ( sizeof(std::string), a3.getSize() );
 	EXPECT_ANY_TYPE_STREQ( a3, "co::ArrayRange<const std::string>" );
 
 	ASSERT_TRUE( r3.getSize() > 0 );
@@ -309,6 +322,7 @@ TEST( AnyTests, constructArray )
 
 	co::RefVector<co::InterfaceType> r4;
 	co::Any a4( &r4 );
+	EXPECT_EQ( sizeof(void*), a4.getSize() );
 	EXPECT_ANY_TYPE_STREQ( a4, "co::RefVector<co::InterfaceType>" );
 
 	a4.set<co::RefVector<co::InterfaceType>*>( NULL );
@@ -320,6 +334,7 @@ TEST( AnyTests, constructArray )
 
 	std::vector<co::Uuid> r5;
 	co::Any a5( &r5 );
+	EXPECT_EQ( sizeof(co::Uuid), a5.getSize() );
 	EXPECT_ANY_TYPE_STREQ( a5, "std::vector<co::Uuid>" );
 
 	a5.set<std::vector<co::Uuid>*>( NULL );
@@ -327,6 +342,7 @@ TEST( AnyTests, constructArray )
 
 	std::vector<const double*> r6;
 	co::Any a6( &r6 );
+	EXPECT_EQ( sizeof(void*), a1.getSize() );
 	EXPECT_ANY_TYPE_STREQ( a6, "std::vector<const double*>" );
 
 	double d = 7.5;

@@ -6,9 +6,8 @@
 #ifndef _LUASTATE_H_
 #define _LUASTATE_H_
 
-#include "Variant.h"
+#include <co/AnyValue.h>
 #include <lua.hpp>
-#include <co/Any.h>
 
 /*!
 	Singleton that manages a Lua universe and provides
@@ -40,7 +39,7 @@ public:
 
 	//! Pushes any Coral value onto the stack.
 	//@{
-	void push( const co::Any& any, int depth = 0 );
+	void push( const co::Any& var, int depth = 0 );
 	void push( const std::string& str );
 	void push( co::Interface* itf );
 	void push( co::Component* component );
@@ -48,19 +47,20 @@ public:
 
 	/*!
 		Reads a value from the stack, using \c expectedType to help interpret the value.
-		If the value at the specified stack index is not a valid Coral value,
-		raises a lua::Exception. The Variant \c data is a support parameter,
-		used for storage of values that do not fit in a co::Any (i.e. strings).
+		The result is returned in \c variable. Non-primitive values are allocated in \c value.
+		If the value at the specified index is not a valid Coral value, raises a lua::Exception.
 	 */
-	void toCoral( int index, co::Type* expectedType, co::Any& value, Variant& data );
+	void toCoral( int index, co::Type* expectedType, co::Any& var, co::AnyValue& value );
 
 private:
-	void pushArray( const co::__any::State& s );
-
 	template<typename BindingClass, typename InstanceType>
 	inline void pushInstance( InstanceType* ptr );
 
 	void pushInstancesTable();
+
+	void pushArray( const co::Any& var );
+	void toArray( int index, co::Type* expectedType, co::Any& var, co::AnyValue& value );
+
 	void raiseException( int errorCode );
 
 private:

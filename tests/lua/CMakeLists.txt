@@ -18,6 +18,7 @@ SET( CORAL_PATH
 	"${CMAKE_SOURCE_DIR}/modules"
 	"${CMAKE_SOURCE_DIR}/tests/moduleA"
 	"${CMAKE_SOURCE_DIR}/tests/moduleB"
+	"${CMAKE_SOURCE_DIR}/tests/core/data/csl"
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 )
 

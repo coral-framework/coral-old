@@ -56,7 +56,6 @@ function M:initialize( module )
 	ASSERT_EQ( testStruct.innerStruct.message, "My Message" )
 	ASSERT_EQ( testStruct.innerStruct.filename, "My Filename" )
 	ASSERT_EQ( testStruct.innerStruct.line, 1337 )
-
 end
 
 return M

@@ -19,23 +19,9 @@
 #include <co/ComponentType.h>
 #include <co/NativeClassType.h>
 
-// forward declarations:
-namespace co {
-	class Any;
-	namespace __any {
-		struct State;
-	} // namespace __any
-} // namespace co
-
-//! Prints the complete C++ type name of the variable stored in a __any::State.
-CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::__any::State& s );
-
-//! Prints out the variable type and data stored in a co::Any.
-CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::Any& a );
-
 namespace co {
 
-//! Private namespace with auxiliary stuff for class co::Any.
+//! Private namespace with auxiliary code for class co::Any.
 namespace __any {
 
 struct State
@@ -511,7 +497,7 @@ public:
 
 public:
 	//! Creates an invalid co::Any.
-	Any() : _state()
+	inline Any() : _state()
 	{;}
 
 	/*!
@@ -523,7 +509,7 @@ public:
 			if you must store a reference or a 'const' variable.
 	 */
 	template<typename T>
-	Any( T var )
+	inline Any( T var )
 	{
 		set<T>( var );
 	}
@@ -532,7 +518,7 @@ public:
 		Custom constructor corresponding to a setInterface() call.
 		Please, see setInterface()'s documentation for more info.
 	 */
-	Any( co::Interface* instance, co::InterfaceType* type )
+	inline Any( co::Interface* instance, co::InterfaceType* type )
 	{
 		setInterface( instance, type );
 	}
@@ -541,7 +527,7 @@ public:
 		Custom constructor corresponding to a setVariable() call.
 		Please, see setVariable()'s documentation for more info.
 	 */
-	Any( Type* type, uint32 flags, void* ptr )
+	inline Any( Type* type, uint32 flags, void* ptr )
 	{
 		setVariable( type, flags, ptr );
 	}
@@ -550,7 +536,7 @@ public:
 		Custom constructor corresponding to a setBasic() call.
 		Please, see setBasic()'s documentation for more info.
 	 */
-	Any( co::TypeKind kind, uint32 flags, void* ptr )
+	inline Any( co::TypeKind kind, uint32 flags, void* ptr )
 	{
 		setBasic( kind, flags, ptr );
 	}
@@ -559,7 +545,7 @@ public:
 		Custom constructor corresponding to a setArray() call.
 		Please, see setArray()'s documentation for more info.
 	 */
-	Any( ArrayKind arrayKind, Type* elementType, uint32 flags, void* ptr, std::size_t arraySize = 0 )
+	inline Any( ArrayKind arrayKind, Type* elementType, uint32 flags, void* ptr, std::size_t arraySize = 0 )
 	{
 		setArray( arrayKind, elementType, flags, ptr, arraySize );
 	}
@@ -596,6 +582,16 @@ public:
 		assert( _state.kind == TK_INTERFACE );
 		return _state.interfaceType;
 	}
+
+	/*!
+		Returns the size of the variable stored in this object; or, in the case of arrays,
+		by each array element. This method mimics the behavior of operator sizeof(): for pointers,
+		the result is always sizeof(void*). For references, the result is equivalent to the value's size.
+
+		This method may have to use the type's reflector to inquire the size of user-defined types;
+		therefore, it may throw exceptions.
+	 */
+	int32 getSize() const;
 
 	/*!
 		Automatically stores any variable supported by the Coral type system.
@@ -711,8 +707,6 @@ public:
 	inline bool operator!=( const Any& other ) const { return !( *this == other ); }
 
 private:
-	friend std::ostream& ::operator<<( std::ostream& out, const Any& a );
-
 	//! Used by setVariable()/setArray().
 	inline void setModifiers( uint32 flags );
 
@@ -726,5 +720,11 @@ private:
 template<> struct kindOf<Any> { static const TypeKind kind = TK_ANY; };
 
 } // namespace co
+
+//! Prints the complete C++ type name of the variable stored in a __any::State.
+CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::__any::State& s );
+
+//! Prints out the variable type and data stored in a co::Any.
+CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::Any& a );
 
 #endif // _CO_ANY_H_
