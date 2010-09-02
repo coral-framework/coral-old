@@ -35,3 +35,13 @@ TARGET_LINK_LIBRARIES( lua lua52 core )
 ################################################################################
 
 SOURCE_GROUP( "@Generated" FILES ${GENERATED_LUA_SOURCES} )
+
+################################################################################
+# Install Rules
+################################################################################
+
+# install shared library
+INSTALL( DIRECTORY ${CMAKE_BINARY_DIR}/modules/lua DESTINATION modules COMPONENT "Lua Module" )
+
+# install CSL files
+INSTALL( DIRECTORY ${CMAKE_SOURCE_DIR}/modules/lua DESTINATION modules COMPONENT "Lua Module" )

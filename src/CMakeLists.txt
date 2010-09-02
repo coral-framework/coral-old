@@ -1,6 +1,6 @@
 ################################################################################
 # About This Directory:
-#	This is the parent dir of the main deployable Coral targets.
+#	This is the parent dir of the main deployable targets.
 ################################################################################
 
 ADD_SUBDIRECTORY( core )

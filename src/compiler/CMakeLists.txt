@@ -38,3 +38,10 @@ SET_TARGET_PROPERTIES( coralc PROPERTIES
 )
 
 CORAL_DEFAULT_TARGET_PROPERTIES( coralc )
+
+################################################################################
+# Install Rules
+################################################################################
+
+# install the compiler executable
+INSTALL( TARGETS coralc DESTINATION bin COMPONENT Core )

@@ -141,3 +141,19 @@ SOURCE_GROUP( "Reserved" FILES ${reservedFiles} )
 # Internal Utility Classes (Tools)
 FILE( GLOB toolsFiles tools/*.h tools/*.cpp )
 SOURCE_GROUP( "Tools" FILES ${toolsFiles} )
+
+################################################################################
+# Install Rules
+################################################################################
+
+# install shared library
+INSTALL( TARGETS core DESTINATION lib COMPONENT Core )
+
+# install CMake package
+INSTALL( FILES ${CMAKE_SOURCE_DIR}/cmake/FindCoral.cmake DESTINATION cmake COMPONENT Core )
+
+# install public headers
+INSTALL( DIRECTORY ${CMAKE_BINARY_DIR}/include DESTINATION . COMPONENT Core )
+
+# install CSL files
+INSTALL( DIRECTORY ${CMAKE_SOURCE_DIR}/modules/co DESTINATION modules COMPONENT Core )

@@ -153,6 +153,7 @@ FUNCTION( _coral_find_program _name)
 	FIND_PROGRAM( ${_name}
 		NAMES ${ARGN}
 		HINTS
+			../
 			$ENV{CORAL_ROOT}
 			${CORAL_ROOT}
 		PATH_SUFFIXES
@@ -166,6 +167,7 @@ FUNCTION( _coral_find_library _name)
 	FIND_LIBRARY( ${_name}
 		NAMES ${ARGN}
 		HINTS
+			../
 			$ENV{CORAL_ROOT}
 			${CORAL_ROOT}
 		PATH_SUFFIXES
@@ -178,13 +180,14 @@ ENDFUNCTION()
 
 FIND_PATH( CORAL_INCLUDE_DIR co/Coral.h
 	HINTS
+		../include
 		$ENV{CORAL_ROOT}/include
 		${CORAL_ROOT}/include
 )
 MARK_AS_ADVANCED( CORAL_INCLUDE_DIR )
 
 IF( NOT CORAL_COMPILER )
-	_coral_find_program( CORAL_COMPILER			coralc coralcd )
+	_coral_find_program( CORAL_COMPILER		coralc coralcd )
 ENDIF()
 
 _coral_find_library( CORAL_LIBRARY			coral )
