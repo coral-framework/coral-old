@@ -219,26 +219,19 @@ int main( int argc, char* argv[] )
 {
 	if( argc < 2 || ( argv[1][0] == '-' && argc < 4 ) )
 	{
-		const char* commandName = strrchr( argv[0], DIR_SEP_CHAR );
-		if( commandName )
-			++commandName;
-		else
-			commandName = argv[0];
-
 		printf(
 			"Coral Application Launcher v" CORAL_VERSION_STR " (" CORAL_BUILD_KEY ")\n"
-			"Usage: %s [options] callee [ARG] ...\n"
+			"Usage: coral [options] callee [ARG] ...\n"
 			"Description:\n"
-			"  A 'callee' must be specified as either a component name or a method name within\n"
-			"  a component interface. If a method is not specified, one named 'main' will be\n"
-			"  searched for in all provided interfaces of the component. The called method must\n"
-			"  return 'void' and receive either no argument or an array of strings.\n"
+			"  A 'callee' must be specified as either a component or a method name within\n"
+			"  a component interface. If a method is not specified, one named 'main' will\n"
+			"  be searched for in all provided interfaces of the component. The called method\n"
+			"  must return 'void' and receive either no argument or an array of strings.\n"
 			"Examples:\n"
-			"  %s myModule.MyComponent arg1 arg2 arg3\n"
-			"  %s someModule.SomeComponent.someInterface:someMethod arg1 arg2\n"
+			"  coral myModule.MyComponent arg1 arg2 arg3\n"
+			"  coral someModule.SomeComponent.someInterface:someMethod arg1 arg2\n"
 			"Available Options:\n"
-			"  -p EXTRA,DIRS   Add a list of repositories to the Coral path.\n",
-			commandName, commandName, commandName
+			"  -p EXTRA,DIRS   Add a list of repositories to the Coral path.\n"
 		);
 
 		return 0;
