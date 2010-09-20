@@ -10,7 +10,7 @@
 #include <co/Reflector.h>
 #include <co/InterfaceType.h>
 #include <co/IllegalCastException.h>
-#include <memory>
+#include <cstdlib>
 #include <iomanip>
 #include <sstream>
 
