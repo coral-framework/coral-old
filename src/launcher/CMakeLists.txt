@@ -30,5 +30,5 @@ CORAL_DEFAULT_TARGET_PROPERTIES( launcher )
 # Install Rules
 ################################################################################
 
-# install the compiler executable
-#INSTALL( TARGETS coralc DESTINATION bin COMPONENT Core )
+# install the launcher executable
+INSTALL( TARGETS launcher DESTINATION . COMPONENT Core )

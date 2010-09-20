@@ -14,9 +14,9 @@
 #include <co/LifeCycleException.h>
 #include <co/ModuleLoadException.h>
 #include <co/IllegalArgumentException.h>
-#include <glog/logging.h>
 #include <algorithm>
 #include <sstream>
+#include <iostream>
 
 ModuleManager::ModuleManager()
 {
@@ -46,7 +46,9 @@ void ModuleManager::updateModules( co::ModuleState state )
 		catch( std::exception& e )
 		{
 			module->abort();
-			LOG( ERROR ) << "Module '" << module->getNamespace()->getFullName()
+
+			// TODO call a handler function instead
+			std::cerr << "Module '" << module->getNamespace()->getFullName()
 						 << "' aborted due to exception: " << e.what();
 		}
 	}

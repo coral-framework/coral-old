@@ -42,18 +42,8 @@ IF( WIN32 )
 	IF( NOT VR_SDK_DIR )
 		SET( VR_SDK_DIR "C:/SDK" )
 	ENDIF( NOT VR_SDK_DIR )
-
-	SET( GLOG_ROOT "${VR_SDK_DIR}/glog" )
 	SET( GTEST_ROOT "${VR_SDK_DIR}/gtest" )
-	SET( GFLAGS_ROOT "${VR_SDK_DIR}/gflags" )
-	SET( CTEMPLATE_ROOT "${VR_SDK_DIR}/ctemplate" )
 ENDIF()
-
-# Google's Logging library is required.
-FIND_PACKAGE( GLog REQUIRED )
-
-# Google's commandline Flags library is required.
-FIND_PACKAGE( GFlags REQUIRED )
 
 # Include our own package, so we can use the CORAL_GENERATE_*() macros.
 SET( CORAL_ROOT ${CMAKE_SOURCE_DIR} )
@@ -61,7 +51,7 @@ SET( CORAL_LAUNCHER launcher )
 FIND_PACKAGE( Coral QUIET )
 
 # Shared include paths for all subprojects
-INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/include ${GLOG_INCLUDE_DIRS} ${GFLAGS_INCLUDE_DIRS} )
+INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/include )
 
 ################################################################################
 # Global Coral Settings

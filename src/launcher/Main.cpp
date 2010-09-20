@@ -299,7 +299,7 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "Invalid method '%s:%s'.\nException: %s.\n", ii->getType()->getFullName().c_str(),
+			fprintf( stderr, "Invalid method '%s:%s'.\nException: %s\n", ii->getType()->getFullName().c_str(),
 						mi->getName().c_str(), e.what() );
 			throw;
 		}
@@ -317,7 +317,7 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "Instantiation failed: %s.\n", e.what() );
+			fprintf( stderr, "Instantiation failed: %s\n", e.what() );
 			throw;
 		}
 		
@@ -329,7 +329,7 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "Invocation failed: %s.\n", e.what() );
+			fprintf( stderr, "Invocation failed: %s\n", e.what() );
 			throw;
 		}
 
@@ -347,7 +347,7 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "Program terminated with an unhandled exception.\nMessage: %s.\n", e.what() );
+			fprintf( stderr, "Program terminated with an unhandled exception.\nMessage: %s\n", e.what() );
 			throw;
 		}
 	}

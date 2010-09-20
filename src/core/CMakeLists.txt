@@ -96,10 +96,7 @@ IF( UNIX )
 	SET_PROPERTY( SOURCE csl/CSLLexer.cpp csl/CSLParser.cpp PROPERTY COMPILE_FLAGS "-Wno-all -Wno-extra -Wno-unused" )
 ENDIF()
 
-TARGET_LINK_LIBRARIES( core
-	antlr3c
-	${GLOG_LIBRARIES}
-)
+TARGET_LINK_LIBRARIES( core	antlr3c )
 
 IF( UNIX )
     TARGET_LINK_LIBRARIES( core dl )
@@ -146,7 +143,7 @@ SOURCE_GROUP( "Tools" FILES ${toolsFiles} )
 ################################################################################
 
 # install shared library
-INSTALL( TARGETS core DESTINATION lib COMPONENT Core )
+INSTALL( TARGETS core DESTINATION . COMPONENT Core )
 
 # install CMake package
 INSTALL( FILES ${CMAKE_SOURCE_DIR}/cmake/FindCoral.cmake DESTINATION cmake COMPONENT Core )

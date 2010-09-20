@@ -17,8 +17,8 @@
 #include <co/InterfaceType.h>
 #include <co/TypeCreationTransaction.h>
 #include <co/NoSuchInterfaceException.h>
-#include <glog/logging.h>
 #include <sstream>
+#include <iostream>
 
 namespace co {
 
@@ -26,7 +26,8 @@ ComponentBase::~ComponentBase()
 {
 	if( _refCount != 0 )
 	{
-		LOG( ERROR ) << "Deleting component " << this <<
+		// TODO call a handler function instead
+		std::cerr << "Deleting component " << this <<
 			" with a reference count of " << _refCount << ". Memory corruption possible.";
 
 		assert( false );

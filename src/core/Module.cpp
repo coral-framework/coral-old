@@ -12,8 +12,8 @@
 #include <co/ModulePartLoader.h>
 #include <co/LifeCycleException.h>
 #include <co/reserved/LibraryManager.h>
-#include <glog/logging.h>
 #include <cassert>
+#include <iostream>
 
 Module::Module() : _state( co::ModuleState_None ), _namespace( 0 )
 {
@@ -148,7 +148,8 @@ void Module::abort()
 			}
 			catch( std::exception& e )
 			{
-				LOG( ERROR ) << "Exception ignored while aborting module '"
+				// TODO call a handler function instead
+				std::cerr << "Exception ignored while aborting module '"
 							 << _namespace->getFullName() << "': " << e.what();
 			}
 		}

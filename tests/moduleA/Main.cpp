@@ -6,17 +6,10 @@
 #include <co/Coral.h>
 #include <co/System.h>
 #include <gtest/gtest.h>
-#include <glog/logging.h>
-#include <gflags/gflags.h>
 
 int main( int argc, char** argv )
 {
 	testing::InitGoogleTest( &argc, argv );
-
-	google::ParseCommandLineFlags( &argc, &argv, true );
-
-	// initialize Google's logging library
-	google::InitGoogleLogging( argv[0] );
 
 	// set up the system
 	co::addPath( CORAL_PATH );

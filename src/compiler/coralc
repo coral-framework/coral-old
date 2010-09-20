@@ -1,2 +1,17 @@
 #!/bin/sh
-./coral lua.Launcher co.compiler.cli $@
+
+CORAL_DIR=`dirname $0`
+if [ "$CORAL_DIR" = "" ]
+then
+	LAUNCHER=`which coral`
+	CORAL_DIR=`dirname $LAUNCHER`
+fi
+
+if [ `uname` = "Darwin" ]
+then
+	export DYLD_LIBRARY_PATH=$CORAL_DIR:$DYLD_LIBRARY_PATH
+else
+	export LD_LIBRARY_PATH=$CORAL_DIR:$LD_LIBRARY_PATH
+fi
+
+$CORAL_DIR/coral lua.Launcher co.compiler.cli $@

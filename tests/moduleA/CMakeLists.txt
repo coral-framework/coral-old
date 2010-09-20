@@ -62,7 +62,6 @@ CORAL_TEST_TARGET_PROPERTIES( tests_moduleA tests_moduleA_EXECUTABLE )
 TARGET_LINK_LIBRARIES( tests_moduleA
 	core
 	${GTEST_LIBRARIES}
-	${GFLAGS_LIBRARIES}
 )
 
 ################################################################################

@@ -46,7 +46,6 @@ CORAL_TEST_TARGET_PROPERTIES( tests_lua tests_lua_EXECUTABLE )
 TARGET_LINK_LIBRARIES( tests_lua
 	core
 	${GTEST_LIBRARIES}
-	${GFLAGS_LIBRARIES}
 )
 
 ################################################################################

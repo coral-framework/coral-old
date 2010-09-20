@@ -49,9 +49,7 @@ CORAL_TEST_TARGET_PROPERTIES( tests_regen tests_regen_EXECUTABLE )
 
 TARGET_LINK_LIBRARIES( tests_regen
 	antlr3c
-	${GLOG_LIBRARIES}
 	${GTEST_LIBRARIES}
-	${GFLAGS_LIBRARIES}
 )
 
 # Disable warnings for AntLR-generated source files

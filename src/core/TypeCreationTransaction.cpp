@@ -12,8 +12,8 @@
 #include <co/System.h>
 #include <co/MissingInputException.h>
 #include <co/UnsupportedOperationException.h>
-#include <glog/logging.h>
 #include <sstream>
+#include <iostream>
 
 TypeCreationTransaction* TypeCreationTransaction::sm_activeTransaction( NULL );
 
@@ -21,7 +21,8 @@ TypeCreationTransaction::TypeCreationTransaction()
 {
 	if( sm_activeTransaction )
 	{
-		LOG( ERROR ) << "Attempt to instantiate a co::TypeCreationTransaction while another instance is active. "
+		// TODO call a handler function instead
+		std::cerr << "Attempt to instantiate a co::TypeCreationTransaction while another instance is active. "
 					 << "Concurrent type creation is unsafe and disallowed in this Coral version.";
 
 		assert( false );
@@ -43,7 +44,8 @@ TypeCreationTransaction::~TypeCreationTransaction()
 
 	if( !_commitSucceeded && !_rolledBack )
 	{
-		LOG( ERROR ) << "co::TypeCreationTransaction not committed nor rolled back.";
+		// TODO call a handler function instead
+		std::cerr << "co::TypeCreationTransaction not committed nor rolled back.";
 		assert( false );
 	}
 }
