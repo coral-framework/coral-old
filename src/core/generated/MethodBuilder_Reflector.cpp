@@ -67,29 +67,29 @@ public:
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 2 ), range, res );
 	}
 
-	void defineException( co::ExceptionType* __exceptionType )
+	void defineException( co::ExceptionType* exceptionType_ )
 	{
 		co::Any res, args[1];
-		args[0].set< co::ExceptionType* >( __exceptionType );
+		args[0].set< co::ExceptionType* >( exceptionType_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 3 ), range, res );
 	}
 
-	void defineParameter( const std::string& __name, co::Type* __type, bool __input, bool __output )
+	void defineParameter( const std::string& name_, co::Type* type_, bool input_, bool output_ )
 	{
 		co::Any res, args[4];
-		args[0].set< const std::string& >( __name );
-		args[1].set< co::Type* >( __type );
-		args[2].set< bool >( __input );
-		args[3].set< bool >( __output );
+		args[0].set< const std::string& >( name_ );
+		args[1].set< co::Type* >( type_ );
+		args[2].set< bool >( input_ );
+		args[3].set< bool >( output_ );
 		co::ArrayRange<co::Any const> range( args, 4 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 4 ), range, res );
 	}
 
-	void defineReturnType( co::Type* __type )
+	void defineReturnType( co::Type* type_ )
 	{
 		co::Any res, args[1];
-		args[0].set< co::Type* >( __type );
+		args[0].set< co::Type* >( type_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 5 ), range, res );
 	}
@@ -183,26 +183,26 @@ public:
 				break;
 			case 3:
 				{
-					co::ExceptionType* __exceptionType = args[++argIndex].get< co::ExceptionType* >();
+					co::ExceptionType* exceptionType_ = args[++argIndex].get< co::ExceptionType* >();
 					argIndex = -1;
-					p->defineException( __exceptionType );
+					p->defineException( exceptionType_ );
 				}
 				break;
 			case 4:
 				{
-					const std::string& __name = args[++argIndex].get< const std::string& >();
-					co::Type* __type = args[++argIndex].get< co::Type* >();
-					bool __input = args[++argIndex].get< bool >();
-					bool __output = args[++argIndex].get< bool >();
+					const std::string& name_ = args[++argIndex].get< const std::string& >();
+					co::Type* type_ = args[++argIndex].get< co::Type* >();
+					bool input_ = args[++argIndex].get< bool >();
+					bool output_ = args[++argIndex].get< bool >();
 					argIndex = -1;
-					p->defineParameter( __name, __type, __input, __output );
+					p->defineParameter( name_, type_, input_, output_ );
 				}
 				break;
 			case 5:
 				{
-					co::Type* __type = args[++argIndex].get< co::Type* >();
+					co::Type* type_ = args[++argIndex].get< co::Type* >();
 					argIndex = -1;
-					p->defineReturnType( __type );
+					p->defineReturnType( type_ );
 				}
 				break;
 			default:

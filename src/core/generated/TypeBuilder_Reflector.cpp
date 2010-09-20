@@ -78,57 +78,57 @@ public:
 		return res.get< co::Type* >();
 	}
 
-	void defineAttribute( const std::string& __name, co::Type* __type, bool __isReadOnly )
+	void defineAttribute( const std::string& name_, co::Type* type_, bool isReadOnly_ )
 	{
 		co::Any res, args[3];
-		args[0].set< const std::string& >( __name );
-		args[1].set< co::Type* >( __type );
-		args[2].set< bool >( __isReadOnly );
+		args[0].set< const std::string& >( name_ );
+		args[1].set< co::Type* >( type_ );
+		args[2].set< bool >( isReadOnly_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 4 ), range, res );
 	}
 
-	void defineIdentifier( const std::string& __name )
+	void defineIdentifier( const std::string& name_ )
 	{
 		co::Any res, args[1];
-		args[0].set< const std::string& >( __name );
+		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 5 ), range, res );
 	}
 
-	void defineInterface( const std::string& __name, co::InterfaceType* __interfaceType, bool __isProvided )
+	void defineInterface( const std::string& name_, co::InterfaceType* interfaceType_, bool isProvided_ )
 	{
 		co::Any res, args[3];
-		args[0].set< const std::string& >( __name );
-		args[1].set< co::InterfaceType* >( __interfaceType );
-		args[2].set< bool >( __isProvided );
+		args[0].set< const std::string& >( name_ );
+		args[1].set< co::InterfaceType* >( interfaceType_ );
+		args[2].set< bool >( isProvided_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 6 ), range, res );
 	}
 
-	co::MethodBuilder* defineMethod( const std::string& __name )
+	co::MethodBuilder* defineMethod( const std::string& name_ )
 	{
 		co::Any res, args[1];
-		args[0].set< const std::string& >( __name );
+		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 7 ), range, res );
 		assert( res.containsObject() == false );
 		return res.get< co::MethodBuilder* >();
 	}
 
-	void defineNativeClass( const std::string& __nativeHeaderFile, const std::string& __nativeName )
+	void defineNativeClass( const std::string& nativeHeaderFile_, const std::string& nativeName_ )
 	{
 		co::Any res, args[2];
-		args[0].set< const std::string& >( __nativeHeaderFile );
-		args[1].set< const std::string& >( __nativeName );
+		args[0].set< const std::string& >( nativeHeaderFile_ );
+		args[1].set< const std::string& >( nativeName_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 8 ), range, res );
 	}
 
-	void defineSuperType( co::Type* __superType )
+	void defineSuperType( co::Type* superType_ )
 	{
 		co::Any res, args[1];
-		args[0].set< co::Type* >( __superType );
+		args[0].set< co::Type* >( superType_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 9 ), range, res );
 	}
@@ -224,49 +224,49 @@ public:
 				break;
 			case 4:
 				{
-					const std::string& __name = args[++argIndex].get< const std::string& >();
-					co::Type* __type = args[++argIndex].get< co::Type* >();
-					bool __isReadOnly = args[++argIndex].get< bool >();
+					const std::string& name_ = args[++argIndex].get< const std::string& >();
+					co::Type* type_ = args[++argIndex].get< co::Type* >();
+					bool isReadOnly_ = args[++argIndex].get< bool >();
 					argIndex = -1;
-					p->defineAttribute( __name, __type, __isReadOnly );
+					p->defineAttribute( name_, type_, isReadOnly_ );
 				}
 				break;
 			case 5:
 				{
-					const std::string& __name = args[++argIndex].get< const std::string& >();
+					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					p->defineIdentifier( __name );
+					p->defineIdentifier( name_ );
 				}
 				break;
 			case 6:
 				{
-					const std::string& __name = args[++argIndex].get< const std::string& >();
-					co::InterfaceType* __interfaceType = args[++argIndex].get< co::InterfaceType* >();
-					bool __isProvided = args[++argIndex].get< bool >();
+					const std::string& name_ = args[++argIndex].get< const std::string& >();
+					co::InterfaceType* interfaceType_ = args[++argIndex].get< co::InterfaceType* >();
+					bool isProvided_ = args[++argIndex].get< bool >();
 					argIndex = -1;
-					p->defineInterface( __name, __interfaceType, __isProvided );
+					p->defineInterface( name_, interfaceType_, isProvided_ );
 				}
 				break;
 			case 7:
 				{
-					const std::string& __name = args[++argIndex].get< const std::string& >();
+					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::MethodBuilder* >( p->defineMethod( __name ) );
+					res.set< co::MethodBuilder* >( p->defineMethod( name_ ) );
 				}
 				break;
 			case 8:
 				{
-					const std::string& __nativeHeaderFile = args[++argIndex].get< const std::string& >();
-					const std::string& __nativeName = args[++argIndex].get< const std::string& >();
+					const std::string& nativeHeaderFile_ = args[++argIndex].get< const std::string& >();
+					const std::string& nativeName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					p->defineNativeClass( __nativeHeaderFile, __nativeName );
+					p->defineNativeClass( nativeHeaderFile_, nativeName_ );
 				}
 				break;
 			case 9:
 				{
-					co::Type* __superType = args[++argIndex].get< co::Type* >();
+					co::Type* superType_ = args[++argIndex].get< co::Type* >();
 					argIndex = -1;
-					p->defineSuperType( __superType );
+					p->defineSuperType( superType_ );
 				}
 				break;
 			default:

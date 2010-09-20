@@ -1,23 +1,11 @@
-/*******************************************************************************
-** Bootstrap functions generated for module 'lua'
-**
-** Created: Mon Sep 20 12:13:52 2010
-**      by: Coral Compiler version 0.3.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/RefPtr.h>
 #include <co/ModulePart.h>
 #include <co/reserved/LibraryManager.h>
-
-#if !defined( CORAL_COMPILER_OUTPUT_REVISION )
-#error "The header file <co/Config.h> was not included."
-#elif CORAL_COMPILER_OUTPUT_REVISION != 1
-#error "This file was generated using the Coral Compiler v0.3.0. It"
-#error "cannot be used with the include files from this version of Coral."
-#error "(The code generation rules have changed too much.)"
-#endif
 
 extern "C" CORAL_DLL_EXPORT
 const char* coral_module_query_verification_data()
@@ -38,24 +26,24 @@ extern "C" CORAL_DLL_EXPORT
 const TypeDependency* coral_module_query_dependencies()
 {
 	static const TypeDependency s_dependencies[] = {
-		{ "lua.ILauncher", "4D3C9263-0377-352B-752D417E95394BC4" },
 		{ "co.Interface", "C9F9F061-B481-151D-4751BCC4494CCD9F" },
+		{ "lua.ILauncher", "4D3C9263-0377-352B-752D417E95394BC4" },
 		{ "lua.lua", "CC83CD39-BDBB-A5E4-1B99D37111BCF066" },
 		{ "co.ArrayType", "F29E701E-02C4-05EF-5678229EC3653D1C" },
 		{ "co.ModulePart", "A34C715E-954E-15CD-2B04800BA19B5052" },
 		{ "co.System", "C6E47013-73A8-D554-C221496BDAE2909C" },
+		{ "lua.Exception", "C9E07715-CB3A-652A-0D46896EFD6FD6AB" },
 		{ "co.EnumType", "1847C34A-33F1-05F8-859BC2523056F718" },
 		{ "lua.ModulePartLoader", "6D1199C9-3749-0528-1D4385C12BE804F5" },
 		{ "co.ExceptionType", "A42F28BA-50B8-9593-346CABF6B6F93BD6" },
-		{ "lua.Exception", "C9E07715-CB3A-652A-0D46896EFD6FD6AB" },
+		{ "co.ModulePartLoader", "536A73D9-F4C8-F597-2FEB68C301937B8D" },
 		{ "lua.Launcher", "E6BFF600-6C63-F5DC-7FE9929DD5132E7C" },
 		{ "co.InterfaceType", "22FF144F-E1B5-1593-CA7DF461B59AB85C" },
 		{ "lua.Universe", "DC0C34EC-207A-85FF-B40436AB2C4A3205" },
 		{ "lua.ModulePart", "CC83CD39-BDBB-A5E4-1B99D37111BCF066" },
 		{ "lua.IState", "718D8C7D-75FB-8554-4FD1A05ED047928A" },
-		{ "co.ModulePartLoader", "536A73D9-F4C8-F597-2FEB68C301937B8D" },
-		{ "co.Reflector", "0AA79840-442C-E518-35F14DC5DA07D79A" },
 		{ "co.NativeClassType", "E06B94AA-0639-6524-D24AD3260F041B58" },
+		{ "co.Reflector", "0AA79840-442C-E518-35F14DC5DA07D79A" },
 		{ "co.ComponentType", "75F346D2-E3C5-858E-D4DAAA0E49608FCF" },
 		{ "co.Namespace", "4FD40C32-7A5E-75F8-05DDEE996453EF13" },
 		{ "co.StructType", "10C22B97-2CDD-E5E9-6696678A6EAF792F" },

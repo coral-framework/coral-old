@@ -116,10 +116,10 @@ public:
 
 ]] )
 				if not a.isReadOnly then
-					writer( "\tvoid ", itf.formatAccessor( "set", a.name ), "( ", inputType, " __", a.name, " )\n", [[
+					writer( "\tvoid ", itf.formatAccessor( "set", a.name ), "( ", inputType, " ", a.name, "_ )\n", [[
 	{
 		co::Any arg;
-		arg.set< ]], inputType, [[ >( __]], a.name, [[ );
+		arg.set< ]], inputType, [[ >( ]], a.name, [[_ );
 		_handler->handleSetAttribute( _cookie, getAttribInfo<]], itf.cppName, [[>( ]], a.index, [[ ), arg );
 	}
 
@@ -136,7 +136,7 @@ public:
 					writer( " " )
 					for i, p in ipairs( params ) do
 						local paramType = ( p.isOut and itf.formatOutput or itf.formatInput )( p.type )
-						writer( paramType, " __", p.name, ( i < #params and ', ' or '' ) )
+						writer( paramType, " ", p.name, ( i < #params and '_, ' or '_' ) )
 					end
 					writer( " " )
 				end
@@ -145,7 +145,7 @@ public:
 					writer( "\t\tco::Any res, args[", #params, "];\n" )
 					for i, p in ipairs( params ) do
 						local paramType = ( p.isOut and itf.formatOutput or itf.formatInput )( p.type )
-						writer( "\t\targs[", i - 1, "].set< ", paramType, " >( __", p.name, " );\n" )
+						writer( "\t\targs[", i - 1, "].set< ", paramType, " >( ", p.name, "_ );\n" )
 					end
 					writer( "\t\tco::ArrayRange<co::Any const> range( args, ", #params, " );\n" )
 				else
@@ -415,7 +415,7 @@ public:
 				writer( "\t\t\tcase ", m.index, ":\n\t\t\t\t{\n" )
 				for i, p in ipairs( m.parameters ) do
 					local paramType = ( p.isOut and t.formatOutput or t.formatInput )( p.type )
-					writer( "\t\t\t\t\t", paramType, " __", p.name, " = args[++argIndex].get< ", paramType, " >();\n" )
+					writer( "\t\t\t\t\t", paramType, " ", p.name, "_ = args[++argIndex].get< ", paramType, " >();\n" )
 				end
 				if #m.parameters > 0 then
 					writer( "\t\t\t\t\targIndex = -1;\n" )
@@ -431,7 +431,7 @@ public:
 						writer( "r, " )
 					end
 					for i, p in ipairs( m.parameters ) do
-						writer( "__", p.name, i < #m.parameters and ", " or "" )
+						writer( p.name, i < #m.parameters and "_, " or "_" )
 					end
 					writer( " )" )
 				elseif t.kind == 'TK_NATIVECLASS' then

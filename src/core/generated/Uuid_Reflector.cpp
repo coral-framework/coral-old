@@ -99,23 +99,23 @@ public:
 				break;
 			case 3:
 				{
-					const std::string& __data = args[++argIndex].get< const std::string& >();
+					const std::string& data_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					co::Uuid_Adapter::createSha1( r, __data );
+					co::Uuid_Adapter::createSha1( r, data_ );
 				}
 				break;
 			case 4:
 				{
-					std::string& __str = args[++argIndex].get< std::string& >();
+					std::string& str_ = args[++argIndex].get< std::string& >();
 					argIndex = -1;
-					co::Uuid_Adapter::getString( r, __str );
+					co::Uuid_Adapter::getString( r, str_ );
 				}
 				break;
 			case 5:
 				{
-					const std::string& __str = args[++argIndex].get< const std::string& >();
+					const std::string& str_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					co::Uuid_Adapter::setString( r, __str );
+					co::Uuid_Adapter::setString( r, str_ );
 				}
 				break;
 			default:

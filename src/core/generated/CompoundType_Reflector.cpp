@@ -101,10 +101,10 @@ public:
         return res.get< co::Reflector* >();
 	}
 
-	void setReflector( co::Reflector* __reflector )
+	void setReflector( co::Reflector* reflector_ )
 	{
 		co::Any arg;
-		arg.set< co::Reflector* >( __reflector );
+		arg.set< co::Reflector* >( reflector_ );
 		_handler->handleSetAttribute( _cookie, getAttribInfo<co::Type>( 6 ), arg );
 	}
 
@@ -118,10 +118,10 @@ public:
         return res.get< co::ArrayRange<co::MemberInfo* const> >();
 	}
 
-	co::MemberInfo* getMember( const std::string& __name )
+	co::MemberInfo* getMember( const std::string& name_ )
 	{
 		co::Any res, args[1];
-		args[0].set< const std::string& >( __name );
+		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::CompoundType>( 1 ), range, res );
 		assert( res.containsObject() == false );
@@ -210,9 +210,9 @@ public:
 			{
 			case 1:
 				{
-					const std::string& __name = args[++argIndex].get< const std::string& >();
+					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::MemberInfo* >( p->getMember( __name ) );
+					res.set< co::MemberInfo* >( p->getMember( name_ ) );
 				}
 				break;
 			default:

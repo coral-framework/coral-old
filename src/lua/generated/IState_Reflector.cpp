@@ -1,11 +1,7 @@
-/*******************************************************************************
-** Reflection code generated for type 'lua.IState'
-**
-** Created: Mon Sep 20 12:13:52 2010
-**      by: Coral Compiler version 0.3.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <lua/IState.h>
 #include <co/DynamicProxyHandler.h>
@@ -17,14 +13,6 @@
 #include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
-
-#if !defined( CORAL_COMPILER_OUTPUT_REVISION )
-#error "The header file <co/Config.h> was not included."
-#elif CORAL_COMPILER_OUTPUT_REVISION != 1
-#error "This file was generated using the Coral Compiler v0.3.0. It"
-#error "cannot be used with the include files from this version of Coral."
-#error "(The code generation rules have changed too much.)"
-#endif
 
 namespace lua {
 
@@ -57,36 +45,36 @@ public:
 
 	// lua.IState Methods:
 
-	void call( co::int32 __numArgs, co::int32 __numResults )
+	void call( co::int32 numArgs_, co::int32 numResults_ )
 	{
 		co::Any res, args[2];
-		args[0].set< co::int32 >( __numArgs );
-		args[1].set< co::int32 >( __numResults );
+		args[0].set< co::int32 >( numArgs_ );
+		args[1].set< co::int32 >( numResults_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 0 ), range, res );
 	}
 
-	void loadFile( const std::string& __filename )
+	void loadFile( const std::string& filename_ )
 	{
 		co::Any res, args[1];
-		args[0].set< const std::string& >( __filename );
+		args[0].set< const std::string& >( filename_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 1 ), range, res );
 	}
 
-	void push( const co::Any& __value )
+	void push( const co::Any& value_ )
 	{
 		co::Any res, args[1];
-		args[0].set< const co::Any& >( __value );
+		args[0].set< const co::Any& >( value_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 2 ), range, res );
 	}
 
-	bool searchScript( const std::string& __name, std::string& __filename )
+	bool searchScript( const std::string& name_, std::string& filename_ )
 	{
 		co::Any res, args[2];
-		args[0].set< const std::string& >( __name );
-		args[1].set< std::string& >( __filename );
+		args[0].set< const std::string& >( name_ );
+		args[1].set< std::string& >( filename_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 3 ), range, res );
 		assert( res.containsObject() == false );
@@ -167,32 +155,32 @@ public:
 			{
 			case 0:
 				{
-					co::int32 __numArgs = args[++argIndex].get< co::int32 >();
-					co::int32 __numResults = args[++argIndex].get< co::int32 >();
+					co::int32 numArgs_ = args[++argIndex].get< co::int32 >();
+					co::int32 numResults_ = args[++argIndex].get< co::int32 >();
 					argIndex = -1;
-					p->call( __numArgs, __numResults );
+					p->call( numArgs_, numResults_ );
 				}
 				break;
 			case 1:
 				{
-					const std::string& __filename = args[++argIndex].get< const std::string& >();
+					const std::string& filename_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					p->loadFile( __filename );
+					p->loadFile( filename_ );
 				}
 				break;
 			case 2:
 				{
-					const co::Any& __value = args[++argIndex].get< const co::Any& >();
+					const co::Any& value_ = args[++argIndex].get< const co::Any& >();
 					argIndex = -1;
-					p->push( __value );
+					p->push( value_ );
 				}
 				break;
 			case 3:
 				{
-					const std::string& __name = args[++argIndex].get< const std::string& >();
-					std::string& __filename = args[++argIndex].get< std::string& >();
+					const std::string& name_ = args[++argIndex].get< const std::string& >();
+					std::string& filename_ = args[++argIndex].get< std::string& >();
 					argIndex = -1;
-					res.set< bool >( p->searchScript( __name, __filename ) );
+					res.set< bool >( p->searchScript( name_, filename_ ) );
 				}
 				break;
 			default:

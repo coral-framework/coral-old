@@ -53,10 +53,10 @@ public:
         return res.get< bool >();
 	}
 
-	void setDocumentationParsing( bool __documentationParsing )
+	void setDocumentationParsing( bool documentationParsing_ )
 	{
 		co::Any arg;
-		arg.set< bool >( __documentationParsing );
+		arg.set< bool >( documentationParsing_ );
 		_handler->handleSetAttribute( _cookie, getAttribInfo<co::TypeManager>( 0 ), arg );
 	}
 
@@ -68,61 +68,61 @@ public:
         return res.get< co::Namespace* >();
 	}
 
-	co::Namespace* findNamespace( const std::string& __fullName )
+	co::Namespace* findNamespace( const std::string& fullName_ )
 	{
 		co::Any res, args[1];
-		args[0].set< const std::string& >( __fullName );
+		args[0].set< const std::string& >( fullName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 2 ), range, res );
 		assert( res.containsObject() == false );
 		return res.get< co::Namespace* >();
 	}
 
-	co::Type* findType( const std::string& __fullName )
+	co::Type* findType( const std::string& fullName_ )
 	{
 		co::Any res, args[1];
-		args[0].set< const std::string& >( __fullName );
+		args[0].set< const std::string& >( fullName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 3 ), range, res );
 		assert( res.containsObject() == false );
 		return res.get< co::Type* >();
 	}
 
-	co::ArrayType* getArrayOf( co::Type* __elementType )
+	co::ArrayType* getArrayOf( co::Type* elementType_ )
 	{
 		co::Any res, args[1];
-		args[0].set< co::Type* >( __elementType );
+		args[0].set< co::Type* >( elementType_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 4 ), range, res );
 		assert( res.containsObject() == false );
 		return res.get< co::ArrayType* >();
 	}
 
-	const std::string& getDocumentation( const std::string& __typeOrMemberName )
+	const std::string& getDocumentation( const std::string& typeOrMemberName_ )
 	{
 		co::Any res, args[1];
-		args[0].set< const std::string& >( __typeOrMemberName );
+		args[0].set< const std::string& >( typeOrMemberName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 5 ), range, res );
 		assert( res.containsObject() == false );
 		return res.get< const std::string& >();
 	}
 
-	co::Type* getType( const std::string& __typeName )
+	co::Type* getType( const std::string& typeName_ )
 	{
 		co::Any res, args[1];
-		args[0].set< const std::string& >( __typeName );
+		args[0].set< const std::string& >( typeName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 6 ), range, res );
 		assert( res.containsObject() == false );
 		return res.get< co::Type* >();
 	}
 
-	co::Type* loadType( const std::string& __typeName, std::vector<co::CSLError>* __errorStack )
+	co::Type* loadType( const std::string& typeName_, std::vector<co::CSLError>* errorStack_ )
 	{
 		co::Any res, args[2];
-		args[0].set< const std::string& >( __typeName );
-		args[1].set< std::vector<co::CSLError>* >( __errorStack );
+		args[0].set< const std::string& >( typeName_ );
+		args[1].set< std::vector<co::CSLError>* >( errorStack_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 7 ), range, res );
 		assert( res.containsObject() == false );
@@ -213,45 +213,45 @@ public:
 			{
 			case 2:
 				{
-					const std::string& __fullName = args[++argIndex].get< const std::string& >();
+					const std::string& fullName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::Namespace* >( p->findNamespace( __fullName ) );
+					res.set< co::Namespace* >( p->findNamespace( fullName_ ) );
 				}
 				break;
 			case 3:
 				{
-					const std::string& __fullName = args[++argIndex].get< const std::string& >();
+					const std::string& fullName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::Type* >( p->findType( __fullName ) );
+					res.set< co::Type* >( p->findType( fullName_ ) );
 				}
 				break;
 			case 4:
 				{
-					co::Type* __elementType = args[++argIndex].get< co::Type* >();
+					co::Type* elementType_ = args[++argIndex].get< co::Type* >();
 					argIndex = -1;
-					res.set< co::ArrayType* >( p->getArrayOf( __elementType ) );
+					res.set< co::ArrayType* >( p->getArrayOf( elementType_ ) );
 				}
 				break;
 			case 5:
 				{
-					const std::string& __typeOrMemberName = args[++argIndex].get< const std::string& >();
+					const std::string& typeOrMemberName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< const std::string& >( p->getDocumentation( __typeOrMemberName ) );
+					res.set< const std::string& >( p->getDocumentation( typeOrMemberName_ ) );
 				}
 				break;
 			case 6:
 				{
-					const std::string& __typeName = args[++argIndex].get< const std::string& >();
+					const std::string& typeName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::Type* >( p->getType( __typeName ) );
+					res.set< co::Type* >( p->getType( typeName_ ) );
 				}
 				break;
 			case 7:
 				{
-					const std::string& __typeName = args[++argIndex].get< const std::string& >();
-					std::vector<co::CSLError>* __errorStack = args[++argIndex].get< std::vector<co::CSLError>* >();
+					const std::string& typeName_ = args[++argIndex].get< const std::string& >();
+					std::vector<co::CSLError>* errorStack_ = args[++argIndex].get< std::vector<co::CSLError>* >();
 					argIndex = -1;
-					res.set< co::Type* >( p->loadType( __typeName, __errorStack ) );
+					res.set< co::Type* >( p->loadType( typeName_, errorStack_ ) );
 				}
 				break;
 			default:

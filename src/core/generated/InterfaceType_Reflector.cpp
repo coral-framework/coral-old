@@ -54,10 +54,10 @@ public:
         return res.get< co::ArrayRange<co::MemberInfo* const> >();
 	}
 
-	co::MemberInfo* getMember( const std::string& __name )
+	co::MemberInfo* getMember( const std::string& name_ )
 	{
 		co::Any res, args[1];
-		args[0].set< const std::string& >( __name );
+		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::CompoundType>( 1 ), range, res );
 		assert( res.containsObject() == false );
@@ -122,10 +122,10 @@ public:
         return res.get< co::Reflector* >();
 	}
 
-	void setReflector( co::Reflector* __reflector )
+	void setReflector( co::Reflector* reflector_ )
 	{
 		co::Any arg;
-		arg.set< co::Reflector* >( __reflector );
+		arg.set< co::Reflector* >( reflector_ );
 		_handler->handleSetAttribute( _cookie, getAttribInfo<co::Type>( 6 ), arg );
 	}
 
@@ -183,10 +183,10 @@ public:
         return res.get< co::ArrayRange<co::InterfaceType* const> >();
 	}
 
-	bool isSubTypeOf( co::InterfaceType* __itf )
+	bool isSubTypeOf( co::InterfaceType* itf_ )
 	{
 		co::Any res, args[1];
-		args[0].set< co::InterfaceType* >( __itf );
+		args[0].set< co::InterfaceType* >( itf_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::InterfaceType>( 4 ), range, res );
 		assert( res.containsObject() == false );
@@ -281,9 +281,9 @@ public:
 			{
 			case 4:
 				{
-					co::InterfaceType* __itf = args[++argIndex].get< co::InterfaceType* >();
+					co::InterfaceType* itf_ = args[++argIndex].get< co::InterfaceType* >();
 					argIndex = -1;
-					res.set< bool >( p->isSubTypeOf( __itf ) );
+					res.set< bool >( p->isSubTypeOf( itf_ ) );
 				}
 				break;
 			default:

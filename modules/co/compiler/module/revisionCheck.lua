@@ -1,5 +1,5 @@
 local function template( writer, c, t )
-	if c.moduleName == 'co' then
+	if c.moduleName == 'co' or c.moduleName == 'lua' then
 		return
 	end
 

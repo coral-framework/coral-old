@@ -69,7 +69,7 @@ static bool getCurrentExecutableDir( std::string& dir )
 		return false;
 	dir.assign( buffer, count );
 #elif defined(CORAL_OS_LINUX)
-	ssize_t count = readlink( "/proc/self/exe", buffer, sizeof(buffer) - 1 ) );
+	ssize_t count = readlink( "/proc/self/exe", buffer, sizeof(buffer) - 1 );
 	if( count == -1 )
 		return false;
 	dir.assign( buffer, count );
@@ -310,7 +310,7 @@ int main( int argc, char* argv[] )
 		try
 		{
 			component = ct->getReflector()->newInstance();
-			assert( component );
+			assert( component.isValid() );
 
 			itf = component->getInterface( ii );
 			assert( itf );

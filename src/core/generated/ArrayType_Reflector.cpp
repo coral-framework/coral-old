@@ -100,10 +100,10 @@ public:
         return res.get< co::Reflector* >();
 	}
 
-	void setReflector( co::Reflector* __reflector )
+	void setReflector( co::Reflector* reflector_ )
 	{
 		co::Any arg;
-		arg.set< co::Reflector* >( __reflector );
+		arg.set< co::Reflector* >( reflector_ );
 		_handler->handleSetAttribute( _cookie, getAttribInfo<co::Type>( 6 ), arg );
 	}
 

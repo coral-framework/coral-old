@@ -42,42 +42,42 @@ public:
 
 	// co.ModulePart Methods:
 
-	void disintegrate( co::Module* __module )
+	void disintegrate( co::Module* module_ )
 	{
 		co::Any res, args[1];
-		args[0].set< co::Module* >( __module );
+		args[0].set< co::Module* >( module_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 0 ), range, res );
 	}
 
-	void dispose( co::Module* __module )
+	void dispose( co::Module* module_ )
 	{
 		co::Any res, args[1];
-		args[0].set< co::Module* >( __module );
+		args[0].set< co::Module* >( module_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 1 ), range, res );
 	}
 
-	void initialize( co::Module* __module )
+	void initialize( co::Module* module_ )
 	{
 		co::Any res, args[1];
-		args[0].set< co::Module* >( __module );
+		args[0].set< co::Module* >( module_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 2 ), range, res );
 	}
 
-	void integrate( co::Module* __module )
+	void integrate( co::Module* module_ )
 	{
 		co::Any res, args[1];
-		args[0].set< co::Module* >( __module );
+		args[0].set< co::Module* >( module_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 3 ), range, res );
 	}
 
-	void integratePresentation( co::Module* __module )
+	void integratePresentation( co::Module* module_ )
 	{
 		co::Any res, args[1];
-		args[0].set< co::Module* >( __module );
+		args[0].set< co::Module* >( module_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 4 ), range, res );
 	}
@@ -156,37 +156,37 @@ public:
 			{
 			case 0:
 				{
-					co::Module* __module = args[++argIndex].get< co::Module* >();
+					co::Module* module_ = args[++argIndex].get< co::Module* >();
 					argIndex = -1;
-					p->disintegrate( __module );
+					p->disintegrate( module_ );
 				}
 				break;
 			case 1:
 				{
-					co::Module* __module = args[++argIndex].get< co::Module* >();
+					co::Module* module_ = args[++argIndex].get< co::Module* >();
 					argIndex = -1;
-					p->dispose( __module );
+					p->dispose( module_ );
 				}
 				break;
 			case 2:
 				{
-					co::Module* __module = args[++argIndex].get< co::Module* >();
+					co::Module* module_ = args[++argIndex].get< co::Module* >();
 					argIndex = -1;
-					p->initialize( __module );
+					p->initialize( module_ );
 				}
 				break;
 			case 3:
 				{
-					co::Module* __module = args[++argIndex].get< co::Module* >();
+					co::Module* module_ = args[++argIndex].get< co::Module* >();
 					argIndex = -1;
-					p->integrate( __module );
+					p->integrate( module_ );
 				}
 				break;
 			case 4:
 				{
-					co::Module* __module = args[++argIndex].get< co::Module* >();
+					co::Module* module_ = args[++argIndex].get< co::Module* >();
 					argIndex = -1;
-					p->integratePresentation( __module );
+					p->integratePresentation( module_ );
 				}
 				break;
 			default:

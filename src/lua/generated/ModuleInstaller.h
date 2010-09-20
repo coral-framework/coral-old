@@ -1,11 +1,7 @@
-/*******************************************************************************
-** ModuleInstaller class generated for module 'lua'
-**
-** Created: Mon Sep 20 12:13:52 2010
-**      by: Coral Compiler version 0.3.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/RefPtr.h>
 #include <co/Reflector.h>

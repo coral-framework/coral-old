@@ -76,10 +76,10 @@ public:
         return res.get< co::TypeManager* >();
 	}
 
-	void setupBase( co::ArrayRange<std::string const> __requiredModules )
+	void setupBase( co::ArrayRange<std::string const> requiredModules_ )
 	{
 		co::Any res, args[1];
-		args[0].set< co::ArrayRange<std::string const> >( __requiredModules );
+		args[0].set< co::ArrayRange<std::string const> >( requiredModules_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 4 ), range, res );
 	}
@@ -186,9 +186,9 @@ public:
 			{
 			case 4:
 				{
-					co::ArrayRange<std::string const> __requiredModules = args[++argIndex].get< co::ArrayRange<std::string const> >();
+					co::ArrayRange<std::string const> requiredModules_ = args[++argIndex].get< co::ArrayRange<std::string const> >();
 					argIndex = -1;
-					p->setupBase( __requiredModules );
+					p->setupBase( requiredModules_ );
 				}
 				break;
 			case 5:

@@ -42,20 +42,20 @@ public:
 
 	// co.ModulePartLoader Methods:
 
-	bool canLoadModulePart( const std::string& __moduleName )
+	bool canLoadModulePart( const std::string& moduleName_ )
 	{
 		co::Any res, args[1];
-		args[0].set< const std::string& >( __moduleName );
+		args[0].set< const std::string& >( moduleName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePartLoader>( 0 ), range, res );
 		assert( res.containsObject() == false );
 		return res.get< bool >();
 	}
 
-	co::ModulePart* loadModulePart( const std::string& __moduleName )
+	co::ModulePart* loadModulePart( const std::string& moduleName_ )
 	{
 		co::Any res, args[1];
-		args[0].set< const std::string& >( __moduleName );
+		args[0].set< const std::string& >( moduleName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePartLoader>( 1 ), range, res );
 		assert( res.containsObject() == false );
@@ -136,16 +136,16 @@ public:
 			{
 			case 0:
 				{
-					const std::string& __moduleName = args[++argIndex].get< const std::string& >();
+					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< bool >( p->canLoadModulePart( __moduleName ) );
+					res.set< bool >( p->canLoadModulePart( moduleName_ ) );
 				}
 				break;
 			case 1:
 				{
-					const std::string& __moduleName = args[++argIndex].get< const std::string& >();
+					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::ModulePart* >( p->loadModulePart( __moduleName ) );
+					res.set< co::ModulePart* >( p->loadModulePart( moduleName_ ) );
 				}
 				break;
 			default:

@@ -60,23 +60,23 @@ public:
         return res.get< co::Type* >();
 	}
 
-	void getAttribute( const co::Any& __instance, co::AttributeInfo* __ai, co::Any& __value )
+	void getAttribute( const co::Any& instance_, co::AttributeInfo* ai_, co::Any& value_ )
 	{
 		co::Any res, args[3];
-		args[0].set< const co::Any& >( __instance );
-		args[1].set< co::AttributeInfo* >( __ai );
-		args[2].set< co::Any& >( __value );
+		args[0].set< const co::Any& >( instance_ );
+		args[1].set< co::AttributeInfo* >( ai_ );
+		args[2].set< co::Any& >( value_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 2 ), range, res );
 	}
 
-	void invokeMethod( const co::Any& __instance, co::MethodInfo* __mi, co::ArrayRange<co::Any const> __args, co::Any& __returnValue )
+	void invokeMethod( const co::Any& instance_, co::MethodInfo* mi_, co::ArrayRange<co::Any const> args_, co::Any& returnValue_ )
 	{
 		co::Any res, args[4];
-		args[0].set< const co::Any& >( __instance );
-		args[1].set< co::MethodInfo* >( __mi );
-		args[2].set< co::ArrayRange<co::Any const> >( __args );
-		args[3].set< co::Any& >( __returnValue );
+		args[0].set< const co::Any& >( instance_ );
+		args[1].set< co::MethodInfo* >( mi_ );
+		args[2].set< co::ArrayRange<co::Any const> >( args_ );
+		args[3].set< co::Any& >( returnValue_ );
 		co::ArrayRange<co::Any const> range( args, 4 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 3 ), range, res );
 	}
@@ -90,22 +90,22 @@ public:
 		return res.get< co::Component* >();
 	}
 
-	co::Interface* newProxy( co::DynamicProxyHandler* __handler )
+	co::Interface* newProxy( co::DynamicProxyHandler* handler_ )
 	{
 		co::Any res, args[1];
-		args[0].set< co::DynamicProxyHandler* >( __handler );
+		args[0].set< co::DynamicProxyHandler* >( handler_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 5 ), range, res );
 		assert( res.containsObject() == false );
 		return res.get< co::Interface* >();
 	}
 
-	void setAttribute( const co::Any& __instance, co::AttributeInfo* __ai, const co::Any& __value )
+	void setAttribute( const co::Any& instance_, co::AttributeInfo* ai_, const co::Any& value_ )
 	{
 		co::Any res, args[3];
-		args[0].set< const co::Any& >( __instance );
-		args[1].set< co::AttributeInfo* >( __ai );
-		args[2].set< const co::Any& >( __value );
+		args[0].set< const co::Any& >( instance_ );
+		args[1].set< co::AttributeInfo* >( ai_ );
+		args[2].set< const co::Any& >( value_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 6 ), range, res );
 	}
@@ -211,21 +211,21 @@ public:
 			{
 			case 2:
 				{
-					const co::Any& __instance = args[++argIndex].get< const co::Any& >();
-					co::AttributeInfo* __ai = args[++argIndex].get< co::AttributeInfo* >();
-					co::Any& __value = args[++argIndex].get< co::Any& >();
+					const co::Any& instance_ = args[++argIndex].get< const co::Any& >();
+					co::AttributeInfo* ai_ = args[++argIndex].get< co::AttributeInfo* >();
+					co::Any& value_ = args[++argIndex].get< co::Any& >();
 					argIndex = -1;
-					p->getAttribute( __instance, __ai, __value );
+					p->getAttribute( instance_, ai_, value_ );
 				}
 				break;
 			case 3:
 				{
-					const co::Any& __instance = args[++argIndex].get< const co::Any& >();
-					co::MethodInfo* __mi = args[++argIndex].get< co::MethodInfo* >();
-					co::ArrayRange<co::Any const> __args = args[++argIndex].get< co::ArrayRange<co::Any const> >();
-					co::Any& __returnValue = args[++argIndex].get< co::Any& >();
+					const co::Any& instance_ = args[++argIndex].get< const co::Any& >();
+					co::MethodInfo* mi_ = args[++argIndex].get< co::MethodInfo* >();
+					co::ArrayRange<co::Any const> args_ = args[++argIndex].get< co::ArrayRange<co::Any const> >();
+					co::Any& returnValue_ = args[++argIndex].get< co::Any& >();
 					argIndex = -1;
-					p->invokeMethod( __instance, __mi, __args, __returnValue );
+					p->invokeMethod( instance_, mi_, args_, returnValue_ );
 				}
 				break;
 			case 4:
@@ -235,18 +235,18 @@ public:
 				break;
 			case 5:
 				{
-					co::DynamicProxyHandler* __handler = args[++argIndex].get< co::DynamicProxyHandler* >();
+					co::DynamicProxyHandler* handler_ = args[++argIndex].get< co::DynamicProxyHandler* >();
 					argIndex = -1;
-					res.set< co::Interface* >( p->newProxy( __handler ) );
+					res.set< co::Interface* >( p->newProxy( handler_ ) );
 				}
 				break;
 			case 6:
 				{
-					const co::Any& __instance = args[++argIndex].get< const co::Any& >();
-					co::AttributeInfo* __ai = args[++argIndex].get< co::AttributeInfo* >();
-					const co::Any& __value = args[++argIndex].get< const co::Any& >();
+					const co::Any& instance_ = args[++argIndex].get< const co::Any& >();
+					co::AttributeInfo* ai_ = args[++argIndex].get< co::AttributeInfo* >();
+					const co::Any& value_ = args[++argIndex].get< const co::Any& >();
 					argIndex = -1;
-					p->setAttribute( __instance, __ai, __value );
+					p->setAttribute( instance_, ai_, value_ );
 				}
 				break;
 			default:

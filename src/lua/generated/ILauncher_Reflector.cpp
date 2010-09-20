@@ -1,11 +1,7 @@
-/*******************************************************************************
-** Reflection code generated for type 'lua.ILauncher'
-**
-** Created: Mon Sep 20 12:13:52 2010
-**      by: Coral Compiler version 0.3.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <lua/ILauncher.h>
 #include <co/DynamicProxyHandler.h>
@@ -17,14 +13,6 @@
 #include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
-
-#if !defined( CORAL_COMPILER_OUTPUT_REVISION )
-#error "The header file <co/Config.h> was not included."
-#elif CORAL_COMPILER_OUTPUT_REVISION != 1
-#error "This file was generated using the Coral Compiler v0.3.0. It"
-#error "cannot be used with the include files from this version of Coral."
-#error "(The code generation rules have changed too much.)"
-#endif
 
 namespace lua {
 
@@ -57,10 +45,10 @@ public:
 
 	// lua.ILauncher Methods:
 
-	void main( co::ArrayRange<std::string const> __args )
+	void main( co::ArrayRange<std::string const> args_ )
 	{
 		co::Any res, args[1];
-		args[0].set< co::ArrayRange<std::string const> >( __args );
+		args[0].set< co::ArrayRange<std::string const> >( args_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::ILauncher>( 0 ), range, res );
 	}
@@ -139,9 +127,9 @@ public:
 			{
 			case 0:
 				{
-					co::ArrayRange<std::string const> __args = args[++argIndex].get< co::ArrayRange<std::string const> >();
+					co::ArrayRange<std::string const> args_ = args[++argIndex].get< co::ArrayRange<std::string const> >();
 					argIndex = -1;
-					p->main( __args );
+					p->main( args_ );
 				}
 				break;
 			default:

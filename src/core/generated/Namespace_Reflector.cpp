@@ -93,42 +93,42 @@ public:
         return res.get< co::ArrayRange<co::Type* const> >();
 	}
 
-	co::Namespace* defineChildNamespace( const std::string& __name )
+	co::Namespace* defineChildNamespace( const std::string& name_ )
 	{
 		co::Any res, args[1];
-		args[0].set< const std::string& >( __name );
+		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 6 ), range, res );
 		assert( res.containsObject() == false );
 		return res.get< co::Namespace* >();
 	}
 
-	co::TypeBuilder* defineType( const std::string& __name, co::TypeKind __typeKind, co::TypeCreationTransaction* __transaction )
+	co::TypeBuilder* defineType( const std::string& name_, co::TypeKind typeKind_, co::TypeCreationTransaction* transaction_ )
 	{
 		co::Any res, args[3];
-		args[0].set< const std::string& >( __name );
-		args[1].set< co::TypeKind >( __typeKind );
-		args[2].set< co::TypeCreationTransaction* >( __transaction );
+		args[0].set< const std::string& >( name_ );
+		args[1].set< co::TypeKind >( typeKind_ );
+		args[2].set< co::TypeCreationTransaction* >( transaction_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 7 ), range, res );
 		assert( res.containsObject() == false );
 		return res.get< co::TypeBuilder* >();
 	}
 
-	co::Namespace* getChildNamespace( const std::string& __name )
+	co::Namespace* getChildNamespace( const std::string& name_ )
 	{
 		co::Any res, args[1];
-		args[0].set< const std::string& >( __name );
+		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 8 ), range, res );
 		assert( res.containsObject() == false );
 		return res.get< co::Namespace* >();
 	}
 
-	co::Type* getType( const std::string& __name )
+	co::Type* getType( const std::string& name_ )
 	{
 		co::Any res, args[1];
-		args[0].set< const std::string& >( __name );
+		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 9 ), range, res );
 		assert( res.containsObject() == false );
@@ -227,32 +227,32 @@ public:
 			{
 			case 6:
 				{
-					const std::string& __name = args[++argIndex].get< const std::string& >();
+					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::Namespace* >( p->defineChildNamespace( __name ) );
+					res.set< co::Namespace* >( p->defineChildNamespace( name_ ) );
 				}
 				break;
 			case 7:
 				{
-					const std::string& __name = args[++argIndex].get< const std::string& >();
-					co::TypeKind __typeKind = args[++argIndex].get< co::TypeKind >();
-					co::TypeCreationTransaction* __transaction = args[++argIndex].get< co::TypeCreationTransaction* >();
+					const std::string& name_ = args[++argIndex].get< const std::string& >();
+					co::TypeKind typeKind_ = args[++argIndex].get< co::TypeKind >();
+					co::TypeCreationTransaction* transaction_ = args[++argIndex].get< co::TypeCreationTransaction* >();
 					argIndex = -1;
-					res.set< co::TypeBuilder* >( p->defineType( __name, __typeKind, __transaction ) );
+					res.set< co::TypeBuilder* >( p->defineType( name_, typeKind_, transaction_ ) );
 				}
 				break;
 			case 8:
 				{
-					const std::string& __name = args[++argIndex].get< const std::string& >();
+					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::Namespace* >( p->getChildNamespace( __name ) );
+					res.set< co::Namespace* >( p->getChildNamespace( name_ ) );
 				}
 				break;
 			case 9:
 				{
-					const std::string& __name = args[++argIndex].get< const std::string& >();
+					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::Type* >( p->getType( __name ) );
+					res.set< co::Type* >( p->getType( name_ ) );
 				}
 				break;
 			default:

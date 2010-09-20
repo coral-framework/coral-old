@@ -1,11 +1,7 @@
-/*******************************************************************************
-** Base class generated for component 'lua.ModulePartLoader'
-**
-** Created: Mon Sep 20 12:13:52 2010
-**      by: Coral Compiler version 0.3.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #ifndef _LUA_MODULEPARTLOADER_BASE_H_
 #define _LUA_MODULEPARTLOADER_BASE_H_
