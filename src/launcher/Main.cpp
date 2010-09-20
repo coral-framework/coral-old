@@ -226,7 +226,7 @@ int main( int argc, char* argv[] )
 			commandName = argv[0];
 
 		printf(
-			"Coral " CORAL_VERSION_STR  " Application Launcher\n"
+			"Coral Application Launcher v" CORAL_VERSION_STR " (" CORAL_BUILD_KEY ")\n"
 			"Usage: %s [options] callee [ARG] ...\n"
 			"Description:\n"
 			"  A 'callee' must be specified as either a component name or a method name within\n"

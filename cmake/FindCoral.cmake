@@ -193,7 +193,7 @@ FIND_PATH( CORAL_INCLUDE_DIR co/Coral.h
 MARK_AS_ADVANCED( CORAL_INCLUDE_DIR )
 
 IF( NOT CORAL_LAUNCHER )
-	_coral_find_program( CORAL_LAUNCHER		coral corald )
+	_coral_find_program( CORAL_LAUNCHER		coral.bat coral )
 ENDIF()
 
 _coral_find_library( CORAL_LIBRARY			coral )

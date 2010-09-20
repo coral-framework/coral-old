@@ -143,7 +143,7 @@ SOURCE_GROUP( "Tools" FILES ${toolsFiles} )
 ################################################################################
 
 # install shared library
-INSTALL( TARGETS core DESTINATION . COMPONENT Core )
+INSTALL( TARGETS core DESTINATION lib COMPONENT Core )
 
 # install CMake package
 INSTALL( FILES ${CMAKE_SOURCE_DIR}/cmake/FindCoral.cmake DESTINATION cmake COMPONENT Core )

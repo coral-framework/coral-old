@@ -10,7 +10,7 @@ PROJECT( COMPILER )
 
 # install the coralc launcher scripts
 IF( WIN32 )
-	INSTALL( PROGRAMS coralc.bat DESTINATION . COMPONENT Core )
+	INSTALL( PROGRAMS coral.bat coralc.bat DESTINATION . COMPONENT Core )
 ELSE()
-	INSTALL( PROGRAMS coralc DESTINATION . COMPONENT Core )
+	INSTALL( PROGRAMS coral coralc DESTINATION . COMPONENT Core )
 ENDIF()

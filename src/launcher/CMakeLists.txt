@@ -31,4 +31,4 @@ CORAL_DEFAULT_TARGET_PROPERTIES( launcher )
 ################################################################################
 
 # install the launcher executable
-INSTALL( TARGETS launcher DESTINATION . COMPONENT Core )
+INSTALL( TARGETS launcher DESTINATION bin COMPONENT Core )
