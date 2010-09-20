@@ -20,9 +20,6 @@ int main( int argc, char** argv )
 	// Initialize Google's logging library.
 	google::InitGoogleLogging( argv[0] );
 
-	co::TypeLoader::enableDocMap();
-	co::TypeLoader::enableCppBlockMap();
-
 	co::addPath( CORAL_PATH );
 
 	int res = RUN_ALL_TESTS();

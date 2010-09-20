@@ -4,6 +4,7 @@
  */
 
 #include "TypeLoader.h"
+#include "TypeManager.h"
 #include "TypeCreationTransaction.h"
 #include "tools/StringTokenizer.h"
 #include <co/Type.h>
@@ -11,44 +12,30 @@
 #include <co/Exception.h>
 #include <co/Namespace.h>
 #include <co/TypeBuilder.h>
-#include <co/TypeManager.h>
 #include <co/MethodBuilder.h>
 #include <co/reserved/FileLookUp.h>
 #include <sstream>
 
-namespace co {
-
-// Global DocMap.
-TypeLoader::DocMap TypeLoader::sm_docMap;
-
-// Global CppBlockMap.
-TypeLoader::CppBlockMap TypeLoader::sm_cppBlockMap;
-
-bool TypeLoader::sm_docMapEnabled( false );
-bool TypeLoader::sm_cppBlockMapEnabled( false );
-
 // Root Loader Contructor:
 TypeLoader::TypeLoader( const std::string& fullTypeName, co::ArrayRange<const std::string> path, co::TypeManager* tm )
-	: _fullTypeName( fullTypeName ), _path( path ), _typeManager( tm ), _parentLoader( NULL )
+	: _fullTypeName( fullTypeName ), _path( path )
 {
+	_typeManager = dynamic_cast<TypeManager*>( tm );
 	assert( _typeManager );
 
+	_parentLoader = NULL;
 	_namespace = NULL;
 	_transaction = new ::TypeCreationTransaction();
-
-	setIgnoreComments( !sm_docMapEnabled );
-	setIgnoreCppBlocks( !sm_cppBlockMapEnabled );
 }
 
 // Non-Root Loader Constructor:
-TypeLoader::TypeLoader( const std::string& fullTypeName, TypeLoader* parent ) : _fullTypeName( fullTypeName ),
-	_path( parent->_path ), _typeManager( parent->_typeManager ), _parentLoader( parent )
+TypeLoader::TypeLoader( const std::string& fullTypeName, TypeLoader* parent )
+	: _fullTypeName( fullTypeName ), _path( parent->_path )
 {
+	_typeManager = parent->_typeManager;
+	_parentLoader = parent;
 	_namespace = parent->_namespace;
 	_transaction = parent->_transaction;
-
-	setIgnoreComments( !sm_docMapEnabled );
-	setIgnoreCppBlocks( !sm_cppBlockMapEnabled );
 }
 
 TypeLoader::~TypeLoader()
@@ -56,16 +43,16 @@ TypeLoader::~TypeLoader()
 	// empty
 }
 
-Namespace* getOrCreateChildNamespace( Namespace* parent, const std::string& name )
+co::Namespace* getOrCreateChildNamespace( co::Namespace* parent, const std::string& name )
 {
-	Namespace* childNs = parent->getChildNamespace( name );
+	co::Namespace* childNs = parent->getChildNamespace( name );
 	if( childNs != NULL )
 		return childNs;
 	else
 		return parent->defineChildNamespace( name );
 }
 
-Type* TypeLoader::loadType()
+co::Type* TypeLoader::loadType()
 {
 	std::string cslPath;
 	std::string foundRelativePath;
@@ -77,10 +64,10 @@ Type* TypeLoader::loadType()
 		return NULL;
 	}
 
-	Namespace* ns = _typeManager->getRootNS();
+	co::Namespace* ns = _typeManager->getRootNS();
 
 	// iterate over all subparts
-	StringTokenizer st( foundRelativePath, "/" );
+	co::StringTokenizer st( foundRelativePath, "/" );
 	st.nextToken();
 	std::string currentToken = st.getToken();
 	while( st.nextToken() )
@@ -102,7 +89,7 @@ Type* TypeLoader::loadType()
 
 		return getType();
 	}
-	catch( Exception& e )
+	catch( co::Exception& e )
 	{
 		// create a csl error, using the current one as inner error
 		_cslError = new csl::Error( e.getMessage(), cslPath, getCurrentLine(), _cslError.get() );
@@ -114,23 +101,23 @@ Type* TypeLoader::loadType()
 	return NULL;
 }
 
-TypeBuilder* TypeLoader::createTypeBuilder( const std::string& typeName, co::TypeKind kind )
+co::TypeBuilder* TypeLoader::createTypeBuilder( const std::string& typeName, co::TypeKind kind )
 {
 	return _namespace->defineType( typeName, kind, _transaction.get() );
 }
 
-Type* TypeLoader::resolveType( const std::string& typeName, bool isArray )
+co::Type* TypeLoader::resolveType( const std::string& typeName, bool isArray )
 {
 	if( isArray )
 	{
-		Type* elementType = resolveType( typeName );
+		co::Type* elementType = resolveType( typeName );
 		if( !elementType )
-			CORAL_THROW( Exception, "error loading array element type '" << typeName << "'" );
+			CORAL_THROW( co::Exception, "error loading array element type '" << typeName << "'" );
 		return _typeManager->getArrayOf( elementType );
 	}
 
 	// try to find an imported type aliased as 'typeName'
-	Type* type = findImportedType( typeName );
+	co::Type* type = findImportedType( typeName );
 	if( type )
 		return type;
 
@@ -154,25 +141,16 @@ void TypeLoader::addDocumentation( const std::string& member, const std::string&
 		key += ":";
 		key += member;
 	}
-
-	DocMap::iterator it = sm_docMap.find( key );
-
-	if( it != sm_docMap.end() )
-		it->second.append( text );
-	else
-		sm_docMap.insert( DocMap::value_type( key, text ) );
+	
+	_typeManager->addDocumentation( key, text );
 }
 
 void TypeLoader::addCppBlock( const std::string& text )
 {	
-	CppBlockMap::iterator it = sm_cppBlockMap.find( _fullTypeName );
-	if( it != sm_cppBlockMap.end() )
-		it->second.append( text );
-	else
-		sm_cppBlockMap.insert( CppBlockMap::value_type( _fullTypeName, text) );
+	_typeManager->addCppBlock( _fullTypeName, text );
 }
 
-inline std::string formatTypeInNamespace( Namespace* ns, const std::string& typeName )
+inline std::string formatTypeInNamespace( co::Namespace* ns, const std::string& typeName )
 {
 	const std::string& namespaceName = ns->getFullName();
 
@@ -185,12 +163,12 @@ inline std::string formatTypeInNamespace( Namespace* ns, const std::string& type
 	return str;
 }
 
-Type* TypeLoader::findDependency( const std::string& typeName )
+co::Type* TypeLoader::findDependency( const std::string& typeName )
 {
 	if( _namespace->getParentNamespace() )
 	{
 		// search _namespace if it is not the root namespace
-		Type* type = _typeManager->findType( formatTypeInNamespace( _namespace, typeName ) );
+		co::Type* type = _typeManager->findType( formatTypeInNamespace( _namespace, typeName ) );
 		if( type )
 			return type;
 	}
@@ -198,7 +176,7 @@ Type* TypeLoader::findDependency( const std::string& typeName )
 	return _typeManager->findType( typeName );
 }
 
-Type* TypeLoader::loadDependency( const std::string& typeName )
+co::Type* TypeLoader::loadDependency( const std::string& typeName )
 {
 	std::string cslPath;
 	std::string foundFilePath;
@@ -214,7 +192,7 @@ Type* TypeLoader::loadDependency( const std::string& typeName )
 	}
 
 	TypeLoader loader( foundFilePath, this );
-	Type* type = loader.loadType();
+	co::Type* type = loader.loadType();
 
 	// set the current error as the child loader error (then it will be set as the inner error
 	// when this loader also detects the error)
@@ -230,7 +208,7 @@ bool TypeLoader::findCslFile( const std::string& typeName, std::string& cslFileP
 	if( s_validExtensions.empty() )
 		s_validExtensions.push_back( "csl" );
 
-	FileLookUp fileLookUp( _path, s_validExtensions );
+	co::FileLookUp fileLookUp( _path, s_validExtensions );
 
 	// if the current namespace is not the root, first try a relative path
 	if( _namespace && _namespace->getParentNamespace() )
@@ -249,6 +227,3 @@ bool TypeLoader::findCslFile( const std::string& typeName, std::string& cslFileP
 
 	return succeeded;
 }
-
-
-} // namespace co

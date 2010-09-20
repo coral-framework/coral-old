@@ -14,7 +14,6 @@
 #include <co/ParameterInfo.h>
 #include <co/ModuleLoadException.h>
 #include <co/IllegalArgumentException.h>
-#include <co/reserved/FileLookUp.h>
 #include <lua/Exception.h>
 #include <cstring>
 #include <sstream>
@@ -66,6 +65,8 @@ static void handleException( lua_State* L )
 void coPackage::open( lua_State* L )
 {
 	static luaL_Reg libFunctions[] = {
+		{ "addPath", addPath },
+		{ "getPaths", getPaths },
 		{ "getType", getType },
 		{ "new", genericNew },
 		{ "packageLoader", packageLoader },
@@ -75,8 +76,24 @@ void coPackage::open( lua_State* L )
 	// create our lib table, containing the libFunctions
 	luaL_newlib( L, libFunctions );
 
+	// set the 'co.version' constant
+	lua_pushliteral( L, CORAL_VERSION_STR );
+	lua_setfield( L, -2, "version" );
+
+	// set the 'co.buildKey' constant
+	lua_pushliteral( L, CORAL_BUILD_KEY );
+	lua_setfield( L, -2, "buildKey" );
+
+	// set the 'co.buildMode' constant
+	lua_pushliteral( L, CORAL_BUILD_MODE );
+	lua_setfield( L, -2, "buildMode" );
+
+	// set the 'co.compilerOutputRevision' constant
+	lua_pushinteger( L, CORAL_COMPILER_OUTPUT_REVISION );
+	lua_setfield( L, -2, "compilerOutputRevision" );
+
 	// set the 'co.system' singleton
-	LuaState::instance().push( co::getSystem() );
+	LuaState::push( L, co::getSystem() );
 	lua_setfield( L, -2, "system" );
 
 	// save the table as a global
@@ -95,6 +112,28 @@ void coPackage::close( lua_State* L )
 	lua_pop( L, 1 );
 }
 
+int coPackage::addPath( lua_State* L )
+{
+	int numArgs = lua_gettop( L );
+	for( int i = 1; i <= numArgs; ++i )
+	{
+		const char* dirList = luaL_checkstring( L, i );
+		co::addPath( dirList );
+	}
+	return 0;
+}
+
+int coPackage::getPaths( lua_State* L )
+{
+	__BEGIN_EXCEPTIONS_BARRIER__
+
+	LuaState::push( L, co::getPaths() );
+
+	return 1;
+
+	__END_EXCEPTIONS_BARRIER__
+}
+
 int coPackage::getType( lua_State* L )
 {
 	const char* typeName = luaL_checkstring( L, 1 );
@@ -102,7 +141,7 @@ int coPackage::getType( lua_State* L )
 	__BEGIN_EXCEPTIONS_BARRIER__
 
 	co::Type* type = co::getType( typeName );
-	LuaState::instance().push( type );
+	LuaState::push( L, type );
 
 	return 1;
 
@@ -125,7 +164,7 @@ int coPackage::genericNew( lua_State* L )
 	{
 		co::Reflector* reflector = type->getReflector();
 		co::RefPtr<co::Component> c = reflector->newInstance();
-		LuaState::instance().push( c.get() );
+		LuaState::push( L, c.get() );
 	}
 	else
 	{
@@ -149,11 +188,8 @@ int coPackage::packageLoader( lua_State* L )
 
 	// look for a Lua script file corresponding to 'moduleName' in the Coral path
 	{
-		co::FileLookUp fileLookUp( co::getPaths(), co::ArrayRange<const std::string>( &s_extension, 1 ) );
-		fileLookUp.addFilePath( moduleName, true );
-
 		std::string filename;
-		if( !fileLookUp.locate( filename ) )
+		if( !LuaState::searchScriptFile( moduleName, filename ) )
 		{
 			lua_pushnil( L );
 			return 1;
@@ -201,16 +237,6 @@ void CompoundTypeBinding::tryGetInstance( lua_State* L, int udataIdx, co::Any& i
 	default:
 		assert( false );
 	}
-}
-
-int CompoundTypeBinding::toString( lua_State* L )
-{
-	co::CompoundType* ct = getType( L, 1 );
-	assert( ct );
-
-	lua_pushfstring( L, "%s: %p", ct->getFullName().c_str(), lua_touserdata( L, 1 ) );
-
-	return 1;
 }
 
 struct Metamethods
@@ -291,7 +317,7 @@ co::CompoundType* CompoundTypeBinding::getType( lua_State* L, int udataIdx )
 	return ct;
 }
 
-void CompoundTypeBinding::pushMember( lua_State* L, co::CompoundType* ct )
+bool CompoundTypeBinding::pushMember( lua_State* L, co::CompoundType* ct, bool mustExist )
 {
 	// check if member is cached (in the type's metatable)
 	lua_getmetatable( L, 1 );
@@ -311,11 +337,19 @@ void CompoundTypeBinding::pushMember( lua_State* L, co::CompoundType* ct )
 			co::MemberInfo* mi = ct->getMember( memberName );
 			if( !mi )
 			{
-				lua_pushliteral( L, "non-existing member '" );
-				lua_pushvalue( L, 2 );
-				lua_pushliteral( L, "'" );
-				lua_concat( L, 3 );
-				throw lua::MsgOnStackException();
+				if( mustExist )
+				{
+					lua_pushliteral( L, "non-existing member '" );
+					lua_pushvalue( L, 2 );
+					lua_pushliteral( L, "'" );
+					lua_concat( L, 3 );
+					throw lua::MsgOnStackException();
+				}
+				else
+				{
+					lua_pushnil( L );
+					return false;
+				}
 			}
 
 			// push the member
@@ -346,6 +380,8 @@ void CompoundTypeBinding::pushMember( lua_State* L, co::CompoundType* ct )
 
 	// remove the metatable
 	lua_remove( L, -2 );
+	
+	return true;
 }
 
 inline co::AttributeInfo* checkAttributeInfo( lua_State* L, int index )
@@ -362,16 +398,16 @@ void CompoundTypeBinding::getAttribute( lua_State* L, const co::Any& instance )
 	co::Any value;
 	reflector->getAttribute( instance, ai, value );
 	lua_pop( L, 1 );
-	LuaState::instance().push( value );
+	LuaState::push( L, value );
 }
 
 void CompoundTypeBinding::setAttribute( lua_State* L, const co::Any& instance )
 {
 	co::AttributeInfo* ai = checkAttributeInfo( L, -2 );
 	co::Reflector* reflector = ai->getOwner()->getReflector();
-	co::Any var; co::AnyValue value;
-	LuaState::instance().toCoral( -1, ai->getType(), var, value );
-	reflector->setAttribute( instance, ai, var );
+	co::Any value;
+	LuaState::toCoral( L, -1, ai->getType(), value );
+	reflector->setAttribute( instance, ai, value );
 	lua_pop( L, 2 );
 }
 
@@ -414,11 +450,7 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 	__BEGIN_EXCEPTIONS_BARRIER__
 
 	// prepare the argument list
-
 	co::Any args[MAX_NUM_PARAMETERS];
-	co::AnyValue values[MAX_NUM_PARAMETERS];
-	
-	LuaState& luaState = LuaState::instance();
 
 	int numRequiredParams = numParams;
 	int i = 0;
@@ -431,12 +463,12 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 			co::Type* paramType = paramInfo->getType();
 
 			if( paramInfo->getIsIn() )
-				luaState.toCoral( i + 2, paramType, args[i], values[i] );
+				LuaState::toCoral( L, i + 2, paramType, args[i] );
 			else
 				--numRequiredParams;
 
 			if( paramInfo->getIsOut() )
-				values[i].makeOut( paramType, args[i] );
+				args[i].makeOut( paramType );
 		}
 	}
 	catch( const co::Exception& e )
@@ -467,7 +499,7 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 	if( mi->getReturnType() != NULL )
 	{
 		++numOut;
-		luaState.push( returnValue );
+		LuaState::push( L, returnValue );
 	}
 
 	for( i = 0; i < numParams; ++i )
@@ -475,8 +507,8 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 		if( paramList[i]->getIsOut() )
 		{
 			++numOut;
-			values[i].makeIn( args[i] );
-			luaState.push( args[i] );
+			args[i].makeIn();
+			LuaState::push( L, args[i] );
 		}
 	}
 
@@ -528,16 +560,17 @@ int ComponentBinding::index( lua_State* L )
 
 	if( isStringComponentType( L, 2 ) )
 	{
-		LuaState::instance().push( component->getComponentType() );
+		LuaState::push( L, component->getComponentType() );
 		return 1;
 	}
 
-	pushMember( L, component->getComponentType() );
-	assert( lua_islightuserdata( L, -1 ) );
-
-	co::InterfaceInfo* itfInfo = checkInterfaceInfo( L, -1 );
-	co::Interface* itf = component->getInterface( itfInfo );
-	LuaState::instance().push( itf );
+	if( pushMember( L, component->getComponentType() ) )
+	{
+		assert( lua_islightuserdata( L, -1 ) );
+		co::InterfaceInfo* itfInfo = checkInterfaceInfo( L, -1 );
+		co::Interface* itf = component->getInterface( itfInfo );
+		LuaState::push( L, itf );
+	}
 
 	return 1;
 
@@ -556,7 +589,7 @@ int ComponentBinding::newIndex( lua_State* L )
 		throw co::IllegalArgumentException( "attribute 'componentType' is read-only and cannot be changed" );
 
 	co::Component* component = *ud;
-	pushMember( L, component->getInterfaceType() );
+	pushMember( L, component->getInterfaceType(), true );
 	if( lua_islightuserdata( L, -1 ) )
 	{
 		co::InterfaceInfo* itfInfo = checkInterfaceInfo( L, -1 );
@@ -568,9 +601,9 @@ int ComponentBinding::newIndex( lua_State* L )
 			lua_concat( L, 3 );
 			throw lua::MsgOnStackException();
 		}
-		co::Any var; co::AnyValue value;
-		LuaState::instance().toCoral( 3, itfInfo->getInterfaceType(), var, value );
-		component->bindInterface( itfInfo, var.get<co::Interface*>() );
+		co::Any value;
+		LuaState::toCoral( L, 3, itfInfo->getInterfaceType(), value );
+		component->bindInterface( itfInfo, value.get<co::Interface*>() );
 	}
 
 	return 0;
@@ -629,9 +662,9 @@ int InterfaceBinding::index( lua_State* L )
 	__BEGIN_EXCEPTIONS_BARRIER__
 
 	co::Interface* itf = *ud;
-	pushMember( L, itf->getInterfaceType() );
-	if( lua_islightuserdata( L, -1 ) )
-		getAttribute( L, itf );
+	if( pushMember( L, itf->getInterfaceType() ) )
+		if( lua_islightuserdata( L, -1 ) )
+			getAttribute( L, itf );
 
 	return 1;
 
@@ -647,7 +680,7 @@ int InterfaceBinding::newIndex( lua_State* L )
 	__BEGIN_EXCEPTIONS_BARRIER__
 
 	co::Interface* itf = *ud;
-	pushMember( L, itf->getInterfaceType() );
+	pushMember( L, itf->getInterfaceType(), true );
 	if( lua_isfunction( L, -1 ) )
 	{
 		lua_pushliteral( L, "'" );
@@ -677,6 +710,17 @@ int InterfaceBinding::gc( lua_State* L )
 	return 0;
 
 	__END_EXCEPTIONS_BARRIER__
+}
+
+int InterfaceBinding::toString( lua_State* L )
+{
+	co::Interface** ud = reinterpret_cast<co::Interface**>( lua_touserdata( L, 1 ) );
+	assert( ud );
+
+	co::Interface* itf = *ud;
+	lua_pushfstring( L, "%s: %p", itf->getInterfaceType()->getFullName().c_str(), itf );
+
+	return 1;
 }
 
 /*****************************************************************************/
@@ -721,6 +765,16 @@ int ComplexValueBinding::gc( lua_State* L )
 	__END_EXCEPTIONS_BARRIER__
 }
 
+int ComplexValueBinding::toString( lua_State* L )
+{
+	co::CompoundType* ct = getType( L, 1 );
+	assert( ct );
+
+	lua_pushfstring( L, "%s: %p", ct->getFullName().c_str(), lua_touserdata( L, 1 ) );
+
+	return 1;
+}
+
 /*****************************************************************************/
 /*  Helper class for binding native classes to Lua                           */
 /*****************************************************************************/
@@ -734,9 +788,9 @@ int NativeClassBinding::index( lua_State* L )
 	co::CompoundType* ct = getType( L, 1 );
 	assert( ct );
 
-	pushMember( L, ct );
-	if( lua_islightuserdata( L, -1 ) )
-		getAttribute( L, co::Any( ct, co::Any::VarIsReference, lua_touserdata( L, 1 ) ) );
+	if( pushMember( L, ct ) )
+		if( lua_islightuserdata( L, -1 ) )
+			getAttribute( L, co::Any( ct, co::Any::VarIsReference, lua_touserdata( L, 1 ) ) );
 
 	return 1;
 
@@ -752,7 +806,7 @@ int NativeClassBinding::newIndex( lua_State* L )
 	co::CompoundType* ct = getType( L, 1 );
 	assert( ct );
 
-	pushMember( L, ct );
+	pushMember( L, ct, true );
 	if( lua_isfunction( L, -1 ) )
 	{
 		lua_pushliteral( L, "'" );
@@ -783,10 +837,11 @@ int StructBinding::index( lua_State* L )
 	co::CompoundType* ct = getType( L, 1 );
 	assert( ct );
 
-	pushMember( L, ct );
-	assert( lua_islightuserdata( L, -1 ) );
-
-	getAttribute( L, co::Any( ct, co::Any::VarIsPointer, lua_touserdata( L, 1 ) ) );
+	if( pushMember( L, ct ) )
+	{
+		assert( lua_islightuserdata( L, -1 ) );
+		getAttribute( L, co::Any( ct, co::Any::VarIsPointer, lua_touserdata( L, 1 ) ) );
+	}
 
 	return 1;
 
@@ -802,7 +857,7 @@ int StructBinding::newIndex( lua_State* L )
 	co::CompoundType* ct = getType( L, 1 );
 	assert( ct );
 
-	pushMember( L, ct );
+	pushMember( L, ct, true );
 	assert( lua_islightuserdata( L, -1 ) );
 
 	lua_pushvalue( L, 3 );

@@ -1,14 +1,9 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.System'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/System.h>
-#include <co/reserved/ReflectorBase.h>
 #include <co/DynamicProxyHandler.h>
 #include <co/ModuleManager.h>
 #include <co/ServiceManager.h>
@@ -18,6 +13,7 @@
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -46,56 +42,60 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
-	// co::System Methods:
+	// co.System Methods:
 
 	co::ModuleManager* getModules()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 0 ), __res );
-        return __res.get< co::ModuleManager* >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ModuleManager* >();
 	}
 
 	co::ServiceManager* getServices()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 1 ), __res );
-        return __res.get< co::ServiceManager* >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 1 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ServiceManager* >();
 	}
 
 	co::SystemState getState()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 2 ), __res );
-        return __res.get< co::SystemState >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 2 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::SystemState >();
 	}
 
 	co::TypeManager* getTypes()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 3 ), __res );
-        return __res.get< co::TypeManager* >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 3 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::TypeManager* >();
 	}
 
-	void setupBase( co::ArrayRange<std::string const> requiredModules )
+	void setupBase( co::ArrayRange<std::string const> __requiredModules )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< co::ArrayRange<std::string const> >( requiredModules );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 4 ), __ar, __res );
+		co::Any res, args[1];
+		args[0].set< co::ArrayRange<std::string const> >( __requiredModules );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 4 ), range, res );
 	}
 
-	void setupPresentation( )
+	void setupPresentation()
 	{
-		co::Any __res;
-		co::ArrayRange<co::Any const> __ar;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 5 ), __ar, __res );
+		co::Any res;
+		co::ArrayRange<co::Any const> range;
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 5 ), range, res );
 	}
 
-	void tearDown( )
+	void tearDown()
 	{
-		co::Any __res;
-		co::ArrayRange<co::Any const> __ar;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 6 ), __ar, __res );
+		co::Any res;
+		co::ArrayRange<co::Any const> range;
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 6 ), range, res );
 	}
 
 protected:
@@ -175,7 +175,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		co::System* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -186,9 +186,9 @@ public:
 			{
 			case 4:
 				{
-					co::ArrayRange<std::string const> requiredModules = args[++argIndex].get< co::ArrayRange<std::string const> >();
+					co::ArrayRange<std::string const> __requiredModules = args[++argIndex].get< co::ArrayRange<std::string const> >();
 					argIndex = -1;
-					p->setupBase( requiredModules );
+					p->setupBase( __requiredModules );
 				}
 				break;
 			case 5:
@@ -215,7 +215,7 @@ public:
 		{
 			throw;
 		}
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:
@@ -238,7 +238,7 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-		return reinterpret_cast<co::System*>( instance.getState().data.ptr );
+		return dynamic_cast<co::System*>( instance.getState().data.itf );
 	}
 };
 

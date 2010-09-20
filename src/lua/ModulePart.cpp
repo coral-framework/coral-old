@@ -11,17 +11,16 @@
 
 ModulePart::ModulePart()
 {
-	// empty
+	LuaState::setup();
 }
 
 ModulePart::~ModulePart()
 {
-	// empty
+	LuaState::tearDown();
 }
 
 void ModulePart::initialize( co::Module* )
 {
-	LuaState::instance().setup();
 	lua::ModuleInstaller::instance().install();
 
 	_luaModulePartLoader = new LuaModulePartLoader;
@@ -44,9 +43,11 @@ void ModulePart::disintegrate( co::Module* )
 }
 
 void ModulePart::dispose( co::Module* )
-{	
+{
+	// force a full garbage-collection cycle
+	lua_gc( LuaState::getL(), LUA_GCCOLLECT, 0 );
+
 	lua::ModuleInstaller::instance().uninstall();
-	LuaState::instance().tearDown();
 }
 
 CORAL_EXPORT_COMPONENT( ModulePart, lua );

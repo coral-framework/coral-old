@@ -12,7 +12,10 @@ PROJECT( TESTS_REGEN )
 ################################################################################
 
 # Re-generate code for the 'co' module
-SET( CORAL_PATH "${CMAKE_SOURCE_DIR}/modules" )
+SET( CORAL_PATH
+	"${CMAKE_BINARY_DIR}/modules"
+	"${CMAKE_SOURCE_DIR}/modules"
+)
 CORAL_GENERATE_MODULE( GENERATED_CORE_SOURCES co )
 
 # Pass the CORAL_PATH as a precompiler definition

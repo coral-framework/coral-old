@@ -1,21 +1,17 @@
-/*******************************************************************************
-** C++ mapping generated for type 'co.InterfaceType'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #ifndef _CO_INTERFACETYPE_H_
 #define _CO_INTERFACETYPE_H_
 
 #include <co/TypeTraits.h>
 #include <co/ArrayRange.h>
-#include <co/AttributeContainer.h>
 #include <co/CompoundType.h>
-#include <co/InterfaceType.h>
+#include <co/AttributeContainer.h>
 #include <co/MethodContainer.h>
+#include <co/InterfaceType.h>
 
 // co.InterfaceType Mapping:
 namespace co {
@@ -24,6 +20,8 @@ class InterfaceType : public co::CompoundType, public co::AttributeContainer, pu
 {
 public:
 	virtual ~InterfaceType() {;}
+
+	virtual const std::string& getCppBlock() = 0;
 
 	virtual co::ArrayRange<co::InterfaceType* const> getInterfaceAncestors() = 0;
 

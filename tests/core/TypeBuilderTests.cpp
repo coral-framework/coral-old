@@ -498,7 +498,7 @@ TEST( TypeBuilderTests, nativeClassDefinition )
 	ASSERT_TRUE( nativeType->getMember( "age" ) != NULL );
 	ASSERT_TRUE( nativeType->getMember( "childMethod" ) != NULL );
 	ASSERT_EQ( "myNativeName", nativeType->getNativeName() );
-	ASSERT_EQ( "MyHeaderName", nativeType->getHeaderName() );
+	ASSERT_EQ( "MyHeaderName", nativeType->getNativeHeaderFile() );
 	ASSERT_EQ( 1, nativeType->getMemberMethods().getSize() );
 	ASSERT_EQ( 2, nativeType->getMemberAttributes().getSize() );
 

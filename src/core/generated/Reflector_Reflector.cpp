@@ -1,26 +1,19 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.Reflector'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/Reflector.h>
-#include <co/reserved/ReflectorBase.h>
-#include <co/DynamicProxyHandler.h>
 #include <co/AttributeInfo.h>
+#include <co/MethodInfo.h>
 #include <co/Component.h>
-#include <co/DynamicProxyHandler.h>
-#include <co/MethodInfo.h>
 #include <co/Type.h>
-#include <co/MethodInfo.h>
-#include <co/AttributeInfo.h>
+#include <co/DynamicProxyHandler.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/UnsupportedOperationException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -49,68 +42,72 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
-	// co::Reflector Methods:
+	// co.Reflector Methods:
 
 	co::int32 getSize()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Reflector>( 0 ), __res );
-        return __res.get< co::int32 >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Reflector>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::int32 >();
 	}
 
 	co::Type* getType()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Reflector>( 1 ), __res );
-        return __res.get< co::Type* >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Reflector>( 1 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::Type* >();
 	}
 
-	void getAttribute( const co::Any& instance, co::AttributeInfo* ai, co::Any& value )
+	void getAttribute( const co::Any& __instance, co::AttributeInfo* __ai, co::Any& __value )
 	{
-		co::Any __res, __arg[3];
-		__arg[0].set< const co::Any& >( instance );
-		__arg[1].set< co::AttributeInfo* >( ai );
-		__arg[2].set< co::Any& >( value );
-		co::ArrayRange<co::Any const> __ar( __arg, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 2 ), __ar, __res );
+		co::Any res, args[3];
+		args[0].set< const co::Any& >( __instance );
+		args[1].set< co::AttributeInfo* >( __ai );
+		args[2].set< co::Any& >( __value );
+		co::ArrayRange<co::Any const> range( args, 3 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 2 ), range, res );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& returnValue )
+	void invokeMethod( const co::Any& __instance, co::MethodInfo* __mi, co::ArrayRange<co::Any const> __args, co::Any& __returnValue )
 	{
-		co::Any __res, __arg[4];
-		__arg[0].set< const co::Any& >( instance );
-		__arg[1].set< co::MethodInfo* >( mi );
-		__arg[2].set< co::ArrayRange<co::Any const> >( args );
-		__arg[3].set< co::Any& >( returnValue );
-		co::ArrayRange<co::Any const> __ar( __arg, 4 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 3 ), __ar, __res );
+		co::Any res, args[4];
+		args[0].set< const co::Any& >( __instance );
+		args[1].set< co::MethodInfo* >( __mi );
+		args[2].set< co::ArrayRange<co::Any const> >( __args );
+		args[3].set< co::Any& >( __returnValue );
+		co::ArrayRange<co::Any const> range( args, 4 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 3 ), range, res );
 	}
 
-	co::Component* newInstance( )
+	co::Component* newInstance()
 	{
-		co::Any __res;
-		co::ArrayRange<co::Any const> __ar;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 4 ), __ar, __res );
-		return __res.get< co::Component* >();
+		co::Any res;
+		co::ArrayRange<co::Any const> range;
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 4 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< co::Component* >();
 	}
 
-	co::Interface* newProxy( co::DynamicProxyHandler* handler )
+	co::Interface* newProxy( co::DynamicProxyHandler* __handler )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< co::DynamicProxyHandler* >( handler );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 5 ), __ar, __res );
-		return __res.get< co::Interface* >();
+		co::Any res, args[1];
+		args[0].set< co::DynamicProxyHandler* >( __handler );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 5 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< co::Interface* >();
 	}
 
-	void setAttribute( const co::Any& instance, co::AttributeInfo* ai, const co::Any& value )
+	void setAttribute( const co::Any& __instance, co::AttributeInfo* __ai, const co::Any& __value )
 	{
-		co::Any __res, __arg[3];
-		__arg[0].set< const co::Any& >( instance );
-		__arg[1].set< co::AttributeInfo* >( ai );
-		__arg[2].set< const co::Any& >( value );
-		co::ArrayRange<co::Any const> __ar( __arg, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 6 ), __ar, __res );
+		co::Any res, args[3];
+		args[0].set< const co::Any& >( __instance );
+		args[1].set< co::AttributeInfo* >( __ai );
+		args[2].set< const co::Any& >( __value );
+		co::ArrayRange<co::Any const> range( args, 3 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 6 ), range, res );
 	}
 
 	// These co::Reflector methods are not part of the reflection system:
@@ -120,7 +117,7 @@ public:
 		throw co::UnsupportedOperationException( "co::Reflector::createValue() cannot be called through a proxy interface." );
 	}
 
-	void copyValue( void*, void* )
+	void copyValue( const void*, void* )
 	{
 		throw co::UnsupportedOperationException( "co::Reflector::copyValue() cannot be called through a proxy interface." );
 	}
@@ -203,7 +200,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		co::Reflector* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -214,42 +211,42 @@ public:
 			{
 			case 2:
 				{
-					const co::Any& instance = args[++argIndex].get< const co::Any& >();
-					co::AttributeInfo* ai = args[++argIndex].get< co::AttributeInfo* >();
-					co::Any& value = args[++argIndex].get< co::Any& >();
+					const co::Any& __instance = args[++argIndex].get< const co::Any& >();
+					co::AttributeInfo* __ai = args[++argIndex].get< co::AttributeInfo* >();
+					co::Any& __value = args[++argIndex].get< co::Any& >();
 					argIndex = -1;
-					p->getAttribute( instance, ai, value );
+					p->getAttribute( __instance, __ai, __value );
 				}
 				break;
 			case 3:
 				{
-					const co::Any& instance = args[++argIndex].get< const co::Any& >();
-					co::MethodInfo* mi = args[++argIndex].get< co::MethodInfo* >();
-					co::ArrayRange<co::Any const> args = args[++argIndex].get< co::ArrayRange<co::Any const> >();
-					co::Any& returnValue = args[++argIndex].get< co::Any& >();
+					const co::Any& __instance = args[++argIndex].get< const co::Any& >();
+					co::MethodInfo* __mi = args[++argIndex].get< co::MethodInfo* >();
+					co::ArrayRange<co::Any const> __args = args[++argIndex].get< co::ArrayRange<co::Any const> >();
+					co::Any& __returnValue = args[++argIndex].get< co::Any& >();
 					argIndex = -1;
-					p->invokeMethod( instance, mi, args, returnValue );
+					p->invokeMethod( __instance, __mi, __args, __returnValue );
 				}
 				break;
 			case 4:
 				{
-					__res.set< co::Component* >( p->newInstance() );
+					res.set< co::Component* >( p->newInstance() );
 				}
 				break;
 			case 5:
 				{
-					co::DynamicProxyHandler* handler = args[++argIndex].get< co::DynamicProxyHandler* >();
+					co::DynamicProxyHandler* __handler = args[++argIndex].get< co::DynamicProxyHandler* >();
 					argIndex = -1;
-					__res.set< co::Interface* >( p->newProxy( handler ) );
+					res.set< co::Interface* >( p->newProxy( __handler ) );
 				}
 				break;
 			case 6:
 				{
-					const co::Any& instance = args[++argIndex].get< const co::Any& >();
-					co::AttributeInfo* ai = args[++argIndex].get< co::AttributeInfo* >();
-					const co::Any& value = args[++argIndex].get< const co::Any& >();
+					const co::Any& __instance = args[++argIndex].get< const co::Any& >();
+					co::AttributeInfo* __ai = args[++argIndex].get< co::AttributeInfo* >();
+					const co::Any& __value = args[++argIndex].get< const co::Any& >();
 					argIndex = -1;
-					p->setAttribute( instance, ai, value );
+					p->setAttribute( __instance, __ai, __value );
 				}
 				break;
 			default:
@@ -266,7 +263,7 @@ public:
 		{
 			throw;
 		}
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:
@@ -289,7 +286,7 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-		return reinterpret_cast<co::Reflector*>( instance.getState().data.ptr );
+		return dynamic_cast<co::Reflector*>( instance.getState().data.itf );
 	}
 };
 

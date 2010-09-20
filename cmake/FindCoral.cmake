@@ -3,7 +3,7 @@
 #	This module defines the following variables:
 #		CORAL_FOUND - Found the Coral framework.
 #		CORAL_INCLUDE_DIRS - Include directories.
-#		CORAL_COMPILER - Path to the 'coralc' executable.
+#		CORAL_LAUNCHER - Path to the 'coral' executable.
 #
 #	It also defines the library variable below, which contain
 #	debug/optimized keywords when a debug library is found:
@@ -18,11 +18,17 @@
 #
 #	The following utility functions simplify the task of invoking the Coral Compiler.
 #
-#	function CORAL_GENERATE_MODULE( generatedSourceFiles moduleName [typeName, ...] )
+#	function CORAL_GENERATE_MODULE( generatedSourceFiles moduleName [extraDependency ...] )
 #		Generates source code, plus all required mappings, to implement the Coral module specified
 #		by moduleName. All files are generated in a dir named "generated", relative to the current
 #		CMake binary dir. Generated source files that should be added to the module's project are
 #		added to the list variable indicated as the first parameter.
+#
+#	function CORAL_GENERATE_MAPPINGS( generatedHeaderFiles [typeName ...] )
+#		Generates mappings for the given list of types. All files are generated in a dir named
+#		"generated", relative to the current CMake binary dir. Generated files are added to the
+#		list variable indicated as the first parameter.
+#
 
 # Gets the current CORAL_PATH value.
 FUNCTION( CORAL_GET_PATH coralPath )
@@ -113,8 +119,8 @@ FUNCTION( CORAL_GENERATE_MODULE generatedSourceFiles moduleName )
 	CORAL_GET_PATH_STRING( coralPathStr )
 
 	ADD_CUSTOM_COMMAND( OUTPUT ${resultList}
-		COMMAND ${CORAL_COMPILER} "-path=${coralPathStr}" -G ${moduleName} ${ARGN}
-		DEPENDS ${CORAL_COMPILER}
+		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" lua.Launcher co.compiler.cli -g ${moduleName} ${ARGN}
+		DEPENDS ${CORAL_LAUNCHER}
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		COMMENT "Generating code for module '${moduleName}'..."
 	)
@@ -140,8 +146,8 @@ FUNCTION( CORAL_GENERATE_MAPPINGS generatedHeaders )
 	CORAL_GET_PATH_STRING( coralPathStr )
 
 	ADD_CUSTOM_COMMAND( OUTPUT ${resultList}
-		COMMAND ${CORAL_COMPILER} "-path=${coralPathStr}" ${ARGN}
-		DEPENDS ${CORAL_COMPILER}
+		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" lua.Launcher co.compiler.cli ${ARGN}
+		DEPENDS ${CORAL_LAUNCHER}
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		COMMENT "Generating required mappings..."
 	)
@@ -186,15 +192,15 @@ FIND_PATH( CORAL_INCLUDE_DIR co/Coral.h
 )
 MARK_AS_ADVANCED( CORAL_INCLUDE_DIR )
 
-IF( NOT CORAL_COMPILER )
-	_coral_find_program( CORAL_COMPILER		coralc coralcd )
+IF( NOT CORAL_LAUNCHER )
+	_coral_find_program( CORAL_LAUNCHER		coral corald )
 ENDIF()
 
 _coral_find_library( CORAL_LIBRARY			coral )
 _coral_find_library( CORAL_LIBRARY_DEBUG	corald )
 
 INCLUDE( FindPackageHandleStandardArgs )
-FIND_PACKAGE_HANDLE_STANDARD_ARGS( Coral DEFAULT_MSG CORAL_COMPILER CORAL_LIBRARY CORAL_INCLUDE_DIR )
+FIND_PACKAGE_HANDLE_STANDARD_ARGS( Coral DEFAULT_MSG CORAL_LAUNCHER CORAL_LIBRARY CORAL_INCLUDE_DIR )
 
 IF( CORAL_FOUND )
 	SET( CORAL_INCLUDE_DIRS ${CORAL_INCLUDE_DIR} )

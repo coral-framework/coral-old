@@ -15,9 +15,9 @@ void NativeClassType::setNativeName( const std::string& nativeName )
 	_nativeName = nativeName;
 }
 
-void NativeClassType::setHeaderName( const std::string& headerName )
+void NativeClassType::setNativeHeaderFile( const std::string& headerName )
 {
-	_headerName = headerName;
+	_nativeHeaderFile = headerName;
 }
 
 const std::string& NativeClassType::getNativeName()
@@ -25,9 +25,9 @@ const std::string& NativeClassType::getNativeName()
 	return _nativeName;
 }
 
-const std::string& NativeClassType::getHeaderName()
+const std::string& NativeClassType::getNativeHeaderFile()
 {
-	return _headerName;
+	return _nativeHeaderFile;
 }
 
 CORAL_EXPORT_COMPONENT( NativeClassType, NativeClassTypeComponent );

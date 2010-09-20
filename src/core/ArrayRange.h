@@ -17,8 +17,8 @@ template<typename T, typename C>
 struct ArrayRangeAdaptor
 {
 	static const bool isValid = false;
-	static T* getData( C& container ) { return 0; }
-	static std::size_t getSize( C& container ) { return 0; }
+	static T* getData( C& ) { return 0; }
+	static std::size_t getSize( C& ) { return 0; }
 };
 
 //! We should always be able to create co::ArrayRanges out of const containers.

@@ -1,18 +1,14 @@
-/*******************************************************************************
-** C++ mapping generated for type 'co.NativeClassType'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #ifndef _CO_NATIVECLASSTYPE_H_
 #define _CO_NATIVECLASSTYPE_H_
 
 #include <co/TypeTraits.h>
-#include <co/AttributeContainer.h>
 #include <co/CompoundType.h>
+#include <co/AttributeContainer.h>
 #include <co/MethodContainer.h>
 
 // co.NativeClassType Mapping:
@@ -23,7 +19,7 @@ class NativeClassType : public co::CompoundType, public co::AttributeContainer, 
 public:
 	virtual ~NativeClassType() {;}
 
-	virtual const std::string& getHeaderName() = 0;
+	virtual const std::string& getNativeHeaderFile() = 0;
 
 	virtual const std::string& getNativeName() = 0;
 

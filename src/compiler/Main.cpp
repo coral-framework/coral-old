@@ -52,9 +52,6 @@ int main( int argc, char* argv[] )
 
 	LOG( INFO ) << "Coral Compiler v" << CORAL_VERSION_STR << " (" << CORAL_BUILD_KEY << ")";
 
-	co::TypeLoader::enableDocMap();
-	co::TypeLoader::enableCppBlockMap();
-
 	co::addPath( fLS::FLAGS_path );
 
 	const std::string& moduleName = fLS::FLAGS_G;

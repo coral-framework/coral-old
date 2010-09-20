@@ -49,11 +49,8 @@ public:
 
 	/*!
 		Builds a 'mapping' dictionary for the type.
-		If this type is an interface, checks if it has a corresponding C++ block
-		in the specified \c cppBlockMap. If if does have one, the dictionary is
-		augmented with the C++ block's code.
 	 */
-	void buildMappingDict( const std::map<std::string, std::string>& cppBlockMap );
+	void buildMappingDict();
 
 	//! Builds a 'reflector' dictionary for the type.
 	void buildCodeDict();

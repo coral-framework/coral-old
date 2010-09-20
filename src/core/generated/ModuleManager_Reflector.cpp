@@ -1,22 +1,18 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.ModuleManager'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/ModuleManager.h>
-#include <co/reserved/ReflectorBase.h>
 #include <co/DynamicProxyHandler.h>
-#include <co/Module.h>
 #include <co/ModulePartLoader.h>
+#include <co/Module.h>
 #include <co/MethodInfo.h>
 #include <co/AttributeInfo.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -45,63 +41,68 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
-	// co::ModuleManager Methods:
+	// co.ModuleManager Methods:
 
 	co::ArrayRange<co::ModulePartLoader* const> getLoaders()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ModuleManager>( 0 ), __res );
-        return __res.get< co::ArrayRange<co::ModulePartLoader* const> >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ModuleManager>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ArrayRange<co::ModulePartLoader* const> >();
 	}
 
 	co::ArrayRange<co::Module* const> getModules()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ModuleManager>( 1 ), __res );
-        return __res.get< co::ArrayRange<co::Module* const> >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ModuleManager>( 1 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ArrayRange<co::Module* const> >();
 	}
 
-	co::Module* findModule( const std::string& moduleName )
+	co::Module* findModule( const std::string& __moduleName )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< const std::string& >( moduleName );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 2 ), __ar, __res );
-		return __res.get< co::Module* >();
+		co::Any res, args[1];
+		args[0].set< const std::string& >( __moduleName );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 2 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< co::Module* >();
 	}
 
-	void installLoader( co::ModulePartLoader* loader )
+	void installLoader( co::ModulePartLoader* __loader )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< co::ModulePartLoader* >( loader );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 3 ), __ar, __res );
+		co::Any res, args[1];
+		args[0].set< co::ModulePartLoader* >( __loader );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 3 ), range, res );
 	}
 
-	bool isLoadable( const std::string& moduleName )
+	bool isLoadable( const std::string& __moduleName )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< const std::string& >( moduleName );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 4 ), __ar, __res );
-		return __res.get< bool >();
+		co::Any res, args[1];
+		args[0].set< const std::string& >( __moduleName );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 4 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< bool >();
 	}
 
-	co::Module* load( const std::string& moduleName )
+	co::Module* load( const std::string& __moduleName )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< const std::string& >( moduleName );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 5 ), __ar, __res );
-		return __res.get< co::Module* >();
+		co::Any res, args[1];
+		args[0].set< const std::string& >( __moduleName );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 5 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< co::Module* >();
 	}
 
-	void uninstallLoader( co::ModulePartLoader* loader )
+	void uninstallLoader( co::ModulePartLoader* __loader )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< co::ModulePartLoader* >( loader );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 6 ), __ar, __res );
+		co::Any res, args[1];
+		args[0].set< co::ModulePartLoader* >( __loader );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 6 ), range, res );
 	}
 
 protected:
@@ -177,7 +178,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		co::ModuleManager* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -188,37 +189,37 @@ public:
 			{
 			case 2:
 				{
-					const std::string& moduleName = args[++argIndex].get< const std::string& >();
+					const std::string& __moduleName = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					__res.set< co::Module* >( p->findModule( moduleName ) );
+					res.set< co::Module* >( p->findModule( __moduleName ) );
 				}
 				break;
 			case 3:
 				{
-					co::ModulePartLoader* loader = args[++argIndex].get< co::ModulePartLoader* >();
+					co::ModulePartLoader* __loader = args[++argIndex].get< co::ModulePartLoader* >();
 					argIndex = -1;
-					p->installLoader( loader );
+					p->installLoader( __loader );
 				}
 				break;
 			case 4:
 				{
-					const std::string& moduleName = args[++argIndex].get< const std::string& >();
+					const std::string& __moduleName = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					__res.set< bool >( p->isLoadable( moduleName ) );
+					res.set< bool >( p->isLoadable( __moduleName ) );
 				}
 				break;
 			case 5:
 				{
-					const std::string& moduleName = args[++argIndex].get< const std::string& >();
+					const std::string& __moduleName = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					__res.set< co::Module* >( p->load( moduleName ) );
+					res.set< co::Module* >( p->load( __moduleName ) );
 				}
 				break;
 			case 6:
 				{
-					co::ModulePartLoader* loader = args[++argIndex].get< co::ModulePartLoader* >();
+					co::ModulePartLoader* __loader = args[++argIndex].get< co::ModulePartLoader* >();
 					argIndex = -1;
-					p->uninstallLoader( loader );
+					p->uninstallLoader( __loader );
 				}
 				break;
 			default:
@@ -235,7 +236,7 @@ public:
 		{
 			throw;
 		}
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:
@@ -258,7 +259,7 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-		return reinterpret_cast<co::ModuleManager*>( instance.getState().data.ptr );
+		return dynamic_cast<co::ModuleManager*>( instance.getState().data.itf );
 	}
 };
 

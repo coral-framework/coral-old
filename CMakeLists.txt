@@ -57,7 +57,7 @@ FIND_PACKAGE( GFlags REQUIRED )
 
 # Include our own package, so we can use the CORAL_GENERATE_*() macros.
 SET( CORAL_ROOT ${CMAKE_SOURCE_DIR} )
-SET( CORAL_COMPILER coralc )
+SET( CORAL_LAUNCHER launcher )
 FIND_PACKAGE( Coral QUIET )
 
 # Shared include paths for all subprojects
@@ -69,11 +69,11 @@ INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/include ${GLOG_INCLUDE_DIRS} ${GFLAGS_I
 
 # The official Coral Version
 SET( CORAL_VERSION_MAJOR	"0" )
-SET( CORAL_VERSION_MINOR	"1" )
+SET( CORAL_VERSION_MINOR	"3" )
 SET( CORAL_VERSION_PATCH	"0" )
 SET( CORAL_VERSION "${CORAL_VERSION_MAJOR}.${CORAL_VERSION_MINOR}.${CORAL_VERSION_PATCH}" )
 
-# Current code generation revision.
+# Code generation rules revision.
 SET( CORAL_COMPILER_OUTPUT_REVISION 1 )
 
 ################################################################################

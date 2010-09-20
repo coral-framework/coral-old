@@ -9,7 +9,7 @@
 
 LuaModulePart::LuaModulePart()
 {
-	lua_State* L = LuaState::instance().get();
+	lua_State* L = LuaState::getL();
 	assert( lua_type( L, -1 ) == LUA_TTABLE );
 
 	// save the module table in the registry indexed by our 'this' pointer
@@ -22,7 +22,7 @@ LuaModulePart::LuaModulePart()
 
 LuaModulePart::~LuaModulePart()
 {
-	lua_State* L = LuaState::instance().get();
+	lua_State* L = LuaState::getL();
 
 	// clear our registry reference to the module table
 	lua_pushlightuserdata( L, this );
@@ -57,8 +57,7 @@ void LuaModulePart::dispose( co::Module* module )
 
 void LuaModulePart::callScriptMethod( const char* methodName, co::Module* module )
 {
-	LuaState& luaState = LuaState::instance();
-	lua_State* L = luaState.get();
+	lua_State* L = LuaState::getL();
 
 	// reserve stack space for the method function
 	lua_pushnil( L );
@@ -82,8 +81,8 @@ void LuaModulePart::callScriptMethod( const char* methodName, co::Module* module
 	lua_replace( L, -3 );
 
 	// push the 'module' argument and call the method
-	luaState.push( module );
-	luaState.call( 2, 0 );
+	LuaState::push( L, module );
+	LuaState::call( L, 2, 0 );
 }
 
 CORAL_EXPORT_COMPONENT( LuaModulePart, ModulePart );

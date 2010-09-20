@@ -12,7 +12,7 @@ function M:initialize( module )
 	ASSERT_EQ( cslError.line, 0 )
 
 	-- test getting a non-existing attribute
-	ASSERT_ERROR( function() return cslError.dummy end, "non-existing member 'dummy'" )
+	ASSERT_EQ( cslError.dummy, nil )
 
 	-- test setting some attributes
 	cslError.message = "My Message"

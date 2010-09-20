@@ -1,24 +1,19 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.MethodInfo'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/MethodInfo.h>
-#include <co/reserved/ReflectorBase.h>
 #include <co/DynamicProxyHandler.h>
 #include <co/CompoundType.h>
 #include <co/ExceptionType.h>
-#include <co/ParameterInfo.h>
 #include <co/Type.h>
-#include <co/MethodInfo.h>
+#include <co/ParameterInfo.h>
 #include <co/AttributeInfo.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -47,50 +42,56 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
-	// co::MemberInfo Methods:
+	// co.MemberInfo Methods:
 
 	co::uint32 getIndex()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MemberInfo>( 0 ), __res );
-        return __res.get< co::uint32 >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MemberInfo>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::uint32 >();
 	}
 
 	const std::string& getName()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MemberInfo>( 1 ), __res );
-        return __res.get< const std::string& >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MemberInfo>( 1 ), res );
+		assert( res.containsObject() == false );
+        return res.get< const std::string& >();
 	}
 
 	co::CompoundType* getOwner()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MemberInfo>( 2 ), __res );
-        return __res.get< co::CompoundType* >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MemberInfo>( 2 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::CompoundType* >();
 	}
 
-	// co::MethodInfo Methods:
+	// co.MethodInfo Methods:
 
 	co::ArrayRange<co::ExceptionType* const> getExceptions()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodInfo>( 0 ), __res );
-        return __res.get< co::ArrayRange<co::ExceptionType* const> >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodInfo>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ArrayRange<co::ExceptionType* const> >();
 	}
 
 	co::ArrayRange<co::ParameterInfo* const> getParameters()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodInfo>( 1 ), __res );
-        return __res.get< co::ArrayRange<co::ParameterInfo* const> >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodInfo>( 1 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ArrayRange<co::ParameterInfo* const> >();
 	}
 
 	co::Type* getReturnType()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodInfo>( 2 ), __res );
-        return __res.get< co::Type* >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodInfo>( 2 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::Type* >();
 	}
 
 protected:
@@ -168,12 +169,12 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		checkInstance( instance, mi );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( args );
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:
@@ -196,7 +197,7 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-		return reinterpret_cast<co::MethodInfo*>( instance.getState().data.ptr );
+		return dynamic_cast<co::MethodInfo*>( instance.getState().data.itf );
 	}
 };
 

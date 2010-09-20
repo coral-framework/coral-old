@@ -1,11 +1,7 @@
-/*******************************************************************************
-** C++ mapping generated for type 'co.ModuleLoadException'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #ifndef _CO_MODULELOADEXCEPTION_H_
 #define _CO_MODULELOADEXCEPTION_H_
@@ -21,7 +17,7 @@ class ModuleLoadException : public co::UserException
 public:
 	ModuleLoadException()
 	{;}
-	
+
 	ModuleLoadException( const std::string& message )
 		: co::UserException( message )
 	{;}

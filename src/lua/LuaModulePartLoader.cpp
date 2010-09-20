@@ -32,12 +32,11 @@ co::ModulePart* LuaModulePartLoader::loadModulePart( const std::string& moduleNa
 	if( !locateModuleLibrary( moduleName, &libraryFilename ) )
 		throw co::ModuleLoadException( "unexpected missing module library file" );
 
-	LuaState& luaState = LuaState::instance();
-	luaState.loadFile( libraryFilename );
-	luaState.call( 0, 1 );
+	lua_State* L = LuaState::getL();
+	LuaState::loadFile( L, libraryFilename );
+	LuaState::call( L, 0, 1 );
 
 	// we expect the module script to return a table
-	lua_State* L = luaState.get();
 	if( lua_type( L, -1 ) != LUA_TTABLE )
 	{
 		lua_pop( L, 1 );

@@ -1,18 +1,15 @@
-/*******************************************************************************
-** C++ mapping generated for type 'co.Reflector'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #ifndef _CO_REFLECTOR_H_
 #define _CO_REFLECTOR_H_
 
 #include <co/TypeTraits.h>
-#include <co/Any.h>
 #include <co/ArrayRange.h>
+#include <co/Any.h>
+#include <vector>
 #include <co/Interface.h>
 
 // Forward Declarations:
@@ -51,7 +48,7 @@ public:
 			The copy is done using the type's assignment operator.
 			\warning Both pointers must point to instances of this exact 'type'.
 		 */
-		virtual void copyValue( void* fromAddress, void* toAddress ) = 0;
+		virtual void copyValue( const void* fromAddress, void* toAddress ) = 0;
 
 		/*!
 			Destroys the struct or native class instance located at \c address.

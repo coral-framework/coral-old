@@ -29,7 +29,6 @@ FILE( GLOB CORAL_PUBLIC_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} reserved/*.
 
 SET( CORAL_PUBLIC_HEADERS
 	Any.h
-	AnyValue.h
 	ArrayRange.h
 	Coral.h
 	CoreException.h

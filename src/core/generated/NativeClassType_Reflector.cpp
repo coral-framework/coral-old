@@ -1,26 +1,20 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.NativeClassType'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/NativeClassType.h>
-#include <co/reserved/ReflectorBase.h>
 #include <co/DynamicProxyHandler.h>
-#include <co/AttributeInfo.h>
-#include <co/MemberInfo.h>
-#include <co/MethodInfo.h>
-#include <co/Namespace.h>
 #include <co/Reflector.h>
-#include <co/Uuid.h>
-#include <co/MethodInfo.h>
+#include <co/Namespace.h>
 #include <co/AttributeInfo.h>
+#include <co/MethodInfo.h>
+#include <co/MemberInfo.h>
+#include <co/Uuid.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -49,114 +43,127 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
-	// co::CompoundType Methods:
+	// co.CompoundType Methods:
 
 	co::ArrayRange<co::MemberInfo* const> getMembers()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::CompoundType>( 0 ), __res );
-        return __res.get< co::ArrayRange<co::MemberInfo* const> >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::CompoundType>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ArrayRange<co::MemberInfo* const> >();
 	}
 
-	co::MemberInfo* getMember( const std::string& name )
+	co::MemberInfo* getMember( const std::string& __name )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< const std::string& >( name );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::CompoundType>( 1 ), __ar, __res );
-		return __res.get< co::MemberInfo* >();
+		co::Any res, args[1];
+		args[0].set< const std::string& >( __name );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::CompoundType>( 1 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< co::MemberInfo* >();
 	}
 
-	// co::Type Methods:
+	// co.Type Methods:
 
 	const co::Uuid& getBinarySignature()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 0 ), __res );
-        return __res.get< const co::Uuid& >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< const co::Uuid& >();
 	}
 
 	const std::string& getFullName()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 1 ), __res );
-        return __res.get< const std::string& >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 1 ), res );
+		assert( res.containsObject() == false );
+        return res.get< const std::string& >();
 	}
 
 	const co::Uuid& getFullSignature()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 2 ), __res );
-        return __res.get< const co::Uuid& >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 2 ), res );
+		assert( res.containsObject() == false );
+        return res.get< const co::Uuid& >();
 	}
 
 	co::TypeKind getKind()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 3 ), __res );
-        return __res.get< co::TypeKind >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 3 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::TypeKind >();
 	}
 
 	const std::string& getName()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 4 ), __res );
-        return __res.get< const std::string& >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 4 ), res );
+		assert( res.containsObject() == false );
+        return res.get< const std::string& >();
 	}
 
 	co::Namespace* getNamespace()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 5 ), __res );
-        return __res.get< co::Namespace* >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 5 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::Namespace* >();
 	}
 
 	co::Reflector* getReflector()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 6 ), __res );
-        return __res.get< co::Reflector* >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 6 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::Reflector* >();
 	}
 
-	void setReflector( co::Reflector* reflector )
+	void setReflector( co::Reflector* __reflector )
 	{
-		co::Any __arg;
-		__arg.set< co::Reflector* >( reflector );
-		_handler->handleSetAttribute( _cookie, getAttribInfo<co::Type>( 6 ), __arg );
+		co::Any arg;
+		arg.set< co::Reflector* >( __reflector );
+		_handler->handleSetAttribute( _cookie, getAttribInfo<co::Type>( 6 ), arg );
 	}
 
-	// co::MethodContainer Methods:
+	// co.MethodContainer Methods:
 
 	co::ArrayRange<co::MethodInfo* const> getMemberMethods()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodContainer>( 0 ), __res );
-        return __res.get< co::ArrayRange<co::MethodInfo* const> >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodContainer>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ArrayRange<co::MethodInfo* const> >();
 	}
 
-	// co::AttributeContainer Methods:
+	// co.AttributeContainer Methods:
 
 	co::ArrayRange<co::AttributeInfo* const> getMemberAttributes()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::AttributeContainer>( 0 ), __res );
-        return __res.get< co::ArrayRange<co::AttributeInfo* const> >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::AttributeContainer>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ArrayRange<co::AttributeInfo* const> >();
 	}
 
-	// co::NativeClassType Methods:
+	// co.NativeClassType Methods:
 
-	const std::string& getHeaderName()
+	const std::string& getNativeHeaderFile()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::NativeClassType>( 0 ), __res );
-        return __res.get< const std::string& >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::NativeClassType>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< const std::string& >();
 	}
 
 	const std::string& getNativeName()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::NativeClassType>( 1 ), __res );
-        return __res.get< const std::string& >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::NativeClassType>( 1 ), res );
+		assert( res.containsObject() == false );
+        return res.get< const std::string& >();
 	}
 
 protected:
@@ -213,7 +220,7 @@ public:
 		co::NativeClassType* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
-		case 0:		value.set< const std::string& >( p->getHeaderName() ); break;
+		case 0:		value.set< const std::string& >( p->getNativeHeaderFile() ); break;
 		case 1:		value.set< const std::string& >( p->getNativeName() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
@@ -232,12 +239,12 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		checkInstance( instance, mi );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( args );
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:
@@ -260,7 +267,7 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-		return reinterpret_cast<co::NativeClassType*>( instance.getState().data.ptr );
+		return dynamic_cast<co::NativeClassType*>( instance.getState().data.itf );
 	}
 };
 

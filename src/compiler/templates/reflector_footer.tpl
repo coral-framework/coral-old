@@ -26,7 +26,12 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 {{NEWLINE}}
+{{#IS_INTERFACE_TRUE}}
+		return dynamic_cast<{{TYPE_NAME_CPP}}*>( instance.getState().data.itf );
+{{/IS_INTERFACE_TRUE}}
+{{#IS_INTERFACE_FALSE}}
 		return {{#IS_NATIVE_TRUE}}*{{/IS_NATIVE_TRUE}}reinterpret_cast<{{TYPE_NAME_CPP}}*>( instance.getState().data.ptr );
+{{/IS_INTERFACE_FALSE}}
 	}
 {{/IS_COMPOUND_TYPE}}
 {{/IS_COMPONENT_FALSE}}

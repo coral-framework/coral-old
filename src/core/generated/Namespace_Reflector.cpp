@@ -1,24 +1,20 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.Namespace'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/Namespace.h>
-#include <co/reserved/ReflectorBase.h>
 #include <co/DynamicProxyHandler.h>
-#include <co/Module.h>
 #include <co/Type.h>
 #include <co/TypeBuilder.h>
+#include <co/Module.h>
 #include <co/TypeCreationTransaction.h>
 #include <co/MethodInfo.h>
 #include <co/AttributeInfo.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -47,86 +43,96 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
-	// co::Namespace Methods:
+	// co.Namespace Methods:
 
 	co::ArrayRange<co::Namespace* const> getChildNamespaces()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 0 ), __res );
-        return __res.get< co::ArrayRange<co::Namespace* const> >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ArrayRange<co::Namespace* const> >();
 	}
 
 	const std::string& getFullName()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 1 ), __res );
-        return __res.get< const std::string& >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 1 ), res );
+		assert( res.containsObject() == false );
+        return res.get< const std::string& >();
 	}
 
 	co::Module* getModule()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 2 ), __res );
-        return __res.get< co::Module* >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 2 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::Module* >();
 	}
 
 	const std::string& getName()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 3 ), __res );
-        return __res.get< const std::string& >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 3 ), res );
+		assert( res.containsObject() == false );
+        return res.get< const std::string& >();
 	}
 
 	co::Namespace* getParentNamespace()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 4 ), __res );
-        return __res.get< co::Namespace* >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 4 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::Namespace* >();
 	}
 
 	co::ArrayRange<co::Type* const> getTypes()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 5 ), __res );
-        return __res.get< co::ArrayRange<co::Type* const> >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 5 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ArrayRange<co::Type* const> >();
 	}
 
-	co::Namespace* defineChildNamespace( const std::string& name )
+	co::Namespace* defineChildNamespace( const std::string& __name )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< const std::string& >( name );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 6 ), __ar, __res );
-		return __res.get< co::Namespace* >();
+		co::Any res, args[1];
+		args[0].set< const std::string& >( __name );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 6 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< co::Namespace* >();
 	}
 
-	co::TypeBuilder* defineType( const std::string& name, co::TypeKind typeKind, co::TypeCreationTransaction* transaction )
+	co::TypeBuilder* defineType( const std::string& __name, co::TypeKind __typeKind, co::TypeCreationTransaction* __transaction )
 	{
-		co::Any __res, __arg[3];
-		__arg[0].set< const std::string& >( name );
-		__arg[1].set< co::TypeKind >( typeKind );
-		__arg[2].set< co::TypeCreationTransaction* >( transaction );
-		co::ArrayRange<co::Any const> __ar( __arg, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 7 ), __ar, __res );
-		return __res.get< co::TypeBuilder* >();
+		co::Any res, args[3];
+		args[0].set< const std::string& >( __name );
+		args[1].set< co::TypeKind >( __typeKind );
+		args[2].set< co::TypeCreationTransaction* >( __transaction );
+		co::ArrayRange<co::Any const> range( args, 3 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 7 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< co::TypeBuilder* >();
 	}
 
-	co::Namespace* getChildNamespace( const std::string& name )
+	co::Namespace* getChildNamespace( const std::string& __name )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< const std::string& >( name );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 8 ), __ar, __res );
-		return __res.get< co::Namespace* >();
+		co::Any res, args[1];
+		args[0].set< const std::string& >( __name );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 8 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< co::Namespace* >();
 	}
 
-	co::Type* getType( const std::string& name )
+	co::Type* getType( const std::string& __name )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< const std::string& >( name );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 9 ), __ar, __res );
-		return __res.get< co::Type* >();
+		co::Any res, args[1];
+		args[0].set< const std::string& >( __name );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 9 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< co::Type* >();
 	}
 
 protected:
@@ -210,7 +216,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		co::Namespace* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -221,32 +227,32 @@ public:
 			{
 			case 6:
 				{
-					const std::string& name = args[++argIndex].get< const std::string& >();
+					const std::string& __name = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					__res.set< co::Namespace* >( p->defineChildNamespace( name ) );
+					res.set< co::Namespace* >( p->defineChildNamespace( __name ) );
 				}
 				break;
 			case 7:
 				{
-					const std::string& name = args[++argIndex].get< const std::string& >();
-					co::TypeKind typeKind = args[++argIndex].get< co::TypeKind >();
-					co::TypeCreationTransaction* transaction = args[++argIndex].get< co::TypeCreationTransaction* >();
+					const std::string& __name = args[++argIndex].get< const std::string& >();
+					co::TypeKind __typeKind = args[++argIndex].get< co::TypeKind >();
+					co::TypeCreationTransaction* __transaction = args[++argIndex].get< co::TypeCreationTransaction* >();
 					argIndex = -1;
-					__res.set< co::TypeBuilder* >( p->defineType( name, typeKind, transaction ) );
+					res.set< co::TypeBuilder* >( p->defineType( __name, __typeKind, __transaction ) );
 				}
 				break;
 			case 8:
 				{
-					const std::string& name = args[++argIndex].get< const std::string& >();
+					const std::string& __name = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					__res.set< co::Namespace* >( p->getChildNamespace( name ) );
+					res.set< co::Namespace* >( p->getChildNamespace( __name ) );
 				}
 				break;
 			case 9:
 				{
-					const std::string& name = args[++argIndex].get< const std::string& >();
+					const std::string& __name = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					__res.set< co::Type* >( p->getType( name ) );
+					res.set< co::Type* >( p->getType( __name ) );
 				}
 				break;
 			default:
@@ -263,7 +269,7 @@ public:
 		{
 			throw;
 		}
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:
@@ -286,7 +292,7 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-		return reinterpret_cast<co::Namespace*>( instance.getState().data.ptr );
+		return dynamic_cast<co::Namespace*>( instance.getState().data.itf );
 	}
 };
 

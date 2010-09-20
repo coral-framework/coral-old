@@ -86,7 +86,7 @@ void ReflectorBase::createValue( void*, size_t )
 	raiseUnsupportedOperationException();
 }
 
-void ReflectorBase::copyValue( void*, void* )
+void ReflectorBase::copyValue( const void*, void* )
 {
 	raiseUnsupportedOperationException();
 }

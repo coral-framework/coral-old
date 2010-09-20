@@ -27,6 +27,7 @@ public:
 	co::ArrayRange<co::InterfaceType* const> getInterfaceAncestors();
 	co::ArrayRange<co::InterfaceType* const> getSuperInterfaces();
 	co::ArrayRange<co::InterfaceType* const> getSubInterfaces();
+	const std::string& getCppBlock();
 	bool isSubTypeOf( co::InterfaceType* itf );
 
 	DELEGATE_CO_TYPE_METHODS( TypeImpl:: );

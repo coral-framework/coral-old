@@ -1,14 +1,9 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.Component'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/Component.h>
-#include <co/reserved/ReflectorBase.h>
 #include <co/DynamicProxyHandler.h>
 #include <co/ComponentType.h>
 #include <co/InterfaceInfo.h>
@@ -17,6 +12,7 @@
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -45,31 +41,33 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
-	// co::Component Methods:
+	// co.Component Methods:
 
 	co::ComponentType* getComponentType()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Component>( 0 ), __res );
-        return __res.get< co::ComponentType* >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Component>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ComponentType* >();
 	}
 
-	void bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+	void bindInterface( co::InterfaceInfo* __clientInterface, co::Interface* __instance )
 	{
-		co::Any __res, __arg[2];
-		__arg[0].set< co::InterfaceInfo* >( clientInterface );
-		__arg[1].set< co::Interface* >( instance );
-		co::ArrayRange<co::Any const> __ar( __arg, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 1 ), __ar, __res );
+		co::Any res, args[2];
+		args[0].set< co::InterfaceInfo* >( __clientInterface );
+		args[1].set< co::Interface* >( __instance );
+		co::ArrayRange<co::Any const> range( args, 2 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 1 ), range, res );
 	}
 
-	co::Interface* getInterface( co::InterfaceInfo* interfaceInfo )
+	co::Interface* getInterface( co::InterfaceInfo* __interfaceInfo )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< co::InterfaceInfo* >( interfaceInfo );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 2 ), __ar, __res );
-		return __res.get< co::Interface* >();
+		co::Any res, args[1];
+		args[0].set< co::InterfaceInfo* >( __interfaceInfo );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 2 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< co::Interface* >();
 	}
 
 protected:
@@ -143,7 +141,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		co::Component* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -154,17 +152,17 @@ public:
 			{
 			case 1:
 				{
-					co::InterfaceInfo* clientInterface = args[++argIndex].get< co::InterfaceInfo* >();
-					co::Interface* instance = args[++argIndex].get< co::Interface* >();
+					co::InterfaceInfo* __clientInterface = args[++argIndex].get< co::InterfaceInfo* >();
+					co::Interface* __instance = args[++argIndex].get< co::Interface* >();
 					argIndex = -1;
-					p->bindInterface( clientInterface, instance );
+					p->bindInterface( __clientInterface, __instance );
 				}
 				break;
 			case 2:
 				{
-					co::InterfaceInfo* interfaceInfo = args[++argIndex].get< co::InterfaceInfo* >();
+					co::InterfaceInfo* __interfaceInfo = args[++argIndex].get< co::InterfaceInfo* >();
 					argIndex = -1;
-					__res.set< co::Interface* >( p->getInterface( interfaceInfo ) );
+					res.set< co::Interface* >( p->getInterface( __interfaceInfo ) );
 				}
 				break;
 			default:
@@ -181,7 +179,7 @@ public:
 		{
 			throw;
 		}
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:
@@ -204,7 +202,7 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-		return reinterpret_cast<co::Component*>( instance.getState().data.ptr );
+		return dynamic_cast<co::Component*>( instance.getState().data.itf );
 	}
 };
 

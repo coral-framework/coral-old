@@ -126,6 +126,7 @@ public:
 	{
 		co::Any __res;
 		_handler->handleGetAttribute( _cookie, getAttribInfo<{{ANCESTOR_CLASS}}>( {{ATTRIBUTE_INDEX}} ), __res );
+		assert( __res.containsObject() == false );
         return __res.get< {{RETURN_TYPE}} >();
 	}{{BI_NEWLINE}}
 		{{/GETTER}}
@@ -155,6 +156,7 @@ public:
 	{{/HAS_PARAMETERS_FALSE}}
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<{{ANCESTOR_CLASS}}>( {{METHOD_INDEX}} ), __ar, __res );
 	{{#HAS_RETURN}}
+		assert( __res.containsObject() == false );
 		return __res.get< {{RETURN_TYPE}} >();
 	{{/HAS_RETURN}}
 	}{{BI_NEWLINE}}
@@ -169,7 +171,7 @@ public:
 		throw co::UnsupportedOperationException( "co::Reflector::createValue() cannot be called through a proxy interface." );
 	}
 {{NEWLINE}}
-	void copyValue( void*, void* )
+	void copyValue( const void*, void* )
 	{
 		throw co::UnsupportedOperationException( "co::Reflector::copyValue() cannot be called through a proxy interface." );
 	}
@@ -277,9 +279,9 @@ public:
 		new( address ) {{TYPE_NAME_CPP}};
     }
 {{NEWLINE}}
-	void copyValue( void* fromAddress, void* toAddress )
+	void copyValue( const void* fromAddress, void* toAddress )
 	{
-		*reinterpret_cast<{{TYPE_NAME_CPP}}*>( toAddress ) = *reinterpret_cast<{{TYPE_NAME_CPP}}*>( fromAddress );
+		*reinterpret_cast<{{TYPE_NAME_CPP}}*>( toAddress ) = *reinterpret_cast<const {{TYPE_NAME_CPP}}*>( fromAddress );
     }
 {{NEWLINE}}
 	void destroyValue( void* address )

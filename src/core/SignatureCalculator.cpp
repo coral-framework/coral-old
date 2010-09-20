@@ -146,7 +146,7 @@ void SignatureCalculator::fillNativeClassSignatureData()
 {
 	co::NativeClassType* nativeType = static_cast<co::NativeClassType*>( _type );
 	_fullSignatureHash.addData( nativeType->getNativeName() );
-	_fullSignatureHash.addData( nativeType->getHeaderName() );
+	_fullSignatureHash.addData( nativeType->getNativeHeaderFile() );
 	fillAttributeAndMethodContainerData();
 }
 

@@ -26,12 +26,6 @@ Parser::Parser()
 	_parser = NULL;
 	_tokenStream = NULL;
 	_inputFileStream = NULL;
-
-	_errorLine = -1;
-	_errorOccurred = false;
-
-	_ignoreComments = true;
-	_ignoreCppBlocks = true;
 }
 
 Parser::~Parser()
@@ -231,9 +225,6 @@ void Parser::parse( const std::string& cslFilePath )
 
 void Parser::onComment( const std::string& text )
 {
-	if( _ignoreComments )
-		return;
-
 	std::string docText;
 	filterText( text, docText );
 
@@ -256,9 +247,6 @@ void Parser::onComment( const std::string& text )
 
 void Parser::onCppBlock( const std::string& text )
 {
-	if( _ignoreCppBlocks )
-		return;
-
 	std::string cppText;
 	filterText( text, cppText );
 
@@ -286,7 +274,6 @@ void Parser::onTypeSpecification( const std::string& typeName, co::TypeKind kind
 
 void Parser::onTypeDeclaration( const std::string& name, bool isArray )
 {
-
 	_lastDeclaredTypeName = name;
 	_lastDeclaredTypeIsArray = isArray;
 	_lastDeclaredTypeLine = _currentLine;
@@ -324,7 +311,9 @@ void Parser::onImportClause( const std::string& importTypeName )
 
 void Parser::onNativeClass( const std::string& cppHeader, const std::string& cppType )
 {
-	_typeBuilder->defineNativeClass( cppHeader, cppType );
+	// cppHeader comes wrapped between <>'s
+	assert( cppHeader.length() >= 2 );
+	_typeBuilder->defineNativeClass( cppHeader.substr( 1, cppHeader.length() - 2 ), cppType );
 }
 
 void Parser::onSuperType( const std::string& name )
@@ -436,9 +425,6 @@ void Parser::resolveImports()
 
 void Parser::handleDocumentation( const std::string& member )
 {
-	if( _ignoreComments )
-		return;
-
 	_lastMember = member;
 
 	if( _docBuffer.empty() )

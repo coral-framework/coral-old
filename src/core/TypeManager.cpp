@@ -15,9 +15,12 @@
 #include <co/IllegalArgumentException.h>
 #include <sstream>
 
+static const std::string sg_emptyString;
+
 TypeManager::TypeManager()
 {
 	_rootNS = new Namespace;
+	_docParsing = true;
 }
 
 TypeManager::~TypeManager()
@@ -30,9 +33,46 @@ void TypeManager::initialize()
 	defineBuiltInTypes();
 }
 
+void TypeManager::addDocumentation( const std::string& typeOrMemberName, const std::string& text )
+{
+	DocMap::iterator it = _docMap.find( typeOrMemberName );
+	if( it != _docMap.end() )
+		it->second.append( text );
+	else
+		_docMap.insert( DocMap::value_type( typeOrMemberName, text ) );
+}
+
+void TypeManager::addCppBlock( const std::string& interfaceName, const std::string& text )
+{
+	CppBlockMap::iterator it = _cppBlockMap.find( interfaceName );
+	if( it != _cppBlockMap.end() )
+		it->second.append( text );
+	else
+		_cppBlockMap.insert( CppBlockMap::value_type( interfaceName, text) );
+}
+
+const std::string& TypeManager::getCppBlock( const std::string& interfaceName )
+{
+	CppBlockMap::iterator it = _cppBlockMap.find( interfaceName );
+	if( it == _cppBlockMap.end() )
+		return sg_emptyString;
+
+	return it->second;
+}
+
 co::Namespace* TypeManager::getRootNS()
 {
 	return _rootNS.get();
+}
+
+bool TypeManager::getDocumentationParsing()
+{
+	return _docParsing;
+}
+
+void TypeManager::setDocumentationParsing( bool documentationParsing )
+{
+	_docParsing = documentationParsing;
 }
 
 co::Type* TypeManager::findType( const std::string& fullName )
@@ -137,7 +177,7 @@ co::Type* TypeManager::loadType( const std::string& typeName, std::vector<co::CS
 	if( type )
 		return type;
 
-	co::TypeLoader loader( typeName, co::getPaths(), this );
+	TypeLoader loader( typeName, co::getPaths(), this );
 
 	type = loader.loadType();
 	if( !type && errorStack )
@@ -161,11 +201,11 @@ co::Type* TypeManager::loadType( const std::string& typeName, std::vector<co::CS
 
 co::Type* TypeManager::loadTypeOrThrow( const std::string& fullName )
 {
-	co::TypeLoader loader( fullName, co::getPaths(), this );
+	TypeLoader loader( fullName, co::getPaths(), this );
 
 	co::Type* type = loader.loadType();
 	if( !type )
-		CORAL_THROW( co::TypeLoadException, "error loading type '" << fullName << "':\n" << *loader.getError() );
+		CORAL_THROW( co::TypeLoadException, "could not load type '" << fullName << "':\n" << *loader.getError() );
 
 	return type;
 }
@@ -196,6 +236,15 @@ void TypeManager::defineBuiltInTypes()
 	coNS->addType( coInterfaceType.get() );
 
 	loadTypeOrThrow( "co.Interface" );
+}
+
+const std::string& TypeManager::getDocumentation( const std::string& typeOrMemberName )
+{
+	DocMap::iterator it = _docMap.find( typeOrMemberName );
+	if( it == _docMap.end() )
+		return sg_emptyString;
+
+	return it->second;
 }
 
 CORAL_EXPORT_COMPONENT( TypeManager, TypeManagerComponent );

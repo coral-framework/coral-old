@@ -1,14 +1,9 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.ParameterInfo'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/ParameterInfo.h>
-#include <co/reserved/ReflectorBase.h>
 #include <co/DynamicProxyHandler.h>
 #include <co/Type.h>
 #include <co/MethodInfo.h>
@@ -16,6 +11,7 @@
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -44,34 +40,38 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
-	// co::ParameterInfo Methods:
+	// co.ParameterInfo Methods:
 
 	bool getIsIn()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ParameterInfo>( 0 ), __res );
-        return __res.get< bool >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ParameterInfo>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< bool >();
 	}
 
 	bool getIsOut()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ParameterInfo>( 1 ), __res );
-        return __res.get< bool >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ParameterInfo>( 1 ), res );
+		assert( res.containsObject() == false );
+        return res.get< bool >();
 	}
 
 	const std::string& getName()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ParameterInfo>( 2 ), __res );
-        return __res.get< const std::string& >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ParameterInfo>( 2 ), res );
+		assert( res.containsObject() == false );
+        return res.get< const std::string& >();
 	}
 
 	co::Type* getType()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ParameterInfo>( 3 ), __res );
-        return __res.get< co::Type* >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ParameterInfo>( 3 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::Type* >();
 	}
 
 protected:
@@ -151,12 +151,12 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		checkInstance( instance, mi );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( args );
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:
@@ -179,7 +179,7 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-		return reinterpret_cast<co::ParameterInfo*>( instance.getState().data.ptr );
+		return dynamic_cast<co::ParameterInfo*>( instance.getState().data.itf );
 	}
 };
 

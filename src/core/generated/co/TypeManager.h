@@ -1,25 +1,22 @@
-/*******************************************************************************
-** C++ mapping generated for type 'co.TypeManager'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #ifndef _CO_TYPEMANAGER_H_
 #define _CO_TYPEMANAGER_H_
 
 #include <co/TypeTraits.h>
-#include <co/Interface.h>
+#include <co/ArrayRange.h>
 #include <vector>
+#include <co/Interface.h>
 
 // Forward Declarations:
 namespace co {
 	class ArrayType;
+	struct CSLError;
 	class Namespace;
 	class Type;
-	struct CSLError;
 } // namespace co
 // End Of Forward Declarations
 
@@ -31,6 +28,10 @@ class TypeManager : public co::Interface
 public:
 	virtual ~TypeManager() {;}
 
+	virtual bool getDocumentationParsing() = 0;
+
+	virtual void setDocumentationParsing( bool documentationParsing ) = 0;
+
 	virtual co::Namespace* getRootNS() = 0;
 
 	virtual co::Namespace* findNamespace( const std::string& fullName ) = 0;
@@ -38,6 +39,8 @@ public:
 	virtual co::Type* findType( const std::string& fullName ) = 0;
 
 	virtual co::ArrayType* getArrayOf( co::Type* elementType ) = 0;
+
+	virtual const std::string& getDocumentation( const std::string& typeOrMemberName ) = 0;
 
 	virtual co::Type* getType( const std::string& typeName ) = 0;
 

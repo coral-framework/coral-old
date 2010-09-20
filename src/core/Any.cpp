@@ -10,6 +10,7 @@
 #include <co/Reflector.h>
 #include <co/InterfaceType.h>
 #include <co/IllegalCastException.h>
+#include <memory>
 #include <iomanip>
 #include <sstream>
 
@@ -485,52 +486,6 @@ bool testAndCopyCompatibleReferences( const __any::State& from, __any::State& to
 	}
 }
 
-bool Any::operator==( const Any& other ) const
-{
-	if( _state.kind != other._state.kind || _state.type != other._state.type )
-		return false;
-
-	if( _state.kind == TK_NONE )
-		return true;
-
-	if( _state.isConst != other._state.isConst ||
-		_state.isPointer != other._state.isPointer ||
-		_state.isPointerConst != other._state.isPointerConst ||
-		_state.isReference != other._state.isReference )
-		return false;
-
-	if( _state.kind == TK_ARRAY && ( _state.arrayKind != other._state.arrayKind ||
-			( _state.arrayKind == __any::State::AK_ArrayRange
-				&& _state.arraySize != other._state.arraySize ) ) )
-		return false;
-
-	// pointer comparison
-	if( _state.kind == TK_ARRAY || _state.isPointer || _state.isReference )
-		return ( _state.data.ptr == other._state.data.ptr );
-
-	// value comparison
-	bool res = false;
-	switch( _state.kind )
-	{
-	case TK_BOOLEAN:	res = ( _state.data.b == other._state.data.b );		break;
-	case TK_INT8:
-	case TK_UINT8:		res = ( _state.data.u8 == other._state.data.u8 );	break;
-	case TK_INT16:
-	case TK_UINT16:		res = ( _state.data.u16 == other._state.data.u16 );	break;
-	case TK_INT32:
-	case TK_UINT32:		res = ( _state.data.u32 == other._state.data.u32 );	break;
-	case TK_INT64:
-	case TK_UINT64:		res = ( _state.data.u64 == other._state.data.u64 );	break;
-	case TK_FLOAT:		res = ( _state.data.f == other._state.data.f );		break;
-	case TK_DOUBLE:		res = ( _state.data.d == other._state.data.d );		break;
-	case TK_ENUM:		res = ( _state.data.u32 == other._state.data.u32 );	break;
-	default:
-		assert( false );
-	}
-
-	return res;
-}
-
 void Any::setInterface( co::Interface* instance, co::InterfaceType* type )
 {
 	// type cannot be NULL when the instance is NULL
@@ -673,7 +628,453 @@ void Any::setArray( ArrayKind arrayKind, Type* elementType, uint32 flags, void* 
 	_state.data.ptr = ptr;
 }
 
-void Any::castFrom( const __any::State& s )
+void Any::makeOut( Type* paramType )
+{
+	TypeKind paramKind = paramType->getKind();
+	switch( paramKind )
+	{
+	case TK_ANY:
+		createAny();
+		break;
+
+	case TK_BOOLEAN:
+		_objectKind = TK_BOOLEAN;
+		if( isValid() )
+			_object.data.b = get<bool>();
+		set<bool&>( _object.data.b );
+		break;
+
+	case TK_INT8:
+		_objectKind = TK_INT8;
+		if( isValid() )
+			_object.data.i8 = get<int8>();
+		set<int8&>( _object.data.i8 );
+		break;
+
+	case TK_UINT8:
+		_objectKind = TK_UINT8;
+		if( isValid() )
+			_object.data.u8 = get<uint8>();
+		set<uint8&>( _object.data.u8 );
+		break;
+
+	case TK_INT16:
+		_objectKind = TK_INT16;
+		if( isValid() )
+			_object.data.i16 = get<int16>();
+		set<int16&>( _object.data.i16 );
+		break;
+
+	case TK_UINT16:
+		_objectKind = TK_UINT16;
+		if( isValid() )
+			_object.data.u16 = get<uint16>();
+		set<uint16&>( _object.data.u16 );
+		break;
+
+	case TK_INT32:
+		_objectKind = TK_INT32;
+		if( isValid() )
+			_object.data.i32 = get<int32>();
+		set<int32&>( _object.data.i32 );
+		break;
+
+	case TK_UINT32:
+		_objectKind = TK_UINT32;
+		if( isValid() )
+			_object.data.u32 = get<uint32>();
+		set<uint32&>( _object.data.u32 );
+		break;
+
+	case TK_INT64:
+		_objectKind = TK_INT64;
+		if( isValid() )
+			_object.data.i64 = get<int64>();
+		set<int64&>( _object.data.i64 );
+		break;
+
+	case TK_UINT64:
+		_objectKind = TK_UINT64;
+		if( isValid() )
+			_object.data.u64 = get<uint64>();
+		set<uint64&>( _object.data.u64 );
+		break;
+
+	case TK_FLOAT:
+		_objectKind = TK_FLOAT;
+		if( isValid() )
+			_object.data.f = get<float>();
+		set<float&>( _object.data.f );
+		break;
+
+	case TK_DOUBLE:
+		_objectKind = TK_DOUBLE;
+		if( isValid() )
+			_object.data.d = get<double>();
+		set<double&>( _object.data.d );
+		break;
+
+	case TK_STRING:
+		if( isValid() )
+			assert( getKind() == TK_STRING && isConst() == false );
+		else
+			set<std::string&>( createString() );
+		break;
+
+	case TK_ARRAY:
+		if( isValid() )
+			assert( getKind() == TK_ARRAY && isConst() == false );
+		else
+		{
+			co::ArrayType* arrayType = dynamic_cast<co::ArrayType*>( paramType );
+			assert( arrayType );
+
+			co::Type* elementType = arrayType->getElementType();
+			co::TypeKind elementKind = elementType->getKind();
+
+			PseudoVector& pv = createArray( elementType );
+			setArray(
+				( elementKind == co::TK_INTERFACE ? co::Any::AK_RefVector : co::Any::AK_StdVector ), elementType,
+				( elementKind == co::TK_INTERFACE ? co::Any::VarIsPointer : co::Any::VarIsValue ), &pv );
+		}
+		break;
+
+	case TK_ENUM:
+		_objectKind = TK_ENUM;
+		if( isValid() )
+			_object.data.u32 = get<uint32>();
+		set<uint32&>( _object.data.u32 );
+		break;
+
+	case TK_STRUCT:
+	case TK_NATIVECLASS:
+		if( isValid() )
+		{
+			assert( paramType == getType() );
+			assert( !isPointer() );
+			setVariable( paramType, Any::VarIsReference, getState().data.ptr );
+		}
+		else
+		{
+			createComplexValue( paramType );
+		}
+		break;
+
+	case TK_INTERFACE:
+		_objectKind = TK_INTERFACE;
+		_object.data.ptr = getState().data.ptr;
+		setVariable( paramType, ( Any::VarIsPointer | Any::VarIsReference ), &_object.data.ptr );
+		break;
+
+	default:
+		assert( false );
+	}
+}
+
+void Any::makeIn()
+{
+	switch( getKind() )
+	{
+	case TK_ANY:
+		_state = get<const Any&>().getState();
+		break;
+
+	case TK_BOOLEAN:
+	case TK_INT8:
+	case TK_UINT8:
+	case TK_INT16:
+	case TK_UINT16:
+	case TK_INT32:
+	case TK_UINT32:
+	case TK_INT64:
+	case TK_UINT64:
+	case TK_FLOAT:
+	case TK_DOUBLE:
+		assert( isReference() && !isPointer() );
+		setBasic( getKind(), Any::VarIsValue, getState().data.ptr );
+		break;
+
+	case TK_STRING:
+	case TK_ARRAY:
+		// empty
+		break;
+
+	case TK_ENUM:
+		assert( isReference() && !isPointer() );
+		setVariable( getType(), Any::VarIsValue, getState().data.ptr );
+		break;
+
+	case TK_STRUCT:
+	case TK_NATIVECLASS:
+		// empty
+		break;
+
+	case TK_INTERFACE:
+		setInterface( reinterpret_cast<Interface*>( _object.data.ptr ), getInterfaceType() );
+		break;
+
+	default:
+		assert( false );
+	}
+}
+
+Any& Any::createAny()
+{
+	if( containsObject() )
+		throw co::Exception( "co::Any::createAny() called while a co::Any contains an object" );
+
+	Any* res = new Any();
+
+	// preserve the current variable (if any) in the new co::Any
+	if( isValid() )
+		res->_state = _state;
+
+	_objectKind = TK_ANY;
+	_object.data.ptr = res;
+	set<Any&>( *res );
+
+	return *res;
+}
+
+std::string& Any::createString()
+{
+	destroyObject();
+	new( _object.stringArea ) std::string();
+	_objectKind = TK_STRING;
+	std::string& res = *reinterpret_cast<std::string*>( _object.stringArea );
+	set<std::string&>( res );
+	return res;
+}
+
+Any::PseudoVector& Any::createArray( Type* elementType, size_t n )
+{
+	destroyObject();
+	
+	_objectKind = TK_ARRAY;
+	_object.array.reflector = elementType->getReflector();
+
+	PseudoVector& res = *reinterpret_cast<PseudoVector*>( _object.array.vectorArea );
+
+	TypeKind elementKind = elementType->getKind();
+	setArray( ( elementKind == co::TK_INTERFACE ? AK_RefVector : AK_StdVector ), elementType,
+			 ( elementKind == co::TK_INTERFACE ? VarIsPointer : VarIsValue ), &res );
+
+	if( n == 0 )
+	{
+		new( _object.array.vectorArea ) PseudoVector();
+		return res;
+	}
+
+	switch( elementKind )
+	{
+	case TK_ANY:
+		new( _object.array.vectorArea ) std::vector<Any>( n );
+		break;
+
+	case TK_BOOLEAN:
+	case TK_INT8:
+	case TK_UINT8:
+	case TK_INT16:
+	case TK_UINT16:
+	case TK_INT32:
+	case TK_UINT32:
+	case TK_INT64:
+	case TK_UINT64:
+	case TK_FLOAT:
+	case TK_DOUBLE:
+	case TK_ENUM:
+		new( _object.array.vectorArea ) PseudoVector( _object.array.reflector->getSize() * n );
+		break;
+
+	case TK_STRING:
+		new( _object.array.vectorArea ) std::vector<std::string>( n );
+		break;
+
+	case TK_STRUCT:
+	case TK_NATIVECLASS:
+		{
+			size_t elementSize = _object.array.reflector->getSize();
+			new( _object.array.vectorArea ) PseudoVector( elementSize * n );
+
+			// call the constructor of each element
+			uint8* beginPtr = &res[0];
+			uint8* endPtr = beginPtr + ( elementSize * n );
+
+			for( uint8* p = beginPtr; p < endPtr; p += elementSize )
+				_object.array.reflector->createValue( p, elementSize );
+		}
+		break;
+
+	case TK_INTERFACE:
+		new( _object.array.vectorArea ) co::RefVector<co::Interface>( n );
+		break;
+
+	default:
+		assert( false );
+	}
+
+	return res;
+}
+
+void* Any::createComplexValue( Type* type )
+{
+	destroyObject();
+
+	_object.complex.reflector = type->getReflector();
+	size_t size = _object.complex.reflector->getSize();
+
+	void* res;
+	if( size > INPLACE_CAPACITY )
+	{
+		_objectKind = TK_STRUCT;
+		res = _object.complex.ptr = malloc( size );
+	}
+	else
+	{
+		_objectKind = TK_NATIVECLASS;
+		res = _object.complex.inplaceArea;
+	}
+
+	_object.complex.reflector->createValue( res, size );
+	setVariable( type, Any::VarIsReference, res );
+
+	return res;
+}
+
+void Any::destroyObject()
+{
+	switch( _objectKind )
+	{
+	case TK_NONE:
+		return;
+
+	case TK_ANY:
+		reinterpret_cast<Any*>( _object.data.ptr )->~Any();
+		break;
+
+	case TK_STRING:
+		reinterpret_cast<std::string*>( _object.stringArea )->~basic_string();
+		break;
+
+	case TK_ARRAY:
+		{
+			// call the destructor of each element
+			PseudoVector* pv = reinterpret_cast<PseudoVector*>( _object.array.vectorArea );	
+			switch( _object.array.reflector->getType()->getKind() )
+			{
+			case TK_ANY:
+				reinterpret_cast<std::vector<Any>*>( pv )->~vector();
+				break;
+
+			case TK_BOOLEAN:
+			case TK_INT8:
+			case TK_UINT8:
+			case TK_INT16:
+			case TK_UINT16:
+			case TK_INT32:
+			case TK_UINT32:
+			case TK_INT64:
+			case TK_UINT64:
+			case TK_FLOAT:
+			case TK_DOUBLE:
+			case TK_ENUM:
+				pv->~vector();
+				break;
+
+			case TK_STRING:
+				reinterpret_cast<std::vector<std::string>*>( pv )->~vector();
+				break;
+
+			case TK_STRUCT:
+			case TK_NATIVECLASS:
+				{
+					size_t arraySize = pv->size();
+					size_t elementSize = _object.array.reflector->getSize();
+					assert( arraySize % elementSize == 0 );
+
+					uint8* beginPtr = &( *pv )[0];
+					uint8* endPtr = beginPtr + arraySize;
+
+					for( uint8* p = beginPtr; p < endPtr; p += elementSize )
+						_object.array.reflector->destroyValue( p );
+					
+					pv->~vector();
+				}
+				break;
+
+			case TK_INTERFACE:
+				reinterpret_cast<co::RefVector<co::Interface>*>( pv )->~RefVector();
+				break;
+
+			default:
+				assert( false );
+			}
+		}
+		break;
+
+	case TK_STRUCT:
+		_object.complex.reflector->destroyValue( _object.complex.ptr );
+		free( _object.complex.ptr );
+		break;
+
+	case TK_NATIVECLASS:
+		_object.complex.reflector->destroyValue( _object.complex.inplaceArea );
+		break;
+
+	default:
+		break;
+	}
+
+	_objectKind = TK_NONE;
+}
+
+bool Any::operator==( const Any& other ) const
+{
+	if( _state.kind != other._state.kind || _state.type != other._state.type )
+		return false;
+
+	if( _state.kind == TK_NONE )
+		return true;
+
+	if( _state.isConst != other._state.isConst ||
+		_state.isPointer != other._state.isPointer ||
+		_state.isPointerConst != other._state.isPointerConst ||
+		_state.isReference != other._state.isReference )
+		return false;
+
+	if( _state.kind == TK_ARRAY && ( _state.arrayKind != other._state.arrayKind ||
+			( _state.arrayKind == __any::State::AK_ArrayRange
+				&& _state.arraySize != other._state.arraySize ) ) )
+		return false;
+
+	// pointer comparison
+	if( _state.kind == TK_ARRAY || _state.isPointer || _state.isReference )
+		return ( _state.data.ptr == other._state.data.ptr );
+
+	// value comparison
+	bool res = false;
+	switch( _state.kind )
+	{
+	case TK_BOOLEAN:	res = ( _state.data.b == other._state.data.b );		break;
+	case TK_INT8:
+	case TK_UINT8:		res = ( _state.data.u8 == other._state.data.u8 );	break;
+	case TK_INT16:
+	case TK_UINT16:		res = ( _state.data.u16 == other._state.data.u16 );	break;
+	case TK_INT32:
+	case TK_UINT32:		res = ( _state.data.u32 == other._state.data.u32 );	break;
+	case TK_INT64:
+	case TK_UINT64:		res = ( _state.data.u64 == other._state.data.u64 );	break;
+	case TK_FLOAT:		res = ( _state.data.f == other._state.data.f );		break;
+	case TK_DOUBLE:		res = ( _state.data.d == other._state.data.d );		break;
+	case TK_ENUM:		res = ( _state.data.u32 == other._state.data.u32 );	break;
+	default:
+		assert( false );
+	}
+
+	return res;
+}
+
+void Any::castFrom( const State& s )
 {
 	// are we dealing with arrays?
 	if( _state.kind == TK_ARRAY || s.kind == TK_ARRAY )
@@ -725,6 +1126,108 @@ void Any::castFrom( const __any::State& s )
 	}
 
 	THROW_ILLEGAL_CAST( s, _state, );
+}
+
+inline bool isInside( void* ptr, const co::Any& any )
+{
+	return ptr >= reinterpret_cast<const void*>( &any ) && ptr <= reinterpret_cast<const void*>( &any + 1 );
+}
+
+void Any::copy( const co::Any& other )
+{
+	_state = other._state;
+
+	if( containsObject() )
+		destroyObject();
+
+	// is the variable a temporary object within 'other'?
+	if( other.containsObject() && ( _state.isPointer || _state.isReference || _state.kind == TK_ARRAY )
+		&& isInside( _state.data.ptr, other )  )
+	{
+		// we should copy the object
+		_objectKind = other._objectKind;
+		switch( _objectKind )
+		{
+		case TK_ANY:
+			createAny() = *reinterpret_cast<Any*>( other._object.data.ptr );
+			break;
+
+		case TK_STRING:
+			createString() = *reinterpret_cast<const std::string*>( other._object.stringArea );
+			break;
+
+		case TK_ARRAY:
+			{
+				_object.array.reflector = other._object.array.reflector;
+				co::Type* elementType = _object.array.reflector->getType();
+				switch( elementType->getKind() )
+				{
+				case TK_ANY:
+					new( _object.array.vectorArea ) std::vector<Any>(
+							*reinterpret_cast<const std::vector<Any>*>( other._object.array.vectorArea ) );
+					break;
+
+				case TK_BOOLEAN:
+				case TK_INT8:
+				case TK_UINT8:
+				case TK_INT16:
+				case TK_UINT16:
+				case TK_INT32:
+				case TK_UINT32:
+				case TK_INT64:
+				case TK_UINT64:
+				case TK_FLOAT:
+				case TK_DOUBLE:
+				case TK_ENUM:
+					new( _object.array.vectorArea ) PseudoVector(
+							*reinterpret_cast<const PseudoVector*>( other._object.array.vectorArea ) );
+					break;
+
+				case TK_STRING:
+					new( _object.array.vectorArea ) std::vector<std::string>( 
+							*reinterpret_cast<const std::vector<std::string>*>( other._object.array.vectorArea ) );
+					break;
+
+				case TK_STRUCT:
+				case TK_NATIVECLASS:
+					{
+						const PseudoVector& opv = *reinterpret_cast<const PseudoVector*>( other._object.array.vectorArea );				
+						size_t arraySize = opv.size();
+						size_t elementSize = _object.array.reflector->getSize();
+						assert( arraySize % elementSize == 0 );
+
+						new( _object.array.vectorArea ) PseudoVector( arraySize );
+						PseudoVector& pv = *reinterpret_cast<PseudoVector*>( _object.array.vectorArea );
+
+						const uint8* opvStart = &opv[0];
+						uint8* pvStart = &pv[0];
+
+						for( size_t offset = 0; offset < arraySize; offset += elementSize )
+							_object.complex.reflector->copyValue( opvStart + offset, pvStart + offset );
+					}
+					break;
+
+				case TK_INTERFACE:
+					new( _object.array.vectorArea ) co::RefVector<co::Interface>( 
+							*reinterpret_cast<const co::RefVector<co::Interface>*>( other._object.array.vectorArea ) );
+					break;
+
+				default:
+					assert( false );
+				}
+			}
+			break;
+
+		case TK_STRUCT:
+		case TK_NATIVECLASS:
+			_object.complex.reflector->copyValue( other._object.complex.ptr,
+					createComplexValue( other._object.complex.reflector->getType() ) );
+			break;
+
+		default:
+			break;
+		}
+	}
 }
 
 } // namespace co

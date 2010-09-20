@@ -1,14 +1,9 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.ModulePart'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/ModulePart.h>
-#include <co/reserved/ReflectorBase.h>
 #include <co/DynamicProxyHandler.h>
 #include <co/Module.h>
 #include <co/MethodInfo.h>
@@ -16,6 +11,7 @@
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -44,46 +40,46 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
-	// co::ModulePart Methods:
+	// co.ModulePart Methods:
 
-	void disintegrate( co::Module* module )
+	void disintegrate( co::Module* __module )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< co::Module* >( module );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 0 ), __ar, __res );
+		co::Any res, args[1];
+		args[0].set< co::Module* >( __module );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 0 ), range, res );
 	}
 
-	void dispose( co::Module* module )
+	void dispose( co::Module* __module )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< co::Module* >( module );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 1 ), __ar, __res );
+		co::Any res, args[1];
+		args[0].set< co::Module* >( __module );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 1 ), range, res );
 	}
 
-	void initialize( co::Module* module )
+	void initialize( co::Module* __module )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< co::Module* >( module );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 2 ), __ar, __res );
+		co::Any res, args[1];
+		args[0].set< co::Module* >( __module );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 2 ), range, res );
 	}
 
-	void integrate( co::Module* module )
+	void integrate( co::Module* __module )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< co::Module* >( module );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 3 ), __ar, __res );
+		co::Any res, args[1];
+		args[0].set< co::Module* >( __module );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 3 ), range, res );
 	}
 
-	void integratePresentation( co::Module* module )
+	void integratePresentation( co::Module* __module )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< co::Module* >( module );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 4 ), __ar, __res );
+		co::Any res, args[1];
+		args[0].set< co::Module* >( __module );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 4 ), range, res );
 	}
 
 protected:
@@ -149,7 +145,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		co::ModulePart* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -160,37 +156,37 @@ public:
 			{
 			case 0:
 				{
-					co::Module* module = args[++argIndex].get< co::Module* >();
+					co::Module* __module = args[++argIndex].get< co::Module* >();
 					argIndex = -1;
-					p->disintegrate( module );
+					p->disintegrate( __module );
 				}
 				break;
 			case 1:
 				{
-					co::Module* module = args[++argIndex].get< co::Module* >();
+					co::Module* __module = args[++argIndex].get< co::Module* >();
 					argIndex = -1;
-					p->dispose( module );
+					p->dispose( __module );
 				}
 				break;
 			case 2:
 				{
-					co::Module* module = args[++argIndex].get< co::Module* >();
+					co::Module* __module = args[++argIndex].get< co::Module* >();
 					argIndex = -1;
-					p->initialize( module );
+					p->initialize( __module );
 				}
 				break;
 			case 3:
 				{
-					co::Module* module = args[++argIndex].get< co::Module* >();
+					co::Module* __module = args[++argIndex].get< co::Module* >();
 					argIndex = -1;
-					p->integrate( module );
+					p->integrate( __module );
 				}
 				break;
 			case 4:
 				{
-					co::Module* module = args[++argIndex].get< co::Module* >();
+					co::Module* __module = args[++argIndex].get< co::Module* >();
 					argIndex = -1;
-					p->integratePresentation( module );
+					p->integratePresentation( __module );
 				}
 				break;
 			default:
@@ -207,7 +203,7 @@ public:
 		{
 			throw;
 		}
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:
@@ -230,7 +226,7 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-		return reinterpret_cast<co::ModulePart*>( instance.getState().data.ptr );
+		return dynamic_cast<co::ModulePart*>( instance.getState().data.itf );
 	}
 };
 

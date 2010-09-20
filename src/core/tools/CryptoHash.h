@@ -18,7 +18,7 @@ class CryptoHashAlgorithm;
 /*!
 	The CryptoHash class provides a way to generate cryptographic hashes.
 	CryptoHash can be used to generate cryptographic hashes of binary or text data.
-	Currently MD5 and SHA1 are supported.
+	Currently only SHA1 is supported.
  */
 class CORAL_EXPORT CryptoHash
 {

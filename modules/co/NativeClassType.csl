@@ -3,9 +3,9 @@
  */
 interface NativeClassType : CompoundType, AttributeContainer, MethodContainer
 {
-	// The fully qualified name of the C++ type wrapped by this native class.
+	// Fully-qualified name of the C++ type wrapped by this native class.
 	readonly attribute string nativeName;
 
-	// The standard name for including the header file where the wrapped C++ type is defined.
-	readonly attribute string headerName;
+	// Name of the header file where the wrapped C++ type is defined.
+	readonly attribute string nativeHeaderFile;
 };

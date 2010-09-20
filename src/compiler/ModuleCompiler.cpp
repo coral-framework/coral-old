@@ -217,7 +217,7 @@ void ModuleCompiler::loadModuleTypes()
 			_moduleDependencies.insert( co::getType( std::string( "co." ) + getTypeInterfaceName( type ) ) );
 		}
 	}
-	
+
 	LOG( INFO ) << "Found " << _moduleTypes.size() << " module types.";
 
 	// add all module types as module dependencies
@@ -236,7 +236,7 @@ void ModuleCompiler::onTypeVisited( co::Type* type, co::uint32 depth )
 		return;
 
 	TypeDictionaryBuilder typeDictBuilder( type );
-	typeDictBuilder.buildMappingDict( co::TypeLoader::getCppBlockMap() );
+	typeDictBuilder.buildMappingDict();
 
 	// generate a mapping, unless the type is a component
 	if( type->getKind() != co::TK_COMPONENT )

@@ -10,7 +10,7 @@ function M:initialize( module )
 	-- test the co.getType() function
 	ASSERT_EQ( co.getType( "bool" ).fullName, "bool" )
 	ASSERT_EQ( co.getType( "co.ArrayType" ).name, "ArrayType" )
-	ASSERT_ERROR( function() co.getType( "nonExistingType" ) end, "error loading type 'nonExistingType'" )
+	ASSERT_ERROR( function() co.getType( "nonExistingType" ) end, "could not load type 'nonExistingType'" )
 
 	-- test the co.new() function
 	local testComponent = co.new( "moduleA.TestComponent" )
@@ -26,7 +26,7 @@ function M:initialize( module )
 	ASSERT_ERROR( function() co.new "co.Type" end, "co.Type is not instantiable" )
 	ASSERT_ERROR( function() co.new "co.SystemState" end, "co.SystemState is not instantiable" )
 	ASSERT_ERROR( function() co.new "int8" end, "int8 is not instantiable" )
-	ASSERT_ERROR( function() co.new "nonExistingType" end, "error loading type 'nonExistingType'" )
+	ASSERT_ERROR( function() co.new "nonExistingType" end, "could not load type 'nonExistingType'" )
 end
 
 return M

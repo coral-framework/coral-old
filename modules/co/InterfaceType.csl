@@ -12,6 +12,9 @@ interface InterfaceType : CompoundType, AttributeContainer, MethodContainer
 	// List of the interfaces that inherit directly from this interface.
 	readonly attribute InterfaceType[] subInterfaces;
 
+	// Block of C++ code that was parsed from this interface's CSL file. May be empty.
+	readonly attribute string cppBlock;
+
 	// Returns whether this InterfaceType descends from (or is equal to) a given InterfaceType.
 	bool isSubTypeOf( in InterfaceType itf );
 };

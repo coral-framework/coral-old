@@ -1,23 +1,19 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.MethodBuilder'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/MethodBuilder.h>
-#include <co/reserved/ReflectorBase.h>
 #include <co/DynamicProxyHandler.h>
-#include <co/ExceptionType.h>
-#include <co/Type.h>
 #include <co/TypeBuilder.h>
+#include <co/Type.h>
+#include <co/ExceptionType.h>
 #include <co/MethodInfo.h>
 #include <co/AttributeInfo.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -46,54 +42,56 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
-	// co::MethodBuilder Methods:
+	// co.MethodBuilder Methods:
 
 	const std::string& getMethodName()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodBuilder>( 0 ), __res );
-        return __res.get< const std::string& >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodBuilder>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< const std::string& >();
 	}
 
 	co::TypeBuilder* getTypeBuilder()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodBuilder>( 1 ), __res );
-        return __res.get< co::TypeBuilder* >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodBuilder>( 1 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::TypeBuilder* >();
 	}
 
-	void createMethod( )
+	void createMethod()
 	{
-		co::Any __res;
-		co::ArrayRange<co::Any const> __ar;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 2 ), __ar, __res );
+		co::Any res;
+		co::ArrayRange<co::Any const> range;
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 2 ), range, res );
 	}
 
-	void defineException( co::ExceptionType* exceptionType )
+	void defineException( co::ExceptionType* __exceptionType )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< co::ExceptionType* >( exceptionType );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 3 ), __ar, __res );
+		co::Any res, args[1];
+		args[0].set< co::ExceptionType* >( __exceptionType );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 3 ), range, res );
 	}
 
-	void defineParameter( const std::string& name, co::Type* type, bool input, bool output )
+	void defineParameter( const std::string& __name, co::Type* __type, bool __input, bool __output )
 	{
-		co::Any __res, __arg[4];
-		__arg[0].set< const std::string& >( name );
-		__arg[1].set< co::Type* >( type );
-		__arg[2].set< bool >( input );
-		__arg[3].set< bool >( output );
-		co::ArrayRange<co::Any const> __ar( __arg, 4 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 4 ), __ar, __res );
+		co::Any res, args[4];
+		args[0].set< const std::string& >( __name );
+		args[1].set< co::Type* >( __type );
+		args[2].set< bool >( __input );
+		args[3].set< bool >( __output );
+		co::ArrayRange<co::Any const> range( args, 4 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 4 ), range, res );
 	}
 
-	void defineReturnType( co::Type* type )
+	void defineReturnType( co::Type* __type )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< co::Type* >( type );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 5 ), __ar, __res );
+		co::Any res, args[1];
+		args[0].set< co::Type* >( __type );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 5 ), range, res );
 	}
 
 protected:
@@ -169,7 +167,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		co::MethodBuilder* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -185,26 +183,26 @@ public:
 				break;
 			case 3:
 				{
-					co::ExceptionType* exceptionType = args[++argIndex].get< co::ExceptionType* >();
+					co::ExceptionType* __exceptionType = args[++argIndex].get< co::ExceptionType* >();
 					argIndex = -1;
-					p->defineException( exceptionType );
+					p->defineException( __exceptionType );
 				}
 				break;
 			case 4:
 				{
-					const std::string& name = args[++argIndex].get< const std::string& >();
-					co::Type* type = args[++argIndex].get< co::Type* >();
-					bool input = args[++argIndex].get< bool >();
-					bool output = args[++argIndex].get< bool >();
+					const std::string& __name = args[++argIndex].get< const std::string& >();
+					co::Type* __type = args[++argIndex].get< co::Type* >();
+					bool __input = args[++argIndex].get< bool >();
+					bool __output = args[++argIndex].get< bool >();
 					argIndex = -1;
-					p->defineParameter( name, type, input, output );
+					p->defineParameter( __name, __type, __input, __output );
 				}
 				break;
 			case 5:
 				{
-					co::Type* type = args[++argIndex].get< co::Type* >();
+					co::Type* __type = args[++argIndex].get< co::Type* >();
 					argIndex = -1;
-					p->defineReturnType( type );
+					p->defineReturnType( __type );
 				}
 				break;
 			default:
@@ -221,7 +219,7 @@ public:
 		{
 			throw;
 		}
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:
@@ -244,7 +242,7 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-		return reinterpret_cast<co::MethodBuilder*>( instance.getState().data.ptr );
+		return dynamic_cast<co::MethodBuilder*>( instance.getState().data.itf );
 	}
 };
 

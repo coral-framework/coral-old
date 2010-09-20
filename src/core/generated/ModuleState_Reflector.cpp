@@ -1,11 +1,7 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.ModuleState'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/ModuleState.h>
 #include <co/reserved/ReflectorBase.h>

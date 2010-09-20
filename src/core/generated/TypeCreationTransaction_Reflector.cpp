@@ -1,14 +1,9 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.TypeCreationTransaction'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/TypeCreationTransaction.h>
-#include <co/reserved/ReflectorBase.h>
 #include <co/DynamicProxyHandler.h>
 #include <co/TypeBuilder.h>
 #include <co/MethodInfo.h>
@@ -16,6 +11,7 @@
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -44,27 +40,28 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
-	// co::TypeCreationTransaction Methods:
+	// co.TypeCreationTransaction Methods:
 
 	co::ArrayRange<co::TypeBuilder* const> getTypeBuilders()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::TypeCreationTransaction>( 0 ), __res );
-        return __res.get< co::ArrayRange<co::TypeBuilder* const> >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::TypeCreationTransaction>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ArrayRange<co::TypeBuilder* const> >();
 	}
 
-	void commit( )
+	void commit()
 	{
-		co::Any __res;
-		co::ArrayRange<co::Any const> __ar;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeCreationTransaction>( 1 ), __ar, __res );
+		co::Any res;
+		co::ArrayRange<co::Any const> range;
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeCreationTransaction>( 1 ), range, res );
 	}
 
-	void rollback( )
+	void rollback()
 	{
-		co::Any __res;
-		co::ArrayRange<co::Any const> __ar;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeCreationTransaction>( 2 ), __ar, __res );
+		co::Any res;
+		co::ArrayRange<co::Any const> range;
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeCreationTransaction>( 2 ), range, res );
 	}
 
 protected:
@@ -138,7 +135,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		co::TypeCreationTransaction* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -171,7 +168,7 @@ public:
 		{
 			throw;
 		}
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:
@@ -194,7 +191,7 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-		return reinterpret_cast<co::TypeCreationTransaction*>( instance.getState().data.ptr );
+		return dynamic_cast<co::TypeCreationTransaction*>( instance.getState().data.itf );
 	}
 };
 

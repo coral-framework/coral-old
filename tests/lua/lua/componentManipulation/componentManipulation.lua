@@ -14,7 +14,8 @@ function M:initialize( module )
 		"attribute 'componentType' is read-only and cannot be changed" )
 
 	-- test getting a non-existing component interface
-	ASSERT_ERROR( function() return testComponent.nonExistingItf end, "non-existing member 'nonExistingItf'" )
+	ASSERT_EQ( testComponent.nonExistingItf, nil )
+	-- Previously: ASSERT_ERROR( function() return testComponent.nonExistingItf end, "non-existing member 'nonExistingItf'" )
 
 	-- test getting existing interfaces
 	ASSERT_EQ( testComponent.testInterface.interfaceName, "testInterface" )

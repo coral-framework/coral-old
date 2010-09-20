@@ -1,23 +1,19 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.EnumType'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/EnumType.h>
-#include <co/reserved/ReflectorBase.h>
 #include <co/DynamicProxyHandler.h>
-#include <co/Namespace.h>
 #include <co/Reflector.h>
+#include <co/Namespace.h>
 #include <co/Uuid.h>
 #include <co/MethodInfo.h>
 #include <co/AttributeInfo.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -46,80 +42,89 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
-	// co::Type Methods:
+	// co.Type Methods:
 
 	const co::Uuid& getBinarySignature()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 0 ), __res );
-        return __res.get< const co::Uuid& >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< const co::Uuid& >();
 	}
 
 	const std::string& getFullName()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 1 ), __res );
-        return __res.get< const std::string& >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 1 ), res );
+		assert( res.containsObject() == false );
+        return res.get< const std::string& >();
 	}
 
 	const co::Uuid& getFullSignature()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 2 ), __res );
-        return __res.get< const co::Uuid& >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 2 ), res );
+		assert( res.containsObject() == false );
+        return res.get< const co::Uuid& >();
 	}
 
 	co::TypeKind getKind()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 3 ), __res );
-        return __res.get< co::TypeKind >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 3 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::TypeKind >();
 	}
 
 	const std::string& getName()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 4 ), __res );
-        return __res.get< const std::string& >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 4 ), res );
+		assert( res.containsObject() == false );
+        return res.get< const std::string& >();
 	}
 
 	co::Namespace* getNamespace()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 5 ), __res );
-        return __res.get< co::Namespace* >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 5 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::Namespace* >();
 	}
 
 	co::Reflector* getReflector()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 6 ), __res );
-        return __res.get< co::Reflector* >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 6 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::Reflector* >();
 	}
 
-	void setReflector( co::Reflector* reflector )
+	void setReflector( co::Reflector* __reflector )
 	{
-		co::Any __arg;
-		__arg.set< co::Reflector* >( reflector );
-		_handler->handleSetAttribute( _cookie, getAttribInfo<co::Type>( 6 ), __arg );
+		co::Any arg;
+		arg.set< co::Reflector* >( __reflector );
+		_handler->handleSetAttribute( _cookie, getAttribInfo<co::Type>( 6 ), arg );
 	}
 
-	// co::EnumType Methods:
+	// co.EnumType Methods:
 
 	co::ArrayRange<std::string const> getIdentifiers()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::EnumType>( 0 ), __res );
-        return __res.get< co::ArrayRange<std::string const> >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::EnumType>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ArrayRange<std::string const> >();
 	}
 
-	co::int32 getValueOf( const std::string& identifier )
+	co::int32 getValueOf( const std::string& __identifier )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< const std::string& >( identifier );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::EnumType>( 1 ), __ar, __res );
-		return __res.get< co::int32 >();
+		co::Any res, args[1];
+		args[0].set< const std::string& >( __identifier );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::EnumType>( 1 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< co::int32 >();
 	}
 
 protected:
@@ -193,7 +198,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		co::EnumType* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -204,9 +209,9 @@ public:
 			{
 			case 1:
 				{
-					const std::string& identifier = args[++argIndex].get< const std::string& >();
+					const std::string& __identifier = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					__res.set< co::int32 >( p->getValueOf( identifier ) );
+					res.set< co::int32 >( p->getValueOf( __identifier ) );
 				}
 				break;
 			default:
@@ -223,7 +228,7 @@ public:
 		{
 			throw;
 		}
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:
@@ -246,7 +251,7 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-		return reinterpret_cast<co::EnumType*>( instance.getState().data.ptr );
+		return dynamic_cast<co::EnumType*>( instance.getState().data.itf );
 	}
 };
 

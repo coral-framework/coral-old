@@ -1,22 +1,18 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.Module'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/Module.h>
-#include <co/reserved/ReflectorBase.h>
 #include <co/DynamicProxyHandler.h>
-#include <co/ModulePart.h>
 #include <co/Namespace.h>
+#include <co/ModulePart.h>
 #include <co/MethodInfo.h>
 #include <co/AttributeInfo.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -45,69 +41,72 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
-	// co::Module Methods:
+	// co.Module Methods:
 
 	co::Namespace* getNamespace()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Module>( 0 ), __res );
-        return __res.get< co::Namespace* >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Module>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::Namespace* >();
 	}
 
 	co::ArrayRange<co::ModulePart* const> getParts()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Module>( 1 ), __res );
-        return __res.get< co::ArrayRange<co::ModulePart* const> >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Module>( 1 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ArrayRange<co::ModulePart* const> >();
 	}
 
 	co::ModuleState getState()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Module>( 2 ), __res );
-        return __res.get< co::ModuleState >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Module>( 2 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ModuleState >();
 	}
 
-	void abort( )
+	void abort()
 	{
-		co::Any __res;
-		co::ArrayRange<co::Any const> __ar;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 3 ), __ar, __res );
+		co::Any res;
+		co::ArrayRange<co::Any const> range;
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 3 ), range, res );
 	}
 
-	void disintegrate( )
+	void disintegrate()
 	{
-		co::Any __res;
-		co::ArrayRange<co::Any const> __ar;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 4 ), __ar, __res );
+		co::Any res;
+		co::ArrayRange<co::Any const> range;
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 4 ), range, res );
 	}
 
-	void dispose( )
+	void dispose()
 	{
-		co::Any __res;
-		co::ArrayRange<co::Any const> __ar;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 5 ), __ar, __res );
+		co::Any res;
+		co::ArrayRange<co::Any const> range;
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 5 ), range, res );
 	}
 
-	void initialize( )
+	void initialize()
 	{
-		co::Any __res;
-		co::ArrayRange<co::Any const> __ar;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 6 ), __ar, __res );
+		co::Any res;
+		co::ArrayRange<co::Any const> range;
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 6 ), range, res );
 	}
 
-	void integrate( )
+	void integrate()
 	{
-		co::Any __res;
-		co::ArrayRange<co::Any const> __ar;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 7 ), __ar, __res );
+		co::Any res;
+		co::ArrayRange<co::Any const> range;
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 7 ), range, res );
 	}
 
-	void integratePresentation( )
+	void integratePresentation()
 	{
-		co::Any __res;
-		co::ArrayRange<co::Any const> __ar;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 8 ), __ar, __res );
+		co::Any res;
+		co::ArrayRange<co::Any const> range;
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 8 ), range, res );
 	}
 
 protected:
@@ -185,7 +184,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		co::Module* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -238,7 +237,7 @@ public:
 		{
 			throw;
 		}
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:
@@ -261,7 +260,7 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-		return reinterpret_cast<co::Module*>( instance.getState().data.ptr );
+		return dynamic_cast<co::Module*>( instance.getState().data.itf );
 	}
 };
 

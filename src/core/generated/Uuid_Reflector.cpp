@@ -1,19 +1,15 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.Uuid'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <Uuid_Adapter.h>
-#include <co/reserved/ReflectorBase.h>
 #include <co/MethodInfo.h>
 #include <co/AttributeInfo.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -50,9 +46,9 @@ public:
 		new( address ) co::Uuid;
     }
 
-	void copyValue( void* fromAddress, void* toAddress )
+	void copyValue( const void* fromAddress, void* toAddress )
 	{
-		*reinterpret_cast<co::Uuid*>( toAddress ) = *reinterpret_cast<co::Uuid*>( fromAddress );
+		*reinterpret_cast<co::Uuid*>( toAddress ) = *reinterpret_cast<const co::Uuid*>( fromAddress );
     }
 
 	void destroyValue( void* address )
@@ -82,7 +78,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		co::Uuid& r = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -103,23 +99,23 @@ public:
 				break;
 			case 3:
 				{
-					const std::string& data = args[++argIndex].get< const std::string& >();
+					const std::string& __data = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					co::Uuid_Adapter::createSha1( r, data );
+					co::Uuid_Adapter::createSha1( r, __data );
 				}
 				break;
 			case 4:
 				{
-					std::string& str = args[++argIndex].get< std::string& >();
+					std::string& __str = args[++argIndex].get< std::string& >();
 					argIndex = -1;
-					co::Uuid_Adapter::getString( r, str );
+					co::Uuid_Adapter::getString( r, __str );
 				}
 				break;
 			case 5:
 				{
-					const std::string& str = args[++argIndex].get< const std::string& >();
+					const std::string& __str = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					co::Uuid_Adapter::setString( r, str );
+					co::Uuid_Adapter::setString( r, __str );
 				}
 				break;
 			default:
@@ -136,7 +132,7 @@ public:
 		{
 			throw;
 		}
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:

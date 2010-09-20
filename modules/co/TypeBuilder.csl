@@ -62,9 +62,9 @@ interface TypeBuilder
 	/*
 		Defines the parameters to create a NativeClassType.
 		\throw UnsupportedOperationException if the builder's kind is not TK_NATIVECLASS or if the type was already created.
-		\throw IllegalArgumentException if the passed \c nativeName or \c headerName parameters are empty.
+		\throw IllegalArgumentException if the passed \c nativeHeaderFile or \c nativeName parameters are empty.
 	 */
-	void defineNativeClass( in string nativeName,  in string headerName )
+	void defineNativeClass( in string nativeHeaderFile,  in string nativeName )
 		raises UnsupportedOperationException, IllegalNameException;
 
 	/*

@@ -366,41 +366,41 @@ public:
 		if( _attributes.empty() && _methods.empty() )
 			CORAL_THROW( co::MissingInputException, "missing native class contents" );
 
-		if( _nativeClassHeaderName.empty() )
+		if( _nativeHeaderFile.empty() )
 			CORAL_THROW( co::MissingInputException, "missing native class header name" );
 
-		if( _nativeClassName.empty() )
+		if( _nativeName.empty() )
 			CORAL_THROW( co::MissingInputException, "missing native class name" );
 	}
 
 	void fillType()
 	{
-		_myType->setHeaderName( _nativeClassHeaderName );
-		_myType->setNativeName( _nativeClassName );
+		_myType->setNativeHeaderFile( _nativeHeaderFile );
+		_myType->setNativeName( _nativeName );
 
 		_myType->addMembers( _attributes );
 		_myType->addMembers( _methods );
 		_myType->sortMembers( _myType );
 	}
 
-	void defineNativeClass( const std::string& headerName, const std::string& nativeName )
+	void defineNativeClass( const std::string& nativeHeaderFile, const std::string& nativeName )
 	{
 		assertNotCreated();
 
-		if( headerName.empty() )
+		if( nativeHeaderFile.empty() )
 			CORAL_THROW( co::IllegalArgumentException, "illegal empty header name" );
 
 		if( nativeName.empty() )
 			CORAL_THROW( co::IllegalArgumentException, "illegal empty native type name" );
-		
-		_nativeClassName = nativeName;
-		_nativeClassHeaderName = headerName;
+
+		_nativeHeaderFile = nativeHeaderFile;
+		_nativeName = nativeName;
 	}
 
 private:
 	NativeClassType* _myType;
-	std::string _nativeClassName;
-	std::string _nativeClassHeaderName;
+	std::string _nativeHeaderFile;
+	std::string _nativeName;
 };
 
 // ------ InterfaceTypeBuilder ----------------------------------------------------

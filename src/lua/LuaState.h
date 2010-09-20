@@ -6,69 +6,91 @@
 #ifndef _LUASTATE_H_
 #define _LUASTATE_H_
 
-#include <co/AnyValue.h>
+#include "Universe_Base.h"
 #include <lua.hpp>
 
 /*!
-	Singleton that manages a Lua universe and provides
-	methods to exchange values between Lua and Coral.
+	A static component class that manages a Lua universe and
+	provides methods to exchange values between Lua and Coral.
+ 
+	All instances of this component share the same state.
+ 
+	\warning
+	All functions taking a lua_State in this module must be called with either
+	the lua_State returned by LuaState::getL(), or a Lua thread	created by it.
+	Currently we do NOT support working with multiple independent lua_States.
  */
-class LuaState
+class LuaState : public lua::Universe_Base
 {
 public:
-	static inline LuaState& instance() { return sm_instance; }
+	//! Returns our Lua universe (a main thread).
+	static inline lua_State* getL() { return sm_L; }
 
-public:
-    LuaState();
-	~LuaState();
+	//! Creates and sets up our Lua universe.
+	static void setup();
 
-	void setup();
-	void tearDown();
-
-	//! Returns the underlying lua_State*.
-	inline lua_State* get() const { return _L; }
+	//! Closes our Lua universe.
+	static void tearDown();
 
 	//! Debug method: prints the Lua stack to stdout.
-	void dumpStack();
+	static void dumpStack( lua_State* L );
 
-	//! Loads a chunk from a file. On error, raises a lua::Exception.
-	void loadFile( const std::string& filename );
+	/*!
+		Searches for a Lua file with the given 'name' in the CORAL_PATH.
+		The search follows the same conventions used for locating Lua packages.
+		Returns false if no script could be found.
+	 */
+	static bool searchScriptFile( const std::string& name, std::string& filename );
 
-	//! Calls the Lua function on the stack top. On error, raises a lua::Exception.
-	void call( int numArgs, int numResults );
+	//! Pushes a chunk loaded from a file. On error, raises a lua::Exception.
+	static void loadFile( lua_State* L, const std::string& filename );
 
-	//! Pushes any Coral value onto the stack.
+	/*!
+		Calls a Lua function using the same conventions as lua_call().
+		On error, raises a lua::Exception.
+	 */
+	static void call( lua_State* L, co::int32 numArgs, co::int32 numResults );
+
+	//! Pushes any Coral value onto the Lua stack.
 	//@{
-	void push( const co::Any& var, int depth = 0 );
-	void push( const std::string& str );
-	void push( co::Interface* itf );
-	void push( co::Component* component );
+	static void push( lua_State* L, const co::Any& var );
+	static void push( lua_State* L, const co::Any& var, int depth );
+	static void push( lua_State* L, const std::string& str );
+	static void push( lua_State* L, co::Interface* itf );
+	static void push( lua_State* L, co::Component* component );
 	//@}
 
 	/*!
 		Reads a value from the stack, using \c expectedType to help interpret the value.
-		The result is returned in \c variable. Non-primitive values are allocated in \c value.
-		If the value at the specified index is not a valid Coral value, raises a lua::Exception.
+		The result is returned in \c var. If the value at the specified index is not a
+		valid Coral value, raises a lua::Exception.
 	 */
-	void toCoral( int index, co::Type* expectedType, co::Any& var, co::AnyValue& value );
+	static void toCoral( lua_State* L, int index, co::Type* expectedType, co::Any& var );
+
+public:
+    LuaState();
+	virtual ~LuaState();
+
+	// These methods delegate calls to their static counterparts, with L = LuaState::getL().
+	bool searchScript( const std::string& name, std::string& filename );
+	void loadFile( const std::string& filename );
+	void call( co::int32 numArgs, co::int32 numResults );
+	void push( const co::Any& var );
 
 private:
 	template<typename BindingClass, typename InstanceType>
-	inline void pushInstance( InstanceType* ptr );
+	static inline void pushInstance( lua_State* L, InstanceType* ptr );
 
-	void pushInstancesTable();
+	static void pushInstancesTable( lua_State* L );
 
-	void pushArray( const co::Any& var );
-	void toArray( int index, co::Type* expectedType, co::Any& var, co::AnyValue& value );
+	static void pushArray( lua_State* L, const co::Any& var );
+	static void toArray( lua_State* L, int index, co::Type* expectedType, co::Any& var );
 
-	void raiseException( int errorCode );
-
-private:
-	static LuaState sm_instance;
+	static void raiseException( lua_State* L, int errorCode );
 
 private:
-	lua_State* _L;
-	int _instancesTableRegIdx;
+	static lua_State* sm_L;
+	static int sm_instancesTableRegIdx;
 };
 
 #endif

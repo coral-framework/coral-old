@@ -8,17 +8,14 @@ PROJECT( MODULE_LUA )
 # Build the 'lua' module library
 ################################################################################
 
-# Build the embedded Lua 5.2 library as a dependency
-ADD_SUBDIRECTORY( lua52 )
+# Compile the embedded Lua libraries into a static library
+ADD_SUBDIRECTORY( libs )
 
-# Run the coral compiler on the module
-SET( CORAL_PATH "${CMAKE_SOURCE_DIR}/modules" )
-CORAL_GENERATE_MODULE( GENERATED_LUA_SOURCES lua )
-
-INCLUDE_DIRECTORIES( lua52 ${CMAKE_CURRENT_BINARY_DIR}/generated )
+INCLUDE_DIRECTORIES( libs/lua libs/lfs generated ${CORE_SOURCE_DIR}/generated )
 
 FILE( GLOB HEADER_FILES *.h )
 FILE( GLOB SOURCE_FILES *.cpp )
+FILE( GLOB GENERATED_LUA_SOURCES generated/*.cpp )
 
 ADD_LIBRARY( lua MODULE ${HEADER_FILES} ${SOURCE_FILES} ${GENERATED_LUA_SOURCES} )
 
@@ -28,7 +25,7 @@ SET_TARGET_PROPERTIES( lua PROPERTIES
 	PROJECT_LABEL "Module Lua"
 )
 
-TARGET_LINK_LIBRARIES( lua lua52 core )
+TARGET_LINK_LIBRARIES( lua lualibs core )
 
 ################################################################################
 # Source Groups

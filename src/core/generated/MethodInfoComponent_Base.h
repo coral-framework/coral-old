@@ -1,17 +1,13 @@
-/*******************************************************************************
-** Base class generated for component 'co.MethodInfoComponent'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #ifndef _CO_METHODINFOCOMPONENT_BASE_H_
 #define _CO_METHODINFOCOMPONENT_BASE_H_
 
-#include <co/reserved/ComponentBase.h>
 #include <co/MethodInfo.h>
+#include <co/reserved/ComponentBase.h>
 
 namespace co {
 

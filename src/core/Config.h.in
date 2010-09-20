@@ -14,7 +14,7 @@
 //! Coral version string.
 #define CORAL_VERSION_STR	"${CORAL_VERSION}"
 
-//! Generated code is only compatible when they are at the same revision as this Coral version.
+//! Generated code is only compatible when they are at this revision number.
 #define CORAL_COMPILER_OUTPUT_REVISION	${CORAL_COMPILER_OUTPUT_REVISION}
 
 //! Equivalent to <tt>sizeof(void*)</tt>.

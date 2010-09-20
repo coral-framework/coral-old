@@ -1,11 +1,7 @@
-/*******************************************************************************
-** C++ mapping generated for type 'co.TypeBuilder'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #ifndef _CO_TYPEBUILDER_H_
 #define _CO_TYPEBUILDER_H_
@@ -47,7 +43,7 @@ public:
 
 	virtual co::MethodBuilder* defineMethod( const std::string& name ) = 0;
 
-	virtual void defineNativeClass( const std::string& nativeName, const std::string& headerName ) = 0;
+	virtual void defineNativeClass( const std::string& nativeHeaderFile, const std::string& nativeName ) = 0;
 
 	virtual void defineSuperType( co::Type* superType ) = 0;
 };

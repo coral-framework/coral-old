@@ -24,7 +24,7 @@ function M:initialize( module )
 	ASSERT_ERROR( function() vec2d.length = 2 end, "attribute 'length' is read-only and cannot be changed" )
 
 	-- test getting a non-existing attribute
-	ASSERT_ERROR( function() return vec2d.dummy end, "non-existing member 'dummy'" )
+	ASSERT_EQ( vec2d.dummy, nil )
 
 	-- test the get/set methods
 	vec2d:set( 3, 7 )

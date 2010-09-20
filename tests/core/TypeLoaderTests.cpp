@@ -4,6 +4,7 @@
  */
 
 #include "CSLTester.h"
+#include <co/TypeManager.h>
 #include <co/InterfaceType.h>
 #include <co/AttributeInfo.h>
 #include <gtest/gtest.h>
@@ -73,112 +74,75 @@ TEST( TypeLoaderTests, syntaxError )
 	CSL_TEST_END()
 }
 
-#define DECL_TYPE_LOADER( varName, typeName ) \
-	co::TypeLoader varName( typeName, co::getPaths(), co::getSystem()->getTypes() )
-
-typedef co::TypeLoader::DocMap DocMap;
-const DocMap& docMap = co::TypeLoader::getDocMap();
-
-TEST( TypeLoaderTests, interfaceDocMapLoading )
+inline const std::string& getDoc( const char* typeOrMemberName )
 {
-	DECL_TYPE_LOADER( loader, "TypeLoaderTests.SingleFileDocMapLoading.DocumentedInterface" );
-	loader.loadType();
-
-	ASSERT_TRUE( loader.getError() == NULL ) << loader.getError()->getMessage();
-
-	// check if the members are all in the map.
-	DocMap::const_iterator interfaceDoc = docMap.find( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedInterface" );
-	DocMap::const_iterator nameDoc = docMap.find( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedInterface:name" );
-	DocMap::const_iterator fooDoc = docMap.find( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedInterface:foo" );
-
-	ASSERT_TRUE( interfaceDoc != docMap.end() );
-	ASSERT_TRUE( nameDoc != docMap.end() );
-	ASSERT_TRUE( fooDoc != docMap.end() );
-
-	EXPECT_EQ( "// This is the interface Declaration\n/* \n\tThat could be a multi-line comment\n*/", interfaceDoc->second );
-	EXPECT_EQ( "// and this is the attribute doc.\n", nameDoc->second );
-	EXPECT_EQ( "// foo method declaration.\n// using separated.\n/* documentation lines.*/", fooDoc->second );
+	return co::getSystem()->getTypes()->getDocumentation( typeOrMemberName );
 }
 
-TEST( TypeLoaderTests, structDocMapLoading )
+TEST( TypeLoaderTests, interfaceDocs )
 {
-	DECL_TYPE_LOADER( loader, "TypeLoaderTests.SingleFileDocMapLoading.DocumentedStruct" );
-	loader.loadType();
+	CSL_TEST( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedInterface" );
 
-	ASSERT_TRUE( loader.getError() == NULL ) << loader.getError()->getMessage();
+	const std::string& interfaceDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedInterface" );
+	const std::string& nameDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedInterface:name" );
+	const std::string& fooDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedInterface:foo" );
 
-	// check if the members are all in the map.
-	DocMap::const_iterator structDoc = docMap.find( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedStruct" );
-	DocMap::const_iterator nameDoc = docMap.find( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedStruct:name" );
-	DocMap::const_iterator fooDoc = docMap.find( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedStruct:foo" );
-
-	ASSERT_TRUE( structDoc != docMap.end() );
-	ASSERT_TRUE( nameDoc != docMap.end() );
-	ASSERT_TRUE( fooDoc != docMap.end() );
-
-	EXPECT_EQ( "//Struct Declaration\n", structDoc->second );
-	EXPECT_EQ( "// struct member.\n//< extra doc.\n", nameDoc->second );
-	EXPECT_EQ( "//< postDoc.\n", fooDoc->second );
+	EXPECT_EQ( "// This is the interface Declaration\n/* \n\tThat could be a multi-line comment\n*/", interfaceDoc );
+	EXPECT_EQ( "// and this is the attribute doc.\n", nameDoc );
+	EXPECT_EQ( "// foo method declaration.\n// using separated.\n/* documentation lines.*/", fooDoc );
 }
 
-TEST( TypeLoaderTests, enumDocMapLoading )
+TEST( TypeLoaderTests, structDocs )
 {
-	DECL_TYPE_LOADER( loader, "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum" );
-	loader.loadType();
+	CSL_TEST( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedStruct" );
 
-	ASSERT_TRUE( loader.getError() == NULL ) << loader.getError()->getMessage();
+	const std::string& structDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedStruct" );
+	const std::string& nameDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedStruct:name" );
+	const std::string& fooDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedStruct:foo" );
 
-	// check if the members are all in the map.
-	DocMap::const_iterator enumDoc = docMap.find( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum" );
-	DocMap::const_iterator firstDoc = docMap.find( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum:first" );
-	DocMap::const_iterator secondDoc = docMap.find( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum:second" );
-	DocMap::const_iterator thirdDoc = docMap.find( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum:third" );
-
-	ASSERT_TRUE( enumDoc != docMap.end() );
-	ASSERT_TRUE( firstDoc != docMap.end() );
-	ASSERT_TRUE( secondDoc != docMap.end() );
-	ASSERT_TRUE( thirdDoc == docMap.end() );
-
-	EXPECT_EQ( "// This is the Enum Declaration\n", enumDoc->second );
-	EXPECT_EQ( "// doc for first.\n//< second doc for first.\n", firstDoc->second );
-	EXPECT_EQ( "//< doc for second.\n", secondDoc->second );
+	EXPECT_EQ( "//Struct Declaration\n", structDoc );
+	EXPECT_EQ( "// struct member.\n//< extra doc.\n", nameDoc );
+	EXPECT_EQ( "//< postDoc.\n", fooDoc );
 }
 
-TEST( TypeLoaderTests, componentDocMapLoading )
+TEST( TypeLoaderTests, enumDocs )
 {
-	DECL_TYPE_LOADER( loader, "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent" );
-	loader.loadType();
+	CSL_TEST( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum" );
 
-	ASSERT_TRUE( loader.getError() == NULL ) << loader.getError()->getMessage();
+	const std::string& enumDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum" );
+	const std::string& firstDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum:first" );
+	const std::string& secondDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum:second" );
+	const std::string& thirdDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum:third" );
 
-	// check if the members are all in the map.
-	DocMap::const_iterator componentDoc = docMap.find( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent" );
-	DocMap::const_iterator providedDoc = docMap.find( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent:providedInterface" );
-	DocMap::const_iterator requiredDoc = docMap.find( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent:requiredInterface" );
-	DocMap::const_iterator notDoc = docMap.find( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent:providedInterfaceNotDocumented" );
-
-	ASSERT_TRUE( componentDoc != docMap.end() );
-	ASSERT_TRUE( providedDoc != docMap.end() );
-	ASSERT_TRUE( requiredDoc != docMap.end() );
-	ASSERT_TRUE( notDoc == docMap.end() );
-
-	EXPECT_EQ( "//Component Declaration\n", componentDoc->second );
-	EXPECT_EQ( "// provided\n", providedDoc->second );
-	EXPECT_EQ( "//< Required interface\n", requiredDoc->second );
+	EXPECT_EQ( "// This is the Enum Declaration\n", enumDoc );
+	EXPECT_EQ( "// doc for first.\n//< second doc for first.\n", firstDoc );
+	EXPECT_EQ( "//< doc for second.\n", secondDoc );
+	EXPECT_TRUE( thirdDoc.empty() );
 }
 
-TEST( TypeLoaderTests, dependencyDocMapLoading )
+TEST( TypeLoaderTests, componentDocs )
 {
-	DECL_TYPE_LOADER( loader, "TypeLoaderTests.DependencyDocMapLoading.StartingType" );
-	loader.loadType();
+	CSL_TEST( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent" );
 
-	ASSERT_TRUE( loader.getError() == NULL ) << loader.getError()->getMessage();
+	const std::string& componentDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent" );
+	const std::string& providedDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent:providedInterface" );
+	const std::string& requiredDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent:requiredInterface" );
+	const std::string& notDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent:providedInterfaceNotDocumented" );
 
-	// check if the members are all in the map.
-	EXPECT_TRUE( docMap.find( "TypeLoaderTests.DependencyDocMapLoading.StartingType" ) != docMap.end() );
-	EXPECT_TRUE( docMap.find( "TypeLoaderTests.DependencyDocMapLoading.StartingType:dep" ) != docMap.end() );
-	EXPECT_TRUE( docMap.find( "TypeLoaderTests.DependencyDocMapLoading.DependencyType" ) != docMap.end() );
-	EXPECT_TRUE( docMap.find( "TypeLoaderTests.DependencyDocMapLoading.DependencyType:name" ) != docMap.end() );
+	EXPECT_EQ( "//Component Declaration\n", componentDoc );
+	EXPECT_EQ( "// provided\n", providedDoc );
+	EXPECT_EQ( "//< Required interface\n", requiredDoc );
+	EXPECT_TRUE( notDoc.empty() );
+}
+
+TEST( TypeLoaderTests, dependencyDocs )
+{
+	CSL_TEST( "TypeLoaderTests.DependencyDocMapLoading.StartingType" );
+
+	EXPECT_FALSE( getDoc( "TypeLoaderTests.DependencyDocMapLoading.StartingType" ).empty() );
+	EXPECT_FALSE( getDoc( "TypeLoaderTests.DependencyDocMapLoading.StartingType:dep" ).empty() );
+	EXPECT_FALSE( getDoc( "TypeLoaderTests.DependencyDocMapLoading.DependencyType" ).empty() );
+	EXPECT_FALSE( getDoc( "TypeLoaderTests.DependencyDocMapLoading.DependencyType:name" ).empty() );
 }
 
 TEST( TypeLoaderTests, nestedErrors )
@@ -238,35 +202,22 @@ TEST( TypeLoaderTests, importAfterTypeSpecification )
 	CSL_TEST_END()
 }
 
-typedef co::TypeLoader::CppBlockMap CppBlockMap;
-const CppBlockMap& cppBlockMap = co::TypeLoader::getCppBlockMap();
-
 TEST( TypeLoaderTests, singleCppBlock )
 {
-	DECL_TYPE_LOADER( loader, "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" );
-	loader.loadType();
+	CSL_TEST( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" );
+	
+	co::InterfaceType* it = dynamic_cast<co::InterfaceType*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" ) );
+	ASSERT_TRUE( it );
 
-	ASSERT_TRUE( loader.getError() == NULL ) << loader.getError()->getMessage();
-
-	// check if the members are all in the map.
-	CppBlockMap::const_iterator interfaceCppBlock = cppBlockMap.find( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" );
-
-	ASSERT_TRUE( interfaceCppBlock != cppBlockMap.end() );
-
-	EXPECT_EQ( "\n\t//This code block was injected by the compiler using the '<c++' tag\n\tvoid myInjectedFoo() {;}\n\t", interfaceCppBlock->second );
+	EXPECT_EQ( "\n\t//This code block was injected by the compiler using the '<c++' tag\n\tvoid myInjectedFoo() {;}\n\t", it->getCppBlock() );
 }
 
 TEST( TypeLoaderTests, multipleCppBlocks )
 {
-	DECL_TYPE_LOADER( loader, "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" );
-	loader.loadType();
+	CSL_TEST( "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" );
 
-	ASSERT_TRUE( loader.getError() == NULL ) << loader.getError()->getMessage();
+	co::InterfaceType* it = dynamic_cast<co::InterfaceType*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" ) );
+	ASSERT_TRUE( it );
 
-	// check if the members are all in the map.
-	CppBlockMap::const_iterator interfaceCppBlock = cppBlockMap.find( "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" );
-
-	ASSERT_TRUE( interfaceCppBlock != cppBlockMap.end() );
-
-	EXPECT_EQ( "\n\tvoid myInjectedFoo() {;}\n\t\n\tvoid myLastInjectedFoo() {;}\n\t", interfaceCppBlock->second );
+	EXPECT_EQ( "\n\tvoid myInjectedFoo() {;}\n\t\n\tvoid myLastInjectedFoo() {;}\n\t", it->getCppBlock() );
 }

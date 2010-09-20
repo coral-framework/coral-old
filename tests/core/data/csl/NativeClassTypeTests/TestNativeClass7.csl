@@ -1,4 +1,4 @@
-native class TestNativeClass7 ( <> a::_ )
+native class TestNativeClass7 ( <x> a::_ )
 {
 
 

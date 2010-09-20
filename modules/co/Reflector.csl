@@ -26,7 +26,7 @@ interface Reflector
 			The copy is done using the type's assignment operator.
 			\warning Both pointers must point to instances of this exact 'type'.
 		 */
-		virtual void copyValue( void* fromAddress, void* toAddress ) = 0;
+		virtual void copyValue( const void* fromAddress, void* toAddress ) = 0;
 
 		/*!
 			Destroys the struct or native class instance located at \c address.

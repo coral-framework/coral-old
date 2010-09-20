@@ -1,14 +1,9 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.ModulePartLoader'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/ModulePartLoader.h>
-#include <co/reserved/ReflectorBase.h>
 #include <co/DynamicProxyHandler.h>
 #include <co/ModulePart.h>
 #include <co/MethodInfo.h>
@@ -16,6 +11,7 @@
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -44,24 +40,26 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
-	// co::ModulePartLoader Methods:
+	// co.ModulePartLoader Methods:
 
-	bool canLoadModulePart( const std::string& moduleName )
+	bool canLoadModulePart( const std::string& __moduleName )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< const std::string& >( moduleName );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePartLoader>( 0 ), __ar, __res );
-		return __res.get< bool >();
+		co::Any res, args[1];
+		args[0].set< const std::string& >( __moduleName );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePartLoader>( 0 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< bool >();
 	}
 
-	co::ModulePart* loadModulePart( const std::string& moduleName )
+	co::ModulePart* loadModulePart( const std::string& __moduleName )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< const std::string& >( moduleName );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePartLoader>( 1 ), __ar, __res );
-		return __res.get< co::ModulePart* >();
+		co::Any res, args[1];
+		args[0].set< const std::string& >( __moduleName );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePartLoader>( 1 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< co::ModulePart* >();
 	}
 
 protected:
@@ -127,7 +125,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		co::ModulePartLoader* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -138,16 +136,16 @@ public:
 			{
 			case 0:
 				{
-					const std::string& moduleName = args[++argIndex].get< const std::string& >();
+					const std::string& __moduleName = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					__res.set< bool >( p->canLoadModulePart( moduleName ) );
+					res.set< bool >( p->canLoadModulePart( __moduleName ) );
 				}
 				break;
 			case 1:
 				{
-					const std::string& moduleName = args[++argIndex].get< const std::string& >();
+					const std::string& __moduleName = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					__res.set< co::ModulePart* >( p->loadModulePart( moduleName ) );
+					res.set< co::ModulePart* >( p->loadModulePart( __moduleName ) );
 				}
 				break;
 			default:
@@ -164,7 +162,7 @@ public:
 		{
 			throw;
 		}
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:
@@ -187,7 +185,7 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-		return reinterpret_cast<co::ModulePartLoader*>( instance.getState().data.ptr );
+		return dynamic_cast<co::ModulePartLoader*>( instance.getState().data.itf );
 	}
 };
 

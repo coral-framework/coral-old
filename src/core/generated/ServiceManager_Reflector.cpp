@@ -1,14 +1,9 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.ServiceManager'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/ServiceManager.h>
-#include <co/reserved/ReflectorBase.h>
 #include <co/DynamicProxyHandler.h>
 #include <co/InterfaceType.h>
 #include <co/MethodInfo.h>
@@ -16,6 +11,7 @@
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -44,104 +40,108 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
-	// co::ServiceManager Methods:
+	// co.ServiceManager Methods:
 
 	bool getIsLazy()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ServiceManager>( 0 ), __res );
-        return __res.get< bool >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ServiceManager>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< bool >();
 	}
 
-	void setIsLazy( bool isLazy )
+	void setIsLazy( bool __isLazy )
 	{
-		co::Any __arg;
-		__arg.set< bool >( isLazy );
-		_handler->handleSetAttribute( _cookie, getAttribInfo<co::ServiceManager>( 0 ), __arg );
+		co::Any arg;
+		arg.set< bool >( __isLazy );
+		_handler->handleSetAttribute( _cookie, getAttribInfo<co::ServiceManager>( 0 ), arg );
 	}
 
-	void addService( co::InterfaceType* serviceType, co::Interface* serviceInstance )
+	void addService( co::InterfaceType* __serviceType, co::Interface* __serviceInstance )
 	{
-		co::Any __res, __arg[2];
-		__arg[0].set< co::InterfaceType* >( serviceType );
-		__arg[1].set< co::Interface* >( serviceInstance );
-		co::ArrayRange<co::Any const> __ar( __arg, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 1 ), __ar, __res );
+		co::Any res, args[2];
+		args[0].set< co::InterfaceType* >( __serviceType );
+		args[1].set< co::Interface* >( __serviceInstance );
+		co::ArrayRange<co::Any const> range( args, 2 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 1 ), range, res );
 	}
 
-	void addServiceForType( co::InterfaceType* serviceType, co::InterfaceType* clientType, co::Interface* serviceInstance )
+	void addServiceForType( co::InterfaceType* __serviceType, co::InterfaceType* __clientType, co::Interface* __serviceInstance )
 	{
-		co::Any __res, __arg[3];
-		__arg[0].set< co::InterfaceType* >( serviceType );
-		__arg[1].set< co::InterfaceType* >( clientType );
-		__arg[2].set< co::Interface* >( serviceInstance );
-		co::ArrayRange<co::Any const> __ar( __arg, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 2 ), __ar, __res );
+		co::Any res, args[3];
+		args[0].set< co::InterfaceType* >( __serviceType );
+		args[1].set< co::InterfaceType* >( __clientType );
+		args[2].set< co::Interface* >( __serviceInstance );
+		co::ArrayRange<co::Any const> range( args, 3 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 2 ), range, res );
 	}
 
-	void addServiceImplementation( co::InterfaceType* serviceType, const std::string& componentName )
+	void addServiceImplementation( co::InterfaceType* __serviceType, const std::string& __componentName )
 	{
-		co::Any __res, __arg[2];
-		__arg[0].set< co::InterfaceType* >( serviceType );
-		__arg[1].set< const std::string& >( componentName );
-		co::ArrayRange<co::Any const> __ar( __arg, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 3 ), __ar, __res );
+		co::Any res, args[2];
+		args[0].set< co::InterfaceType* >( __serviceType );
+		args[1].set< const std::string& >( __componentName );
+		co::ArrayRange<co::Any const> range( args, 2 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 3 ), range, res );
 	}
 
-	void addServiceImplementationForType( co::InterfaceType* serviceType, co::InterfaceType* clientType, const std::string& componentName )
+	void addServiceImplementationForType( co::InterfaceType* __serviceType, co::InterfaceType* __clientType, const std::string& __componentName )
 	{
-		co::Any __res, __arg[3];
-		__arg[0].set< co::InterfaceType* >( serviceType );
-		__arg[1].set< co::InterfaceType* >( clientType );
-		__arg[2].set< const std::string& >( componentName );
-		co::ArrayRange<co::Any const> __ar( __arg, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 4 ), __ar, __res );
+		co::Any res, args[3];
+		args[0].set< co::InterfaceType* >( __serviceType );
+		args[1].set< co::InterfaceType* >( __clientType );
+		args[2].set< const std::string& >( __componentName );
+		co::ArrayRange<co::Any const> range( args, 3 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 4 ), range, res );
 	}
 
-	co::Interface* getService( co::InterfaceType* serviceType )
+	co::Interface* getService( co::InterfaceType* __serviceType )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< co::InterfaceType* >( serviceType );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 5 ), __ar, __res );
-		return __res.get< co::Interface* >();
+		co::Any res, args[1];
+		args[0].set< co::InterfaceType* >( __serviceType );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 5 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< co::Interface* >();
 	}
 
-	co::Interface* getServiceForInstance( co::InterfaceType* serviceType, co::Interface* clientInstance )
+	co::Interface* getServiceForInstance( co::InterfaceType* __serviceType, co::Interface* __clientInstance )
 	{
-		co::Any __res, __arg[2];
-		__arg[0].set< co::InterfaceType* >( serviceType );
-		__arg[1].set< co::Interface* >( clientInstance );
-		co::ArrayRange<co::Any const> __ar( __arg, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 6 ), __ar, __res );
-		return __res.get< co::Interface* >();
+		co::Any res, args[2];
+		args[0].set< co::InterfaceType* >( __serviceType );
+		args[1].set< co::Interface* >( __clientInstance );
+		co::ArrayRange<co::Any const> range( args, 2 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 6 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< co::Interface* >();
 	}
 
-	co::Interface* getServiceForType( co::InterfaceType* serviceType, co::InterfaceType* clientType )
+	co::Interface* getServiceForType( co::InterfaceType* __serviceType, co::InterfaceType* __clientType )
 	{
-		co::Any __res, __arg[2];
-		__arg[0].set< co::InterfaceType* >( serviceType );
-		__arg[1].set< co::InterfaceType* >( clientType );
-		co::ArrayRange<co::Any const> __ar( __arg, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 7 ), __ar, __res );
-		return __res.get< co::Interface* >();
+		co::Any res, args[2];
+		args[0].set< co::InterfaceType* >( __serviceType );
+		args[1].set< co::InterfaceType* >( __clientType );
+		co::ArrayRange<co::Any const> range( args, 2 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 7 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< co::Interface* >();
 	}
 
-	void removeService( co::InterfaceType* serviceType )
+	void removeService( co::InterfaceType* __serviceType )
 	{
-		co::Any __res, __arg[1];
-		__arg[0].set< co::InterfaceType* >( serviceType );
-		co::ArrayRange<co::Any const> __ar( __arg, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 8 ), __ar, __res );
+		co::Any res, args[1];
+		args[0].set< co::InterfaceType* >( __serviceType );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 8 ), range, res );
 	}
 
-	void removeServiceForType( co::InterfaceType* serviceType, co::InterfaceType* clientType )
+	void removeServiceForType( co::InterfaceType* __serviceType, co::InterfaceType* __clientType )
 	{
-		co::Any __res, __arg[2];
-		__arg[0].set< co::InterfaceType* >( serviceType );
-		__arg[1].set< co::InterfaceType* >( clientType );
-		co::ArrayRange<co::Any const> __ar( __arg, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 9 ), __ar, __res );
+		co::Any res, args[2];
+		args[0].set< co::InterfaceType* >( __serviceType );
+		args[1].set< co::InterfaceType* >( __clientType );
+		co::ArrayRange<co::Any const> range( args, 2 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 9 ), range, res );
 	}
 
 protected:
@@ -215,7 +215,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		co::ServiceManager* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -226,74 +226,74 @@ public:
 			{
 			case 1:
 				{
-					co::InterfaceType* serviceType = args[++argIndex].get< co::InterfaceType* >();
-					co::Interface* serviceInstance = args[++argIndex].get< co::Interface* >();
+					co::InterfaceType* __serviceType = args[++argIndex].get< co::InterfaceType* >();
+					co::Interface* __serviceInstance = args[++argIndex].get< co::Interface* >();
 					argIndex = -1;
-					p->addService( serviceType, serviceInstance );
+					p->addService( __serviceType, __serviceInstance );
 				}
 				break;
 			case 2:
 				{
-					co::InterfaceType* serviceType = args[++argIndex].get< co::InterfaceType* >();
-					co::InterfaceType* clientType = args[++argIndex].get< co::InterfaceType* >();
-					co::Interface* serviceInstance = args[++argIndex].get< co::Interface* >();
+					co::InterfaceType* __serviceType = args[++argIndex].get< co::InterfaceType* >();
+					co::InterfaceType* __clientType = args[++argIndex].get< co::InterfaceType* >();
+					co::Interface* __serviceInstance = args[++argIndex].get< co::Interface* >();
 					argIndex = -1;
-					p->addServiceForType( serviceType, clientType, serviceInstance );
+					p->addServiceForType( __serviceType, __clientType, __serviceInstance );
 				}
 				break;
 			case 3:
 				{
-					co::InterfaceType* serviceType = args[++argIndex].get< co::InterfaceType* >();
-					const std::string& componentName = args[++argIndex].get< const std::string& >();
+					co::InterfaceType* __serviceType = args[++argIndex].get< co::InterfaceType* >();
+					const std::string& __componentName = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					p->addServiceImplementation( serviceType, componentName );
+					p->addServiceImplementation( __serviceType, __componentName );
 				}
 				break;
 			case 4:
 				{
-					co::InterfaceType* serviceType = args[++argIndex].get< co::InterfaceType* >();
-					co::InterfaceType* clientType = args[++argIndex].get< co::InterfaceType* >();
-					const std::string& componentName = args[++argIndex].get< const std::string& >();
+					co::InterfaceType* __serviceType = args[++argIndex].get< co::InterfaceType* >();
+					co::InterfaceType* __clientType = args[++argIndex].get< co::InterfaceType* >();
+					const std::string& __componentName = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					p->addServiceImplementationForType( serviceType, clientType, componentName );
+					p->addServiceImplementationForType( __serviceType, __clientType, __componentName );
 				}
 				break;
 			case 5:
 				{
-					co::InterfaceType* serviceType = args[++argIndex].get< co::InterfaceType* >();
+					co::InterfaceType* __serviceType = args[++argIndex].get< co::InterfaceType* >();
 					argIndex = -1;
-					__res.set< co::Interface* >( p->getService( serviceType ) );
+					res.set< co::Interface* >( p->getService( __serviceType ) );
 				}
 				break;
 			case 6:
 				{
-					co::InterfaceType* serviceType = args[++argIndex].get< co::InterfaceType* >();
-					co::Interface* clientInstance = args[++argIndex].get< co::Interface* >();
+					co::InterfaceType* __serviceType = args[++argIndex].get< co::InterfaceType* >();
+					co::Interface* __clientInstance = args[++argIndex].get< co::Interface* >();
 					argIndex = -1;
-					__res.set< co::Interface* >( p->getServiceForInstance( serviceType, clientInstance ) );
+					res.set< co::Interface* >( p->getServiceForInstance( __serviceType, __clientInstance ) );
 				}
 				break;
 			case 7:
 				{
-					co::InterfaceType* serviceType = args[++argIndex].get< co::InterfaceType* >();
-					co::InterfaceType* clientType = args[++argIndex].get< co::InterfaceType* >();
+					co::InterfaceType* __serviceType = args[++argIndex].get< co::InterfaceType* >();
+					co::InterfaceType* __clientType = args[++argIndex].get< co::InterfaceType* >();
 					argIndex = -1;
-					__res.set< co::Interface* >( p->getServiceForType( serviceType, clientType ) );
+					res.set< co::Interface* >( p->getServiceForType( __serviceType, __clientType ) );
 				}
 				break;
 			case 8:
 				{
-					co::InterfaceType* serviceType = args[++argIndex].get< co::InterfaceType* >();
+					co::InterfaceType* __serviceType = args[++argIndex].get< co::InterfaceType* >();
 					argIndex = -1;
-					p->removeService( serviceType );
+					p->removeService( __serviceType );
 				}
 				break;
 			case 9:
 				{
-					co::InterfaceType* serviceType = args[++argIndex].get< co::InterfaceType* >();
-					co::InterfaceType* clientType = args[++argIndex].get< co::InterfaceType* >();
+					co::InterfaceType* __serviceType = args[++argIndex].get< co::InterfaceType* >();
+					co::InterfaceType* __clientType = args[++argIndex].get< co::InterfaceType* >();
 					argIndex = -1;
-					p->removeServiceForType( serviceType, clientType );
+					p->removeServiceForType( __serviceType, __clientType );
 				}
 				break;
 			default:
@@ -310,7 +310,7 @@ public:
 		{
 			throw;
 		}
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:
@@ -333,7 +333,7 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-		return reinterpret_cast<co::ServiceManager*>( instance.getState().data.ptr );
+		return dynamic_cast<co::ServiceManager*>( instance.getState().data.itf );
 	}
 };
 

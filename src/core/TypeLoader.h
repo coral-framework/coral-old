@@ -16,10 +16,12 @@
 #include <co/TypeCreationTransaction.h>
 
 namespace co {
+	class Type;
+	class Namespace;
+	class TypeBuilder;
+} // namespace co
 
-class Type;
-class Namespace;
-class TypeBuilder;
+class TypeManager;
 
 /*!
 	Locates and loads a co::Type from a CSL file in the filesystem.
@@ -34,40 +36,9 @@ class TypeBuilder;
  
 	All search for dependencies and type creation is done within the context of a given
 	co::TypeManager, which should also be passed in the constructor.
-
-	If enableDocMap() is called, newly parsed CSL files containing documentation will generate
-	documentation chunks into a global DocMap, which can be retrieved by calling getDocMap().
- 
-	If enableCppBlockMap() is called, newly parsed interfaces containing C++ blocks will generate
-	entries into a global CppBlockMap, which can be retrieved by calling getCppBlockMap().
- 
-	Notice that both, enableDocMap() and enableCppBlockMap() should be called \e before the first
-	call to co::getSystem(), otherwise we will miss the data pertaining to some core Coral types. 
  */
 class CORAL_EXPORT TypeLoader : private csl::Parser
 {
-public:
-	/*!
-		Maps type and member names to their documentation.
-		Keys are formatted according to the template: <tt>name.space.Type:memberName</tt>
-	 */
-	typedef std::map<std::string, std::string> DocMap;
-
-	//! Enables the storage of documentation into a global DocMap. See getDocMap().
-	inline static void enableDocMap() { sm_docMapEnabled = true; }
-
-	//! Retrieves the global DocMap. It'll be empty unless you called enableDocMap().
-	inline static const DocMap& getDocMap() { return sm_docMap; }
-
-	//!	Maps a type's full name to the its block of C++ code.
-	typedef std::map<std::string, std::string> CppBlockMap;
-
-	//! Enables the storage of C++ blocks into a global CppBlockMap. See getDocMap().
-	inline static void enableCppBlockMap() { sm_cppBlockMapEnabled = true; }
-
-	//! Retrieves the global CppBlockMap. It'll be empty unless you called enableCppBlockMap().
-	inline static const CppBlockMap& getCppBlockMap() { return sm_cppBlockMap; }
-
 public:
 	/*!
 		Constructs a loader for the type with the given \c fullTypeName.
@@ -97,7 +68,7 @@ public:
 			and all partially constructed types are rolled back.
 
 	 */
-	Type* loadType();
+	co::Type* loadType();
 
 private:
 	/*
@@ -126,14 +97,13 @@ private:
 	virtual co::Type* resolveType( const std::string& typeName, bool isArray = false );
 
 	/*
-		Adds the given tuple to the DocMap if it was especified.
-		If the \c member parameter is not especifeid, the documentation is added to the loading type.
-		If the member name is already inserted into the doc map the documentation is
-		appended with the \c documentation, this behaivour is necessary for post comments ( e.g. starting with "//<" ).
+		Processes a documentation chunk. If the \c member parameter is not specified, the
+		documentation is associated with the type itself. If a member already contains some
+		documentation, the extra docs are appended to previous contents.
 	 */
 	void addDocumentation( const std::string& member, const std::string& documentation );
 
-	// Appends the passed \c text to the CppBlockMap for the loadding type.
+	// Appends the passed \c text to the CppBlockMap of our type.
 	void addCppBlock( const std::string& text );
 
 	//	Searches an existing type with the passed \c typeName. The name can be fully qualified
@@ -152,23 +122,15 @@ private:
 	bool findCslFile( const std::string& typeName, std::string& cslFilePath, std::string& foundRelativePath );
 
 private:
-	static DocMap sm_docMap;
-	static CppBlockMap sm_cppBlockMap;
-	static bool sm_docMapEnabled;
-	static bool sm_cppBlockMapEnabled;
-
-private:
 	std::string _fullTypeName;
 	const co::ArrayRange<const std::string> _path;
-	co::TypeManager* _typeManager;
+	TypeManager* _typeManager;
 	TypeLoader* _parentLoader;
 
-	Namespace* _namespace;
-	RefPtr<co::TypeCreationTransaction> _transaction;
+	co::Namespace* _namespace;
+	co::RefPtr<co::TypeCreationTransaction> _transaction;
 
-	RefPtr<csl::Error> _cslError;
+	co::RefPtr<csl::Error> _cslError;
 };
-
-} // namespace co
 
 #endif

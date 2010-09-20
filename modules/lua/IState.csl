@@ -1,0 +1,30 @@
+/*
+	Interface for C++ components to interact with a Lua state.
+	Not meant to be called from Lua.
+ */
+interface IState
+{
+	/*
+		Searches for a Lua file with the given 'name' in the CORAL_PATH.
+		The search follows the same conventions used for locating Lua packages.
+		Returns false if no script could be found.
+	 */
+	bool searchScript( in string name, out string filename );
+
+	/*
+		Compiles a Lua script file and pushes a function onto the stack.
+		On error, raises a lua.Exception.
+	 */
+	void loadFile( in string filename ) raises Exception;
+
+	/*
+		Calls a Lua function using the same conventions as lua_call().
+		On error, raises a lua.Exception.
+	 */
+	void call( in int32 numArgs, in int32 numResults ) raises Exception;
+
+	/*
+		Pushes any Coral value onto the Lua stack.
+	 */
+	void push( in any value );
+};

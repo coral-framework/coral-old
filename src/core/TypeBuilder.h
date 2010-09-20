@@ -51,7 +51,7 @@ public:
 	void defineSuperType( co::Type* superType );
 	void defineInterface( const std::string& name, co::InterfaceType* interface, bool isProvided );
 	co::MethodBuilder* defineMethod( const std::string& name );
-	void defineNativeClass( const std::string& headerName, const std::string& nativeName );
+	void defineNativeClass( const std::string& nativeHeaderFile, const std::string& nativeName );
 	co::Type* createType();
 
 protected:

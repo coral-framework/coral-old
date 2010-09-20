@@ -4,6 +4,9 @@
  */
 
 #include "InterfaceType.h"
+#include "TypeManager.h"
+#include <co/Coral.h>
+#include <co/System.h>
 #include <algorithm>
 
 InterfaceType::~InterfaceType()
@@ -35,6 +38,13 @@ co::ArrayRange<co::InterfaceType* const> InterfaceType::getSuperInterfaces()
 co::ArrayRange<co::InterfaceType* const> InterfaceType::getSubInterfaces()
 {
 	return _subInterfaces;
+}
+
+const std::string& InterfaceType::getCppBlock()
+{
+	TypeManager* tm = dynamic_cast<TypeManager*>( co::getSystem()->getTypes() );
+	assert( tm );
+	return tm->getCppBlock( getFullName() );
 }
 
 bool InterfaceType::isSubTypeOf( co::InterfaceType* itf )

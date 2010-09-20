@@ -86,12 +86,6 @@ protected:
 	//! Returns NULL if the alias does not identify an imported type.
 	co::Type* findImportedType( const std::string& alias );
 
-	//! Sets whether comments should be processed. When this is true (default) addDocumentation() is never called.
-	inline void setIgnoreComments( bool ignore ) { _ignoreComments = ignore; }
-
-	//! Sets whether c++ blocks should be processed. When this is true (default) addCppBlock() is never called.
-	inline void setIgnoreCppBlocks( bool ignore ) { _ignoreCppBlocks = ignore; }
-
 private:
 	struct ImportInfo
 	{
@@ -139,16 +133,12 @@ private:
 
 	// the base name of the file being parsed
 	std::string _cslFileBaseName;
+	
+	// keeps track of the last defined member
+	std::string _lastMember;
 
-	// first error
-	int _errorLine;
-	bool _errorOccurred;
-	std::string _errorMessage;
-
-	bool _ignoreComments;		// if true (default) comments are ignored and doc is not processed
-	bool _ignoreCppBlocks;		// if true (default) c++ blocks are ignored
-	std::string _docBuffer;		// accumulates 'pre'-documentation
-	std::string _lastMember;	// keeps track of the last defined member
+	// accumulates 'pre'-documentation
+	std::string _docBuffer;
 };
 
 } // namespace csl

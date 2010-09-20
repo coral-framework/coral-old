@@ -1,21 +1,16 @@
-/*******************************************************************************
-** Reflection code generated for type 'co.AttributeContainer'
-**
-** Created: Wed Aug 25 16:31:31 2010
-**      by: Coral Compiler version 0.1.0
-**
-** WARNING! All changes made in this file will be lost when recompiling!
-********************************************************************************/
+/*
+ * Coral - A C++ Component Framework.
+ * See Copyright Notice in Coral.h
+ */
 
 #include <co/AttributeContainer.h>
-#include <co/reserved/ReflectorBase.h>
 #include <co/DynamicProxyHandler.h>
 #include <co/AttributeInfo.h>
 #include <co/MethodInfo.h>
-#include <co/AttributeInfo.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
 
@@ -44,13 +39,14 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
-	// co::AttributeContainer Methods:
+	// co.AttributeContainer Methods:
 
 	co::ArrayRange<co::AttributeInfo* const> getMemberAttributes()
 	{
-		co::Any __res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::AttributeContainer>( 0 ), __res );
-        return __res.get< co::ArrayRange<co::AttributeInfo* const> >();
+		co::Any res;
+		_handler->handleGetAttribute( _cookie, getAttribInfo<co::AttributeContainer>( 0 ), res );
+		assert( res.containsObject() == false );
+        return res.get< co::ArrayRange<co::AttributeInfo* const> >();
 	}
 
 protected:
@@ -124,12 +120,12 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& __res )
+	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		checkInstance( instance, mi );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( args );
-		CORAL_UNUSED( __res );
+		CORAL_UNUSED( res );
 	}
 
 private:
@@ -152,7 +148,7 @@ private:
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-		return reinterpret_cast<co::AttributeContainer*>( instance.getState().data.ptr );
+		return dynamic_cast<co::AttributeContainer*>( instance.getState().data.itf );
 	}
 };
 

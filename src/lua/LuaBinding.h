@@ -21,6 +21,8 @@ public:
 	static void close( lua_State* L );
 
 private:
+	static int addPath( lua_State* L );
+	static int getPaths( lua_State* L );
 	static int getType( lua_State* L );
 	static int genericNew( lua_State* L );
 	static int packageLoader( lua_State* L );
@@ -46,9 +48,6 @@ public:
 	 */
 	static void tryGetInstance( lua_State* L, int index, co::Any& instance );
 
-	// --- Shared Metamethods ---
-	static int toString( lua_State* L );
-
 protected:
 	/*!
 		Pushes a metatable for a userdata of the specified co::CompoundType.
@@ -64,18 +63,19 @@ protected:
 
 	/*!
 		Assumes the CompoundType's udata is at index 1 and the member name is at index 2.
-		Pushes a function, if the member is a method; or a light userdata pointing to a
-		co::MemberInfo, if the member is not a method. If the member cannot be found,
-		pushes an error message and raises a lua::MsgOnStackException.
+		Pushes a function and returns true, if the member is a method; or a light
+		userdata pointing to a co::MemberInfo, if the member is not a method.
+		If the member cannot be found and \c mustExist is false (default), pushes nil and
+		returns false; otherwise, if \c mustExist is true, an exception is thrown.
 	 */
-	static void pushMember( lua_State* L, co::CompoundType* ct );
+	static bool pushMember( lua_State* L, co::CompoundType* ct, bool mustExist = false );
 
 	/*!
 		Pops a light userdata (co::AttributeInfo*) from the stack.
 		Pushes the corresponding attribute value of the given 'instance'.
 	 */
 	static void getAttribute( lua_State* L, const co::Any& instance );
-	
+
 	/*!
 		Pops a value and a light userdata (co::AttributeInfo*) from the stack.
 		Assigns the value to the corresponding attribute of the given 'instance'.
@@ -117,6 +117,7 @@ public:
 	static int index( lua_State* L );
 	static int newIndex( lua_State* L );
 	static int gc( lua_State* L );
+	static int toString( lua_State* L );
 };
 
 /*!
@@ -134,6 +135,7 @@ public:
 
 	// --- Metamethods ---
 	static int gc( lua_State* L );
+	static int toString( lua_State* L );
 };
 
 /*!

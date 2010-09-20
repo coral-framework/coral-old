@@ -12,7 +12,7 @@
 namespace co {
 	class Type;
 	class MethodInfo;
-}
+} // namespace co
 
 /*!
 	Calculates version hashes for binary or full type compatibility checking.

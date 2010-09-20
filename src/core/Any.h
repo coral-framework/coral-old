@@ -41,9 +41,10 @@ struct State
 		float f;
 		double d;
 
-		// General-purpose pointers:
+		// Multipurpose pointers:
 		void* ptr;
 		const void* cptr;
+		co::Interface* itf;
 	}
 	data;
 
@@ -471,9 +472,15 @@ struct VariableHelper<double>
 class CORAL_EXPORT Any
 {
 public:
+	//! Alias to the struct that contains all info about a co::Any's var.
+	typedef __any::State State;
+
+	//! A 'neutral' std::vector type.
+	typedef std::vector<uint8> PseudoVector;
+
 	/*!
 		Flags that can be OR'ed together to describe variables in the Coral type system.
-		For use with setVariable()/setArray() and the custom co::Any constructors.
+		For use with the custom variable setters and constructors.
 	 */
 	enum VariableFlags
 	{
@@ -486,7 +493,7 @@ public:
 
 	/*!
 		Enumeration of the supported array representations in the Coral type system.
-		For use with setArray() and its corresponding custom co::Any constructor.
+		For use with setArray() and its corresponding co::Any constructor.
 	 */
 	enum ArrayKind
 	{
@@ -497,7 +504,7 @@ public:
 
 public:
 	//! Creates an invalid co::Any.
-	inline Any() : _state()
+	inline Any() : _state(), _objectKind( TK_NONE )
 	{;}
 
 	/*!
@@ -509,46 +516,63 @@ public:
 			if you must store a reference or a 'const' variable.
 	 */
 	template<typename T>
-	inline Any( T var )
+	inline Any( T var ) : _objectKind( TK_NONE )
 	{
 		set<T>( var );
 	}
 
 	/*!
-		Custom constructor corresponding to a setInterface() call.
+		Constructor corresponding to a setInterface() call.
 		Please, see setInterface()'s documentation for more info.
 	 */
-	inline Any( co::Interface* instance, co::InterfaceType* type )
+	inline Any( co::Interface* instance, co::InterfaceType* type ) : _objectKind( TK_NONE )
 	{
 		setInterface( instance, type );
 	}
 
 	/*!
-		Custom constructor corresponding to a setVariable() call.
+		Constructor corresponding to a setVariable() call.
 		Please, see setVariable()'s documentation for more info.
 	 */
-	inline Any( Type* type, uint32 flags, void* ptr )
+	inline Any( Type* type, uint32 flags, void* ptr ) : _objectKind( TK_NONE )
 	{
 		setVariable( type, flags, ptr );
 	}
 	
 	/*!
-		Custom constructor corresponding to a setBasic() call.
+		Constructor corresponding to a setBasic() call.
 		Please, see setBasic()'s documentation for more info.
 	 */
-	inline Any( co::TypeKind kind, uint32 flags, void* ptr )
+	inline Any( co::TypeKind kind, uint32 flags, void* ptr ) : _objectKind( TK_NONE )
 	{
 		setBasic( kind, flags, ptr );
 	}
 
 	/*!
-		Custom constructor corresponding to a setArray() call.
+		Constructor corresponding to a setArray() call.
 		Please, see setArray()'s documentation for more info.
 	 */
 	inline Any( ArrayKind arrayKind, Type* elementType, uint32 flags, void* ptr, std::size_t arraySize = 0 )
+		: _objectKind( TK_NONE )
 	{
 		setArray( arrayKind, elementType, flags, ptr, arraySize );
 	}
+
+	//! Copy constructor.
+	inline Any( const co::Any& other ) : _state(), _objectKind( TK_NONE )
+	{
+		copy( other );
+	}
+
+	//! Destructor.
+	inline ~Any()
+	{
+		if( _objectKind != co::TK_NONE )
+			destroyObject();
+	}
+
+	//! \name Variable Introspection
+	//@{
 
 	//! Returns whether this co::Any was initialized.
 	inline bool isValid() const { return _state.kind != co::TK_NONE; }
@@ -594,6 +618,34 @@ public:
 	int32 getSize() const;
 
 	/*!
+		Attempts to retrieve a stored variable, making the necessary casts whenever possible.
+	
+		\throw co::IllegalCastException if there is no valid cast from the stored variable's
+				type to the requested type \c T.
+	 */
+	template<typename T>
+	inline T get() const
+	{
+		typedef traits::get<T> TT;
+
+		CORAL_STATIC_CHECK( TT::kind != TK_NONE, T_is_not_a_valid_Coral_type );
+		CORAL_STATIC_CHECK( TT::kind != TK_EXCEPTION, cannot_retrieve_exceptions );
+
+		Any temp;
+		__any::PrepareStateFor<TT::kind, TT>::prepare( temp._state );
+		temp.castFrom( _state );
+
+		return __any::VariableHelper<T>::retrieve( temp._state );
+	}
+
+	//! Provides read access to the internal state of a co::Any.
+	inline const State& getState() const { return _state; }
+
+	//@}
+	//! \name Automatic Variable Storage
+	//@{
+
+	/*!
 		Automatically stores any variable supported by the Coral type system.
 		Previous contents are discarded.
 	 
@@ -615,8 +667,9 @@ public:
 		__any::VariableHelper<T>::store( _state, var );
 	}
 
+	//@}
 	/*!
-		\name Custom Storage Methods
+		\name Custom Variable Storage
 		These are alternative versions of set() that offer manual control over the passed variables.
 
 		\warning
@@ -676,29 +729,75 @@ public:
 
 	//@}
 
+	//@}
+	//! \name Output Arguments
+	//@{
+
 	/*!
-		Attempts to retrieve a stored variable, making the necessary casts whenever possible.
-	
-		\throw co::IllegalCastException if there is no valid cast from the stored variable's
-				type to the requested type \c T.
+		Prepares a co::Any for use as an 'out' argument of the specified type.
+		If the co::Any already contains a value, it will be preserved (if it's compatible).
+		Otherwise, a default-constructed, temporary object will be created. 
+		\param paramType the 'out' parameter type.
+		\throw co::Exception if the co::Any's current value is incompatible with 'paramType'.
+		\sa makeIn()
 	 */
-	template<typename T>
-	inline T get() const
-	{
-		typedef traits::get<T> TT;
+	void makeOut( Type* paramType );
 
-		CORAL_STATIC_CHECK( TT::kind != TK_NONE, T_is_not_a_valid_Coral_type );
-		CORAL_STATIC_CHECK( TT::kind != TK_EXCEPTION, cannot_retrieve_exceptions );
+	/*!
+		Should be used after a call to makeOut(), to return an argument to its 'in' condition.
+		For instance, variables of type 'co::int8&' will be dereferenced to a 'co::int8'.
+		\note This method does not raise exceptions.
+	 */
+	void makeIn();
 
-		Any temp;
-		__any::PrepareStateFor<TT::kind, TT>::prepare( temp._state );
-		temp.castFrom( _state );
+	//@}
 
-		return __any::VariableHelper<T>::retrieve( temp._state );
-	}
+	/*!
+		\name Temporary Objects
+		A temporary object is created by calling one of the <em>createXXX()</em> methods.
+		The object will last while its enclosing co::Any is alive, or until
+		destroyObject() is called or another temporary object is created.
+	 */
+	//@{
 
-	//! Provides read access to the internal state of a co::Any.
-	inline const __any::State& getState() const { return _state; }
+	/*!
+		Returns whether this co::Any contains a temporary object instance.
+		If isValid() is true but containsObject() is false, then the co::Any
+		only contains a reference (i.e. only its co::Any part is being used).
+	 */
+	inline bool containsObject() const { return _objectKind != co::TK_NONE; }
+
+	/*!
+		Creates a temporary co::Any instance and makes this co::Any reference it.
+		If the co::Any contains a variable at the time this method is called, it will
+		be preserved in (moved to) the temporary co::Any instance. However, the co::Any
+		must not contain a temporary object, or an exception will be thrown.
+	 */
+	Any& createAny();
+
+	//! Creates a temporary std::string instance and makes this co::Any reference it.
+	std::string& createString();
+
+	/*!
+		Creates a std::vector (or a std::RefVector, if \c elementType is an interface)
+		with \c n default-constructed elements of type \c elementType, and sets this
+		co::Any with a reference to the array.
+	 */
+	PseudoVector& createArray( Type* elementType, size_t n = 0 );
+
+	/*!
+		Creates an instance of the specified complex value \c type, and makes
+		this co::Any reference it.
+	 */
+	void* createComplexValue( Type* type );
+
+	/*!
+		Calls the appropriate destructors and releases any memory allocated
+		for this co::Any's temporary object.
+	 */
+	void destroyObject();
+
+	//@}
 
 	//! Equality test operator.
 	bool operator==( const Any& other ) const;
@@ -706,15 +805,68 @@ public:
 	//! Inequality test operator.
 	inline bool operator!=( const Any& other ) const { return !( *this == other ); }
 
+	// Assignment operator.
+	inline Any& operator=( const co::Any& other )
+	{
+		copy( other );
+		return *this;
+	}
+
 private:
 	//! Used by setVariable()/setArray().
 	inline void setModifiers( uint32 flags );
 
 	//! Raises co::IllegalCastException when the cast is impossible.
-	void castFrom( const __any::State& s );
+	void castFrom( const State& s );
+
+	/*!
+		Copies another co::Any's var. If the var points to an enclosed temporary
+		object, also copies the object and updates the var.
+	 */
+	void copy( const co::Any& other );
 
 private:
-	__any::State _state;
+	State _state;
+
+	/*
+		Kind of temporary object currently stored in this co::Any (if any).
+		For complex values, it assumes special meanings:
+			- co::TK_STRUCT: the CV is larger than INPLACE_CAPACITY and is heap-allocated.
+			- co::TK_NATIVECLASS: the CV fits in INPLACE_CAPACITY and is kept in place.
+	 */
+	TypeKind _objectKind;
+
+	/*
+		Performance Setting: number of 'doubles' that can be stored in a co::Any
+		without resorting to dynamic memory allocation. For instance, if you want
+		your double-precision Quaternion native class to be handled efficiently,
+		set this to 4. If you want your single-precision (float) 4x4 matrix class
+		to be handled efficiently, you could set this to 8. Please note that large
+		values lead to excessive stack consumption and performance degradation.
+		Also note that it does not make sense to set this value to less than 2.
+	 */
+	static const int INPLACE_DOUBLES = 4;
+	static const size_t INPLACE_CAPACITY = sizeof(double) * INPLACE_DOUBLES;
+
+	// Temporary object data.
+	union
+	{
+		State::Data data;
+		uint8 stringArea[sizeof(std::string)];
+		struct
+		{
+			Reflector* reflector;
+			uint8 vectorArea[sizeof(PseudoVector)];
+		}
+		array;
+		struct
+		{
+			Reflector* reflector;
+			union { void* ptr; double inplaceArea[INPLACE_DOUBLES]; };
+		}
+		complex;
+	}
+	_object;
 };
 
 template<> struct kindOf<Any> { static const TypeKind kind = TK_ANY; };

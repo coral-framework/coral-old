@@ -52,7 +52,7 @@ TypeDictionaryBuilder::~TypeDictionaryBuilder()
 	delete _dict;
 }
 
-void TypeDictionaryBuilder::buildMappingDict( const std::map<std::string, std::string>& cppBlockMap )
+void TypeDictionaryBuilder::buildMappingDict()
 {
 	assert( _dict == NULL );
 
@@ -63,14 +63,11 @@ void TypeDictionaryBuilder::buildMappingDict( const std::map<std::string, std::s
 	fill();
 
 	// add C++ block data, if available
-	if( _type->getKind() != co::TK_INTERFACE )
+	co::InterfaceType* it = dynamic_cast<co::InterfaceType*>( _type );
+	if( !it )
 		return;
 
-	std::map<std::string, std::string>::const_iterator it = cppBlockMap.find( _type->getFullName() );
-	if( it == cppBlockMap.end() )
-		return;
-
-	const std::string& code = it->second;
+	const std::string& code = it->getCppBlock();
 	if( code.empty() )
 		return;
 
@@ -468,15 +465,9 @@ void TypeDictionaryBuilder::fillStructData( co::StructType* structType )
 
 void TypeDictionaryBuilder::fillNativeClassData( co::NativeClassType* nativeClassType )
 {
-	const std::string& nativeName = nativeClassType->getNativeName();
-	_dict->SetValue( "NATIVE_NAME", nativeName );
+	_dict->SetValue( "NATIVE_NAME", nativeClassType->getNativeName() );
+	includeHeader( nativeClassType->getNativeHeaderFile() );
 
-	std::string headerName = nativeClassType->getHeaderName();
-	headerName.erase( headerName.begin() );		// removes the '<'
-	headerName.erase( headerName.end() - 1 );	// removes the '>'
-
-	includeHeader( headerName );
-	
 	if( _mode == Mode_Code )
 	{
 		// add the "MY_LOCAL" section just for compatibility with interfaces
@@ -851,13 +842,8 @@ void TypeDictionaryBuilder::formatOutputType( co::Type* type, std::string& out )
 			concatenate( "std::vector<", getCppName( baseType ), ">*", out );
 		}
 	}
-	else if( ( kind >= co::TK_BOOLEAN && kind <= co::TK_DOUBLE ) || kind == co::TK_ENUM )
-	{
-		out = getCppName( type );
-		out += "&";
-	}
-
-	else if( kind == co::TK_STRING || kind == co::TK_ANY || kind == co::TK_STRUCT || kind == co::TK_NATIVECLASS )
+	else if( ( kind >= co::TK_ANY && kind <= co::TK_STRING )
+				|| kind == co::TK_ENUM || kind == co::TK_STRUCT || kind == co::TK_NATIVECLASS )
 	{
 		out = getCppName( type );
 		out += "&";

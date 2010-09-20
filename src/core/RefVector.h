@@ -19,6 +19,12 @@ template<class T>
 class RefVector : public std::vector< co::RefPtr<T> >
 {
 public:
+	//! Default constructor.
+	inline RefVector() : std::vector< co::RefPtr<T> >() {;}
+
+	//! Creates a vector with \c n null pointers.
+	inline RefVector( size_t n ) : std::vector< co::RefPtr<T> >( n ) {;}
+
 	/*!
 		Performs a binary search on the sorted range [first,last] using a \c Comparator function.
 

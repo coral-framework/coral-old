@@ -20,26 +20,26 @@
 #include <co/AttributeContainer.h>
 #include <co/IllegalCastException.h>
 
-TEST( AnyTests, sizeOfAny )
+TEST( AnyTests, sizeOfState )
 {
 	// we assume std::size_t has the size of a pointer
 	EXPECT_EQ( CORAL_POINTER_SIZE, sizeof(std::size_t) );
 
 	/*
-		Makes sure sizeof(co::Any) is as expected.
-		A co::Any instance contains a double, a pointer, a size_t, plus 3 bytes.
+		Make sure sizeof(co::Any::State) is as expected.
+		A co::Any::State instance contains a double, a pointer, a size_t, plus 3 bytes.
 	 */
 #if CORAL_POINTER_SIZE == 4
 	#if defined(CORAL_OS_UNIX)
 		// 32-bit system with 4-byte alignment
-		EXPECT_EQ( 20, sizeof(co::Any) );
+		EXPECT_EQ( 20, sizeof(co::Any::State) );
 	#else
 		// 32-bit system with 8-byte alignment
-		EXPECT_EQ( 24, sizeof(co::Any) );
+		EXPECT_EQ( 24, sizeof(co::Any::State) );
 	#endif
 #elif CORAL_POINTER_SIZE == 8
 	// 64-bit system with 8-byte alignment
-	EXPECT_EQ( 32, sizeof(co::Any) );
+	EXPECT_EQ( 32, sizeof(co::Any::State) );
 #else
 #error Huh, pointers are neither 32 nor 64 bit long?
 #endif
@@ -1109,4 +1109,27 @@ TEST( AnyTests, setArray )
 	automatic.set( int8VecRange );
 	manual.setArray( co::Any::AK_ArrayRange, co::getType( "int8" ), co::Any::VarIsValue, &int8Vec.front(), int8Vec.size() );
 	EXPECT_EQ( automatic, manual );
+}
+
+/****************************************************************************
+ *	Tests for the temporary object management methods
+ ****************************************************************************/
+
+TEST( AnyTests, stdVectorMemoryLayout )
+{
+	/*
+		In co::Any we assume some truths about the memory layout of std::vectors.
+		This test verifies whether the assumptions are true for the local STL distro.
+	
+		Basically, the assumption is that the std::vector computes its size() by subtracting
+		two pointers (one to the start, another past the end of the array). This is a fairly
+		standard implementation choice for std::vectors, and allows Coral to find out how much
+		memory is allocated by a std::vector in run-time without knowing its template type.
+	 */
+
+	std::vector<double> dblVector( 8 );
+	ASSERT_EQ( 8, dblVector.size() );
+
+	std::vector<co::uint8>& bytesVector = *reinterpret_cast<std::vector<co::uint8>*>( &dblVector );
+	ASSERT_EQ( 64, bytesVector.size() );
 }

@@ -21,11 +21,11 @@ public:
 
 	// internal methods:
 	void setNativeName( const std::string& nativeName );
-	void setHeaderName( const std::string& headerName );
+	void setNativeHeaderFile( const std::string& nativeHeaderFile );
 
 	// co::NativeClassType methods:
 	const std::string& getNativeName();
-	const std::string& getHeaderName();
+	const std::string& getNativeHeaderFile();
 
 	DELEGATE_CO_TYPE_METHODS( TypeImpl:: );
 	DELEGATE_CO_COMPOUNDTYPE_METHODS( AttributeAndMethodContainer:: );
@@ -34,7 +34,7 @@ public:
 	
 private:
 	std::string _nativeName;
-	std::string _headerName;
+	std::string _nativeHeaderFile;
 };
 
 #endif

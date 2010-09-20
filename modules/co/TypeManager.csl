@@ -7,6 +7,12 @@ interface TypeManager
 	readonly attribute Namespace rootNS;
 
 	/*
+		If true, newly parsed CSL files will generate entries in the documentation database.
+		See getDocumentation(). Default is true. Can be set to false in order to save memory.
+	 */
+	attribute bool documentationParsing;
+
+	/*
 		Searches the database of loaded types for a type with the specified fully-qualified name.
 		A suffix "[]" may be added to the name of a type to search for its corresponding co::ArrayType.
 		Returns null if a type with the given \c fullName is not currently loaded.
@@ -48,4 +54,11 @@ interface TypeManager
 		\note This method does NOT create arrays, but can retrieve existing array types.
 	 */
 	Type loadType( in string typeName, out CSLError[] errorStack );
+
+	/*
+		Gets the documentation associated with either a type or a member.
+		Returns an empty string if the type/member has no documentation, or if the type has not been
+		loaded yet. Member names are formatted like the following: <tt>"name.space.TypeName:memberName"</tt>.
+	 */
+	string getDocumentation( in string typeOrMemberName );
 };
