@@ -114,10 +114,25 @@ std::ostream& operator<<( std::ostream& out, const co::Any& a )
 	// print pointer
 	if( s.kind == co::TK_ARRAY || s.isPointer || s.isReference )
 	{
-		if( s.data.ptr )
-			out << s.data.ptr;
-		else
+		if( s.data.ptr == NULL )
+		{
 			out << "NULL";
+		}
+		else if( s.kind == co::TK_STRING && !s.isPointer )
+		{
+			// special case: print strings up to 30 chars.
+			const std::string& str = a.get<const std::string&>();
+			out << '"';
+			if( str.length() < 30 )
+				out << str;
+			else
+				out << str.substr( 0, 27 ) << "...";
+			out << '"';
+		}
+		else
+		{
+			out << s.data.ptr;
+		}
 	}
 	else
 	{

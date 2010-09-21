@@ -19,6 +19,7 @@
 #include <cstring>
 #include <cassert>
 #include <sstream>
+#include <iostream>
 #include <sys/stat.h>
 
 /*
@@ -128,7 +129,7 @@ static void addDefaultPaths()
 	}
 	else
 	{
-		fprintf( stderr, "Oops! Could not determine the current executable's path.\n" );
+		std::cerr << "Oops! Could not determine the current executable's path.\n";
 	}
 
 	// add the current working dir to the path
@@ -143,7 +144,7 @@ static void addDefaultPaths()
 			co::addPath( path );
 	}
 	else
-		fprintf( stderr, "Oops! Could not determine the current working directory.\n" );
+		std::cerr << "Oops! Could not determine the current working directory.\n";
 }
 
 void resolveCallee( const std::string& calleeName, co::ComponentType*& ct, co::InterfaceInfo*& ii, co::MethodInfo*& mi )
@@ -219,20 +220,20 @@ int main( int argc, char* argv[] )
 {
 	if( argc < 2 || ( argv[1][0] == '-' && argc < 4 ) )
 	{
-		printf(
+		std::cout <<
 			"Coral Application Launcher v" CORAL_VERSION_STR " (" CORAL_BUILD_KEY ")\n"
 			"Usage: coral [options] callee [ARG] ...\n"
 			"Description:\n"
 			"  A 'callee' must be specified as either a component or a method name within\n"
-			"  a component interface. If a method is not specified, one named 'main' will\n"
-			"  be searched for in all provided interfaces of the component. The called method\n"
-			"  must return 'void' and receive either no argument or an array of strings.\n"
+			"  a component interface. If a method is not specified, one named 'main' will be\n"
+			"  searched for in all provided interfaces of the component. The called method\n"
+			"  must receive either no argument or an array of strings. If the method returns\n"
+			"  a number, it will be used as the application return status."
 			"Examples:\n"
 			"  coral myModule.MyComponent arg1 arg2 arg3\n"
 			"  coral someModule.SomeComponent.someInterface:someMethod arg1 arg2\n"
 			"Available Options:\n"
-			"  -p EXTRA,DIRS   Add a list of repositories to the Coral path.\n"
-		);
+			"  -p EXTRA,DIRS   Add a list of repositories to the Coral path.\n";
 
 		return 0;
 	}
@@ -244,14 +245,15 @@ int main( int argc, char* argv[] )
 		if( argv[1][1] == 'p' && argv[1][2] == '\0' )
 			co::addPath( argv[2] );
 		else
-			fprintf( stderr, "Unrecognized flag '%s'.\n", argv[1] );
+			std::cerr << "Unrecognized flag '" << argv[1] << "'.\n";
 	}
 
 	assert( argc >= index );
 
 	addDefaultPaths();
 
-	int result = 0;
+	int status = 0;
+
 	try
 	{
 		// initialize the Coral framework
@@ -261,7 +263,7 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "System initialization failed.\nException: %s\n", e.what() );
+			std::cerr << "System initialization failed.\nException: " << e.what() << "\n";
 			throw;
 		}
 
@@ -276,24 +278,21 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "Invalid callee '%s'.\nException: %s\n", argv[index], e.what() );
+			std::cerr << "Invalid callee '" << argv[index] << "'.\nException: " << e.what() << "\n";
 			throw;
 		}
 
 		// check the method signature
 		try
 		{
-			if( mi->getReturnType() )
-				throw co::Exception( "method does not return 'void'" );
-
 			co::ArrayRange<co::ParameterInfo* const> params = mi->getParameters();
 			if( !params.isEmpty() && ( params.getSize() > 1 || params[0]->getType()->getFullName() != "string[]" ) )
 				throw co::Exception( "method can only have a single parameter, of type 'string[]'" );
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "Invalid method '%s:%s'.\nException: %s\n", ii->getType()->getFullName().c_str(),
-						mi->getName().c_str(), e.what() );
+			std::cerr << "Invalid method '" << ii->getType()->getFullName() << ":"
+				<< mi->getName().c_str() << "'.\nException: " << e.what() << "\n";
 			throw;
 		}
 
@@ -310,7 +309,7 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "Instantiation failed: %s\n", e.what() );
+			std::cerr << "Instantiation failed: " << e.what() << "\n";
 			throw;
 		}
 		
@@ -322,7 +321,7 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "Invocation failed: %s\n", e.what() );
+			std::cerr << "Invocation failed: " << e.what() << "\n";
 			throw;
 		}
 
@@ -333,23 +332,31 @@ int main( int argc, char* argv[] )
 			while( ++index < argc )
 				args.push_back( argv[index] );
 
-			co::Any returnValue;
+			co::Any res;
 			co::Any arg( &args );
+			reflector->invokeMethod( itf, mi, co::ArrayRange<co::Any const>( &arg, 1 ), res );
 
-			reflector->invokeMethod( itf, mi, co::ArrayRange<co::Any const>( &arg, 1 ), returnValue );
+			// if the result is a number, use it as the return status; otherwise, print it
+			if( res.isValid() )
+			{
+				if( res.getKind() >= co::TK_INT8 and res.getKind() <= co::TK_DOUBLE )
+					status = res.get<int>();
+				else
+					std::cout << "Method returned " << res << "\n";
+			}
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "Program terminated with an unhandled exception.\nMessage: %s\n", e.what() );
+			std::cerr << "Program terminated with an unhandled exception.\nMessage: " << e.what() << "\n";
 			throw;
 		}
 	}
 	catch( std::exception& e )
 	{
-		result = -1;
+		status = -1;
 	}
 
 	co::shutdown();
 
-	return result;
+	return status;
 }

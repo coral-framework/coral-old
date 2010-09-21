@@ -19,7 +19,7 @@ class ILauncher : public co::Interface
 public:
 	virtual ~ILauncher() {;}
 
-	virtual void main( co::ArrayRange<std::string const> args ) = 0;
+	virtual co::int32 main( co::ArrayRange<std::string const> args ) = 0;
 };
 
 } // namespace lua

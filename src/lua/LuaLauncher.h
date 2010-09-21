@@ -18,7 +18,7 @@ public:
 	virtual ~LuaLauncher();
 
 	// lua::ILauncher methods:
-	void main( co::ArrayRange<std::string const> args );
+	co::int32 main( co::ArrayRange<std::string const> args );
 };
 
 #endif

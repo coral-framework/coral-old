@@ -45,12 +45,14 @@ public:
 
 	// lua.ILauncher Methods:
 
-	void main( co::ArrayRange<std::string const> args_ )
+	co::int32 main( co::ArrayRange<std::string const> args_ )
 	{
 		co::Any res, args[1];
 		args[0].set< co::ArrayRange<std::string const> >( args_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::ILauncher>( 0 ), range, res );
+		assert( res.containsObject() == false );
+		return res.get< co::int32 >();
 	}
 
 protected:
@@ -129,7 +131,7 @@ public:
 				{
 					co::ArrayRange<std::string const> args_ = args[++argIndex].get< co::ArrayRange<std::string const> >();
 					argIndex = -1;
-					p->main( args_ );
+					res.set< co::int32 >( p->main( args_ ) );
 				}
 				break;
 			default:
@@ -150,26 +152,25 @@ public:
 	}
 
 private:
-	lua::ILauncher* checkInstance( const co::Any& instance, co::MemberInfo* member )
+	lua::ILauncher* checkInstance( const co::Any& any, co::MemberInfo* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
 
+		// make sure that 'any' is an instance of this type
 		co::InterfaceType* myType = co::typeOf<lua::ILauncher>::get();
 
-		// make sure that 'instance' is an instance of this type
-		if( instance.getKind() != co::TK_INTERFACE ||
-			!instance.getInterfaceType()->isSubTypeOf( myType ) ||
-			instance.getState().data.ptr == NULL )
-			CORAL_THROW( co::IllegalArgumentException, "expected a valid lua::ILauncher*, but got " << instance );
+		lua::ILauncher* res;
+		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<lua::ILauncher*>( any.getState().data.itf ) ) )
+			CORAL_THROW( co::IllegalArgumentException, "expected a valid lua::ILauncher*, but got " << any );
 
 		// make sure that 'member' belongs to this type
 		co::CompoundType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
-				<< owner->getFullName() << ", not to " << myType->getFullName() );
+				<< owner->getFullName() << ", not to lua.ILauncher" );
 
-		return dynamic_cast<lua::ILauncher*>( instance.getState().data.itf );
+		return res;
 	}
 };
 

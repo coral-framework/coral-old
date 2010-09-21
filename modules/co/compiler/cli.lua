@@ -73,16 +73,18 @@ end
 
 local allArgs = {...}
 if #allArgs == 0 then
-	return flags.help()
+	flags.help()
+	return 0
 end
 
 local args, errorString = cmdline.process( allArgs, flags )
 if not args then
-	return print( errorString )
+	print( errorString )
+	return -2
 end
 
 if askedForVersion then
-	return
+	return 0
 end
 
 -------------------------------------------------------------------------------
@@ -106,4 +108,7 @@ end, debug.traceback )
 if not ok then
 	print( "*** Error ***" )
 	print( err )
+	return -1
 end
+
+return 0

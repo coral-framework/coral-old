@@ -79,26 +79,24 @@ public:
 	}
 
 private:
-	co::CSLError* checkInstance( const co::Any& instance, co::MemberInfo* member )
+	co::CSLError* checkInstance( const co::Any& any, co::MemberInfo* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
 
+		// make sure that 'any' is an instance of this type
 		co::StructType* myType = co::typeOf<co::CSLError>::get();
 
-		// make sure that 'instance' is an instance of this type
-		if( instance.getKind() != co::TK_STRUCT ||
-			instance.getType() != myType ||
-			instance.getState().data.ptr == NULL )
-			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::CSLError*, but got " << instance );
+		if( any.getKind() != co::TK_STRUCT || any.getType() != myType || any.getState().data.ptr == NULL )
+			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::CSLError*, but got " << any );
 
 		// make sure that 'member' belongs to this type
 		co::CompoundType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
-				<< owner->getFullName() << ", not to " << myType->getFullName() );
+				<< owner->getFullName() << ", not to co.CSLError" );
 
-		return reinterpret_cast<co::CSLError*>( instance.getState().data.ptr );
+		return reinterpret_cast<co::CSLError*>( any.getState().data.ptr );
 	}
 };
 

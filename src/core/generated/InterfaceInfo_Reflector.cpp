@@ -167,26 +167,25 @@ public:
 	}
 
 private:
-	co::InterfaceInfo* checkInstance( const co::Any& instance, co::MemberInfo* member )
+	co::InterfaceInfo* checkInstance( const co::Any& any, co::MemberInfo* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
 
+		// make sure that 'any' is an instance of this type
 		co::InterfaceType* myType = co::typeOf<co::InterfaceInfo>::get();
 
-		// make sure that 'instance' is an instance of this type
-		if( instance.getKind() != co::TK_INTERFACE ||
-			!instance.getInterfaceType()->isSubTypeOf( myType ) ||
-			instance.getState().data.ptr == NULL )
-			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::InterfaceInfo*, but got " << instance );
+		co::InterfaceInfo* res;
+		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::InterfaceInfo*>( any.getState().data.itf ) ) )
+			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::InterfaceInfo*, but got " << any );
 
 		// make sure that 'member' belongs to this type
 		co::CompoundType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
-				<< owner->getFullName() << ", not to " << myType->getFullName() );
+				<< owner->getFullName() << ", not to co.InterfaceInfo" );
 
-		return dynamic_cast<co::InterfaceInfo*>( instance.getState().data.itf );
+		return res;
 	}
 };
 

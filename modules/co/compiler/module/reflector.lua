@@ -478,39 +478,39 @@ public:
 		if t.memberAttributes then
 			writer( "\nprivate:\n" )
 			writer( "\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "&" or "*" ),
-				[[ checkInstance( const co::Any& instance, co::MemberInfo* member )
+				[[ checkInstance( const co::Any& any, co::MemberInfo* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
 
+		// make sure that 'any' is an instance of this type
 		co::]], t.typeInterfaceName, [[* myType = co::typeOf<]], t.cppName, [[>::get();
 
-		// make sure that 'instance' is an instance of this type
-		if( instance.getKind() != co::]], t.kind, [[ ||
-			]] )
+		]] )
 
 			if t.kind == 'TK_INTERFACE' then
-				writer( "!instance.getInterfaceType()->isSubTypeOf( myType ) ||\n" )
+				writer( t.cppName, "* res;\n\t\t" )
+				writer( "if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<", t.cppName, "*>( any.getState().data.itf ) ) )\n" )
 			else
-				writer( "instance.getType() != myType ||\n" )
+				writer( "if( any.getKind() != co::", t.kind, " || any.getType() != myType || any.getState().data.ptr == NULL )\n" )
 			end
 
 			writer( [[
-			instance.getState().data.ptr == NULL )
-			CORAL_THROW( co::IllegalArgumentException, "expected a valid ]], t.cppName, [[*, but got " << instance );
+			CORAL_THROW( co::IllegalArgumentException, "expected a valid ]], t.cppName, [[*, but got " << any );
 
 		// make sure that 'member' belongs to this type
 		co::CompoundType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
-				<< owner->getFullName() << ", not to " << myType->getFullName() );
+				<< owner->getFullName() << ", not to ]], t.fullName, [[" );
 
 		]] )
+
 			if t.kind == 'TK_INTERFACE' then
-				writer( "return dynamic_cast<", t.cppName, "*>( instance.getState().data.itf );\n" )
+				writer( "return res;\n" )
 			else
 				writer( "return ", t.kind == 'TK_NATIVECLASS' and "*" or "", "reinterpret_cast<",
-					t.cppName, "*>( instance.getState().data.ptr );\n" )
+					t.cppName, "*>( any.getState().data.ptr );\n" )
 			end
 
 			writer( "\t}\n" )

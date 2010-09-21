@@ -42,8 +42,11 @@ void co::ModuleInstaller::uninstall()
 {
 	for( unsigned int i = 0; i < TypeCount; ++i )
 	{
-		_reflectors[i]->getType()->setReflector( NULL );
-		_reflectors[i] = NULL;
+		if( _reflectors[i].isValid() )
+		{
+			_reflectors[i]->getType()->setReflector( NULL );
+			_reflectors[i] = NULL;
+		}
 	}
 }
 
