@@ -207,7 +207,7 @@ TEST( TypeLoaderTests, singleCppBlock )
 	CSL_TEST( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" );
 	
 	co::InterfaceType* it = dynamic_cast<co::InterfaceType*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" ) );
-	ASSERT_TRUE( it );
+	ASSERT_TRUE( it != NULL );
 
 	EXPECT_EQ( "\n\t//This code block was injected by the compiler using the '<c++' tag\n\tvoid myInjectedFoo() {;}\n\t", it->getCppBlock() );
 }
@@ -217,7 +217,7 @@ TEST( TypeLoaderTests, multipleCppBlocks )
 	CSL_TEST( "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" );
 
 	co::InterfaceType* it = dynamic_cast<co::InterfaceType*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" ) );
-	ASSERT_TRUE( it );
+	ASSERT_TRUE( it != NULL );
 
 	EXPECT_EQ( "\n\tvoid myInjectedFoo() {;}\n\t\n\tvoid myLastInjectedFoo() {;}\n\t", it->getCppBlock() );
 }

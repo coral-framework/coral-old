@@ -30,8 +30,6 @@ TEST( MappingTests, enumValues )
 TEST( MappingTests, enumSize )
 {
 	EXPECT_EQ( sizeof(moduleA::TestEnum), 4 );
-	moduleA::TestEnum enumArray[2];
-	EXPECT_EQ( sizeof(enumArray), 8 );
 }
 
 TEST( MappingTests, structFields )

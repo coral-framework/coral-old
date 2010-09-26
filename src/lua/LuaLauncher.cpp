@@ -31,7 +31,7 @@ co::int32 LuaLauncher::main( co::ArrayRange<std::string const> args )
 	LuaState::loadFile( L, filename );
 	
 	args.popFirst();
-	co::int32 numArgs = args.getSize();
+	co::int32 numArgs = static_cast<co::int32>( args.getSize() );
 
 	for( ; args; args.popFirst() )
 		LuaState::push( L, args.getFirst() );
@@ -39,7 +39,7 @@ co::int32 LuaLauncher::main( co::ArrayRange<std::string const> args )
 	LuaState::call( L, numArgs, 1 );
 
 	int resType = lua_type( L, -1 );
-	int res = lua_tonumber( L, -1 );
+	co::int32 res = static_cast<co::int32>( lua_tointeger( L, -1 ) );
 	lua_pop( L, 1 );
 
 	if( resType != LUA_TNIL && resType != LUA_TNUMBER )

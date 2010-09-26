@@ -405,17 +405,17 @@ void LuaState::pushArray( lua_State* L, const co::Any& var )
 	assert( kind != co::TK_INTERFACE || elemSize == sizeof(void*) );
 
 	// get the array as a memory block
-	co::int32 elemCount;
+	int elemCount;
 	co::uint8* blockStart;
 	if( s.arrayKind == co::__any::State::AK_ArrayRange )
 	{
-		elemCount = s.arraySize;
+		elemCount = static_cast<int>( s.arraySize );
 		blockStart = reinterpret_cast<co::uint8*>( s.data.ptr );
 	}
 	else
 	{
 		std::vector<co::uint8>& pseudoVector = *reinterpret_cast<std::vector<co::uint8>*>( s.data.ptr );
-		elemCount = pseudoVector.size() / elemSize;
+		elemCount = static_cast<int>( pseudoVector.size() / elemSize );
 		blockStart = &pseudoVector[0];
 	}
 
@@ -423,7 +423,7 @@ void LuaState::pushArray( lua_State* L, const co::Any& var )
 
 	if( kind == co::TK_INTERFACE )
 	{
-		for( co::int32 i = 0; i < elemCount; ++i )
+		for( int i = 0; i < elemCount; ++i )
 		{
 			co::Interface* itf = *reinterpret_cast<co::Interface**>( blockStart + i * sizeof(void*) );
 			if( itf )
@@ -442,7 +442,7 @@ void LuaState::pushArray( lua_State* L, const co::Any& var )
 	{
 		co::Any elem;
 		co::uint32 flags = ( kind < co::TK_STRING || kind == co::TK_ENUM ? co::Any::VarIsValue : co::Any::VarIsReference );
-		for( co::int32 i = 0; i < elemCount; ++i )
+		for( int i = 0; i < elemCount; ++i )
 		{
 			if( kind < co::TK_ARRAY )
 				elem.setBasic( kind, flags, blockStart + i * elemSize );
@@ -465,12 +465,12 @@ void LuaState::toArray( lua_State* L, int index, co::Type* expectedType, co::Any
 	co::Reflector* elementReflector = elementType->getReflector();
 	co::int32 elementSize = elementReflector->getSize();
 
-	size_t len = lua_rawlen( L, index );
+	int len = static_cast<int>( lua_rawlen( L, index ) );
 
 	co::Any::PseudoVector& pv = var.createArray( elementType, len );
 	co::uint8* p = &pv[0];
 
-	size_t i = 1;
+	int i = 1;
 	int stackTop = lua_gettop( L );
 	co::Any elementValue;
 
