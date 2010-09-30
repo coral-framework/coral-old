@@ -93,6 +93,14 @@ function M.includeHeader( t, headerOrType )
 	t.includedHeaders[headerOrType] = true
 end
 
+function M.addForwardDecl( t, type )
+	if t._type ~= type._type then
+		t.forwardDeclTypes[type.fullName] = type
+	end
+end
+
+------ includeType() ----------------------------------------------------------
+
 local include = {}
 
 function M.includeType( t, type )
@@ -132,7 +140,7 @@ function include.TK_STRUCT( t, type )
 	end
 end
 
-include.TK_NATIVECLASS = include.TK_STRUCT
+include.TK_NATIVECLASS = include.TK_ENUM
 
 function include.TK_INTERFACE( t, type )
 	if t.kind == 'TK_STRUCT' then
@@ -144,9 +152,68 @@ function include.TK_INTERFACE( t, type )
 	end
 end
 
-function M.addForwardDecl( t, type )
-	if t._type ~= type._type then
-		t.forwardDeclTypes[type.fullName] = type
+------ writeIncludesAndFwdDecls() ----------------------------------------------------------
+
+function M.writeIncludesAndFwdDecls( t, writer )
+	for header in pairs( t.includedHeaders ) do
+		writer( "#include <", header, ">\n" )
+	end
+
+	if next( t.forwardDeclTypes ) then
+		writer( "\n// Forward Declarations:\n" )
+
+		-- gather all type names into an array and sort them
+		local fullTypeNames = {}
+		for fullName, type in pairs( t.forwardDeclTypes ) do
+			fullTypeNames[#fullTypeNames + 1] = fullName
+		end
+
+		table.sort( fullTypeNames )
+
+		local depth = 0
+		local lastNS = ''
+		local indent = ''
+		local s, e
+
+		-- closes namespaces from 'lastNS' until it contains 'ns'
+		local function closeNamespacesUntilItContains( ns )
+			while true do
+				s, e = ns:find( lastNS, 1, true )
+				if s == 1 then break end
+				local prefix, name = lastNS:match( '(.+)%.([^%.]+)$' )
+				if prefix then
+					lastNS = prefix
+				else
+					name = lastNS
+					lastNS = ''
+				end
+				depth = depth - 1
+				indent = ( "\t" ):rep( depth )
+				writer( indent, "} // namespace ", name, "\n" )
+			end
+		end
+
+		for _, fullName in ipairs( fullTypeNames ) do
+			local type = t.forwardDeclTypes[fullName]
+			local ns = type.namespace.fullName
+			if ns ~= lastNS then
+				closeNamespacesUntilItContains( ns )
+
+				-- ns is within lastNS, just open the necessary namespaces
+				local namespacesToOpen = ns:sub( e + 1 )
+				for name in namespacesToOpen:gmatch( '([^%.]+)' ) do
+					writer( indent, "namespace ", name, " {\n" )
+					depth = depth + 1
+					indent = ( '\t' ):rep( depth )
+				end
+				lastNS = ns
+			end
+			writer( indent, type.kind == 'TK_STRUCT' and "struct " or "class ", type.name, ";\n" )
+		end
+
+		closeNamespacesUntilItContains( '' )
+
+		writer( "// End Of Forward Declarations\n" )
 	end
 end
 

@@ -835,6 +835,9 @@ void Any::makeIn()
 
 Any& Any::createAny()
 {
+	if( _objectKind == TK_ANY )
+		return *reinterpret_cast<Any*>( _object.data.ptr );
+
 	if( containsObject() )
 		throw co::Exception( "co::Any::createAny() called while a co::Any contains an object" );
 
@@ -1160,8 +1163,7 @@ void Any::copy( const co::Any& other )
 		&& isInside( _state.data.ptr, other )  )
 	{
 		// we should copy the object
-		_objectKind = other._objectKind;
-		switch( _objectKind )
+		switch( other._objectKind )
 		{
 		case TK_ANY:
 			createAny() = *reinterpret_cast<Any*>( other._object.data.ptr );
@@ -1173,6 +1175,7 @@ void Any::copy( const co::Any& other )
 
 		case TK_ARRAY:
 			{
+				_objectKind = TK_ARRAY;
 				_object.array.reflector = other._object.array.reflector;
 				co::Type* elementType = _object.array.reflector->getType();
 				switch( elementType->getKind() )
@@ -1242,6 +1245,8 @@ void Any::copy( const co::Any& other )
 		default:
 			break;
 		}
+
+		assert( _objectKind == other._objectKind );
 	}
 }
 

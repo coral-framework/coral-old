@@ -35,11 +35,11 @@ protected:
 			delete this;
 	}
 
-	//! Raises co::NoSuchInterfaceException if \c interfaceInfo isn't one of the component's interfaces.
-	void checkValidInterface( InterfaceInfo* interfaceInfo );
+	//! Raises co::NoSuchInterfaceException if \c itfInfo isn't one of the component's interfaces.
+	void checkValidInterface( InterfaceInfo* itfInfo );
 
-	//! Similar to checkValidInterface(), but also raises an exception if \c clientInterface is a server interface.
-	void checkValidClientInterface( InterfaceInfo* clientInterface );
+	//! Similar to checkValidInterface(), but also raises an exception if \c itfInfo is a server interface.
+	void checkValidClientInterface( InterfaceInfo* itfInfo );
 
 	/*!
 		Raises a co::NoSuchInterfaceException for cases that simply "should never happen"

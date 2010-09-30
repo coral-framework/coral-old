@@ -26,6 +26,8 @@ private:
 	static int getType( lua_State* L );
 	static int genericNew( lua_State* L );
 	static int packageLoader( lua_State* L );
+	static int newComponentType( lua_State* L );
+	static int setComponentInstance( lua_State* L );
 };
 
 /*!

@@ -58,6 +58,28 @@ function M:initialize( module )
 	ASSERT_EQ( r1.x, 1 ) ASSERT_EQ( r1.y, 1 )
 	ASSERT_EQ( r2.x, 2 ) ASSERT_EQ( r2.y, 2 )
 	ASSERT_EQ( r3.x, 3 ) ASSERT_EQ( r3.y, 3 )
+
+	-- test passing & retrieving any's
+	local _, v = vec2d:dummyMethod( "str" )
+	ASSERT_EQ( v, "str" )
+
+	_, v = vec2d:dummyMethod( 3.14 )
+	ASSERT_EQ( type( v ), 'number' )
+	ASSERT_EQ( v, 3.14 )
+
+	_, v = vec2d:dummyMethod( s )
+	ASSERT_EQ( type( v), 'userdata' )
+	ASSERT_EQ( v.x, 1 )
+	ASSERT_EQ( v.y, 1 )
+
+--[[-- currently we cannot pass an array as an 'any' argument, unfortunately
+	_, v = vec2d:dummyMethod( { 4, 5, 6 } )
+	ASSERT_EQ( type( v ), 'array' )
+	ASSERT_EQ( v[1], 4 )
+	ASSERT_EQ( v[2], 5 )
+	ASSERT_EQ( v[3], 6 )
+--]]
+
 end
 
 return M

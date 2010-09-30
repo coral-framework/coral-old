@@ -56,8 +56,17 @@ public:
 	co::ArrayRange<co::TypeBuilder* const> getTypeBuilders();
 	void commit();
 	void rollback();
+	
+protected:
+	co::InterfaceType* getRequiredItfType();
+	void setRequiredItfType( co::InterfaceType* itfType );
+	co::Type* getRequiredType();
+	void setRequiredType( co::Type* type );
 
 private:
+	co::RefPtr<co::InterfaceType> _itfType;
+	co::RefPtr<co::Type> _type;
+
 	co::RefPtr<moduleA::DummyInterface> _dummyInterface;
 	std::string _name;
 	std::string _readOnlyString;

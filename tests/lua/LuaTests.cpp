@@ -94,6 +94,13 @@ TEST( LuaTests, array )
 	ASSERT_SUCCESS( "lua.array" );
 }
 
+// --- Lua Component Tests --- //
+
+TEST( LuaTests, component )
+{
+	ASSERT_SUCCESS( "lua.component" );
+}
+
 // --- Component Binding Tests --- //
 
 TEST( LuaTests, componentManipulation )

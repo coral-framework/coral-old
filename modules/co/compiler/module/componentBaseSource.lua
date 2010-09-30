@@ -106,7 +106,7 @@ co::Interface* ]], t.name, [[_Base::getInterface( co::InterfaceInfo* interfaceIn
 
 	for i, itf in ipairs( requiredItfs ) do
 		writer( "\tcase ", itf.index, ":\t\tres = co::disambiguate<co::Interface, ",
-			itf.type.cppName, ">( ", t.formatAccessor( "get", itf.name ), "() ); break;\n" )
+			itf.type.cppName, ">( ", t.formatAccessor( "getRequired", itf.name ), "() ); break;\n" )
 	end
 
 	for i, itf in ipairs( providedItfs ) do
@@ -131,7 +131,7 @@ void ]], t.name, [[_Base::bindInterface( co::InterfaceInfo* clientInterface, co:
 ]] )
 
 		for i, itf in ipairs( requiredItfs ) do
-			writer( "\tcase ", itf.index, ":\t\t", t.formatAccessor( "set", itf.name ),
+			writer( "\tcase ", itf.index, ":\t\t", t.formatAccessor( "setRequired", itf.name ),
 				"( checkedInterfaceCast<", itf.type.cppName, ">( instance ) ); break;\n" )
 		end
 

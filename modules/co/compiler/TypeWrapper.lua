@@ -250,11 +250,7 @@ function traverse.TK_STRUCT( t )
 	end
 end
 
-function traverse.TK_NATIVECLASS( t )
-	t:includeHeader( t.nativeHeaderFile )
-end
-
-function traverse.TK_INTERFACE( t )
+local function traverseAttribMethodContainer( t )
 	for i, a in ipairs( t.memberAttributes ) do
 		t:includeType( a.type )
 	end
@@ -275,6 +271,15 @@ function traverse.TK_INTERFACE( t )
 			end
 		end
 	end
+end
+
+function traverse.TK_NATIVECLASS( t )
+	t:includeHeader( t.headerName )
+	traverseAttribMethodContainer( t )
+end
+
+function traverse.TK_INTERFACE( t )
+	traverseAttribMethodContainer( t )
 
 	for i, super in ipairs( t.superInterfaces ) do
 		t:includeHeader( super )

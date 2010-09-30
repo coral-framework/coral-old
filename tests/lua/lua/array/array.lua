@@ -7,9 +7,9 @@ function M:initialize( module )
 
 	-- test the number of types in the l
 	local luaModuleTypes = co.system.types:findNamespace( "lua" ).types
-	ASSERT_EQ( 8, #luaModuleTypes )
-	ASSERT_EQ( "Exception", luaModuleTypes[1].name )
-	ASSERT_EQ( "lua", luaModuleTypes[8].name )
+	ASSERT_EQ( 9, #luaModuleTypes )
+	ASSERT_EQ( "Component", luaModuleTypes[1].name )
+	ASSERT_EQ( "Universe", luaModuleTypes[8].name )
 
 	-- test a method that returns an array of structs as an output param
 	local type, cslErrors = co.system.types:loadType( "TypeLoaderTests.NestedErrors.Struct1" )

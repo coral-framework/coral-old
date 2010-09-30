@@ -55,6 +55,7 @@ co::Reflector* lua::ModuleInstaller::createReflector( TypeId typeId )
 	co::Reflector* res = NULL;
 	switch( typeId )
 	{
+	case TypeId_Component: res = lua::__createComponentReflector(); break;
 	case TypeId_Exception: res = lua::__createExceptionReflector(); break;
 	case TypeId_ILauncher: res = lua::__createILauncherReflector(); break;
 	case TypeId_IState: res = lua::__createIStateReflector(); break;

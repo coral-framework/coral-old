@@ -65,3 +65,9 @@ const moduleA::Vec2D& moduleA::Vec2D_Adapter::testInOut( moduleA::Vec2D& self,
 	b = a;
 	return self;
 }
+
+co::Interface* moduleA::Vec2D_Adapter::dummyMethod( moduleA::Vec2D&, const co::Any& in, co::Any& out )
+{
+	out = in;
+	return NULL;
+}

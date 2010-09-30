@@ -25,6 +25,15 @@ void ModulePart::initialize( co::Module* )
 
 	_luaModulePartLoader = new LuaModulePartLoader;
 	co::getSystem()->getModules()->installLoader( _luaModulePartLoader.get() );
+
+	/*
+		Install the co.packageLoader function into Lua's package.loaders table,
+		in order to enable 'require' to load Lua scripts in the CORAL_PATH.
+	 */
+	LuaState::doString( LuaState::getL(), "table.insert( package.loaders, 2, co.packageLoader )" );
+
+	// force loading of our own package (lua/init.lua)
+	LuaState::doString( LuaState::getL(), "require 'lua'" );
 }
 
 void ModulePart::integrate( co::Module* )

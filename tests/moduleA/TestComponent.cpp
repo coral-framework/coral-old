@@ -176,4 +176,24 @@ void TestComponent::rollback()
 	// empty
 }
 
+co::InterfaceType* TestComponent::getRequiredItfType()
+{
+	return _itfType.get();
+}
+
+void TestComponent::setRequiredItfType( co::InterfaceType* itfType )
+{
+	_itfType = itfType;
+}
+
+co::Type* TestComponent::getRequiredType()
+{
+	return _type.get();
+}
+
+void TestComponent::setRequiredType( co::Type* type )
+{
+	_type = type;
+}
+
 CORAL_EXPORT_COMPONENT( TestComponent, TestComponent );

@@ -69,7 +69,7 @@ function M.process( args, handlers )
 			end
 
 			if type( h ) ~= 'function' then
-				error( "Invalid handler for '" .. v .. "':", h )
+				error( "Invalid handler for '" .. v .. "':" .. tostring( h ), 0 )
 			end
 
 			-- Now, find out how many non-flag parameters we can provide the call
@@ -81,7 +81,7 @@ function M.process( args, handlers )
 			if n then
 				n = tonumber( n )
 				if not n then
-					error( "Handler for '" .. flag .. "' returned a bad, non-numeric value." )
+					error( "Handler for '" .. flag .. "' returned a bad, non-numeric value.", 0 )
 				end
 				i = i + n  -- skip n
 			end

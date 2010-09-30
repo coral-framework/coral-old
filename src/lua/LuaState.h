@@ -35,6 +35,9 @@ public:
 	//! Debug method: prints the Lua stack to stdout.
 	static void dumpStack( lua_State* L );
 
+	//! Loads and runs the given string. On error, raises a lua::Exception.
+	static void doString( lua_State* L, const char* code );
+
 	/*!
 		Searches for a Lua file with the given 'name' in the CORAL_PATH.
 		The search follows the same conventions used for locating Lua packages.
@@ -44,6 +47,9 @@ public:
 
 	//! Pushes a chunk loaded from a file. On error, raises a lua::Exception.
 	static void loadFile( lua_State* L, const std::string& filename );
+
+	//! Pushes a chunk loaded from a string. On error, raises a lua::Exception.
+	static void loadString( lua_State* L, const char* code );
 
 	/*!
 		Calls a Lua function using the same conventions as lua_call().

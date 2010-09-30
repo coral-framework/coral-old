@@ -35,7 +35,7 @@ function M:initialize( module )
 	-- test setting some attributes
 	testStruct.testEnum = "Third"
 	ASSERT_EQ( testStruct.testEnum, "Third" )
-	testStruct.aType = co.getType( "uint16" )
+	testStruct.aType = co.Type.uint16
 	ASSERT_EQ( testStruct.aType.fullName, "uint16" )
 
 	-- test setting 'testEnum' with an invalid identifier

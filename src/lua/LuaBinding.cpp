@@ -5,6 +5,7 @@
 
 #include "LuaBinding.h"
 #include "LuaState.h"
+#include "LuaComponent.h"
 #include <co/System.h>
 #include <co/Component.h>
 #include <co/Reflector.h>
@@ -70,6 +71,8 @@ void coPackage::open( lua_State* L )
 		{ "getType", getType },
 		{ "new", genericNew },
 		{ "packageLoader", packageLoader },
+		{ "newComponentType", newComponentType },
+		{ "setComponentInstance", setComponentInstance },
 		{ NULL, NULL }
 	};
 
@@ -203,6 +206,53 @@ int coPackage::packageLoader( lua_State* L )
 		return lua_error( L );
 
 	return 1;
+}
+
+int coPackage::newComponentType( lua_State* L )
+{
+	luaL_checktype( L, 2, LUA_TTABLE );
+
+	__BEGIN_EXCEPTIONS_BARRIER__
+
+	co::Any ctAny;
+	CompoundTypeBinding::getInstance( L, 1, ctAny );
+	co::ComponentType* ct = ctAny.get<co::ComponentType*>();
+
+	lua_pushvalue( L, 2 );
+	int tableRef = luaL_ref( L, LUA_REGISTRYINDEX );
+
+	LuaComponent* lc = new LuaComponent;
+	lc->setComponentType( ct, tableRef );
+
+	LuaState::push( L, static_cast<co::Reflector*>( lc ) );
+
+	return 1;
+
+	__END_EXCEPTIONS_BARRIER__
+}
+
+int coPackage::setComponentInstance( lua_State* L )
+{
+	luaL_checktype( L, 2, LUA_TTABLE );
+
+	__BEGIN_EXCEPTIONS_BARRIER__
+
+	co::Any ctAny;
+	CompoundTypeBinding::getInstance( L, 1, ctAny );
+	co::Component* comp = ctAny.get<co::Component*>();
+
+	lua_pushvalue( L, 2 );
+	int tableRef = luaL_ref( L, LUA_REGISTRYINDEX );
+
+	LuaComponent* lc = dynamic_cast<LuaComponent*>( comp );
+	if( !lc )
+		throw lua::Exception( "bad argument #1 to setComponentInstance (lua.Component expected)" );
+
+	lc->setComponentInstance( tableRef );
+
+	return 0;
+
+	__END_EXCEPTIONS_BARRIER__
 }
 
 /*****************************************************************************/

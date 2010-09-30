@@ -12,6 +12,11 @@ function M:initialize( module )
 	ASSERT_EQ( co.getType( "co.ArrayType" ).name, "ArrayType" )
 	ASSERT_ERROR( function() co.getType( "nonExistingType" ) end, "could not load type 'nonExistingType'" )
 
+	-- test the co.Type table
+	ASSERT_EQ( co.Type "bool", co.getType( "bool" ) )
+	ASSERT_EQ( co.Type["co.ArrayType"], co.getType( "co.ArrayType" ) )
+	ASSERT_ERROR( function() return co.Type.nonExistingType end, "could not load type 'nonExistingType'" )
+
 	-- test the co.new() function
 	local testComponent = co.new( "moduleA.TestComponent" )
 	ASSERT_EQ( testComponent.componentType.fullName, "moduleA.TestComponent" )

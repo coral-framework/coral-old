@@ -50,16 +50,6 @@ void LuaState::setup()
 	// create the 'co' package
 	coPackage::open( sm_L );
 
-	/*
-		We install the co.packageLoader function into Lua's package.loaders table
-		in order to enable 'require' to load Lua scripts in the CORAL_PATH.
-	 */
-	if( luaL_dostring( sm_L, "table.insert( package.loaders, 2, co.packageLoader )" ) )
-	{
-		lua_pop( sm_L, 1 );
-		throw lua::Exception( "error installing the co.packageLoader into Lua's package.loaders table" );
-	}
-
 	// keep our stack-tracing function at the first stack position
 	lua_settop( sm_L, 0 );
 	lua_pushcfunction( sm_L, traceback );
@@ -104,6 +94,12 @@ void LuaState::dumpStack( lua_State* L )
 	printf( "dumpStack -- END\n" );
 }
 
+void LuaState::doString( lua_State* L, const char* code )
+{
+	loadString( L, code );
+	call( L, 0, 0 );
+}
+
 bool LuaState::searchScriptFile( const std::string& name, std::string& filename )
 {
 	static const std::string s_extension( "lua" );
@@ -124,6 +120,13 @@ bool LuaState::searchScriptFile( const std::string& name, std::string& filename 
 void LuaState::loadFile( lua_State* L, const std::string& filename )
 {
 	int res = luaL_loadfile( L, filename.c_str() );
+	if( res != LUA_OK )
+		raiseException( L, res );
+}
+
+void LuaState::loadString( lua_State* L, const char* code )
+{
+	int res = luaL_loadstring( L, code );
 	if( res != LUA_OK )
 		raiseException( L, res );
 }
@@ -291,49 +294,57 @@ void LuaState::push( lua_State* L, co::Component* component )
 
 void LuaState::toCoral( lua_State* L, int index, co::Type* expectedType, co::Any& var )
 {
-	assert( expectedType );	
+	assert( expectedType );
+
+	co::Any* any;
+	co::TypeKind expectedKind = expectedType->getKind();
+	if( expectedKind == co::TK_ANY )
+		any = &var.createAny();
+	else
+		any = &var;
+	
 	switch( lua_type( L, index ) )
 	{
 	case LUA_TNIL:
-		if( expectedType->getKind() == co::TK_INTERFACE )
+		if( expectedKind == co::TK_INTERFACE )
 		{
-			var.setInterface( NULL, static_cast<co::InterfaceType*>( expectedType ) );
+			any->setInterface( NULL, static_cast<co::InterfaceType*>( expectedType ) );
 			break;
 		}
 		throw lua::Exception( "no conversion from Lua's nil" );
 
 	case LUA_TBOOLEAN:
-		var.set<bool>( lua_toboolean( L, index ) != 0 );
+		any->set<bool>( lua_toboolean( L, index ) != 0 );
 		break;
 
 	case LUA_TLIGHTUSERDATA:
 		throw lua::Exception( "no conversion from a Lua light userdata" );
 
 	case LUA_TNUMBER:
-		var.set( lua_tonumber( L, index ) );
+		any->set( lua_tonumber( L, index ) );
 		break;
 
 	case LUA_TSTRING:
-		if( expectedType->getKind() == co::TK_ENUM )
+		if( expectedKind == co::TK_ENUM )
 		{
 			const char* str = lua_tostring( L, index );
 			co::int32 id = static_cast<co::EnumType*>( expectedType )->getValueOf( str );
 			if( id == -1 )
 				CORAL_THROW( lua::Exception, "invalid identifier '" << str << "' for enum '"
 								<< expectedType->getFullName() << "'" );
-			var.set( id );
+			any->set( id );
 		}
 		else
 		{
 			size_t length;
 			const char* cstr = lua_tolstring( L, index, &length );
-			var.createString().assign( cstr, length );
+			any->createString().assign( cstr, length );
 		}
 		break;
 
 	case LUA_TTABLE:
-		if( expectedType->getKind() == co::TK_ARRAY )
-			toArray( L, index, expectedType, var );
+		if( expectedKind == co::TK_ARRAY )
+			toArray( L, index, expectedType, *any );
 		else
 			throw lua::Exception( "no conversion from a Lua table" );
 
@@ -341,7 +352,7 @@ void LuaState::toCoral( lua_State* L, int index, co::Type* expectedType, co::Any
 		throw lua::Exception( "no conversion from a Lua function" );
 
 	case LUA_TUSERDATA:
-		CompoundTypeBinding::getInstance( L, index, var );
+		CompoundTypeBinding::getInstance( L, index, *any );
 		break;
 
 	case LUA_TTHREAD:

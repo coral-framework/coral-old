@@ -109,11 +109,6 @@ static bool getCurrentWorkingDir( std::string& dir )
  */
 static void addDefaultPaths()
 {
-#if defined(CORAL_PATH)
-	// if specified at compile time, add the contents of 'CORAL_PATH' to the path;
-	co::addPath( CORAL_PATH );
-#endif
-
 	// if the CORAL_PATH environment variable is specified, add it to the path
 	char* coralPathEnv = getenv( "CORAL_PATH" );
 	if( coralPathEnv )
@@ -145,6 +140,11 @@ static void addDefaultPaths()
 	}
 	else
 		std::cerr << "Oops! Could not determine the current working directory.\n";
+
+#if defined(CORAL_PATH)
+	// if specified at compile time, add the contents of 'CORAL_PATH' to the path;
+	co::addPath( CORAL_PATH );
+#endif
 }
 
 void resolveCallee( const std::string& calleeName, co::ComponentType*& ct, co::InterfaceInfo*& ii, co::MethodInfo*& mi )

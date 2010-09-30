@@ -6,9 +6,11 @@ local function template( writer, c, t )
 #ifndef _]], t.fullNameUpperUnderline, [[_ADAPTER_H_
 #define _]], t.fullNameUpperUnderline, [[_ADAPTER_H_
 
-#include <]], t.headerName, [[>
-
 ]] )
+
+	t:writeIncludesAndFwdDecls( writer )
+
+	writer( "\n" )
 
 	c.utils.openNamespaces( writer, c.moduleName )
 

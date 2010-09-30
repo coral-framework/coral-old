@@ -16,6 +16,7 @@ public:
 
 	enum TypeId
 	{
+		TypeId_Component,
 		TypeId_Exception,
 		TypeId_ILauncher,
 		TypeId_IState,
@@ -60,6 +61,7 @@ private:
 };
 
 // Module's reflector creation functions:
+co::Reflector* __createComponentReflector();
 co::Reflector* __createExceptionReflector();
 co::Reflector* __createILauncherReflector();
 co::Reflector* __createIStateReflector();

@@ -18,21 +18,21 @@ interface Component
 	/*
 		Retrieves the interface instance "provided by" or "connected to" one of the component's interfaces.
 
-		If \c interfaceInfo identifies a \e server interface, this method returns the corresponding interface
-		instance <em>provided by</em> this component. Otherwise, if \c interfaceInfo is a \e client interface,
+		If \c itfInfo identifies a \e server interface, this method returns the corresponding interface
+		instance <em>provided by</em> this component. Otherwise, if \c itfInfo is a \e client interface,
 		this method returns the server interface that is <em>connected to</em> the client interface (in this
 		case, the returned value is null if no server interface is currently bound to the client interface).
 
-		\throw NoSuchInterfaceException if \c interfaceInfo is not a valid interface of this component.
+		\throw NoSuchInterfaceException if \c itfInfo is not a valid interface of this component.
 	 */
-	Interface getInterface( in InterfaceInfo interfaceInfo ) raises NoSuchInterfaceException;
+	Interface getInterface( in InterfaceInfo itfInfo ) raises NoSuchInterfaceException;
 
 	/*
-		Connects the given server interface instance to a client interface of this component.
+		Connects the given server interface \c instance to a client interface of this component.
 		If an interface instance is already bound to the client interface, it is replaced by the new \c instance.
-		\throw NoSuchInterfaceException if \c clientInterface is not a valid client interface of this component.
+		\throw NoSuchInterfaceException if \c clientItfInfo is not a valid client interface of this component.
 		\throw IllegalArgumentException if the passed \c instance is incompatible with the client interface.
 	 */
-	void bindInterface( in InterfaceInfo clientInterface, in Interface instance )
+	void bindInterface( in InterfaceInfo clientItfInfo, in Interface instance )
 		raises NoSuchInterfaceException, IllegalArgumentException;
 };

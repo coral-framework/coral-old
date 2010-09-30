@@ -45,24 +45,24 @@ const std::string& ComponentBase::getInterfaceName()
 	return s_interfaceName;
 }
 
-void ComponentBase::checkValidInterface( InterfaceInfo* itf )
+void ComponentBase::checkValidInterface( InterfaceInfo* itfInfo )
 {
-	if( !itf )
+	if( !itfInfo )
 		throw NoSuchInterfaceException( "illegal null interface info" );
 
 	ComponentType* myType = getComponentType();
-	CompoundType* owner = itf->getOwner();
+	CompoundType* owner = itfInfo->getOwner();
 	if( owner != static_cast<CompoundType*>( myType ) )
-		CORAL_THROW( NoSuchInterfaceException, "interface '" << itf->getName() << "' belongs to "
+		CORAL_THROW( NoSuchInterfaceException, "interface '" << itfInfo->getName() << "' belongs to "
 			<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-	assert( itf->getIndex() < myType->getInterfaces().getSize() );
+	assert( itfInfo->getIndex() < myType->getInterfaces().getSize() );
 }
 
-void ComponentBase::checkValidClientInterface( InterfaceInfo* clientInterface )
+void ComponentBase::checkValidClientInterface( InterfaceInfo* itfInfo )
 {
-	checkValidInterface( clientInterface );
-	if( clientInterface->getIsProvided() )
+	checkValidInterface( itfInfo );
+	if( itfInfo->getIsProvided() )
 		throw NoSuchInterfaceException( "expected a client interface, but got a server interface" );
 }
 

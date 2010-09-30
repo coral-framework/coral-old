@@ -8,13 +8,6 @@ local function template( writer, c, t )
 
 ]] )
 
-	local providedItfs = t.providedInterfaces
-	local requiredItfs = t.requiredInterfaces
-
-	if #requiredItfs > 0 then
-		writer( "#include <co/RefPtr.h>\n" )
-	end
-
 	for header in pairs( t.includedHeaders ) do
 		writer( "#include <", header, ">\n" )
 	end
@@ -27,10 +20,14 @@ local function template( writer, c, t )
 
 	c.utils.openNamespaces( writer, c.moduleName )
 
+	writer( "\n" )
+
+	local providedItfs = t.providedInterfaces
+	local requiredItfs = t.requiredInterfaces
+
 	for i, itf in ipairs( providedItfs ) do
 		writer( [[
-
-//! ]], t.fullName, [[ provides an interface named ']], itf.name, [[', of type ]], itf.type.fullName, "\n", [[
+//! ]], t.fullName, [[ provides an interface named ']], itf.name, [[', of type ]], itf.type.fullName, ".\n", [[
 class ]], t.name , [[_]], itf.type.fullNameUnderline, [[ : public ]], itf.type.cppName, "\n", [[
 {
 public:
@@ -49,43 +46,40 @@ class ]], t.name, [[_Base : public co::ComponentBase]] )
 
 	if #providedItfs > 0 then
 		for i, itf in ipairs( providedItfs ) do
-			writer( ",\n\tpublic ", t.name, "_", itf.type.fullNameUnderline, "\n" )
+			writer( ",\n\tpublic ", t.name, "_", itf.type.fullNameUnderline )
 		end
 	end
 
 	writer( [[
+
 {
 public:
 	]], t.name, [[_Base();
 	virtual ~]], t.name, [[_Base();
 
 	// co::Interface Methods:
-	virtual co::Component* getInterfaceOwner();
-	virtual void componentRetain();
-	virtual void componentRelease();
+	co::Component* getInterfaceOwner();
+	void componentRetain();
+	void componentRelease();
 
 	// co::Component Methods:
-	virtual co::ComponentType* getComponentType();
-	virtual co::Interface* getInterface( co::InterfaceInfo* );
-	virtual void bindInterface( co::InterfaceInfo*, co::Interface* );
+	co::ComponentType* getComponentType();
+	co::Interface* getInterface( co::InterfaceInfo* );
+	void bindInterface( co::InterfaceInfo*, co::Interface* );
 ]] )
 
 	if #requiredItfs > 0 then
-		writer( "\nprotected:\n" )
+		writer( "\nprotected:" )
 
 		for i, itf in ipairs( requiredItfs ) do
 			writer( [[
-	//! Required interface ']], itf.name, [[', of type ]], itf.type.fullName, "\n", [[
-	inline ]], itf.type.cppName, [[* ]], t.formatAccessor( "get", itf.name ), [[() { return _]], itf.name, [[.get(); }
-	inline void ]], t.formatAccessor( "set", itf.name ), [[( ]], itf.type.cppName, [[* ]], itf.name, [[ ) { _]], itf.name, [[ = ]], itf.name, [[; }
 
+	//! Gets required interface ']], itf.name, [[', of type ]], itf.type.fullName, ".\n", [[
+	virtual ]], itf.type.cppName, [[* ]], t.formatAccessor( "getRequired", itf.name ), [[() = 0;
+
+	//! Sets required interface ']], itf.name, [[', of type ]], itf.type.fullName, ".\n", [[
+	virtual void ]], t.formatAccessor( "setRequired", itf.name ), [[( ]], itf.type.cppName, [[* ]], itf.name, [[ ) = 0;
 ]] )
-		end
-
-		writer( "private:\n" )
-
-		for i, itf in ipairs( requiredItfs ) do
-			writer( "\tco::RefPtr<", itf.type.cppName, "> _", itf.name, ";\n" )
 		end
 	end
 
