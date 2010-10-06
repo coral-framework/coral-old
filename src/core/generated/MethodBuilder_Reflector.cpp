@@ -46,52 +46,47 @@ public:
 
 	const std::string& getMethodName()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodBuilder>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodBuilder>( 0 ) );
         return res.get< const std::string& >();
 	}
 
 	co::TypeBuilder* getTypeBuilder()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodBuilder>( 1 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodBuilder>( 1 ) );
         return res.get< co::TypeBuilder* >();
 	}
 
 	void createMethod()
 	{
-		co::Any res;
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 2 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 2 ), range );
 	}
 
 	void defineException( co::ExceptionType* exceptionType_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< co::ExceptionType* >( exceptionType_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 3 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 3 ), range );
 	}
 
 	void defineParameter( const std::string& name_, co::Type* type_, bool input_, bool output_ )
 	{
-		co::Any res, args[4];
+		co::Any args[4];
 		args[0].set< const std::string& >( name_ );
 		args[1].set< co::Type* >( type_ );
 		args[2].set< bool >( input_ );
 		args[3].set< bool >( output_ );
 		co::ArrayRange<co::Any const> range( args, 4 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 4 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 4 ), range );
 	}
 
 	void defineReturnType( co::Type* type_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< co::Type* >( type_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 5 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 5 ), range );
 	}
 
 protected:

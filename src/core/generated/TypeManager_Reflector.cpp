@@ -47,9 +47,7 @@ public:
 
 	bool getDocumentationParsing()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::TypeManager>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::TypeManager>( 0 ) );
         return res.get< bool >();
 	}
 
@@ -62,70 +60,62 @@ public:
 
 	co::Namespace* getRootNS()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::TypeManager>( 1 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::TypeManager>( 1 ) );
         return res.get< co::Namespace* >();
 	}
 
 	co::Namespace* findNamespace( const std::string& fullName_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const std::string& >( fullName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 2 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 2 ), range );
 		return res.get< co::Namespace* >();
 	}
 
 	co::Type* findType( const std::string& fullName_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const std::string& >( fullName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 3 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 3 ), range );
 		return res.get< co::Type* >();
 	}
 
 	co::ArrayType* getArrayOf( co::Type* elementType_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< co::Type* >( elementType_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 4 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 4 ), range );
 		return res.get< co::ArrayType* >();
 	}
 
 	const std::string& getDocumentation( const std::string& typeOrMemberName_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const std::string& >( typeOrMemberName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 5 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 5 ), range );
 		return res.get< const std::string& >();
 	}
 
 	co::Type* getType( const std::string& typeName_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const std::string& >( typeName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 6 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 6 ), range );
 		return res.get< co::Type* >();
 	}
 
 	co::Type* loadType( const std::string& typeName_, std::vector<co::CSLError>* errorStack_ )
 	{
-		co::Any res, args[2];
+		co::Any args[2];
 		args[0].set< const std::string& >( typeName_ );
 		args[1].set< std::vector<co::CSLError>* >( errorStack_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 7 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 7 ), range );
 		return res.get< co::Type* >();
 	}
 

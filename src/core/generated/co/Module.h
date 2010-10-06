@@ -30,6 +30,10 @@ public:
 
 	virtual co::ArrayRange<co::ModulePart* const> getParts() = 0;
 
+	virtual co::int32 getPriority() = 0;
+
+	virtual void setPriority( co::int32 priority ) = 0;
+
 	virtual co::ModuleState getState() = 0;
 
 	virtual void abort() = 0;

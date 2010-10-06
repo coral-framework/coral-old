@@ -46,56 +46,46 @@ public:
 
 	co::ModuleManager* getModules()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 0 ) );
         return res.get< co::ModuleManager* >();
 	}
 
 	co::ServiceManager* getServices()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 1 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 1 ) );
         return res.get< co::ServiceManager* >();
 	}
 
 	co::SystemState getState()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 2 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 2 ) );
         return res.get< co::SystemState >();
 	}
 
 	co::TypeManager* getTypes()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 3 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::System>( 3 ) );
         return res.get< co::TypeManager* >();
 	}
 
 	void setupBase( co::ArrayRange<std::string const> requiredModules_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< co::ArrayRange<std::string const> >( requiredModules_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 4 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 4 ), range );
 	}
 
 	void setupPresentation()
 	{
-		co::Any res;
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 5 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 5 ), range );
 	}
 
 	void tearDown()
 	{
-		co::Any res;
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 6 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 6 ), range );
 	}
 
 protected:

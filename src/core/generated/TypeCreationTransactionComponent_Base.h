@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.TypeCreationTransactionComponent provides an interface named 'transaction', of type co.TypeCreationTransaction
+//! co.TypeCreationTransactionComponent provides an interface named 'transaction', of type co.TypeCreationTransaction.
 class TypeCreationTransactionComponent_co_TypeCreationTransaction : public co::TypeCreationTransaction
 {
 public:
@@ -30,14 +30,14 @@ public:
 	virtual ~TypeCreationTransactionComponent_Base();
 
 	// co::Interface Methods:
-	virtual co::Component* getInterfaceOwner();
-	virtual void componentRetain();
-	virtual void componentRelease();
+	co::Component* getInterfaceOwner();
+	void componentRetain();
+	void componentRelease();
 
 	// co::Component Methods:
-	virtual co::ComponentType* getComponentType();
-	virtual co::Interface* getInterface( co::InterfaceInfo* );
-	virtual void bindInterface( co::InterfaceInfo*, co::Interface* );
+	co::ComponentType* getComponentType();
+	co::Interface* getInterface( co::InterfaceInfo* );
+	void bindInterface( co::InterfaceInfo*, co::Interface* );
 };
 
 } // namespace co

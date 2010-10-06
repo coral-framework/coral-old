@@ -3,9 +3,7 @@ require "lua.test"
 local M = {}
 
 function M:initialize( module )
-	-- printTypesIn( co.system.types.rootNS )
-
-	-- test the number of types in the l
+	-- test the number of types in the lua module
 	local luaModuleTypes = co.system.types:findNamespace( "lua" ).types
 	ASSERT_EQ( 9, #luaModuleTypes )
 	ASSERT_EQ( "Component", luaModuleTypes[1].name )
@@ -15,7 +13,6 @@ function M:initialize( module )
 	local type, cslErrors = co.system.types:loadType( "TypeLoaderTests.NestedErrors.Struct1" )
 	ASSERT_EQ( nil, type )
 	ASSERT_EQ( 5, #cslErrors )
-	--pretty( "cslErrors", cslErrors )
 end
 
 return M

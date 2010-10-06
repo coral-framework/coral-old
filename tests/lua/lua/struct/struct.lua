@@ -40,7 +40,7 @@ function M:initialize( module )
 
 	-- test setting 'testEnum' with an invalid identifier
 	ASSERT_ERROR( function() testStruct.testEnum = "Fourth" end,
-		"invalid identifier 'Fourth' for enum 'moduleA.TestEnum'" )
+		"invalid identifier 'Fourth' for enum moduleA.TestEnum" )
 
 	-- test getting attributes of the innerStruct
 	ASSERT_EQ( testStruct.innerStruct.message, "" )
@@ -56,6 +56,34 @@ function M:initialize( module )
 	ASSERT_EQ( testStruct.innerStruct.message, "My Message" )
 	ASSERT_EQ( testStruct.innerStruct.filename, "My Filename" )
 	ASSERT_EQ( testStruct.innerStruct.line, 1337 )
+
+	-- test gettin/setting serveral array fields in a modulaA.TestStruct
+	local ts = co.new "moduleA.TestStruct"
+	ASSERT_EQ( 0, #ts.floatArray )
+	ASSERT_EQ( 0, #ts.enumArray )
+	ASSERT_EQ( 0, #ts.typeArray )
+
+	ts.floatArray = { 1.5, 2.5, 3.5 }
+	ASSERT_EQ( 3, #ts.floatArray )
+	ASSERT_EQ( 2.5, ts.floatArray[2] )
+
+	ts.enumArray = { 'Second', 'Third', 'First' }
+	ASSERT_EQ( 3, #ts.enumArray )
+	ASSERT_EQ( 'Third', ts.enumArray[2] )
+
+	ts.enumArray = { 2, 1, 0, 1, 2 }
+	ASSERT_EQ( 5, #ts.enumArray )
+	ASSERT_EQ( 'First', ts.enumArray[3] )
+
+	ASSERT_ERROR( function() ts.enumArray = { 3 } end, "integer '3' is out of range for enum moduleA.TestEnum" )
+
+	ts.typeArray = {}
+	ASSERT_EQ( 0, #ts.typeArray )
+
+	ts.typeArray = { co.Type "int32", co.Type "co.ArrayType", co.Type "any" }
+	ASSERT_EQ( 3, #ts.typeArray )
+	ASSERT_EQ( "int32", ts.typeArray[1].fullName )
+	ASSERT_EQ( "co.ArrayType", ts.typeArray[2].fullName )
 end
 
 return M

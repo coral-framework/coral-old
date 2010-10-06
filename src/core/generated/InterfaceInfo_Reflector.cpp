@@ -45,25 +45,19 @@ public:
 
 	co::uint32 getIndex()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MemberInfo>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::MemberInfo>( 0 ) );
         return res.get< co::uint32 >();
 	}
 
 	const std::string& getName()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MemberInfo>( 1 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::MemberInfo>( 1 ) );
         return res.get< const std::string& >();
 	}
 
 	co::CompoundType* getOwner()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MemberInfo>( 2 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::MemberInfo>( 2 ) );
         return res.get< co::CompoundType* >();
 	}
 
@@ -71,17 +65,13 @@ public:
 
 	bool getIsProvided()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::InterfaceInfo>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::InterfaceInfo>( 0 ) );
         return res.get< bool >();
 	}
 
 	co::InterfaceType* getType()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::InterfaceInfo>( 1 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::InterfaceInfo>( 1 ) );
         return res.get< co::InterfaceType* >();
 	}
 

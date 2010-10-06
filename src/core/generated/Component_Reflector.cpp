@@ -45,28 +45,25 @@ public:
 
 	co::ComponentType* getComponentType()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Component>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Component>( 0 ) );
         return res.get< co::ComponentType* >();
 	}
 
-	void bindInterface( co::InterfaceInfo* clientInterface_, co::Interface* instance_ )
+	void bindInterface( co::InterfaceInfo* clientItfInfo_, co::Interface* instance_ )
 	{
-		co::Any res, args[2];
-		args[0].set< co::InterfaceInfo* >( clientInterface_ );
+		co::Any args[2];
+		args[0].set< co::InterfaceInfo* >( clientItfInfo_ );
 		args[1].set< co::Interface* >( instance_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 1 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 1 ), range );
 	}
 
-	co::Interface* getInterface( co::InterfaceInfo* interfaceInfo_ )
+	co::Interface* getInterface( co::InterfaceInfo* itfInfo_ )
 	{
-		co::Any res, args[1];
-		args[0].set< co::InterfaceInfo* >( interfaceInfo_ );
+		co::Any args[1];
+		args[0].set< co::InterfaceInfo* >( itfInfo_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 2 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 2 ), range );
 		return res.get< co::Interface* >();
 	}
 
@@ -152,17 +149,17 @@ public:
 			{
 			case 1:
 				{
-					co::InterfaceInfo* clientInterface_ = args[++argIndex].get< co::InterfaceInfo* >();
+					co::InterfaceInfo* clientItfInfo_ = args[++argIndex].get< co::InterfaceInfo* >();
 					co::Interface* instance_ = args[++argIndex].get< co::Interface* >();
 					argIndex = -1;
-					p->bindInterface( clientInterface_, instance_ );
+					p->bindInterface( clientItfInfo_, instance_ );
 				}
 				break;
 			case 2:
 				{
-					co::InterfaceInfo* interfaceInfo_ = args[++argIndex].get< co::InterfaceInfo* >();
+					co::InterfaceInfo* itfInfo_ = args[++argIndex].get< co::InterfaceInfo* >();
 					argIndex = -1;
-					res.set< co::Interface* >( p->getInterface( interfaceInfo_ ) );
+					res.set< co::Interface* >( p->getInterface( itfInfo_ ) );
 				}
 				break;
 			default:

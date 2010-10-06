@@ -46,68 +46,61 @@ public:
 
 	co::int32 getSize()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Reflector>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Reflector>( 0 ) );
         return res.get< co::int32 >();
 	}
 
 	co::Type* getType()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Reflector>( 1 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Reflector>( 1 ) );
         return res.get< co::Type* >();
 	}
 
 	void getAttribute( const co::Any& instance_, co::AttributeInfo* ai_, co::Any& value_ )
 	{
-		co::Any res, args[3];
+		co::Any args[3];
 		args[0].set< const co::Any& >( instance_ );
 		args[1].set< co::AttributeInfo* >( ai_ );
 		args[2].set< co::Any& >( value_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 2 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 2 ), range );
 	}
 
 	void invokeMethod( const co::Any& instance_, co::MethodInfo* mi_, co::ArrayRange<co::Any const> args_, co::Any& returnValue_ )
 	{
-		co::Any res, args[4];
+		co::Any args[4];
 		args[0].set< const co::Any& >( instance_ );
 		args[1].set< co::MethodInfo* >( mi_ );
 		args[2].set< co::ArrayRange<co::Any const> >( args_ );
 		args[3].set< co::Any& >( returnValue_ );
 		co::ArrayRange<co::Any const> range( args, 4 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 3 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 3 ), range );
 	}
 
 	co::Component* newInstance()
 	{
-		co::Any res;
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 4 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 4 ), range );
 		return res.get< co::Component* >();
 	}
 
 	co::Interface* newProxy( co::DynamicProxyHandler* handler_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< co::DynamicProxyHandler* >( handler_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 5 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 5 ), range );
 		return res.get< co::Interface* >();
 	}
 
 	void setAttribute( const co::Any& instance_, co::AttributeInfo* ai_, const co::Any& value_ )
 	{
-		co::Any res, args[3];
+		co::Any args[3];
 		args[0].set< const co::Any& >( instance_ );
 		args[1].set< co::AttributeInfo* >( ai_ );
 		args[2].set< const co::Any& >( value_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 6 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 6 ), range );
 	}
 
 	// These co::Reflector methods are not part of the reflection system:

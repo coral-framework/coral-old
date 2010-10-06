@@ -8,13 +8,13 @@
 
 #include <co/TypeTraits.h>
 #include <co/Interface.h>
+#include <co/Uuid.h>
 #include <co/TypeKind.h>
 
 // Forward Declarations:
 namespace co {
 	class Namespace;
 	class Reflector;
-	class Uuid;
 } // namespace co
 // End Of Forward Declarations
 

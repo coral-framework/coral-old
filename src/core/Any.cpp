@@ -162,6 +162,13 @@ std::ostream& operator<<( std::ostream& out, const co::Any& a )
 
 namespace co {
 
+void Any::clear()
+{
+	_state = State();
+	if( _objectKind != TK_NONE )
+		destroyObject();
+}
+
 int32 Any::getSize() const
 {
 	if( _state.isPointer )
@@ -170,26 +177,26 @@ int32 Any::getSize() const
 	int32 size = -1;
 	switch( _state.kind )
 	{
-	case co::TK_NONE:		break;
-	case co::TK_ANY:		size = sizeof(co::Any);		break;
-	case co::TK_BOOLEAN:	size = sizeof(bool);		break;
-	case co::TK_INT8:		size = sizeof(int8);		break;
-	case co::TK_UINT8:		size = sizeof(uint8);		break;
-	case co::TK_INT16:		size = sizeof(int16);		break;
-	case co::TK_UINT16:		size = sizeof(uint16);		break;
-	case co::TK_INT32:		size = sizeof(int32);		break;
-	case co::TK_UINT32:		size = sizeof(uint32);		break;
-	case co::TK_INT64:		size = sizeof(int64);		break;
-	case co::TK_UINT64:		size = sizeof(uint64);		break;
-	case co::TK_FLOAT:		size = sizeof(float);		break;
-	case co::TK_DOUBLE:		size = sizeof(double);		break;
-	case co::TK_STRING:		size = sizeof(std::string);	break;
-	case co::TK_ARRAY:
+	case TK_NONE:		break;
+	case TK_ANY:		size = sizeof(Any);			break;
+	case TK_BOOLEAN:	size = sizeof(bool);		break;
+	case TK_INT8:		size = sizeof(int8);		break;
+	case TK_UINT8:		size = sizeof(uint8);		break;
+	case TK_INT16:		size = sizeof(int16);		break;
+	case TK_UINT16:		size = sizeof(uint16);		break;
+	case TK_INT32:		size = sizeof(int32);		break;
+	case TK_UINT32:		size = sizeof(uint32);		break;
+	case TK_INT64:		size = sizeof(int64);		break;
+	case TK_UINT64:		size = sizeof(uint64);		break;
+	case TK_FLOAT:		size = sizeof(float);		break;
+	case TK_DOUBLE:		size = sizeof(double);		break;
+	case TK_STRING:		size = sizeof(std::string);	break;
+	case TK_ARRAY:
 		size = _state.type->getReflector()->getSize();
 		break;
-	case co::TK_ENUM:		size = sizeof(uint32);		break;
-	case co::TK_STRUCT:
-	case co::TK_NATIVECLASS:
+	case TK_ENUM:		size = sizeof(uint32);		break;
+	case TK_STRUCT:
+	case TK_NATIVECLASS:
 		size = _state.type->getReflector()->getSize();
 		break;
 	default:
@@ -501,7 +508,7 @@ bool testAndCopyCompatibleReferences( const __any::State& from, __any::State& to
 	}
 }
 
-void Any::setInterface( co::Interface* instance, co::InterfaceType* type )
+void Any::setInterface( Interface* instance, InterfaceType* type )
 {
 	// type cannot be NULL when the instance is NULL
 	assert( type || instance );
@@ -551,12 +558,12 @@ void Any::setVariable( Type* type, uint32 flags, void* ptr )
 	}
 	else
 	{
-		assert( kind == co::TK_ENUM );
+		assert( kind == TK_ENUM );
 		_state.data.u32 = *reinterpret_cast<uint32*>( ptr );
 	}
 }
 
-void Any::setBasic( co::TypeKind kind, uint32 flags, void* ptr )
+void Any::setBasic( TypeKind kind, uint32 flags, void* ptr )
 {
 	// invalid type kind?
 	assert( kind > TK_NONE );
@@ -649,7 +656,8 @@ void Any::makeOut( Type* paramType )
 	switch( paramKind )
 	{
 	case TK_ANY:
-		createAny();
+		if( _objectKind != TK_ANY )
+			createAny();
 		break;
 
 	case TK_BOOLEAN:
@@ -741,16 +749,16 @@ void Any::makeOut( Type* paramType )
 			assert( getKind() == TK_ARRAY && isConst() == false );
 		else
 		{
-			co::ArrayType* arrayType = dynamic_cast<co::ArrayType*>( paramType );
+			ArrayType* arrayType = dynamic_cast<ArrayType*>( paramType );
 			assert( arrayType );
 
-			co::Type* elementType = arrayType->getElementType();
-			co::TypeKind elementKind = elementType->getKind();
+			Type* elementType = arrayType->getElementType();
+			TypeKind elementKind = elementType->getKind();
 
 			PseudoVector& pv = createArray( elementType );
 			setArray(
-				( elementKind == co::TK_INTERFACE ? co::Any::AK_RefVector : co::Any::AK_StdVector ), elementType,
-				( elementKind == co::TK_INTERFACE ? co::Any::VarIsPointer : co::Any::VarIsValue ), &pv );
+				( elementKind == TK_INTERFACE ? Any::AK_RefVector : Any::AK_StdVector ), elementType,
+				( elementKind == TK_INTERFACE ? Any::VarIsPointer : Any::VarIsValue ), &pv );
 		}
 		break;
 
@@ -758,7 +766,7 @@ void Any::makeOut( Type* paramType )
 		_objectKind = TK_ENUM;
 		if( isValid() )
 			_object.data.u32 = get<uint32>();
-		set<uint32&>( _object.data.u32 );
+		setVariable( paramType, VarIsReference, &_object.data.u32 );
 		break;
 
 	case TK_STRUCT:
@@ -836,10 +844,14 @@ void Any::makeIn()
 Any& Any::createAny()
 {
 	if( _objectKind == TK_ANY )
-		return *reinterpret_cast<Any*>( _object.data.ptr );
+	{
+		Any& any = *reinterpret_cast<Any*>( _object.data.ptr );
+		any.clear();
+		return any;
+	}
 
-	if( containsObject() )
-		throw co::Exception( "co::Any::createAny() called while a co::Any contains an object" );
+	if( _objectKind != TK_NONE )
+		throw Exception( "co::Any::createAny() called while a co::Any contains an object" );
 
 	Any* res = new Any();
 
@@ -874,8 +886,8 @@ Any::PseudoVector& Any::createArray( Type* elementType, size_t n )
 	PseudoVector& res = *reinterpret_cast<PseudoVector*>( _object.array.vectorArea );
 
 	TypeKind elementKind = elementType->getKind();
-	setArray( ( elementKind == co::TK_INTERFACE ? AK_RefVector : AK_StdVector ), elementType,
-			 ( elementKind == co::TK_INTERFACE ? VarIsPointer : VarIsValue ), &res );
+	setArray( ( elementKind == TK_INTERFACE ? AK_RefVector : AK_StdVector ), elementType,
+				( elementKind == TK_INTERFACE ? VarIsPointer : VarIsValue ), &res );
 
 	if( n == 0 )
 	{
@@ -924,7 +936,7 @@ Any::PseudoVector& Any::createArray( Type* elementType, size_t n )
 		break;
 
 	case TK_INTERFACE:
-		new( _object.array.vectorArea ) co::RefVector<co::Interface>( n );
+		new( _object.array.vectorArea ) RefVector<Interface>( n );
 		break;
 
 	default:
@@ -932,6 +944,20 @@ Any::PseudoVector& Any::createArray( Type* elementType, size_t n )
 	}
 
 	return res;
+}
+
+void Any::swapArray( const Any& other )
+{
+	assert( _state.kind == TK_ARRAY && other._state.kind == TK_ARRAY );
+	assert( _state.type == other._state.type );
+	assert( _state.isPointer == other._state.isPointer );
+	assert( _state.isReference == other._state.isReference );
+	assert( _state.arrayKind == other._state.arrayKind );
+	assert( _state.arrayKind == State::AK_StdVector || _state.arrayKind == State::AK_RefVector );
+	assert( _objectKind == TK_ARRAY ); // the array must be allocated in this co::Any
+	PseudoVector* myVec = reinterpret_cast<PseudoVector*>( _object.array.vectorArea );
+	PseudoVector* otherVec = reinterpret_cast<PseudoVector*>( other._state.data.ptr );
+	myVec->swap( *otherVec );
 }
 
 void* Any::createComplexValue( Type* type )
@@ -1021,7 +1047,7 @@ void Any::destroyObject()
 				break;
 
 			case TK_INTERFACE:
-				reinterpret_cast<co::RefVector<co::Interface>*>( pv )->~RefVector();
+				reinterpret_cast<RefVector<Interface>*>( pv )->~RefVector();
 				break;
 
 			default:
@@ -1146,20 +1172,20 @@ void Any::castFrom( const State& s )
 	THROW_ILLEGAL_CAST( s, _state, );
 }
 
-inline bool isInside( void* ptr, const co::Any& any )
+inline bool isInside( void* ptr, const Any& any )
 {
 	return ptr >= reinterpret_cast<const void*>( &any ) && ptr <= reinterpret_cast<const void*>( &any + 1 );
 }
 
-void Any::copy( const co::Any& other )
+void Any::copy( const Any& other )
 {
 	_state = other._state;
 
-	if( containsObject() )
+	if( _objectKind != TK_NONE )
 		destroyObject();
 
 	// is the variable a temporary object within 'other'?
-	if( other.containsObject() && ( _state.isPointer || _state.isReference || _state.kind == TK_ARRAY )
+	if( other._objectKind != TK_NONE && ( _state.isPointer || _state.isReference || _state.kind == TK_ARRAY )
 		&& isInside( _state.data.ptr, other )  )
 	{
 		// we should copy the object
@@ -1177,7 +1203,7 @@ void Any::copy( const co::Any& other )
 			{
 				_objectKind = TK_ARRAY;
 				_object.array.reflector = other._object.array.reflector;
-				co::Type* elementType = _object.array.reflector->getType();
+				Type* elementType = _object.array.reflector->getType();
 				switch( elementType->getKind() )
 				{
 				case TK_ANY:
@@ -1226,8 +1252,8 @@ void Any::copy( const co::Any& other )
 					break;
 
 				case TK_INTERFACE:
-					new( _object.array.vectorArea ) co::RefVector<co::Interface>( 
-							*reinterpret_cast<const co::RefVector<co::Interface>*>( other._object.array.vectorArea ) );
+					new( _object.array.vectorArea ) RefVector<Interface>( 
+							*reinterpret_cast<const RefVector<Interface>*>( other._object.array.vectorArea ) );
 					break;
 
 				default:

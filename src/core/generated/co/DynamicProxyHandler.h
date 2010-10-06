@@ -29,9 +29,9 @@ public:
 
 	virtual const std::string& getProxyInterfaceName( co::int32 cookie ) = 0;
 
-	virtual void handleGetAttribute( co::int32 cookie, co::AttributeInfo* ai, co::Any& value ) = 0;
+	virtual const co::Any& handleGetAttribute( co::int32 cookie, co::AttributeInfo* ai ) = 0;
 
-	virtual void handleMethodInvocation( co::int32 cookie, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& returnValue ) = 0;
+	virtual const co::Any& handleMethodInvocation( co::int32 cookie, co::MethodInfo* mi, co::ArrayRange<co::Any const> args ) = 0;
 
 	virtual void handleSetAttribute( co::int32 cookie, co::AttributeInfo* ai, const co::Any& value ) = 0;
 

@@ -43,9 +43,7 @@ public:
 
 	co::ArrayRange<co::MethodInfo* const> getMemberMethods()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodContainer>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodContainer>( 0 ) );
         return res.get< co::ArrayRange<co::MethodInfo* const> >();
 	}
 

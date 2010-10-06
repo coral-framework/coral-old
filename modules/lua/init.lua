@@ -2,11 +2,19 @@
 -- Lua module's main package
 -------------------------------------------------------------------------------
 
+-- localize commonly used functions
+local error = error
+local pairs = pairs
+local ipairs = ipairs
+local tostring = tostring
+local getmetatable = getmetatable
+local setmetatable = setmetatable
+
 local coNew = co.new
 local coGetType = co.getType
 local coRootNS = co.system.types.rootNS
 local coNewComponentType = co.newComponentType
-local coSetComponentInstance = co.setComponentInstance
+local coNewComponentInstance = co.newComponentInstance
 
 -------------------------------------------------------------------------------
 --
@@ -36,47 +44,55 @@ co.Type = coType
 --
 -- componentPrototype = co.Component( desc )
 --
--- Creates a Coral component type that is implemented in Lua.
+-- Defines a Coral component type that is implemented in Lua.
 --
 -- Receives a table describing the component type, with three fields:
 --		desc.name = a fully-qualified Coral type name for the component.
 --		desc.provides = a map of interface names to interface type names.
 --		desc.requires = a map of interface names to interface type names.
--- Either 'provides' or 'requires' can be omitted. Interface names cannot clash.
+-- Either 'provides' or 'requires' can be omitted, but at least one interface
+-- must be defined. When providing both tables, beware of interface name clashes.
 --
 -- The 'desc' table is converted into a component prototype table and returned
 -- as the function result. A brand new component prototype table contains only
 -- the component's provided (server) interfaces, as interface prototype tables.
 --
--- Prototype tables should be populated with Lua methods to implement the
--- component interfaces. A method will only affect a specific server interface
--- if it is added to the interface's prototype table; otherwise, it will affect
--- all interfaces if it is added to the component's prototype table. For example:
+-- Prototype tables should be populated with Lua methods to implement the component.
+-- A method will only affect a specific server interface if it is added to the
+-- interface's prototype table; conversely, it will affect all interfaces if it
+-- is added to the component's prototype table. For example:
 --		local MyComponent = co.Component{ ... }
 --		function MyComponent:doSomething() print "all interfaces" end
 --		function MyComponent.someItf:doSomething() print "just someItf" end
 --
--- A component instance is created by calling the component prototype table. For example:
+-- A component can be instantiated by calling the component's prototype table. For example:
 --		local instance = MyComponent() -- either no args, or...
 --		local instance = MyComponent{} -- a table, which is re-used as the component instance.
 --		local instance = MyComponent{ initial = 1, values = 2, areOK = 3 }
+--
+-- It is also possible to instantiate a Lua component from C++ by using the component's
+-- type reflector. Therefore, co::newInstance() should also work for Lua components.
 
 local function checkComponentInterfaces( provides, requires )
 	local ok = false
 
 	-- turn type names into type instances
-	for k, v in pairs( provides ) do
-		ok = true
-		local t = coType[v]
-		local r = t.reflector -- force reflectors to be loaded
-		provides[k] = t
+	if provides then
+		for k, v in pairs( provides ) do
+			ok = true
+			local t = coType[v]
+			local r = t.reflector -- force reflectors to be loaded
+			provides[k] = t
+		end
 	end
 
-	for k, v in pairs( requires ) do
-		ok = true
-		requires[k] = coType[v]
-		if provides and provides[k] then
-			error( "required interface '" .. k .. "' clashes with a provided interface" )
+	if requires then
+		for k, v in pairs( requires ) do
+			ok = true
+			requires[k] = coType[v]
+			if provides and provides[k] then
+				error( "required interface '" .. k .. "' clashes with a provided interface" )
+			end
 		end
 	end
 
@@ -88,16 +104,22 @@ end
 local function defineComponentType( ns, typeName, tct, provides, requires )
 	local typeBuilder = ns:defineType( typeName, 'TK_COMPONENT', tct )
 
-	for itfName, itfType in pairs( provides ) do
-		typeBuilder:defineInterface( itfName, itfType, true )
+	if provides then
+		for itfName, itfType in pairs( provides ) do
+			typeBuilder:defineInterface( itfName, itfType, true )
+		end
 	end
 
-	for itfName, itfType in pairs( requires ) do
-		typeBuilder:defineInterface( itfName, itfType, false )
+	if requires then
+		for itfName, itfType in pairs( requires ) do
+			typeBuilder:defineInterface( itfName, itfType, false )
+		end
 	end
 
 	return typeBuilder:createType()
 end
+
+local ComponentMT = {}
 
 function co.Component( t )
 	local fullName = t.name
@@ -136,8 +158,42 @@ function co.Component( t )
 		error( "could not define a new component type: " .. tostring( ct ), 2 )
 	end
 
-	local proto = provides or requires
-	proto.__reflector = coNewComponentType( ct, proto )
+	-- convert 't' into a component prototype table
+	t.name = nil
+	t.provides = nil
+	t.requires = nil
 
-	return proto
+	t.__provides = provides
+	t.__requires = requires
+	t.__reflector = coNewComponentType( ct, t )
+
+	-- a component prototype table is the MT for its component instances
+	t.__index = function( _, k ) return t[k] end
+
+	-- create prototype tables for the server interfaces
+	for k, v in pairs( provides ) do
+		t[k] = {}
+	end
+
+	return setmetatable( t, ComponentMT )
+end
+
+local function interfaceMT__index( itfTable, k )
+	return itfTable.__protoItf[k] or getmetatable( itfTable )[k]
+end
+
+function ComponentMT.__call( protoTable, instanceTable )
+	instanceTable = instanceTable or {}
+	instanceTable.__index = interfaceMT__index
+
+	local instance = coNewComponentInstance( protoTable.__reflector, instanceTable )
+
+	-- setup the server interface instance tables
+	for k, v in pairs( protoTable.__provides ) do
+		instanceTable[k] = setmetatable( { __interface = instance[k], __protoItf = protoTable[k] }, instanceTable )
+	end
+
+	setmetatable( instanceTable, protoTable )
+
+	return instance
 end

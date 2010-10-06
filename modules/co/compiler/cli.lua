@@ -6,6 +6,9 @@ local debug = require "debug"
 local cmdline = require "co.compiler.cmdline"
 local compiler = require( "co.compiler" ):new()
 
+-- garbage collection is unnecessary for a compiler
+collectgarbage( "stop" )
+
 -------------------------------------------------------------------------------
 -- Handling of Command-Line Args
 -------------------------------------------------------------------------------

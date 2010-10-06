@@ -67,11 +67,17 @@ public:
 	//@}
 
 	/*!
-		Reads a value from the stack, using \c expectedType to help interpret the value.
-		The result is returned in \c var. If the value at the specified index is not a
-		valid Coral value, raises a lua::Exception.
+		Gets any value from the Lua stack, using \c expectedType to help interpret it.
+		If the value at \c index has no convertion to Coral, raises a lua::Exception.
 	 */
-	static void toCoral( lua_State* L, int index, co::Type* expectedType, co::Any& var );
+	static void getAny( lua_State* L, int index, co::Type* expectedType, co::Any& any );
+
+	/*!
+		Gets a specific value from the Lua stack. The storage for the returned value
+		should be passed in \c var using the same semantics of an 'out' parameter.
+		If the value at \c index cannot be stored in \c var, raises a lua::Exception.
+	 */
+	static void getValue( lua_State* L, int index, const co::Any& var );
 
 public:
     LuaState();
@@ -90,8 +96,11 @@ private:
 	static void pushInstancesTable( lua_State* L );
 
 	static void pushArray( lua_State* L, const co::Any& var );
-	static void toArray( lua_State* L, int index, co::Type* expectedType, co::Any& var );
+	static void toArray( lua_State* L, int index, co::Type* elementType, co::Any& var );
+	
+	static co::int32 getEnumIdentifier( lua_State* L, int index, co::EnumType* enumType );
 
+	static void checkType( lua_State* L, int index, int expectedType );
 	static void raiseException( lua_State* L, int errorCode );
 
 private:

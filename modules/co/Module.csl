@@ -4,14 +4,21 @@
  */
 interface Module
 {
-	// Current module state. See the module life cycle control methods below.
-	readonly attribute ModuleState state;
-
 	// The module's namespace in the type repository.
 	readonly attribute Namespace namespace;
 
+	// Current module state. See the module life cycle control methods below.
+	readonly attribute ModuleState state;
+
 	// List of ModuleParts that make up this module.
 	readonly attribute ModulePart[] parts;
+
+	/*
+		Affects the order in which a module receives state changes, in relation to other modules.
+		Modules are always notified of state changes in increasing order of priority.
+		Initially, all modules have a priority of zero.
+	 */
+	attribute int32 priority;
 
 	//---------- Module Life Cycle Control Methods --------------------------//
 

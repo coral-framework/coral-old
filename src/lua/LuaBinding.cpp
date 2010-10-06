@@ -63,6 +63,8 @@ static void handleException( lua_State* L )
 /*  Helper class that manages the 'co' package                               */
 /*****************************************************************************/
 
+coPackage::ComponentTypeList coPackage::sm_luaComponentTypes;
+
 void coPackage::open( lua_State* L )
 {
 	static luaL_Reg libFunctions[] = {
@@ -72,7 +74,7 @@ void coPackage::open( lua_State* L )
 		{ "new", genericNew },
 		{ "packageLoader", packageLoader },
 		{ "newComponentType", newComponentType },
-		{ "setComponentInstance", setComponentInstance },
+		{ "newComponentInstance", newComponentInstance },
 		{ NULL, NULL }
 	};
 
@@ -113,6 +115,11 @@ void coPackage::close( lua_State* L )
 		lua_setfield( L, -2, "system" );
 	}
 	lua_pop( L, 1 );
+	
+	// release all LuaComponent reflectors
+	size_t numComponentTypes = sm_luaComponentTypes.size();
+	for( size_t i = 0; i <numComponentTypes; ++i )
+		sm_luaComponentTypes[i]->setReflector( NULL );
 }
 
 int coPackage::addPath( lua_State* L )
@@ -214,9 +221,10 @@ int coPackage::newComponentType( lua_State* L )
 
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	co::Any ctAny;
-	CompoundTypeBinding::getInstance( L, 1, ctAny );
-	co::ComponentType* ct = ctAny.get<co::ComponentType*>();
+	co::Any any;
+	CompoundTypeBinding::getInstance( L, 1, any );
+	co::ComponentType* ct = any.get<co::ComponentType*>();
+	sm_luaComponentTypes.push_back( ct );
 
 	lua_pushvalue( L, 2 );
 	int tableRef = luaL_ref( L, LUA_REGISTRYINDEX );
@@ -231,26 +239,27 @@ int coPackage::newComponentType( lua_State* L )
 	__END_EXCEPTIONS_BARRIER__
 }
 
-int coPackage::setComponentInstance( lua_State* L )
+int coPackage::newComponentInstance( lua_State* L )
 {
 	luaL_checktype( L, 2, LUA_TTABLE );
 
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	co::Any ctAny;
-	CompoundTypeBinding::getInstance( L, 1, ctAny );
-	co::Component* comp = ctAny.get<co::Component*>();
+	co::Any any;
+	CompoundTypeBinding::getInstance( L, 1, any );
+	LuaComponent* prototype = dynamic_cast<LuaComponent*>( any.get<co::Reflector*>() );
+	if( !prototype )
+		throw lua::Exception( "bad argument #1 to co.newComponentInstance (lua.Component.reflector expected)" );
 
 	lua_pushvalue( L, 2 );
 	int tableRef = luaL_ref( L, LUA_REGISTRYINDEX );
 
-	LuaComponent* lc = dynamic_cast<LuaComponent*>( comp );
-	if( !lc )
-		throw lua::Exception( "bad argument #1 to setComponentInstance (lua.Component expected)" );
+	LuaComponent* lc = new LuaComponent;
+	lc->setComponentInstance( prototype, tableRef );
 
-	lc->setComponentInstance( tableRef );
+	LuaState::push( L, static_cast<co::Component*>( lc ) );
 
-	return 0;
+	return 1;
 
 	__END_EXCEPTIONS_BARRIER__
 }
@@ -258,6 +267,20 @@ int coPackage::setComponentInstance( lua_State* L )
 /*****************************************************************************/
 /*  Class with re-usable functions for binding co::CompoundTypes to Lua      */
 /*****************************************************************************/
+
+co::CompoundType* CompoundTypeBinding::getType( lua_State* L, int udataIdx )
+{
+	if( !lua_isuserdata( L, udataIdx ) )
+		return NULL;
+
+	lua_getmetatable( L, udataIdx );
+	lua_rawgeti( L, -1, 1 );
+
+	co::CompoundType* ct = reinterpret_cast<co::CompoundType*>( lua_touserdata( L, -1 ) );
+	lua_pop( L, 2 );
+	
+	return ct;
+}
 
 void CompoundTypeBinding::getInstance( lua_State* L, int udataIdx, co::Any& instance )
 {
@@ -274,15 +297,15 @@ void CompoundTypeBinding::tryGetInstance( lua_State* L, int udataIdx, co::Any& i
 	if( !ct )
 		return;
 
-	void* ud = lua_touserdata( L, udataIdx );
 	switch( ct->getKind() )
 	{
 	case co::TK_STRUCT:
 	case co::TK_NATIVECLASS:
-		instance.setVariable( ct, co::Any::VarIsReference, ud );
+		instance.setVariable( ct, co::Any::VarIsReference, ComplexValueBinding::getInstance( L, udataIdx ) );
 		break;
 	case co::TK_INTERFACE:
-		instance.setInterface( *reinterpret_cast<co::Interface**>( ud ) );
+	case co::TK_COMPONENT:
+		instance.setInterface( InterfaceBinding::getInstance( L, udataIdx ) );
 		break;
 	default:
 		assert( false );
@@ -351,20 +374,6 @@ void CompoundTypeBinding::pushMetatable( lua_State* L, co::CompoundType* ct )
 		lua_pushvalue( L, -2 );
 		lua_rawset( L, LUA_REGISTRYINDEX );
 	}
-}
-
-co::CompoundType* CompoundTypeBinding::getType( lua_State* L, int udataIdx )
-{
-	if( !lua_isuserdata( L, udataIdx ) )
-		return NULL;
-
-	lua_getmetatable( L, udataIdx );
-	lua_rawgeti( L, -1, 1 );
-
-	co::CompoundType* ct = reinterpret_cast<co::CompoundType*>( lua_touserdata( L, -1 ) );
-	lua_pop( L, 2 );
-
-	return ct;
 }
 
 bool CompoundTypeBinding::pushMember( lua_State* L, co::CompoundType* ct, bool mustExist )
@@ -456,7 +465,7 @@ void CompoundTypeBinding::setAttribute( lua_State* L, const co::Any& instance )
 	co::AttributeInfo* ai = checkAttributeInfo( L, -2 );
 	co::Reflector* reflector = ai->getOwner()->getReflector();
 	co::Any value;
-	LuaState::toCoral( L, -1, ai->getType(), value );
+	LuaState::getAny( L, -1, ai->getType(), value );
 	reflector->setAttribute( instance, ai, value );
 	lua_pop( L, 2 );
 }
@@ -502,7 +511,7 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 	// prepare the argument list
 	co::Any args[MAX_NUM_PARAMETERS];
 
-	int numRequiredParams = numParams;
+	int numRequiredArgs = numParams;
 	int i = 0;
 
 	try
@@ -513,9 +522,9 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 			co::Type* paramType = paramInfo->getType();
 
 			if( paramInfo->getIsIn() )
-				LuaState::toCoral( L, i + 2, paramType, args[i] );
+				LuaState::getAny( L, i + 2, paramType, args[i] );
 			else
-				--numRequiredParams;
+				--numRequiredArgs;
 
 			if( paramInfo->getIsOut() )
 				args[i].makeOut( paramType );
@@ -523,17 +532,17 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 	}
 	catch( const co::Exception& e )
 	{
-		lua_pushfstring( L, "bad argument %d to method '%s': %s",
+		lua_pushfstring( L, "bad argument #%d to method '%s' (%s)",
 							i + 1, mi->getName().c_str(), e.getMessage().c_str() );
 		throw lua::MsgOnStackException();
 	}
 
 	// check the number of required/passed parameters
-	int numPassedParams = lua_gettop( L ) - 1;
-	if( numRequiredParams > numPassedParams )
+	int numPassedArgs = lua_gettop( L ) - 1;
+	if( numRequiredArgs > numPassedArgs )
 	{
 		lua_pushfstring( L, "insufficient number of arguments to method '%s' (%d expected, got %d)",
-						mi->getName().c_str(), numRequiredParams, numPassedParams );
+							mi->getName().c_str(), numRequiredArgs, numPassedArgs );
 		throw lua::MsgOnStackException();
 	}
 
@@ -652,7 +661,7 @@ int ComponentBinding::newIndex( lua_State* L )
 			throw lua::MsgOnStackException();
 		}
 		co::Any value;
-		LuaState::toCoral( L, 3, itfInfo->getInterfaceType(), value );
+		LuaState::getAny( L, 3, itfInfo->getInterfaceType(), value );
 		component->bindInterface( itfInfo, value.get<co::Interface*>() );
 	}
 

@@ -37,9 +37,9 @@ public:
 
 	virtual co::ComponentType* getComponentType() = 0;
 
-	virtual void bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance ) = 0;
+	virtual void bindInterface( co::InterfaceInfo* clientItfInfo, co::Interface* instance ) = 0;
 
-	virtual co::Interface* getInterface( co::InterfaceInfo* interfaceInfo ) = 0;
+	virtual co::Interface* getInterface( co::InterfaceInfo* itfInfo ) = 0;
 };
 
 } // namespace co

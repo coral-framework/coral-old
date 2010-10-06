@@ -90,6 +90,7 @@ void System::tearDown()
 		throw co::LifeCycleException( "the system's state is not SystemState_Running" );
 
 	// dispose all modules
+	_modules->updateModules( co::ModuleState_Disintegrated );
 	_modules->updateModules( co::ModuleState_Disposed );
 
 	// release the remaining service instances

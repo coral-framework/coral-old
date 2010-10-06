@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.TypeComponent provides an interface named 'type', of type co.Type
+//! co.TypeComponent provides an interface named 'type', of type co.Type.
 class TypeComponent_co_Type : public co::Type
 {
 public:
@@ -30,14 +30,14 @@ public:
 	virtual ~TypeComponent_Base();
 
 	// co::Interface Methods:
-	virtual co::Component* getInterfaceOwner();
-	virtual void componentRetain();
-	virtual void componentRelease();
+	co::Component* getInterfaceOwner();
+	void componentRetain();
+	void componentRelease();
 
 	// co::Component Methods:
-	virtual co::ComponentType* getComponentType();
-	virtual co::Interface* getInterface( co::InterfaceInfo* );
-	virtual void bindInterface( co::InterfaceInfo*, co::Interface* );
+	co::ComponentType* getComponentType();
+	co::Interface* getInterface( co::InterfaceInfo* );
+	void bindInterface( co::InterfaceInfo*, co::Interface* );
 };
 
 } // namespace co

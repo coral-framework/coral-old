@@ -47,90 +47,81 @@ public:
 
 	co::TypeKind getKind()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::TypeBuilder>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::TypeBuilder>( 0 ) );
         return res.get< co::TypeKind >();
 	}
 
 	co::Namespace* getNamespace()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::TypeBuilder>( 1 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::TypeBuilder>( 1 ) );
         return res.get< co::Namespace* >();
 	}
 
 	const std::string& getTypeName()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::TypeBuilder>( 2 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::TypeBuilder>( 2 ) );
         return res.get< const std::string& >();
 	}
 
 	co::Type* createType()
 	{
-		co::Any res;
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 3 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 3 ), range );
 		return res.get< co::Type* >();
 	}
 
 	void defineAttribute( const std::string& name_, co::Type* type_, bool isReadOnly_ )
 	{
-		co::Any res, args[3];
+		co::Any args[3];
 		args[0].set< const std::string& >( name_ );
 		args[1].set< co::Type* >( type_ );
 		args[2].set< bool >( isReadOnly_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 4 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 4 ), range );
 	}
 
 	void defineIdentifier( const std::string& name_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 5 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 5 ), range );
 	}
 
 	void defineInterface( const std::string& name_, co::InterfaceType* interfaceType_, bool isProvided_ )
 	{
-		co::Any res, args[3];
+		co::Any args[3];
 		args[0].set< const std::string& >( name_ );
 		args[1].set< co::InterfaceType* >( interfaceType_ );
 		args[2].set< bool >( isProvided_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 6 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 6 ), range );
 	}
 
 	co::MethodBuilder* defineMethod( const std::string& name_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 7 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 7 ), range );
 		return res.get< co::MethodBuilder* >();
 	}
 
 	void defineNativeClass( const std::string& nativeHeaderFile_, const std::string& nativeName_ )
 	{
-		co::Any res, args[2];
+		co::Any args[2];
 		args[0].set< const std::string& >( nativeHeaderFile_ );
 		args[1].set< const std::string& >( nativeName_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 8 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 8 ), range );
 	}
 
 	void defineSuperType( co::Type* superType_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< co::Type* >( superType_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 9 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 9 ), range );
 	}
 
 protected:

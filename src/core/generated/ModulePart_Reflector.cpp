@@ -44,42 +44,42 @@ public:
 
 	void disintegrate( co::Module* module_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< co::Module* >( module_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 0 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 0 ), range );
 	}
 
 	void dispose( co::Module* module_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< co::Module* >( module_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 1 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 1 ), range );
 	}
 
 	void initialize( co::Module* module_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< co::Module* >( module_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 2 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 2 ), range );
 	}
 
 	void integrate( co::Module* module_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< co::Module* >( module_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 3 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 3 ), range );
 	}
 
 	void integratePresentation( co::Module* module_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< co::Module* >( module_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 4 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePart>( 4 ), range );
 	}
 
 protected:

@@ -27,7 +27,11 @@ private:
 	static int genericNew( lua_State* L );
 	static int packageLoader( lua_State* L );
 	static int newComponentType( lua_State* L );
-	static int setComponentInstance( lua_State* L );
+	static int newComponentInstance( lua_State* L );
+
+private:
+	typedef std::vector<co::ComponentType*> ComponentTypeList;
+	static ComponentTypeList sm_luaComponentTypes;
 };
 
 /*!
@@ -38,15 +42,21 @@ class CompoundTypeBinding
 {
 public:
 	/*!
-		Given a userdata's index, attempts to retrieve a co::Any to any
-		valid Coral object (i.e. an interface, native class, struct or component).
+		Attempts to get the co::CompoundType* for the Coral object at \c index.
+		Returns NULL if the value at \c index is not a valid Coral object.
+	 */
+	static co::CompoundType* getType( lua_State* L, int index );
+
+	/*!
+		Given a userdata's index, attempts to set a co::Any with a reference to
+		any valid Coral object (interface, native class, struct or component).
 		If the userdata is not a valid Coral object, raises a lua::Exception.
 	 */
 	static void getInstance( lua_State* L, int index, co::Any& instance );
 
 	/*!
-		Just like getInstance(), but does not raise exceptions (if the userdata
-		is invalid, 'instance' is left unmodified).
+		 Just like getInstance(), but does not raise exceptions (if the userdata
+		 is invalid, 'instance' is left unmodified)..
 	 */
 	static void tryGetInstance( lua_State* L, int index, co::Any& instance );
 
@@ -56,12 +66,6 @@ protected:
 		The metatable is cached in the registry, indexed by the co::CompoundType pointer.
 	 */
 	static void pushMetatable( lua_State* L, co::CompoundType* ct );
-
-	/*!
-		Given a userdata's index, attempts to get its co::CompoundType* (from its
-		metatable). Returns NULL if the userdata is not a valid Coral object.
-	 */
-	static co::CompoundType* getType( lua_State* L, int index );
 
 	/*!
 		Assumes the CompoundType's udata is at index 1 and the member name is at index 2.
@@ -115,6 +119,12 @@ public:
 	//! Pushes a new instance of a co::Interface* userdata onto the stack.
 	static void create( lua_State* L, co::Interface* itf );
 
+	//! Gets the interface pointer of a verified Coral interface userdata.
+	inline static co::Interface* getInstance( lua_State* L, int index )
+	{
+		return *reinterpret_cast<co::Interface**>( lua_touserdata( L, index ) );
+	}
+
 	// --- Metamethods ---
 	static int index( lua_State* L );
 	static int newIndex( lua_State* L );
@@ -134,6 +144,12 @@ public:
 		Otherwise, if instancePtr is NULL, a default-constructed complex value will be pushed.
 	 */
 	static void push( lua_State* L, co::Type* type, void* instancePtr );
+
+	//! Gets the instance pointer of a verified Coral CV userdata.
+	inline static void* getInstance( lua_State* L, int index )
+	{
+		return lua_touserdata( L, index );
+	}
 
 	// --- Metamethods ---
 	static int gc( lua_State* L );

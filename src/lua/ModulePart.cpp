@@ -7,6 +7,7 @@
 #include "LuaState.h"
 #include "ModuleInstaller.h"
 #include <co/System.h>
+#include <co/Module.h>
 #include <co/ModuleManager.h>
 
 ModulePart::ModulePart()
@@ -16,13 +17,17 @@ ModulePart::ModulePart()
 
 ModulePart::~ModulePart()
 {
-	LuaState::tearDown();
+	// empty
 }
 
-void ModulePart::initialize( co::Module* )
+void ModulePart::initialize( co::Module* module )
 {
 	lua::ModuleInstaller::instance().install();
 
+	// usually update this module AFTER other modules
+	module->setPriority( 100000 );
+
+	// install our LuaModulePartLoader
 	_luaModulePartLoader = new LuaModulePartLoader;
 	co::getSystem()->getModules()->installLoader( _luaModulePartLoader.get() );
 
@@ -53,10 +58,8 @@ void ModulePart::disintegrate( co::Module* )
 
 void ModulePart::dispose( co::Module* )
 {
-	// force a full garbage-collection cycle
-	lua_gc( LuaState::getL(), LUA_GCCOLLECT, 0 );
-
 	lua::ModuleInstaller::instance().uninstall();
+	LuaState::tearDown();
 }
 
 CORAL_EXPORT_COMPONENT( ModulePart, lua );

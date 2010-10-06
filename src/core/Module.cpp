@@ -15,9 +15,11 @@
 #include <cassert>
 #include <iostream>
 
-Module::Module() : _state( co::ModuleState_None ), _namespace( 0 )
+Module::Module()
 {
-	// empty
+	_state = co::ModuleState_None;
+	_namespace = NULL;
+	_priority = 0;
 }
 
 Module::~Module()
@@ -68,6 +70,16 @@ co::Namespace* Module::getNamespace()
 co::ArrayRange<co::ModulePart* const> Module::getParts()
 {
 	return co::ArrayRange<co::ModulePart* const>();
+}
+
+co::int32 Module::getPriority()
+{
+	return _priority;
+}
+
+void Module::setPriority( co::int32 priority )
+{
+	_priority = priority;
 }
 
 void Module::initialize()

@@ -34,11 +34,26 @@ void ModuleManager::initialize()
 	_loaders.push_back( new ModulePartLoader );
 }
 
+static bool sortByIncreasingPriority( co::Module* a, co::Module* b )
+{
+	return a->getPriority() < b->getPriority();
+}
+
 void ModuleManager::updateModules( co::ModuleState state )
 {
-	for( ModuleList::iterator it = _modules.begin(); it != _modules.end(); ++it )
+	size_t numModules = _modules.size();
+
+	std::vector<co::Module*> sortedModules;
+	sortedModules.reserve( numModules );
+
+	for( size_t i = 0; i < numModules; ++i )
+		sortedModules.push_back( _modules[i].get() );
+
+	std::sort( sortedModules.begin(), sortedModules.end(), sortByIncreasingPriority );
+
+	for( size_t i = 0; i < numModules; ++i )
 	{
-		co::Module* module = it->get();
+		co::Module* module = sortedModules[i];
 		try
 		{
 			updateModule( module, state );

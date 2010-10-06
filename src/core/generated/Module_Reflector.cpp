@@ -45,68 +45,69 @@ public:
 
 	co::Namespace* getNamespace()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Module>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Module>( 0 ) );
         return res.get< co::Namespace* >();
 	}
 
 	co::ArrayRange<co::ModulePart* const> getParts()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Module>( 1 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Module>( 1 ) );
         return res.get< co::ArrayRange<co::ModulePart* const> >();
+	}
+
+	co::int32 getPriority()
+	{
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Module>( 2 ) );
+        return res.get< co::int32 >();
+	}
+
+	void setPriority( co::int32 priority_ )
+	{
+		co::Any arg;
+		arg.set< co::int32 >( priority_ );
+		_handler->handleSetAttribute( _cookie, getAttribInfo<co::Module>( 2 ), arg );
 	}
 
 	co::ModuleState getState()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Module>( 2 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Module>( 3 ) );
         return res.get< co::ModuleState >();
 	}
 
 	void abort()
 	{
-		co::Any res;
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 3 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 4 ), range );
 	}
 
 	void disintegrate()
 	{
-		co::Any res;
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 4 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 5 ), range );
 	}
 
 	void dispose()
 	{
-		co::Any res;
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 5 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 6 ), range );
 	}
 
 	void initialize()
 	{
-		co::Any res;
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 6 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 7 ), range );
 	}
 
 	void integrate()
 	{
-		co::Any res;
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 7 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 8 ), range );
 	}
 
 	void integratePresentation()
 	{
-		co::Any res;
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 8 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 9 ), range );
 	}
 
 protected:
@@ -165,7 +166,8 @@ public:
 		{
 		case 0:		value.set< co::Namespace* >( p->getNamespace() ); break;
 		case 1:		value.set< co::ArrayRange<co::ModulePart* const> >( p->getParts() ); break;
-		case 2:		value.set< co::ModuleState >( p->getState() ); break;
+		case 2:		value.set< co::int32 >( p->getPriority() ); break;
+		case 3:		value.set< co::ModuleState >( p->getState() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -177,7 +179,8 @@ public:
 		{
 		case 0:		raiseAttributeIsReadOnly( ai ); break;
 		case 1:		raiseAttributeIsReadOnly( ai ); break;
-		case 2:		raiseAttributeIsReadOnly( ai ); break;
+		case 2:		p->setPriority( value.get< co::int32 >() ); break;
+		case 3:		raiseAttributeIsReadOnly( ai ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 		CORAL_UNUSED( p );
@@ -193,32 +196,32 @@ public:
 		{
 			switch( mi->getIndex() )
 			{
-			case 3:
+			case 4:
 				{
 					p->abort();
 				}
 				break;
-			case 4:
+			case 5:
 				{
 					p->disintegrate();
 				}
 				break;
-			case 5:
+			case 6:
 				{
 					p->dispose();
 				}
 				break;
-			case 6:
+			case 7:
 				{
 					p->initialize();
 				}
 				break;
-			case 7:
+			case 8:
 				{
 					p->integrate();
 				}
 				break;
-			case 8:
+			case 9:
 				{
 					p->integratePresentation();
 				}

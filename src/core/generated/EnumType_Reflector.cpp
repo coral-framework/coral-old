@@ -46,57 +46,43 @@ public:
 
 	const co::Uuid& getBinarySignature()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 0 ) );
         return res.get< const co::Uuid& >();
 	}
 
 	const std::string& getFullName()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 1 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 1 ) );
         return res.get< const std::string& >();
 	}
 
 	const co::Uuid& getFullSignature()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 2 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 2 ) );
         return res.get< const co::Uuid& >();
 	}
 
 	co::TypeKind getKind()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 3 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 3 ) );
         return res.get< co::TypeKind >();
 	}
 
 	const std::string& getName()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 4 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 4 ) );
         return res.get< const std::string& >();
 	}
 
 	co::Namespace* getNamespace()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 5 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 5 ) );
         return res.get< co::Namespace* >();
 	}
 
 	co::Reflector* getReflector()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 6 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Type>( 6 ) );
         return res.get< co::Reflector* >();
 	}
 
@@ -111,19 +97,16 @@ public:
 
 	co::ArrayRange<std::string const> getIdentifiers()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::EnumType>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::EnumType>( 0 ) );
         return res.get< co::ArrayRange<std::string const> >();
 	}
 
 	co::int32 getValueOf( const std::string& identifier_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const std::string& >( identifier_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::EnumType>( 1 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::EnumType>( 1 ), range );
 		return res.get< co::int32 >();
 	}
 

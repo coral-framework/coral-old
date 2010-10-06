@@ -44,7 +44,7 @@ struct State
 		// Multipurpose pointers:
 		void* ptr;
 		const void* cptr;
-		co::Interface* itf;
+		Interface* itf;
 	}
 	data;
 
@@ -89,7 +89,7 @@ struct PrepareWithType
 	inline static void prepare( State& s )
 	{
 		PrepareBasic<TT>::prepare( s );
-		s.type = co::typeOf<typename TT::CoreType>::get();
+		s.type = typeOf<typename TT::CoreType>::get();
 	}
 };
 
@@ -132,7 +132,7 @@ struct PrepareStateForArray<std::vector<T>, ATT>
 	{
 		CORAL_STATIC_CHECK( ETT::kind != TK_ARRAY, arrays_of_arrays_are_not_supported );
 		CORAL_STATIC_CHECK( ATT::isPointer && !ATT::isReference, vectors_must_be_passed_by_pointer );
-		s.type = co::typeOf<typename ETT::CoreType>::get();
+		s.type = typeOf<typename ETT::CoreType>::get();
 		s.isConst = ETT::isConst;
 		s.isPointer = ETT::isPointer;
 		s.isPointerConst = ETT::isPointerConst;
@@ -142,12 +142,12 @@ struct PrepareStateForArray<std::vector<T>, ATT>
 };
 
 template<typename T, typename ATT>
-struct PrepareStateForArray<co::RefVector<T>, ATT>
+struct PrepareStateForArray<RefVector<T>, ATT>
 {
 	inline static void prepare( State& s )
 	{
 		CORAL_STATIC_CHECK( ATT::isPointer && !ATT::isReference, RefVectors_must_be_passed_by_pointer );
-		s.type = co::typeOf<T>::get();
+		s.type = typeOf<T>::get();
 		s.isConst = false;
 		s.isPointer = true;
 		s.isPointerConst = true;
@@ -157,14 +157,14 @@ struct PrepareStateForArray<co::RefVector<T>, ATT>
 };
 
 template<typename T, typename ATT>
-struct PrepareStateForArray<co::ArrayRange<T>, ATT>
+struct PrepareStateForArray<ArrayRange<T>, ATT>
 {
 	typedef traits::get<T> ETT; // traits for the array element type
 	inline static void prepare( State& s )
 	{
 		CORAL_STATIC_CHECK( ETT::kind != TK_ARRAY, arrays_of_arrays_are_not_supported );
 		CORAL_STATIC_CHECK( !ATT::isPointer && !ATT::isReference, ArrayRanges_must_be_passed_by_value );
-		s.type = co::typeOf<typename ETT::CoreType>::get();
+		s.type = typeOf<typename ETT::CoreType>::get();
 		s.isConst = ETT::isConst;
 		s.isPointer = ETT::isPointer;
 		s.isPointerConst = ETT::isPointerConst;
@@ -229,23 +229,23 @@ struct ValueHelper<TK_ARRAY, T>
 };
 
 template<typename T>
-struct ValueHelper<TK_ARRAY, co::ArrayRange<T> >
+struct ValueHelper<TK_ARRAY, ArrayRange<T> >
 {
 	// co::ArrayRanges are handled by this case
-	inline static void store( State& s, co::ArrayRange<T>& v )
+	inline static void store( State& s, ArrayRange<T>& v )
 	{
 		s.data.cptr = &( v.getFirst() );
 		s.arraySize = v.getSize();
 	}
 
-	inline static co::ArrayRange<T> retrieve( State& s )
+	inline static ArrayRange<T> retrieve( State& s )
 	{
 		if( s.data.ptr == NULL )
-			return co::ArrayRange<T>();
+			return ArrayRange<T>();
 		if( s.arrayKind == State::AK_ArrayRange )
-			return co::ArrayRange<T>( reinterpret_cast<T*>( s.data.ptr ), s.arraySize );
+			return ArrayRange<T>( reinterpret_cast<T*>( s.data.ptr ), s.arraySize );
 		else
-			return co::ArrayRange<T>( *reinterpret_cast<std::vector<typename
+			return ArrayRange<T>( *reinterpret_cast<std::vector<typename
 										traits::removeConst<T>::Type>*>( s.data.ptr ) );
 	}
 };
@@ -525,7 +525,7 @@ public:
 		Constructor corresponding to a setInterface() call.
 		Please, see setInterface()'s documentation for more info.
 	 */
-	inline Any( co::Interface* instance, co::InterfaceType* type ) : _objectKind( TK_NONE )
+	inline Any( Interface* instance, InterfaceType* type ) : _objectKind( TK_NONE )
 	{
 		setInterface( instance, type );
 	}
@@ -543,7 +543,7 @@ public:
 		Constructor corresponding to a setBasic() call.
 		Please, see setBasic()'s documentation for more info.
 	 */
-	inline Any( co::TypeKind kind, uint32 flags, void* ptr ) : _objectKind( TK_NONE )
+	inline Any( TypeKind kind, uint32 flags, void* ptr ) : _objectKind( TK_NONE )
 	{
 		setBasic( kind, flags, ptr );
 	}
@@ -559,7 +559,7 @@ public:
 	}
 
 	//! Copy constructor.
-	inline Any( const co::Any& other ) : _state(), _objectKind( TK_NONE )
+	inline Any( const Any& other ) : _state(), _objectKind( TK_NONE )
 	{
 		copy( other );
 	}
@@ -567,15 +567,18 @@ public:
 	//! Destructor.
 	inline ~Any()
 	{
-		if( _objectKind != co::TK_NONE )
+		if( _objectKind != TK_NONE )
 			destroyObject();
 	}
+
+	//! Clears any variable/object stored in the co::Any.
+	void clear();
 
 	//! \name Variable Introspection
 	//@{
 
 	//! Returns whether this co::Any was initialized.
-	inline bool isValid() const { return _state.kind != co::TK_NONE; }
+	inline bool isValid() const { return _state.kind != TK_NONE; }
 
 	//! Returns the kind of variable stored in this object.
 	inline TypeKind getKind() const { return static_cast<TypeKind>( _state.kind ); }
@@ -637,6 +640,9 @@ public:
 
 		return __any::VariableHelper<T>::retrieve( temp._state );
 	}
+	
+	//! Provides read/write access to the internal state of a co::Any.
+	inline State& getState() { return _state; }
 
 	//! Provides read access to the internal state of a co::Any.
 	inline const State& getState() const { return _state; }
@@ -689,7 +695,7 @@ public:
 		This method does not take variable flags, variables are always pointers. If you
 		want to create a reference to an interface pointer, use setVariable() instead.
 	 */
-	void setInterface( co::Interface* instance, co::InterfaceType* type = 0 );
+	void setInterface( Interface* instance, InterfaceType* type = 0 );
 
 	/*!
 		Stores a single-value (non-array) variable.
@@ -709,7 +715,7 @@ public:
 		Parameter 'kind' must range from co::TK_ANY to co::TK_STRING (i.e. types
 		that are uniquely identified by their co::TypeKind).
 	 */
-	void setBasic( co::TypeKind kind, uint32 flags, void* ptr );
+	void setBasic( TypeKind kind, uint32 flags, void* ptr );
 
 	/*!
 		Stores an array of any kind.
@@ -761,11 +767,11 @@ public:
 	//@{
 
 	/*!
-		Returns whether this co::Any contains a temporary object instance.
-		If isValid() is true but containsObject() is false, then the co::Any
-		only contains a reference (i.e. only its co::Any part is being used).
+		Returns the kind of temporary object contained in this co::Any, if any.
+		If isValid() is true but getContainedObjectKind() is co::TK_NONE, then
+		the co::Any contains only a reference, not an object instance.
 	 */
-	inline bool containsObject() const { return _objectKind != co::TK_NONE; }
+	inline bool getContainedObjectKind() const { return _objectKind; }
 
 	/*!
 		Creates a temporary co::Any instance and makes this co::Any reference it.
@@ -779,11 +785,18 @@ public:
 	std::string& createString();
 
 	/*!
-		Creates a std::vector (or a std::RefVector, if \c elementType is an interface)
+		Creates a std::vector (or a co::RefVector, if \c elementType is an interface)
 		with \c n default-constructed elements of type \c elementType, and sets this
 		co::Any with a reference to the array.
 	 */
 	PseudoVector& createArray( Type* elementType, size_t n = 0 );
+
+	/*!
+		Swaps the temporary std::vector or co::RefVector contained in this
+		co::Any (i.e. created with createArray()) with a std::vector or
+		co::RefVector of the exact same type contained in another co::Any.
+	 */
+	void swapArray( const Any& other );
 
 	/*!
 		Creates an instance of the specified complex value \c type, and makes
@@ -806,7 +819,7 @@ public:
 	inline bool operator!=( const Any& other ) const { return !( *this == other ); }
 
 	// Assignment operator.
-	inline Any& operator=( const co::Any& other )
+	inline Any& operator=( const Any& other )
 	{
 		copy( other );
 		return *this;
@@ -823,7 +836,7 @@ private:
 		Copies another co::Any's var. If the var points to an enclosed temporary
 		object, also copies the object and updates the var.
 	 */
-	void copy( const co::Any& other );
+	void copy( const Any& other );
 
 private:
 	State _state;

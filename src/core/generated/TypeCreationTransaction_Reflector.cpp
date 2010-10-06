@@ -44,24 +44,20 @@ public:
 
 	co::ArrayRange<co::TypeBuilder* const> getTypeBuilders()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::TypeCreationTransaction>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::TypeCreationTransaction>( 0 ) );
         return res.get< co::ArrayRange<co::TypeBuilder* const> >();
 	}
 
 	void commit()
 	{
-		co::Any res;
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeCreationTransaction>( 1 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeCreationTransaction>( 1 ), range );
 	}
 
 	void rollback()
 	{
-		co::Any res;
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeCreationTransaction>( 2 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeCreationTransaction>( 2 ), range );
 	}
 
 protected:

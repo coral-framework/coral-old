@@ -47,11 +47,10 @@ public:
 
 	co::int32 main( co::ArrayRange<std::string const> args_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< co::ArrayRange<std::string const> >( args_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::ILauncher>( 0 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<lua::ILauncher>( 0 ), range );
 		return res.get< co::int32 >();
 	}
 

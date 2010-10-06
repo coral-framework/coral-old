@@ -35,6 +35,8 @@ public:
 	co::ModuleState getState();
 	co::Namespace* getNamespace();
 	co::ArrayRange<co::ModulePart* const> getParts();
+	co::int32 getPriority();
+	void setPriority( co::int32 priority );
 	void initialize();
 	void integrate();
 	void integratePresentation();
@@ -46,6 +48,7 @@ private:
 	co::ModuleState _state;
 	co::Namespace* _namespace;
 	co::RefVector<co::ModulePart> _parts;
+	co::int32 _priority;
 };
 
 #endif

@@ -74,8 +74,8 @@ void ComponentBase::raiseUnexpectedInterfaceIndex()
 
 void ComponentBase::raiseIncompatibleInterface( InterfaceType* expectedType, Interface* ptr )
 {
-	CORAL_THROW( IllegalArgumentException, "expected a " << expectedType->getFullName()
-					<< ", but got a " << ptr->getInterfaceType()->getFullName() );
+	CORAL_THROW( IllegalArgumentException, "incompatible interface types (" << expectedType->getFullName()
+					<< " expected, got " << ptr->getInterfaceType()->getFullName() << ")" );
 }
 	
 ComponentType* ComponentBase::getOrCreateSimpleInternalComponentType( const char* componentTypeName, 

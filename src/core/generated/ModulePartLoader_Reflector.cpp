@@ -44,21 +44,19 @@ public:
 
 	bool canLoadModulePart( const std::string& moduleName_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePartLoader>( 0 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePartLoader>( 0 ), range );
 		return res.get< bool >();
 	}
 
 	co::ModulePart* loadModulePart( const std::string& moduleName_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePartLoader>( 1 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModulePartLoader>( 1 ), range );
 		return res.get< co::ModulePart* >();
 	}
 

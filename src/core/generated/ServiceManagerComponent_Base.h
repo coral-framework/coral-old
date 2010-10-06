@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.ServiceManagerComponent provides an interface named 'serviceManager', of type co.ServiceManager
+//! co.ServiceManagerComponent provides an interface named 'serviceManager', of type co.ServiceManager.
 class ServiceManagerComponent_co_ServiceManager : public co::ServiceManager
 {
 public:
@@ -30,14 +30,14 @@ public:
 	virtual ~ServiceManagerComponent_Base();
 
 	// co::Interface Methods:
-	virtual co::Component* getInterfaceOwner();
-	virtual void componentRetain();
-	virtual void componentRelease();
+	co::Component* getInterfaceOwner();
+	void componentRetain();
+	void componentRelease();
 
 	// co::Component Methods:
-	virtual co::ComponentType* getComponentType();
-	virtual co::Interface* getInterface( co::InterfaceInfo* );
-	virtual void bindInterface( co::InterfaceInfo*, co::Interface* );
+	co::ComponentType* getComponentType();
+	co::Interface* getInterface( co::InterfaceInfo* );
+	void bindInterface( co::InterfaceInfo*, co::Interface* );
 };
 
 } // namespace co

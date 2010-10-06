@@ -7,6 +7,7 @@
 #define _LUACOMPONENT_H_
 
 #include "Component_Base.h"
+#include "LuaState.h"
 #include <co/RefPtr.h>
 
 /*!
@@ -20,7 +21,7 @@ public:
 
 	// internal methods:
 	void setComponentType( co::ComponentType* ct, int prototypeTableRef );
-	void setComponentInstance( int instanceTableRef );
+	void setComponentInstance( LuaComponent* prototype, int instanceTableRef );
 
 	// co::Component methods:
 	co::ComponentType* getComponentType();
@@ -30,9 +31,9 @@ public:
 	// co::DynamicProxyHandler methods:
 	co::int32 registerProxyInterface( co::Interface* proxy );
 	const std::string& getProxyInterfaceName( co::int32 cookie );
-	void handleGetAttribute( co::int32 cookie, co::AttributeInfo* ai, co::Any& value );
+	const co::Any& handleGetAttribute( co::int32 cookie, co::AttributeInfo* ai );
 	void handleSetAttribute( co::int32 cookie, co::AttributeInfo* ai, const co::Any& value );
-	void handleMethodInvocation( co::int32 cookie, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& returnValue );
+	const co::Any& handleMethodInvocation( co::int32 cookie, co::MethodInfo* mi, co::ArrayRange<co::Any const> args );
 
 	// co::Reflector methods:
 	co::int32 getSize();
@@ -47,6 +48,11 @@ public:
     void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& returnValue );
 
 private:
+	inline const std::string& getInterfaceName( co::int32 cookie );
+	void pushInterfaceInstanceTable( lua_State* L, co::int32 cookie );
+	void pushAccessorName( lua_State* L, const char* prefix, const std::string& attribName );
+	void getMethod( lua_State* L, int t, co::int32 cookie = -1 );
+
 	co::Interface* getCustomInterface( co::InterfaceInfo* itfInfo );
 	void bindCustomInterface( co::InterfaceInfo* clientItfInfo, co::Interface* instance );
 
@@ -73,6 +79,9 @@ private:
 		the component's instance table.
 	 */
 	int _tableRef;
+
+	// used by the co::DynamicProxyHandler methods to return values
+	co::Any _res;
 };
 
 #endif

@@ -47,37 +47,36 @@ public:
 
 	void call( co::int32 numArgs_, co::int32 numResults_ )
 	{
-		co::Any res, args[2];
+		co::Any args[2];
 		args[0].set< co::int32 >( numArgs_ );
 		args[1].set< co::int32 >( numResults_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 0 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 0 ), range );
 	}
 
 	void loadFile( const std::string& filename_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const std::string& >( filename_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 1 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 1 ), range );
 	}
 
 	void push( const co::Any& value_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const co::Any& >( value_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 2 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 2 ), range );
 	}
 
 	bool searchScript( const std::string& name_, std::string& filename_ )
 	{
-		co::Any res, args[2];
+		co::Any args[2];
 		args[0].set< const std::string& >( name_ );
 		args[1].set< std::string& >( filename_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 3 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 3 ), range );
 		return res.get< bool >();
 	}
 

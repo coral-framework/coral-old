@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.ModuleComponent provides an interface named 'module', of type co.Module
+//! co.ModuleComponent provides an interface named 'module', of type co.Module.
 class ModuleComponent_co_Module : public co::Module
 {
 public:
@@ -30,14 +30,14 @@ public:
 	virtual ~ModuleComponent_Base();
 
 	// co::Interface Methods:
-	virtual co::Component* getInterfaceOwner();
-	virtual void componentRetain();
-	virtual void componentRelease();
+	co::Component* getInterfaceOwner();
+	void componentRetain();
+	void componentRelease();
 
 	// co::Component Methods:
-	virtual co::ComponentType* getComponentType();
-	virtual co::Interface* getInterface( co::InterfaceInfo* );
-	virtual void bindInterface( co::InterfaceInfo*, co::Interface* );
+	co::ComponentType* getComponentType();
+	co::Interface* getInterface( co::InterfaceInfo* );
+	void bindInterface( co::InterfaceInfo*, co::Interface* );
 };
 
 } // namespace co

@@ -44,33 +44,25 @@ public:
 
 	bool getIsIn()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ParameterInfo>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::ParameterInfo>( 0 ) );
         return res.get< bool >();
 	}
 
 	bool getIsOut()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ParameterInfo>( 1 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::ParameterInfo>( 1 ) );
         return res.get< bool >();
 	}
 
 	const std::string& getName()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ParameterInfo>( 2 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::ParameterInfo>( 2 ) );
         return res.get< const std::string& >();
 	}
 
 	co::Type* getType()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ParameterInfo>( 3 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::ParameterInfo>( 3 ) );
         return res.get< co::Type* >();
 	}
 

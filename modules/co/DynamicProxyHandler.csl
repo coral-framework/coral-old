@@ -10,11 +10,11 @@ interface DynamicProxyHandler
 	string getProxyInterfaceName( in int32 cookie );
 
 	// Handles a request for retrieving an attribute value.
-	void handleGetAttribute( in int32 cookie, in AttributeInfo ai, out any value );
+	any handleGetAttribute( in int32 cookie, in AttributeInfo ai );
 
 	// Handles a request for setting an attribute value.
 	void handleSetAttribute( in int32 cookie, in AttributeInfo ai, in any value );
 
 	// Handles a call to one of the proxy interface's methods.
-	void handleMethodInvocation( in int32 cookie, in MethodInfo mi, in any[] args, out any returnValue );
+	any handleMethodInvocation( in int32 cookie, in MethodInfo mi, in any[] args );
 };

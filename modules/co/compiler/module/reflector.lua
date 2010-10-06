@@ -108,9 +108,7 @@ public:
 				local inputType = itf.formatInput( a.type )
 				writer( "\t", inputType, " ", itf.formatAccessor( "get", a.name ), "()\n", [[
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<]], itf.cppName, [[>( ]], a.index, [[ ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<]], itf.cppName, [[>( ]], i - 1, [[ ) );
         return res.get< ]], inputType, [[ >();
 	}
 
@@ -120,7 +118,7 @@ public:
 	{
 		co::Any arg;
 		arg.set< ]], inputType, [[ >( ]], a.name, [[_ );
-		_handler->handleSetAttribute( _cookie, getAttribInfo<]], itf.cppName, [[>( ]], a.index, [[ ), arg );
+		_handler->handleSetAttribute( _cookie, getAttribInfo<]], itf.cppName, [[>( ]], i - 1, [[ ), arg );
 	}
 
 ]] )
@@ -142,18 +140,22 @@ public:
 				end
 				writer( ")\n\t{\n" )
 				if #params > 0 then
-					writer( "\t\tco::Any res, args[", #params, "];\n" )
+					writer( "\t\tco::Any args[", #params, "];\n" )
 					for i, p in ipairs( params ) do
 						local paramType = ( p.isOut and itf.formatOutput or itf.formatInput )( p.type )
 						writer( "\t\targs[", i - 1, "].set< ", paramType, " >( ", p.name, "_ );\n" )
 					end
 					writer( "\t\tco::ArrayRange<co::Any const> range( args, ", #params, " );\n" )
 				else
-					writer( "\t\tco::Any res;\n\t\tco::ArrayRange<co::Any const> range;\n" )
+					writer( "\t\tco::ArrayRange<co::Any const> range;\n" )
 				end
-				writer( "\t\t_handler->handleMethodInvocation( _cookie, getMethodInfo<", itf.cppName, ">( ", m.index, " ), range, res );\n" )
+				writer( "\t\t" )
 				if m.returnType then
-					writer( "\t\tassert( res.containsObject() == false );\n\t\treturn res.get< ", formattedReturnType, " >();\n" )
+					writer( "const co::Any& res = " )
+				end
+				writer( "_handler->handleMethodInvocation( _cookie, getMethodInfo<", itf.cppName, ">( ", i - 1, " ), range );\n" )
+				if m.returnType then
+					writer( "\t\treturn res.get< ", formattedReturnType, " >();\n" )
 				end
 				writer( "\t}\n\n" )
 			end

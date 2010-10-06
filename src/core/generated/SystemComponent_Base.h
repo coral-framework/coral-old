@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.SystemComponent provides an interface named 'system', of type co.System
+//! co.SystemComponent provides an interface named 'system', of type co.System.
 class SystemComponent_co_System : public co::System
 {
 public:
@@ -30,14 +30,14 @@ public:
 	virtual ~SystemComponent_Base();
 
 	// co::Interface Methods:
-	virtual co::Component* getInterfaceOwner();
-	virtual void componentRetain();
-	virtual void componentRelease();
+	co::Component* getInterfaceOwner();
+	void componentRetain();
+	void componentRelease();
 
 	// co::Component Methods:
-	virtual co::ComponentType* getComponentType();
-	virtual co::Interface* getInterface( co::InterfaceInfo* );
-	virtual void bindInterface( co::InterfaceInfo*, co::Interface* );
+	co::ComponentType* getComponentType();
+	co::Interface* getInterface( co::InterfaceInfo* );
+	void bindInterface( co::InterfaceInfo*, co::Interface* );
 };
 
 } // namespace co

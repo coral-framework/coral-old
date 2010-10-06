@@ -47,91 +47,75 @@ public:
 
 	co::ArrayRange<co::Namespace* const> getChildNamespaces()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 0 ) );
         return res.get< co::ArrayRange<co::Namespace* const> >();
 	}
 
 	const std::string& getFullName()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 1 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 1 ) );
         return res.get< const std::string& >();
 	}
 
 	co::Module* getModule()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 2 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 2 ) );
         return res.get< co::Module* >();
 	}
 
 	const std::string& getName()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 3 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 3 ) );
         return res.get< const std::string& >();
 	}
 
 	co::Namespace* getParentNamespace()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 4 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 4 ) );
         return res.get< co::Namespace* >();
 	}
 
 	co::ArrayRange<co::Type* const> getTypes()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 5 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Namespace>( 5 ) );
         return res.get< co::ArrayRange<co::Type* const> >();
 	}
 
 	co::Namespace* defineChildNamespace( const std::string& name_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 6 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 6 ), range );
 		return res.get< co::Namespace* >();
 	}
 
 	co::TypeBuilder* defineType( const std::string& name_, co::TypeKind typeKind_, co::TypeCreationTransaction* transaction_ )
 	{
-		co::Any res, args[3];
+		co::Any args[3];
 		args[0].set< const std::string& >( name_ );
 		args[1].set< co::TypeKind >( typeKind_ );
 		args[2].set< co::TypeCreationTransaction* >( transaction_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 7 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 7 ), range );
 		return res.get< co::TypeBuilder* >();
 	}
 
 	co::Namespace* getChildNamespace( const std::string& name_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 8 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 8 ), range );
 		return res.get< co::Namespace* >();
 	}
 
 	co::Type* getType( const std::string& name_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 9 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 9 ), range );
 		return res.get< co::Type* >();
 	}
 

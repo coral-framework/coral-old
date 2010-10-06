@@ -45,64 +45,57 @@ public:
 
 	co::ArrayRange<co::ModulePartLoader* const> getLoaders()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ModuleManager>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::ModuleManager>( 0 ) );
         return res.get< co::ArrayRange<co::ModulePartLoader* const> >();
 	}
 
 	co::ArrayRange<co::Module* const> getModules()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::ModuleManager>( 1 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::ModuleManager>( 1 ) );
         return res.get< co::ArrayRange<co::Module* const> >();
 	}
 
 	co::Module* findModule( const std::string& moduleName_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 2 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 2 ), range );
 		return res.get< co::Module* >();
 	}
 
 	void installLoader( co::ModulePartLoader* loader_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< co::ModulePartLoader* >( loader_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 3 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 3 ), range );
 	}
 
 	bool isLoadable( const std::string& moduleName_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 4 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 4 ), range );
 		return res.get< bool >();
 	}
 
 	co::Module* load( const std::string& moduleName_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 5 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 5 ), range );
 		return res.get< co::Module* >();
 	}
 
 	void uninstallLoader( co::ModulePartLoader* loader_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< co::ModulePartLoader* >( loader_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 6 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 6 ), range );
 	}
 
 protected:

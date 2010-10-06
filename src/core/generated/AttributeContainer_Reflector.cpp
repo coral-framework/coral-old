@@ -43,9 +43,7 @@ public:
 
 	co::ArrayRange<co::AttributeInfo* const> getMemberAttributes()
 	{
-		co::Any res;
-		_handler->handleGetAttribute( _cookie, getAttribInfo<co::AttributeContainer>( 0 ), res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::AttributeContainer>( 0 ) );
         return res.get< co::ArrayRange<co::AttributeInfo* const> >();
 	}
 

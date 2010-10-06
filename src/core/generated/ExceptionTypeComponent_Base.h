@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.ExceptionTypeComponent provides an interface named 'type', of type co.ExceptionType
+//! co.ExceptionTypeComponent provides an interface named 'type', of type co.ExceptionType.
 class ExceptionTypeComponent_co_ExceptionType : public co::ExceptionType
 {
 public:
@@ -30,14 +30,14 @@ public:
 	virtual ~ExceptionTypeComponent_Base();
 
 	// co::Interface Methods:
-	virtual co::Component* getInterfaceOwner();
-	virtual void componentRetain();
-	virtual void componentRelease();
+	co::Component* getInterfaceOwner();
+	void componentRetain();
+	void componentRelease();
 
 	// co::Component Methods:
-	virtual co::ComponentType* getComponentType();
-	virtual co::Interface* getInterface( co::InterfaceInfo* );
-	virtual void bindInterface( co::InterfaceInfo*, co::Interface* );
+	co::ComponentType* getComponentType();
+	co::Interface* getInterface( co::InterfaceInfo* );
+	void bindInterface( co::InterfaceInfo*, co::Interface* );
 };
 
 } // namespace co

@@ -42,52 +42,50 @@ public:
 
 	const std::string& getProxyInterfaceName( co::int32 cookie_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< co::int32 >( cookie_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::DynamicProxyHandler>( 0 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::DynamicProxyHandler>( 0 ), range );
 		return res.get< const std::string& >();
 	}
 
-	void handleGetAttribute( co::int32 cookie_, co::AttributeInfo* ai_, co::Any& value_ )
+	const co::Any& handleGetAttribute( co::int32 cookie_, co::AttributeInfo* ai_ )
 	{
-		co::Any res, args[3];
+		co::Any args[2];
 		args[0].set< co::int32 >( cookie_ );
 		args[1].set< co::AttributeInfo* >( ai_ );
-		args[2].set< co::Any& >( value_ );
-		co::ArrayRange<co::Any const> range( args, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::DynamicProxyHandler>( 1 ), range, res );
+		co::ArrayRange<co::Any const> range( args, 2 );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::DynamicProxyHandler>( 1 ), range );
+		return res.get< const co::Any& >();
 	}
 
-	void handleMethodInvocation( co::int32 cookie_, co::MethodInfo* mi_, co::ArrayRange<co::Any const> args_, co::Any& returnValue_ )
+	const co::Any& handleMethodInvocation( co::int32 cookie_, co::MethodInfo* mi_, co::ArrayRange<co::Any const> args_ )
 	{
-		co::Any res, args[4];
+		co::Any args[3];
 		args[0].set< co::int32 >( cookie_ );
 		args[1].set< co::MethodInfo* >( mi_ );
 		args[2].set< co::ArrayRange<co::Any const> >( args_ );
-		args[3].set< co::Any& >( returnValue_ );
-		co::ArrayRange<co::Any const> range( args, 4 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::DynamicProxyHandler>( 2 ), range, res );
+		co::ArrayRange<co::Any const> range( args, 3 );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::DynamicProxyHandler>( 2 ), range );
+		return res.get< const co::Any& >();
 	}
 
 	void handleSetAttribute( co::int32 cookie_, co::AttributeInfo* ai_, const co::Any& value_ )
 	{
-		co::Any res, args[3];
+		co::Any args[3];
 		args[0].set< co::int32 >( cookie_ );
 		args[1].set< co::AttributeInfo* >( ai_ );
 		args[2].set< const co::Any& >( value_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::DynamicProxyHandler>( 3 ), range, res );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::DynamicProxyHandler>( 3 ), range );
 	}
 
 	co::int32 registerProxyInterface( co::Interface* proxy_ )
 	{
-		co::Any res, args[1];
+		co::Any args[1];
 		args[0].set< co::Interface* >( proxy_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::DynamicProxyHandler>( 4 ), range, res );
-		assert( res.containsObject() == false );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::DynamicProxyHandler>( 4 ), range );
 		return res.get< co::int32 >();
 	}
 
@@ -174,9 +172,8 @@ public:
 				{
 					co::int32 cookie_ = args[++argIndex].get< co::int32 >();
 					co::AttributeInfo* ai_ = args[++argIndex].get< co::AttributeInfo* >();
-					co::Any& value_ = args[++argIndex].get< co::Any& >();
 					argIndex = -1;
-					p->handleGetAttribute( cookie_, ai_, value_ );
+					res.set< const co::Any& >( p->handleGetAttribute( cookie_, ai_ ) );
 				}
 				break;
 			case 2:
@@ -184,9 +181,8 @@ public:
 					co::int32 cookie_ = args[++argIndex].get< co::int32 >();
 					co::MethodInfo* mi_ = args[++argIndex].get< co::MethodInfo* >();
 					co::ArrayRange<co::Any const> args_ = args[++argIndex].get< co::ArrayRange<co::Any const> >();
-					co::Any& returnValue_ = args[++argIndex].get< co::Any& >();
 					argIndex = -1;
-					p->handleMethodInvocation( cookie_, mi_, args_, returnValue_ );
+					res.set< const co::Any& >( p->handleMethodInvocation( cookie_, mi_, args_ ) );
 				}
 				break;
 			case 3:
