@@ -771,7 +771,7 @@ public:
 		If isValid() is true but getContainedObjectKind() is co::TK_NONE, then
 		the co::Any contains only a reference, not an object instance.
 	 */
-	inline bool getContainedObjectKind() const { return _objectKind; }
+	inline TypeKind getContainedObjectKind() const { return _objectKind; }
 
 	/*!
 		Creates a temporary co::Any instance and makes this co::Any reference it.
@@ -865,17 +865,17 @@ private:
 	union
 	{
 		State::Data data;
-		uint8 stringArea[sizeof(std::string)];
+		void* stringArea[sizeof(std::string)/sizeof(void*)];
 		struct
 		{
+			void* vectorArea[sizeof(PseudoVector)/sizeof(void*)];
 			Reflector* reflector;
-			uint8 vectorArea[sizeof(PseudoVector)];
 		}
 		array;
 		struct
 		{
-			Reflector* reflector;
 			union { void* ptr; double inplaceArea[INPLACE_DOUBLES]; };
+			Reflector* reflector;
 		}
 		complex;
 	}
