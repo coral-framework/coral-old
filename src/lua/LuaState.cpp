@@ -427,7 +427,7 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 			var.get<float&>() = static_cast<float>( lua_tonumber( L, index ) );
 			break;
 		case co::TK_DOUBLE:
-			var.get<co::int64&>() = static_cast<double>( lua_tonumber( L, index ) );
+			var.get<double&>() = static_cast<double>( lua_tonumber( L, index ) );
 			break;
 		default:
 			assert( false );
@@ -558,7 +558,7 @@ void LuaState::pushArray( lua_State* L, const co::Any& var )
 	{
 		std::vector<co::uint8>& pseudoVector = *reinterpret_cast<std::vector<co::uint8>*>( s.data.ptr );
 		elemCount = static_cast<int>( pseudoVector.size() / elemSize );
-		blockStart = &pseudoVector[0];
+		blockStart = ( elemCount == 0 ? NULL : &pseudoVector[0] );
 	}
 
 	lua_createtable( L, elemCount, 0 );

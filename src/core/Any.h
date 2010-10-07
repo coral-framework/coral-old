@@ -865,10 +865,10 @@ private:
 	union
 	{
 		State::Data data;
-		void* stringArea[sizeof(std::string)/sizeof(void*)];
+		uint8 stringArea[sizeof(std::string)];
 		struct
 		{
-			void* vectorArea[sizeof(PseudoVector)/sizeof(void*)];
+			uint8 vectorArea[sizeof(PseudoVector)];
 			Reflector* reflector;
 		}
 		array;

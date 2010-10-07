@@ -871,7 +871,11 @@ std::string& Any::createString()
 	destroyObject();
 	new( _object.stringArea ) std::string();
 	_objectKind = TK_STRING;
-	std::string& res = *reinterpret_cast<std::string*>( _object.stringArea );
+
+	// avoid incorrect warning about breaking strict-aliasing rules in GCC 4.x
+	uint8* ptr = _object.stringArea;
+	std::string& res = *reinterpret_cast<std::string*>( ptr );
+
 	set<std::string&>( res );
 	return res;
 }
