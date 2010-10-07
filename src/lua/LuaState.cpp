@@ -663,7 +663,7 @@ co::int32 LuaState::getEnumIdentifier( lua_State* L, int index, co::EnumType* en
 		break;
 
 	case LUA_TNUMBER:
-		res = lua_tointeger( L, index );
+		res = static_cast<co::int32>( lua_tointeger( L, index ) );
 		if( res < 0 || res >= static_cast<co::int32>( enumType->getIdentifiers().getSize() ) )
 			CORAL_THROW( lua::Exception, "integer '" << res
 							<< "' is out of range for enum " << enumType->getFullName() );

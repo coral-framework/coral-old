@@ -866,16 +866,19 @@ Any& Any::createAny()
 	return *res;
 }
 
+// avoid incorrect warning about breaking strict-aliasing rules in GCC 4.x
+template<typename T>
+inline T* reinterpretPtr( const void* ptr )
+{
+	return reinterpret_cast<T*>( const_cast<void*>( ptr ) );
+}
+
 std::string& Any::createString()
 {
 	destroyObject();
 	new( _object.stringArea ) std::string();
 	_objectKind = TK_STRING;
-
-	// avoid incorrect warning about breaking strict-aliasing rules in GCC 4.x
-	uint8* ptr = _object.stringArea;
-	std::string& res = *reinterpret_cast<std::string*>( ptr );
-
+	std::string& res = *reinterpretPtr<std::string>( _object.stringArea );
 	set<std::string&>( res );
 	return res;
 }
@@ -887,16 +890,16 @@ Any::PseudoVector& Any::createArray( Type* elementType, size_t n )
 	_objectKind = TK_ARRAY;
 	_object.array.reflector = elementType->getReflector();
 
-	PseudoVector& res = *reinterpret_cast<PseudoVector*>( _object.array.vectorArea );
+	PseudoVector* res = reinterpret_cast<PseudoVector*>( _object.array.vectorArea );
 
 	TypeKind elementKind = elementType->getKind();
 	setArray( ( elementKind == TK_INTERFACE ? AK_RefVector : AK_StdVector ), elementType,
-				( elementKind == TK_INTERFACE ? VarIsPointer : VarIsValue ), &res );
+				( elementKind == TK_INTERFACE ? VarIsPointer : VarIsValue ), res );
 
 	if( n == 0 )
 	{
 		new( _object.array.vectorArea ) PseudoVector();
-		return res;
+		return *res;
 	}
 
 	switch( elementKind )
@@ -931,7 +934,7 @@ Any::PseudoVector& Any::createArray( Type* elementType, size_t n )
 			new( _object.array.vectorArea ) PseudoVector( elementSize * n );
 
 			// call the constructor of each element
-			uint8* beginPtr = &res[0];
+			uint8* beginPtr = &res->front();
 			uint8* endPtr = beginPtr + ( elementSize * n );
 
 			for( uint8* p = beginPtr; p < endPtr; p += elementSize )
@@ -947,7 +950,7 @@ Any::PseudoVector& Any::createArray( Type* elementType, size_t n )
 		assert( false );
 	}
 
-	return res;
+	return *res;
 }
 
 void Any::swapArray( const Any& other )
@@ -1001,7 +1004,7 @@ void Any::destroyObject()
 		break;
 
 	case TK_STRING:
-		reinterpret_cast<std::string*>( _object.stringArea )->~basic_string();
+		reinterpretPtr<std::string>( _object.stringArea )->~basic_string();
 		break;
 
 	case TK_ARRAY:
@@ -1040,7 +1043,7 @@ void Any::destroyObject()
 					size_t elementSize = _object.array.reflector->getSize();
 					assert( arraySize % elementSize == 0 );
 
-					uint8* beginPtr = &( *pv )[0];
+					uint8* beginPtr = &pv->front();
 					uint8* endPtr = beginPtr + arraySize;
 
 					for( uint8* p = beginPtr; p < endPtr; p += elementSize )
@@ -1200,7 +1203,7 @@ void Any::copy( const Any& other )
 			break;
 
 		case TK_STRING:
-			createString() = *reinterpret_cast<const std::string*>( other._object.stringArea );
+			createString() = *reinterpretPtr<const std::string>( other._object.stringArea );
 			break;
 
 		case TK_ARRAY:
@@ -1212,7 +1215,7 @@ void Any::copy( const Any& other )
 				{
 				case TK_ANY:
 					new( _object.array.vectorArea ) std::vector<Any>(
-							*reinterpret_cast<const std::vector<Any>*>( other._object.array.vectorArea ) );
+						*reinterpretPtr<const std::vector<Any> >( other._object.array.vectorArea ) );
 					break;
 
 				case TK_BOOLEAN:
@@ -1228,27 +1231,27 @@ void Any::copy( const Any& other )
 				case TK_DOUBLE:
 				case TK_ENUM:
 					new( _object.array.vectorArea ) PseudoVector(
-							*reinterpret_cast<const PseudoVector*>( other._object.array.vectorArea ) );
+							*reinterpretPtr<const PseudoVector>( other._object.array.vectorArea ) );
 					break;
 
 				case TK_STRING:
 					new( _object.array.vectorArea ) std::vector<std::string>( 
-							*reinterpret_cast<const std::vector<std::string>*>( other._object.array.vectorArea ) );
+							*reinterpretPtr<const std::vector<std::string> >( other._object.array.vectorArea ) );
 					break;
 
 				case TK_STRUCT:
 				case TK_NATIVECLASS:
 					{
-						const PseudoVector& opv = *reinterpret_cast<const PseudoVector*>( other._object.array.vectorArea );				
-						size_t arraySize = opv.size();
+						const PseudoVector* opv = reinterpret_cast<const PseudoVector*>( other._object.array.vectorArea );				
+						size_t arraySize = opv->size();
 						size_t elementSize = _object.array.reflector->getSize();
 						assert( arraySize % elementSize == 0 );
 
 						new( _object.array.vectorArea ) PseudoVector( arraySize );
-						PseudoVector& pv = *reinterpret_cast<PseudoVector*>( _object.array.vectorArea );
+						PseudoVector* pv = reinterpret_cast<PseudoVector*>( _object.array.vectorArea );
 
-						const uint8* opvStart = &opv[0];
-						uint8* pvStart = &pv[0];
+						const uint8* opvStart = &opv->front();
+						uint8* pvStart = &pv->front();
 
 						for( size_t offset = 0; offset < arraySize; offset += elementSize )
 							_object.complex.reflector->copyValue( opvStart + offset, pvStart + offset );
@@ -1257,7 +1260,7 @@ void Any::copy( const Any& other )
 
 				case TK_INTERFACE:
 					new( _object.array.vectorArea ) RefVector<Interface>( 
-							*reinterpret_cast<const RefVector<Interface>*>( other._object.array.vectorArea ) );
+							*reinterpretPtr<const RefVector<Interface> >( other._object.array.vectorArea ) );
 					break;
 
 				default:
