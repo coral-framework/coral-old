@@ -129,6 +129,10 @@ function autoFields.headerName( t )
 	return utils.toHeaderName( t.fullName )
 end
 
+function autoFields.fullSignatureStr( t )
+	return t.fullSignature:getString()
+end
+
 function autoFields.includedHeaders( t )
 	autoFields.traverse( t )
 	return rawget( t, 'includedHeaders' )

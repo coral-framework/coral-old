@@ -118,11 +118,14 @@ FUNCTION( CORAL_GENERATE_MODULE generatedSourceFiles moduleName )
 
 	CORAL_GET_PATH_STRING( coralPathStr )
 
+	ADD_CUSTOM_COMMAND( OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
+		COMMAND ${CMAKE_COMMAND} -E echo "Coral Compiler Dependency Check"
+	)
+
 	ADD_CUSTOM_COMMAND( OUTPUT ${resultList}
 		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" lua.Launcher co.compiler.cli -g ${moduleName} ${ARGN}
-		DEPENDS ${CORAL_LAUNCHER}
+		DEPENDS ${CORAL_LAUNCHER} "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-		COMMENT "Generating code for module '${moduleName}'..."
 	)
 
 	SET( ${generatedSourceFiles} ${resultList} PARENT_SCOPE )
@@ -145,11 +148,14 @@ FUNCTION( CORAL_GENERATE_MAPPINGS generatedHeaders )
 
 	CORAL_GET_PATH_STRING( coralPathStr )
 
+	ADD_CUSTOM_COMMAND( OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
+		COMMAND ${CMAKE_COMMAND} -E echo "Coral Compiler Dependency Check"
+	)
+
 	ADD_CUSTOM_COMMAND( OUTPUT ${resultList}
 		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" lua.Launcher co.compiler.cli ${ARGN}
-		DEPENDS ${CORAL_LAUNCHER}
+		DEPENDS ${CORAL_LAUNCHER} "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-		COMMENT "Generating required mappings..."
 	)
 
 	SET( ${generatedHeaders} ${resultList} PARENT_SCOPE )

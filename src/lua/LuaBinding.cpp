@@ -660,9 +660,11 @@ int ComponentBinding::newIndex( lua_State* L )
 			lua_concat( L, 3 );
 			throw lua::MsgOnStackException();
 		}
-		co::Any value;
-		LuaState::getAny( L, 3, itfInfo->getInterfaceType(), value );
-		component->bindInterface( itfInfo, value.get<co::Interface*>() );
+		co::Interface* itf;
+		co::Any any;
+		any.setVariable( itfInfo->getType(), co::Any::VarIsPointer|co::Any::VarIsReference, &itf );
+		LuaState::getValue( L, 3, any );
+		component->bindInterface( itfInfo, itf );
 	}
 
 	return 0;

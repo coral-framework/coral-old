@@ -4,6 +4,7 @@
 
 local lfs = require "lfs"
 local path = require "co.compiler.path"
+local utils = require "co.compiler.utils"
 local dependencies = require "co.compiler.dependencies"
 local TypeWrapper = require "co.compiler.TypeWrapper"
 
@@ -23,7 +24,7 @@ local moduleDefaultPart = require "co.compiler.module.defaultPart"
 local Compiler = {
 	------ Default Field Values --
 	outDir = "./generated",		-- output dir for generated files
-	numGeneratedMappings = 0,	-- counts the number of mappings generated
+	numMappings = 0,			-- number of required mappings
 	log = function( ... ) end,	-- function called to print misc. info (stats, etc.)
 
 	------ Easy access to re-usable modules/templates ------
@@ -56,12 +57,15 @@ function Compiler:addType( typeName )
 	self.dependencies[t] = 1
 end
 
+local numExpandedFiles = 0
+
 -- Creates a dir hierarchy, opens a file and writes the given template, passing it 'data'.
 local function expand( dir, filename, template, ... )
 	path.makePath( dir )
 	local f = io.open( dir .. '/' .. filename, "w" )
 	template( function( ... ) f:write( ... ) end, ... )
 	f:close()
+	numExpandedFiles = numExpandedFiles + 1
 end
 
 local function isBuiltInType( t )
@@ -69,39 +73,76 @@ local function isBuiltInType( t )
 	return name == 'co.Interface' or name == 'co.TypeKind'
 end
 
+local function reportChanges( action, subject, changed, total )
+	if changed == 0 then
+		return "All " .. total .. " " .. subject .. "s are up to date."
+	else
+		local msg = action .. " " .. changed .. " " .. subject .. ( changed > 1 and 's' or '' )
+		if changed < total then
+			local numChanged = ( total - changed )
+			msg = msg .. " (" .. numChanged .. ( numChanged > 1 and " were" or " was" ) .. " up to date)"
+		end
+		return msg .. "."
+	end
+end
+
 -- Runs the compiler to generate mappings. Use this when you don't need to generate a module.
 function Compiler:generateMappings()
-	assert( self.numGeneratedMappings == 0, "this compiler instance has already been used" )
+	assert( self.numMappings == 0, "this compiler instance has already been used" )
 
 	if not self.mappingsDir then
 		self.mappingsDir = self.outDir
 	end
 
-	-- generate mappings for the types in 'types' and all their dependencies
+	if not self.moduleName then
+		self:loadCache()
+	end
+
+	local cachedTypes = self.cachedTypes
+	local updatedTypes = {}
+	local numMappings = 0
+	numExpandedFiles = 0
+
+	-- generate mappings for all direct and indirect dependencies
 	for t, dist in dependencies( self.dependencies ) do
 		-- we may find additional direct module dependencies
 		if dist <= 1 then self.dependencies[t] = dist end
-		-- only generate mappings for non-component, non-built-in types
+		-- only create mappings for non-component, non-built-in types
 		if t.kind ~= 'TK_COMPONENT' and not isBuiltInType( t ) then
-			local dir = self.mappingsDir .. '/' .. t.namespace.fullName:gsub( '%.', '/' )
-			expand( dir, t.name .. '.h', mapping, self, t )
-			self.numGeneratedMappings = self.numGeneratedMappings + 1
+			numMappings = numMappings + 1
+			-- only regenerate out-of-date files
+			local sig = t.fullSignature:getString()
+			if cachedTypes[t.fullName] ~= sig then
+				local dir = self.mappingsDir .. '/' .. t.namespace.fullName:gsub( '%.', '/' )
+				expand( dir, t.name .. '.h', mapping, self, t )
+				updatedTypes[t.fullName] = sig
+			end
 		end
 	end
 
-	self.log( "Created " .. self.numGeneratedMappings .. " mappings." )
+	self.numMappings = numMappings
+	self.updatedTypes = updatedTypes
+
+	self.log( reportChanges( "Created", "mapping", numExpandedFiles, numMappings ) )
+
+	if not self.moduleName then
+		self:saveCache()
+	end
 end
 
 -- Runs the compiler to generate a module. Also generates the necessary mappings.
 function Compiler:generateModule( moduleName )
 	assert( self.moduleName == nil, "this compiler instance has already been used" )
 
+	self:loadCache()
+
 	self.moduleName = moduleName
 	self.moduleNS = self.utils.toCppName( moduleName )
-	self.log( "Processing module '" .. self.moduleName .. "'..." )
 
 	self:loadModuleTypes()
-	self.log( "Found " .. #self.types .. " module types." )
+
+	local doing = ( next( self.cachedTypes ) and "Updating" or "Generating" )
+	self.log(  doing .. " code for module '" .. self.moduleName .. "' (" .. #self.types .. " types)..." )
 
 	-- add types that may not come as explicit dependencies, but are required by generated module code
 	self:addType( "co.System" )
@@ -120,10 +161,24 @@ function Compiler:generateModule( moduleName )
 	-- generateMappings() also adds entries to self.dependencies
 	self:generateMappings()
 
-	self.log( "Generating module code..." )
+	local cachedTypes = self.cachedTypes
+	local updatedTypes = self.updatedTypes
+	local numFiles = 0
+	numExpandedFiles = 0
+
+	local function cachedExpand( ... ) numFiles = numFiles + 1 end
+	local function updateExpand( dir, filename, template, c, t )
+		numFiles = numFiles + 1
+		if t then
+			updatedTypes[t.fullName] = t.fullSignatureStr
+		end
+		expand( dir, filename, template, c, t )
+	end
 
 	-- Generate per-type files
 	for i, t in ipairs( self.types ) do
+		-- only regenerate out-of-date files
+		local expand = ( cachedTypes[t.fullName] == t.fullSignatureStr and cachedExpand or updateExpand )
 		if t.kind == 'TK_NATIVECLASS' then
 			expand( self.outDir, t.name .. "_Adapter.h", nativeClassAdapter, self, t )
 		elseif t.kind == 'TK_COMPONENT' then
@@ -133,7 +188,9 @@ function Compiler:generateModule( moduleName )
 		expand( self.outDir, t.name .. "_Reflector.cpp", reflector, self, t )
 	end
 
-	-- Generate per-module files
+	-- Generate per-module files (only if at least one file was out of date)
+	local shouldUpdateModuleFiles = ( numExpandedFiles > 0 or self.cachedNumModuleFiles > #self.types )
+	local expand = ( shouldUpdateModuleFiles and updateExpand or cachedExpand )
 	expand( self.outDir, "__Bootstrap.cpp", moduleBootstrap, self )
 	expand( self.outDir, "ModuleInstaller.h", moduleInstallerHeader, self )
 	expand( self.outDir, "ModuleInstaller.cpp", moduleInstallerSource, self )
@@ -141,7 +198,9 @@ function Compiler:generateModule( moduleName )
 		expand( self.outDir, "__ModulePart.cpp", moduleDefaultPart, self )
 	end
 
-	self.log( "Done." )
+	self.log( reportChanges( "Generated", "module file", numExpandedFiles, numFiles ) )
+
+	self:saveCache()
 end
 
 -- Loads all module types by locating CSL files in the module's namespace
@@ -192,6 +251,85 @@ function Compiler:hasCustomModulePart()
 			self.moduleName .. "', but it does not provide the co.ModulePart interface.", 0  )
 	end
 	return false
+end
+
+local function loadCacheFile( filename, cachedTypes )
+	local f = io.open( filename, 'r' )
+	local code = f:read( "*a" )
+	f:close()
+	local chunk, err = loadin( cachedTypes, code, filename, 't' )
+	if not chunk then
+		return print( "Error in cache file '" .. filename .. "': " .. tostring( err ) )
+	end
+	local ok, moreCachedTypes, numModuleFiles = pcall( chunk )
+	if not ok then
+		return print( "Error in cache file '" .. filename .. "': " .. tostring( moreCachedTypes ) )
+	end
+	if type( moreCachedTypes ) ~= 'table' then
+		return print( "Cache file '" .. filename .. "' returned an invalid result (" .. tostring( moreCachedTypes ) .. ")." )
+	end
+	for k, v in pairs( moreCachedTypes ) do
+		local current = cachedTypes[k]
+		if current then
+			if current ~= v then
+				cachedTypes[k] = 'collision' -- handle collisions by forcing an update
+			end
+		else
+			cachedTypes[k] = v
+		end
+	end
+	return numModuleFiles
+end
+
+local function saveCacheFile( filename, cachedTypes, numModuleFiles )
+	local f = io.open( filename, "w" )
+	f:write( [[
+-------------------------------------------------------------------------------
+-- Coral Compiler v]], co.version, [[ Cache File
+-- Generated on ]], utils.currentDateTime(), "\n", [[
+-- Delete this file if you want to force regeneration of all files.
+-------------------------------------------------------------------------------
+
+return {
+]] )
+	for k, v in pairs( cachedTypes ) do
+		f:write( '\t["', k, '"] = "', v, '",\n' )
+	end
+	f:write( "}, ", numModuleFiles, "\n" )
+	f:close()
+end
+
+local CACHE_FILE_NAME = '/__coralc_cache.lua'
+
+function Compiler:loadCache()
+	local cachedTypes = {}
+	local cachedNumModuleFiles
+	local filename = self.outDir .. CACHE_FILE_NAME
+	if path.isFile( filename ) then
+		cachedNumModuleFiles = loadCacheFile( filename, cachedTypes )
+	end
+	if self.mappingsDir and self.mappingsDir ~= self.outDir then
+		filename = self.mappingsDir .. CACHE_FILE_NAME
+		if path.isFile( filename ) then
+			loadCacheFile( filename, cachedTypes )
+		end
+	end
+	self.cachedTypes = cachedTypes
+	self.cachedNumModuleFiles = cachedNumModuleFiles or 0
+end
+
+function Compiler:saveCache()
+	local cachedTypes = self.cachedTypes
+	local updatedTypes = self.updatedTypes
+	assert( type( cachedTypes ) == 'table' )
+	-- merge 'updatedTypes' into 'cachedTypes'
+	for k, v in pairs( updatedTypes ) do
+		cachedTypes[k] = v
+	end
+	saveCacheFile( self.outDir .. CACHE_FILE_NAME, self.cachedTypes, #self.types )
+	if self.mappingsDir ~= self.outDir then
+		saveCacheFile( self.mappingsDir .. CACHE_FILE_NAME, self.cachedTypes, 0 )
+	end
 end
 
 return Compiler
