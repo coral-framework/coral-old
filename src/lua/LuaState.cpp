@@ -606,7 +606,7 @@ void LuaState::toArray( lua_State* L, int index, co::Type* elementType, co::Any&
 	int len = static_cast<int>( lua_rawlen( L, index ) );
 
 	co::Any::PseudoVector& pv = var.createArray( elementType, len );
-	co::uint8* p = &pv[0];
+	co::uint8* p = ( len == 0 ? NULL : &pv[0] );
 
 	co::Any elementVar;
 	co::uint32 flags = ( elementKind == co::TK_INTERFACE ? co::Any::VarIsPointer : 0 );
