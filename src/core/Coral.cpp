@@ -93,7 +93,7 @@ static void defaultDebugEventHandler( co::DebugEvent ev, const char* message )
 	static const char* s_eventName[] = { "DEBUG", "WARNING", "CRITICAL", "FATAL" };
 
 #ifdef CORAL_NDEBUG
-	if( ev == Dbg_Message )
+	if( ev == co::Dbg_Message )
 		return;
 #endif
 

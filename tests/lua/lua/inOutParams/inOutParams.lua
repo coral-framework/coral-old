@@ -55,7 +55,7 @@ end
 function Component:testArrayOfInts( a, b )
 	ASSERT_TRUE( #a == 3 and a[1] == 1 and a[2] == 2 and a[3] == 3 )
 	ASSERT_TRUE( #b == 2 and b[1] == 4 and b[2] == 5 )
-	return { 6, 7 }, { 8.8, 9.9, 0.1 }
+	return { 6, 7 }, { 8.1, 9.2, 0.3 }
 end
 
 function Component:testArrayOfAnys( a, b )
