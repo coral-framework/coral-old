@@ -9,6 +9,7 @@
 #include <co/System.h>
 #include <co/Module.h>
 #include <co/ModuleManager.h>
+#include <lua/Exception.h>
 
 ModulePart::ModulePart()
 {
@@ -24,21 +25,27 @@ void ModulePart::initialize( co::Module* module )
 {
 	lua::ModuleInstaller::instance().install();
 
-	// usually update this module AFTER other modules
-	module->setPriority( 100000 );
+	// generally update this module AFTER all other modules
+	module->setRank( 100000 );
 
 	// install our LuaModulePartLoader
 	_luaModulePartLoader = new LuaModulePartLoader;
 	co::getSystem()->getModules()->installLoader( _luaModulePartLoader.get() );
 
 	/*
-		Install the co.packageLoader function into Lua's package.loaders table,
-		in order to enable 'require' to load Lua scripts in the CORAL_PATH.
+		Manually load our Lua module ("lua/__init.lua"), which will in turn
+		install our loader function into Lua's package.loaders table, in order
+		to enable 'require' to load Lua scripts in the CORAL_PATH.
 	 */
-	LuaState::doString( LuaState::getL(), "table.insert( package.loaders, 2, co.packageLoader )" );
+	std::string initScriptFileName;
+	lua_State* L = LuaState::getL();
+	if( !LuaState::findScript( L, "lua", initScriptFileName ) )
+		throw lua::Exception( "could not find the Lua module's init script in the Coral path" );
 
-	// force loading of our own package (lua/init.lua)
-	LuaState::doString( LuaState::getL(), "require 'lua'" );
+	// call the 'lua/__init.lua' script passing in its filename as an arg
+	LuaState::loadFile( L, initScriptFileName );
+	LuaState::push( L, initScriptFileName );
+	LuaState::call( L, 1, 0 );
 }
 
 void ModulePart::integrate( co::Module* )

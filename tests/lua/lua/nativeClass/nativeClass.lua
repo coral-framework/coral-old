@@ -51,8 +51,13 @@ function M:initialize( module )
 	-- returned values should be new values
 	ASSERT_TRUE( r1 ~= s and r2 ~= a and r3 ~= b )
 
-	-- instance 'b' should have been modified
-	ASSERT_TRUE( b:equals( a ) )
+	-- instance 'b' should NOT have been modified
+	ASSERT_EQ( b.x, 3 ) ASSERT_EQ( b.y, 3 )
+
+	-- expected outcome: r1 == s, r2 == a, r3 == b
+	ASSERT_EQ( r1.x, s.x ) ASSERT_EQ( r1.y, s.y )
+	ASSERT_EQ( r2.x, a.x ) ASSERT_EQ( r2.y, a.y )
+	ASSERT_EQ( r3.x, b.x ) ASSERT_EQ( r3.y, b.y )
 
 	-- check returned values
 	ASSERT_EQ( r1.x, 1 ) ASSERT_EQ( r1.y, 1 )

@@ -23,9 +23,9 @@ public:
 private:
 	static int addPath( lua_State* L );
 	static int getPaths( lua_State* L );
+	static int findScript( lua_State* L );
 	static int getType( lua_State* L );
 	static int genericNew( lua_State* L );
-	static int packageLoader( lua_State* L );
 	static int newComponentType( lua_State* L );
 	static int newComponentInstance( lua_State* L );
 
@@ -55,17 +55,22 @@ public:
 	static void getInstance( lua_State* L, int index, co::Any& instance );
 
 	/*!
-		 Just like getInstance(), but does not raise exceptions (if the userdata
-		 is invalid, 'instance' is left unmodified)..
+		 Just like getInstance(), but does not raise exceptions. If the userdata
+		 is invalid, 'instance' is left unmodified and the method returns false.
 	 */
-	static void tryGetInstance( lua_State* L, int index, co::Any& instance );
+	static bool tryGetInstance( lua_State* L, int index, co::Any& instance );
+
+	/*!
+		Removes all references to CompoundType metatables from the Lua registry.
+	 */
+	static void releaseBindings( lua_State* L );
 
 protected:
 	/*!
 		Pushes a metatable for a userdata of the specified co::CompoundType.
 		The metatable is cached in the registry, indexed by the co::CompoundType pointer.
 	 */
-	static void pushMetatable( lua_State* L, co::CompoundType* ct );
+	static void pushMetatable( lua_State* L, co::CompoundType* ct, co::Reflector* reflector = 0 );
 
 	/*!
 		Assumes the CompoundType's udata is at index 1 and the member name is at index 2.
@@ -92,6 +97,10 @@ protected:
 		The lua_CFunction that dispatches method calls.
 	 */
 	static int callMethod( lua_State* L );
+
+private:
+	typedef std::vector<co::CompoundType*> CompoundTypeList;
+	static CompoundTypeList sm_boundTypes;
 };
 
 /*!

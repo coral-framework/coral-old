@@ -56,6 +56,15 @@ FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output )
 ADD_TEST( tests_lua ${tests_lua_EXECUTABLE} --gtest_output=xml:../output/LuaTests.xml )
 
 ################################################################################
+# If Valgrind is available, repeat the test checking for memory leaks
+################################################################################
+IF( VALGRIND_COMMAND )
+	ADD_TEST( tests_lua_MemoryCheck ${VALGRIND_COMMAND}
+		--leak-check=full --show-reachable=yes --num-callers=30 --dsymutil=yes
+		--log-file=${CMAKE_BINARY_DIR}/valgrind-lua.log --error-exitcode=13 --suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp ${tests_lua_EXECUTABLE} )
+ENDIF()
+
+################################################################################
 # Source Groups
 ################################################################################
 

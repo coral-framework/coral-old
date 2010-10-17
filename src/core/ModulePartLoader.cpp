@@ -10,15 +10,16 @@
 #include <co/Uuid.h>
 #include <co/Coral.h>
 #include <co/Module.h>
+#include <co/System.h>
 #include <co/Namespace.h>
 #include <co/ModulePart.h>
+#include <co/ModuleManager.h>
 #include <co/TypeLoadException.h>
 #include <co/ModuleLoadException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/FileLookUp.h>
 #include <co/reserved/LibraryManager.h>
 #include <cstdio>
-#include <memory>
 #include <sstream>
 
 //------ Module Bootstrap Functions -----------------------------------------//
@@ -64,7 +65,7 @@ co::ModulePart* ModulePartLoader::loadModulePart( const std::string& moduleName 
 	if( !locateModuleLibrary( moduleName, &libraryFilename ) )
 		throw co::ModuleLoadException( "unexpected missing module library file" );
 
-	std::auto_ptr<co::Library> lib( new co::Library( libraryFilename ) );
+	co::RefPtr<co::Library> lib( new co::Library( libraryFilename ) );
 	lib->load();
 
 	// resolve module bootstrap functions
@@ -82,7 +83,7 @@ co::ModulePart* ModulePartLoader::loadModulePart( const std::string& moduleName 
 	if( !part )
 		throw co::ModuleLoadException( "library provided a null ModulePart" );
 
-	co::LibraryManager::add( part, lib.release() );
+	co::LibraryManager::add( part, lib.get() );
 
 	return part;
 }
@@ -244,6 +245,9 @@ void ModulePartLoader::checkTypeDependencies( const TypeDependency* td )
 	{
 		CORAL_THROW( co::ModuleLoadException, "type dependency check error: " << e.what() );
 	}
+
+	if( !co::getSystem()->getModules()->getBinaryCompatibilityChecks() )
+		return; // binary interface check errors are disabled
 
 	size_t numIncompatibleTypes = incompatibleTypes.size();
 	if( numIncompatibleTypes == 0 )

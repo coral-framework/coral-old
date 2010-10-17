@@ -54,12 +54,31 @@ public:
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 0 ), range );
 	}
 
+	bool findScript( const std::string& name_, std::string& filename_ )
+	{
+		co::Any args[2];
+		args[0].set< const std::string& >( name_ );
+		args[1].set< std::string& >( filename_ );
+		co::ArrayRange<co::Any const> range( args, 2 );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 1 ), range );
+		return res.get< bool >();
+	}
+
+	void getValue( co::int32 index_, const co::Any& outputVar_ )
+	{
+		co::Any args[2];
+		args[0].set< co::int32 >( index_ );
+		args[1].set< const co::Any& >( outputVar_ );
+		co::ArrayRange<co::Any const> range( args, 2 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 2 ), range );
+	}
+
 	void loadFile( const std::string& filename_ )
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( filename_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 1 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 3 ), range );
 	}
 
 	void push( const co::Any& value_ )
@@ -67,17 +86,7 @@ public:
 		co::Any args[1];
 		args[0].set< const co::Any& >( value_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 2 ), range );
-	}
-
-	bool searchScript( const std::string& name_, std::string& filename_ )
-	{
-		co::Any args[2];
-		args[0].set< const std::string& >( name_ );
-		args[1].set< std::string& >( filename_ );
-		co::ArrayRange<co::Any const> range( args, 2 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 3 ), range );
-		return res.get< bool >();
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 4 ), range );
 	}
 
 protected:
@@ -162,24 +171,32 @@ public:
 				break;
 			case 1:
 				{
+					const std::string& name_ = args[++argIndex].get< const std::string& >();
+					std::string& filename_ = args[++argIndex].get< std::string& >();
+					argIndex = -1;
+					res.set< bool >( p->findScript( name_, filename_ ) );
+				}
+				break;
+			case 2:
+				{
+					co::int32 index_ = args[++argIndex].get< co::int32 >();
+					const co::Any& outputVar_ = args[++argIndex].get< const co::Any& >();
+					argIndex = -1;
+					p->getValue( index_, outputVar_ );
+				}
+				break;
+			case 3:
+				{
 					const std::string& filename_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
 					p->loadFile( filename_ );
 				}
 				break;
-			case 2:
+			case 4:
 				{
 					const co::Any& value_ = args[++argIndex].get< const co::Any& >();
 					argIndex = -1;
 					p->push( value_ );
-				}
-				break;
-			case 3:
-				{
-					const std::string& name_ = args[++argIndex].get< const std::string& >();
-					std::string& filename_ = args[++argIndex].get< std::string& >();
-					argIndex = -1;
-					res.set< bool >( p->searchScript( name_, filename_ ) );
 				}
 				break;
 			default:

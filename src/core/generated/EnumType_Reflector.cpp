@@ -106,7 +106,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( identifier_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::EnumType>( 1 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::EnumType>( 0 ), range );
 		return res.get< co::int32 >();
 	}
 

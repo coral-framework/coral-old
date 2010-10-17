@@ -72,11 +72,11 @@ FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output )
 ADD_TEST( tests_moduleB ${tests_moduleB_EXECUTABLE} --gtest_output=xml:../output/ModuleBTests.xml )
 
 ################################################################################
-# If Valgrind is available, add a memory-checking test for tests_moduleB
+# If Valgrind is available, repeat the test checking for memory leaks
 ################################################################################
 IF( VALGRIND_COMMAND )
 	ADD_TEST( tests_moduleB_MemoryCheck ${VALGRIND_COMMAND}
-		--leak-check=full --show-reachable=yes --num-callers=15
+		--leak-check=full --show-reachable=yes --num-callers=15 --dsymutil=yes
 		--log-file=${CMAKE_BINARY_DIR}/valgrind-moduleB.log --error-exitcode=13 --suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp ${tests_moduleB_EXECUTABLE} )
 ENDIF()
 

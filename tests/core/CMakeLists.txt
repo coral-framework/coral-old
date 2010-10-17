@@ -57,12 +57,13 @@ FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output )
 ADD_TEST( tests_core ${tests_core_EXECUTABLE} --gtest_output=xml:../output/CoreTests.xml )
 
 ################################################################################
-# If Valgrind is available, add a memory-checking test for tests_core
+# If Valgrind is available, repeat the test checking for memory leaks
 ################################################################################
 IF( VALGRIND_COMMAND )
 	ADD_TEST( tests_core_MemoryCheck ${VALGRIND_COMMAND}
-		--leak-check=full --show-reachable=yes --num-callers=15
-		--log-file=${CMAKE_BINARY_DIR}/valgrind.log --error-exitcode=13 --suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp ${tests_core_EXECUTABLE} )
+		--leak-check=full --show-reachable=yes --num-callers=15 --dsymutil=yes
+		--log-file=${CMAKE_BINARY_DIR}/valgrind.log --error-exitcode=13
+		--suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp ${tests_core_EXECUTABLE} )
 ENDIF()
 
 ################################################################################

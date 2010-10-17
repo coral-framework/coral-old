@@ -59,7 +59,7 @@ public:
 	void createMethod()
 	{
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 2 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 0 ), range );
 	}
 
 	void defineException( co::ExceptionType* exceptionType_ )
@@ -67,7 +67,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::ExceptionType* >( exceptionType_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 3 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 1 ), range );
 	}
 
 	void defineParameter( const std::string& name_, co::Type* type_, bool input_, bool output_ )
@@ -78,7 +78,7 @@ public:
 		args[2].set< bool >( input_ );
 		args[3].set< bool >( output_ );
 		co::ArrayRange<co::Any const> range( args, 4 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 4 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 2 ), range );
 	}
 
 	void defineReturnType( co::Type* type_ )
@@ -86,7 +86,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::Type* >( type_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 5 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::MethodBuilder>( 3 ), range );
 	}
 
 protected:

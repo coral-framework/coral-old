@@ -51,13 +51,13 @@ public:
 	void commit()
 	{
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeCreationTransaction>( 1 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeCreationTransaction>( 0 ), range );
 	}
 
 	void rollback()
 	{
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeCreationTransaction>( 2 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeCreationTransaction>( 1 ), range );
 	}
 
 protected:

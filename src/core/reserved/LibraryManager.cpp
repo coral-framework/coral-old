@@ -8,8 +8,8 @@
 #include <map>
 #include <vector>
 
-typedef std::map<co::ModulePart*, co::Library*> LibraryMap;
-typedef std::vector<co::Library*> LibraryList;
+typedef std::map<co::ModulePart*, co::RefPtr<co::Library> > LibraryMap;
+typedef std::vector<co::RefPtr<co::Library> > LibraryList;
 
 namespace
 {
@@ -36,16 +36,14 @@ void co::LibraryManager::release( co::ModulePart* part )
 	sg_loadedLibs.erase( it );
 }
 
+void co::LibraryManager::releaseAll()
+{
+	for( LibraryMap::iterator it = sg_loadedLibs.begin(); it != sg_loadedLibs.end(); ++it )
+		sg_releasedLibs.push_back( it->second );
+	sg_loadedLibs.clear();
+}
+
 void co::LibraryManager::flush()
 {
-	if( sg_releasedLibs.empty() )
-		return;
-
-	size_t count = sg_releasedLibs.size();
-	for( size_t i = 0; i < count; ++i )
-	{
-		delete sg_releasedLibs[i];
-	}
-
 	sg_releasedLibs.clear();
 }

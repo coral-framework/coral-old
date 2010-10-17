@@ -55,7 +55,7 @@ public:
 		args[0].set< co::InterfaceInfo* >( clientItfInfo_ );
 		args[1].set< co::Interface* >( instance_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 1 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 0 ), range );
 	}
 
 	co::Interface* getInterface( co::InterfaceInfo* itfInfo_ )
@@ -63,7 +63,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::InterfaceInfo* >( itfInfo_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 2 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 1 ), range );
 		return res.get< co::Interface* >();
 	}
 

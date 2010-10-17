@@ -24,7 +24,7 @@ co::int32 LuaLauncher::main( co::ArrayRange<std::string const> args )
 		throw lua::Exception( "lua.Launcher must receive a Lua script name as argument" );
 
 	std::string filename;
-	if( !LuaState::searchScriptFile( args.getFirst(), filename ) )
+	if( !LuaState::findScript( LuaState::getL(), args.getFirst(), filename ) )
 		CORAL_THROW( lua::Exception, "launch script '" << args.getFirst() << "' could not be found in the path" );
 
 	lua_State* L = LuaState::getL();

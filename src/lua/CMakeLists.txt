@@ -28,14 +28,15 @@ SET_TARGET_PROPERTIES( lua PROPERTIES
 TARGET_LINK_LIBRARIES( lua lualibs core )
 
 ################################################################################
-# Custom target to re-create generated Lua module files using the Coral compiler
+# Custom target to re-generate the Lua module files using the Coral compiler
 ################################################################################
 
 ADD_CUSTOM_TARGET( lua_regen
-	COMMAND ${CORAL_LAUNCHER} -p "${CMAKE_SOURCE_DIR}/modules,${CMAKE_BINARY_DIR}/modules" lua.Launcher co.compiler.cli -g lua
+	COMMAND ${CORAL_LAUNCHER} -p "${CMAKE_SOURCE_DIR}/modules,${CMAKE_BINARY_DIR}/modules"
+		--no-abi-checks lua.Launcher co.compiler.cli -g lua
 	DEPENDS ${CORAL_LAUNCHER}
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-	COMMENT "Re-creating 'generated' Lua module files..."
+	COMMENT "Forcing regeneration of the Lua module files..."
 )
 
 ################################################################################

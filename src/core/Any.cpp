@@ -1000,7 +1000,7 @@ void Any::destroyObject()
 		return;
 
 	case TK_ANY:
-		reinterpret_cast<Any*>( _object.data.ptr )->~Any();
+		delete reinterpret_cast<Any*>( _object.data.ptr );
 		break;
 
 	case TK_STRING:

@@ -73,19 +73,19 @@ public:
 		co::Any args[1];
 		args[0].set< co::ArrayRange<std::string const> >( requiredModules_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 4 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 0 ), range );
 	}
 
 	void setupPresentation()
 	{
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 5 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 1 ), range );
 	}
 
 	void tearDown()
 	{
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 6 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::System>( 2 ), range );
 	}
 
 protected:

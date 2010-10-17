@@ -21,11 +21,8 @@ TypeCreationTransaction::TypeCreationTransaction()
 {
 	if( sm_activeTransaction )
 	{
-		// TODO call a handler function instead
-		std::cerr	<< "Attempt to instantiate a co::TypeCreationTransaction while another instance is active. "
-					<< "Concurrent type creation is unsafe and disallowed in this Coral version.\n";
-
-		assert( false );
+		co::debug( co::Dbg_Fatal, "Attempt to instantiate a co::TypeCreationTransaction while another "
+			"instance is active. Concurrent type creation is unsafe and disallowed in this Coral version." );
 
 		CORAL_THROW( co::UnsupportedOperationException,
 			"Only a single co::TypeCreationTransaction instance may exist at any moment in time" );
@@ -41,11 +38,7 @@ TypeCreationTransaction::TypeCreationTransaction()
 TypeCreationTransaction::~TypeCreationTransaction()
 {
 	if( !_commitSucceeded && !_rolledBack )
-	{
-		// TODO call a handler function instead
-		std::cerr << "co::TypeCreationTransaction not committed nor rolled back.";
-		assert( false );
-	}
+		co::debug( co::Dbg_Critical, "co::TypeCreationTransaction not committed nor rolled back." );
 }
 
 void TypeCreationTransaction::addTypeBuilder( co::TypeBuilder* typeBuilder )

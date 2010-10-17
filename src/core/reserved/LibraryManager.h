@@ -20,11 +20,17 @@ class ModulePart;
 class CORAL_EXPORT LibraryManager
 {
 public:
-	//! Registers a module part and its related library.
+	//! Registers a module part and its associated library.
 	static void add( ModulePart* part, Library* library );
 
-	//! Releases the library related to a module part so it can be unloaded at the next flush().
+	/*!
+		Releases the library associated with a module part,
+		so it can be unloaded by the next flush().
+	 */
 	static void release( ModulePart* part );
+
+	//! Releases all registered libraries.
+	static void releaseAll();
 
 	//! Unloads all released libraries that are still loaded.
 	static void flush();

@@ -6,6 +6,7 @@
 #ifndef _CO_LIBRARY_H_
 #define _CO_LIBRARY_H_
 
+#include "RefCounted.h"
 #include <co/Platform.h>
 #include <string>
 
@@ -30,7 +31,7 @@ namespace co {
 	the library is loaded, and exported symbols are "hidden" from other modules (i.e. only accessible
 	through resolve()). All load hints are currently ignored on Windows.
  */
-class CORAL_EXPORT Library
+class CORAL_EXPORT Library : public RefCounted
 {
 public:
 	//! Hints for when and how library symbols should be bound.
@@ -45,7 +46,7 @@ public:
 	Library( const std::string& fileName );
 
 	//! Destructor. Unloads the library if it is still loaded.
-	~Library();
+	virtual ~Library();
 
 	//! Returns the library file name.
 	inline const std::string& getFileName() const { return _fileName; }

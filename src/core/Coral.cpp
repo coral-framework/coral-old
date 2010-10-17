@@ -9,6 +9,8 @@
 #include <co/Coral.h>
 #include <co/RefPtr.h>
 #include <co/Reflector.h>
+#include <co/reserved/LibraryManager.h>
+#include <cstdarg>
 #include <cstdlib>
 
 #ifdef CORAL_OS_WIN
@@ -73,11 +75,51 @@ void co::shutdown()
 	if( systemState == co::SystemState_Running )
 		sg_system->tearDown();
 
+	// uninstall the 'core' module
 	co::ModuleInstaller::instance().uninstall();
 
+	// release the main system interfaces
 	sg_serviceManager = NULL;
 	sg_typeManager = NULL;
 	sg_system = NULL;
+
+	// flush all released libraries
+	co::LibraryManager::flush();
+}
+
+static void defaultDebugEventHandler( co::DebugEvent ev, const char* message )
+{
+	static const char* s_eventName[] = { "DEBUG", "WARNING", "CRITICAL", "FATAL" };
+
+#ifdef CORAL_NDEBUG
+	if( ev == Dbg_Message )
+		return;
+#endif
+
+	const char* eventName = s_eventName[ev >= 0 && ev <= co::Dbg_Fatal ? ev : co::Dbg_Fatal];
+	fprintf( stderr, "[%s] %s\n", eventName, message );
+	if( ev == co::Dbg_Fatal )
+		abort();
+}
+
+static co::DebugEventHandler sg_debugEventHandler = defaultDebugEventHandler;
+
+co::DebugEventHandler co::installDebugEventHandler( co::DebugEventHandler handler )
+{
+	co::DebugEventHandler previous = sg_debugEventHandler;
+	sg_debugEventHandler = handler ? handler : defaultDebugEventHandler;
+	return previous;
+}
+
+void co::debug( co::DebugEvent event, const char* msg, ... )
+{
+	char buffer[1024] = { 0 };
+	va_list va;
+	va_start( va, msg );
+	if( msg )
+		vsprintf( buffer, msg, va );
+	va_end( va );
+	sg_debugEventHandler( event, buffer );
 }
 
 co::Type* co::getType( const std::string& fullName )

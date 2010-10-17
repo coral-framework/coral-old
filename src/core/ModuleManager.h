@@ -30,6 +30,8 @@ public:
 	// co::ModuleManager methods:
 	co::ArrayRange<co::Module* const> getModules();
 	co::ArrayRange<co::ModulePartLoader* const> getLoaders();
+	bool getBinaryCompatibilityChecks();
+	void setBinaryCompatibilityChecks( bool enabled );
 	co::Module* findModule( const std::string& moduleName );
 	void installLoader( co::ModulePartLoader* loader );
 	void uninstallLoader( co::ModulePartLoader* loader );
@@ -48,6 +50,8 @@ private:
 
 	typedef co::RefVector<co::ModulePartLoader> ModulePartLoaderList;
 	ModulePartLoaderList _loaders;
+	
+	bool _binaryCompatibilityChecks;
 };
 
 #endif

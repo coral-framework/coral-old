@@ -94,13 +94,6 @@ TEST( LuaTests, array )
 	ASSERT_SUCCESS( "lua.array" );
 }
 
-// --- Lua Component Tests --- //
-
-TEST( LuaTests, component )
-{
-	ASSERT_SUCCESS( "lua.component" );
-}
-
 // --- Component Binding Tests --- //
 
 TEST( LuaTests, componentManipulation )
@@ -132,4 +125,18 @@ TEST( LuaTests, nativeClass )
 TEST( LuaTests, struct )
 {
 	ASSERT_SUCCESS( "lua.struct" );
+}
+
+// --- Lua Component Tests --- //
+
+TEST( LuaTests, component )
+{
+	ASSERT_SUCCESS( "lua.component" );
+}
+
+// --- In/Out Any/Array/Struct Parameter Tests --- //
+
+TEST( LuaTests, inOutParams )
+{
+	ASSERT_SUCCESS( "lua.inOutParams" );
 }

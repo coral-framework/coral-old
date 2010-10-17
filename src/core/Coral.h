@@ -18,6 +18,8 @@ class Component;
 class Interface;
 class InterfaceType;
 
+//---------- Coral Path -----------------------------------------------------//
+
 //! Returns the list of type repositories in use by the framework.
 CORAL_EXPORT ArrayRange<const std::string> getPaths();
 
@@ -28,6 +30,9 @@ CORAL_EXPORT ArrayRange<const std::string> getPaths();
  */
 CORAL_EXPORT void addPath( const std::string& path );
 
+
+//---------- Bootstrap and Shutdown -----------------------------------------//
+
 /*!
 	Returns the co::System bootstrap interface (a singleton).
 	This first call to this function (ever, or since the last call to co::shutdown())
@@ -36,9 +41,54 @@ CORAL_EXPORT void addPath( const std::string& path );
 CORAL_EXPORT System* getSystem();
 
 /*!
-	Tears down the system (if it is running) and destroys it, releasing all memory and resources.
+	Tears down and destroys the system, releasing all memory and resources.
  */
 CORAL_EXPORT void shutdown();
+
+
+//---------- Debug Events ---------------------------------------------------//
+
+//! The kind of events that can be sent to a DebugEventHandler.
+enum DebugEvent
+{
+	Dbg_Message,	//!< A simple debug message. Not sent in Release builds.
+	Dbg_Warning,	//!< A Warning message. Something worth checking.
+	Dbg_Critical,	//!< A Critical error. Potential data loss and malfunction.
+	Dbg_Fatal		//!< Fatal error. Default action is to abort the application.
+};
+
+//! Signature of a DebugEventHandler function. See installDebugEventHandler().
+typedef void (*DebugEventHandler)( DebugEvent event, const char* message );
+
+/*!
+	Installs a debug event handler and returns the previous handler (which may be NULL).
+
+	A debug event handler is a function that prints out debug messages, warnings, critical and fatal
+	error messages. The default handler prints all messages to \c stderr, and aborts the application
+	in case of a fatal error. Only a single debug event handler can be defined per application, and
+	it should generally be installed before the framework is initialized.
+	To restore the default handler, call <tt>installDebugEventHandler( NULL )</tt>.
+
+	\sa debug()
+ */
+CORAL_EXPORT DebugEventHandler installDebugEventHandler( DebugEventHandler handler );
+
+/*!
+	Sends a debug event to the currently-installed debug event handler.
+
+	The debug event API is used as an alternative to exception handling
+	when it is impossible or unnecessary to raise an exception.
+
+	The first parameter specifies the kind of the event (see DebugEvent).
+	The remaining parameters are a format string and an optional list of
+	arguments that will compose the debug message, just like in printf().
+
+	\sa installDebugEventHandler()
+ */
+CORAL_EXPORT void debug( DebugEvent event, const char* msg, ... );
+
+
+//---------- General Utility Functions --------------------------------------//
 
 /*!
 	Utility function to retrieve or load a type by name.

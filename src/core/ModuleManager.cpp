@@ -20,7 +20,7 @@
 
 ModuleManager::ModuleManager()
 {
-	// empty
+	_binaryCompatibilityChecks = true;
 }
 
 ModuleManager::~ModuleManager()
@@ -34,9 +34,9 @@ void ModuleManager::initialize()
 	_loaders.push_back( new ModulePartLoader );
 }
 
-static bool sortByIncreasingPriority( co::Module* a, co::Module* b )
+static bool sortByIncreasingRank( co::Module* a, co::Module* b )
 {
-	return a->getPriority() < b->getPriority();
+	return a->getRank() < b->getRank();
 }
 
 void ModuleManager::updateModules( co::ModuleState state )
@@ -49,7 +49,7 @@ void ModuleManager::updateModules( co::ModuleState state )
 	for( size_t i = 0; i < numModules; ++i )
 		sortedModules.push_back( _modules[i].get() );
 
-	std::sort( sortedModules.begin(), sortedModules.end(), sortByIncreasingPriority );
+	std::sort( sortedModules.begin(), sortedModules.end(), sortByIncreasingRank );
 
 	for( size_t i = 0; i < numModules; ++i )
 	{
@@ -61,10 +61,8 @@ void ModuleManager::updateModules( co::ModuleState state )
 		catch( std::exception& e )
 		{
 			module->abort();
-
-			// TODO call a handler function instead
-			std::cerr << "Module '" << module->getNamespace()->getFullName()
-						 << "' aborted due to exception: " << e.what();
+			co::debug( co::Dbg_Warning, "Module '%s' aborted due to exception: %s",
+				module->getNamespace()->getFullName().c_str(), e.what() );
 		}
 	}
 }
@@ -77,6 +75,16 @@ co::ArrayRange<co::Module* const> ModuleManager::getModules()
 co::ArrayRange<co::ModulePartLoader* const> ModuleManager::getLoaders()
 {
 	return _loaders;
+}
+
+bool ModuleManager::getBinaryCompatibilityChecks()
+{
+	return _binaryCompatibilityChecks;
+}
+
+void ModuleManager::setBinaryCompatibilityChecks( bool enabled )
+{
+	_binaryCompatibilityChecks = enabled;
 }
 
 co::Module* ModuleManager::findModule( const std::string& moduleName )

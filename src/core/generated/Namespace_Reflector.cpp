@@ -86,7 +86,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 6 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 0 ), range );
 		return res.get< co::Namespace* >();
 	}
 
@@ -97,7 +97,7 @@ public:
 		args[1].set< co::TypeKind >( typeKind_ );
 		args[2].set< co::TypeCreationTransaction* >( transaction_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 7 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 1 ), range );
 		return res.get< co::TypeBuilder* >();
 	}
 
@@ -106,7 +106,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 8 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 2 ), range );
 		return res.get< co::Namespace* >();
 	}
 
@@ -115,7 +115,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 9 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Namespace>( 3 ), range );
 		return res.get< co::Type* >();
 	}
 

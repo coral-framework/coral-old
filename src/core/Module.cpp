@@ -19,7 +19,7 @@ Module::Module()
 {
 	_state = co::ModuleState_None;
 	_namespace = NULL;
-	_priority = 0;
+	_rank = 0;
 }
 
 Module::~Module()
@@ -72,14 +72,14 @@ co::ArrayRange<co::ModulePart* const> Module::getParts()
 	return co::ArrayRange<co::ModulePart* const>();
 }
 
-co::int32 Module::getPriority()
+co::int32 Module::getRank()
 {
-	return _priority;
+	return _rank;
 }
 
-void Module::setPriority( co::int32 priority )
+void Module::setRank( co::int32 rank )
 {
-	_priority = priority;
+	_rank = rank;
 }
 
 void Module::initialize()
@@ -160,9 +160,8 @@ void Module::abort()
 			}
 			catch( std::exception& e )
 			{
-				// TODO call a handler function instead
-				std::cerr << "Exception ignored while aborting module '"
-							 << _namespace->getFullName() << "': " << e.what();
+				co::debug( co::Dbg_Critical, "Exception ignored while aborting module '%s': %s",
+						_namespace->getFullName().c_str(), e.what() );
 			}
 		}
 	}

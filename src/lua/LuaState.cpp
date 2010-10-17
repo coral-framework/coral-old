@@ -53,6 +53,10 @@ void LuaState::tearDown()
 	// release the 'co.system' interface
 	coPackage::close( sm_L );
 
+	// force a full GC cycle to ensure all __gc finalizers are called.
+	lua_settop( sm_L, 0 );
+	lua_gc( sm_L, LUA_GCCOLLECT, 0 );
+
 	// close our Lua universe
 	lua_close( sm_L );
 	sm_L = NULL;
@@ -87,13 +91,7 @@ void LuaState::dumpStack( lua_State* L )
 	printf( "dumpStack -- END\n" );
 }
 
-void LuaState::doString( lua_State* L, const char* code )
-{
-	loadString( L, code );
-	call( L, 0, 0 );
-}
-
-bool LuaState::searchScriptFile( const std::string& name, std::string& filename )
+bool LuaState::findScript( lua_State*, const std::string& name, std::string& filename )
 {
 	static const std::string s_extension( "lua" );
 
@@ -103,11 +101,23 @@ bool LuaState::searchScriptFile( const std::string& name, std::string& filename 
 	std::string filePath( name );
 	fileLookUp.addFilePath( filePath, true );
 
-	// look for '?/init.lua'
-	filePath.append( ".init" );
+	// look for '?/__init.lua'
+	filePath.append( ".__init" );
 	fileLookUp.addFilePath( filePath, true );
 
 	return fileLookUp.locate( filename );
+}
+
+void LuaState::doFile( lua_State* L, const std::string& filename )
+{
+	loadFile( L, filename );
+	call( L, 0, 0 );
+}
+
+void LuaState::doString( lua_State* L, const char* code )
+{
+	loadString( L, code );
+	call( L, 0, 0 );
 }
 
 void LuaState::loadFile( lua_State* L, const std::string& filename )
@@ -150,22 +160,21 @@ void LuaState::push( lua_State* L, const co::Any& var )
 
 void LuaState::push( lua_State* L, const co::Any& var, int depth )
 {
-	const co::__any::State& s = var.getState();
+	const co::Any::State& s = var.getState();
 
-	/*
-		The variable must be either a value or a reference (to a string or complex value).
-		Pointers are only accepted for interfaces.
-	 */
-	if( s.kind != co::TK_INTERFACE && s.kind != co::TK_ARRAY && ( s.isPointer ||
-		   ( s.isReference && ( s.kind < co::TK_STRING || s.kind == co::TK_ENUM ) ) ) )
-	{
-		assert( false );
-		lua_pushnil( L );
-		return;
-	}
+	// only arrays or interfaces can be passed as pointers
+	assert( !s.isPointer || s.kind == co::TK_INTERFACE || s.kind == co::TK_ARRAY );
+
+	// dereference the variable, if necessary
+	const co::Any::State::Data* d = &s.data;
+	if( s.isReference && s.kind != co::TK_ANY && ( s.kind < co::TK_STRING || s.kind == co::TK_ENUM ) )
+		d = reinterpret_cast<const co::Any::State::Data*>( d->ptr );
 
 	switch( s.kind )
 	{
+	case co::TK_NONE:
+		lua_pushnil( L );
+		break;
 	case co::TK_ANY:
 		if( depth > 1 )
 		{
@@ -180,37 +189,37 @@ void LuaState::push( lua_State* L, const co::Any& var, int depth )
 		push( L, var.get<const co::Any&>(), depth + 1 );
 		break;
 	case co::TK_BOOLEAN:
-		lua_pushboolean( L, s.data.b );
+		lua_pushboolean( L, d->b );
 		break;
 	case co::TK_INT8:
-		lua_pushnumber( L, s.data.i8 );
+		lua_pushnumber( L, d->i8 );
 		break;
 	case co::TK_UINT8:
-		lua_pushnumber( L, s.data.u8 );
+		lua_pushnumber( L, d->u8 );
 		break;
 	case co::TK_INT16:
-		lua_pushnumber( L, s.data.i16 );
+		lua_pushnumber( L, d->i16 );
 		break;
 	case co::TK_UINT16:
-		lua_pushnumber( L, s.data.u16 );
+		lua_pushnumber( L, d->u16 );
 		break;
 	case co::TK_INT32:
-		lua_pushnumber( L, s.data.i32 );
+		lua_pushnumber( L, d->i32 );
 		break;
 	case co::TK_UINT32:
-		lua_pushnumber( L, s.data.u32 );
+		lua_pushnumber( L, d->u32 );
 		break;
 	case co::TK_INT64:
-		lua_pushnumber( L, static_cast<lua_Number>( s.data.i64 ) );
+		lua_pushnumber( L, static_cast<lua_Number>( d->i64 ) );
 		break;
 	case co::TK_UINT64:
-		lua_pushnumber( L, static_cast<lua_Number>( s.data.u64 ) );
+		lua_pushnumber( L, static_cast<lua_Number>( d->u64 ) );
 		break;
 	case co::TK_FLOAT:
-		lua_pushnumber( L, s.data.f );
+		lua_pushnumber( L, d->f );
 		break;
 	case co::TK_DOUBLE:
-		lua_pushnumber( L, s.data.d );
+		lua_pushnumber( L, d->d );
 		break;
 	case co::TK_STRING:
 		push( L, var.get<const std::string&>() );
@@ -221,8 +230,9 @@ void LuaState::push( lua_State* L, const co::Any& var, int depth )
 	case co::TK_ENUM:
 		{
 			co::ArrayRange<std::string const> ids = static_cast<co::EnumType*>( s.type )->getIdentifiers();
-			if( s.data.u32 < ids.getSize() )
-				push( L, ids[s.data.u32] );
+			co::uint32 id = d->u32;
+			if( id < ids.getSize() )
+				push( L, ids[id] );
 			else
 			{
 				// enum value is out of bounds
@@ -310,6 +320,10 @@ void LuaState::getAny( lua_State* L, int index, co::Type* expectedType, co::Any&
 		any.set( getEnumIdentifier( L, index, static_cast<co::EnumType*>( expectedType ) ) );
 		return;
 
+	case co::TK_NONE:
+		expectedKind = co::TK_ANY;
+		// continue
+
 	default:
 		var = &any;
 	}
@@ -320,6 +334,11 @@ void LuaState::getAny( lua_State* L, int index, co::Type* expectedType, co::Any&
 		if( expectedKind == co::TK_INTERFACE )
 		{
 			var->setInterface( NULL, static_cast<co::InterfaceType*>( expectedType ) );
+			break;
+		}
+		else if( expectedKind == co::TK_ANY )
+		{
+			var->clear();
 			break;
 		}
 		throw lua::Exception( "no conversion from Lua's nil" );
@@ -348,7 +367,8 @@ void LuaState::getAny( lua_State* L, int index, co::Type* expectedType, co::Any&
 		if( expectedKind == co::TK_ARRAY )
 			toArray( L, index, static_cast<co::ArrayType*>( expectedType )->getElementType(), *var );
 		else
-			throw lua::Exception( "no conversion from a Lua table" );
+			throw lua::Exception( expectedKind != co::TK_ANY ? "no conversion from a Lua table" :
+						"unsupported conversion from a Lua table to a Coral 'any'" );
 		break;
 
 	case LUA_TFUNCTION:
@@ -442,8 +462,17 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 		}
 		break;
 	case co::TK_ARRAY:
-		if( var.getState().data.ptr == NULL || lua_isnil( L, index ) )
-			break; // the array was either not request or not returned
+		// array no requested?
+		if( var.getState().data.ptr == NULL )
+			break;
+		// array not provided?
+		if( lua_isnil( L, index ) )
+		{
+			co::Any emptyArray;
+			emptyArray.createArray( var.getType(), 0 );
+			emptyArray.swapArray( var );
+			break;
+		}
 		checkType( L, index, LUA_TTABLE );
 		{
 			co::Any anyArray;
@@ -462,7 +491,7 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 			co::CompoundType* actual = CompoundTypeBinding::getType( L, index );
 			if( actual != expected )
 				CORAL_THROW( lua::Exception, expected->getFullName() << " expected, got " <<
-					( expected ? expected->getFullName().c_str() : lua_typename( L, lua_type( L, index ) ) ) );
+					( actual ? actual->getFullName().c_str() : lua_typename( L, lua_type( L, index ) ) ) );
 			expected->getReflector()->copyValue( ComplexValueBinding::getInstance( L, index ), var.getState().data.ptr );
 		}
 		break;
@@ -489,9 +518,9 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 	}
 }
 
-bool LuaState::searchScript( const std::string& name, std::string& filename )
+bool LuaState::findScript( const std::string& name, std::string& filename )
 {
-	return searchScriptFile( name, filename );
+	return findScript( getL(), name, filename );
 }
 
 void LuaState::loadFile( const std::string& filename )
@@ -507,6 +536,11 @@ void LuaState::call( co::int32 numArgs, co::int32 numResults )
 void LuaState::push( const co::Any& var )
 {
 	push( getL(), var );
+}
+
+void LuaState::getValue( co::int32 index, const co::Any& outputVar )
+{
+	getValue( getL(), index, outputVar );
 }
 
 void LuaState::pushInstancesTable( lua_State* L )
@@ -583,7 +617,8 @@ void LuaState::pushArray( lua_State* L, const co::Any& var )
 	else
 	{
 		co::Any elem;
-		co::uint32 flags = ( kind < co::TK_STRING || kind == co::TK_ENUM ? co::Any::VarIsValue : co::Any::VarIsReference );
+		co::uint32 flags = ( ( kind > co::TK_ANY && ( kind < co::TK_STRING || kind == co::TK_ENUM ) ) ?
+								co::Any::VarIsValue : co::Any::VarIsReference );
 		for( int i = 0; i < elemCount; ++i )
 		{
 			if( kind < co::TK_ARRAY )

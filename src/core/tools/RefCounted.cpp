@@ -4,6 +4,7 @@
  */
 
 #include "RefCounted.h"
+#include <co/Coral.h>
 #include <cassert>
 #include <iostream>
 
@@ -12,13 +13,7 @@ namespace co {
 RefCounted::~RefCounted()
 {
 	if( _refCount != 0 )
-	{
-		// TODO call a handler function instead
-		std::cerr << "Deleting object " << this
-			<< " with a reference count of " << _refCount << ". Memory corruption possible.";
-
-		assert( false );
-	}
+		debug( Dbg_Fatal, "Deleting object %p with a reference count of %i.", this, _refCount );
 }
 
 } // namespace co

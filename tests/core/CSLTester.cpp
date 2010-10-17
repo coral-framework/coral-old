@@ -7,14 +7,10 @@
 #include <core/csl/Error.h>
 #include <gtest/gtest.h>
 
-#define ALWAYS_PRINT_ERROR_STACK 0
-
 #define THE_EXPECTED_ERROR_LINE_DOES_NOT_MATCH 0
 #define THE_EXPECTED_ERROR_FILE_DOES_NOT_MATCH 0
 #define THE_EXPECTED_ERROR_COUNT_DOES_NOT_MATCH 0
 #define THE_EXPECTED_ERROR_MESSAGE_DOES_NOT_MATCH 0
-
-#define CSL_LOCATION "[CSLTester]: Error, from: " << _locationInfo.sourceFile << ":" << _locationInfo.sourceLine << ": "
 
 CSLTester::CSLTester( const std::string& typeName, const LocationInfo& li  )
 	: _typeName( typeName ),  _loader( typeName, co::getPaths(), co::getSystem()->getTypes() ), _locationInfo( li )
@@ -35,21 +31,12 @@ CSLTester& CSLTester::expectedError( const std::string& messageSubStr, const std
 
 void CSLTester::run()
 {
+	#define CSL_LOCATION "[CSLTester]: Error, from: " << _locationInfo.sourceFile << ":" << _locationInfo.sourceLine << ": "
+
 	ASSERT_NO_THROW( _loader.loadType() )
 		<< CSL_LOCATION  << "the CSL file for type '" << _typeName << "' does not exist!";
 
 	const csl::Error* error = _loader.getError();
-	if( error != NULL )
-	{
-#if( ALWAYS_PRINT_ERROR_STACK )
-		std::cerr << std::endl;
-		std::cerr << "******************* CSL Tester, Error Stack - Begin  *********************" << std::endl;
-		std::cerr << "* From Test: " << _locationInfo.sourceFile << ":" << _locationInfo.sourceLine << std::endl;
-		std::cerr << "* Error Stack: " << std::endl << *error << std::endl;
-		std::cerr << "******************* CSL Tester, Error Stack - End ************************" << std::endl;
-		std::cerr << std::endl;
-#endif
-	}
 
 	if( _expectedErrors.size() == 0 )
 	{		

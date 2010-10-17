@@ -43,15 +43,28 @@ public:
 
 	// co.ModuleManager Methods:
 
-	co::ArrayRange<co::ModulePartLoader* const> getLoaders()
+	bool getBinaryCompatibilityChecks()
 	{
 		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::ModuleManager>( 0 ) );
+        return res.get< bool >();
+	}
+
+	void setBinaryCompatibilityChecks( bool binaryCompatibilityChecks_ )
+	{
+		co::Any arg;
+		arg.set< bool >( binaryCompatibilityChecks_ );
+		_handler->handleSetAttribute( _cookie, getAttribInfo<co::ModuleManager>( 0 ), arg );
+	}
+
+	co::ArrayRange<co::ModulePartLoader* const> getLoaders()
+	{
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::ModuleManager>( 1 ) );
         return res.get< co::ArrayRange<co::ModulePartLoader* const> >();
 	}
 
 	co::ArrayRange<co::Module* const> getModules()
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::ModuleManager>( 1 ) );
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::ModuleManager>( 2 ) );
         return res.get< co::ArrayRange<co::Module* const> >();
 	}
 
@@ -60,7 +73,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 2 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 0 ), range );
 		return res.get< co::Module* >();
 	}
 
@@ -69,7 +82,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::ModulePartLoader* >( loader_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 3 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 1 ), range );
 	}
 
 	bool isLoadable( const std::string& moduleName_ )
@@ -77,7 +90,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 4 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 2 ), range );
 		return res.get< bool >();
 	}
 
@@ -86,7 +99,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 5 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 3 ), range );
 		return res.get< co::Module* >();
 	}
 
@@ -95,7 +108,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::ModulePartLoader* >( loader_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 6 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ModuleManager>( 4 ), range );
 	}
 
 protected:
@@ -152,8 +165,9 @@ public:
 		co::ModuleManager* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
-		case 0:		value.set< co::ArrayRange<co::ModulePartLoader* const> >( p->getLoaders() ); break;
-		case 1:		value.set< co::ArrayRange<co::Module* const> >( p->getModules() ); break;
+		case 0:		value.set< bool >( p->getBinaryCompatibilityChecks() ); break;
+		case 1:		value.set< co::ArrayRange<co::ModulePartLoader* const> >( p->getLoaders() ); break;
+		case 2:		value.set< co::ArrayRange<co::Module* const> >( p->getModules() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -163,8 +177,9 @@ public:
 		co::ModuleManager* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
-		case 0:		raiseAttributeIsReadOnly( ai ); break;
+		case 0:		p->setBinaryCompatibilityChecks( value.get< bool >() ); break;
 		case 1:		raiseAttributeIsReadOnly( ai ); break;
+		case 2:		raiseAttributeIsReadOnly( ai ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 		CORAL_UNUSED( p );
@@ -180,35 +195,35 @@ public:
 		{
 			switch( mi->getIndex() )
 			{
-			case 2:
+			case 3:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
 					res.set< co::Module* >( p->findModule( moduleName_ ) );
 				}
 				break;
-			case 3:
+			case 4:
 				{
 					co::ModulePartLoader* loader_ = args[++argIndex].get< co::ModulePartLoader* >();
 					argIndex = -1;
 					p->installLoader( loader_ );
 				}
 				break;
-			case 4:
+			case 5:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
 					res.set< bool >( p->isLoadable( moduleName_ ) );
 				}
 				break;
-			case 5:
+			case 6:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
 					res.set< co::Module* >( p->load( moduleName_ ) );
 				}
 				break;
-			case 6:
+			case 7:
 				{
 					co::ModulePartLoader* loader_ = args[++argIndex].get< co::ModulePartLoader* >();
 					argIndex = -1;

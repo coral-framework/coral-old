@@ -20,11 +20,13 @@ public:
 
 	virtual void call( co::int32 numArgs, co::int32 numResults ) = 0;
 
+	virtual bool findScript( const std::string& name, std::string& filename ) = 0;
+
+	virtual void getValue( co::int32 index, const co::Any& outputVar ) = 0;
+
 	virtual void loadFile( const std::string& filename ) = 0;
 
 	virtual void push( const co::Any& value ) = 0;
-
-	virtual bool searchScript( const std::string& name, std::string& filename ) = 0;
 };
 
 } // namespace lua

@@ -5,11 +5,11 @@
 interface IState
 {
 	/*
-		Searches for a Lua file with the given 'name' in the CORAL_PATH.
+		Searches for a Lua script with the given 'name' in the CORAL_PATH.
 		The search follows the same conventions used for locating Lua packages.
 		Returns false if no script could be found.
 	 */
-	bool searchScript( in string name, out string filename );
+	bool findScript( in string name, out string filename );
 
 	/*
 		Compiles a Lua script file and pushes a function onto the stack.
@@ -27,4 +27,11 @@ interface IState
 		Pushes any Coral value onto the Lua stack.
 	 */
 	void push( in any value );
+
+	/*
+		Gets the value at \c index in the Lua stack and assigns it to \c outputVar.
+		If the Lua value cannot be assigned to the var in \c outputVar, raises a lua.Exception.
+		\warning \c outputVar must be a valid output variable.
+	 */
+	void getValue( in int32 index, in any outputVar );
 };

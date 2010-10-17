@@ -61,7 +61,7 @@ public:
 		args[0].set< co::InterfaceType* >( serviceType_ );
 		args[1].set< co::Interface* >( serviceInstance_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 1 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 0 ), range );
 	}
 
 	void addServiceForType( co::InterfaceType* serviceType_, co::InterfaceType* clientType_, co::Interface* serviceInstance_ )
@@ -71,7 +71,7 @@ public:
 		args[1].set< co::InterfaceType* >( clientType_ );
 		args[2].set< co::Interface* >( serviceInstance_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 2 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 1 ), range );
 	}
 
 	void addServiceImplementation( co::InterfaceType* serviceType_, const std::string& componentName_ )
@@ -80,7 +80,7 @@ public:
 		args[0].set< co::InterfaceType* >( serviceType_ );
 		args[1].set< const std::string& >( componentName_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 3 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 2 ), range );
 	}
 
 	void addServiceImplementationForType( co::InterfaceType* serviceType_, co::InterfaceType* clientType_, const std::string& componentName_ )
@@ -90,7 +90,7 @@ public:
 		args[1].set< co::InterfaceType* >( clientType_ );
 		args[2].set< const std::string& >( componentName_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 4 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 3 ), range );
 	}
 
 	co::Interface* getService( co::InterfaceType* serviceType_ )
@@ -98,7 +98,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::InterfaceType* >( serviceType_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 5 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 4 ), range );
 		return res.get< co::Interface* >();
 	}
 
@@ -108,7 +108,7 @@ public:
 		args[0].set< co::InterfaceType* >( serviceType_ );
 		args[1].set< co::Interface* >( clientInstance_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 6 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 5 ), range );
 		return res.get< co::Interface* >();
 	}
 
@@ -118,7 +118,7 @@ public:
 		args[0].set< co::InterfaceType* >( serviceType_ );
 		args[1].set< co::InterfaceType* >( clientType_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 7 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 6 ), range );
 		return res.get< co::Interface* >();
 	}
 
@@ -127,7 +127,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::InterfaceType* >( serviceType_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 8 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 7 ), range );
 	}
 
 	void removeServiceForType( co::InterfaceType* serviceType_, co::InterfaceType* clientType_ )
@@ -136,7 +136,7 @@ public:
 		args[0].set< co::InterfaceType* >( serviceType_ );
 		args[1].set< co::InterfaceType* >( clientType_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 9 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::ServiceManager>( 8 ), range );
 	}
 
 protected:

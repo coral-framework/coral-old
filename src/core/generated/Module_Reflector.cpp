@@ -55,16 +55,16 @@ public:
         return res.get< co::ArrayRange<co::ModulePart* const> >();
 	}
 
-	co::int32 getPriority()
+	co::int32 getRank()
 	{
 		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::Module>( 2 ) );
         return res.get< co::int32 >();
 	}
 
-	void setPriority( co::int32 priority_ )
+	void setRank( co::int32 rank_ )
 	{
 		co::Any arg;
-		arg.set< co::int32 >( priority_ );
+		arg.set< co::int32 >( rank_ );
 		_handler->handleSetAttribute( _cookie, getAttribInfo<co::Module>( 2 ), arg );
 	}
 
@@ -77,37 +77,37 @@ public:
 	void abort()
 	{
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 4 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 0 ), range );
 	}
 
 	void disintegrate()
 	{
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 5 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 1 ), range );
 	}
 
 	void dispose()
 	{
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 6 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 2 ), range );
 	}
 
 	void initialize()
 	{
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 7 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 3 ), range );
 	}
 
 	void integrate()
 	{
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 8 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 4 ), range );
 	}
 
 	void integratePresentation()
 	{
 		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 9 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Module>( 5 ), range );
 	}
 
 protected:
@@ -166,7 +166,7 @@ public:
 		{
 		case 0:		value.set< co::Namespace* >( p->getNamespace() ); break;
 		case 1:		value.set< co::ArrayRange<co::ModulePart* const> >( p->getParts() ); break;
-		case 2:		value.set< co::int32 >( p->getPriority() ); break;
+		case 2:		value.set< co::int32 >( p->getRank() ); break;
 		case 3:		value.set< co::ModuleState >( p->getState() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
@@ -179,7 +179,7 @@ public:
 		{
 		case 0:		raiseAttributeIsReadOnly( ai ); break;
 		case 1:		raiseAttributeIsReadOnly( ai ); break;
-		case 2:		p->setPriority( value.get< co::int32 >() ); break;
+		case 2:		p->setRank( value.get< co::int32 >() ); break;
 		case 3:		raiseAttributeIsReadOnly( ai ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}

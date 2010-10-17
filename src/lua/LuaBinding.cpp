@@ -70,9 +70,9 @@ void coPackage::open( lua_State* L )
 	static luaL_Reg libFunctions[] = {
 		{ "addPath", addPath },
 		{ "getPaths", getPaths },
+		{ "findScript", findScript },
 		{ "getType", getType },
 		{ "new", genericNew },
-		{ "packageLoader", packageLoader },
 		{ "newComponentType", newComponentType },
 		{ "newComponentInstance", newComponentInstance },
 		{ NULL, NULL }
@@ -115,11 +115,14 @@ void coPackage::close( lua_State* L )
 		lua_setfield( L, -2, "system" );
 	}
 	lua_pop( L, 1 );
-	
+
 	// release all LuaComponent reflectors
 	size_t numComponentTypes = sm_luaComponentTypes.size();
-	for( size_t i = 0; i <numComponentTypes; ++i )
+	for( size_t i = 0; i < numComponentTypes; ++i )
 		sm_luaComponentTypes[i]->setReflector( NULL );
+
+	// release all type bindings
+	CompoundTypeBinding::releaseBindings( L );
 }
 
 int coPackage::addPath( lua_State* L )
@@ -142,6 +145,17 @@ int coPackage::getPaths( lua_State* L )
 	return 1;
 
 	__END_EXCEPTIONS_BARRIER__
+}
+
+int coPackage::findScript( lua_State* L )
+{
+	const char* scriptName = luaL_checkstring( L, 1 );
+	std::string filename;
+	if( LuaState::findScript( L, scriptName, filename ) )
+		lua_pushlstring( L, filename.data(), filename.length() );
+	else
+		lua_pushnil( L );
+	return 1;
 }
 
 int coPackage::getType( lua_State* L )
@@ -187,32 +201,6 @@ int coPackage::genericNew( lua_State* L )
 	return 1;
 
 	__END_EXCEPTIONS_BARRIER__
-}
-
-int coPackage::packageLoader( lua_State* L )
-{
-	static const std::string s_extension( "lua" );
-
-	const char* moduleName = luaL_checkstring( L, 1 );
-	bool raiseError = false;
-
-	// look for a Lua script file corresponding to 'moduleName' in the Coral path
-	{
-		std::string filename;
-		if( !LuaState::searchScriptFile( moduleName, filename ) )
-		{
-			lua_pushnil( L );
-			return 1;
-		}
-
-		if( luaL_loadfile( L, filename.c_str() ) != LUA_OK )
-			raiseError = true;
-	}
-
-	if( raiseError )
-		return lua_error( L );
-
-	return 1;
 }
 
 int coPackage::newComponentType( lua_State* L )
@@ -268,6 +256,8 @@ int coPackage::newComponentInstance( lua_State* L )
 /*  Class with re-usable functions for binding co::CompoundTypes to Lua      */
 /*****************************************************************************/
 
+CompoundTypeBinding::CompoundTypeList CompoundTypeBinding::sm_boundTypes;
+
 co::CompoundType* CompoundTypeBinding::getType( lua_State* L, int udataIdx )
 {
 	if( !lua_isuserdata( L, udataIdx ) )
@@ -284,18 +274,15 @@ co::CompoundType* CompoundTypeBinding::getType( lua_State* L, int udataIdx )
 
 void CompoundTypeBinding::getInstance( lua_State* L, int udataIdx, co::Any& instance )
 {
-	tryGetInstance( L, udataIdx, instance );
-	if( !instance.isValid() )
+	if( !tryGetInstance( L, udataIdx, instance ) )
 		throw lua::Exception( "unknown userdata type" );
 }
 
-void CompoundTypeBinding::tryGetInstance( lua_State* L, int udataIdx, co::Any& instance )
+bool CompoundTypeBinding::tryGetInstance( lua_State* L, int udataIdx, co::Any& instance )
 {
-	assert( !instance.isValid() );
-
 	co::CompoundType* ct = getType( L, udataIdx );
 	if( !ct )
-		return;
+		return false;
 
 	switch( ct->getKind() )
 	{
@@ -309,7 +296,22 @@ void CompoundTypeBinding::tryGetInstance( lua_State* L, int udataIdx, co::Any& i
 		break;
 	default:
 		assert( false );
+		return false;
 	}
+
+	return true;
+}
+
+void CompoundTypeBinding::releaseBindings( lua_State* L )
+{
+	for( CompoundTypeList::iterator it = sm_boundTypes.begin(); it != sm_boundTypes.end(); ++it )
+	{
+		co::CompoundType* ct = *it;
+		lua_pushlightuserdata( L, ct );
+		lua_pushnil( L );
+		lua_rawset( L, LUA_REGISTRYINDEX );
+	}
+	sm_boundTypes.clear();
 }
 
 struct Metamethods
@@ -327,7 +329,7 @@ static const Metamethods METAMETHODS_TABLE[] = {
 	{ ComponentBinding::index, ComponentBinding::newIndex, ComponentBinding::gc, ComponentBinding::toString }
 };
 
-void CompoundTypeBinding::pushMetatable( lua_State* L, co::CompoundType* ct )
+void CompoundTypeBinding::pushMetatable( lua_State* L, co::CompoundType* ct, co::Reflector* reflector )
 {
 	assert( ct );
 	lua_pushlightuserdata( L, ct );
@@ -346,8 +348,16 @@ void CompoundTypeBinding::pushMetatable( lua_State* L, co::CompoundType* ct )
 		lua_pop( L, 1 );
 		lua_createtable( L, 1, 4 );
 
+		// save the CompoundType at MT[1]
 		lua_pushlightuserdata( L, ct );
 		lua_rawseti( L, -2, 1 );
+
+		// if a Reflector was provided, save it at MT[2]
+		if( reflector )
+		{
+			lua_pushlightuserdata( L, reflector );
+			lua_rawseti( L, -2, 2 );
+		}
 
 		assert( mms.index );
 		lua_pushliteral( L, "__index" );
@@ -373,6 +383,8 @@ void CompoundTypeBinding::pushMetatable( lua_State* L, co::CompoundType* ct )
 		lua_pushlightuserdata( L, ct );
 		lua_pushvalue( L, -2 );
 		lua_rawset( L, LUA_REGISTRYINDEX );
+
+		sm_boundTypes.push_back( ct );
 	}
 }
 
@@ -520,14 +532,25 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 		{
 			co::ParameterInfo* paramInfo = paramList[i];
 			co::Type* paramType = paramInfo->getType();
-
+		
 			if( paramInfo->getIsIn() )
-				LuaState::getAny( L, i + 2, paramType, args[i] );
-			else
+			{
+				if( paramInfo->getIsOut() )
+				{
+					// inout: allocate an 'out' var and set it with the 'in' value.
+					args[i].makeOut( paramType );
+					LuaState::getValue( L, i + 2, args[i] );
+				}
+				else // only 'in'
+				{
+					LuaState::getAny( L, i + 2, paramType, args[i] );
+				}
+			}
+			else // only 'out'
+			{
 				--numRequiredArgs;
-
-			if( paramInfo->getIsOut() )
-				args[i].makeOut( paramType );
+				args[i].makeOut( paramType );				
+			}
 		}
 	}
 	catch( const co::Exception& e )
@@ -805,7 +828,7 @@ void ComplexValueBinding::push( lua_State* L, co::Type* type, void* instancePtr 
 		reflector->copyValue( instancePtr, ud );
 
 	// set the userdata's metatable
-	pushMetatable( L, static_cast<co::CompoundType*>( type ) );
+	pushMetatable( L, static_cast<co::CompoundType*>( type ), reflector );
 	lua_setmetatable( L, -2 );
 }
 
@@ -813,12 +836,12 @@ int ComplexValueBinding::gc( lua_State* L )
 {	
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	co::CompoundType* ct = getType( L, 1 );
-	assert( ct );
+	lua_getmetatable( L, 1 );
+	lua_rawgeti( L, -1, 2 );
+	assert( lua_islightuserdata( L, -1 ) );
 
-	co::Reflector* reflector = ct->getReflector();
+	co::Reflector* reflector = reinterpret_cast<co::Reflector*>( lua_touserdata( L, -1 ) );
 	reflector->destroyValue( lua_touserdata( L, 1 ) );
-
 	reflector->componentRelease();
 
 	return 0;

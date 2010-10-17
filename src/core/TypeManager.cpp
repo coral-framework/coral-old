@@ -214,7 +214,6 @@ void TypeManager::definePrimitiveType( Namespace* ns, const std::string& name, c
 {
 	co::RefPtr<Type> type = new Type;
 	type->setType( ns, name, kind );
-
 	ns->addType( type.get() );
 }
 

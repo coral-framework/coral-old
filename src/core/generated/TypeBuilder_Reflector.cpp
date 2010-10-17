@@ -66,7 +66,7 @@ public:
 	co::Type* createType()
 	{
 		co::ArrayRange<co::Any const> range;
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 3 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 0 ), range );
 		return res.get< co::Type* >();
 	}
 
@@ -77,7 +77,7 @@ public:
 		args[1].set< co::Type* >( type_ );
 		args[2].set< bool >( isReadOnly_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 4 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 1 ), range );
 	}
 
 	void defineIdentifier( const std::string& name_ )
@@ -85,7 +85,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 5 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 2 ), range );
 	}
 
 	void defineInterface( const std::string& name_, co::InterfaceType* interfaceType_, bool isProvided_ )
@@ -95,7 +95,7 @@ public:
 		args[1].set< co::InterfaceType* >( interfaceType_ );
 		args[2].set< bool >( isProvided_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 6 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 3 ), range );
 	}
 
 	co::MethodBuilder* defineMethod( const std::string& name_ )
@@ -103,7 +103,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 7 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 4 ), range );
 		return res.get< co::MethodBuilder* >();
 	}
 
@@ -113,7 +113,7 @@ public:
 		args[0].set< const std::string& >( nativeHeaderFile_ );
 		args[1].set< const std::string& >( nativeName_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 8 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 5 ), range );
 	}
 
 	void defineSuperType( co::Type* superType_ )
@@ -121,7 +121,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::Type* >( superType_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 9 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 6 ), range );
 	}
 
 protected:

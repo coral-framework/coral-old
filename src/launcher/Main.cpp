@@ -13,13 +13,13 @@
 #include <co/InterfaceInfo.h>
 #include <co/InterfaceType.h>
 #include <co/ParameterInfo.h>
+#include <co/ModuleManager.h>
 #include <core/tools/FileSystem.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <cassert>
 #include <sstream>
-#include <iostream>
 #include <sys/stat.h>
 
 /*
@@ -124,7 +124,7 @@ static void addDefaultPaths()
 	}
 	else
 	{
-		std::cerr << "Oops! Could not determine the current executable's path.\n";
+		fprintf( stderr, "Oops! Could not determine the current executable's path.\n" );
 	}
 
 	// add the current working dir to the path
@@ -139,7 +139,9 @@ static void addDefaultPaths()
 			co::addPath( path );
 	}
 	else
-		std::cerr << "Oops! Could not determine the current working directory.\n";
+	{
+		fprintf( stderr, "Oops! Could not determine the current working directory.\n" );
+	}
 
 #if defined(CORAL_PATH)
 	// if specified at compile time, add the contents of 'CORAL_PATH' to the path;
@@ -218,9 +220,36 @@ void resolveCallee( const std::string& calleeName, co::ComponentType*& ct, co::I
  */
 int main( int argc, char* argv[] )
 {
-	if( argc < 2 || ( argv[1][0] == '-' && argc < 4 ) )
+	int index = 1;
+
+	// process command-line options
+	bool abiChecks = true;
+	while( index < argc && argv[index][0] == '-' )
 	{
-		std::cout <<
+		if( argv[index][1] == 'p' && argv[index][2] == '\0' )
+		{
+			if( ++index >= argc )
+			{
+				fprintf( stderr, "Missing dir list after option '-p'." );
+				return EXIT_FAILURE;
+			}
+			co::addPath( argv[index] );
+		}
+		else if( strcmp( argv[index] + 1, "-no-abi-checks" ) == 0 )
+		{
+			abiChecks = false;
+		}
+		else
+		{
+			fprintf( stderr, "Unrecognized flag: %s\n", argv[index] );
+		}
+		++index;
+	}
+
+	// print help if not enough args were passed
+	if( index >= argc )
+	{
+		printf(
 			"Coral Application Launcher v" CORAL_VERSION_STR " (" CORAL_BUILD_KEY ")\n"
 			"Usage: coral [options] callee [ARG] ...\n"
 			"Description:\n"
@@ -233,37 +262,28 @@ int main( int argc, char* argv[] )
 			"  coral myModule.MyComponent arg1 arg2 arg3\n"
 			"  coral someModule.SomeComponent.someInterface:someMethod arg1 arg2\n"
 			"Available Options:\n"
-			"  -p EXTRA,DIRS   Add a list of repositories to the Coral path.\n";
-
-		return 0;
+			"  -p EXTRA,DIRS    Add a list of repositories to the Coral path.\n"
+			"  --no-abi-checks  Disables ABI compatibility checking for loaded modules.\n"
+		);
+		return EXIT_FAILURE;
 	}
-
-	int index = 1;
-	if( argv[1][0] == '-' )
-	{
-		index = 3;
-		if( argv[1][1] == 'p' && argv[1][2] == '\0' )
-			co::addPath( argv[2] );
-		else
-			std::cerr << "Unrecognized flag '" << argv[1] << "'.\n";
-	}
-
-	assert( argc >= index );
 
 	addDefaultPaths();
 
-	int status = 0;
-
+	int exitStatus = EXIT_SUCCESS;
 	try
 	{
 		// initialize the Coral framework
+		co::System* system;
 		try
 		{
-			co::getSystem()->setup();
+			system = co::getSystem();
+			system->getModules()->setBinaryCompatibilityChecks( abiChecks );
+			system->setup();
 		}
 		catch( std::exception& e )
 		{
-			std::cerr << "System initialization failed.\nException: " << e.what() << "\n";
+			fprintf( stderr, "System initialization failed.\nException: %s\n", e.what() );
 			throw;
 		}
 
@@ -278,7 +298,7 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			std::cerr << "Invalid callee '" << argv[index] << "'.\nException: " << e.what() << "\n";
+			fprintf( stderr, "Invalid callee '%s'.\nException: %s\n", argv[index], e.what() );
 			throw;
 		}
 
@@ -291,8 +311,8 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			std::cerr << "Invalid method '" << ii->getType()->getFullName() << ":"
-				<< mi->getName().c_str() << "'.\nException: " << e.what() << "\n";
+			fprintf( stderr, "Invalid method '%s:%s'.\nException: %s\n",
+					ii->getType()->getFullName().c_str(), mi->getName().c_str(), e.what() );
 			throw;
 		}
 
@@ -309,10 +329,10 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			std::cerr << "Instantiation failed: " << e.what() << "\n";
+			fprintf( stderr, "Instantiation failed: %s\n", e.what() );
 			throw;
 		}
-		
+
 		// prepare to invoke the method
 		co::Reflector* reflector;
 		try
@@ -321,7 +341,7 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			std::cerr << "Invocation failed: " << e.what() << "\n";
+			fprintf( stderr, "Invocation failed: %s\n", e.what() );
 			throw;
 		}
 
@@ -340,23 +360,29 @@ int main( int argc, char* argv[] )
 			if( res.isValid() )
 			{
 				if( res.getKind() >= co::TK_INT8 && res.getKind() <= co::TK_DOUBLE )
-					status = res.get<int>();
+				{
+					exitStatus = res.get<int>();
+				}
 				else
-					std::cout << "Method returned " << res << "\n";
+				{
+					std::stringstream ss;
+					ss << res;
+					printf( "Method returned %s\n", ss.str().c_str() );
+				}
 			}
 		}
 		catch( std::exception& e )
 		{
-			std::cerr << "Program terminated with an unhandled exception.\nMessage: " << e.what() << "\n";
+			fprintf( stderr, "Program terminated with an unhandled exception.\nMessage: %s", e.what() );
 			throw;
 		}
 	}
 	catch( std::exception& )
 	{
-		status = -1;
+		exitStatus = EXIT_FAILURE;
 	}
 
 	co::shutdown();
 
-	return status;
+	return exitStatus;
 }

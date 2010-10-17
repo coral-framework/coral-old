@@ -63,7 +63,7 @@ public:
 		args[1].set< co::AttributeInfo* >( ai_ );
 		args[2].set< co::Any& >( value_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 2 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 0 ), range );
 	}
 
 	void invokeMethod( const co::Any& instance_, co::MethodInfo* mi_, co::ArrayRange<co::Any const> args_, co::Any& returnValue_ )
@@ -74,13 +74,13 @@ public:
 		args[2].set< co::ArrayRange<co::Any const> >( args_ );
 		args[3].set< co::Any& >( returnValue_ );
 		co::ArrayRange<co::Any const> range( args, 4 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 3 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 1 ), range );
 	}
 
 	co::Component* newInstance()
 	{
 		co::ArrayRange<co::Any const> range;
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 4 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 2 ), range );
 		return res.get< co::Component* >();
 	}
 
@@ -89,7 +89,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::DynamicProxyHandler* >( handler_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 5 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 3 ), range );
 		return res.get< co::Interface* >();
 	}
 
@@ -100,7 +100,7 @@ public:
 		args[1].set< co::AttributeInfo* >( ai_ );
 		args[2].set< const co::Any& >( value_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 6 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 4 ), range );
 	}
 
 	// These co::Reflector methods are not part of the reflection system:

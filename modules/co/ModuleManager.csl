@@ -16,6 +16,14 @@ interface ModuleManager
 	readonly attribute ModulePartLoader[] loaders;
 
 	/*
+		If true (default), the built-in ModulePartLoader will protect application by checking
+		whether native modules are binary-compatible with the Coral core and installed types.
+		When false, applications are able to load incompatible modules, but will subject to
+		sudden crashes due to ABI incompatibilities.
+	 */
+	attribute bool binaryCompatibilityChecks;
+
+	/*
 		Finds an already loaded module given its fully-qualified \c moduleName.
 		If the module was not previously loaded, returns null.
 	 */

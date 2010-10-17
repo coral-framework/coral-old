@@ -25,13 +25,7 @@ namespace co {
 ComponentBase::~ComponentBase()
 {
 	if( _refCount != 0 )
-	{
-		// TODO call a handler function instead
-		std::cerr << "Deleting component " << this <<
-			" with a reference count of " << _refCount << ". Memory corruption possible.";
-
-		assert( false );
-    }
+		debug( Dbg_Fatal, "Deleting component %p with a reference count of %i.", this, _refCount );
 }
 
 InterfaceType* ComponentBase::getInterfaceType()
