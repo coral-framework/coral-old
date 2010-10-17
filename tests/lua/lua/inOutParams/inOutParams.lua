@@ -115,15 +115,15 @@ function M:initialize( module )
 	local ai1, ai2 = { 1, 2, 3 }, { 4, 5 }
 
 	x, y = const:testArrayOfInts( ai1, ai2 )
-	ASSERT_TRUE( #x == 2 and x[1] == 6 and x[2] == 7 )
-	ASSERT_TRUE( #y == 3 and y[1] == 8 and y[2] == 9 and y[3] == 0 )
+	ASSERT_EQ( #x, 2 ) ASSERT_EQ( x[1], 6 ) ASSERT_EQ( x[2], 7 )
+	ASSERT_EQ( #y, 3 ) ASSERT_EQ( y[1], 8 ) ASSERT_EQ( y[2], 9 ) ASSERT_EQ( y[3], 0 )
 
 	x, y = shift:testArrayOfInts( ai1, ai2 )
-	ASSERT_TRUE( #x == 3 and x[1] == 1 and x[2] == 2 and x[3] == 3 )
-	ASSERT_TRUE( #y == 2 and y[1] == 4 and y[2] == 5 )
+	ASSERT_TRUE( #x, 3 ) ASSERT_EQ( x[1], 1 ) ASSERT_EQ( x[2], 2 ) ASSERT_EQ( x[3], 3 )
+	ASSERT_TRUE( #y, 2 ) ASSERT_EQ( y[1], 4 ) ASSERT_EQ( y[2], 5 )
 
 	x, y = shift:testArrayOfInts( ai1, nil )
-	ASSERT_TRUE( #x == 3 and x[1] == 1 and x[2] == 2 and x[3] == 3 )
+	ASSERT_EQ( #x, 3 ) ASSERT_EQ( x[1], 1 ) ASSERT_EQ( x[2], 2 ) ASSERT_EQ( x[3], 3 )
 	ASSERT_EQ( #y, 0 )
 
 	x, y = noret:testArrayOfInts( ai2, ai2 )

@@ -10,6 +10,7 @@
 #include <co/RefPtr.h>
 #include <co/Reflector.h>
 #include <co/reserved/LibraryManager.h>
+#include <cstdio>
 #include <cstdarg>
 #include <cstdlib>
 
