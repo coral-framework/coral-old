@@ -1040,15 +1040,17 @@ void Any::destroyObject()
 			case TK_NATIVECLASS:
 				{
 					size_t arraySize = pv->size();
-					size_t elementSize = _object.array.reflector->getSize();
-					assert( arraySize % elementSize == 0 );
+					if( arraySize > 0 )
+					{
+						uint8* beginPtr = &pv->front();
+						uint8* endPtr = beginPtr + arraySize;
 
-					uint8* beginPtr = &pv->front();
-					uint8* endPtr = beginPtr + arraySize;
+						size_t elementSize = _object.array.reflector->getSize();
+						assert( arraySize % elementSize == 0 );
 
-					for( uint8* p = beginPtr; p < endPtr; p += elementSize )
-						_object.array.reflector->destroyValue( p );
-					
+						for( uint8* p = beginPtr; p < endPtr; p += elementSize )
+							_object.array.reflector->destroyValue( p );
+					}
 					pv->~vector();
 				}
 				break;
@@ -1244,17 +1246,21 @@ void Any::copy( const Any& other )
 					{
 						const PseudoVector* opv = reinterpret_cast<const PseudoVector*>( other._object.array.vectorArea );				
 						size_t arraySize = opv->size();
-						size_t elementSize = _object.array.reflector->getSize();
-						assert( arraySize % elementSize == 0 );
 
 						new( _object.array.vectorArea ) PseudoVector( arraySize );
 						PseudoVector* pv = reinterpret_cast<PseudoVector*>( _object.array.vectorArea );
 
-						const uint8* opvStart = &opv->front();
-						uint8* pvStart = &pv->front();
+						if( arraySize > 0 )
+						{
+							const uint8* opvStart = &opv->front();
+							uint8* pvStart = &pv->front();
 
-						for( size_t offset = 0; offset < arraySize; offset += elementSize )
-							_object.complex.reflector->copyValue( opvStart + offset, pvStart + offset );
+							size_t elementSize = _object.array.reflector->getSize();
+							assert( arraySize % elementSize == 0 );
+
+							for( size_t offset = 0; offset < arraySize; offset += elementSize )
+								_object.complex.reflector->copyValue( opvStart + offset, pvStart + offset );
+						}
 					}
 					break;
 
