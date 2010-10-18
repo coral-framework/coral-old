@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Lua module's main package
+-- The Lua module's initialization script
 -------------------------------------------------------------------------------
 
 -- localize commonly used functions
@@ -62,6 +62,48 @@ end
 
 local coType = setmetatable( {}, coTypeMT )
 co.Type = coType
+
+-------------------------------------------------------------------------------
+-- interfaceInstance = co.getService( serviceName[, client] )
+--
+-- Performs all kinds of service lookups: global, specialized by client type,
+-- or specialized by client instance.
+--
+-- Parameter 'serviceName' is a fully-qualified interface type name (string),
+-- indicating the kind of service you are trying to obtain.
+--
+-- If parameter 'client' is omitted, this function will attempt to get the
+-- global provider of the specified service. Otherwise, 'client' must be
+-- either an interface type name (string) or an interface instance.
+--
+-- If 'client' is an interface type name, co.getService() will pick the most
+-- specialized service instance available for clients of this type. Otherwise,
+-- if 'client' is an interface instance, co.getService() will pick the most
+-- specialized service instance available for the given client instance,
+-- considering its component and interface types.
+--
+-- Examples:
+--     local itf = co.getService( "gfx.IDrawer" )
+--     Gets the global (or default) instance of 'gfx.IDrawer'. Much like a singleton.
+--
+--     local itf = co.getService( "gfx.IDrawer", "obj.IPlayer" )
+--     Gets an instance of 'gfx.IDrawer' specialized for an 'obj.IPlayer'.
+--
+--     local itf = co.getService( "gfx.IDrawer", obj )
+--     Gets an instance of 'gfx.IDrawer' specialized for this 'obj' instance.
+
+local serviceManager = co.system.services
+
+function co.getService( serviceName, client )
+	local serviceType = coType[serviceName]
+	if not client then
+		return serviceManager:getService( serviceType )
+	elseif type( client ) == 'string' then
+		return serviceManager:getServiceForType( serviceType, coType[client] )
+	else
+		return serviceManager:getServiceForInstance( serviceType, client )
+	end
+end
 
 -------------------------------------------------------------------------------
 -- componentPrototype = co.Component( desc )

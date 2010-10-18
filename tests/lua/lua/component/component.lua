@@ -33,6 +33,13 @@ function BatComponent.batman:getName()
 	return "Batman"
 end
 
+function BatComponent:fightCrime()
+	-- test passing our own interfaces to another component
+	local component = self.requiredTarget1.interfaceOwner
+	component.bat = self.vampireBat
+	component.target1 = self.batman
+end
+
 function BatComponent:getRequiredBat() return self.requiredBat end
 function BatComponent:setRequiredBat( bat ) self.requiredBat = bat end
 function BatComponent:getRequiredTarget1() return self.requiredTarget1 end
@@ -79,6 +86,20 @@ function M:initialize( module )
 	ASSERT_EQ( bc.batman, bc.target1 )
 	ASSERT_ERROR( function() bc.target1 = bc.fruitBat end, "moduleA.IHuman expected, got moduleA.IBat" )
 	ASSERT_ERROR( function() return bc.target2 end, "missing method 'getRequiredTarget2'" )
+
+	-- test passing interfaces from within the component
+	local bc2 = BatComponent()
+	bc.bat = nil
+	bc.target1 = bc2.batman
+	ASSERT_EQ( bc.bat, nil )
+	ASSERT_EQ( bc.target1, bc2.batman )
+	ASSERT_EQ( bc2.bat, nil )
+	ASSERT_EQ( bc2.target1, nil )
+	bc.batman:fightCrime()
+	ASSERT_EQ( bc.bat, nil )
+	ASSERT_EQ( bc.target1, bc2.batman )
+	ASSERT_EQ( bc2.bat, bc.vampireBat )
+	ASSERT_EQ( bc2.target1, bc.batman )
 
 	-- TestComponent tests
 	local tc = co.new "lua.test.Component"

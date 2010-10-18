@@ -43,7 +43,9 @@ LuaComponent::LuaComponent()
 
 LuaComponent::~LuaComponent()
 {
-	luaL_unref( LuaState::getL(), LUA_REGISTRYINDEX, _tableRef );
+	lua_State* L = LuaState::getL();
+	if( L )
+		luaL_unref( L, LUA_REGISTRYINDEX, _tableRef );
 	for( int i = 0; i < _numServerItfs; ++i )
 		delete _serverItfs[i];
 	delete[] _serverItfs;

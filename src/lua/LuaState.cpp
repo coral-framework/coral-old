@@ -503,13 +503,34 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 		else
 		{
 			co::Interface* itf = NULL;
-			co::CompoundType* ct = CompoundTypeBinding::getType( L, index );
-			co::TypeKind kind = ct ? ct->getKind() : co::TK_NONE;
-			if( kind == co::TK_INTERFACE || kind == co::TK_COMPONENT )
-				itf = InterfaceBinding::getInstance( L, index );
+			co::CompoundType* ct = NULL;
+
+			int stackTop = lua_gettop( L );
+			int tp = lua_type( L, index );
+			if( tp == LUA_TTABLE )
+			{
+				lua_getfield( L, index, "__interface" );
+				if( lua_type( L, -1 ) == LUA_TUSERDATA )
+				{
+					tp = LUA_TUSERDATA;
+					index = -1;
+				}
+			}
+
+			if( tp == LUA_TUSERDATA )
+			{
+				ct = CompoundTypeBinding::getType( L, index );
+				co::TypeKind kind = ct ? ct->getKind() : co::TK_NONE;
+				if( kind == co::TK_INTERFACE || kind == co::TK_COMPONENT )
+					itf = InterfaceBinding::getInstance( L, index );
+			}
+
+			lua_settop( L, stackTop );
+
 			if( !itf || !itf->getInterfaceType()->isSubTypeOf( var.getInterfaceType() ) )
-				CORAL_THROW( lua::Exception, var.getInterfaceType()->getFullName() << " expected, got " <<
-					( ct ? ct->getFullName().c_str() : lua_typename( L, lua_type( L, index ) ) ) );
+				CORAL_THROW( lua::Exception, var.getInterfaceType()->getFullName() << " expected, got "
+								<< ( ct ? ct->getFullName().c_str() : lua_typename( L, tp ) ) );
+
 			*reinterpret_cast<co::Interface**>( var.getState().data.ptr ) = itf;
 		}
 		break;

@@ -140,3 +140,10 @@ TEST( LuaTests, inOutParams )
 {
 	ASSERT_SUCCESS( "lua.inOutParams" );
 }
+
+// --- Services Tests --- //
+
+TEST( LuaTests, services )
+{
+	ASSERT_SUCCESS( "lua.services" );
+}
