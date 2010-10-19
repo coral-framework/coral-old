@@ -130,6 +130,9 @@ FUNCTION( CORAL_GENERATE_MODULE generatedSourceFiles moduleName )
 	)
 
 	SET( ${generatedSourceFiles} ${resultList} PARENT_SCOPE )
+
+	# "make clean" should delete the coralc cache file
+	SET_PROPERTY( DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${outDir}/__coralc_cache.lua" )
 ENDFUNCTION()
 
 FUNCTION( CORAL_GENERATE_MAPPINGS generatedHeaders )
@@ -161,6 +164,9 @@ FUNCTION( CORAL_GENERATE_MAPPINGS generatedHeaders )
 	)
 
 	SET( ${generatedHeaders} ${resultList} PARENT_SCOPE )
+
+	# "make clean" should delete the coralc cache file
+	SET_PROPERTY( DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${outDir}/__coralc_cache.lua" )
 ENDFUNCTION()
 
 FUNCTION( _coral_find_program _name)
