@@ -35,7 +35,7 @@ TEST( MappingTests, enumSize )
 TEST( MappingTests, structFields )
 {
 	moduleA::TestStruct dummyStruct;
-	
+
 	dummyStruct.anInt8 = co::MAX_INT8;
 	ASSERT_EQ( dummyStruct.anInt8, co::MAX_INT8 );
 
@@ -78,7 +78,7 @@ TEST( MappingTests, structAlignment )
 
 #if defined(CORAL_OS_UNIX) && CORAL_POINTER_SIZE == 4
 	// double alignment on 32-bit Linuxses is 4-byte aligned
-	EXPECT_EQ( 28, sizeof(moduleA::BadlySortedStruct) );	
+	EXPECT_EQ( 28, sizeof(moduleA::BadlySortedStruct) );
 #else
 	// double alignment is 8-byte aligned on 64-bit systems and on Win32
 	EXPECT_EQ( 32, sizeof(moduleA::BadlySortedStruct) );
@@ -106,7 +106,7 @@ TEST( MappingTests, interface )
 {
 	co::RefPtr<co::Component> testComponent = co::newInstance( "moduleA.TestComponent" );
 
-	moduleA::TestInterface* ti = testComponent->getProvided<moduleA::TestInterface>();
+	moduleA::TestInterface* ti = testComponent->getFacet<moduleA::TestInterface>();
 
 	ASSERT_EQ( 1, ti->testCppBlock1() );
 	ASSERT_EQ( 2, ti->testCppBlock2() );

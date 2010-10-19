@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.MethodBuilderComponent provides an interface named 'methodBuilder', of type co.MethodBuilder.
+//! co.MethodBuilderComponent has a facet named 'methodBuilder', of type co.MethodBuilder.
 class MethodBuilderComponent_co_MethodBuilder : public co::MethodBuilder
 {
 public:

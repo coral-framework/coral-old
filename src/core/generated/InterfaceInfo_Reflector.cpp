@@ -63,7 +63,7 @@ public:
 
 	// co.InterfaceInfo Methods:
 
-	bool getIsProvided()
+	bool getIsFacet()
 	{
 		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::InterfaceInfo>( 0 ) );
         return res.get< bool >();
@@ -129,7 +129,7 @@ public:
 		co::InterfaceInfo* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
-		case 0:		value.set< bool >( p->getIsProvided() ); break;
+		case 0:		value.set< bool >( p->getIsFacet() ); break;
 		case 1:		value.set< co::InterfaceType* >( p->getType() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}

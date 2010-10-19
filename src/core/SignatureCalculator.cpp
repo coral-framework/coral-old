@@ -177,8 +177,8 @@ void SignatureCalculator::fillComponentSignatureData()
 	{
 		co::InterfaceInfo* itf = interfaces.getFirst();
 
-		const co::uint8 isProvided = itf->getIsProvided() ? 1 : 0;
-		addDataToSignatures( isProvided );
+		const co::uint8 isFacet = itf->getIsFacet() ? 1 : 0;
+		addDataToSignatures( isFacet );
 
 		co::Type* type = itf->getType();
 		_fullSignatureHash.addData( type->getFullSignature() );

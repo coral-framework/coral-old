@@ -10,7 +10,7 @@ local BatComponent = co.Component{
 		fruitBat = "moduleA.IBat",
 		batman = "moduleA.IBatman",
 	},
-	requires = {
+	receives = {
 		bat = "moduleA.IBat",
 		target1 = "moduleA.IHuman",
 		target2 = "moduleA.IHuman",
@@ -35,15 +35,15 @@ end
 
 function BatComponent:fightCrime()
 	-- test passing our own interfaces to another component
-	local component = self.requiredTarget1.interfaceOwner
+	local component = self.target1.interfaceOwner
 	component.bat = self.vampireBat
 	component.target1 = self.batman
 end
 
-function BatComponent:getRequiredBat() return self.requiredBat end
-function BatComponent:setRequiredBat( bat ) self.requiredBat = bat end
-function BatComponent:getRequiredTarget1() return self.requiredTarget1 end
-function BatComponent:setRequiredTarget1( human ) self.requiredTarget1 = human end
+function BatComponent:getReceptacleBat() return self.bat end
+function BatComponent:setReceptacleBat( bat ) self.bat = bat end
+function BatComponent:getReceptacleTarget1() return self.target1 end
+function BatComponent:setReceptacleTarget1( human ) self.target1 = human end
 
 local function testBatInstance( batInstance )
 	ASSERT_EQ( batInstance.componentType.fullName, "lua.bat.Component" )
@@ -77,7 +77,7 @@ function M:initialize( module )
 	local bc = co.new "lua.bat.Component"
 	testBatInstance( bc )
 
-	-- test getting & setting the required (client) interfaces
+	-- test getting & setting the receptacles
 	ASSERT_EQ( nil, bc.bat )
 	bc.bat = bc.vampireBat
 	ASSERT_EQ( bc.vampireBat, bc.bat )
@@ -85,7 +85,7 @@ function M:initialize( module )
 	bc.target1 = bc.batman
 	ASSERT_EQ( bc.batman, bc.target1 )
 	ASSERT_ERROR( function() bc.target1 = bc.fruitBat end, "moduleA.IHuman expected, got moduleA.IBat" )
-	ASSERT_ERROR( function() return bc.target2 end, "missing method 'getRequiredTarget2'" )
+	ASSERT_ERROR( function() return bc.target2 end, "missing method 'getReceptacleTarget2'" )
 
 	-- test passing interfaces from within the component
 	local bc2 = BatComponent()

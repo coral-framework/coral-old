@@ -5,7 +5,7 @@
 
 #include "InterfaceInfo.h"
 
-InterfaceInfo::InterfaceInfo() : _interfaceType( 0 ), _isProvided( true )
+InterfaceInfo::InterfaceInfo() : _interfaceType( 0 ), _isFacet( true )
 {
 	// empty
 }
@@ -21,9 +21,9 @@ void InterfaceInfo::setType( co::InterfaceType* interfaceType )
 	_interfaceType = interfaceType;
 }
 
-void InterfaceInfo::setIsProvided( bool isProvided )
+void InterfaceInfo::setIsFacet( bool isFacet )
 {
-	_isProvided = isProvided;
+	_isFacet = isFacet;
 }
 
 co::InterfaceType* InterfaceInfo::getType()
@@ -31,9 +31,9 @@ co::InterfaceType* InterfaceInfo::getType()
 	return _interfaceType;
 }
 
-bool InterfaceInfo::getIsProvided()
+bool InterfaceInfo::getIsFacet()
 {
-	return _isProvided;
+	return _isFacet;
 }
 
 CORAL_EXPORT_COMPONENT( InterfaceInfo, InterfaceInfoComponent );

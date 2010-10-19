@@ -27,17 +27,17 @@ public:
 	// Code From <c++ Block:
 	
 		/*!
-			<tt>getProvided<T>()</tt>: convenience method that returns the instance of an interface 'T' provided
+			<tt>getFacet<T>()</tt>: convenience method that returns the instance of a facet 'T' provided
 			by this component. Please notice that this method only works for statically-defined components.
 			It will not retrieve proxy interfaces from dynamic components (such as those implemented in Lua).
 		 */
-		template<typename T> inline T* getProvided() { return dynamic_cast<T*>( this ); }
+		template<typename T> inline T* getFacet() { return dynamic_cast<T*>( this ); }
 	
 	// End Of c++> Block
 
 	virtual co::ComponentType* getComponentType() = 0;
 
-	virtual void bindInterface( co::InterfaceInfo* clientItfInfo, co::Interface* instance ) = 0;
+	virtual void bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance ) = 0;
 
 	virtual co::Interface* getInterface( co::InterfaceInfo* itfInfo ) = 0;
 };

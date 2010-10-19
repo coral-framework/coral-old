@@ -114,19 +114,19 @@ public:
 
 	// co.ComponentType Methods:
 
-	co::ArrayRange<co::InterfaceInfo* const> getInterfaces()
+	co::ArrayRange<co::InterfaceInfo* const> getFacets()
 	{
 		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::ComponentType>( 0 ) );
         return res.get< co::ArrayRange<co::InterfaceInfo* const> >();
 	}
 
-	co::ArrayRange<co::InterfaceInfo* const> getProvidedInterfaces()
+	co::ArrayRange<co::InterfaceInfo* const> getInterfaces()
 	{
 		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::ComponentType>( 1 ) );
         return res.get< co::ArrayRange<co::InterfaceInfo* const> >();
 	}
 
-	co::ArrayRange<co::InterfaceInfo* const> getRequiredInterfaces()
+	co::ArrayRange<co::InterfaceInfo* const> getReceptacles()
 	{
 		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::ComponentType>( 2 ) );
         return res.get< co::ArrayRange<co::InterfaceInfo* const> >();
@@ -186,9 +186,9 @@ public:
 		co::ComponentType* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
-		case 0:		value.set< co::ArrayRange<co::InterfaceInfo* const> >( p->getInterfaces() ); break;
-		case 1:		value.set< co::ArrayRange<co::InterfaceInfo* const> >( p->getProvidedInterfaces() ); break;
-		case 2:		value.set< co::ArrayRange<co::InterfaceInfo* const> >( p->getRequiredInterfaces() ); break;
+		case 0:		value.set< co::ArrayRange<co::InterfaceInfo* const> >( p->getFacets() ); break;
+		case 1:		value.set< co::ArrayRange<co::InterfaceInfo* const> >( p->getInterfaces() ); break;
+		case 2:		value.set< co::ArrayRange<co::InterfaceInfo* const> >( p->getReceptacles() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

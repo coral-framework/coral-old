@@ -38,8 +38,8 @@ protected:
 	//! Raises co::NoSuchInterfaceException if \c itfInfo isn't one of the component's interfaces.
 	void checkValidInterface( InterfaceInfo* itfInfo );
 
-	//! Similar to checkValidInterface(), but also raises an exception if \c itfInfo is a server interface.
-	void checkValidClientInterface( InterfaceInfo* itfInfo );
+	//! Similar to checkValidInterface(), but also raises an exception if \c itfInfo is a facet.
+	void checkValidReceptacle( InterfaceInfo* receptacle );
 
 	/*!
 		Raises a co::NoSuchInterfaceException for cases that simply "should never happen"
@@ -67,8 +67,8 @@ protected:
 		internally by the core for all Reflectors and default ModulePart components.
 
 		\param componentTypeName fully-qualified name of the ComponentType.
-		\param interfaceTypeName type name of the component's sole (provided) interface.
-		\param interfaceName interface name of the component's sole (provided) interface.
+		\param interfaceTypeName type name of the component's sole facet.
+		\param interfaceName interface name of the component's sole facet.
 	 */
 	ComponentType* getOrCreateSimpleInternalComponentType( const char* componentTypeName,
 														   const char* interfaceTypeName,

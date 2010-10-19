@@ -54,7 +54,7 @@ public:
 	void onIdentifierListItem( const std::string& name );
 	void onSuperType( const std::string& typeName );
 	void onStructMember( const std::string& memberIdentifier );
-	void onComponentInterface( bool isProvided, const std::string& name );
+	void onComponentInterface( bool isFacet, const std::string& name );
 	void onAttribute( bool isReadOnly, const std::string& name );
 	void onMethod( const std::string& name );
 	void onParameter( bool isIn, bool isOut, const std::string& name );

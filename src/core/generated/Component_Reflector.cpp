@@ -49,10 +49,10 @@ public:
         return res.get< co::ComponentType* >();
 	}
 
-	void bindInterface( co::InterfaceInfo* clientItfInfo_, co::Interface* instance_ )
+	void bindInterface( co::InterfaceInfo* receptacle_, co::Interface* instance_ )
 	{
 		co::Any args[2];
-		args[0].set< co::InterfaceInfo* >( clientItfInfo_ );
+		args[0].set< co::InterfaceInfo* >( receptacle_ );
 		args[1].set< co::Interface* >( instance_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 0 ), range );
@@ -149,10 +149,10 @@ public:
 			{
 			case 1:
 				{
-					co::InterfaceInfo* clientItfInfo_ = args[++argIndex].get< co::InterfaceInfo* >();
+					co::InterfaceInfo* receptacle_ = args[++argIndex].get< co::InterfaceInfo* >();
 					co::Interface* instance_ = args[++argIndex].get< co::Interface* >();
 					argIndex = -1;
-					p->bindInterface( clientItfInfo_, instance_ );
+					p->bindInterface( receptacle_, instance_ );
 				}
 				break;
 			case 2:

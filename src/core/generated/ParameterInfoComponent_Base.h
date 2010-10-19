@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.ParameterInfoComponent provides an interface named 'parameterInfo', of type co.ParameterInfo.
+//! co.ParameterInfoComponent has a facet named 'parameterInfo', of type co.ParameterInfo.
 class ParameterInfoComponent_co_ParameterInfo : public co::ParameterInfo
 {
 public:

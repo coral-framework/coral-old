@@ -24,16 +24,15 @@ function M:initialize( module )
 	ASSERT_EQ( testComponent.transaction.interfaceName, "transaction" )
 	ASSERT_EQ( testComponent.transaction.interfaceOwner, testComponent )
 
-	-- test getting/setting a client interface
+	-- test getting/setting a receptacle
 	ASSERT_EQ( testComponent.itfType, nil )
 	testComponent.itfType = testComponent.testInterface.interfaceType
 	ASSERT_EQ( testComponent.itfType, testComponent.testInterface.interfaceType )
 	testComponent.itfType = nil
 	ASSERT_EQ( testComponent.itfType, nil )
 
-	-- test setting a server interface
-	ASSERT_ERROR( function() testComponent.testInterface = nil end,
-		"'testInterface' is a provided interface and cannot be set" )
+	-- test setting a facet
+	ASSERT_ERROR( function() testComponent.testInterface = nil end, "'testInterface' is a facet and cannot be set" )
 end
 
 return M

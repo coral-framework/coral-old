@@ -127,11 +127,11 @@ TEST( TypeBuilderTests, componentDefinition )
 
 	co::InterfaceType* interfaceTest = dynamic_cast<co::InterfaceType*>( interfaceBuilder->createType() );
 
-	componentBuilder->defineInterface( "ClientInterface", interfaceTest, false );
-	componentBuilder->defineInterface( "ProvidedInterface", interfaceTest, true );
+	componentBuilder->defineInterface( "Receptacle", interfaceTest, false );
+	componentBuilder->defineInterface( "Facet", interfaceTest, true );
 
 	EXPECT_THROW( componentBuilder->defineInterface( "NullInterface", NULL, false ), co::IllegalArgumentException );
-	EXPECT_THROW( componentBuilder->defineInterface( "ClientInterface", interfaceTest, false ), co::IllegalNameException );
+	EXPECT_THROW( componentBuilder->defineInterface( "Receptacle", interfaceTest, false ), co::IllegalNameException );
 
 	EXPECT_NO_THROW( tct->commit() );
 
@@ -140,25 +140,25 @@ TEST( TypeBuilderTests, componentDefinition )
 
 	ASSERT_TRUE( componentType->getInterfaces().getSize() == 2 );
 
-	co::MemberInfo* clientMember = componentType->getMember( "ClientInterface" );
-	ASSERT_TRUE( clientMember != NULL );
-	co::InterfaceInfo* clientInterfaceInfo = dynamic_cast<co::InterfaceInfo*>( clientMember );
-	ASSERT_TRUE( clientInterfaceInfo != NULL );
+	co::MemberInfo* memberInfo = componentType->getMember( "Receptacle" );
+	ASSERT_TRUE( memberInfo != NULL );
+	co::InterfaceInfo* receptacle = dynamic_cast<co::InterfaceInfo*>( memberInfo );
+	ASSERT_TRUE( receptacle != NULL );
 
-	co::MemberInfo* providedMember = componentType->getMember( "ProvidedInterface" );
-	ASSERT_TRUE( providedMember != NULL );
-	co::InterfaceInfo* providedInterfaceInfo = dynamic_cast<co::InterfaceInfo*>( providedMember );
-	ASSERT_TRUE( providedInterfaceInfo != NULL );
+	memberInfo = componentType->getMember( "Facet" );
+	ASSERT_TRUE( memberInfo != NULL );
+	co::InterfaceInfo* facet = dynamic_cast<co::InterfaceInfo*>( memberInfo );
+	ASSERT_TRUE( facet != NULL );
 
-	ASSERT_TRUE( clientInterfaceInfo->getName() == "ClientInterface" );
-	ASSERT_TRUE( clientInterfaceInfo->getType() != NULL );
-	ASSERT_TRUE( clientInterfaceInfo->getType() == interfaceTest );
-	ASSERT_TRUE( clientInterfaceInfo->getIsProvided() == false );
+	ASSERT_TRUE( receptacle->getName() == "Receptacle" );
+	ASSERT_TRUE( receptacle->getType() != NULL );
+	ASSERT_TRUE( receptacle->getType() == interfaceTest );
+	ASSERT_TRUE( receptacle->getIsFacet() == false );
 
-	ASSERT_TRUE( providedInterfaceInfo->getName() == "ProvidedInterface" );
-	ASSERT_TRUE( providedInterfaceInfo->getType() != NULL );
-	ASSERT_TRUE( providedInterfaceInfo->getType() == interfaceTest );
-	ASSERT_TRUE( providedInterfaceInfo->getIsProvided() == true );
+	ASSERT_TRUE( facet->getName() == "Facet" );
+	ASSERT_TRUE( facet->getType() != NULL );
+	ASSERT_TRUE( facet->getType() == interfaceTest );
+	ASSERT_TRUE( facet->getIsFacet() == true );
 }
 
 TEST( TypeBuilderTests, componentMissingInput )
@@ -195,16 +195,15 @@ TEST( TypeBuilderTests, componentGetInterfaces )
 
 	ASSERT_TRUE( componentType->getInterfaces().getSize() == 6 );
 
-	co::ArrayRange<co::InterfaceInfo* const>  clientInt = componentType->getRequiredInterfaces();
-	ASSERT_TRUE( clientInt.getSize() == 3 );
-	for( ; clientInt; clientInt.popFirst() )
-		ASSERT_FALSE( clientInt.getFirst()->getIsProvided() );
+	co::ArrayRange<co::InterfaceInfo* const> facets = componentType->getFacets();
+	ASSERT_TRUE( facets.getSize() == 3 );
+	for( ; facets; facets.popFirst() )
+		ASSERT_TRUE( facets.getFirst()->getIsFacet() );
 
-	co::ArrayRange<co::InterfaceInfo* const>  serverInt = componentType->getProvidedInterfaces();
-	ASSERT_TRUE( serverInt.getSize() == 3 );
-
-	for( ; serverInt; serverInt.popFirst() )
-		ASSERT_TRUE( serverInt.getFirst()->getIsProvided() );
+	co::ArrayRange<co::InterfaceInfo* const> receptacles = componentType->getReceptacles();
+	ASSERT_TRUE( receptacles.getSize() == 3 );
+	for( ; receptacles; receptacles.popFirst() )
+		ASSERT_FALSE( receptacles.getFirst()->getIsFacet() );
 }
 
 // EnumType:
@@ -381,7 +380,7 @@ TEST( TypeBuilderTests, interfaceDefinition )
 	co::RefPtr<co::TypeBuilder> builder = TestHelper::createBuilder( co::TK_INTERFACE, "builderTest.AInterfaceType", tct.get() );
 
 	// try creating an incomplete interface
-	EXPECT_THROW( builder->createType(), co::MissingInputException );	
+	EXPECT_THROW( builder->createType(), co::MissingInputException );
 
 	// define builderTest.AInterfaceType:
 	co::Type* stringType = TestHelper::type( "string" );

@@ -20,17 +20,17 @@ public:
 
 	// internal methods:
 	void setType( co::InterfaceType* interfaceType );
-	void setIsProvided( bool isProvided );
+	void setIsFacet( bool isFacet );
 
 	// co::InterfaceInfo methods:
 	co::InterfaceType* getType();
-	bool getIsProvided();
+	bool getIsFacet();
 
 	DELEGATE_CO_MEMBERINFO_METHODS( MemberInfoImpl:: );
 
 private:
 	co::InterfaceType* _interfaceType;
-	bool _isProvided;
+	bool _isFacet;
 };
 
 #endif

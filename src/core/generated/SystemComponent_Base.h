@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.SystemComponent provides an interface named 'system', of type co.System.
+//! co.SystemComponent has a facet named 'system', of type co.System.
 class SystemComponent_co_System : public co::System
 {
 public:

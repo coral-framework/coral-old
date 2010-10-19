@@ -113,18 +113,18 @@ end
 -- Receives a table describing the component type, with three fields:
 --		desc.name = a fully-qualified Coral type name for the component.
 --		desc.provides = a map of interface names to interface type names.
---		desc.requires = a map of interface names to interface type names.
--- Either 'provides' or 'requires' can be omitted, but at least one interface
+--		desc.receives = a map of interface names to interface type names.
+-- Either 'provides' or 'receives' can be omitted, but at least one interface
 -- must be defined. When providing both tables, beware of interface name clashes.
 --
 -- The 'desc' table is converted into a component prototype table and returned
 -- as the function result. A brand new component prototype table contains only
--- the component's provided (server) interfaces, as interface prototype tables.
+-- the component's facets, as interface prototype tables.
 --
 -- Prototype tables should be populated with Lua methods to implement the component.
--- A method will only affect a specific server interface if it is added to the
--- interface's prototype table; conversely, it will affect all interfaces if it
--- is added to the component's prototype table. For example:
+-- A method will only affect a specific facet if it is added to the facet's prototype
+-- table; conversely, it will affect all facets if added to the component's prototype
+-- table. For example:
 --		local MyComponent = co.Component{ ... }
 --		function MyComponent:doSomething() print "all interfaces" end
 --		function MyComponent.someItf:doSomething() print "just someItf" end
@@ -137,7 +137,7 @@ end
 -- It is also possible to instantiate a Lua component from C++ by using the component's
 -- type reflector. Therefore, co::newInstance() should also work for Lua components.
 
-local function checkComponentInterfaces( provides, requires )
+local function checkComponentInterfaces( provides, receives )
 	local ok = false
 
 	-- turn type names into type instances
@@ -150,12 +150,12 @@ local function checkComponentInterfaces( provides, requires )
 		end
 	end
 
-	if requires then
-		for k, v in pairs( requires ) do
+	if receives then
+		for k, v in pairs( receives ) do
 			ok = true
-			requires[k] = coType[v]
+			receives[k] = coType[v]
 			if provides and provides[k] then
-				error( "required interface '" .. k .. "' clashes with a provided interface" )
+				error( "receptacle '" .. k .. "' clashes with a facet name" )
 			end
 		end
 	end
@@ -165,7 +165,7 @@ local function checkComponentInterfaces( provides, requires )
 	end
 end
 
-local function defineComponentType( ns, typeName, tct, provides, requires )
+local function defineComponentType( ns, typeName, tct, provides, receives )
 	local typeBuilder = ns:defineType( typeName, 'TK_COMPONENT', tct )
 
 	if provides then
@@ -174,8 +174,8 @@ local function defineComponentType( ns, typeName, tct, provides, requires )
 		end
 	end
 
-	if requires then
-		for itfName, itfType in pairs( requires ) do
+	if receives then
+		for itfName, itfType in pairs( receives ) do
 			typeBuilder:defineInterface( itfName, itfType, false )
 		end
 	end
@@ -192,8 +192,8 @@ function co.Component( t )
 	end
 
 	local provides = t.provides
-	local requires = t.requires
-	local ok, err = pcall( checkComponentInterfaces, provides, requires )
+	local receives = t.receives
+	local ok, err = pcall( checkComponentInterfaces, provides, receives )
 	if not ok then
 		error( "invalid component interfaces: " .. tostring( err ), 2 )
 	end
@@ -214,7 +214,7 @@ function co.Component( t )
 	end
 
 	local tct = coNew( "co.TypeCreationTransactionComponent" ).transaction
-	local ok, ct = pcall( defineComponentType, ns, typeName, tct, provides, requires )
+	local ok, ct = pcall( defineComponentType, ns, typeName, tct, provides, receives )
 	if ok then
 		tct:commit()
 	else
@@ -225,16 +225,16 @@ function co.Component( t )
 	-- convert 't' into a component prototype table
 	t.name = nil
 	t.provides = nil
-	t.requires = nil
+	t.receives = nil
 
 	t.__provides = provides
-	t.__requires = requires
+	t.__receives = receives
 	t.__reflector = coNewComponentType( ct, t )
 
 	-- a component prototype table is the MT for its component instances
 	t.__index = function( _, k ) return t[k] end
 
-	-- create prototype tables for the server interfaces
+	-- create prototype tables for the facets
 	for k, v in pairs( provides ) do
 		t[k] = {}
 	end
@@ -252,7 +252,7 @@ function ComponentMT.__call( protoTable, instanceTable )
 
 	local instance = coNewComponentInstance( protoTable.__reflector, instanceTable )
 
-	-- setup the server interface instance tables
+	-- setup the facet instance tables
 	for k, v in pairs( protoTable.__provides ) do
 		instanceTable[k] = setmetatable( { __interface = instance[k], __protoItf = protoTable[k] }, instanceTable )
 	end

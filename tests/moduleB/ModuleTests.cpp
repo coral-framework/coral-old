@@ -133,10 +133,10 @@ TEST( ModuleTests, crossModuleInheritance )
 	co::RefPtr<co::Component> component = co::newInstance( "moduleA.TestComponent" );
 
 	// exercise dynamic_casts
-	moduleA::TestInterface* ti = component->getProvided<moduleA::TestInterface>();
+	moduleA::TestInterface* ti = component->getFacet<moduleA::TestInterface>();
 	EXPECT_EQ( component.get(), ti->getInterfaceOwner() );
 
-	co::TypeCreationTransaction* tct = component->getProvided<co::TypeCreationTransaction>();
+	co::TypeCreationTransaction* tct = component->getFacet<co::TypeCreationTransaction>();
 	EXPECT_EQ( component.get(), tct->getInterfaceOwner() );
 }
 

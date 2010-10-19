@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.TypeBuilderComponent provides an interface named 'typeBuilder', of type co.TypeBuilder.
+//! co.TypeBuilderComponent has a facet named 'typeBuilder', of type co.TypeBuilder.
 class TypeBuilderComponent_co_TypeBuilder : public co::TypeBuilder
 {
 public:

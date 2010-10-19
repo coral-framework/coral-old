@@ -3,36 +3,36 @@
  */
 interface Component
 {
-	// Object providing type introspection for this component.
+	// The component's blueprint.
 	readonly attribute ComponentType componentType;
 
 	<c++
 		/*!
-			<tt>getProvided<T>()</tt>: convenience method that returns the instance of an interface 'T' provided
+			<tt>getFacet<T>()</tt>: convenience method that returns the instance of a facet 'T' provided
 			by this component. Please notice that this method only works for statically-defined components.
 			It will not retrieve proxy interfaces from dynamic components (such as those implemented in Lua).
 		 */
-		template<typename T> inline T* getProvided() { return dynamic_cast<T*>( this ); }
+		template<typename T> inline T* getFacet() { return dynamic_cast<T*>( this ); }
 	c++>
 
 	/*
-		Retrieves the interface instance "provided by" or "connected to" one of the component's interfaces.
+		Retrieves the interface instance "provided by" or "bound to" one of the component's interfaces.
 
-		If \c itfInfo identifies a \e server interface, this method returns the corresponding interface
-		instance <em>provided by</em> this component. Otherwise, if \c itfInfo is a \e client interface,
-		this method returns the server interface that is <em>connected to</em> the client interface (in this
-		case, the returned value is null if no server interface is currently bound to the client interface).
+		If \c itfInfo is a \e facet, this method returns the corresponding interface instance
+		<em>provided by</em> this component. Otherwise, if \c itfInfo is a \e receptacle, this
+		method returns the interface instance that is currently <em>bound to</em> the receptacle
+		(in this case, the result can be null if nothing is bound to the receptacle).
 
 		\throw NoSuchInterfaceException if \c itfInfo is not a valid interface of this component.
 	 */
 	Interface getInterface( in InterfaceInfo itfInfo ) raises NoSuchInterfaceException;
 
 	/*
-		Connects the given server interface \c instance to a client interface of this component.
-		If an interface instance is already bound to the client interface, it is replaced by the new \c instance.
-		\throw NoSuchInterfaceException if \c clientItfInfo is not a valid client interface of this component.
-		\throw IllegalArgumentException if the passed \c instance is incompatible with the client interface.
+		Binds an interface \c instance to one of the component's receptacles.
+		If an interface instance is already bound to the receptacle, it is replaced by the new \c instance.
+		\throw NoSuchInterfaceException if \c receptacle is not a valid receptacle of this component.
+		\throw IllegalArgumentException if the passed \c instance is incompatible with the receptacle.
 	 */
-	void bindInterface( in InterfaceInfo clientItfInfo, in Interface instance )
+	void bindInterface( in InterfaceInfo receptacle, in Interface instance )
 		raises NoSuchInterfaceException, IllegalArgumentException;
 };

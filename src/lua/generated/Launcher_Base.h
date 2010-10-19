@@ -11,7 +11,7 @@
 
 namespace lua {
 
-//! lua.Launcher provides an interface named 'launcher', of type lua.ILauncher.
+//! lua.Launcher has a facet named 'launcher', of type lua.ILauncher.
 class Launcher_lua_ILauncher : public lua::ILauncher
 {
 public:

@@ -1,6 +1,6 @@
 // this is a valid component specification
 component testComponent
 {
-	//required interfaces.
-	requires anInterface firstRequired;
+	// receptacles:
+	receives anInterface firstRequired;
 };

@@ -11,7 +11,7 @@
 
 namespace lua {
 
-//! lua.ModulePart provides an interface named 'part', of type co.ModulePart.
+//! lua.ModulePart has a facet named 'part', of type co.ModulePart.
 class ModulePart_co_ModulePart : public co::ModulePart
 {
 public:

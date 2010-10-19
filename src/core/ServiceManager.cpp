@@ -112,13 +112,13 @@ co::Interface* ServiceManager::getServiceForType( co::InterfaceType* serviceType
 	return getServiceForType( fetchServiceRecord( serviceType ), serviceType, clientType );
 }
 
-co::InterfaceInfo* ServiceManager::getProvidedInterfaceInfo( co::ComponentType* ct, co::InterfaceType* itfType )
+co::InterfaceInfo* ServiceManager::getFacetInfo( co::ComponentType* ct, co::InterfaceType* itfType )
 {
-	co::ArrayRange<co::InterfaceInfo* const> providedItfs = ct->getProvidedInterfaces();
-	for( ; providedItfs; providedItfs.popFirst() )
+	co::ArrayRange<co::InterfaceInfo* const> facets = ct->getFacets();
+	for( ; facets; facets.popFirst() )
 	{
-		if( providedItfs.getFirst()->getType()->isSubTypeOf( itfType ) )
-			return providedItfs.getFirst();
+		if( facets.getFirst()->getType()->isSubTypeOf( itfType ) )
+			return facets.getFirst();
 	}
 	return NULL;
 }
@@ -131,7 +131,7 @@ co::Interface* ServiceManager::getServiceForInstance( co::InterfaceType* service
 	// give preference the component's instance of the service interface, if available
 	co::Component* component = clientInstance->getInterfaceOwner();
 	co::ComponentType* ct = component->getComponentType();
-	co::InterfaceInfo* itfInfo = getProvidedInterfaceInfo( ct, serviceType );
+	co::InterfaceInfo* itfInfo = getFacetInfo( ct, serviceType );
 	if( itfInfo )
 		return component->getInterface( itfInfo );
 
@@ -213,7 +213,7 @@ co::ComponentType* ServiceManager::validateComponentType( co::InterfaceType* ser
 	if( !ct )
 		CORAL_THROW( co::IllegalArgumentException, "invalid component type name '" << componentName << "'" );
 
-	if( getProvidedInterfaceInfo( ct, serviceType ) )
+	if( getFacetInfo( ct, serviceType ) )
 		return ct; // ok, component implements the service interface
 
 	CORAL_THROW( co::NoSuchInterfaceException, "component '" << componentName
@@ -229,7 +229,7 @@ void ServiceManager::createServiceInstance( co::InterfaceType* serviceType, Lazy
 	{
 		co::Reflector* reflector = instance.getComponentType()->getReflector();
 		co::Component* component = reflector->newInstance();
-		co::InterfaceInfo* serviceItfInfo = getProvidedInterfaceInfo( instance.getComponentType(), serviceType );
+		co::InterfaceInfo* serviceItfInfo = getFacetInfo( instance.getComponentType(), serviceType );
 		assert( serviceItfInfo );
 		instance.setInstance( component->getInterface( serviceItfInfo ) );
 	}

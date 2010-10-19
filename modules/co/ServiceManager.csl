@@ -45,8 +45,8 @@ interface ServiceManager
 		the service is requested (unless the \c isLazy attribute is currently set to \c false).
 
 		To create the service instance, this manager will attempt to instantiate a component using
-		the given \c componentName and get its provided interface of type \c serviceType. If an error
-		occurs, the service will be removed and the calling method will raise a co::MissingServiceException.
+		the given \c componentName and get its facet of type \c serviceType. If an error occurs,
+		the service will be removed and the calling method will raise a co::MissingServiceException.
 
 		\throw co::IllegalArgumentException if \c serviceType is null or \c componentName does not identify
 					a valid component type.
@@ -64,8 +64,8 @@ interface ServiceManager
 		the service is requested (unless the \c isLazy attribute is currently set to \c false).
 
 		To create the service instance, this manager will attempt to instantiate a component using
-		the given \c componentName and get its provided interface of type \c serviceType. If an error
-		occurs, the service will be removed and the calling method will raise a co::MissingServiceException.
+		the given \c componentName and get its facet of type \c serviceType. If an error occurs,
+		the service will be removed and the calling method will raise a co::MissingServiceException.
 
 		\throw co::IllegalArgumentException if a) \c serviceType or \c clientType are null;
 				or b) \c componentName does not identify a valid component type; or c) \c clientType is

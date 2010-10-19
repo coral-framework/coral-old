@@ -337,13 +337,13 @@ void Parser::onIdentifierListItem( const std::string& name )
 	handleDocumentation( name );
 }
 
-void Parser::onComponentInterface( bool isProvided, const std::string& name )
+void Parser::onComponentInterface( bool isFacet, const std::string& name )
 {
 	co::InterfaceType* interface = dynamic_cast<co::InterfaceType*>( getLastDeclaredType() );
 	if( !interface )
 		CORAL_THROW( co::CoreException, "an interface type was expected" );
 
-	_typeBuilder->defineInterface( name, interface, isProvided );
+	_typeBuilder->defineInterface( name, interface, isFacet );
 	handleDocumentation( name );
 }
 

@@ -1,16 +1,14 @@
 /*
-	Concrete component type.
-
-	\note If you need to retrieve an InterfaceInfo given an interface name, use co::CompoundType::getMember().
+	A component blueprint.
  */
 interface ComponentType : CompoundType
 {
-	// List of all member (both client and server) interfaces of this component.
+	// List of all member interfaces (both facets and receptacles) of this component.
 	readonly attribute InterfaceInfo[] interfaces;
 
-	// List of all client interfaces of this component.
-	readonly attribute InterfaceInfo[] requiredInterfaces;
+	// List of all facets (server interfaces) of this component.
+	readonly attribute InterfaceInfo[] facets;
 
-	// List of all server interfaces of this component.
-	readonly attribute InterfaceInfo[] providedInterfaces;
+	// List of all receptacles (client interfaces) of this component.
+	readonly attribute InterfaceInfo[] receptacles;
 };

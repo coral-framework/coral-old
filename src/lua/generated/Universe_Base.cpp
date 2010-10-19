@@ -73,9 +73,9 @@ co::Interface* Universe_Base::getInterface( co::InterfaceInfo* interfaceInfo )
 	return res;
 }
 
-void Universe_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void Universe_Base::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
 {
-	checkValidClientInterface( clientInterface );
+	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }

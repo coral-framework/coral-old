@@ -150,7 +150,7 @@ A princípio, considera-se que todo comentário serve para documentar o elemento i
 	This documents the enum 'CaseSensitivity'.
  */
 enum CaseSensitivity
-{	
+{
 	CaseSensitive,		//< This documents the constant 'CaseSensitive'
 	CaseInsensitive,	//< This documents the constant 'CaseInsensitive'
 };
@@ -289,7 +289,7 @@ Finalmente, a gramática para especificar um componente é fornecida abaixo.
 \verbatim
 interface-specification = "component" , Identifier , "{" , { component-member } , "}" , ";" ;
 
-component-member        = ( "provides" | "requires" ) , qualified-identifier , Identifier , ";" ;
+component-member        = ( "provides" | "receives" ) , qualified-identifier , Identifier , ";" ;
 \endverbatim
 
 Exemplo de \c component:
@@ -297,8 +297,8 @@ Exemplo de \c component:
 component HotelReservation
 {
 	provides IHotelRes;
-	requires ILoyaltyProgram;
-	requires IBilling;
+	receives ILoyaltyProgram;
+	receives IBilling;
 };
 \endcode
 

@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.ModuleComponent provides an interface named 'module', of type co.Module.
+//! co.ModuleComponent has a facet named 'module', of type co.Module.
 class ModuleComponent_co_Module : public co::Module
 {
 public:

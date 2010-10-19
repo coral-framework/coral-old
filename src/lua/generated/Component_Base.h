@@ -12,7 +12,7 @@
 
 namespace lua {
 
-//! lua.Component provides an interface named 'dynamicProxyHandler', of type co.DynamicProxyHandler.
+//! lua.Component has a facet named 'dynamicProxyHandler', of type co.DynamicProxyHandler.
 class Component_co_DynamicProxyHandler : public co::DynamicProxyHandler
 {
 public:
@@ -20,7 +20,7 @@ public:
 	virtual const std::string& getInterfaceName();
 };
 
-//! lua.Component provides an interface named 'reflector', of type co.Reflector.
+//! lua.Component has a facet named 'reflector', of type co.Reflector.
 class Component_co_Reflector : public co::Reflector
 {
 public:

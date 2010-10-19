@@ -23,10 +23,10 @@ void moduleRelease();
 ]] )
 	end
 
-	local providedItfs = t.providedInterfaces
-	local requiredItfs = t.requiredInterfaces
+	local facets = t.facets
+	local receptacles = t.receptacles
 
-	for i, itf in ipairs( providedItfs ) do
+	for i, itf in ipairs( facets ) do
 		writer( [[
 
 // ------ ]], t.fullName, [[ provides an interface named ']], itf.name, [[', of type ]], itf.type.fullName, [[ ------ //
@@ -104,13 +104,13 @@ co::Interface* ]], t.name, [[_Base::getInterface( co::InterfaceInfo* interfaceIn
 	{
 ]] )
 
-	for i, itf in ipairs( requiredItfs ) do
-		writer( "\tcase ", itf.index, ":\t\tres = co::disambiguate<co::Interface, ",
-			itf.type.cppName, ">( ", t.formatAccessor( "getRequired", itf.name ), "() ); break;\n" )
+	for i, itf in ipairs( facets ) do
+		writer( "\tcase ", itf.index, ":\t\tres = co::disambiguate<co::Interface, ", itf.type.cppName, ">( this ); break;\n" )
 	end
 
-	for i, itf in ipairs( providedItfs ) do
-		writer( "\tcase ", itf.index, ":\t\tres = co::disambiguate<co::Interface, ", itf.type.cppName, ">( this ); break;\n" )
+	for i, itf in ipairs( receptacles ) do
+		writer( "\tcase ", itf.index, ":\t\tres = co::disambiguate<co::Interface, ",
+			itf.type.cppName, ">( ", t.formatAccessor( "getReceptacle", itf.name ), "() ); break;\n" )
 	end
 
 	writer( [[
@@ -119,19 +119,19 @@ co::Interface* ]], t.name, [[_Base::getInterface( co::InterfaceInfo* interfaceIn
 	return res;
 }
 
-void ]], t.name, [[_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void ]], t.name, [[_Base::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
 {
-	checkValidClientInterface( clientInterface );
+	checkValidReceptacle( receptacle );
 ]] )
 
-	if #requiredItfs > 0 then
+	if #receptacles > 0 then
 		writer( [[
-	switch( clientInterface->getIndex() )
+	switch( receptacle->getIndex() )
 	{
 ]] )
 
-		for i, itf in ipairs( requiredItfs ) do
-			writer( "\tcase ", itf.index, ":\t\t", t.formatAccessor( "setRequired", itf.name ),
+		for i, itf in ipairs( receptacles ) do
+			writer( "\tcase ", itf.index, ":\t\t", t.formatAccessor( "setReceptacle", itf.name ),
 				"( checkedInterfaceCast<", itf.type.cppName, ">( instance ) ); break;\n" )
 		end
 

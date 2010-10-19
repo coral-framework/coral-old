@@ -70,9 +70,9 @@ co::Interface* ModuleComponent_Base::getInterface( co::InterfaceInfo* interfaceI
 	return res;
 }
 
-void ModuleComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void ModuleComponent_Base::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
 {
-	checkValidClientInterface( clientInterface );
+	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }

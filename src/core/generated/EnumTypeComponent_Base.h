@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.EnumTypeComponent provides an interface named 'type', of type co.EnumType.
+//! co.EnumTypeComponent has a facet named 'type', of type co.EnumType.
 class EnumTypeComponent_co_EnumType : public co::EnumType
 {
 public:

@@ -11,7 +11,7 @@
 
 namespace lua {
 
-//! lua.Universe provides an interface named 'state', of type lua.IState.
+//! lua.Universe has a facet named 'state', of type lua.IState.
 class Universe_lua_IState : public lua::IState
 {
 public:

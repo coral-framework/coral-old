@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.ModulePartLoaderComponent provides an interface named 'loader', of type co.ModulePartLoader.
+//! co.ModulePartLoaderComponent has a facet named 'loader', of type co.ModulePartLoader.
 class ModulePartLoaderComponent_co_ModulePartLoader : public co::ModulePartLoader
 {
 public:

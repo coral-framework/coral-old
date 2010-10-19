@@ -57,7 +57,7 @@ function M:initialize( module )
 	ASSERT_EQ( testStruct.innerStruct.filename, "My Filename" )
 	ASSERT_EQ( testStruct.innerStruct.line, 1337 )
 
-	-- test gettin/setting serveral array fields in a modulaA.TestStruct
+	-- test gettin/setting several array fields in a modulaA.TestStruct
 	local ts = co.new "moduleA.TestStruct"
 	ASSERT_EQ( 0, #ts.floatArray )
 	ASSERT_EQ( 0, #ts.enumArray )

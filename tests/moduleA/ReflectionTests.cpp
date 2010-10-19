@@ -24,10 +24,10 @@ T* getMember( co::Type* type, const char* memberName )
 {
 	co::CompoundType* ct = dynamic_cast<co::CompoundType*>( type );
 	assert( ct );
-	
+
 	T* mi = dynamic_cast<T*>( ct->getMember( memberName ) );
 	assert( mi );
-	
+
 	return mi;
 }
 
@@ -120,30 +120,30 @@ TEST( ReflectionTests, getAndBindComponentInterfaces )
 
 	co::ComponentType* type = testComponent->getComponentType();
 
-	// get a server interface info
+	// get a facet info
 	co::InterfaceInfo* testInterfaceInfo = dynamic_cast<co::InterfaceInfo*>( type->getMember( "testInterface" ) );
 	ASSERT_TRUE( testInterfaceInfo != NULL );
 
-	// get the 'testInterface' server interface
+	// get the 'testInterface' instance
 	co::Interface* itf = testComponent->getInterface( testInterfaceInfo );
-	EXPECT_EQ( testComponent->getProvided<moduleA::TestInterface>(), itf );
+	EXPECT_EQ( testComponent->getFacet<moduleA::TestInterface>(), itf );
 
-	// cannot 'bind' to a server interface
+	// cannot 'bind' to a facet
 	EXPECT_THROW( testComponent->bindInterface( testInterfaceInfo, itf ), co::NoSuchInterfaceException );
 
-	// get InterfaceInfo's for the client interfaces
+	// get InterfaceInfo's for the receptacles
 	co::InterfaceInfo* typeItfInfo = dynamic_cast<co::InterfaceInfo*>( type->getMember( "type" ) );
 	co::InterfaceInfo* itfTypeItfInfo = dynamic_cast<co::InterfaceInfo*>( type->getMember( "itfType" ) );
 	ASSERT_TRUE( typeItfInfo && itfTypeItfInfo );
 
-	// get the interface currently bound to the 'type' client interface (should be null)
+	// get the interface currently bound to the 'type' receptacle (should be null)
 	EXPECT_EQ( NULL, testComponent->getInterface( typeItfInfo ) );
 
 	// attempting to bind a StructType to 'itfType' should produce an exception (it expects an InterfaceType)
 	co::Type* structType = co::getType( "moduleA.TestStruct" );
 	EXPECT_THROW( testComponent->bindInterface( itfTypeItfInfo, structType ), co::IllegalArgumentException );
 
-	// bind an InterfaceType to both client interfaces
+	// bind an InterfaceType to both receptacles
 	co::Type* itfType = co::getType( "moduleA.TestInterface" );
 
 	testComponent->bindInterface( typeItfInfo, itfType );

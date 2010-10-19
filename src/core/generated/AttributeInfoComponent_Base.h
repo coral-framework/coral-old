@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.AttributeInfoComponent provides an interface named 'attributeInfo', of type co.AttributeInfo.
+//! co.AttributeInfoComponent has a facet named 'attributeInfo', of type co.AttributeInfo.
 class AttributeInfoComponent_co_AttributeInfo : public co::AttributeInfo
 {
 public:

@@ -26,24 +26,24 @@ public:
 	//! method the interfaces list must be re-sorted using the sortInterfaces() method.
 	void addInterfaces( co::ArrayRange<co::InterfaceInfo* const> interfaces );
 
-	//! Sort the interfaces list by (provided, name) and update _firstProvidedPos.
+	//! Sorts the interface list by (isFacet, name) and updates _firstReceptacle.
 	void sortInterfaces();
-	
+
 	// co::CompoundType methods:
 	co::ArrayRange<co::MemberInfo* const> getMembers();
 	co::MemberInfo* getMember( const std::string& name );
 
 	// co::ComponentType methods:
 	co::ArrayRange<co::InterfaceInfo* const> getInterfaces();
-	co::ArrayRange<co::InterfaceInfo* const> getRequiredInterfaces();
-	co::ArrayRange<co::InterfaceInfo* const> getProvidedInterfaces();
+	co::ArrayRange<co::InterfaceInfo* const> getFacets();
+	co::ArrayRange<co::InterfaceInfo* const> getReceptacles();
 
 	DELEGATE_CO_TYPE_METHODS( TypeImpl:: );
 
 private:
 	typedef co::RefVector<co::InterfaceInfo> InterfacesVector;
-	InterfacesVector _interfaces;	// dual sorted vector: client interfaces first, then server interfaces.
-	std::size_t _firstProvidedPos;	// dividing point: position of the first provided interface in _interfaces.
+	InterfacesVector _interfaces;	// dual sorted vector: facets first, then receptacles.
+	std::size_t _firstReceptacle;	// dividing point: position of the first receptacle in _interfaces.
 };
 
 #endif

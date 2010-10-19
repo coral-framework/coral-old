@@ -675,11 +675,11 @@ int ComponentBinding::newIndex( lua_State* L )
 	if( lua_islightuserdata( L, -1 ) )
 	{
 		co::InterfaceInfo* itfInfo = checkInterfaceInfo( L, -1 );
-		if( itfInfo->getIsProvided() )
+		if( itfInfo->getIsFacet() )
 		{
 			lua_pushliteral( L, "'" );
 			lua_pushvalue( L, 2 );
-			lua_pushliteral( L, "' is a provided interface and cannot be set" );
+			lua_pushliteral( L, "' is a facet and cannot be set" );
 			lua_concat( L, 3 );
 			throw lua::MsgOnStackException();
 		}

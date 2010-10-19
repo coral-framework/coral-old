@@ -176,22 +176,22 @@ void TestComponent::rollback()
 	// empty
 }
 
-co::InterfaceType* TestComponent::getRequiredItfType()
+co::InterfaceType* TestComponent::getReceptacleItfType()
 {
 	return _itfType.get();
 }
 
-void TestComponent::setRequiredItfType( co::InterfaceType* itfType )
+void TestComponent::setReceptacleItfType( co::InterfaceType* itfType )
 {
 	_itfType = itfType;
 }
 
-co::Type* TestComponent::getRequiredType()
+co::Type* TestComponent::getReceptacleType()
 {
 	return _type.get();
 }
 
-void TestComponent::setRequiredType( co::Type* type )
+void TestComponent::setReceptacleType( co::Type* type )
 {
 	_type = type;
 }

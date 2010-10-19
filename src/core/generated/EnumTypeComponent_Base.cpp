@@ -70,9 +70,9 @@ co::Interface* EnumTypeComponent_Base::getInterface( co::InterfaceInfo* interfac
 	return res;
 }
 
-void EnumTypeComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void EnumTypeComponent_Base::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
 {
-	checkValidClientInterface( clientInterface );
+	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }

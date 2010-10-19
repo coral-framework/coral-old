@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.ArrayTypeComponent provides an interface named 'type', of type co.ArrayType.
+//! co.ArrayTypeComponent has a facet named 'type', of type co.ArrayType.
 class ArrayTypeComponent_co_ArrayType : public co::ArrayType
 {
 public:

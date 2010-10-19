@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.TypeManagerComponent provides an interface named 'typeManager', of type co.TypeManager.
+//! co.TypeManagerComponent has a facet named 'typeManager', of type co.TypeManager.
 class TypeManagerComponent_co_TypeManager : public co::TypeManager
 {
 public:

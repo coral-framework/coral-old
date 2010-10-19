@@ -522,7 +522,7 @@ public:
 		_myType->sortInterfaces();
 	}
 
-	void defineInterface( const std::string& name, co::InterfaceType* interface, bool isProvided )
+	void defineInterface( const std::string& name, co::InterfaceType* interface, bool isFacet )
 	{
 		assertNotCreated();
 
@@ -541,7 +541,7 @@ public:
 		InterfaceInfo* interfaceInfo = new InterfaceInfo;
 		interfaceInfo->setName( name );
 		interfaceInfo->setType( interface );
-		interfaceInfo->setIsProvided( isProvided );
+		interfaceInfo->setIsFacet( isFacet );
 
 		_interfaces.push_back( interfaceInfo );
 	}

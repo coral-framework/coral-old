@@ -70,9 +70,9 @@ co::Interface* NativeClassTypeComponent_Base::getInterface( co::InterfaceInfo* i
 	return res;
 }
 
-void NativeClassTypeComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void NativeClassTypeComponent_Base::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
 {
-	checkValidClientInterface( clientInterface );
+	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }

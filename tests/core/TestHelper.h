@@ -24,7 +24,7 @@ inline co::TypeCreationTransaction* createTypeCreationTransaction()
 {
 	co::Component* component = co::newInstance( "co.TypeCreationTransactionComponent" );
 	assert( component );
-	co::TypeCreationTransaction* tct = component->getProvided<co::TypeCreationTransaction>();
+	co::TypeCreationTransaction* tct = component->getFacet<co::TypeCreationTransaction>();
 	assert( tct );
 	return tct;
 }

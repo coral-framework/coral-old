@@ -11,7 +11,7 @@
 
 namespace lua {
 
-//! lua.ModulePartLoader provides an interface named 'loader', of type co.ModulePartLoader.
+//! lua.ModulePartLoader has a facet named 'loader', of type co.ModulePartLoader.
 class ModulePartLoader_co_ModulePartLoader : public co::ModulePartLoader
 {
 public:

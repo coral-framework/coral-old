@@ -24,11 +24,11 @@ class ComponentType : public co::CompoundType
 public:
 	virtual ~ComponentType() {;}
 
+	virtual co::ArrayRange<co::InterfaceInfo* const> getFacets() = 0;
+
 	virtual co::ArrayRange<co::InterfaceInfo* const> getInterfaces() = 0;
 
-	virtual co::ArrayRange<co::InterfaceInfo* const> getProvidedInterfaces() = 0;
-
-	virtual co::ArrayRange<co::InterfaceInfo* const> getRequiredInterfaces() = 0;
+	virtual co::ArrayRange<co::InterfaceInfo* const> getReceptacles() = 0;
 };
 
 } // namespace co

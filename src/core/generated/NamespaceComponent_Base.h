@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.NamespaceComponent provides an interface named 'namespace', of type co.Namespace.
+//! co.NamespaceComponent has a facet named 'namespace', of type co.Namespace.
 class NamespaceComponent_co_Namespace : public co::Namespace
 {
 public:

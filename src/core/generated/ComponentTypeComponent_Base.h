@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.ComponentTypeComponent provides an interface named 'type', of type co.ComponentType.
+//! co.ComponentTypeComponent has a facet named 'type', of type co.ComponentType.
 class ComponentTypeComponent_co_ComponentType : public co::ComponentType
 {
 public:

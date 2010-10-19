@@ -58,10 +58,10 @@ public:
 	void rollback();
 	
 protected:
-	co::InterfaceType* getRequiredItfType();
-	void setRequiredItfType( co::InterfaceType* itfType );
-	co::Type* getRequiredType();
-	void setRequiredType( co::Type* type );
+	co::InterfaceType* getReceptacleItfType();
+	void setReceptacleItfType( co::InterfaceType* itfType );
+	co::Type* getReceptacleType();
+	void setReceptacleType( co::Type* type );
 
 private:
 	co::RefPtr<co::InterfaceType> _itfType;

@@ -7,15 +7,14 @@ interface ModulePart
 	/*
 		Initialization Phase - registration of services provided by the ModulePart.
 
-		\note This phase should install Reflectors for all module types. If a
-			missing Reflector is detected after the initialization phase is
-			complete, the module will be aborted.
+		\note This phase should install Reflectors for all module types. If a missing Reflector
+			is detected after the initialization phase is complete, the module will be aborted.
 	 */
 	void initialize( in Module module );
 
 	/*
 		Integration Phase - consumption of services provided by other modules.
-		May throw an exception to indicate the module cannot be loaded due to a missing service.
+		May throw an exception to indicate that the module cannot be loaded due to a missing service.
 		\throw co::MissingServiceException if a required service was not available.
 	 */
 	void integrate( in Module module ) raises MissingServiceException;

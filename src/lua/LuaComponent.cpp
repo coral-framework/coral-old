@@ -35,9 +35,9 @@
 
 LuaComponent::LuaComponent()
 {
-	_customType = NULL;
-	_serverItfs = NULL;
-	_numServerItfs = 0;
+	_componentType = NULL;
+	_facets = NULL;
+	_numFacets = 0;
 	_tableRef = LUA_NOREF;
 }
 
@@ -46,76 +46,76 @@ LuaComponent::~LuaComponent()
 	lua_State* L = LuaState::getL();
 	if( L )
 		luaL_unref( L, LUA_REGISTRYINDEX, _tableRef );
-	for( int i = 0; i < _numServerItfs; ++i )
-		delete _serverItfs[i];
-	delete[] _serverItfs;
+	for( int i = 0; i < _numFacets; ++i )
+		delete _facets[i];
+	delete[] _facets;
 }
 
 void LuaComponent::setComponentType( co::ComponentType* ct, int prototypeTableRef )
 {
-	assert( ct != NULL && _customType == NULL && _serverItfs == NULL );
+	assert( ct != NULL && _componentType == NULL && _facets == NULL );
 
-	_customType = ct;
+	_componentType = ct;
 	_tableRef = prototypeTableRef;
 
 	// register ourself as the type's reflector
-	_customType->setReflector( this );
+	_componentType->setReflector( this );
 }
 
 void LuaComponent::setComponentInstance( LuaComponent* prototype, int instanceTableRef )
 {
-	assert( prototype && prototype->_serverItfs == NULL );
+	assert( prototype && prototype->_facets == NULL );
 
-	_customType = prototype->_customType;
+	_componentType = prototype->_componentType;
 	_tableRef = instanceTableRef;
 
-	// create our server proxy interfaces
-	co::ArrayRange<co::InterfaceInfo* const> serverItfs = _customType->getProvidedInterfaces();
-	int numServerItfs = static_cast<int>( serverItfs.getSize() );
-	_serverItfs = new co::Interface*[numServerItfs];
-	for( int i = 0; i < numServerItfs; ++i )
+	// create proxy interfaces for our facets
+	co::ArrayRange<co::InterfaceInfo* const> facets = _componentType->getFacets();
+	int numFacets = static_cast<int>( facets.getSize() );
+	_facets = new co::Interface*[numFacets];
+	for( int i = 0; i < numFacets; ++i )
 	{
 		/*
 			To avoid having exceptions raised here by getReflector(), we
 			should check all interface reflectors before creating the Component.
 		 */
-		assert( _numServerItfs == i );
-		serverItfs[i]->getType()->getReflector()->newProxy( this );
-		assert( _numServerItfs == i + 1 );
+		assert( _numFacets == i );
+		facets[i]->getType()->getReflector()->newProxy( this );
+		assert( _numFacets == i + 1 );
 	}
 }
 
 co::ComponentType* LuaComponent::getComponentType()
 {
-	return _customType ? _customType : lua::Component_Base::getComponentType();
+	return _componentType ? _componentType : lua::Component_Base::getComponentType();
 }
 
 co::Interface* LuaComponent::getInterface( co::InterfaceInfo* itfInfo )
 {
 	co::CompoundType* owner = itfInfo->getOwner();
-	if( owner == _customType )
-		return getCustomInterface( itfInfo );
+	if( owner == _componentType )
+		return getDynamicInterface( itfInfo );
 	return lua::Component_Base::getInterface( itfInfo );
 }
 
-void LuaComponent::bindInterface( co::InterfaceInfo* clientItfInfo, co::Interface* instance )
+void LuaComponent::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
 {
-	co::CompoundType* owner = clientItfInfo->getOwner();
-	if( owner == _customType )
-		bindCustomInterface( clientItfInfo, instance );
+	co::CompoundType* owner = receptacle->getOwner();
+	if( owner == _componentType )
+		bindToDynamicReceptacle( receptacle, instance );
 	else
-		lua::Component_Base::bindInterface( clientItfInfo, instance );
+		lua::Component_Base::bindInterface( receptacle, instance );
 }
 
 co::int32 LuaComponent::registerProxyInterface( co::Interface* proxy )
 {
-	_serverItfs[_numServerItfs] = proxy;
-	return _numServerItfs++;
+	_facets[_numFacets] = proxy;
+	return _numFacets++;
 }
 
 const std::string& LuaComponent::getInterfaceName( co::int32 cookie )
 {
-	return _customType->getProvidedInterfaces()[cookie]->getName();
+	return _componentType->getFacets()[cookie]->getName();
 }
 
 const std::string& LuaComponent::getProxyInterfaceName( co::int32 cookie )
@@ -152,7 +152,7 @@ void LuaComponent::getMethod( lua_State* L, int t, co::int32 cookie )
 	if( lua_isnil( L, -1 ) )
 	{
 		std::stringstream ss;
-		ss << "missing method '" << methodName << "' in LuaComponent '" << _customType->getFullName() << "'";
+		ss << "missing method '" << methodName << "' in LuaComponent '" << _componentType->getFullName() << "'";
 		if( cookie != -1 )
 			ss << ", interface '" << getInterfaceName( cookie ) << "'";
 		throw lua::Exception( ss.str() );
@@ -266,7 +266,7 @@ co::int32 LuaComponent::getSize()
 
 co::Type* LuaComponent::getType()
 {
-	return _customType;
+	return _componentType;
 }
 
 void LuaComponent::createValue( void*, size_t )
@@ -286,7 +286,7 @@ void LuaComponent::destroyValue( void* )
 
 co::Component* LuaComponent::newInstance()
 {
-	assert( _serverItfs == NULL && _tableRef != LUA_NOREF );
+	assert( _facets == NULL && _tableRef != LUA_NOREF );
 
 	co::Any any;
 
@@ -330,20 +330,17 @@ void LuaComponent::invokeMethod( const co::Any&, co::MethodInfo*, co::ArrayRange
 	raiseUnsupportedOperationException();
 }
 
-co::Interface* LuaComponent::getCustomInterface( co::InterfaceInfo* itfInfo )
+co::Interface* LuaComponent::getDynamicInterface( co::InterfaceInfo* itfInfo )
 {
-	if( itfInfo->getIsProvided() )
-	{
-		int idx = itfInfo->getIndex() - static_cast<int>( _customType->getRequiredInterfaces().getSize() );
-		return _serverItfs[idx];
-	}
+	if( itfInfo->getIsFacet() )
+		return _facets[itfInfo->getIndex()];
 
 	// call the Lua component to get a client interface
 	co::Interface* res;
 	__BEGIN_LUA_API_CODE__
 
 	lua_rawgeti( L, LUA_REGISTRYINDEX, _tableRef );
-	pushAccessorName( L, "getRequired", itfInfo->getName() );
+	pushAccessorName( L, "getReceptacle", itfInfo->getName() );
 	getMethod( L, -2 );
 	lua_pushvalue( L, -2 ); // push the 'self' argument
 	LuaState::call( L, 1, 1 );
@@ -361,16 +358,16 @@ co::Interface* LuaComponent::getCustomInterface( co::InterfaceInfo* itfInfo )
 	return res;
 }
 
-void LuaComponent::bindCustomInterface( co::InterfaceInfo* clientItfInfo, co::Interface* instance )
+void LuaComponent::bindToDynamicReceptacle( co::InterfaceInfo* receptacle, co::Interface* instance )
 {
 	// check interface compatibility
-	if( instance && !instance->getInterfaceType()->isSubTypeOf( clientItfInfo->getType() ) )
-		raiseIncompatibleInterface( clientItfInfo->getType(), instance );
-	
+	if( instance && !instance->getInterfaceType()->isSubTypeOf( receptacle->getType() ) )
+		raiseIncompatibleInterface( receptacle->getType(), instance );
+
 	__BEGIN_LUA_API_CODE__
 
 	lua_rawgeti( L, LUA_REGISTRYINDEX, _tableRef );
-	pushAccessorName( L, "setRequired", clientItfInfo->getName() );
+	pushAccessorName( L, "setReceptacle", receptacle->getName() );
 	getMethod( L, -2 );
 	lua_pushvalue( L, -2 ); // push the 'self' argument
 	LuaState::push( L, instance );

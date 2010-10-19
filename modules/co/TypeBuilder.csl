@@ -46,7 +46,7 @@ interface TypeBuilder
 		\throw IllegalNameException if the passed \c name is not a valid identifier or clashes with other members.
 		\throw IllegalArgumentException if the passed \c interfaceType is invalid (e.g. null).
 	 */
-	void defineInterface( in string name, in InterfaceType interfaceType, in bool isProvided )
+	void defineInterface( in string name, in InterfaceType interfaceType, in bool isFacet )
 		raises UnsupportedOperationException, IllegalNameException, IllegalArgumentException;
 
 	/*
@@ -71,7 +71,7 @@ interface TypeBuilder
 		Fills the Type with all the definitions set and returns it.
 		This method should be called only once and after all definitions have been set.
 		\throw UnsupportedOperationException if the type is already created.
-		\throw MissingInputException if not all required definitions were set for this builder's kind of type.
+		\throw MissingInputException if not all required definitions were set for this builder's type kind.
 	 */
 	Type createType() raises MissingInputException;
 };

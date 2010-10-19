@@ -26,7 +26,7 @@ public:
 	// co::Component methods:
 	co::ComponentType* getComponentType();
 	co::Interface* getInterface( co::InterfaceInfo* itfInfo );
-	void bindInterface( co::InterfaceInfo* clientItfInfo, co::Interface* instance );
+	void bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance );
 
 	// co::DynamicProxyHandler methods:
 	co::int32 registerProxyInterface( co::Interface* proxy );
@@ -53,24 +53,23 @@ private:
 	void pushAccessorName( lua_State* L, const char* prefix, const std::string& attribName );
 	void getMethod( lua_State* L, int t, co::int32 cookie = -1 );
 
-	co::Interface* getCustomInterface( co::InterfaceInfo* itfInfo );
-	void bindCustomInterface( co::InterfaceInfo* clientItfInfo, co::Interface* instance );
+	co::Interface* getDynamicInterface( co::InterfaceInfo* itfInfo );
+	void bindToDynamicReceptacle( co::InterfaceInfo* receptacle, co::Interface* instance );
 
 	void raiseUnsupportedOperationException();
 
 private:
 	// co.ComponentType that describes this Lua Component
-	co::ComponentType* _customType;
+	co::ComponentType* _componentType;
 
 	/*
-		Array of server proxy interfaces created for the component.
-		If '_serverItfs' is NULL, it means this lua::Component is a 'component type',
-		not a 'component instance'.
+		Array of proxy interfaces created for the component's facets. If '_facets'
+		is NULL, it means this is a 'component type', not a 'component instance'.
 	 */
-	co::Interface** _serverItfs;
+	co::Interface** _facets;
 
 	// Length of the '_serverItfs' array.
-	int _numServerItfs;
+	int _numFacets;
 
 	/*
 		Lua registry reference to the component's table.

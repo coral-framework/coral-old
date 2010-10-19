@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.StructTypeComponent provides an interface named 'type', of type co.StructType.
+//! co.StructTypeComponent has a facet named 'type', of type co.StructType.
 class StructTypeComponent_co_StructType : public co::StructType
 {
 public:

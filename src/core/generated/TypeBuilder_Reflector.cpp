@@ -88,12 +88,12 @@ public:
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 2 ), range );
 	}
 
-	void defineInterface( const std::string& name_, co::InterfaceType* interfaceType_, bool isProvided_ )
+	void defineInterface( const std::string& name_, co::InterfaceType* interfaceType_, bool isFacet_ )
 	{
 		co::Any args[3];
 		args[0].set< const std::string& >( name_ );
 		args[1].set< co::InterfaceType* >( interfaceType_ );
-		args[2].set< bool >( isProvided_ );
+		args[2].set< bool >( isFacet_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
 		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeBuilder>( 3 ), range );
 	}
@@ -233,9 +233,9 @@ public:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					co::InterfaceType* interfaceType_ = args[++argIndex].get< co::InterfaceType* >();
-					bool isProvided_ = args[++argIndex].get< bool >();
+					bool isFacet_ = args[++argIndex].get< bool >();
 					argIndex = -1;
-					p->defineInterface( name_, interfaceType_, isProvided_ );
+					p->defineInterface( name_, interfaceType_, isFacet_ );
 				}
 				break;
 			case 7:

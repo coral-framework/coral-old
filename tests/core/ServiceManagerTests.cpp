@@ -43,7 +43,7 @@ TEST( ServiceManagerTests, globalService )
 	// remove the service & check if it's been removed
 	sm->removeService( typeManagerType );
 	EXPECT_THROW( sm->removeService( typeManagerType ), co::MissingServiceException );
-	EXPECT_THROW( sm->getService( typeManagerType ), co::MissingServiceException );	
+	EXPECT_THROW( sm->getService( typeManagerType ), co::MissingServiceException );
 }
 
 TEST( ServiceManagerTests, lazyGlobalService )
@@ -75,7 +75,7 @@ TEST( ServiceManagerTests, lazyGlobalService )
 	tct->rollback();
 	sm->removeService( tctType );
 
-	EXPECT_THROW( sm->getService( tctType ), co::MissingServiceException );	
+	EXPECT_THROW( sm->getService( tctType ), co::MissingServiceException );
 }
 
 TEST( ServiceManagerTests, customServicesPerType )
@@ -89,7 +89,7 @@ TEST( ServiceManagerTests, customServicesPerType )
 	// add a custom instance for AttributeContainers
 	co::InterfaceType* attribContType = co::typeOf<co::AttributeContainer>::get();
 	co::Component* component = co::newInstance( "co.AttributeInfoComponent" );
-	sm->addServiceForType( memberInfoType, attribContType, component->getProvided<co::MemberInfo>() );
+	sm->addServiceForType( memberInfoType, attribContType, component->getFacet<co::MemberInfo>() );
 
 	// add a different custom instance for InterfaceTypes
 	co::InterfaceType* interfaceTypeType = co::typeOf<co::InterfaceType>::get();
@@ -149,7 +149,7 @@ TEST( ServiceManagerTests, customServicesPerInstance )
 
 	EXPECT_EQ( itf, co::getServiceForInstance( memberInfoType, aMethod ) );
 	EXPECT_EQ( itf, co::getService<co::MemberInfo>( aMethod ) );
-	
+
 	// getting a MemberInfo service for the system should return the global service instance
 	itf = sm->getServiceForInstance( memberInfoType, co::getSystem() );
 	EXPECT_EQ( "co.MethodInfo", itf->getInterfaceType()->getFullName() );
@@ -181,7 +181,7 @@ TEST( ServiceManagerTests, serviceRemovals )
 	// getting the service for an ArrayType should hit an unavailable global instance
 	EXPECT_THROW( sm->getServiceForType( memberInfoType, co::typeOf<co::ArrayType>::get() ),
 				 co::MissingServiceException );
-	
+
 	// getting the service for a StructType should still return an AttributeInfo
 	co::Interface* itf = sm->getServiceForType( memberInfoType, co::typeOf<co::StructType>::get() );
 	EXPECT_EQ( "co.AttributeInfo", itf->getInterfaceType()->getFullName() );

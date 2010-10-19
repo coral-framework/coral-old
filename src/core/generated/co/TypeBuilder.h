@@ -39,7 +39,7 @@ public:
 
 	virtual void defineIdentifier( const std::string& name ) = 0;
 
-	virtual void defineInterface( const std::string& name, co::InterfaceType* interfaceType, bool isProvided ) = 0;
+	virtual void defineInterface( const std::string& name, co::InterfaceType* interfaceType, bool isFacet ) = 0;
 
 	virtual co::MethodBuilder* defineMethod( const std::string& name ) = 0;
 

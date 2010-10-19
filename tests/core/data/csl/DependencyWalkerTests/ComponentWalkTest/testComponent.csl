@@ -2,5 +2,5 @@ component testComponent
 {
 	provides providedInterface providedInterface;
 
-	requires requiredInterface requiredInterface;
+	receives requiredInterface requiredInterface;
 };

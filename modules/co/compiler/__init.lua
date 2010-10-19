@@ -238,13 +238,13 @@ function Compiler:hasCustomModulePart()
 	local t = co.system.types:findType( self.moduleName .. '.' .. localModuleName )
 	local modulePartItf = co.Type "co.ModulePart"
 	if t and t.kind == 'TK_COMPONENT' then
-		for i, itf in ipairs( t.providedInterfaces ) do
-			if itf.type:isSubTypeOf( modulePartItf ) then
-				if itf.name == 'part' then
+		for i, facet in ipairs( t.facets ) do
+			if facet.type:isSubTypeOf( modulePartItf ) then
+				if facet.name == 'part' then
 					return true
 				end
 				error( "Module '" .. self.moduleName .. "' contains a component named '" ..
-					self.moduleName .. "', but its co.ModulePart interface is not named 'part'.", 0  )
+					self.moduleName .. "', but its co.ModulePart facet is not named 'part'.", 0  )
 			end
 		end
 		error( "Module '" .. self.moduleName .. "' contains a component named '" ..

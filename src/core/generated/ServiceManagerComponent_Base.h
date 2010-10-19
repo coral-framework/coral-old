@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.ServiceManagerComponent provides an interface named 'serviceManager', of type co.ServiceManager.
+//! co.ServiceManagerComponent has a facet named 'serviceManager', of type co.ServiceManager.
 class ServiceManagerComponent_co_ServiceManager : public co::ServiceManager
 {
 public:

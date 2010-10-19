@@ -195,7 +195,7 @@ component_member
 		}
 		ID SEMICOLON
 		{
-			ctx->parser->onComponentInterface( $interface_role.isProvided, (const char*)$ID.text->chars );
+			ctx->parser->onComponentInterface( $interface_role.isFacet, (const char*)$ID.text->chars );
 		}
 	;
 
@@ -232,9 +232,9 @@ param_io returns [ bool isIn, bool isOut ]
 	| TOK_INOUT{ $isIn = true; $isOut = true; }
 	;
 
-interface_role returns [ bool isProvided ]
-	: PROVIDES { $isProvided = true; }
-	| REQUIRES { $isProvided = false; }
+interface_role returns [ bool isFacet ]
+	: PROVIDES { $isFacet = true; }
+	| RECEIVES { $isFacet = false; }
 	;
 
 comment
@@ -329,8 +329,8 @@ READONLY
 	: 'readonly'
 	;
 
-REQUIRES
-	: 'requires'
+RECEIVES
+	: 'receives'
 	;
 
 SEMICOLON

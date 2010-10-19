@@ -73,9 +73,9 @@ co::Interface* Launcher_Base::getInterface( co::InterfaceInfo* interfaceInfo )
 	return res;
 }
 
-void Launcher_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void Launcher_Base::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
 {
-	checkValidClientInterface( clientInterface );
+	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }

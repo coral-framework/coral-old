@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.MethodInfoComponent provides an interface named 'methodInfo', of type co.MethodInfo.
+//! co.MethodInfoComponent has a facet named 'methodInfo', of type co.MethodInfo.
 class MethodInfoComponent_co_MethodInfo : public co::MethodInfo
 {
 public:

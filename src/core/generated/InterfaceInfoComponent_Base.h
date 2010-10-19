@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.InterfaceInfoComponent provides an interface named 'interfaceInfo', of type co.InterfaceInfo.
+//! co.InterfaceInfoComponent has a facet named 'interfaceInfo', of type co.InterfaceInfo.
 class InterfaceInfoComponent_co_InterfaceInfo : public co::InterfaceInfo
 {
 public:

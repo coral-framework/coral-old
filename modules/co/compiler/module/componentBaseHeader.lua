@@ -22,12 +22,12 @@ local function template( writer, c, t )
 
 	writer( "\n" )
 
-	local providedItfs = t.providedInterfaces
-	local requiredItfs = t.requiredInterfaces
+	local facets = t.facets
+	local receptacles = t.receptacles
 
-	for i, itf in ipairs( providedItfs ) do
+	for i, itf in ipairs( facets ) do
 		writer( [[
-//! ]], t.fullName, [[ provides an interface named ']], itf.name, [[', of type ]], itf.type.fullName, ".\n", [[
+//! ]], t.fullName, [[ has a facet named ']], itf.name, [[', of type ]], itf.type.fullName, ".\n", [[
 class ]], t.name , [[_]], itf.type.fullNameUnderline, [[ : public ]], itf.type.cppName, "\n", [[
 {
 public:
@@ -44,8 +44,8 @@ public:
  */
 class ]], t.name, [[_Base : public co::ComponentBase]] )
 
-	if #providedItfs > 0 then
-		for i, itf in ipairs( providedItfs ) do
+	if #facets > 0 then
+		for i, itf in ipairs( facets ) do
 			writer( ",\n\tpublic ", t.name, "_", itf.type.fullNameUnderline )
 		end
 	end
@@ -68,17 +68,17 @@ public:
 	void bindInterface( co::InterfaceInfo*, co::Interface* );
 ]] )
 
-	if #requiredItfs > 0 then
+	if #receptacles > 0 then
 		writer( "\nprotected:" )
 
-		for i, itf in ipairs( requiredItfs ) do
+		for i, itf in ipairs( receptacles ) do
 			writer( [[
 
-	//! Gets required interface ']], itf.name, [[', of type ]], itf.type.fullName, ".\n", [[
-	virtual ]], itf.type.cppName, [[* ]], t.formatAccessor( "getRequired", itf.name ), [[() = 0;
+	//! Get receptacle ']], itf.name, [[', of type ]], itf.type.fullName, ".\n", [[
+	virtual ]], itf.type.cppName, [[* ]], t.formatAccessor( "getReceptacle", itf.name ), [[() = 0;
 
-	//! Sets required interface ']], itf.name, [[', of type ]], itf.type.fullName, ".\n", [[
-	virtual void ]], t.formatAccessor( "setRequired", itf.name ), [[( ]], itf.type.cppName, [[* ]], itf.name, [[ ) = 0;
+	//! Set receptacle ']], itf.name, [[', of type ]], itf.type.fullName, ".\n", [[
+	virtual void ]], t.formatAccessor( "setReceptacle", itf.name ), [[( ]], itf.type.cppName, [[* ]], itf.name, [[ ) = 0;
 ]] )
 		end
 	end

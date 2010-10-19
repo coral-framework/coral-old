@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.ExceptionTypeComponent provides an interface named 'type', of type co.ExceptionType.
+//! co.ExceptionTypeComponent has a facet named 'type', of type co.ExceptionType.
 class ExceptionTypeComponent_co_ExceptionType : public co::ExceptionType
 {
 public:

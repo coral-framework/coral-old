@@ -23,7 +23,7 @@ class InterfaceInfo : public co::MemberInfo
 public:
 	virtual ~InterfaceInfo() {;}
 
-	virtual bool getIsProvided() = 0;
+	virtual bool getIsFacet() = 0;
 
 	virtual co::InterfaceType* getType() = 0;
 };

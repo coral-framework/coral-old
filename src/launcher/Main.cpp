@@ -149,7 +149,7 @@ static void addDefaultPaths()
 #endif
 }
 
-void resolveCallee( const std::string& calleeName, co::ComponentType*& ct, co::InterfaceInfo*& ii, co::MethodInfo*& mi )
+void resolveCallee( const std::string& calleeName, co::ComponentType*& ct, co::InterfaceInfo*& facet, co::MethodInfo*& method )
 {
 	// was a method name specified?
 	size_t colonPos = calleeName.rfind( ':' );
@@ -160,20 +160,20 @@ void resolveCallee( const std::string& calleeName, co::ComponentType*& ct, co::I
 		ct = dynamic_cast<co::ComponentType*>( type );
 		if( !ct )
 			CORAL_THROW( co::Exception, "'" << calleeName << "' is not a component." );
-	
-		// search the component's list of provided interfaces
-		co::ArrayRange<co::InterfaceInfo* const> serverItfs = ct->getProvidedInterfaces();
-		for( ; serverItfs; serverItfs.popFirst() )
+
+		// search the component's list of facets
+		co::ArrayRange<co::InterfaceInfo* const> facets = ct->getFacets();
+		for( ; facets; facets.popFirst() )
 		{
-			ii = serverItfs.getFirst();
-			co::MemberInfo* member = ii->getType()->getMember( "main" );
-			if( member && ( mi = dynamic_cast<co::MethodInfo*>( member ) ) )
+			facet = facets.getFirst();
+			co::MemberInfo* member = facet->getType()->getMember( "main" );
+			if( member && ( method = dynamic_cast<co::MethodInfo*>( member ) ) )
 				return;
 		}
 
 		CORAL_THROW( co::Exception, "none of " << calleeName << "'s interfaces has a main() method." );
 	}
-	
+
 	// parse the component.interface:method names
 
 	std::string methodName( calleeName, colonPos + 1 );
@@ -196,23 +196,22 @@ void resolveCallee( const std::string& calleeName, co::ComponentType*& ct, co::I
 	if( !member )
 		CORAL_THROW( co::Exception, "'" << componentName << "' has no interface named '" << interfaceName << "'." );
 
-	ii = dynamic_cast<co::InterfaceInfo*>( member );
-	assert( ii );
+	facet = dynamic_cast<co::InterfaceInfo*>( member );
+	assert( facet );
 
-	if( !ii || !ii->getIsProvided() )
-		CORAL_THROW( co::Exception, "'" << interfaceName << "' is not a provided interface of component '"
-						<< componentName << "'." );
+	if( !facet || !facet->getIsFacet() )
+		CORAL_THROW( co::Exception, "'" << interfaceName << "' is not a facet of component '" << componentName << "'." );
 
 	// resolve method
-	member = ii->getType()->getMember( methodName );
+	member = facet->getType()->getMember( methodName );
 	if( !member )
-		CORAL_THROW( co::Exception, "interface '" << ii->getType()->getFullName() << "' has no method named '"
-						<< methodName << "'." );
+		CORAL_THROW( co::Exception, "interface '" << facet->getType()->getFullName()
+						<< "' has no method named '" << methodName << "'." );
 
-	mi = dynamic_cast<co::MethodInfo*>( member );
-	if( !mi )
-		CORAL_THROW( co::Exception, "interface '" << ii->getType()->getFullName() << "' has a member named '"
-						<< methodName << "', but it is not a method." );
+	method = dynamic_cast<co::MethodInfo*>( member );
+	if( !method )
+		CORAL_THROW( co::Exception, "interface '" << facet->getType()->getFullName()
+						<< "' has a member named '" << methodName << "', but it is not a method." );
 }
 
 /*
@@ -255,15 +254,15 @@ int main( int argc, char* argv[] )
 			"Description:\n"
 			"  A 'callee' must be specified as either a component or a method name within\n"
 			"  a component interface. If a method is not specified, one named 'main' will be\n"
-			"  searched for in all provided interfaces of the component. The called method\n"
-			"  must receive either no argument or an array of strings. If the method returns\n"
-			"  a number, it will be used as the application return status."
+			"  searched for in all facets of the component. The called method must receive\n"
+			"  either no argument or an array of strings. If the method returns a number, it\n"
+			"  will be used as the application's return status."
 			"Examples:\n"
 			"  coral myModule.MyComponent arg1 arg2 arg3\n"
 			"  coral someModule.SomeComponent.someInterface:someMethod arg1 arg2\n"
 			"Available Options:\n"
 			"  -p EXTRA,DIRS    Add a list of repositories to the Coral path.\n"
-			"  --no-abi-checks  Disables ABI compatibility checking for loaded modules.\n"
+			"  --no-abi-checks  Disable ABI compatibility checks when loading modules.\n"
 		);
 		return EXIT_FAILURE;
 	}
@@ -289,12 +288,12 @@ int main( int argc, char* argv[] )
 
 		// resolve the callee
 		co::ComponentType* ct = NULL;
-		co::InterfaceInfo* ii = NULL;
-		co::MethodInfo* mi = NULL;
+		co::InterfaceInfo* facet = NULL;
+		co::MethodInfo* method = NULL;
 		try
 		{
-			resolveCallee( argv[index], ct, ii, mi );
-			assert( ct && ii && mi );
+			resolveCallee( argv[index], ct, facet, method );
+			assert( ct && facet && method );
 		}
 		catch( std::exception& e )
 		{
@@ -305,14 +304,14 @@ int main( int argc, char* argv[] )
 		// check the method signature
 		try
 		{
-			co::ArrayRange<co::ParameterInfo* const> params = mi->getParameters();
+			co::ArrayRange<co::ParameterInfo* const> params = method->getParameters();
 			if( !params.isEmpty() && ( params.getSize() > 1 || params[0]->getType()->getFullName() != "string[]" ) )
 				throw co::Exception( "method can only have a single parameter, of type 'string[]'" );
 		}
 		catch( std::exception& e )
 		{
 			fprintf( stderr, "Invalid method '%s:%s'.\nException: %s\n",
-					ii->getType()->getFullName().c_str(), mi->getName().c_str(), e.what() );
+					facet->getType()->getFullName().c_str(), method->getName().c_str(), e.what() );
 			throw;
 		}
 
@@ -324,7 +323,7 @@ int main( int argc, char* argv[] )
 			component = ct->getReflector()->newInstance();
 			assert( component.isValid() );
 
-			itf = component->getInterface( ii );
+			itf = component->getInterface( facet );
 			assert( itf );
 		}
 		catch( std::exception& e )
@@ -337,7 +336,7 @@ int main( int argc, char* argv[] )
 		co::Reflector* reflector;
 		try
 		{
-			reflector = mi->getOwner()->getReflector();
+			reflector = method->getOwner()->getReflector();
 		}
 		catch( std::exception& e )
 		{
@@ -354,7 +353,7 @@ int main( int argc, char* argv[] )
 
 			co::Any res;
 			co::Any arg( &args );
-			reflector->invokeMethod( itf, mi, co::ArrayRange<co::Any const>( &arg, 1 ), res );
+			reflector->invokeMethod( itf, method, co::ArrayRange<co::Any const>( &arg, 1 ), res );
 
 			// if the result is a number, use it as the return status; otherwise, print it
 			if( res.isValid() )

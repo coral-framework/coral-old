@@ -70,9 +70,9 @@ co::Interface* TypeCreationTransactionComponent_Base::getInterface( co::Interfac
 	return res;
 }
 
-void TypeCreationTransactionComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void TypeCreationTransactionComponent_Base::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
 {
-	checkValidClientInterface( clientInterface );
+	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }

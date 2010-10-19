@@ -70,9 +70,9 @@ co::Interface* ParameterInfoComponent_Base::getInterface( co::InterfaceInfo* int
 	return res;
 }
 
-void ParameterInfoComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void ParameterInfoComponent_Base::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
 {
-	checkValidClientInterface( clientInterface );
+	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }

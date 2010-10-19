@@ -75,9 +75,9 @@ Interface* ReflectorBase::getInterface( InterfaceInfo* interfaceInfo )
 	return res;
 }
 
-void ReflectorBase::bindInterface( InterfaceInfo* clientInterface, Interface* )
+void ReflectorBase::bindInterface( InterfaceInfo* receptacle, Interface* )
 {
-	checkValidClientInterface( clientInterface );
+	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
 }
 

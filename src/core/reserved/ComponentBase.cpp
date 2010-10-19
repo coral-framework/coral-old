@@ -53,11 +53,11 @@ void ComponentBase::checkValidInterface( InterfaceInfo* itfInfo )
 	assert( itfInfo->getIndex() < myType->getInterfaces().getSize() );
 }
 
-void ComponentBase::checkValidClientInterface( InterfaceInfo* itfInfo )
+void ComponentBase::checkValidReceptacle( InterfaceInfo* receptacle )
 {
-	checkValidInterface( itfInfo );
-	if( itfInfo->getIsProvided() )
-		throw NoSuchInterfaceException( "expected a client interface, but got a server interface" );
+	checkValidInterface( receptacle );
+	if( receptacle->getIsFacet() )
+		throw NoSuchInterfaceException( "receptacle expected, got facet" );
 }
 
 void ComponentBase::raiseUnexpectedInterfaceIndex()
@@ -71,8 +71,8 @@ void ComponentBase::raiseIncompatibleInterface( InterfaceType* expectedType, Int
 	CORAL_THROW( IllegalArgumentException, "incompatible interface types (" << expectedType->getFullName()
 					<< " expected, got " << ptr->getInterfaceType()->getFullName() << ")" );
 }
-	
-ComponentType* ComponentBase::getOrCreateSimpleInternalComponentType( const char* componentTypeName, 
+
+ComponentType* ComponentBase::getOrCreateSimpleInternalComponentType( const char* componentTypeName,
 																	  const char* interfaceTypeName,
 																	  const char* interfaceName )
 {
@@ -92,7 +92,7 @@ ComponentType* ComponentBase::getOrCreateSimpleInternalComponentType( const char
 	assert( interfaceType );
 
 	RefPtr<TypeCreationTransaction> tct =
-			newInstance( "co.TypeCreationTransactionComponent" )->getProvided<TypeCreationTransaction>();
+			newInstance( "co.TypeCreationTransactionComponent" )->getFacet<TypeCreationTransaction>();
 
 	std::size_t lastDotPos = fullTypeName.rfind( '.' );
 	assert( lastDotPos != std::string::npos ); // componentTypeName must be specified with a namespace

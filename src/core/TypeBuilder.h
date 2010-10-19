@@ -49,7 +49,7 @@ public:
 	void defineIdentifier( const std::string& name );
 	void defineAttribute( const std::string& name, co::Type* type, bool isReadOnly );
 	void defineSuperType( co::Type* superType );
-	void defineInterface( const std::string& name, co::InterfaceType* interface, bool isProvided );
+	void defineInterface( const std::string& name, co::InterfaceType* interface, bool isFacet );
 	co::MethodBuilder* defineMethod( const std::string& name );
 	void defineNativeClass( const std::string& nativeHeaderFile, const std::string& nativeName );
 	co::Type* createType();

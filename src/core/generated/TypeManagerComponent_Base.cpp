@@ -70,9 +70,9 @@ co::Interface* TypeManagerComponent_Base::getInterface( co::InterfaceInfo* inter
 	return res;
 }
 
-void TypeManagerComponent_Base::bindInterface( co::InterfaceInfo* clientInterface, co::Interface* instance )
+void TypeManagerComponent_Base::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
 {
-	checkValidClientInterface( clientInterface );
+	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
 	CORAL_UNUSED( instance );
 }

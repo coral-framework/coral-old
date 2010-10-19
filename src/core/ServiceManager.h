@@ -93,7 +93,7 @@ private:
 	typedef std::map<co::InterfaceType*, ServiceRecord> ServiceMap;
 
 	inline ServiceRecord& fetchServiceRecord( co::InterfaceType* serviceType );
-	inline co::InterfaceInfo* getProvidedInterfaceInfo( co::ComponentType* ct, co::InterfaceType* itfType );
+	inline co::InterfaceInfo* getFacetInfo( co::ComponentType* ct, co::InterfaceType* itfType );
 
 	void validateClientType( co::InterfaceType* clientType );
 	void validateServiceInstance( co::InterfaceType* serviceType, co::Interface* serviceInstance );

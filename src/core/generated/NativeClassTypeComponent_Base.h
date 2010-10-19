@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.NativeClassTypeComponent provides an interface named 'type', of type co.NativeClassType.
+//! co.NativeClassTypeComponent has a facet named 'type', of type co.NativeClassType.
 class NativeClassTypeComponent_co_NativeClassType : public co::NativeClassType
 {
 public:

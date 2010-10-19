@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.ModuleManagerComponent provides an interface named 'moduleManager', of type co.ModuleManager.
+//! co.ModuleManagerComponent has a facet named 'moduleManager', of type co.ModuleManager.
 class ModuleManagerComponent_co_ModuleManager : public co::ModuleManager
 {
 public:

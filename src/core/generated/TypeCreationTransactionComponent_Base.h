@@ -11,7 +11,7 @@
 
 namespace co {
 
-//! co.TypeCreationTransactionComponent provides an interface named 'transaction', of type co.TypeCreationTransaction.
+//! co.TypeCreationTransactionComponent has a facet named 'transaction', of type co.TypeCreationTransaction.
 class TypeCreationTransactionComponent_co_TypeCreationTransaction : public co::TypeCreationTransaction
 {
 public:
