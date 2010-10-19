@@ -39,7 +39,7 @@ static luaL_reg func[] = {
 * Initializes module
 \*-------------------------------------------------------------------------*/
 int select_open(lua_State *L) {
-    luaL_openlib(L, NULL, func, 0);
+    luaL_setfuncs(L, func, 0);
     return 0;
 }
 

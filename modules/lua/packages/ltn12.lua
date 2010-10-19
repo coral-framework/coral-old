@@ -11,7 +11,8 @@
 local string = require("string")
 local table = require("table")
 local base = _G
-module("ltn12")
+
+_ENV = {}
 
 filter = {}
 source = {}
@@ -290,3 +291,4 @@ function pump.all(src, snk, step)
     end
 end
 
+return _ENV

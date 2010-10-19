@@ -11,7 +11,8 @@ local base = _G
 local string = require("string")
 local math = require("math")
 local socket = require("socket.core")
-module("socket")
+
+_ENV = socket
 
 -----------------------------------------------------------------------------
 -- Exported auxiliar functions
@@ -131,3 +132,4 @@ sourcet["default"] = sourcet["until-closed"]
 
 source = choose(sourcet)
 
+return _ENV

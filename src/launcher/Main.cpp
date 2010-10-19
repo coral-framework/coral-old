@@ -372,7 +372,7 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "Program terminated with an unhandled exception.\nMessage: %s", e.what() );
+			fprintf( stderr, "Program terminated with an unhandled exception.\nMessage: %s\n", e.what() );
 			throw;
 		}
 	}

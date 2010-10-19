@@ -16,7 +16,8 @@ local socket = require("socket")
 local url = require("socket.url")
 local tp = require("socket.tp")
 local ltn12 = require("ltn12")
-module("socket.ftp")
+
+_ENV = {}
 
 -----------------------------------------------------------------------------
 -- Program constants
@@ -90,7 +91,7 @@ function metat.__index:port(ip, port)
         ip, port = self.try(self.server:getsockname())
         self.try(self.server:settimeout(TIMEOUT))
     end
-    local pl = math.mod(port, 256)
+    local pl = math.modf(port, 256)
     local ph = (port - pl)/256
     local arg = string.gsub(string.format("%s,%d,%d", ip, ph, pl), "%.", ",")
     self.try(self.tp:command("port", arg))
@@ -279,3 +280,4 @@ get = socket.protect(function(gett)
     else return tget(gett) end
 end)
 
+return _ENV

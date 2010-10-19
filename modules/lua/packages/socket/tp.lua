@@ -12,7 +12,8 @@ local base = _G
 local string = require("string")
 local socket = require("socket")
 local ltn12 = require("ltn12")
-module("socket.tp")
+
+_ENV = {}
 
 -----------------------------------------------------------------------------
 -- Program constants
@@ -121,3 +122,4 @@ function connect(host, port, timeout, create)
     return base.setmetatable({c = c}, metat)
 end
 
+return _ENV

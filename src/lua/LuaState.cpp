@@ -12,6 +12,8 @@
 
 extern "C" {
 	#include <lfs.h>
+	#include <luasocket.h>
+	#include <mime.h>
 }
 
 lua_State* LuaState::sm_L( NULL );
@@ -40,6 +42,11 @@ void LuaState::setup()
 	// open the LuaFileSystem library
 	luaL_requiref( sm_L, "lfs", luaopen_lfs, 0 );
     lua_pop( sm_L, 1 );
+
+	// open the LuaSocket libraries
+	luaL_requiref( sm_L, "socket.core", luaopen_socket_core, 0 );
+	luaL_requiref( sm_L, "mime.core", luaopen_mime_core, 0 );
+	lua_pop( sm_L, 2 );
 
 	// create the 'co' package
 	coPackage::open( sm_L );

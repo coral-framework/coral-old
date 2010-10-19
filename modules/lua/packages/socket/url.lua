@@ -11,7 +11,8 @@
 local string = require("string")
 local base = _G
 local table = require("table")
-module("socket.url")
+
+_ENV = {}
 
 -----------------------------------------------------------------------------
 -- Module version
@@ -233,7 +234,7 @@ function absolute(base_url, relative_url)
                         relative_parsed.query = base_parsed.query
                     end
                 end
-            else    
+            else
                 relative_parsed.path = absolute_path(base_parsed.path or "",
                     relative_parsed.path)
             end
@@ -295,3 +296,5 @@ function build_path(parsed, unsafe)
 	if parsed.is_absolute then path = "/" .. path end
 	return path
 end
+
+return _ENV

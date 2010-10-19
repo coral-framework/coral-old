@@ -17,7 +17,8 @@ local socket = require("socket")
 local tp = require("socket.tp")
 local ltn12 = require("ltn12")
 local mime = require("mime")
-module("socket.smtp")
+
+_ENV = {}
 
 -----------------------------------------------------------------------------
 -- Program constants
@@ -249,3 +250,5 @@ send = socket.protect(function(mailt)
     s:quit()
     return s:close()
 end)
+
+return _ENV

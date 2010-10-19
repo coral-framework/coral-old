@@ -81,7 +81,7 @@ void auxiliar_add2group(lua_State *L, const char *classname, const char *groupna
 \*-------------------------------------------------------------------------*/
 int auxiliar_checkboolean(lua_State *L, int objidx) {
     if (!lua_isboolean(L, objidx))
-        luaL_typerror(L, objidx, lua_typename(L, LUA_TBOOLEAN));
+        luaL_typeerror(L, objidx, lua_typename(L, LUA_TBOOLEAN));
     return lua_toboolean(L, objidx);
 }
 

@@ -99,6 +99,8 @@ int buffer_meth_send(lua_State *L, p_buffer buf) {
 #ifdef LUASOCKET_DEBUG
     /* push time elapsed during operation as the last return value */
     lua_pushnumber(L, timeout_gettime() - timeout_getstart(tm));
+#else
+	(void)tm;
 #endif
     return lua_gettop(L) - top;
 }
@@ -142,6 +144,8 @@ int buffer_meth_receive(lua_State *L, p_buffer buf) {
 #ifdef LUASOCKET_DEBUG
     /* push time elapsed during operation as the last return value */
     lua_pushnumber(L, timeout_gettime() - timeout_getstart(tm));
+#else
+	(void)tm;
 #endif
     return lua_gettop(L) - top;
 }
@@ -225,7 +229,7 @@ static int recvline(p_buffer buf, luaL_Buffer *b) {
         pos = 0;
         while (pos < count && data[pos] != '\n') {
             /* we ignore all \r's */
-            if (data[pos] != '\r') luaL_putchar(b, data[pos]);
+            if (data[pos] != '\r') luaL_addchar(b, data[pos]);
             pos++;
         }
         if (pos < count) { /* found '\n' */

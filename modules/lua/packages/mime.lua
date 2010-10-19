@@ -13,7 +13,8 @@ local ltn12 = require("ltn12")
 local mime = require("mime.core")
 local io = require("io")
 local string = require("string")
-module("mime")
+
+_ENV = mime
 
 -- encode, decode and wrap algorithm tables
 encodet = {}
@@ -27,7 +28,7 @@ local function choose(table)
             name, opt1, opt2 = "default", name, opt1
         end
         local f = table[name or "nil"]
-        if not f then 
+        if not f then
             base.error("unknown key (" .. base.tostring(name) .. ")", 3)
         else return f(opt1, opt2) end
     end
@@ -85,3 +86,5 @@ end
 function stuff()
     return ltn12.filter.cycle(dot, 2)
 end
+
+return _ENV

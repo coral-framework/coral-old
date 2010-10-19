@@ -9,7 +9,7 @@
 \*=========================================================================*/
 #include <string.h>
 
-#include "socket.h"
+#include "../socket.h"
 
 /* WinSock doesn't have a strerror... */
 static const char *wstrerror(int err);

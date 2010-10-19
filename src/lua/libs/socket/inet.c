@@ -38,7 +38,7 @@ int inet_open(lua_State *L)
 {
     lua_pushstring(L, "dns");
     lua_newtable(L);
-    luaL_openlib(L, NULL, func, 0);
+    luaL_setfuncs(L, func, 0);
     lua_settable(L, -3);
     return 0;
 }
