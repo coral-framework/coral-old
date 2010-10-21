@@ -28,7 +28,7 @@ package.loaded.lua = true
 local thisScriptFileName = ...
 local thisModuleDir = thisScriptFileName:match( "(.+)__init%.lua$" )
 local luaPackagesDir = thisModuleDir .. 'packages'
-package.path = luaPackagesDir .. "/?.lua;" .. luaPackagesDir .. "/?/init.lua"
+package.path = luaPackagesDir .. "/?.lua"
 
 -------------------------------------------------------------------------------
 -- Install our own loader function into Lua's package.loaders table.
@@ -36,7 +36,11 @@ package.path = luaPackagesDir .. "/?.lua;" .. luaPackagesDir .. "/?/init.lua"
 table.insert( package.loaders, 2, function( moduleName )
 	local filename = coFindScript( moduleName )
 	if filename then
-		return loadfile( filename )
+		local chunk, err = loadfile( filename )
+		if err then
+			error( err, 0 )
+		end
+		return chunk
 	end
 end )
 

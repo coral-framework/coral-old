@@ -11,9 +11,9 @@
 #include <sstream>
 
 extern "C" {
-	#include <lfs.h>
-	#include <luasocket.h>
-	#include <mime.h>
+	#include "lfs/lfs.h"
+	#include "socket/mime.h"
+	#include "socket/luasocket.h"
 }
 
 lua_State* LuaState::sm_L( NULL );
@@ -39,14 +39,19 @@ void LuaState::setup()
 	// open all standard Lua libraries
 	luaL_openlibs( sm_L );
 
-	// open the LuaFileSystem library
-	luaL_requiref( sm_L, "lfs", luaopen_lfs, 0 );
-    lua_pop( sm_L, 1 );
+	// pre-load all statically-linked Lua modules
+	lua_getglobal( sm_L, "package" );
+	lua_getfield( sm_L, -1, "preload" );
 
-	// open the LuaSocket libraries
-	luaL_requiref( sm_L, "socket.core", luaopen_socket_core, 0 );
-	luaL_requiref( sm_L, "mime.core", luaopen_mime_core, 0 );
-	lua_pop( sm_L, 2 );
+	// pre-load the LuaFileSystem library
+	lua_pushcfunction( sm_L, luaopen_lfs );
+	lua_setfield( sm_L, -2, "lfs" );
+
+	// pre-load the LuaSocket libraries
+	lua_pushcfunction( sm_L, luaopen_socket_core );
+	lua_setfield( sm_L, -2, "socket.core" );
+	lua_pushcfunction( sm_L, luaopen_mime_core );
+	lua_setfield( sm_L, -2, "mime.core" );
 
 	// create the 'co' package
 	coPackage::open( sm_L );

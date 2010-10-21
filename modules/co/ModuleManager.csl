@@ -21,7 +21,7 @@ interface ModuleManager
 		When false, applications are able to load incompatible modules, but will subject to
 		sudden crashes due to ABI incompatibilities.
 	 */
-	attribute bool binaryCompatibilityChecks;
+	attribute bool binaryCompatibilityChecking;
 
 	/*
 		Finds an already loaded module given its fully-qualified \c moduleName.

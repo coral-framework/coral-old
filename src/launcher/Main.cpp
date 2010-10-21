@@ -277,7 +277,7 @@ int main( int argc, char* argv[] )
 		try
 		{
 			system = co::getSystem();
-			system->getModules()->setBinaryCompatibilityChecks( abiChecks );
+			system->getModules()->setBinaryCompatibilityChecking( abiChecks );
 			system->setup();
 		}
 		catch( std::exception& e )

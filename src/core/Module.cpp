@@ -69,7 +69,7 @@ co::Namespace* Module::getNamespace()
 
 co::ArrayRange<co::ModulePart* const> Module::getParts()
 {
-	return co::ArrayRange<co::ModulePart* const>();
+	return _parts;
 }
 
 co::int32 Module::getRank()

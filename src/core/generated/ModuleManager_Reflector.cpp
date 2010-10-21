@@ -43,16 +43,16 @@ public:
 
 	// co.ModuleManager Methods:
 
-	bool getBinaryCompatibilityChecks()
+	bool getBinaryCompatibilityChecking()
 	{
 		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::ModuleManager>( 0 ) );
         return res.get< bool >();
 	}
 
-	void setBinaryCompatibilityChecks( bool binaryCompatibilityChecks_ )
+	void setBinaryCompatibilityChecking( bool binaryCompatibilityChecking_ )
 	{
 		co::Any arg;
-		arg.set< bool >( binaryCompatibilityChecks_ );
+		arg.set< bool >( binaryCompatibilityChecking_ );
 		_handler->handleSetAttribute( _cookie, getAttribInfo<co::ModuleManager>( 0 ), arg );
 	}
 
@@ -165,7 +165,7 @@ public:
 		co::ModuleManager* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
-		case 0:		value.set< bool >( p->getBinaryCompatibilityChecks() ); break;
+		case 0:		value.set< bool >( p->getBinaryCompatibilityChecking() ); break;
 		case 1:		value.set< co::ArrayRange<co::ModulePartLoader* const> >( p->getLoaders() ); break;
 		case 2:		value.set< co::ArrayRange<co::Module* const> >( p->getModules() ); break;
 		default:	raiseUnexpectedMemberIndex();
@@ -177,7 +177,7 @@ public:
 		co::ModuleManager* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
-		case 0:		p->setBinaryCompatibilityChecks( value.get< bool >() ); break;
+		case 0:		p->setBinaryCompatibilityChecking( value.get< bool >() ); break;
 		case 1:		raiseAttributeIsReadOnly( ai ); break;
 		case 2:		raiseAttributeIsReadOnly( ai ); break;
 		default:	raiseUnexpectedMemberIndex();

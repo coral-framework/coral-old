@@ -20,7 +20,7 @@
 
 ModuleManager::ModuleManager()
 {
-	_binaryCompatibilityChecks = true;
+	_binaryCompatibilityChecking = true;
 }
 
 ModuleManager::~ModuleManager()
@@ -77,14 +77,14 @@ co::ArrayRange<co::ModulePartLoader* const> ModuleManager::getLoaders()
 	return _loaders;
 }
 
-bool ModuleManager::getBinaryCompatibilityChecks()
+bool ModuleManager::getBinaryCompatibilityChecking()
 {
-	return _binaryCompatibilityChecks;
+	return _binaryCompatibilityChecking;
 }
 
-void ModuleManager::setBinaryCompatibilityChecks( bool enabled )
+void ModuleManager::setBinaryCompatibilityChecking( bool enabled )
 {
-	_binaryCompatibilityChecks = enabled;
+	_binaryCompatibilityChecking = enabled;
 }
 
 co::Module* ModuleManager::findModule( const std::string& moduleName )

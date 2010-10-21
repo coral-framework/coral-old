@@ -25,9 +25,9 @@ class ModuleManager : public co::Interface
 public:
 	virtual ~ModuleManager() {;}
 
-	virtual bool getBinaryCompatibilityChecks() = 0;
+	virtual bool getBinaryCompatibilityChecking() = 0;
 
-	virtual void setBinaryCompatibilityChecks( bool binaryCompatibilityChecks ) = 0;
+	virtual void setBinaryCompatibilityChecking( bool binaryCompatibilityChecking ) = 0;
 
 	virtual co::ArrayRange<co::ModulePartLoader* const> getLoaders() = 0;
 

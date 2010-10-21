@@ -246,7 +246,7 @@ void ModulePartLoader::checkTypeDependencies( const TypeDependency* td )
 		CORAL_THROW( co::ModuleLoadException, "type dependency check error: " << e.what() );
 	}
 
-	if( !co::getSystem()->getModules()->getBinaryCompatibilityChecks() )
+	if( !co::getSystem()->getModules()->getBinaryCompatibilityChecking() )
 		return; // binary interface check errors are disabled
 
 	size_t numIncompatibleTypes = incompatibleTypes.size();
