@@ -1,5 +1,5 @@
 /*
-	Component that implements co.System.
+	Implements co.System.
  */
 component SystemComponent
 {

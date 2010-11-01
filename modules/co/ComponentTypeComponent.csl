@@ -1,5 +1,5 @@
 /*
-	Component that implements co.ComponentType.
+	Implements co.ComponentType.
  */
 component ComponentTypeComponent
 {

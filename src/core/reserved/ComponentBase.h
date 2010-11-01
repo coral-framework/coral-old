@@ -85,8 +85,8 @@ private:
 	co::int32 __##ComponentName##_getSize() { return sizeof(ClassName); } \
 	co::Component* __##ComponentName##_newInstance() { return new ClassName; }
 
-//! Macro that should be called once for each module's main co::ModulePart class.
+//! Macro that should be called once for each module's main co::ModulePart class, in the module's namespace.
 #define CORAL_EXPORT_MODULE_PART( ClassName ) \
-	co::ModulePart* __createModulePart() { return new ClassName; }
+	co::ModulePart* createModulePart() { return new ClassName; }
 
 #endif // _CO_RESERVED_COMPONENTBASE_H_

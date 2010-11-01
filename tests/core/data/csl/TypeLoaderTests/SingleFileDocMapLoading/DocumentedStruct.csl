@@ -1,7 +1,7 @@
 //Struct Declaration
-struct DocumentedStruct 
+struct DocumentedStruct
 {
-// struct member.
+	// struct member.
 	string name; //< extra doc.
 
 	string foo; //< postDoc.

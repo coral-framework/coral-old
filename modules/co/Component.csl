@@ -1,5 +1,5 @@
 /*
-	The co.Component interface, implemented by all components.
+	The base interface implemented by all components.
  */
 interface Component
 {

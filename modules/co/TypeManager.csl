@@ -1,5 +1,5 @@
 /*
-	Manages the database of loaded types and provides methods to load/create new types.
+	Manages the database of loaded types, providing methods to load and create new types.
  */
 interface TypeManager
 {
@@ -14,7 +14,7 @@ interface TypeManager
 
 	/*
 		Searches the database of loaded types for a type with the specified fully-qualified name.
-		A suffix "[]" may be added to the name of a type to search for its corresponding co::ArrayType.
+		A suffix "[]" may be added to the name of a type to search for its corresponding ArrayType.
 		Returns null if a type with the given \c fullName is not currently loaded.
 	 */
  	Type findType( in string fullName );
@@ -31,16 +31,16 @@ interface TypeManager
 		This can also retrieve or create arrays: if \c typeName ends with "[]", this method will
 		call getArrayOf() passing as argument the element type specified in \c typeName.
 
-		\throw co::IllegalArgumentException if the passed \c typeName is empty.
-		\throw co::TypeLoadException if any error occurs while loading the type.
-		\throw co::IllegalArgumentException when dealing with arrays, this is thrown if \c typeName
+		\throw IllegalArgumentException if the passed \c typeName is empty.
+		\throw TypeLoadException if any error occurs while loading the type.
+		\throw IllegalArgumentException when dealing with arrays, this is thrown if \c typeName
 			specifies an invalid array element type (i.e. an array, exception or component).
 	 */
 	Type getType( in string typeName ) raises IllegalArgumentException, TypeLoadException;
 
 	/*
-		Creates or retrieves an existing co::ArrayType whose elements are of type \c elementType.
-		\throw co::IllegalArgumentException if \c elementType is null, an array, an exception or a component.
+		Creates or retrieves an existing ArrayType whose elements are of type \c elementType.
+		\throw IllegalArgumentException if \c elementType is null, an array, an exception or a component.
 	 */
 	ArrayType getArrayOf( in Type elementType ) raises IllegalArgumentException;
 

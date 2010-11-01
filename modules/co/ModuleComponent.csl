@@ -1,5 +1,5 @@
 /*
-	Component that implements co.Module.
+	Implements co.Module.
  */
 component ModuleComponent
 {

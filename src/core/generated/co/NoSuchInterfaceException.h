@@ -7,19 +7,19 @@
 #define _CO_NOSUCHINTERFACEEXCEPTION_H_
 
 #include <co/TypeTraits.h>
-#include <co/UserException.h>
+#include <co/Exception.h>
 
 // co.NoSuchInterfaceException Mapping:
 namespace co {
 
-class NoSuchInterfaceException : public co::UserException
+class NoSuchInterfaceException : public co::Exception
 {
 public:
 	NoSuchInterfaceException()
 	{;}
 
 	NoSuchInterfaceException( const std::string& message )
-		: co::UserException( message )
+		: co::Exception( message )
 	{;}
 };
 

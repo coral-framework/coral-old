@@ -1,5 +1,5 @@
 /*
-	Describes an interface as part of a component.
+	Describes an interface (either a facet or receptacle) as part of a component.
  */
 interface InterfaceInfo : MemberInfo
 {

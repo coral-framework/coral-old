@@ -5,8 +5,6 @@
 
 #include <co/RefVector.h>
 #include <co/Interface.h>
-#include <co/UserException.h>
-
 #include <gtest/gtest.h>
 
 class PseudoInterface : public co::Interface

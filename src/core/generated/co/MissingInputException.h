@@ -7,19 +7,19 @@
 #define _CO_MISSINGINPUTEXCEPTION_H_
 
 #include <co/TypeTraits.h>
-#include <co/UserException.h>
+#include <co/Exception.h>
 
 // co.MissingInputException Mapping:
 namespace co {
 
-class MissingInputException : public co::UserException
+class MissingInputException : public co::Exception
 {
 public:
 	MissingInputException()
 	{;}
 
 	MissingInputException( const std::string& message )
-		: co::UserException( message )
+		: co::Exception( message )
 	{;}
 };
 

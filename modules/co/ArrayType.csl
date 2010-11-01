@@ -1,5 +1,5 @@
 /*
-	Unidimensional array of elements.
+	Type representing a unidimensional array of elements.
  */
 interface ArrayType : Type
 {

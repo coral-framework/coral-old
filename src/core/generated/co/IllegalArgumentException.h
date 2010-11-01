@@ -7,19 +7,19 @@
 #define _CO_ILLEGALARGUMENTEXCEPTION_H_
 
 #include <co/TypeTraits.h>
-#include <co/UserException.h>
+#include <co/Exception.h>
 
 // co.IllegalArgumentException Mapping:
 namespace co {
 
-class IllegalArgumentException : public co::UserException
+class IllegalArgumentException : public co::Exception
 {
 public:
 	IllegalArgumentException()
 	{;}
 
 	IllegalArgumentException( const std::string& message )
-		: co::UserException( message )
+		: co::Exception( message )
 	{;}
 };
 

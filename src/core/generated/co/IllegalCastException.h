@@ -7,19 +7,19 @@
 #define _CO_ILLEGALCASTEXCEPTION_H_
 
 #include <co/TypeTraits.h>
-#include <co/UserException.h>
+#include <co/Exception.h>
 
 // co.IllegalCastException Mapping:
 namespace co {
 
-class IllegalCastException : public co::UserException
+class IllegalCastException : public co::Exception
 {
 public:
 	IllegalCastException()
 	{;}
 
 	IllegalCastException( const std::string& message )
-		: co::UserException( message )
+		: co::Exception( message )
 	{;}
 };
 

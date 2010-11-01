@@ -43,7 +43,7 @@ co::int32 BasicReflector::getSize()
 		sizeof(std::string),		// TK_STRING
 		sizeof(std::vector<int>),	// TK_ARRAY
 		4,							// TK_ENUM
-		sizeof(co::UserException)	// TK_EXCEPTION
+		sizeof(co::Exception)		// TK_EXCEPTION
 	};
 
 	co::TypeKind kind = _type->getKind();

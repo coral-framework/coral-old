@@ -109,7 +109,7 @@ antlr3readAscii(pANTLR3_INPUT_STREAM    input, pANTLR3_UINT8 fileName)
 
 	/* Open the OS file in read binary mode
 	*/
-	infile  = antlr3Fopen(fileName, "rb");
+	infile  = antlr3Fopen(fileName, "rt");
 
 	/* Check that it was there
 	*/

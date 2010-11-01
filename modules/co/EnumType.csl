@@ -1,5 +1,5 @@
 /*
-	Enumeration of constant identifiers.
+	Type representing an enumeration of constant identifiers, in the range [0, n].
  */
 interface EnumType : Type
 {
@@ -9,7 +9,7 @@ interface EnumType : Type
 	 */
 	readonly attribute string[] identifiers;
 
-	/*!
+	/*
 		Returns the value of an identifier in this enum.
 		Valid values are in the range [0, n]. If the string is not a valid identifier, -1 is returned.
 		\warning This method is case sensitive.

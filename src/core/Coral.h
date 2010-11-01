@@ -20,13 +20,19 @@ class InterfaceType;
 
 //---------- Coral Path -----------------------------------------------------//
 
-//! Returns the list of type repositories in use by the framework.
+/*!
+	\brief Returns the list of type repositories in use by the system.
+	\ingroup setup
+ */
 CORAL_EXPORT ArrayRange<const std::string> getPaths();
 
 /*!
-	Adds one or more type repositories to be used by the framework.
+	\brief Adds one or more type repositories for use by the system.
+ 
 	The passed string may contain a single directory or a list of directories,
 	separated by comma or semicolon (or colon, on UNIX systems).
+
+	\ingroup setup
  */
 CORAL_EXPORT void addPath( const std::string& path );
 
@@ -34,21 +40,28 @@ CORAL_EXPORT void addPath( const std::string& path );
 //---------- Bootstrap and Shutdown -----------------------------------------//
 
 /*!
-	Returns the co::System bootstrap interface (a singleton).
+	\brief Returns the co.System bootstrap interface (a singleton).
+
 	This first call to this function (ever, or since the last call to co::shutdown())
 	initializes the Coral framework.
+
+	\ingroup setup
  */
 CORAL_EXPORT System* getSystem();
 
 /*!
-	Tears down and destroys the system, releasing all memory and resources.
+	\brief Tears down and destroys the system, releasing all memory and resources.
+	\ingroup setup
  */
 CORAL_EXPORT void shutdown();
 
 
 //---------- Debug Events ---------------------------------------------------//
 
-//! The kind of events that can be sent to a DebugEventHandler.
+/*!
+	The kind of events that can be sent to a DebugEventHandler.
+	\ingroup debugevents
+ */
 enum DebugEvent
 {
 	Dbg_Message,	//!< A simple debug message. Not sent in Release builds.
@@ -57,7 +70,10 @@ enum DebugEvent
 	Dbg_Fatal		//!< Fatal error. Default action is to abort the application.
 };
 
-//! Signature of a DebugEventHandler function. See installDebugEventHandler().
+/*!
+	Signature of a DebugEventHandler function. See installDebugEventHandler().
+	\ingroup debugevents
+ */
 typedef void (*DebugEventHandler)( DebugEvent event, const char* message );
 
 /*!
@@ -69,7 +85,8 @@ typedef void (*DebugEventHandler)( DebugEvent event, const char* message );
 	it should generally be installed before the framework is initialized.
 	To restore the default handler, call <tt>installDebugEventHandler( NULL )</tt>.
 
-	\sa debug()
+	 \sa debug()
+	 \ingroup debugevents
  */
 CORAL_EXPORT DebugEventHandler installDebugEventHandler( DebugEventHandler handler );
 
@@ -83,7 +100,8 @@ CORAL_EXPORT DebugEventHandler installDebugEventHandler( DebugEventHandler handl
 	The remaining parameters are a format string and an optional list of
 	arguments that will compose the debug message, just like in printf().
 
-	\sa installDebugEventHandler()
+	 \sa installDebugEventHandler()
+	 \ingroup debugevents
  */
 CORAL_EXPORT void debug( DebugEvent event, const char* msg, ... );
 
@@ -94,6 +112,7 @@ CORAL_EXPORT void debug( DebugEvent event, const char* msg, ... );
 	Utility function to retrieve or load a type by name.
 	This is equivalent to calling <tt>co::getSystem()->getTypes()->getType( fullName )</tt>.
 	Please refer to co::TypeManager::getType() for the list of exceptions this function may throw.
+	\ingroup convenience
  */
 CORAL_EXPORT Type* getType( const std::string& fullName );
 
@@ -101,6 +120,7 @@ CORAL_EXPORT Type* getType( const std::string& fullName );
 	Utility function to instantiate a component given its full type name.
 	This is equivalent to calling <tt>co::getType( fullName )->getReflector()->newInstance()</tt>.
 	Notice that this function may raise all exceptions raised by the aforementioned methods.
+	\ingroup convenience
  */
 CORAL_EXPORT Component* newInstance( const std::string& fullName );
 
@@ -108,6 +128,7 @@ CORAL_EXPORT Component* newInstance( const std::string& fullName );
 	Utility function to get the best provider of \c serviceType for clients of type \c clientType.
 	If \c clientType is null this function will retrieve the service's global instance.
 	Please refer to co::ServiceManager::getServiceForType() for the list of exceptions this function may throw.
+	\ingroup convenience
  */
 CORAL_EXPORT Interface* getServiceForType( InterfaceType* serviceType, InterfaceType* clientType );
 
@@ -115,12 +136,14 @@ CORAL_EXPORT Interface* getServiceForType( InterfaceType* serviceType, Interface
 	Utility function to get the best provider of \c serviceType for the given \c clientInstance.
 	This is equivalent to calling <tt>co::getSystem()->getServices()->getServiceForInstance()</tt>.
 	Please refer to co::ServiceManager::getServiceForInstance() for the list of exceptions this function may throw.
+	\ingroup convenience
  */
 CORAL_EXPORT Interface* getServiceForInstance( InterfaceType* serviceType, Interface* clientInstance );
 
 /*!
 	Template function to get a global service by its interface type.
 	Please refer to co::ServiceManager::getService() for the list of exceptions this function may throw.
+	\ingroup convenience
  */
 template<typename T>
 inline T* getService()
@@ -132,6 +155,7 @@ inline T* getService()
 	Template function to get a \c clientType-specialized service by its interface type.
 	This picks the most appropriate service instance available for clients of the given \c clientType.
 	Please refer to co::ServiceManager::getServiceForType() for the list of exceptions this function may throw.
+	\ingroup convenience
  */
 template<typename T>
 inline T* getService( co::InterfaceType* clientType )
@@ -143,6 +167,7 @@ inline T* getService( co::InterfaceType* clientType )
 	Template function to get a \c clientInstance-specialized service by its interface type.
 	This picks the most appropriate service instance available for the given \c clientInstance.
 	Please refer to co::ServiceManager::getServiceForInstance() for the list of exceptions this function may throw.
+	\ingroup convenience
  */
 template<typename T>
 inline T* getService( co::Interface* clientInstance )

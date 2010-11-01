@@ -12,59 +12,54 @@
 namespace co {
 
 /*!
-	Root class of the exception hierarchy of the Coral framework.
-	All core and user exceptions inherit directly or indirectly from this class.
-	\sa co::UserException
+	\brief Base class for all Coral exceptions.
  */
 class CORAL_EXPORT Exception : public std::exception
 {
 public:
+	//! Constructs an Exception with an empty message.
+	inline Exception()
+	{;}
+
 	//! Constructs an Exception with the specified message.
-	Exception( const std::string& message ) : _message( message )
+	inline Exception( const std::string& message ) : _message( message )
 	{;}
 
 	//! Constructs a copy of an Exception.
-	Exception( const Exception& other ) : std::exception()
-	{
-		_message = other._message;
-	}
+	inline Exception( const Exception& other )
+		: std::exception(), _message( other._message )
+	{;}
 
-	//! Destructor
+	//! Destructor.
 	virtual ~Exception() throw();
 
 	//! Returns the exception message.
-	const std::string& getMessage() const
-	{
-		return _message;
-	}
+	inline const std::string& getMessage() const { return _message; }
 
-	//! Updates the exception message.
-	void setMessage( const std::string& message )
-	{
-		_message = message;
-	}
+	//! Sets the exception message.
+	inline void setMessage( const std::string& message ) { _message = message; }
 
-	//! Returns the exception message.
+	//! Returns the exception message as C-string, for compatibility with std::exception.
 	virtual const char* what() const throw();
 
 private:
-	// forbid copies
-	Exception& operator=( const Exception& )
-	{
-		return *this;
-	}
+	// copies are forbidden
+	Exception& operator=( const Exception& );
 
 private:
 	std::string _message;
 };
 
+#ifndef DOXYGEN
 template<> struct kindOf<Exception> : public kindOfBase<TK_EXCEPTION> {};
+#endif // DOXYGEN
 
 } // namespace co
 
 /*!
 	Macro to raise an exception with a std::ostream-style formatted message.
-	You must #include <sstream> to use this.
+	You must #include \<sstream\> to use this macro.
+	\relates co::Exception
  */
 #define CORAL_THROW( exceptionType, message ) \
 	{ \

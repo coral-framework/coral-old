@@ -1,5 +1,5 @@
 /*
-	Offers type introspection for an attribute in a struct/interface/class.
+	Offers type introspection for an attribute, as a member of an AttributeContainer.
  */
 interface AttributeInfo : MemberInfo
 {

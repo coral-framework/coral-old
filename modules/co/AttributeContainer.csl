@@ -1,5 +1,5 @@
 /*
-	Interface for types that may have attributes.
+	Mixin interface for types that may have attributes.
  */
 interface AttributeContainer
 {

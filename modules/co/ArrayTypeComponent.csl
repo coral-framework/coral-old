@@ -1,5 +1,5 @@
 /*
-	Component that implements co.ArrayType.
+	Implements co.ArrayType.
  */
 component ArrayTypeComponent
 {

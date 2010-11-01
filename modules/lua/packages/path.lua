@@ -72,7 +72,7 @@ end
 
 -- Creates a directory hierarchy.
 local function _makePath( path )
-	if isRoot( path ) or isDir( path ) then
+	if not path or isRoot( path ) or isDir( path ) then
 		return
 	end
 	_makePath( path:match( '(.+)/[^/]+$' ) )

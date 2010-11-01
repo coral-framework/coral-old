@@ -66,6 +66,7 @@ co::ModulePart* ModulePartLoader::loadModulePart( const std::string& moduleName 
 		throw co::ModuleLoadException( "unexpected missing module library file" );
 
 	co::RefPtr<co::Library> lib( new co::Library( libraryFilename ) );
+	lib->setLoadHints( co::Library::GlobalSymbolsHint );
 	lib->load();
 
 	// resolve module bootstrap functions

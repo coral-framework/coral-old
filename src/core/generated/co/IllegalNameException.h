@@ -7,19 +7,19 @@
 #define _CO_ILLEGALNAMEEXCEPTION_H_
 
 #include <co/TypeTraits.h>
-#include <co/UserException.h>
+#include <co/Exception.h>
 
 // co.IllegalNameException Mapping:
 namespace co {
 
-class IllegalNameException : public co::UserException
+class IllegalNameException : public co::Exception
 {
 public:
 	IllegalNameException()
 	{;}
 
 	IllegalNameException( const std::string& message )
-		: co::UserException( message )
+		: co::Exception( message )
 	{;}
 };
 

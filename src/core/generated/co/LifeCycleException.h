@@ -7,19 +7,19 @@
 #define _CO_LIFECYCLEEXCEPTION_H_
 
 #include <co/TypeTraits.h>
-#include <co/UserException.h>
+#include <co/Exception.h>
 
 // co.LifeCycleException Mapping:
 namespace co {
 
-class LifeCycleException : public co::UserException
+class LifeCycleException : public co::Exception
 {
 public:
 	LifeCycleException()
 	{;}
 
 	LifeCycleException( const std::string& message )
-		: co::UserException( message )
+		: co::Exception( message )
 	{;}
 };
 

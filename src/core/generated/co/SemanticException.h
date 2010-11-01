@@ -7,19 +7,19 @@
 #define _CO_SEMANTICEXCEPTION_H_
 
 #include <co/TypeTraits.h>
-#include <co/UserException.h>
+#include <co/Exception.h>
 
 // co.SemanticException Mapping:
 namespace co {
 
-class SemanticException : public co::UserException
+class SemanticException : public co::Exception
 {
 public:
 	SemanticException()
 	{;}
 
 	SemanticException( const std::string& message )
-		: co::UserException( message )
+		: co::Exception( message )
 	{;}
 };
 

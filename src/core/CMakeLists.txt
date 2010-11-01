@@ -31,7 +31,6 @@ SET( CORAL_PUBLIC_HEADERS
 	Any.h
 	ArrayRange.h
 	Coral.h
-	CoreException.h
 	Endian.h
 	Exception.h
 	Interface.h
@@ -40,7 +39,6 @@ SET( CORAL_PUBLIC_HEADERS
 	RefVector.h
 	TypeKind.h
 	TypeTraits.h
-	UserException.h
 	${CORAL_PUBLIC_HEADERS}
 )
 

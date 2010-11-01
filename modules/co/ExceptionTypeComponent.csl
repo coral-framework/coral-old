@@ -1,5 +1,5 @@
 /*
-	Component that implements co.ExceptionType.
+	Implements co.ExceptionType.
  */
 component ExceptionTypeComponent
 {

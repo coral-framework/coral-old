@@ -1,5 +1,5 @@
 /*
-	Native class type.
+	Type representing a native class (a C++ class wrapped as a Coral value).
  */
 interface NativeClassType : CompoundType, AttributeContainer, MethodContainer
 {

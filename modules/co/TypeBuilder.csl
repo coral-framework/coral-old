@@ -51,7 +51,7 @@ interface TypeBuilder
 
 	/*
 		Adds a method to a NativeClassType or InterfaceType.
-		\note The method is only really added when co::MethodBuilder::createMethod() is called.
+		\note The method is only really added when MethodBuilder::createMethod() is called.
 		\throw UnsupportedOperationException if the builder's kind is neither TK_NATIVECLASS nor TK_INTERFACE or if the type was already created.
 		\throw IllegalNameException if the passed \c name is not a valid identifier.
 		\throw IllegalNameException  if the passed \c name clashes with other members.

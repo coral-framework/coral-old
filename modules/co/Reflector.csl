@@ -1,5 +1,5 @@
 /*
-	Provides support for basic reflective programming.
+	Provides reflective programming facilities for a \ref co::Type "Type".
  */
 interface Reflector
 {
@@ -16,7 +16,7 @@ interface Reflector
 			Constructs an instance of a struct or native class in the specified memory area.
 			\param[in] address memory address where the instance is to be constructed.
 			\param[in] length number of bytes (starting at \c address) reserved for the instance.
-			\throw UnsupportedOperationException if \c type is neither a co::StructType nor a co::NativeClassType.
+			\throw UnsupportedOperationException if \c type is neither a StructType nor a NativeClassType.
 			\throw IllegalArgumentException if the passed \c length is not equal to the type's \c size.
 		 */
 		virtual void createValue( void* address, size_t length ) = 0;
@@ -32,24 +32,24 @@ interface Reflector
 			Destroys the struct or native class instance located at \c address.
 			The instance should have been constructed using createValue().
 			\warning Expect the worst if \c address does not point to an instance of this exact type.
-			\throw UnsupportedOperationException if \c type is neither a co::StructType nor a co::NativeClassType.
+			\throw UnsupportedOperationException if \c type is neither a StructType nor a NativeClassType.
 		 */
 		virtual void destroyValue( void* address ) = 0;
 	c++>
 
 	/*
-		Creates a new instance of a component.
-		\throw UnsupportedOperationException if \c type is not a co::ComponentType.
+		Instantiates a component.
+		\throw UnsupportedOperationException if \c type is not a ComponentType.
 	 */
 	Component newInstance() raises UnsupportedOperationException;
 
 	/*
-		Creates a proxy interface that forwards all calls to a co::DynamicProxyHandler.
+		Creates a proxy interface that forwards all calls to a given DynamicProxyHandler.
 
 		A dynamic proxy is a lightweight interface instance (i.e. it is \e not a real component instance)
 		that forwards all its calls to a \c handler interface, or to the handler's component instance.
 
-		\throw UnsupportedOperationException if \c type is not an co::InterfaceType.
+		\throw UnsupportedOperationException if \c type is not an InterfaceType.
 		\throw IllegalArgumentException if the passed \c handler is invalid (e.g. null).
 	 */
 	Interface newProxy( in DynamicProxyHandler handler )
@@ -57,7 +57,7 @@ interface Reflector
 
 	/*
 		Gets the current value of an attribute from a struct, interface or native class instance.
-		\throw UnsupportedOperationException if \c type is not an co::AttributeContainer.
+		\throw UnsupportedOperationException if \c type is not an AttributeContainer.
 		\throw IllegalArgumentException if \c instance is not an instance of \c type, or if the
 			attribute \c ai does not belong to this type.
 	 */
@@ -66,11 +66,11 @@ interface Reflector
 
 	/*
 		Sets the current value of an attribute in a struct, interface or native class instance.
-		\throw UnsupportedOperationException if \c type is not an co::AttributeContainer.
+		\throw UnsupportedOperationException if \c type is not an AttributeContainer.
 		\throw IllegalArgumentException if \c instance is not an instance of \c type; if the
 			attribute \c ai does not belong to this type, or if it is read-only.
 		\throw IllegalCastException if \c value has no valid conversion to the actual attribute type.
-			Please refer to co::Any's documentation for more information about type conversion rules.
+			Please refer to Any's documentation for more information about type conversion rules.
 	 */
 	void setAttribute( in any instance, in AttributeInfo ai, in any value )
 		raises UnsupportedOperationException, IllegalArgumentException, IllegalCastException;
@@ -81,19 +81,19 @@ interface Reflector
 		Method arguments are passed in the \c args array, in the same order they are expected
 		by the callee. If \c args contains more arguments than the number of method
 		parameters, the excess arguments are ignored. However, if \c args contains fewer
-		arguments than the number of parameters, a co::MissingInputException is raised.
+		arguments than the number of parameters, a MissingInputException is raised.
 
 		Method return values are obtainable through the \c returnValue argument. Notice that
-		you must \e always pass a co::Any at this parameter, even when the callee is a \c void
+		you must \e always pass a Any at this parameter, even when the callee is a \c void
 		method (in this case, the \c returnValue parameter will return unmodified).
 
-		\throw UnsupportedOperationException if \c type is not a co::MethodContainer.
+		\throw UnsupportedOperationException if \c type is not a MethodContainer.
 		\throw IllegalArgumentException if \c instance is not an instance of \c type, or if the
 			method \c mi does not belong to this type.
 		\throw MissingInputException if \c args contains fewer elements than the number of parameters
 			expected by the callee.
 		\throw IllegalCastException if one of the arguments in \c args has no valid conversion to the
-			actual parameter type. Please refer to co::Any's documentation for more information
+			actual parameter type. Please refer to Any's documentation for more information
 			about type conversion rules.
 	 */
 	void invokeMethod( in any instance, in MethodInfo mi, in any[] args, out any returnValue )

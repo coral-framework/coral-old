@@ -1,5 +1,5 @@
 /*
-	A component blueprint.
+	The blueprint of a component.
  */
 interface ComponentType : CompoundType
 {

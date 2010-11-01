@@ -1,5 +1,5 @@
 /*
-	Represents a method parameter.
+	Offers type introspection for a parameter of a \ref co::MethodInfo "Method".
  */
 interface ParameterInfo
 {

@@ -1,2 +1,2 @@
-// Raised to indicate that some expected service is not available.
+// Raised to indicate that a required service is not available.
 exception MissingServiceException;

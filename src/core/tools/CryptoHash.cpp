@@ -5,7 +5,7 @@
 
 #include "CryptoHash.h"
 #include "Sha1.h"
-#include <co/CoreException.h>
+#include <co/LifeCycleException.h>
 #include <cassert>
 #include <sstream>
 
@@ -31,7 +31,7 @@ protected:
 	{
 		if( _hasResult )
 		{
-			CORAL_THROW( CoreException, "The hash result has already been calculated. "
+			CORAL_THROW( LifeCycleException, "The hash result has already been calculated. "
 						"You must reset the CryptoHash before re-using it." );
 		}
 	}

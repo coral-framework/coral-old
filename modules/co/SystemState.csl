@@ -1,5 +1,5 @@
 /*
-	Possible system states.
+	The life-cycle stages of the system.
  */
 enum SystemState
 {

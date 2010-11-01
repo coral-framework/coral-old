@@ -4,7 +4,7 @@
  */
 
 #include "Library.h"
-#include <co/CoreException.h>
+#include <co/ModuleLoadException.h>
 #include <sstream>
 
 #if defined(CORAL_OS_UNIX)
@@ -134,7 +134,7 @@ void Library::doUnload()
 	{
 		std::string errorMsg;
 		getLastErrorMessage( errorMsg );
-		CORAL_THROW( CoreException, "error unloading library '" << _fileName << "': " << errorMsg );
+		CORAL_THROW( ModuleLoadException, "error unloading library '" << _fileName << "': " << errorMsg );
 	}
 	
 	_handle = 0;
@@ -172,7 +172,7 @@ void Library::assertIsLoaded()
 	{
 		std::string errorMsg;
 		getLastErrorMessage( errorMsg );
-		CORAL_THROW( CoreException, "error loading library '" << _fileName << "': " << errorMsg );
+		CORAL_THROW( ModuleLoadException, "error loading library '" << _fileName << "': " << errorMsg );
 	}
 }
 

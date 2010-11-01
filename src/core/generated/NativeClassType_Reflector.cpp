@@ -7,8 +7,8 @@
 #include <co/DynamicProxyHandler.h>
 #include <co/Reflector.h>
 #include <co/Namespace.h>
-#include <co/AttributeInfo.h>
 #include <co/MethodInfo.h>
+#include <co/AttributeInfo.h>
 #include <co/MemberInfo.h>
 #include <co/Uuid.h>
 #include <co/IllegalCastException.h>
@@ -111,20 +111,20 @@ public:
 		_handler->handleSetAttribute( _cookie, getAttribInfo<co::Type>( 6 ), arg );
 	}
 
-	// co.MethodContainer Methods:
-
-	co::ArrayRange<co::MethodInfo* const> getMemberMethods()
-	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodContainer>( 0 ) );
-        return res.get< co::ArrayRange<co::MethodInfo* const> >();
-	}
-
 	// co.AttributeContainer Methods:
 
 	co::ArrayRange<co::AttributeInfo* const> getMemberAttributes()
 	{
 		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::AttributeContainer>( 0 ) );
         return res.get< co::ArrayRange<co::AttributeInfo* const> >();
+	}
+
+	// co.MethodContainer Methods:
+
+	co::ArrayRange<co::MethodInfo* const> getMemberMethods()
+	{
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodContainer>( 0 ) );
+        return res.get< co::ArrayRange<co::MethodInfo* const> >();
 	}
 
 	// co.NativeClassType Methods:

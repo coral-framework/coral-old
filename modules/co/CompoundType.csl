@@ -1,14 +1,13 @@
 /*
-	Base interface for Types that may have 'members' (e.g. fields, methods, etc.).
+	Base interface for Types that may have 'members' (i.e. attributes, methods, etc.).
  */
 interface CompoundType : Type
 {
 	/*
-		List of all members of this type.
-		A member can be an attribute, a method, etc.
+		List of all members of this type. A member can be an attribute, a method, etc.
 	 */
 	readonly attribute MemberInfo[] members;
-	
+
 	/*
 		Retrieves the member with the given name, if one exists; otherwise, returns null.
 		For types that support inheritance, this method should consider inherited members.

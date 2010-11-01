@@ -12,7 +12,6 @@
 #include <co/TypeBuilder.h>
 #include <co/InterfaceInfo.h>
 #include <co/InterfaceType.h>
-#include <co/CoreException.h>
 #include <co/TypeCreationTransaction.h>
 
 namespace co {

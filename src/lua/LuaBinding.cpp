@@ -671,7 +671,7 @@ int ComponentBinding::newIndex( lua_State* L )
 		throw co::IllegalArgumentException( "attribute 'componentType' is read-only and cannot be changed" );
 
 	co::Component* component = *ud;
-	pushMember( L, component->getInterfaceType(), true );
+	pushMember( L, component->getComponentType(), true );
 	if( lua_islightuserdata( L, -1 ) )
 	{
 		co::InterfaceInfo* itfInfo = checkInterfaceInfo( L, -1 );

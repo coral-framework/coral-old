@@ -1,5 +1,5 @@
 /*
-	Component that implements co.ServiceManager.
+	Implements co.ServiceManager.
  */
 component ServiceManagerComponent
 {

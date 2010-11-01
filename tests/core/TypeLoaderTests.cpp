@@ -87,9 +87,9 @@ TEST( TypeLoaderTests, interfaceDocs )
 	const std::string& nameDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedInterface:name" );
 	const std::string& fooDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedInterface:foo" );
 
-	EXPECT_EQ( "// This is the interface Declaration\n/* \n\tThat could be a multi-line comment\n*/", interfaceDoc );
-	EXPECT_EQ( "// and this is the attribute doc.\n", nameDoc );
-	EXPECT_EQ( "// foo method declaration.\n// using separated.\n/* documentation lines.*/", fooDoc );
+	EXPECT_EQ( "This is the interface Declaration\nThis could be a multi-line comment", interfaceDoc );
+	EXPECT_EQ( "and this is the attribute doc.", nameDoc );
+	EXPECT_EQ( "foo method declaration.\nusing separated.\ndocumentation lines.", fooDoc );
 }
 
 TEST( TypeLoaderTests, structDocs )
@@ -100,9 +100,9 @@ TEST( TypeLoaderTests, structDocs )
 	const std::string& nameDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedStruct:name" );
 	const std::string& fooDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedStruct:foo" );
 
-	EXPECT_EQ( "//Struct Declaration\n", structDoc );
-	EXPECT_EQ( "// struct member.\n//< extra doc.\n", nameDoc );
-	EXPECT_EQ( "//< postDoc.\n", fooDoc );
+	EXPECT_EQ( "Struct Declaration", structDoc );
+	EXPECT_EQ( "struct member.\nextra doc.", nameDoc );
+	EXPECT_EQ( "postDoc.", fooDoc );
 }
 
 TEST( TypeLoaderTests, enumDocs )
@@ -114,9 +114,9 @@ TEST( TypeLoaderTests, enumDocs )
 	const std::string& secondDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum:second" );
 	const std::string& thirdDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum:third" );
 
-	EXPECT_EQ( "// This is the Enum Declaration\n", enumDoc );
-	EXPECT_EQ( "// doc for first.\n//< second doc for first.\n", firstDoc );
-	EXPECT_EQ( "//< doc for second.\n", secondDoc );
+	EXPECT_EQ( "This is the Enum Declaration", enumDoc );
+	EXPECT_EQ( "doc for first.\nsecond doc for first.", firstDoc );
+	EXPECT_EQ( "doc for second.", secondDoc );
 	EXPECT_TRUE( thirdDoc.empty() );
 }
 
@@ -129,9 +129,9 @@ TEST( TypeLoaderTests, componentDocs )
 	const std::string& requiredDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent:requiredInterface" );
 	const std::string& notDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent:providedInterfaceNotDocumented" );
 
-	EXPECT_EQ( "//Component Declaration\n", componentDoc );
-	EXPECT_EQ( "// provided\n", providedDoc );
-	EXPECT_EQ( "//< Required interface\n", requiredDoc );
+	EXPECT_EQ( "Component Declaration", componentDoc );
+	EXPECT_EQ( "provided", providedDoc );
+	EXPECT_EQ( "Required interface", requiredDoc );
 	EXPECT_TRUE( notDoc.empty() );
 }
 

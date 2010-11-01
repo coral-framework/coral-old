@@ -1,5 +1,6 @@
 /*
-	A namespace in the type hierarchy. It may contain types and child namespaces.
+	Namespaces are nodes in the type hierarchy. They contain types and child namespaces.
+	A namespace will generally correspond to a directory in the Coral path, although this is not enforced.
  */
 interface Namespace
 {

@@ -7,19 +7,19 @@
 #define _CO_MISSINGSERVICEEXCEPTION_H_
 
 #include <co/TypeTraits.h>
-#include <co/UserException.h>
+#include <co/Exception.h>
 
 // co.MissingServiceException Mapping:
 namespace co {
 
-class MissingServiceException : public co::UserException
+class MissingServiceException : public co::Exception
 {
 public:
 	MissingServiceException()
 	{;}
 
 	MissingServiceException( const std::string& message )
-		: co::UserException( message )
+		: co::Exception( message )
 	{;}
 };
 

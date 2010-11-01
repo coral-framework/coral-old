@@ -1,5 +1,5 @@
 /*
-	Component that implements co.TypeCreationTransaction.
+	Implements co.TypeCreationTransaction.
  */
 component TypeCreationTransactionComponent
 {

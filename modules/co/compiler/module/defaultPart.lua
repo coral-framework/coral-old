@@ -14,13 +14,9 @@ local function template( writer, c )
 	c.utils.openNamespaces( writer, c.moduleName )
 
 	writer( [[
-	void moduleRetain();
-	void moduleRelease();
-]] )
 
-	c.utils.closeNamespaces( writer, c.moduleName )
-
-	writer( [[
+void moduleRetain();
+void moduleRelease();
 
 class __ModulePart : public co::ModulePartBase
 {
@@ -47,7 +43,10 @@ public:
 };
 
 CORAL_EXPORT_MODULE_PART( __ModulePart )
+
 ]] )
+
+	c.utils.closeNamespaces( writer, c.moduleName )
 
 end
 

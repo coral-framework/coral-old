@@ -55,7 +55,7 @@ public:
 
 	/*!
 		Adds the first length chars of data to the cryptographic hash.
-		\throw CoreException if the hash result was already calculated.
+		\throw LifeCycleException if the hash result was already calculated.
 	 */
 	void addData( const uint8* data, std::size_t length );
 

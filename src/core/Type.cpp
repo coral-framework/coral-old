@@ -108,6 +108,11 @@ co::Reflector* TypeImpl::getReflector( co::Type* myType )
 				CORAL_THROW( co::ModuleLoadException, "could not obtain a reflector for '"
 								<< myType->getFullName() << "': " << e.what() );
 			}
+			catch( ... )
+			{
+				CORAL_THROW( co::ModuleLoadException, "could not obtain a reflector for '"
+								<< myType->getFullName() << "': unknown exception" );
+			}
 		}
 	}
 

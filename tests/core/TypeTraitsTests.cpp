@@ -6,10 +6,10 @@
 #include <co/Uuid.h>
 #include <co/Coral.h>
 #include <co/ArrayType.h>
+#include <co/Exception.h>
 #include <co/RefVector.h>
 #include <co/TypeTraits.h>
 #include <co/InterfaceType.h>
-#include <co/UserException.h>
 #include <gtest/gtest.h>
 
 using namespace co::traits;
@@ -119,11 +119,11 @@ TEST( TypeTraitsTests, get )
 	EXPECT_FALSE( getD::isPointerConst );
 	EXPECT_FALSE( getD::isReference );
 
-	typedef co::traits::get<const co::UserException*> getE;
-	EXPECT_TRUE(( isSame<getE::ReferencedType, const co::UserException*>::value ));
-	EXPECT_TRUE(( isSame<getE::ValueType, const co::UserException*>::value ));
-	EXPECT_TRUE(( isSame<getE::PointedType, const co::UserException>::value ));
-	EXPECT_TRUE(( isSame<getE::CoreType, co::UserException>::value ));
+	typedef co::traits::get<const co::Exception*> getE;
+	EXPECT_TRUE(( isSame<getE::ReferencedType, const co::Exception*>::value ));
+	EXPECT_TRUE(( isSame<getE::ValueType, const co::Exception*>::value ));
+	EXPECT_TRUE(( isSame<getE::PointedType, const co::Exception>::value ));
+	EXPECT_TRUE(( isSame<getE::CoreType, co::Exception>::value ));
 	EXPECT_TRUE( getE::kind == co::TK_EXCEPTION );
 	EXPECT_TRUE( getE::isConst );
 	EXPECT_TRUE( getE::isPointer );
@@ -148,7 +148,7 @@ TEST( TypeTraitsTests, kindOf )
 	
 	EXPECT_TRUE( co::kindOf<co::TypeKind>::kind == co::TK_ENUM );
 
-	EXPECT_TRUE( co::kindOf<co::UserException>::kind == co::TK_EXCEPTION );
+	EXPECT_TRUE( co::kindOf<co::Exception>::kind == co::TK_EXCEPTION );
 
 	EXPECT_TRUE( co::kindOf<co::ArrayRange<float> >::kind == co::TK_ARRAY );
 	EXPECT_TRUE( co::kindOf<co::ArrayRange<const std::string> >::kind == co::TK_ARRAY );

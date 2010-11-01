@@ -1,12 +1,12 @@
 // This is the interface Declaration
-/* 
-	That could be a multi-line comment
-*/
-interface DocumentedInterface 
+/*
+	This could be a multi-line comment
+ */
+interface DocumentedInterface
 {
 	// and this is the attribute doc.
 	attribute string name;
-	
+
 	// foo method declaration.
 
 	// using separated.

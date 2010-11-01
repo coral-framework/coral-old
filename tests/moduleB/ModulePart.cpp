@@ -47,4 +47,7 @@ void ModulePart::dispose( co::Module* )
 }
 
 CORAL_EXPORT_COMPONENT( ModulePart, moduleB );
-CORAL_EXPORT_MODULE_PART( ModulePart );
+
+namespace moduleB {
+	CORAL_EXPORT_MODULE_PART( ModulePart );
+}

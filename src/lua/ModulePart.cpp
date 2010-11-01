@@ -70,4 +70,7 @@ void ModulePart::dispose( co::Module* )
 }
 
 CORAL_EXPORT_COMPONENT( ModulePart, lua );
-CORAL_EXPORT_MODULE_PART( ModulePart );
+
+namespace lua {
+	CORAL_EXPORT_MODULE_PART( ModulePart );
+}

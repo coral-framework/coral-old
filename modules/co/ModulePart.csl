@@ -1,6 +1,6 @@
 /*
-	Controls the life cycle of an \e abstract \e artifact (such as a dynamic library or a script bundle)
-	that contributes with new services as part of a Module.
+	An <em>abstract artifact</em> (such as a dynamic library or a script bundle) loaded as part of a Module.
+	This interface is meant to control the life-cycle of such artifact.
  */
 interface ModulePart
 {
@@ -15,7 +15,7 @@ interface ModulePart
 	/*
 		Integration Phase - consumption of services provided by other modules.
 		May throw an exception to indicate that the module cannot be loaded due to a missing service.
-		\throw co::MissingServiceException if a required service was not available.
+		\throw MissingServiceException if a required service was not available.
 	 */
 	void integrate( in Module module ) raises MissingServiceException;
 

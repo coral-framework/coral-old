@@ -1,6 +1,6 @@
 /*
-	Represents an abstract set of extensions located in a Namespace. Modules are composed of one or more
-	ModuleParts, which are individual extension artifacts loaded from the module's directory.
+	A set of custom extensions loaded from a Namespace in the Coral path. Modules are composed of
+	one or more ModuleParts, which are individual extension artifacts found in the module's dir.
  */
 interface Module
 {
@@ -26,7 +26,7 @@ interface Module
 		in the ModuleState_Initialized state.
 
 		The module's state must be ModuleState_None when this method is called,
-		or a co::LifeCycleException will be raised.
+		or a LifeCycleException will be raised.
 	 */
 	void initialize() raises LifeCycleException;
 
@@ -34,8 +34,8 @@ interface Module
 		Runs the integration phase on all module parts and leaves the module
 		in the ModuleState_Integrated state.
 
-		The module's state must be ModuleState_Initialized when this method is called,
-		or a co::LifeCycleException will be raised.
+		The module's state must be ModuleState_Initialized when this method
+		is called, or a LifeCycleException will be raised.
 	 */
 	void integrate() raises LifeCycleException, MissingServiceException;
 
@@ -44,7 +44,7 @@ interface Module
 		module in the ModuleState_PresentationIntegrated state.
 
 		The module's state must be ModuleState_Integrated when this method is called,
-		or a co::LifeCycleException will be raised.
+		or a LifeCycleException will be raised.
 	 */
 	void integratePresentation() raises LifeCycleException;
 
@@ -52,8 +52,8 @@ interface Module
 		Runs the disintegration phase on all module parts and leaves the module
 		in the ModuleState_Disintegrated state.
 
-		The module's state must be ModuleState_PresentationIntegrated when this method
-		is called, or a co::LifeCycleException will be raised.
+		The module's state must be ModuleState_PresentationIntegrated when this
+		method is called, or a LifeCycleException will be raised.
 	 */
 	void disintegrate() raises LifeCycleException;
 
@@ -61,8 +61,8 @@ interface Module
 		Runs the disposal phase on all module parts, unloads all module parts,
 		then leaves the module in the ModuleState_Disposed state.
 
-		The module's state must be ModuleState_Disintegrated when this method is
-		called, or a co::LifeCycleException will be raised.
+		The module's state must be ModuleState_Disintegrated when this method
+		is called, or a LifeCycleException will be raised.
 	 */
 	void dispose() raises LifeCycleException;
 
@@ -74,7 +74,7 @@ interface Module
 		integration phase had run successfully for the module.
 
 		The module's state must preceed ModuleState_Disintegrated when this
-		method is called, or a co::LifeCycleException will be raised.
+		method is called, or a LifeCycleException will be raised.
 	 */
 	void abort() raises LifeCycleException;
 

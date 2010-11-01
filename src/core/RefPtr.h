@@ -11,7 +11,9 @@
 namespace co {
 
 /*!
-	A smart-pointer for keeping references to Coral interfaces with automatic memory management (reference counting).
+	\brief A smart-pointer that implements reference counting for Coral interfaces.
+ 
+	\tparam T an interface type (co::Interface).
  */
 template<class T>
 class RefPtr

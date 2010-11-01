@@ -1,87 +1,4 @@
 ################################################################################
-# Common Global Initialization
-################################################################################
-IF( APPLE )
-	# On OSX 10.6 (Darwin 10.0), use only the x86_64 architecture by default
-	IF( NOT ${CMAKE_HOST_SYSTEM_VERSION} VERSION_LESS 10 )
-		SET( CMAKE_OSX_ARCHITECTURES "x86_64" )
-		SET( CMAKE_OSX_DEPLOYMENT_TARGET "10.6" )
-	ENDIF()
-ENDIF()
-
-################################################################################
-# Macro to set common properties for a default target (executables/libs)
-################################################################################
-MACRO( CORAL_DEFAULT_TARGET_PROPERTIES targetName )
-
-	# On Windows, artifacts get a 'D' suffix when built in Debug mode
-	IF( WIN32 )
-		SET_PROPERTY( TARGET ${targetName} PROPERTY OUTPUT_NAME_DEBUG "${targetName}_debug" )
-
-		# Prevent the MSVC IDE from creating targets in "Debug"/"Release" subdirs
-		IF( MSVC_IDE )
-			SET_TARGET_PROPERTIES( ${targetName} PROPERTIES PREFIX "../" )
-		ENDIF()
-
-		# Generate all executables and shared libs (but not module libs) in /bin
-		GET_TARGET_PROPERTY( _targetType ${targetName} TYPE )
-		IF( NOT _targetType STREQUAL "MODULE_LIBRARY" )
-			SET_TARGET_PROPERTIES( ${targetName} PROPERTIES
-				RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-				LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-			)
-		ENDIF()
-	ENDIF()
-
-	IF( MSVC )
-		SET_PROPERTY( TARGET ${targetName} APPEND PROPERTY COMPILE_DEFINITIONS
-				"_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE" )
-	ENDIF()
-
-	IF( XCODE_VERSION )
-		IF( ${CMAKE_HOST_SYSTEM_VERSION} VERSION_LESS 10 )
-			# On Leopard, force usage of GCC 4.2
-			SET_TARGET_PROPERTIES( ${targetName} PROPERTIES
-				XCODE_ATTRIBUTE_GCC_VERSION "4.2"
-			)
-		ELSE()
-			# On Snow Leopard, force usage of the x86_64 arch.
-			SET_TARGET_PROPERTIES( ${targetName} PROPERTIES
-				XCODE_ATTRIBUTE_ARCHS ${CMAKE_OSX_ARCHITECTURES}
-			)
-		ENDIF()
-	ENDIF()
-
-ENDMACRO( CORAL_DEFAULT_TARGET_PROPERTIES )
-
-################################################################################
-# Macro to set common properties for a module target (Coral Module)
-################################################################################
-MACRO( CORAL_MODULE_TARGET_PROPERTIES moduleName )
-
-	CORAL_DEFAULT_TARGET_PROPERTIES( ${moduleName} )
-
-	# Add a suffix to module libraries built in Debug mode
-	SET_PROPERTY( TARGET ${moduleName} PROPERTY LIBRARY_OUTPUT_NAME_DEBUG "${moduleName}_debug" )
-
-	# Copy or generate the module library into /modules/${moduleName}/
-	IF( XCODE_VERSION )
-		# Copy the library after linking (makes sense for IDE's that create intermediate dirs)
-		FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/modules/${moduleName} )
-		ADD_CUSTOM_COMMAND( TARGET ${moduleName} POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy "$(CONFIGURATION_BUILD_DIR)/$(FULL_PRODUCT_NAME)" ${CMAKE_BINARY_DIR}/modules/${moduleName}/
-			COMMENT "Copying module '${moduleName}'..."
-		)
-	ELSE()
-		# Create the library directly in the output dir
-		SET_TARGET_PROPERTIES( ${moduleName} PROPERTIES
-			LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/modules/${moduleName}
-		)
-	ENDIF()
-
-ENDMACRO( CORAL_MODULE_TARGET_PROPERTIES )
-
-################################################################################
 # Macro to set common properties for a test target (test executable)
 ################################################################################
 MACRO( CORAL_TEST_TARGET_PROPERTIES targetName testExecutableVar )
@@ -146,6 +63,8 @@ ENDMACRO( CORAL_ADD_TO_CLEAN )
 #     target_name     Name given to the target that generates the documentation.
 #     doxyfile_name   Name of the Doxygen config file.
 #
+# Extra args are passed at the end of the custom target's list of args to Doxygen.
+#
 MACRO( CORAL_GENERATE_DOXYGEN target_name doxyfile_name )
 	FIND_PACKAGE( Doxygen )
 	IF( DOXYGEN_FOUND )
@@ -160,7 +79,11 @@ MACRO( CORAL_GENERATE_DOXYGEN target_name doxyfile_name )
 
 			CONFIGURE_FILE( "${CMAKE_CURRENT_SOURCE_DIR}/${doxyfile_name}" "${CMAKE_CURRENT_BINARY_DIR}/${doxyfile_name}.configured" )
 
-			ADD_CUSTOM_TARGET( ${target_name} ${DOXYGEN_EXECUTABLE} "${CMAKE_CURRENT_BINARY_DIR}/${doxyfile_name}.configured" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}" )
+			ADD_CUSTOM_TARGET( ${target_name}
+				COMMENT "Running Doxygen..."
+				WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+				COMMAND ${DOXYGEN_EXECUTABLE} "${CMAKE_CURRENT_BINARY_DIR}/${doxyfile_name}.configured" ${ARGN}
+			)
 
 			SET_TARGET_PROPERTIES( ${target_name} PROPERTIES PROJECT_LABEL "Doxygen" )
 

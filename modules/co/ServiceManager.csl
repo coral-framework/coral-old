@@ -22,7 +22,7 @@ interface ServiceManager
 	/*
 		Publishes the specified \c serviceInstance as the global provider of \c serviceType.
 
-		\throw co::IllegalArgumentException if any of the arguments are null, or if the interface
+		\throw IllegalArgumentException if any of the arguments are null, or if the interface
 					type of \c serviceInstance is not a subtype of \c serviceType.
 	 */
 	void addService( in InterfaceType serviceType, in Interface serviceInstance )
@@ -31,9 +31,9 @@ interface ServiceManager
 	/*
 		Publishes a \c serviceInstance as the provider of \c serviceType for clients of type \c clientType.
 
-		\throw co::IllegalArgumentException if a) any of the arguments are null; or b) the interface type
+		\throw IllegalArgumentException if a) any of the arguments are null; or b) the interface type
 				of \c serviceInstance is not a subtype of \c serviceType; or c) \c clientType is the
-				\c co.Interface interface (in this case you should call addService() instead).
+				co.Interface interface (in this case you should call addService() instead).
 	 */
 	void addServiceForType( in InterfaceType serviceType, in InterfaceType clientType, in Interface serviceInstance )
 			raises IllegalArgumentException;
@@ -46,13 +46,13 @@ interface ServiceManager
 
 		To create the service instance, this manager will attempt to instantiate a component using
 		the given \c componentName and get its facet of type \c serviceType. If an error occurs,
-		the service will be removed and the calling method will raise a co::MissingServiceException.
+		the service will be removed and the calling method will raise a MissingServiceException.
 
-		\throw co::IllegalArgumentException if \c serviceType is null or \c componentName does not identify
+		\throw IllegalArgumentException if \c serviceType is null or \c componentName does not identify
 					a valid component type.
-		\throw co::NoSuchInterfaceException if the named component type does not provide an interface of
+		\throw NoSuchInterfaceException if the named component type does not provide an interface of
 					type \c serviceType.
-		\throw co::MissingServiceException if \c isLazy is \c false and the service cannot be instantiated.
+		\throw MissingServiceException if \c isLazy is \c false and the service cannot be instantiated.
 	 */
 	void addServiceImplementation( in InterfaceType serviceType, in string componentName )
 			raises IllegalArgumentException, NoSuchInterfaceException, MissingServiceException;
@@ -65,14 +65,14 @@ interface ServiceManager
 
 		To create the service instance, this manager will attempt to instantiate a component using
 		the given \c componentName and get its facet of type \c serviceType. If an error occurs,
-		the service will be removed and the calling method will raise a co::MissingServiceException.
+		the service will be removed and the calling method will raise a MissingServiceException.
 
-		\throw co::IllegalArgumentException if a) \c serviceType or \c clientType are null;
+		\throw IllegalArgumentException if a) \c serviceType or \c clientType are null;
 				or b) \c componentName does not identify a valid component type; or c) \c clientType is
-				the \c co.Interface interface (in this case you should call addService() instead).
-		\throw co::NoSuchInterfaceException if the named component type does not provide an interface of
+				the co.Interface interface (in this case you should call addService() instead).
+		\throw NoSuchInterfaceException if the named component type does not provide an interface of
 					type \c serviceType.
-		\throw co::MissingServiceException if \c isLazy is \c false and the service cannot be instantiated.
+		\throw MissingServiceException if \c isLazy is \c false and the service cannot be instantiated.
 	 */
 	void addServiceImplementationForType( in InterfaceType serviceType, in InterfaceType clientType, in string componentName )
 			raises IllegalArgumentException, NoSuchInterfaceException, MissingServiceException;
@@ -80,8 +80,8 @@ interface ServiceManager
 	/*
 		Gets the global provider of the specified \c serviceType.
 
-		\throw co::IllegalArgumentException if serviceType is null.
-		\throw co::MissingServiceException if no global instance of \c serviceType is available.
+		\throw IllegalArgumentException if serviceType is null.
+		\throw MissingServiceException if no global instance of \c serviceType is available.
 	 */
 	Interface getService( in InterfaceType serviceType )
 			raises IllegalArgumentException, MissingServiceException;
@@ -94,8 +94,8 @@ interface ServiceManager
 		search in the list of superInterfaces of \c clientType). Finally, if no specialized instance
 		is available for \c clientType, this method will return the global provider of \c serviceType.
 
-		\throw co::IllegalArgumentException if any of the arguments are null.
-		\throw co::MissingServiceException if no suitable instance of \c serviceType is available for \c clientType.
+		\throw IllegalArgumentException if any of the arguments are null.
+		\throw MissingServiceException if no suitable instance of \c serviceType is available for \c clientType.
 	 */
 	Interface getServiceForType( in InterfaceType serviceType, in InterfaceType clientType )
 			raises IllegalArgumentException, MissingServiceException;
@@ -107,21 +107,21 @@ interface ServiceManager
 		type \c serviceType. If so, that interface is returned. Otherwise, this method behaves
 		like a call to <tt>getServiceForType( service, clientInstance->getInterfaceType() )</tt>.
 
-		\throw co::IllegalArgumentException if any of the arguments are null.
-		\throw co::MissingServiceException if no suitable instance of \c serviceType is available for \c clientInstance.
+		\throw IllegalArgumentException if any of the arguments are null.
+		\throw MissingServiceException if no suitable instance of \c serviceType is available for \c clientInstance.
 	 */
 	Interface getServiceForInstance( in InterfaceType serviceType, in Interface clientInstance )
 			raises IllegalArgumentException, MissingServiceException;
 
 	/*
 		Removes the global instance of the specified \c serviceType.
-		\throw co::MissingServiceException if no global instance of \c serviceType was found.
+		\throw MissingServiceException if no global instance of \c serviceType was found.
 	 */
 	void removeService( in InterfaceType serviceType ) raises MissingServiceException;
 
 	/*
 		Removes the instance of \c serviceType that was published for \c clientType.
-		\throw co::MissingServiceException if no matching service instance was found.
+		\throw MissingServiceException if no matching service instance was found.
 	 */
 	void removeServiceForType( in InterfaceType serviceType, in InterfaceType clientType )
 			raises MissingServiceException;

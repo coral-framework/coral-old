@@ -1,5 +1,5 @@
 /*
-	Component that implements co.MethodInfo.
+	Implements co.MethodInfo.
  */
 component MethodInfoComponent
 {

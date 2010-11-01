@@ -7,19 +7,19 @@
 #define _CO_UNSUPPORTEDOPERATIONEXCEPTION_H_
 
 #include <co/TypeTraits.h>
-#include <co/UserException.h>
+#include <co/Exception.h>
 
 // co.UnsupportedOperationException Mapping:
 namespace co {
 
-class UnsupportedOperationException : public co::UserException
+class UnsupportedOperationException : public co::Exception
 {
 public:
 	UnsupportedOperationException()
 	{;}
 
 	UnsupportedOperationException( const std::string& message )
-		: co::UserException( message )
+		: co::Exception( message )
 	{;}
 };
 

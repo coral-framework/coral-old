@@ -37,9 +37,16 @@ void TypeManager::addDocumentation( const std::string& typeOrMemberName, const s
 {
 	DocMap::iterator it = _docMap.find( typeOrMemberName );
 	if( it != _docMap.end() )
-		it->second.append( text );
+	{
+		std::string& str = it->second;
+		str.reserve( str.length() + 1 + text.length() );
+		str.push_back( '\n' );
+		str.append( text );
+	}
 	else
+	{
 		_docMap.insert( DocMap::value_type( typeOrMemberName, text ) );
+	}
 }
 
 void TypeManager::addCppBlock( const std::string& interfaceName, const std::string& text )

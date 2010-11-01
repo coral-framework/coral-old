@@ -98,7 +98,35 @@ local typeKindToCpp = {
 }
 
 function autoFields.cppName( t )
-	return typeKindToCpp[t.kind] or utils.toCppName( t.fullName )
+	if t.kind == 'TK_ARRAY' then
+		return t.elementType.cppName .. "[]"
+	else
+		return typeKindToCpp[t.kind] or utils.toCppName( t.fullName )
+	end
+end
+
+local typeKindToDoc = {
+	TK_ANY		= "co::Any",
+	TK_BOOLEAN	= "bool",
+	TK_INT8		= "int8",
+	TK_UINT8	= "uint8",
+	TK_INT16	= "int16",
+	TK_UINT16	= "uint16",
+	TK_INT32	= "int32",
+	TK_UINT32	= "uint32",
+	TK_INT64	= "int64",
+	TK_UINT64	= "uint64",
+	TK_FLOAT	= "float",
+	TK_DOUBLE	= "double",
+	TK_STRING	= "string",
+}
+
+function autoFields.docName( t )
+	if t.kind == 'TK_ARRAY' then
+		return t.elementType.docName .. "[]"
+	else
+		return typeKindToDoc[t.kind] or utils.toCppName( t.fullName )
+	end
 end
 
 function autoFields.fullNameUnderline( t )
@@ -236,7 +264,7 @@ function traverse.TK_ENUM( t )
 end
 
 function traverse.TK_EXCEPTION( t )
-	t:includeHeader( "co/UserException.h" )
+	t:includeHeader( "co/Exception.h" )
 end
 
 function traverse.TK_STRUCT( t )

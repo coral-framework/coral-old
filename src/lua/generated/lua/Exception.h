@@ -7,19 +7,19 @@
 #define _LUA_EXCEPTION_H_
 
 #include <co/TypeTraits.h>
-#include <co/UserException.h>
+#include <co/Exception.h>
 
 // lua.Exception Mapping:
 namespace lua {
 
-class Exception : public co::UserException
+class Exception : public co::Exception
 {
 public:
 	Exception()
 	{;}
 
 	Exception( const std::string& message )
-		: co::UserException( message )
+		: co::Exception( message )
 	{;}
 };
 

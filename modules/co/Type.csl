@@ -1,12 +1,10 @@
-import co.Uuid;
-
 /*
 	Basic Type interface.
  */
 interface Type
 {
 	/*
-		The type's local name (i.e. not considering its namespace).
+		The type's local name (not considering its namespace).
 		For instance, for the type <tt>liquid.drinkable.Water</tt>, the local name would be <tt>Water</tt>.
 	 */
  	readonly attribute string name;
@@ -40,7 +38,7 @@ interface Type
 	/*
 		The type's reflector. Getting this attribute may cause the type's module to be loaded,
 		in order to instantiate its reflector. Therefore, getting this attribute may raise a
-		co::ModuleLoadException, which also indicates that the reflector cannot be obtained.
+		ModuleLoadException, which also indicates that the reflector cannot be obtained.
 	 */
 	attribute Reflector reflector;
 };

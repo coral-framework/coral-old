@@ -247,14 +247,14 @@ void ModuleManager::verifyModuleIntegrity( co::Module* module )
 			}
 		}
 	}
-	catch( std::exception& )
+	catch( std::exception& e )
 	{
 		assert( !types.isEmpty() );
 		module->abort();
 		CORAL_THROW( co::ModuleLoadException, "module '"
 				<< module->getNamespace()->getFullName()
 				<< "' was aborted because it did not provide a reflector for type '"
-				<< types.getFirst()->getFullName() << "'" );
+				<< types.getFirst()->getFullName() << "' (" << e.what() << ")" );
 	}
 }
 

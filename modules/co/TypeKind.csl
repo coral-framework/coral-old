@@ -1,8 +1,8 @@
 /*
-	Enumeration containing all kinds of Types available in Coral.
+	The kinds of types available in the Coral type system.
  */
 enum TypeKind
-{	
+{
 	TK_NONE,			//< Invalid type kind.
 	TK_ANY,				//< The special 'any' (variant) type.
 	TK_BOOLEAN,			//< Boolean value; either true or false.

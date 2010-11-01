@@ -1,12 +1,13 @@
 /*
-	Transaction for creating a set of inter-dependent Coral types atomically.
+	Allows sets of interdependent types to be created atomically.
  */
 interface TypeCreationTransaction
 {
+	// List of TypeBuilders participating in the transaction.
 	readonly attribute TypeBuilder[] typeBuilders;
 
 	/*
-		Effectively creates all types associated with this transaction, registering them with the TypeManager.
+		Creates all types associated with this transaction, registering them with the system's TypeManager.
 
 		This validates any unvalidated type, which includes checking for missing data and semantic errors.
 		If any type fails any of the checks, an exception is thrown and the user is expected to call rollback().

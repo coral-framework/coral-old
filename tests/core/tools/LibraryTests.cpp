@@ -5,7 +5,7 @@
 
 #include <core/tools/Library.h>
 #include <core/tools/RefCounted.h>
-#include <co/CoreException.h>
+#include <co/ModuleLoadException.h>
 #include <gtest/gtest.h>
 
 class TestData : public co::RefCounted
@@ -106,11 +106,11 @@ TEST( LibraryTests, simpleLoading )
 
 	// try to load an invalid dynamic library
 	co::Library invalidLib( getData().invalidLibPath );
-	EXPECT_THROW( invalidLib.load(), co::CoreException );
+	EXPECT_THROW( invalidLib.load(), co::ModuleLoadException );
 	EXPECT_FALSE( invalidLib.isLoaded() );
 	EXPECT_NO_THROW( invalidLib.unload() );
 	EXPECT_FALSE( invalidLib.isLoaded() );
-	EXPECT_THROW( invalidLib.resolve( "foo" ), co::CoreException );
+	EXPECT_THROW( invalidLib.resolve( "foo" ), co::ModuleLoadException );
 }
 
 TEST( LibraryTests, redundantLoads )

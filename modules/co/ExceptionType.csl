@@ -1,5 +1,5 @@
 /*
-	Named exception that can be thrown by methods.
+	Type representing a named exception that can be raised by methods.
  */
 interface ExceptionType : Type
 {

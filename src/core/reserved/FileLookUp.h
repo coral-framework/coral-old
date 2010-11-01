@@ -13,11 +13,10 @@
 namespace co {
 
 /*!
-	Searches for a file within a list of directories in the filesystem.
+	\brief Searches for a file within a list of directories in the filesystem.
 
 	The search supports multiple possible file names (and/or relative locations), specified by the
-	'filePathList' property; and multiple possible file extensions, specified by the 'extensionList'
-	property.
+	\c filePathList property; as well as multiple file extensions, specified by \c extensionList.
 
 	File name combinations are evaluated in the same order they're listed, and in case of ambiguities
 	the search will always return the first match.

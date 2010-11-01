@@ -67,14 +67,14 @@ public:
 	/*!
 		Loads the library (if not currently loaded) using the current load hints.
 		Note that you are not required to call this method explicitly, as resolve() will call it internally.
-		\throw CoreException if an error occurs while loading the library.
+		\throw ModuleLoadException if an error occurs while loading the library.
 	 */
 	void load();
 
 	/*!
 		Resolves the address of an exported library symbol.
 		Returns 0 if the library was successfully loaded, but the symbol could not be found.
-		\throw CoreException if the library could not be loaded.
+		\throw ModuleLoadException if the library could not be loaded.
 	 */
 	void* resolve( const char* symbolName );
 
@@ -85,7 +85,7 @@ public:
 		guaranteed that the DLL will really be unloaded by the OS. For instance, on UNIX-based
 		systems this method only decrements the library's reference count.
 
-		\throw CoreException if an error occurs while unloading the library.
+		\throw ModuleLoadException if an error occurs while unloading the library.
 	 */
 	void unload();
 

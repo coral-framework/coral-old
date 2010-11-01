@@ -1,5 +1,5 @@
 /*
-	Component that implements co.InterfaceType.
+	Implements co.InterfaceType.
  */
 component InterfaceTypeComponent
 {

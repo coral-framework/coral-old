@@ -8,10 +8,10 @@
 #include "CSLParser.h"
 #include <co/Namespace.h>
 #include <co/TypeBuilder.h>
-#include <co/CoreException.h>
 #include <co/MethodBuilder.h>
 #include <co/InterfaceType.h>
 #include <co/ExceptionType.h>
+#include <co/TypeLoadException.h>
 #include <co/TypeCreationTransaction.h>
 #include <co/IllegalArgumentException.h>
 #include <sstream>
@@ -133,51 +133,50 @@ static void formatErrorMessage( pANTLR3_BASE_RECOGNIZER recognizer, std::string&
 
 static void handleError( pANTLR3_BASE_RECOGNIZER recognizer )
 {	
-	// signal we are in error recovery now
+	// indicate we're recovering from an error
 	recognizer->state->errorRecovery = ANTLR3_TRUE;
 
-	// indicate this recognizer had an error while processing.
+	// indicate this recognizer had an error
 	recognizer->state->errorCount++;
 }
 
 static void	reportParserError( pANTLR3_BASE_RECOGNIZER recognizer )
 {
+	// if already recovering from an error, ignore additional calls
 	if( recognizer->state->errorRecovery == ANTLR3_TRUE )
-	{
-		// already in error recovery so don't display another error while doing so
 		return;
-	}
 
 	std::string message;
 	formatErrorMessage( recognizer, message );
 
 	handleError( recognizer );
+
 	// access the parser
 	Parser* parser = reinterpret_cast<Parser*>( recognizer->state->userp );
 	parser->setCurrentLine( recognizer->state->exception->line );
 
-	CORAL_THROW( co::CoreException, message );
+	CORAL_THROW( co::TypeLoadException, message );
 }
 
 static void	reportLexerError( pANTLR3_BASE_RECOGNIZER recognizer )
 {
+	// if already recovering from an error, ignore additional calls
 	if( recognizer->state->errorRecovery == ANTLR3_TRUE )
-	{
-		// already in error recovery so don't display another error while doing so
 		return;
-	}
+
 	handleError( recognizer );
 
 	std::string message;
 	formatErrorMessage( recognizer, message );
 
 	handleError( recognizer );
+
 	// access the parser
 	Parser* parser = reinterpret_cast<Parser*>( recognizer->state->userp );
 	pANTLR3_LEXER lexer = reinterpret_cast<pANTLR3_LEXER>( recognizer->super );
 	parser->setCurrentLine( lexer->getLine( lexer ) );
 
-	CORAL_THROW( co::CoreException, message );
+	CORAL_THROW( co::TypeLoadException, message );
 }
 
 void Parser::parse( const std::string& cslFilePath )
@@ -225,45 +224,62 @@ void Parser::parse( const std::string& cslFilePath )
 
 void Parser::onComment( const std::string& text )
 {
-	std::string docText;
-	filterText( text, docText );
+	assert( text.length() >= 2 );
 
-	std::size_t carriagePos = docText.find( '\r' );
-	while ( carriagePos != std::string::npos )
-	{
-		docText.erase( carriagePos, 1 );
-		carriagePos = docText.find( '\r' );
-	}
+	static const char* START_END_BLANKS = " *\t\r\n";
+
+	bool isRetroactive = false;
+	bool isLineComment = ( text[1] != '*' );
+
+	// discard the comment's opening symbol
+	size_t start = 2;
 
 	// is this retroactive documentation?
-	if( docText.length() > 2 && docText[2] == '<' )
+	if( text.length() > 2 && text[2] == '<' )
 	{
-		addDocumentation( _lastMember, docText );
-		return;
+		start = 3;
+		isRetroactive = true;
 	}
+	start = text.find_first_not_of( START_END_BLANKS, start );
+	
+	// ignore a comment if it starts with a dash (useful for separators)
+	if( text.length() > start && text[start] == '-' )
+		return;
 
-	_docBuffer.append( docText );
+	// discard the comment's closing symbol (\n or */)
+	size_t end = ( text.length() - ( isLineComment ? 1 : 2 ) );
+	end = text.find_last_not_of( START_END_BLANKS, end );
+
+	// extract and add the doc text
+	size_t len = ( end - start ) + 1;
+	std::string docText;
+	docText.reserve( len + 1 );
+	if( !_docBuffer.empty() )
+		docText.push_back( '\n' );
+	docText.append( text, start, len );
+
+	if( isRetroactive )
+		addDocumentation( _lastMember, docText );
+	else
+		_docBuffer.append( docText );
 }
 
 void Parser::onCppBlock( const std::string& text )
 {
-	std::string cppText;
-	filterText( text, cppText );
-
-	//removes the opening and closing c++ tags.
-	addCppBlock( cppText.substr( 4, cppText.length() - 8 ) );
+	// removes the opening and closing c++ tags.
+	addCppBlock( text.substr( 4, text.length() - 8 ) );
 }
 
 void Parser::onTypeSpecification( const std::string& typeName, co::TypeKind kind )
 {
 	if( _typeBuilder.isValid() )
 	{
-		CORAL_THROW( co::CoreException, "only one type specification is allowed per file" );
+		CORAL_THROW( co::TypeLoadException, "only one type specification is allowed per file" );
 	}
 
 	if( typeName != _cslFileBaseName )
 	{
-		CORAL_THROW( co::CoreException, "the name of the defined type must match its filename" );
+		CORAL_THROW( co::TypeLoadException, "the name of the defined type must match its filename" );
 	}
 
 	_typeBuilder = createTypeBuilder( typeName, kind );
@@ -287,24 +303,20 @@ void Parser::onImportClause( const std::string& importTypeName )
 	 */
 
 	if( _typeBuilder.isValid() )
-	{
-		CORAL_THROW( co::CoreException, "all import clauses must come before the type specification" );
-	}
+		CORAL_THROW( co::TypeLoadException, "all import clauses must come before the type specification" );
 
 	std::size_t lastDotPos = importTypeName.rfind( '.' );
 	if( lastDotPos == std::string::npos )
-	{
-		CORAL_THROW( co::CoreException, "type '" << importTypeName << "' is in the same namespace and does not require importing" );
-	}
+		CORAL_THROW( co::TypeLoadException, "type '" << importTypeName
+						<< "' is in the same namespace and does not require importing" );
 
 	std::string localTypeName = importTypeName.substr( lastDotPos + 1 );
 
 	// checks whether a type with the same local name was already imported
 	ImportTypeMap::iterator it = _importedTypes.find( localTypeName );
 	if( it != _importedTypes.end() )
-	{
-		CORAL_THROW( co::CoreException, "import '" << importTypeName << "' conflicts with a previous import at line " << it->second.line  );
-	}
+		CORAL_THROW( co::TypeLoadException, "import '" << importTypeName
+						<< "' conflicts with a previous import at line " << it->second.line  );
 
 	_importedTypes.insert( ImportTypeMap::value_type( localTypeName, ImportInfo( importTypeName, _currentLine ) ) );
 }
@@ -320,7 +332,7 @@ void Parser::onSuperType( const std::string& name )
 {
 	co::Type* type = resolveType( name );
 	if( !type )
-		CORAL_THROW( co::CoreException, "could not load super-type '" << name << "'" );
+		CORAL_THROW( co::TypeLoadException, "could not load super-type '" << name << "'" );
 
 	_typeBuilder->defineSuperType( type );
 }
@@ -341,7 +353,7 @@ void Parser::onComponentInterface( bool isFacet, const std::string& name )
 {
 	co::InterfaceType* interface = dynamic_cast<co::InterfaceType*>( getLastDeclaredType() );
 	if( !interface )
-		CORAL_THROW( co::CoreException, "an interface type was expected" );
+		CORAL_THROW( co::TypeLoadException, "an interface type was expected" );
 
 	_typeBuilder->defineInterface( name, interface, isFacet );
 	handleDocumentation( name );
@@ -373,11 +385,11 @@ void Parser::onExeptionRaised( const std::string& name )
 {
 	co::Type* type = resolveType( name );
 	if( !type )
-		CORAL_THROW( co::CoreException, "error loading exception type '" << name << "'" );
+		CORAL_THROW( co::TypeLoadException, "error loading exception type '" << name << "'" );
 
 	co::ExceptionType* exeptionType = dynamic_cast<co::ExceptionType*>( type );
 	if( !exeptionType )
-		CORAL_THROW( co::CoreException, "attempt to raise non-exception type '" << type->getFullName() << "'" );
+		CORAL_THROW( co::TypeLoadException, "attempt to raise non-exception type '" << type->getFullName() << "'" );
 
 	_methodBuilder->defineException( exeptionType );
 }
@@ -416,7 +428,7 @@ void Parser::resolveImports()
 
 		it->second.type = resolveType( it->second.typeName.c_str() );
 		if( it->second.type == NULL )
-			CORAL_THROW( co::CoreException, "could not import '" << it->second.typeName << "'" );
+			CORAL_THROW( co::TypeLoadException, "could not import '" << it->second.typeName << "'" );
 	}
 
 	// if no exceptions are raised, restore the original line.
@@ -435,16 +447,6 @@ void Parser::handleDocumentation( const std::string& member )
 	_docBuffer.clear();
 }
 
-void Parser::filterText( const std::string& input, std::string& output )
-{
-	// remove '\r's from the text
-	size_t length = input.length();
-	output.reserve( length );
-	for( size_t i = 0; i < length; ++i )
-		if( input[i] != '\r' )
-			output.push_back( input[i] );
-}
-
 co::Type* Parser::getLastDeclaredType()
 {
 	co::Type* lastDeclaredType;
@@ -456,7 +458,7 @@ co::Type* Parser::getLastDeclaredType()
 	{
 		lastDeclaredType = resolveType( _lastDeclaredTypeName, _lastDeclaredTypeIsArray );
 		if( !lastDeclaredType )
-			CORAL_THROW( co::CoreException, "error loading dependency '" << _lastDeclaredTypeName << "'" );
+			CORAL_THROW( co::TypeLoadException, "error loading dependency '" << _lastDeclaredTypeName << "'" );
 	}
 	return lastDeclaredType;
 }

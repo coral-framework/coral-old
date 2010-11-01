@@ -1,5 +1,5 @@
 /*
-	Component that implements co.Namespace.
+	Implements co.Namespace.
  */
 component NamespaceComponent
 {

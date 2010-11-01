@@ -7,19 +7,19 @@
 #define _CO_TYPELOADEXCEPTION_H_
 
 #include <co/TypeTraits.h>
-#include <co/UserException.h>
+#include <co/Exception.h>
 
 // co.TypeLoadException Mapping:
 namespace co {
 
-class TypeLoadException : public co::UserException
+class TypeLoadException : public co::Exception
 {
 public:
 	TypeLoadException()
 	{;}
 
 	TypeLoadException( const std::string& message )
-		: co::UserException( message )
+		: co::Exception( message )
 	{;}
 };
 

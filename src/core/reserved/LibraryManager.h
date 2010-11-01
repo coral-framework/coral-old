@@ -14,8 +14,8 @@ class Library;
 class ModulePart;
 
 /*!
-	Auxiliary static class that keeps track of all co::Library instances
-	(corresponding to the loaded module's shared libs) until they can be unloaded.
+	\brief Reserved, auxiliary static class that keeps track of all loaded
+	module libraries (instances of co::Library) until they can be unloaded.
  */
 class CORAL_EXPORT LibraryManager
 {

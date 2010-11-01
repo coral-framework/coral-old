@@ -70,14 +70,14 @@ void moduleRelease()
 	}
 }
 
+// implemented by CORAL_EXPORT_MODULE_PART()
+co::ModulePart* createModulePart();
+
 ]] )
 
 	c.utils.closeNamespaces( writer, c.moduleName )
 
 	writer( [[
-
-// __createModulePart() is implemented by CORAL_EXPORT_MODULE_PART()
-co::ModulePart* __createModulePart();
 
 extern "C" CORAL_DLL_EXPORT
 co::ModulePart* coral_module_part_instance()
@@ -85,7 +85,7 @@ co::ModulePart* coral_module_part_instance()
 	if( !]], c.moduleNS, [[::sg_instance.isValid() )
 	{
 		assert( ]], c.moduleNS, [[::sg_refCount == 0 );
-		]], c.moduleNS, [[::sg_instance = __createModulePart();
+		]], c.moduleNS, [[::sg_instance = ]], c.moduleNS, [[::createModulePart();
 	}
 	return ]], c.moduleNS, [[::sg_instance.get();
 }

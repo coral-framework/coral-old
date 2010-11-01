@@ -14,7 +14,7 @@
 namespace co {
 
 /*!
-	Lexical utility functions.
+	\brief Static class containing lexical utility functions.
  */
 class CORAL_EXPORT LexicalUtilities
 {

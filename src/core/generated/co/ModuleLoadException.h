@@ -7,19 +7,19 @@
 #define _CO_MODULELOADEXCEPTION_H_
 
 #include <co/TypeTraits.h>
-#include <co/UserException.h>
+#include <co/Exception.h>
 
 // co.ModuleLoadException Mapping:
 namespace co {
 
-class ModuleLoadException : public co::UserException
+class ModuleLoadException : public co::Exception
 {
 public:
 	ModuleLoadException()
 	{;}
 
 	ModuleLoadException( const std::string& message )
-		: co::UserException( message )
+		: co::Exception( message )
 	{;}
 };
 

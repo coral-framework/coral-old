@@ -21,6 +21,8 @@
 
 namespace co {
 
+#ifndef DOXYGEN
+
 //! Private namespace with auxiliary code for class co::Any.
 namespace __any {
 
@@ -401,9 +403,14 @@ struct VariableHelper<double>
 
 } // namespace __any
 
+#endif // DOXYGEN
+
 /*!
-	An intermediate representation for variables in the Coral type system, used for reflection.
-	By design, the state of a co::Any is \e transient, so its instances <b>should only be allocated on the stack</b>.
+	\brief An intermediate representation for variables in the Coral type system, used for reflection.
+
+	By design, the state of a co::Any is \e transient, so its instances <b>should only be allocated
+	on the stack</b>. This class is optimized for use in C++ method signatures (as a parameter or
+	return type) and is <b>unsafe for use as a field type or member variable</b>.
 
 	\par Supported Features:
 		- Type checks, including compliance with type const'ness.
@@ -751,7 +758,7 @@ public:
 
 	/*!
 		Should be used after a call to makeOut(), to return an argument to its 'in' condition.
-		For instance, variables of type 'co::int8&' will be dereferenced to a 'co::int8'.
+		For instance, variables of type <tt>co::int8&</tt> will be dereferenced to a <tt>co::int8</tt>.
 		\note This method does not raise exceptions.
 	 */
 	void makeIn();
@@ -818,7 +825,7 @@ public:
 	//! Inequality test operator.
 	inline bool operator!=( const Any& other ) const { return !( *this == other ); }
 
-	// Assignment operator.
+	//! Assignment operator.
 	inline Any& operator=( const Any& other )
 	{
 		copy( other );
@@ -882,14 +889,21 @@ private:
 	_object;
 };
 
+#ifndef DOXYGEN
 template<> struct kindOf<Any> { static const TypeKind kind = TK_ANY; };
+#endif // DOXYGEN
 
 } // namespace co
 
-//! Prints the complete C++ type name of the variable stored in a __any::State.
+#ifndef DOXYGEN
+// Prints the complete C++ type name of the variable stored in a __any::State.
 CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::__any::State& s );
+#endif // DOXYGEN
 
-//! Prints out the variable type and data stored in a co::Any.
+/*!
+	Prints out the variable type and data stored in a co::Any.
+	\relates co::Any
+ */
 CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::Any& a );
 
 #endif // _CO_ANY_H_

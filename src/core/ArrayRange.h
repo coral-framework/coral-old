@@ -12,7 +12,9 @@
 
 namespace co {
 
-//! Teaches a co::ArrayRange how to extract an array out of a custom container.
+#ifndef DOXYGEN
+
+// Instructs an ArrayRange how to extract an array out of a custom container.
 template<typename T, typename C>
 struct ArrayRangeAdaptor
 {
@@ -21,7 +23,7 @@ struct ArrayRangeAdaptor
 	static std::size_t getSize( C& ) { return 0; }
 };
 
-//! We should always be able to create co::ArrayRanges out of const containers.
+// We should always be able to create ArrayRanges out of const containers.
 template<typename T, typename C>
 struct ArrayRangeAdaptor<T, const C>
 {
@@ -31,7 +33,7 @@ struct ArrayRangeAdaptor<T, const C>
 	static std::size_t getSize( const C& container ) { return NCA::getSize( const_cast<C&>( container ) ); }
 };
 
-//! Specialization for std::vectors of values.
+// Specialization for std::vectors of values.
 template<typename T, typename ET>
 struct ArrayRangeAdaptor<T, std::vector<ET> >
 {
@@ -40,7 +42,7 @@ struct ArrayRangeAdaptor<T, std::vector<ET> >
 	static std::size_t getSize( std::vector<ET>& v ) { return v.size(); }
 };
 
-//! Specialization for std::vectors of pointers (allows coercions).
+// Specialization for std::vectors of pointers (allows coercions).
 template<typename T, typename ET>
 struct ArrayRangeAdaptor<T, std::vector<ET*> >
 {
@@ -55,6 +57,8 @@ struct ArrayRangeAdaptor<T, std::vector<ET*> >
 	static std::size_t getSize( std::vector<ET*>& v ) { return v.size(); }
 };
 
+#endif // DOXYGEN
+
 #ifdef CORAL_CC_MSVC
 #pragma warning (push)
 #pragma warning (disable: 4521) // disable "multiple copy constructors specified"
@@ -62,9 +66,16 @@ struct ArrayRangeAdaptor<T, std::vector<ET*> >
 
 /*!
 	\brief An advanced iterator for contiguous arrays of elements.
-	The range [begin, end) is represented by two pointers.
+
+	\tparam T any valid type for C++ arrays.
  
-	Example - how to iterate over a range:
+	The range [start, end) is represented by two pointers.
+	The first and the last elements can be obtained by getFirst() and getLast(), respectively.
+	A traversal can be made in either direction using popFirst() or popLast().
+	It's also possible to index an array element directly using operator[].
+	Testing an ArrayRange object is equivalent to testing whether it isEmpty().
+ 
+	Here's an example of how to iterate over a range:
 	\code
 		std::vector<int> myArray;
 		myArray.push_back( 3 );
@@ -87,7 +98,7 @@ public:
 	{;}
 
 	/*!
-		Creates the range [begin, end) out of two pointers.
+		Creates the range [start, end) out of two pointers.
 		\param[in] start pointer to the first element in the range.
 		\param[in] end pointer to the location right after the last element in the range.
 	 */
@@ -100,16 +111,17 @@ public:
 	ArrayRange( T* array, std::size_t size ) : _start( array ), _end( array + size )
 	{;}
 
-	//! Copy constructor.
-	//@{
+	//! Non-const copy constructor.
 	ArrayRange( ArrayRange& other ) : _start( other._start ), _end( other._end ) {;}
+
+	//! Const copy constructor.
 	ArrayRange( const ArrayRange& other ) : _start( other._start ), _end( other._end ) {;}
-	//@}
 
 	/*!
 		Creates a range spanning the entire contents of an array-like container.
 		By default, the only accepted container type is std::vector, but you may
 		specialize the co::ArrayRangeAdaptor struct to accept other container types.
+		\tparam C a container class for which a co::ArrayRangeAdaptor was defined.
 	 */
 	template<typename C>
 	ArrayRange( C& container )
@@ -134,16 +146,16 @@ public:
 	inline operator bool() const { return _start != _end; }
 
 	//! Returns the first element in the range.
-	//@{
 	inline T& getFirst() { return *_start; }
+
+	//! Returns the first element in the range (const version).
 	inline const T& getFirst() const { return *_start; }
-	//@}
 
 	//! Returns the last element in the range.
-	//@{
 	inline T& getLast() { return *( _end - 1 ); }
-	inline const T& getLast() const { return *( _end - 1 ); }	
-	//@}
+
+	//! Returns the last element in the range (const version).
+	inline const T& getLast() const { return *( _end - 1 ); }
 
 	//! Removes the first element from the range, if it's not empty.
 	inline void popFirst()
@@ -159,11 +171,11 @@ public:
 			--_end;
 	}
 
-	//! Unchecked random access to range elements. Should only be used sparingly, with extreme care.
-	//@{
+	//! Unchecked random access to range elements.
 	inline T& operator[]( int index ) { return *( _start + index ); }
+
+	//! Unchecked random access to range elements (const version).
 	inline const T& operator[]( int index ) const { return *( _start + index ); }
-	//@}
 
 private:
 	T* _start;
@@ -178,6 +190,8 @@ private:
 /* All type-traits definitions related to co::ArrayRange are located below  */
 /****************************************************************************/
 
+#ifndef DOXYGEN
+
 template<typename T>
 struct kindOf<ArrayRange<T> > : public kindOfBase<TK_ARRAY> {};
 
@@ -186,6 +200,8 @@ struct nameOf<ArrayRange<T> > : public nameOfArrayBase<T> {};
 
 template<typename T>
 struct typeOf<ArrayRange<T> > : public typeOfArrayBase<T> {};
+
+#endif // DOXYGEN
 
 } // namespace co
 

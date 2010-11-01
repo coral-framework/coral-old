@@ -1,8 +1,7 @@
 /*
-	Identifies and loads a ModulePart from a certain kind of artifact in a module's directory.
+	Interface responsible for recognizing and loading a ModulePart from a module's dir.
 
-	Please notice that module names are fully-qualified namespace names, which when combined
-	with the list of type repositories indicate a set of directories in the file system.
+	Please notice that a module may actually comprise a set of dirs scattered over the Coral path.
  */
 interface ModulePartLoader
 {

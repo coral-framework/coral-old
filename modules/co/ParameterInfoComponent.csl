@@ -1,5 +1,5 @@
 /*
-	Component that implements co.ParameterInfo.
+	Implements co.ParameterInfo.
  */
 component ParameterInfoComponent
 {

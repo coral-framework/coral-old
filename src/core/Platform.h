@@ -6,15 +6,18 @@
 #ifndef _CO_PLATFORM_H_
 #define _CO_PLATFORM_H_
 
-//! \file Platform.h Platform Info and Portable Types
-
-#include <co/Config.h>
-#include <cassert>
-#include <cstddef>
+/*!
+	\file
+	Platform Info, Portable Types and Utilities
+ */
 
 #ifndef __cplusplus
 	#error Coral requires a C++ compiler.
 #endif
+
+#include <co/Config.h>
+#include <cassert>
+#include <cstddef>
 
 //------ Build Mode Detection ------------------------------------------------
 
@@ -202,7 +205,8 @@ const int64		MIN_INT64	= -MAX_INT64 - 1;
 } // namespace co
 
 /*!
-	Imports all portable integer types into the current namespace.
+	\brief Imports all portable integer types into the current namespace.
+
 	This is useful if you want to write \c uint8, \c int32, etc. in your code.
  */
 #define USING_CORAL_INTEGER_TYPES	\
@@ -216,15 +220,8 @@ const int64		MIN_INT64	= -MAX_INT64 - 1;
 	using co::uint64;
 
 /*!
-	\addtogroup platformutils Utility Macros and Functions
-	@{
- */
-
-/*!
-	\def CORAL_STATIC_CHECK( const_expr, id_msg )
-	Evaluates a constant expression and, if the result is false, aborts the
-	compilation with an error message.
-
+	\brief Evaluates a constant expression and, if the result is false,
+	aborts the compilation with an error message.
 	\param[in] const_expr compile-time integral or pointer expression.
 	\param[in] id_msg C++ identifier that describes the error (it does not need to be defined).
 		Something like 'invalid_element_size'.
@@ -233,55 +230,62 @@ const int64		MIN_INT64	= -MAX_INT64 - 1;
     { co::CompileTimeError<( (const_expr) != 0 )> ERROR_##id_msg; (void)ERROR_##id_msg; }
 
 /*!
-	\def CORAL_ARRAY_LENGTH( array )
-	Returns the number of elements in a statically allocated array.
-	\param[in] array name of a statically allocated array.
+	\brief Returns the number of elements in a statically-allocated array.
+	\param[in] array name of a statically-allocated array.
  */
 #define CORAL_ARRAY_LENGTH( array )	( sizeof( array ) / sizeof( array[0] ) )
 
 /*!
 	\def CORAL_INT64_C( c )
-	Wraps the signed 64-bit integer literal 'c' in a platform-independent way.
+	\brief Wraps the signed 64-bit integer literal 'c' in a platform-independent way.
 
 	\def CORAL_UINT64_C( uc )
-	Wraps the unsigned 64-bit integer literal 'uc' in a platform-independent way.
+	\brief Wraps the unsigned 64-bit integer literal 'uc' in a platform-independent way.
  */
 #if defined(CORAL_OS_WIN) && !defined(CORAL_CC_GNU)
 	#define CORAL_INT64_C( c ) c ## i64
-	#define CORAL_UINT64_C( c ) c ## ui64
+	#define CORAL_UINT64_C( uc ) uc ## ui64
 #elif CORAL_POINTER_SIZE == 8 && !defined(CORAL_OS_MAC)
 	#define CORAL_INT64_C( c ) c ## L
-	#define CORAL_UINT64_C( c ) c ## UL
+	#define CORAL_UINT64_C( uc ) uc ## UL
 #else
 	#define CORAL_INT64_C( c ) c ## LL
-	#define CORAL_UINT64_C( c ) c ## ULL
+	#define CORAL_UINT64_C( uc ) uc ## ULL
 #endif
 
 //! Supresses 'unused parameter' warnings.
 #define CORAL_UNUSED( x ) (void)x;
 
-// Portable function attributes to force or forbid inlining.
+/*!
+	\def CORAL_FORCE_INLINE
+	\brief Portable function attribute to force inlining.
+	\def CORAL_NO_INLINE
+	\brief Portable function attribute to forbid inlining.
+ */
 #if defined(CORAL_CC_MSVC)
 	#define CORAL_FORCE_INLINE __forceinline 
 	#define CORAL_NO_INLINE __declspec(noinline)
-#else
-	// assumes the compiler is GCC-compatible 
+#else // assumes the compiler is GCC-compatible 
 	#define CORAL_FORCE_INLINE __attribute__((always_inline)) 
 	#define CORAL_NO_INLINE __attribute__((noinline)) 
 #endif 
 
-/*! @} */ // end of group platformutils
-
-//! Main namespace of this library.
+//! Coral's main namespace.
 namespace co {
+
+#ifndef DOXYGEN
 
 // Template trick to yield compile time errors:
 template<int> struct CompileTimeError;
 template<> struct CompileTimeError<true> {};
 
+#endif // DOXYGEN
+
 } // namespace co
 
 //------ Portable shared-library interface attributes ------
+
+#ifndef DOXYGEN
 
 #if defined(CORAL_OS_WIN)
 	#define CORAL_DLL_EXPORT __declspec(dllexport)
@@ -295,5 +299,7 @@ template<> struct CompileTimeError<true> {};
 	#define CORAL_EXPORT
 	#define CORAL_DLL_EXPORT
 #endif
+
+#endif // DOXYGEN
 
 #endif // _CO_PLATFORM_H_

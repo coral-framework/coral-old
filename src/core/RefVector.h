@@ -12,8 +12,12 @@
 namespace co {
 
 /*!
-	A std::vector of reference pointers to Coral interfaces of type T.
-	Offers two extra methods, to maintain sorted arrays: sortedFind() and sortedInsert().
+	\brief An enhanced std::vector of co::RefPtr's.
+ 
+	\tparam T an interface type (co::Interface).
+ 
+	Supports automatic coercion to co::ArrayRange< T* >.
+	Also offers extra methods for sorted arrays: sortedInsert() and sortedFind().
  */
 template<class T>
 class RefVector : public std::vector< co::RefPtr<T> >
@@ -112,7 +116,9 @@ public:
 	//@}}
 };
 
-//! co::ArrayRangeAdaptor to extract an interface-pointer array out of a co::RefVector.
+#ifndef DOXYGEN
+
+// ArrayRangeAdaptor to extract an interface-pointer array out of a RefVector.
 template<typename T, typename ET>
 struct ArrayRangeAdaptor<T, RefVector<ET> >
 {
@@ -139,6 +145,8 @@ struct nameOf<RefVector<T> > : public nameOfArrayBase<T> {};
 
 template<typename T>
 struct typeOf<RefVector<T> > : public typeOfArrayBase<T> {};
+
+#endif // DOXYGEN
 
 } // namespace co
 

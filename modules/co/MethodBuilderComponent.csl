@@ -1,5 +1,5 @@
 /*
-	Component that implements co.MethodBuilder.
+	Implements co.MethodBuilder.
  */
 component MethodBuilderComponent
 {

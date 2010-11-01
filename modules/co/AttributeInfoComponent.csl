@@ -1,5 +1,5 @@
 /*
-	Component that implements co.AttributeInfo.
+	Implements co.AttributeInfo.
  */
 component AttributeInfoComponent
 {

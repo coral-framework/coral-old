@@ -18,24 +18,34 @@ end
 
 M.toHeaderName = toHeaderName
 
-function M.openNamespaces( writer, ns )
-	for name in ns:gmatch( "([^%.]+)%.?" ) do
-		writer( "namespace ", name, " {\n" )
+local function openBlocks( writer, keyword, fullName )
+	for name in fullName:gmatch( "([^%.]+)%.?" ) do
+		writer( keyword, " ", name, " {\n" )
 	end
 end
 
-local function closeNamespaces( writer, ns, it )
+M.openBlocks = openBlocks
+
+function M.openNamespaces( writer, ns )
+	openBlocks( writer, "namespace", ns )
+end
+
+local function closeBlocks( writer, keyword, fullName, it )
 	if not it then
-		it = ns:gmatch( "([^%.]+)%.?" )
+		it = fullName:gmatch( "([^%.]+)%.?" )
 	end
 	local name = it()
 	if name then
-		closeNamespaces( writer, ns, it )
-		writer( "} // namespace ", name, "\n" )
+		closeBlocks( writer, keyword, fullName, it )
+		writer( "} // ", keyword, " ", name, "\n" )
 	end
 end
 
-M.closeNamespaces = closeNamespaces
+M.closeBlocks = closeBlocks
+
+function M.closeNamespaces( writer, ns )
+	closeBlocks( writer, "namespace", ns )
+end
 
 function M.formatAccessor( prefix, attribName )
 	return prefix .. attribName:sub( 1, 1 ):upper() .. attribName:sub( 2 )

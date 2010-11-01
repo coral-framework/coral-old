@@ -8,6 +8,10 @@ local utils = require "co.compiler.utils"
 local dependencies = require "co.compiler.dependencies"
 local TypeWrapper = require "co.compiler.TypeWrapper"
 
+local dox = require "co.compiler.dox"
+local doxyConf = require "co.compiler.dox.conf"
+local moduleDox = require "co.compiler.dox.module"
+
 local mapping = require "co.compiler.mapping"
 
 local componentBaseHeader = require "co.compiler.module.componentBaseHeader"
@@ -24,7 +28,6 @@ local moduleDefaultPart = require "co.compiler.module.defaultPart"
 local Compiler = {
 	------ Default Field Values --
 	outDir = "./generated",		-- output dir for generated files
-	numMappings = 0,			-- number of required mappings
 	log = function( ... ) end,	-- function called to print misc. info (stats, etc.)
 
 	------ Easy access to re-usable modules/templates ------
@@ -68,6 +71,21 @@ local function expand( dir, filename, template, ... )
 	numExpandedFiles = numExpandedFiles + 1
 end
 
+-- Runs the compiler to generate documentation. Each module type produces a reshaped CSL
+-- file for consumption by Doxygen, containing the type's description and documentation.
+function Compiler:generateDox( moduleName )
+	assert( not self.updatedTypes and #self.types == 0, "this compiler instance has already been used" )
+	self.moduleName = moduleName
+	self:loadModuleTypes()
+	numExpandedFiles = 0
+	for i, t in ipairs( self.types ) do
+		expand( self.outDir, t.name .. '.dox', dox, self, t )
+	end
+	expand( self.outDir, '__module.dox', moduleDox, self )
+	expand( self.outDir, 'Doxygen.conf', doxyConf, self )
+	self.log( "Generated " .. numExpandedFiles .. " documentation files." )
+end
+
 local function isBuiltInType( t )
 	local name = t.fullName
 	return name == 'co.Interface' or name == 'co.TypeKind'
@@ -88,12 +106,13 @@ end
 
 -- Runs the compiler to generate mappings. Use this when you don't need to generate a module.
 function Compiler:generateMappings()
-	assert( self.numMappings == 0, "this compiler instance has already been used" )
+	assert( not self.updatedTypes, "this compiler instance has already been used" )
 
 	if not self.mappingsDir then
 		self.mappingsDir = self.outDir
 	end
 
+	-- if not called through generateModule(), we must load the cache ourselves
 	if not self.moduleName then
 		self:loadCache()
 	end
@@ -120,7 +139,6 @@ function Compiler:generateMappings()
 		end
 	end
 
-	self.numMappings = numMappings
 	self.updatedTypes = updatedTypes
 
 	self.log( reportChanges( "Created", "mapping", numExpandedFiles, numMappings ) )
