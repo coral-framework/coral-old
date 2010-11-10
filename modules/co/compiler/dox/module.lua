@@ -22,8 +22,8 @@ local function template( writer, c )
 	\namespace ]], utils.toCppName( c.moduleName ), '\n', [[
 	CSL namespace '<tt>]], c.moduleName, [[</tt>'.
 
-	\weakgroup coral_type List of Coral Types
-	\brief List of all Coral Types in this documentation, grouped by \ref co::TypeKind "TypeKind".
+	\weakgroup coral_types Coral Types
+	\brief This is a list of Coral types, grouped into \ref co::TypeKind "TypeKinds".
  */
 //@{
 /*!
@@ -31,43 +31,43 @@ local function template( writer, c )
 
 	if countTypeKinds.TK_INTERFACE > 0 then
 		writer [[
-	\weakgroup coral_interface Coral Interface
-	\brief List of all Coral Interfaces in this documentation.
+	\weakgroup coral_interfaces Coral Interfaces
+	\brief List of Coral Interfaces.
 ]]
 	end
 
 	if c.moduleName ~= "co" and countTypeKinds.TK_COMPONENT > 0 then
 		writer [[
-	\weakgroup coral_component Coral Component
-	\brief List of all Coral Components in this documentation.
+	\weakgroup coral_components Coral Components
+	\brief List of Coral Components.
 ]]
 	end
 
 	if countTypeKinds.TK_NATIVECLASS > 0 then
 		writer [[
-	\weakgroup coral_nativeclass Coral Native Class
-	\brief List of all Coral Native Classes in this documentation.
+	\weakgroup coral_nativeclasses Coral Native Classes
+	\brief List of Coral Native Classes.
 ]]
 	end
 
 	if countTypeKinds.TK_STRUCT > 0 then
 		writer [[
-	\weakgroup coral_struct Coral Struct
-	\brief List of all Coral Structs in this documentation.
+	\weakgroup coral_structs Coral Structs
+	\brief List of Coral Structs.
 ]]
 	end
 
 	if countTypeKinds.TK_ENUM > 0 then
 		writer [[
-	\weakgroup coral_enum Coral Enum
-	\brief List of all Coral Enums in this documentation.
+	\weakgroup coral_enums Coral Enums
+	\brief List of Coral Enums.
 ]]
 	end
 
 	if countTypeKinds.TK_EXCEPTION > 0 then
 		writer [[
-	\weakgroup coral_exception Coral Exception
-	\brief List of all Coral Exceptions in this documentation.
+	\weakgroup coral_exceptions Coral Exceptions
+	\brief List of Coral Exceptions.
 ]]
 	end
 

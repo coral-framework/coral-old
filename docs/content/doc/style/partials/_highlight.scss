@@ -1,0 +1,36 @@
+/*
+	Highlight color theme inspired by Xcode.
+ */
+.cpp, .csl {
+	.num { color:#282AD8; } // Number
+	.esc { color:#000000; } // Escape
+	.str { color:#D13019; } // String
+	.pps { color:#78492A; } // Preprocessor String
+	.slc { color:#008400; } // Single-line Comment
+	.com { color:#008400; } // Block Comment
+	.ppc { color:#78492A; } // Preprocessor
+	.opt { color:#000000; } // Operator
+	.lin { color:#808080; } // Line
+	.kwa { color:#BA2DA2; } // Keywords
+	.kwb { color:#BA2DA2; } // TypeDecl Keywords
+	.kwc { color:#703DAA; } // Built-in Types
+	.kwg { color:#31585E; } // Methods
+	.kwe { color:#3E1E81; } // Constants
+	.kwf { color:#4F8087; } // Identifiers
+}
+
+.ebnf {
+	.num { color:#1094a0; }
+	.esc { color:#dc6816; }
+	.str { color:#D13019; }
+	.pps { color:#1094a0; }
+	.slc { color:#969696; }
+	.com { color:#969696; }
+	.ppc { color:#69c73a; }
+	.opt { color:#1737FF; }
+	.lin { color:#969696; }
+	.kwa { color:#004C14; }
+	.kwb { color:#a00050; }
+	.kwc { color:#3b6ac8; }
+	.kwd { color:#c73a69; }
+}

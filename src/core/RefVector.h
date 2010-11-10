@@ -45,7 +45,6 @@ public:
 		\warning Assumes the specified range is already sorted according to the \c Comparator function.
 		\sa sortedInsert()
 	 */
-	//@{
 	template<class Key, class Comparator>
 	inline bool sortedFind( const Key& key, Comparator compare, std::size_t first, std::size_t last, std::size_t& pos )
 	{
@@ -69,6 +68,10 @@ public:
 		return false;
 	}
 
+	/*!
+		\overload
+		This overload operates on the whole co::RefVector, in the range [0, n - 1].
+	 */
 	template<class Key, class Comparator>
 	inline bool sortedFind( const Key& key, Comparator compare, std::size_t& pos )
 	{
@@ -79,18 +82,15 @@ public:
 		}
 		return sortedFind( key, compare, 0, this->size() - 1, pos );
 	}
-	//@}
 
 	/*!
-		Inserts a new element in a sorted vector of interfaces.
-		Intended to be used in combination with sortedFind().
-		See sortedFind() for a description of the \c Comparator function.
+		Inserts a new element in a sorted vector of interfaces. Intended for use in combination
+		with sortedFind(). See sortedFind() for a description of the \c Comparator function.
 		\return \c true on success; or \c false if an existing element with the same key was found.
 		\sa sortedFind()
-		\note This method is probably more efficient than using std::lower_bound and insert(), because
-			it does fewer calls to the comparator and uses co::RefPtr::swap() instead of assignments.
+		\note This method is supposed to be slightly more efficient than using std::lower_bound
+				and insert(), mainly because it uses co::RefPtr<T>::swap().
 	 */
-	//@{
 	template<typename Key, typename Comparator>
 	inline bool sortedInsert( const Key& key, T* element, Comparator compare )
 	{
@@ -108,12 +108,12 @@ public:
 		return true;
 	}
 
+	//! \overload
 	template<typename Key, typename Comparator>
-	inline bool sortedInsert( const Key& key, co::RefPtr<T>& value, Comparator compare )
+	inline bool sortedInsert( const Key& key, co::RefPtr<T>& element, Comparator compare )
 	{
-		return sortedInsert<Key, Comparator>( key, value.get(), compare );
+		return sortedInsert<Key, Comparator>( key, element.get(), compare );
 	}
-	//@}}
 };
 
 #ifndef DOXYGEN

@@ -1,0 +1,10 @@
+- render "base" do
+	%body.bp
+		#header= render 'partials/header'
+		#container
+			#sidebar= render 'partials/sidebar'
+			#mainarea
+				#toolbar= render 'partials/toolbar'
+				#content.doc= yield
+		#footer= render 'partials/footer'
+		= render 'partials/analytics'

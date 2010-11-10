@@ -1,0 +1,89 @@
+#!/usr/bin/env ruby
+
+require 'compass'
+
+Compass.add_project_configuration( 'config.rb' )
+
+### Preprocessing Rules
+
+preprocess do
+  # remove css and images from the sitemap
+  items.each { |item| if item.identifier.include?( "/doc/images/" ) ||
+                         item.identifier.include?( "/doc/js/" ) ||
+                         item.identifier.include?( "/doc/style/" ) then
+      item[:is_hidden] = true
+    end }
+end
+
+### Compilation Rules
+
+compile '/doc/js/*/' do
+  nil # don't compile javascripts
+end
+
+compile '/doc/style/partials/*/' do
+  nil # don't compile partials
+end
+
+compile '/doc/style/*/' do
+  filter :sass, Compass.sass_engine_options
+  filter :relativize_paths, :type => :css
+end
+
+compile '*' do
+  if not item.binary? then
+    # item[:extension] returns 'html.erb' for multi-dotted filename
+    ext = item[:extension].nil? ? nil : item[:extension].split('.').last
+
+    case ext
+      when 'md', 'markdown'
+        filter :colorize_code
+        filter :erb
+        filter :rdiscount
+      when 'haml'
+        filter :haml
+      else
+        filter :erb
+    end
+
+    # use layouts for items mapped to .html or with layout specified in meta
+    item[:layout] = "none" unless item[:layout] || File.extname( route_path( item ) ) == '.html'
+    unless item[:layout] == "none"
+      layout item[:layout] || 'default'
+      filter :relativize_paths, :type => :html
+    end
+
+	# adjust the relative path of all items outside 'doc', to account for the current version
+	unless item.identifier =~ /^\/doc\//
+		filter :gsubfilter, :pattern => /doc\//, :replacement => "#{@config[:version]}/"
+	end
+  end
+end
+
+### Routing Rules
+
+route '/doc/js/*/' do
+  # special route for javascripts
+  item.identifier.chop + '.' + item[:extension]
+end
+
+route '/doc/style/partials/*/' do
+  nil # don't output partials
+end
+
+route '/doc/style/*/' do
+  # special route for stylesheets
+  item.identifier.chop + '.css'
+end
+
+route '*' do
+  if item.binary?
+    item.raw_filename[7..-1]
+  else
+    route_path( item )
+  end
+end
+
+### Layout Rules
+
+layout '*', :haml, :ugly => true

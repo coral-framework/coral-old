@@ -128,12 +128,12 @@ function write.TK_COMPONENT( writer, t )
 end
 
 local typeGroupName = {
-	TK_ENUM = "enum",
-	TK_EXCEPTION = "exception",
-	TK_STRUCT = "struct",
-	TK_NATIVECLASS = "nativeclass",
-	TK_INTERFACE = "interface",
-	TK_COMPONENT = "component",
+	TK_ENUM = "enums",
+	TK_EXCEPTION = "exceptions",
+	TK_STRUCT = "structs",
+	TK_NATIVECLASS = "nativeclasses",
+	TK_INTERFACE = "interfaces",
+	TK_COMPONENT = "components",
 }
 
 local function template( writer, c, t )

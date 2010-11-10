@@ -1,0 +1,19 @@
+---
+layout: none
+is_hidden: true
+---
+<%=
+
+layoutPage = @site.items.find{ |i| i.identifier == "/doc/api/layout/" }
+
+header = layoutPage.compiled_content( :snapshot => :last )
+
+# Extract the header part of the layout (for Doxygen)
+header = header[/^(.+)<div class='doc' id='content'>/m, 1] + "<div class='api' id='content'>"
+
+header.gsub!( /<title>.+<\/title>/, "<title>Coral $projectnumber: $title</title>" )
+
+header.gsub!( /<li class='last'>\s*<span class="active" title="You're here.">Current Page<\/span>\s*<\/li>/,
+				"<li><a href='/'>API</a></li><li id='doxtitle'>$title</li>" )
+
+%>

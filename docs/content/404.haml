@@ -1,0 +1,19 @@
+---
+title: Page Not Found
+layout: standalone
+---
+
+%center
+	%h1 #{@item[:title]}
+
+	%div.sectionlist{:style => "font-size: 16px; font-weight: bold;"}
+		%p
+			Looks like the page you're after doesn't exist.
+			%br
+			Guess you're going to have to go <a href="/">home</a> and try again!
+			%br
+			You will be redirected momentarily...
+
+:javascript
+	function delayer() { window.location = "http://doc.libcoral.org"; }
+	window.onload = function() { setTimeout( 'delayer()', 5000 ); }

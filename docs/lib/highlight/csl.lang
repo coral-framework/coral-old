@@ -1,0 +1,96 @@
+Description="CSL"
+
+Keywords = {
+	{	-- General Keywords
+		Id = 1,
+		List = {
+			"import",
+		},
+	},
+	{	-- TypeDecl Keywords
+		Id = 2,
+		List = {
+			"attribute",
+			"class",
+			"component",
+			"enum",
+			"exception",
+			"in",
+			"inout",
+			"interface",
+			"native",
+			"out",
+			"provides",
+			"raises",
+			"readonly",
+			"receives",
+			"struct",
+			"void",
+		},
+	},
+	{	-- Built-in Types
+		Id = 3,
+		List = {
+			"any",
+			"bool",
+			"double",
+			"float",
+			"int8",
+			"int16",
+			"int32",
+			"int64",
+			"string",
+			"uint8",
+			"uint16",
+			"uint32",
+			"uint64",
+		},
+	},
+	{	-- Methods
+		Id = 4,
+		Regex = [[(\w+)\s*\(]]
+	},
+	{	-- Enum Constants
+		Id = 5,
+		Regex = [[^\s*(\w+)[\s,]*$]],
+	},
+	{	-- Identifiers (something.like.This)
+		Id = 6,
+		Regex = [[((\w+\.)*[A-Z]\w*)]],
+		Group = 1,
+	},
+}
+
+Strings = {
+	Delimiter = [["]],
+}
+
+IgnoreCase = false
+
+Comments = {
+	{
+		Block = false,
+		Delimiter= { "//" },
+	},
+	{
+		Block = true,
+		Nested = false,
+		Delimiter = { [[\/\*]], [[\*\/]] }
+  }
+}
+
+NestedSections = {
+	{
+		Lang = "c",
+		Delimiter = { [[<c\+\+]], [[c\+\+>]] }
+	}
+}
+
+-- resolve issue with ]] close delimiter which ends comments and strings
+function OnStateChange( oldState, newState, token )
+
+   if token=="]]" and oldState==HL_STRING and newState==HL_BLOCK_COMMENT_END then
+      return HL_STRING_END
+   end
+   return newState
+end

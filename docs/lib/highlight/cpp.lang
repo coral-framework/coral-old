@@ -1,0 +1,158 @@
+Description="C++"
+
+Keywords = {
+	{
+		-- General Keywords
+		Id = 1,
+		List = {
+			"assert",
+			"break",
+			"case",
+			"catch",
+			"const_cast",
+			"continue",
+			"default",
+			"delete",
+			"do",
+			"dynamic_cast",
+			"else",
+			"false",
+			"for",
+			"if",
+			"namespace",
+			"new",
+			"reinterpret_cast",
+			"return",
+			"sizeof",
+			"static_cast",
+			"switch",
+			"this",
+			"throw",
+			"true",
+			"try",
+			"typeid",
+			"using",
+			"while",
+		}
+	},
+	{	-- TypeDecl Keywords
+		Id = 2,
+		List= {
+			"class",
+			"const",
+			"enum",
+			"explicit",
+			"extern",
+			"friend",
+			"inline",
+			"inline",
+			"mutable",
+			"operator",
+			"private",
+			"private:",
+			"protected",
+			"protected:",
+			"public",
+			"public:",
+			"register",
+			"static",
+			"struct",
+			"template",
+			"typedef",
+			"union",
+			"virtual",
+			"void",
+			"volatile",
+		}
+	},
+	{
+		-- Standard Types
+		Id = 3,
+		List = {
+			"auto",
+			"bool",
+			"char",
+			"clock_t",
+			"co::int8",
+			"co::int16",
+			"co::int32",
+			"co::int64",
+			"co::uint8",
+			"co::uint16",
+			"co::uint32",
+			"co::uint64",
+			"complex",
+			"double",
+			"FILE",
+			"float",
+			"int",
+			"int16_t",
+			"int32_t",
+			"int64_t",
+			"int8_t",
+			"intmax_t",
+			"intptr_t",
+			"jmp_buf",
+			"long",
+			"ptrdiff_t",
+			"short",
+			"signed",
+			"size_t",
+			"std::string",
+			"std::vector",
+			"time_t",
+			"uint16_t",
+			"uint32_t",
+			"uint64_t",
+			"uint8_t",
+			"uintmax_t",
+			"uintptr_t",
+			"unsigned",
+			"va_list",
+			"NULL",
+		}
+	},
+	{	-- Constants
+		Id = 5,
+		Regex = [[std::\w+]]
+	},
+	{	-- Identifiers (something::like::This)
+		Id = 6,
+		Regex = [[((\w*::)*[A-Z]\w*)]],
+		Group = 1,
+	},
+	{	-- Functions
+		Id = 4,
+		Regex = [=[([:\w]+)\s*[\(\<]]=]
+	},
+}
+
+Strings = {
+  Delimiter=[["|']],
+  RawPrefix="R",
+}
+
+Comments = {
+	{
+		Block = true,
+		Nested = false,
+		Delimiter = { [[\/\*]], [[\*\/]] }
+   },
+   {
+		Block = false,
+		Delimiter = { [[//]] }
+   }
+}
+
+IgnoreCase = false
+
+PreProcessor = {
+	Prefix = [[#]],
+	Continuation = "\\",
+}
+
+Identifiers = [=[[\w:]+]=]
+
+Operators = [[\(|\)|\[|\]|\{|\}|\,|\;|\.|\:|\&|\<|\>|\!|\=|\/|\*|\%|\+|\-|\~|\|]]
+
+EnableIndentation = true

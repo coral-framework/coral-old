@@ -1,65 +1,38 @@
 /*!
 
-\mainpage Coral Documentation
+\mainpage Coral API Documentation
 
-\warning This document is currently out of date. A new version will be written in english.
+\htmlonly
 
-\section sec_overview Visão Geral
+<div class="sectionlist" style="float: left; width: 33%; font-weight: bold;">
+<h3>Classes</h3>
+<ul>
+	<li><a href="hierarchy.html">Hierarchy</a></li>
+	<li><a href="annotated.html">Annotated List</a></li>
+	<li><a href="classes.html">Alphabetical Index</a></li>
+	<li><a href="functions.html">All Class Members</a></li>
+</ul>
+</div>
 
-O <b>Coral</b> é um ambiente de desenvolvimento baseado em componentes construído sobre a linguagem de programação C++. Ele compreende:
-- Um modelo de componentes simples, com suporte a reflexão.
-- Uma linguagem de especificação de componentes, interfaces e outros tipos.
-- Um conjunto de ferramentas para a geração de código e criação de componentes.
-- Um modelo de implantação e extensão baseado em módulos.
+<div class="sectionlist" style="float: left; width: 33%; font-weight: bold;">
+<h3>Groups of Related Classes</h3>
+<ul>
+	<li><a href="group__setup.html">System Setup and Shutdown</a></li>
+	<li><a href="group__convenience.html">Convenience Functions and Macros</a></li>
+	<li><a href="group__platform.html">Platform Abstraction</a></li>
+	<li><a href="group__debugevents.html">Debug Events API</a></li>
+</ul>
+</div>
 
-Além disso, o Coral inclui um conjunto abrangente de módulos padrões, visando principalmente o desenvolvimento de aplicações interativas. Os principais recursos providos pelos módulos padrões são:
-- Serialização e recuperação de dados.
-- <em>Bridge</em> completo para a linguagem script Lua.
-- Modelo de construção e extensão de GUIs baseado no Qt 4.5.
+<div class="sectionlist" style="float: right; width: 33%; font-weight: bold;">
+<h3>Other</h3>
+<ul>
+	<li><a href="namespaces.html">List of Namespaces</a></li>
+	<li><a href="namespacemembers.html">All Namespace Members</a></li>
+	<li><a href="group__coral__types.html">Coral Type Groups</a></li>
+</ul>
+</div>
 
-Se você procura uma introdução rápida ao Coral, leia o \ref examples_quick_start ou navegue na lista de \subpage examples.
-
-
-\section sec_model Modelo de Componentes
-
-Documentação do \subpage model "modelo de componentes":
--# \ref model_fundamentals
--# \ref model_types
--# \ref model_reflection
-
-
-\section sec_csl Linguagem de Especificação
-
-Documentação da <em>\subpage csl</em>.
-Veja também: \ref csl2cpp.
-
-
-\section sec_langs Linguagens de Programação
-
-É possível implementar componentes Coral em diferentes linguagens de programação:
-- <b>C++</b> &mdash; linguagem nativa do Coral, permite atingir o nível máximo de eficiência.
-- <b>Lua</b> &mdash; fornece maior agilidade na criação e composição de componentes.
-
-
-\section sec_modules Módulos Padrões
-
-Módulos contendo extensões, serviços e componentes prontos para uso.
-- TODO
-
-
-\section sec_tools Ferramentas
-
-\subpage tools para auxiliar no processo de desenvolvimento de aplicações com o Coral.
-- \ref compiler &mdash; necessário para usar ou implementar componentes em C++.
-- \ref cmake &mdash; facilita a compilação de módulos e aplicações Coral utilizando o CMake.
-
-
-\section sec_portability Portabilidade
-
-Por ser implementado em ISO C++, o Coral é portável para todas as principais plataformas.
-
-Porém, visto que a implementação atual faz uso de recursos relativamente avançados do C++ (i.e. templates), pode ser obrigatório o uso de um compilador C++ recente, como o GCC 4.2 ou o Visual C++ 2005.
-
-Além disso, por basear-se na ABI do C++ para implementar a interface binária dos componentes &mdash; e observado o fato que a ABI de um compilador C++ é geralmente incompatível com outros compiladores C++ &mdash; é provável que todos os módulos que compõem uma aplicação Coral precisem ser compilados com o mesmo compilador, sempre.
+\endhtmlonly
 
 */

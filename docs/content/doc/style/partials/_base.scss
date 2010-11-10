@@ -1,0 +1,14 @@
+// Here is where you can define your constants for your application and to configure the blueprint framework.
+// Feel free to delete these if you want keep the defaults:
+
+$font-color: #363534;
+
+$link-color: #005493;
+$link-visited-color: $link-color;
+
+$font-family-arial: Arial, "Helvetica Neue", Helvetica, Sans-Serif;
+$font-family-verdana: Verdana, $font-family-arial;
+$font-family-code: Menlo, 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', Courier, Monospace;
+
+$blueprint-font-size: 13px;
+$blueprint-font-family: $font-family-verdana;

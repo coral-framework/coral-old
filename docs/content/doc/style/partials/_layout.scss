@@ -1,0 +1,97 @@
+/*
+
+The markup would look like:
+
+  #header
+  #container
+    #sidebar
+    #mainarea
+      #toolbar
+      #content
+  #footer
+
+and the layout would look like:
+
+  +------------------------------+
+  |           #header            |
+  +--------+---------------------+
+  |        |       #toolbar      |
+  |        +---------------------+
+  |        |                     |
+  |#sidebar|                     |
+  |        |       #content      |
+  |        |                     |
+  |        |                     |
+  +------------------------------+
+  |         #footer              |
+  +--------+---------------------+
+
+*/
+
+@import "compass/css3";
+@import "compass/css3/gradient";
+@import "compass/css3/box-shadow";
+
+#footer, #container {
+  min-width: 600px;
+  max-width: 1500px;
+}
+#header, #footer {
+  clear: both;
+  overflow: hidden;
+}
+#header {
+  height: 100px;
+  background: #FFFFFF;
+}
+#footer {
+  padding: 36px;
+  text-align: center;
+  color: #666;
+  font-size: 9px;
+}
+#container {
+  padding: 0px;
+  margin: 15px 0px 0px 0px;
+}
+#sidebar {
+  float: left;
+  width: 162px;
+  margin-left: 5px;
+  padding: 18px 20px;
+  background: #FFFFFF;
+  @include border-radius(10px);
+  @include box-shadow(#AAA, 1px, 1px, 7px, -1px);
+
+  #separator {
+    clear: both;
+    margin: 15px -20px;
+    padding: 0;
+    width: 202px;
+    height: 5px;
+    overflow: visible;
+    position: relative;
+    background: #D1D1D1;
+    @include linear-gradient( color-stops( #FFF, #CCC ) );
+  }
+}
+#mainarea {
+  overflow: visible;
+  background: #FFFFFF;
+  margin: 0px 5px 0px 210px;
+  @include border-radius(10px);
+  @include box-shadow(#AAA, 1px, 1px, 7px, -1px);
+}
+#mainarea.standalone {
+  margin: 30px;
+}
+#toolbar {
+  height: 20px;
+  padding: 8px 0px 1px 27px;
+  position: relative;
+  border-bottom: 1px solid #D1D1D1;
+}
+#content {
+  padding: 30px;
+  word-wrap: break-word;
+}

@@ -1,0 +1,20 @@
+#logotitle
+  %a(href="http://doc.libcoral.org/#{@config[:version]}/")
+    %h1 Coral Reference Documentation
+#navtr
+  %ul
+    %li
+      %a(href="http://libcoral.org/" title="Coral Home") Coral HOME
+    %li(class="#{'selected' unless @item.identifier == '/doc/api/layout/' }")
+      %a(href="http://doc.libcoral.org/#{@config[:version]}/" title="Coral Reference Documentation") DOC
+    %li(class="#{'selected' if @item.identifier == '/doc/api/layout/' }")
+      %a(href="http://doc.libcoral.org/#{@config[:version]}/api/" title="Coral API Documentation") API
+#versions
+  %ul
+    %li
+      %a(href="http://doc.libcoral.org/#{@config[:version]}/")
+        Coral #{@config[:version]}
+        #selected
+          #text Coral #{@config[:version]}
+    %li
+      %a(href="http://doc.libcoral.org/") ALL VERSIONS

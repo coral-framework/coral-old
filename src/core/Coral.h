@@ -94,9 +94,9 @@ CORAL_EXPORT DebugEventHandler installDebugEventHandler( DebugEventHandler handl
 	Sends a debug event to the currently-installed debug event handler.
 
 	The debug event API is used as an alternative to exception handling
-	when it is impossible or unnecessary to raise an exception.
+	when it is impossible (or it does not make sense) to raise an exception.
 
-	The first parameter specifies the kind of the event (see DebugEvent).
+	The first parameter specifies the kind of the event (see \ref DebugEvent).
 	The remaining parameters are a format string and an optional list of
 	arguments that will compose the debug message, just like in printf().
 
@@ -110,7 +110,7 @@ CORAL_EXPORT void debug( DebugEvent event, const char* msg, ... );
 
 /*!
 	Utility function to retrieve or load a type by name.
-	This is equivalent to calling <tt>co::getSystem()->getTypes()->getType( fullName )</tt>.
+	This is equivalent to calling: \code co::getSystem()->getTypes()->getType( fullName ) \endcode
 	Please refer to co::TypeManager::getType() for the list of exceptions this function may throw.
 	\ingroup convenience
  */
@@ -118,8 +118,8 @@ CORAL_EXPORT Type* getType( const std::string& fullName );
 
 /*!
 	Utility function to instantiate a component given its full type name.
-	This is equivalent to calling <tt>co::getType( fullName )->getReflector()->newInstance()</tt>.
-	Notice that this function may raise all exceptions raised by the aforementioned methods.
+	This is equivalent to calling: \code co::getType( fullName )->getReflector()->newInstance() \endcode
+	Please note that this function may raise all exceptions raised by the aforementioned methods.
 	\ingroup convenience
  */
 CORAL_EXPORT Component* newInstance( const std::string& fullName );
@@ -134,7 +134,7 @@ CORAL_EXPORT Interface* getServiceForType( InterfaceType* serviceType, Interface
 
 /*!
 	Utility function to get the best provider of \c serviceType for the given \c clientInstance.
-	This is equivalent to calling <tt>co::getSystem()->getServices()->getServiceForInstance()</tt>.
+	This is equivalent to calling: \code co::getSystem()->getServices()->getServiceForInstance() \endcode
 	Please refer to co::ServiceManager::getServiceForInstance() for the list of exceptions this function may throw.
 	\ingroup convenience
  */
@@ -152,7 +152,7 @@ inline T* getService()
 }
 
 /*!
-	Template function to get a \c clientType-specialized service by its interface type.
+	Template function to get a <tt>clientType</tt>-specialized service by its interface type.
 	This picks the most appropriate service instance available for clients of the given \c clientType.
 	Please refer to co::ServiceManager::getServiceForType() for the list of exceptions this function may throw.
 	\ingroup convenience
@@ -164,7 +164,7 @@ inline T* getService( co::InterfaceType* clientType )
 }
 
 /*!
-	Template function to get a \c clientInstance-specialized service by its interface type.
+	Template function to get a <tt>clientInstance</tt>-specialized service by its interface type.
 	This picks the most appropriate service instance available for the given \c clientInstance.
 	Please refer to co::ServiceManager::getServiceForInstance() for the list of exceptions this function may throw.
 	\ingroup convenience

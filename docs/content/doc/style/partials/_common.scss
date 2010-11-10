@@ -1,0 +1,191 @@
+@import "compass/css3";
+@import "compass/utilities/lists/horizontal-list";
+@import "compass/utilities/links/hover-link";
+@import "compass/utilities/tables/alternating-rows-and-columns";
+
+body {
+	background: #E6E7E8;
+
+	@include blueprint-typography-body( 13px );
+	@include blueprint-typography-defaults;
+
+	// reset 'tr.even', introduced by blueprint-typography-defaults (doh)
+	tr.even td { background: transparent; }
+
+	a { @include hover-link; }
+}
+
+.error {
+	@include error;
+	@include border-radius( 6px );
+}
+
+.notice {
+	@include notice;
+	@include border-radius( 6px );
+}
+
+.success {
+	@include success;
+	@include border-radius( 6px );
+}
+
+.highlight {
+	@include highlight;
+	@include border-radius( 6px );
+}
+
+.added {
+	@include added;
+	@include border-radius( 6px );
+}
+
+.removed {
+	@include removed;
+	@include border-radius( 6px );
+}
+
+.doc table {
+	width: 100%;
+	border: 1px solid #C4CFE5;
+	@include border-radius( 6px );
+	td, th { padding: 6px 8px; }
+	th { background: $blueprint-table-header-color; }
+	tr.even td { background: $blueprint-table-stripe-color; }
+}
+
+// should not apply to a code within a pre, only to 'top-level' codes
+.doc div > code, .doc p > code, .doc li > code {
+	color: #333;
+	padding: 0px 0.2em;
+	border: 1px solid #E6E6E6;
+	background: #F6F6F6;
+}
+
+.sourcecode pre, .fragment pre {
+	padding: 1.5em;
+	font-size: 12px;
+	line-height: 17px;
+	background: white;
+	border: 1px solid #DEDEDE;
+	font-family: $font-family-code;
+	@include border-radius( 8px );
+}
+
+pre {
+	color: #333;
+	margin: 1em 0px;
+	padding: 0.5em 1em;
+	background: #F6F6F6;
+	border: 1px solid #E6E6E6;
+	@include border-radius( 6px );
+}
+
+#logotitle {
+	float: left;
+	padding: 15px 0px 0px 20px;
+	a:hover{ text-decoration: none; }
+	h1 {
+		top: 27px;
+		left: 65px;
+		position: absolute;
+		color: $link-color;
+		font-size: 30px;
+		font-weight: bolder;
+		letter-spacing: -2px;
+	}
+}
+
+@mixin navlist {
+	font-weight: bolder;
+	a, a:visited { color: #B4B4B4; }
+	a:hover { color: $link-color; text-decoration: none; }
+	@include horizontal-list( 15px );
+}
+
+#navtr {
+	float: right;
+	padding: 8px 120px 0px 0px;
+	ul {
+		@include navlist;
+		font-size: 16px;
+	}
+	li.selected {
+		a { color: $link-color; }
+	}
+}
+
+#versions {
+	top: 80px;
+	left: 120px;
+	position: absolute;
+	ul { @include navlist; }
+	#selected {
+		top: -3px;
+		position: absolute;
+		border-bottom: 4px solid #B5D5FF;
+		#text { visibility: hidden; }
+	}
+}
+
+#breadcrumbs, .navpath {
+	font-size: 11px;
+	font-weight: bold;
+	line-height: 13px;
+	ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	li {
+		float: left;
+		margin-left: 12px;
+		padding-left: 18px;
+		background: url('/doc/images/breadcrumb.png') no-repeat 0px 4px;
+		a, a:hover { color: $font-color; }
+	}
+	li.first {
+		margin: 0;
+		padding: 0;
+		background: transparent;
+	}
+}
+
+#docfeedback {
+	float: right;
+	font-size: 10px;
+	padding-right:	15px;
+	a { color: #B0ADAB; }
+	a:hover { color: $link-color; }
+}
+
+#sidebar {
+	font-size: 11px;
+	line-height: 13px;
+	h1 {
+		margin: 0;
+		padding: 0;
+		font-size: 17px;
+		font-weight: bold;
+		font-family: $font-family-arial;
+	}
+	ul {
+		margin: 0;
+		padding: 5px 0px 0px 19px;
+		list-style: url('/doc/images/bullet.png');
+	}
+	li {
+		margin: 0;
+		margin-bottom: 5px;
+		padding: 0;
+	}
+}
+
+.mapping-down-arrow {
+	z-index: 2;
+	position: relative;
+	width: 55px;
+	height: 45px;
+	margin: -24px auto -39px auto;
+	background: url('/doc/images/arrow-down.png');
+}

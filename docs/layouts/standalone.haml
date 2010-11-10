@@ -1,0 +1,7 @@
+- render "base" do
+	%body.bp
+		#mainarea.standalone
+			#content
+				= yield
+		#footer= render 'partials/footer'
+		= render 'partials/analytics'

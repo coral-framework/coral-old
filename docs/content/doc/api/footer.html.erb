@@ -1,0 +1,14 @@
+---
+layout: none
+is_hidden: true
+---
+<%=
+
+layoutPage = @site.items.find{ |i| i.identifier == "/doc/api/layout/" }
+
+footer = layoutPage.compiled_content( :snapshot => :last )
+
+# Extract the footer part of the layout (for Doxygen)
+footer = footer[/<div class='doc' id='content'>\s*(<\/div>.+)$/m, 1]
+
+%>
