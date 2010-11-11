@@ -14,6 +14,6 @@ header = header[/^(.+)<div class='doc' id='content'>/m, 1] + "<div class='api' i
 header.gsub!( /<title>.+<\/title>/, "<title>Coral $projectnumber: $title</title>" )
 
 header.gsub!( /<li class='last'>\s*<span class="active" title="You're here.">Current Page<\/span>\s*<\/li>/,
-				"<li><a href='/'>API</a></li><li id='doxtitle'>$title</li>" )
+				"<li><a href='./'>API</a></li><li id='doxtitle'>$title</li>" )
 
 %>

@@ -9,5 +9,5 @@
         = link_to_unless_current( bc[:title], bc )
 
 #docfeedback
-  %a(href="https://spreadsheets.google.com/viewform?formkey=dE9TZy1kLTctZ3NBdUd6T2ZBNVBXdmc6MQ&entry_0=#{ @item.identifier == "/doc/api/layout/" ? "$title" : @item.path.gsub("/doc/", "") }&entry_2=#{ @item.identifier == "/doc/api/layout/" ? "$projectnumber" : @config[:version] }" title="Provide feedback about this documentation page." target="_blank")
+  %a(href="https://spreadsheets.google.com/viewform?formkey=dE9TZy1kLTctZ3NBdUd6T2ZBNVBXdmc6MQ&entry_0=#{ @item.identifier == "/doc/api/layout/" ? "$title" : @item.path.gsub("/#{@config[:version]}/", "") }&entry_2=#{ @item.identifier == "/doc/api/layout/" ? "$projectnumber" : @config[:version] }" title="Provide feedback about this documentation page." target="_blank")
     [+] Documentation Feedback

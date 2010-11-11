@@ -6,7 +6,6 @@ http_path        = '/'
 output_style     = :compressed
 sass_dir         = 'content/doc/style'
 images_dir       = 'content/doc/images'
-http_images_path = '/doc/images'
 
 # use SCSS:
 sass_options = {

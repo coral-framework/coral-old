@@ -30,4 +30,4 @@ The API Documentation is generated in three steps:
 
 Thankfully, this process is handled automatically by CMake in a custom target named `docs`. See [/docs/CMakeLists.txt](CMakeLists.txt) for the code, which is based on re-usable macros from the Coral package.
 
-Using CMake, the general documentation is placed in `${CMAKE_BINARY_DIR}/docs/output/doc`, and the API documentation is placed in `${CMAKE_BINARY_DIR}/docs/output/doc/api`.
+The output is placed in `${CMAKE_BINARY_DIR}/docs/output`.

@@ -141,7 +141,7 @@ pre {
 		float: left;
 		margin-left: 12px;
 		padding-left: 18px;
-		background: url('/doc/images/breadcrumb.png') no-repeat 0px 4px;
+		background: url('../images/breadcrumb.png') no-repeat 0px 4px;
 		a, a:hover { color: $font-color; }
 	}
 	li.first {
@@ -172,7 +172,7 @@ pre {
 	ul {
 		margin: 0;
 		padding: 5px 0px 0px 19px;
-		list-style: url('/doc/images/bullet.png');
+		list-style: url('../images/bullet.png');
 	}
 	li {
 		margin: 0;
@@ -187,5 +187,5 @@ pre {
 	width: 55px;
 	height: 45px;
 	margin: -24px auto -39px auto;
-	background: url('/doc/images/arrow-down.png');
+	background: url('../images/arrow-down.png');
 }

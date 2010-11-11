@@ -26,8 +26,8 @@ At least the following groups are still missing:
 	@{
 	@}
 
-	\defgroup convenience Convenience Functions and Macros
-	\brief Miscellaneous functions and macros, just for your convenience and productivity.
+	\defgroup convenience Convenience Functions
+	\brief Functions for your convenience and productivity.
 	@{
 	@}
 
