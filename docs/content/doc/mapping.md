@@ -350,17 +350,14 @@ Cada método de uma interface é mapeado para um método puramente virtual da class
 		</tr>
 		<tr>
 			<td>Arrays de Valores</td>
-			<td>Passagem de um <tt>std::vector&lt;Type&gt;*</tt></td>
+			<td>Passagem de um <tt>std::vector&lt;Type&gt;&</tt></td>
 		</tr>
 		<tr>
 			<td>Arrays de Referências</td>
-			<td>Passagem de um <tt>co::RefVector&lt;Type&gt;*</tt></td>
+			<td>Passagem de um <tt>co::RefVector&lt;Type&gt;&</tt></td>
 		</tr>
 	</tbody>
 </table>
-
-**Rationale:**
-Para poderem ser modificados, todos os tipos &mdash; exceto arrays &mdash; são passados por referência. Arrays, no entanto, são passadas por ponteiro, para permitir que o parâmetro seja de passagem opcional. Assim, é possível evitar a criação desnecessária de um `std::vector` ou `co::RefVector` quando a função cliente não está interessada no resultado do parâmetro. Um efeito colateral desta medida é que todo método que recebe arrays `out` ou `inout` precisa verificar se o ponteiro é NULL &mdash; algo suscetível a bugs. Porém, estima-se que em geral os benefícios da passagem opcional de arrays superem as desvantagens.
 
 No exemplo de mapeamento a seguir, considere que `RequestType` é um `enum`, `Request` é um `struct`, `ServiceDelegate` é uma `interface` e `Uuid` é uma classe nativa.
 

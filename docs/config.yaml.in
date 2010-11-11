@@ -1,0 +1,10 @@
+---
+
+version:   ${CORAL_VERSION_MAJOR}.${CORAL_VERSION_MINOR}
+base_url:  http://doc.libcoral.org/${CORAL_VERSION_MAJOR}.${CORAL_VERSION_MINOR}
+
+output_dir: ${CMAKE_CURRENT_BINARY_DIR}/output
+data_sources:
+  - type: filesystem_unified
+    items_root: /
+    layouts_root: /

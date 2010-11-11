@@ -23,26 +23,12 @@ At least the following groups are still missing:
 
 	Please note that you generally don't have to worry about setting up the system nor the Coral Path
 	when using the Coral Application Launcher.
-
 	@{
 	@}
 
 	\defgroup convenience Convenience Functions and Macros
 	\brief Miscellaneous functions and macros, just for your convenience and productivity.
 	@{
-		\def CORAL_STATIC_CHECK
-		\def CORAL_ARRAY_LENGTH
-	@}
-
-	\defgroup platform Platform Abstraction
-	\brief Types and macros to help you write platform-independent code.
-	@{
-		\def USING_CORAL_INTEGER_TYPES
-		\def CORAL_INT64_C
-		\def CORAL_UINT64_C
-		\def CORAL_UNUSED
-		\def CORAL_FORCE_INLINE
-		\def CORAL_NO_INLINE
 	@}
 
 	\defgroup debugevents Debug Events API
@@ -55,6 +41,170 @@ At least the following groups are still missing:
 
 	@{
 	@}
+
+	\defgroup platform Platform Utilities
+	\brief Platform info, portable types and utilities.
+	@{
+		\name Compiler Utilities
+		@{
+			\def CORAL_UNUSED
+			\def CORAL_FORCE_INLINE
+			\def CORAL_NO_INLINE
+			\def CORAL_STATIC_CHECK
+			\def CORAL_ARRAY_LENGTH
+			\def CORAL_STRINGIFY
+				Converts the macro argument into a string literal.
+			\def CORAL_STRINGIFY
+		@}
+
+		\name Portable Integers
+		@{
+			\typedef co::int8
+				Signed integer type guaranteed to be 8-bit on all platforms supported by Coral.
+			\typedef co::int16
+				Signed integer type guaranteed to be 16-bit on all platforms supported by Coral.
+			\typedef co::int32
+				Signed integer type guaranteed to be 32-bit on all platforms supported by Coral.
+			\typedef co::int64
+				Signed integer type guaranteed to be 64-bit on all platforms supported by Coral.
+			\typedef co::uint8
+				Unsigned integer type guaranteed to be 8-bit on all platforms supported by Coral.
+			\typedef co::uint16
+				Unsigned integer type guaranteed to be 16-bit on all platforms supported by Coral.
+			\typedef co::uint32
+				Unsigned integer type guaranteed to be 32-bit on all platforms supported by Coral.
+			\typedef co::uint64
+				Unsigned integer type guaranteed to be 64-bit on all platforms supported by Coral.
+			\typedef co::intptr
+				Signed integer type of the same size as a pointer.
+			\typedef co::uintptr
+				Unsigned integer type of the same size as a pointer.
+
+			\def USING_CORAL_INTEGER_TYPES
+			\def CORAL_INT64_C
+			\def CORAL_UINT64_C
+
+			\var co::MIN_INT8
+				Minimum value for an object of type co::int8.
+			\var co::MAX_INT8
+				Maximum value for an object of type co::int8.
+			\var co::MAX_UINT8
+				Maximum value for an object of type co::uint8.
+			\var co::MIN_INT16
+				Minimum value for an object of type co::int16.
+			\var co::MAX_INT16
+				Maximum value for an object of type co::int16.
+			\var co::MAX_UINT16
+				Maximum value for an object of type co::uint16.
+			\var co::MIN_INT32
+				Minimum value for an object of type co::int32.
+			\var co::MAX_INT32
+				Maximum value for an object of type co::int32.
+			\var co::MAX_UINT32
+				Maximum value for an object of type co::uint32.
+			\var co::MIN_INT64
+				Minimum value for an object of type co::int64.
+			\var co::MAX_INT64
+				Maximum value for an object of type co::int64.
+			\var co::MAX_UINT64
+				Maximum value for an object of type co::uint64.
+			\var co::MAX_UINT64
+		@}
+
+		\name Endian Conversion
+		@{
+			\fn uint16 co::endianSwap(uint16)
+			\fn uint32 co::endianSwap(uint32)
+			\fn uint64 co::endianSwap(uint64)
+			\fn uint64 co::endianSwap(uint64)
+			\fn co::fromBigEndian(T)
+			\fn co::fromLittleEndian(T)
+			\fn co::toBigEndian(T)
+			\fn co::toLittleEndian(T)
+			\fn co::toLittleEndian(T)
+		@}
+
+		\name Build Info
+		@{
+			\def CORAL_NDEBUG
+				Defined only in non-debug (release) builds.
+			\def CORAL_BUILD_MODE
+				String literal identifying the current build mode (either "release" or "debug").
+			\def CORAL_BUILD_KEY
+				String literal identifying the host OS, platform and compiler.
+			\def CORAL_BUILD_KEY
+		@}
+
+		\name Compiler Info
+		@{
+			\def CORAL_CC_GNU
+				Defined if the current compiler is GNU C++.
+			\def CORAL_CC_MSVC
+				Defined if the current compiler is Microsoft Visual C++.
+			\def CORAL_CC_NAME
+				String literal containing the current compiler's name (e.g. "msvc" or "g++").
+			\def CORAL_CC_VERSION
+				String literal containing the current compiler's version.
+			\def CORAL_CC_VERSION
+		@}
+
+		\name Platform Info
+		@{
+			\def CORAL_BYTE_ORDER
+				The host platform's byte order. Either \c CORAL_LITTLE_ENDIAN or \c CORAL_BIG_ENDIAN.
+			\def CORAL_POINTER_SIZE
+				The value of <tt>sizeof(void*)</tt>.
+			\def CORAL_OS_NAME
+				String literal containing the name of the host operating system (e.g. "MacOSX" or "Linux").
+			\def CORAL_ARCH_NAME
+				String literal containing the name of the host architecture (e.g. "x86_32" or "x86_64").
+			\def CORAL_ARCH_NAME
+		@}
+
+		\name OS Info
+		@{
+			\def CORAL_OS_LINUX
+				Defined on Linux.
+			\def CORAL_OS_MAC
+				Defined on MacOSX.
+			\def CORAL_OS_UNIX
+				Defined on any UNIX system.
+			\def CORAL_OS_WIN
+				Defined on all versions of Windows.
+			\def CORAL_OS_WIN
+		@}
+
+		\name Coral Version
+		@{
+			\def CORAL_VERSION_STR
+				Current Coral version, formatted like "major.minor.patch".
+			\def CORAL_VERSION_MAJOR
+				Current Coral major version number.
+			\def CORAL_VERSION_MINOR
+				Current Coral minor version number.
+			\def CORAL_VERSION_PATCH
+				Current Coral patch version number.
+			\def CORAL_VERSION_PATCH
+		@}
+
+	@}
 @}
 
 */
+
+// Force declaration of stuff under #ifdefs
+
+#define CORAL_NDEBUG
+
+#define CORAL_OS_LINUX
+#define CORAL_OS_MAC
+#define CORAL_OS_UNIX
+#define CORAL_OS_WIN
+#define CORAL_OS_NAME
+
+#define CORAL_CC_GNU
+#define CORAL_CC_MSVC
+#define CORAL_CC_NAME
+#define CORAL_CC_VERSION
+
+#define CORAL_ARCH_NAME

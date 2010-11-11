@@ -36,8 +36,8 @@ interface Namespace
 
 	/*
 		Creates a TypeBuilder to instantiate a type in this namespace.
-		\throw IllegalNameException if the passed \c name is not a valid identifier or clashes with an existing type or child namespace.
-		\throw IllegalArgumentException if the passed \c typeKind is not a user-definable type kind
+		\throw IllegalNameException if the passed \a name is not a valid identifier or clashes with an existing type or child namespace.
+		\throw IllegalArgumentException if the passed \a typeKind is not a user-definable type kind
 					(TK_ARRAY, TK_ENUM, TK_EXCEPTION, TK_STRUCT, TK_NATIVECLASS, TK_INTERFACE or TK_COMPONENT).
 	 */
 	TypeBuilder defineType( in string name, in TypeKind typeKind, in TypeCreationTransaction transaction )
@@ -45,7 +45,7 @@ interface Namespace
 
 	/*
 		Creates a child namespace with the specified name.
-		\throw IllegalNameException if the passed \c name is not a valid identifier or clashes with an existing type or child namespace.
+		\throw IllegalNameException if the passed \a name is not a valid identifier or clashes with an existing type or child namespace.
 	 */
 	Namespace defineChildNamespace( in string name ) raises IllegalNameException;
 };

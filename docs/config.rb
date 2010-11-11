@@ -4,7 +4,6 @@
 project_path     = File.dirname(__FILE__)
 http_path        = '/'
 output_style     = :compressed
-css_dir          = 'output/style'
 sass_dir         = 'content/doc/style'
 images_dir       = 'content/doc/images'
 http_images_path = '/doc/images'

@@ -109,11 +109,11 @@ public:
 		return res.get< co::Type* >();
 	}
 
-	co::Type* loadType( const std::string& typeName_, std::vector<co::CSLError>* errorStack_ )
+	co::Type* loadType( const std::string& typeName_, std::vector<co::CSLError>& errorStack_ )
 	{
 		co::Any args[2];
 		args[0].set< const std::string& >( typeName_ );
-		args[1].set< std::vector<co::CSLError>* >( errorStack_ );
+		args[1].set< std::vector<co::CSLError>& >( errorStack_ );
 		co::ArrayRange<co::Any const> range( args, 2 );
 		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::TypeManager>( 5 ), range );
 		return res.get< co::Type* >();
@@ -239,7 +239,7 @@ public:
 			case 7:
 				{
 					const std::string& typeName_ = args[++argIndex].get< const std::string& >();
-					std::vector<co::CSLError>* errorStack_ = args[++argIndex].get< std::vector<co::CSLError>* >();
+					std::vector<co::CSLError>& errorStack_ = args[++argIndex].get< std::vector<co::CSLError>& >();
 					argIndex = -1;
 					res.set< co::Type* >( p->loadType( typeName_, errorStack_ ) );
 				}

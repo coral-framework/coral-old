@@ -70,9 +70,9 @@ function M.formatOutput( t )
 	local kind = t.kind
 	if kind == 'TK_ARRAY' then
 		if t.elementType.kind == 'TK_INTERFACE' then
-			return "co::RefVector<" .. t.elementType.cppName .. ">*"
+			return "co::RefVector<" .. t.elementType.cppName .. ">&"
 		else
-			return "std::vector<" .. t.elementType.cppName .. ">*"
+			return "std::vector<" .. t.elementType.cppName .. ">&"
 		end
 	elseif kind == 'TK_INTERFACE' then
 		return t.cppName .. "*&"

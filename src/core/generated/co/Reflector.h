@@ -37,9 +37,9 @@ public:
 		/*!
 			Constructs an instance of a struct or native class in the specified memory area.
 			\param[in] address memory address where the instance is to be constructed.
-			\param[in] length number of bytes (starting at \c address) reserved for the instance.
-			\throw UnsupportedOperationException if \c type is neither a co::StructType nor a co::NativeClassType.
-			\throw IllegalArgumentException if the passed \c length is not equal to the type's \c size.
+			\param[in] length number of bytes (starting at \a address) reserved for the instance.
+			\throw UnsupportedOperationException if \a type is neither a StructType nor a NativeClassType.
+			\throw IllegalArgumentException if the passed \a length is not equal to the type's \a size.
 		 */
 		virtual void createValue( void* address, size_t length ) = 0;
 
@@ -51,10 +51,10 @@ public:
 		virtual void copyValue( const void* fromAddress, void* toAddress ) = 0;
 
 		/*!
-			Destroys the struct or native class instance located at \c address.
+			Destroys the struct or native class instance located at \a address.
 			The instance should have been constructed using createValue().
-			\warning Expect the worst if \c address does not point to an instance of this exact type.
-			\throw UnsupportedOperationException if \c type is neither a co::StructType nor a co::NativeClassType.
+			\warning Expect the worst if \a address does not point to an instance of this exact type.
+			\throw UnsupportedOperationException if \a type is neither a StructType nor a NativeClassType.
 		 */
 		virtual void destroyValue( void* address ) = 0;
 	

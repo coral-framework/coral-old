@@ -13,8 +13,8 @@
 namespace co {
 
 	// This is a native class mapping.
-	// You may use type 'co::Uuid' directly, or through the typedef below.
-	typedef co::Uuid Uuid;
+	// You may use type 'Uuid' directly, or through the typedef below.
+	typedef Uuid Uuid;
 
 } // namespace co
 

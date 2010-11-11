@@ -65,17 +65,17 @@ protected:
 	//! Template method: creates the TypeBuilder for the type being parsed.
 	virtual co::TypeBuilder* createTypeBuilder( const std::string& typeName, co::TypeKind kind ) = 0;
 
-	//! Template method: resolves a type given its \c typeName and whether it is an array.
+	//! Template method: resolves a type given its \a typeName and whether it is an array.
 	//! \param typeName may be a full or relative type name.
 	virtual co::Type* resolveType( const std::string& typeName, bool isArray = false ) = 0;
 
 	/*!
-		Template method: adds the passed \c text as documentation for the specified \c member of the
-		parsed type. When \c member is an empty string, documentation is for the parsed type itself.
+		Template method: adds the passed \a text as documentation for the specified \a member of the
+		parsed type. When \a member is an empty string, documentation is for the parsed type itself.
 	 */
 	virtual void addDocumentation( const std::string& member, const std::string& text ) = 0;
 
-	//!	Template method: adds the passed \c text as a c++ block to be used by the type that is beeing defined.
+	//!	Template method: adds the passed \a text as a c++ block to be used by the type that is beeing defined.
 	virtual void addCppBlock( const std::string& text ) = 0;
 
 	//! Returns the type created by our TypeBuilder.

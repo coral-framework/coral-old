@@ -34,7 +34,7 @@ public:
 	co::Namespace* findNamespace( const std::string& fullName );
 	co::Type* getType( const std::string& typeName );
 	co::ArrayType* getArrayOf( co::Type* elementType );
-	co::Type* loadType( const std::string& typeName, std::vector<co::CSLError>* errorStack );
+	co::Type* loadType( const std::string& typeName, std::vector<co::CSLError>& errorStack );
 	const std::string& getDocumentation( const std::string& typeOrMemberName );
 
 private:

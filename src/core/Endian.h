@@ -11,11 +11,19 @@
 
 namespace co {
 
+/*!
+	Swaps the byte order of a 16-bit integer.
+	\ingroup platform
+ */
 inline uint16 endianSwap( uint16 x )
 {
 	return ( x >> 8 ) | ( x << 8 );
 }
 
+/*!
+	Swaps the byte order of a 32-bit integer.
+ 	\ingroup platform
+ */
 inline uint32 endianSwap( uint32 x )
 {
 	return 	( x >> 24 ) | 
@@ -24,6 +32,10 @@ inline uint32 endianSwap( uint32 x )
 			( x << 24 );
 }
 
+/*!
+	Swaps the byte order of a 64-bit integer.
+ 	\ingroup platform
+ */
 inline uint64 endianSwap( uint64 x )
 {
 	return 	( x >> 56 ) | 
@@ -36,59 +48,73 @@ inline uint64 endianSwap( uint64 x )
 			( x << 56 );
 }
 
+/*!
+	\brief Converts \a v from big-endian byte order to the host platform's byte order.
+
+	On big-endian platforms (such as PowerPC), this will return \a v unmodified.
+ 
+	\ingroup platform
+ */
+template<typename T>
+inline T fromBigEndian( T v )
+{
 #if CORAL_BYTE_ORDER == CORAL_LITTLE_ENDIAN
-
-	template<typename T>
-	inline T fromBigEndian( T v )
-	{
-		return endianSwap( v );
-	}
-	
-	template<typename T>
-	inline T toBigEndian( T v )
-	{
-		return endianSwap( v );
-	}	
-
-	template<typename T>
-	inline T fromLittleEndian( T v )
-	{
-		return v;
-	}
-
-	template<typename T>
-	inline T toLittleEndian( T v )
-	{
-		return v;
-	}
-
+	return endianSwap( v );
 #else
-
-	template<typename T>
-	inline T fromBigEndian( T v )
-	{
-		return v;
-	}
-	
-	template<typename T>
-	inline T toBigEndian( T v )
-	{
-		return v;
-	}
-
-	template<typename T>
-	inline T fromLittleEndian( T v )
-	{
-		return endianSwap( v );
-	}
-
-	template<typename T>
-	inline T toLittleEndian( T v )
-	{
-		return endianSwap( v );
-	}
-
+	return v;
 #endif
+}
+
+/*!
+	\brief Converts \a v from little-endian byte order to the host platform's byte order.
+
+	On little-endian platforms (such as x86), this will return \a v unmodified.
+ 
+	\ingroup platform
+ */
+template<typename T>
+inline T fromLittleEndian( T v )
+{
+#if CORAL_BYTE_ORDER == CORAL_LITTLE_ENDIAN
+	return v;
+#else
+	return endianSwap( v );
+#endif
+}
+	
+/*!
+	\brief Converts \a v from the host platform's byte order to big-endian byte order.
+
+	On big-endian platforms (such as PowerPC), this will return \a v unmodified.
+ 
+	\ingroup platform
+ */
+template<typename T>
+inline T toBigEndian( T v )
+{
+#if CORAL_BYTE_ORDER == CORAL_LITTLE_ENDIAN
+	return endianSwap( v );
+#else
+	return v;
+#endif
+}
+
+/*!
+	\brief Converts \a v from the host platform's byte order to little-endian byte order.
+
+	On little-endian platforms (such as x86), this will return \a v unmodified.
+ 
+	\ingroup platform
+ */
+template<typename T>
+inline T toLittleEndian( T v )
+{
+#if CORAL_BYTE_ORDER == CORAL_LITTLE_ENDIAN
+	return v;
+#else
+	return endianSwap( v );
+#endif
+}
 
 } // namespace co
 

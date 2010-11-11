@@ -178,7 +178,7 @@ co::ArrayType* TypeManager::getArrayOf( co::Type* elementType )
 	return arrayType.get();
 }
 
-co::Type* TypeManager::loadType( const std::string& typeName, std::vector<co::CSLError>* errorStack )
+co::Type* TypeManager::loadType( const std::string& typeName, std::vector<co::CSLError>& errorStack )
 {
 	co::Type* type = findType( typeName );
 	if( type )
@@ -187,18 +187,18 @@ co::Type* TypeManager::loadType( const std::string& typeName, std::vector<co::CS
 	TypeLoader loader( typeName, co::getPaths(), this );
 
 	type = loader.loadType();
-	if( !type && errorStack )
+	if( !type )
 	{
 		const csl::Error* currentError = loader.getError();
 		while( currentError )
 		{
-			errorStack->push_back( co::CSLError() );
+			errorStack.push_back( co::CSLError() );
 
-			co::CSLError& cslError = errorStack->back();
+			co::CSLError& cslError = errorStack.back();
 			cslError.filename = currentError->getFileName();
 			cslError.message = currentError->getMessage();
 			cslError.line = currentError->getLine();
-			
+
 			currentError = currentError->getInnerError();
 		}
 	}

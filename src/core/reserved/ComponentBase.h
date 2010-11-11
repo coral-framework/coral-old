@@ -35,10 +35,10 @@ protected:
 			delete this;
 	}
 
-	//! Raises co::NoSuchInterfaceException if \c itfInfo isn't one of the component's interfaces.
+	//! Raises co::NoSuchInterfaceException if \a itfInfo isn't one of the component's interfaces.
 	void checkValidInterface( InterfaceInfo* itfInfo );
 
-	//! Similar to checkValidInterface(), but also raises an exception if \c itfInfo is a facet.
+	//! Similar to checkValidInterface(), but also raises an exception if \a receptacle is a facet.
 	void checkValidReceptacle( InterfaceInfo* receptacle );
 
 	/*!

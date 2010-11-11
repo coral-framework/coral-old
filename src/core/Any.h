@@ -133,7 +133,7 @@ struct PrepareStateForArray<std::vector<T>, ATT>
 	inline static void prepare( State& s )
 	{
 		CORAL_STATIC_CHECK( ETT::kind != TK_ARRAY, arrays_of_arrays_are_not_supported );
-		CORAL_STATIC_CHECK( ATT::isPointer && !ATT::isReference, vectors_must_be_passed_by_pointer );
+		CORAL_STATIC_CHECK( ATT::isReference && !ATT::isPointer, vectors_must_be_passed_by_reference );
 		s.type = typeOf<typename ETT::CoreType>::get();
 		s.isConst = ETT::isConst;
 		s.isPointer = ETT::isPointer;
@@ -148,7 +148,7 @@ struct PrepareStateForArray<RefVector<T>, ATT>
 {
 	inline static void prepare( State& s )
 	{
-		CORAL_STATIC_CHECK( ATT::isPointer && !ATT::isReference, RefVectors_must_be_passed_by_pointer );
+		CORAL_STATIC_CHECK( ATT::isReference && !ATT::isPointer, RefVectors_must_be_passed_by_reference );
 		s.type = typeOf<T>::get();
 		s.isConst = false;
 		s.isPointer = true;
@@ -226,8 +226,8 @@ template<typename T>
 struct ValueHelper<TK_ARRAY, T>
 {
 	// std::vectors and co::RefVectors are handled by this case
-	static void store( State& s, T v ) { CORAL_STATIC_CHECK( false, arrays_must_be_passed_by_pointer ); }
-	static T retrieve( State& s ) { CORAL_STATIC_CHECK( false, that_array_type_must_be_retrieved_by_pointer ); }
+	static void store( State& s, T v ) { CORAL_STATIC_CHECK( false, arrays_must_be_passed_by_reference ); }
+	static T retrieve( State& s ) { CORAL_STATIC_CHECK( false, that_array_type_must_be_retrieved_by_reference ); }
 };
 
 template<typename T>
@@ -242,8 +242,6 @@ struct ValueHelper<TK_ARRAY, ArrayRange<T> >
 
 	inline static ArrayRange<T> retrieve( State& s )
 	{
-		if( s.data.ptr == NULL )
-			return ArrayRange<T>();
 		if( s.arrayKind == State::AK_ArrayRange )
 			return ArrayRange<T>( reinterpret_cast<T*>( s.data.ptr ), s.arraySize );
 		else
@@ -449,7 +447,7 @@ struct VariableHelper<double>
 		<tt>co::ArrayRange<std::string></tt> allows existing strings to be modified, but not the array length.
 		\par
 		Arrays represented by \c std::vectors or \c co::RefVectors must always be passed and retrieved
-		\b by \b pointer, while \c co::ArrayRanges must always be passed and retrieved \b by \b value.
+		<b>by reference</b>, while \c co::ArrayRanges must always be passed and retrieved <b>by value</b>.
 		\par
 		Arrays must generally be retrieved by the exact same type they were passed. However, when
 		retrieving \c co::ArrayRanges the following coercion rules apply:

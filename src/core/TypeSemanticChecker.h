@@ -22,7 +22,7 @@ class InterfaceType;
 class TypeSemanticChecker
 {
 public:
-	//! The passed \c type and it's inheritance tree should be fully loaded.
+	//! The passed \a type and it's inheritance tree should be fully loaded.
 	TypeSemanticChecker( Type* type );
 
 	//! Performs the semantic analysis of the type.

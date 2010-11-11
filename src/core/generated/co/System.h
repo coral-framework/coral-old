@@ -31,10 +31,10 @@ public:
 	// Code From <c++ Block:
 	
 		//! Convenience method to setup the entire system without requiring any module.
-		inline void setup() { setup( co::ArrayRange<std::string const>() ); }
+		inline void setup() { setup( ArrayRange<std::string const>() ); }
 
 		//! Convenience method to setup the entire system.
-		inline void setup( co::ArrayRange<std::string const> requiredModules )
+		inline void setup( ArrayRange<std::string const> requiredModules )
 		{
 			setupBase( requiredModules );
 			setupPresentation();

@@ -144,7 +144,7 @@ TEST( MappingTests, interface )
 	moduleA::DummyInterface* dummyPtr = NULL;
 
 	// Callling this method should modify the parameters
-	ti->testOutParameters( size, enumValue, text, testStruct, dummyPtr, &intVector, &interfaceRefVector );
+	ti->testOutParameters( size, enumValue, text, testStruct, dummyPtr, intVector, interfaceRefVector );
 
 	ASSERT_NE( 1, size );
 	ASSERT_NE( "VALUE", text );

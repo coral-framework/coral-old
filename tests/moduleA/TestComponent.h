@@ -49,8 +49,8 @@ public:
 
 	virtual void testOutParameters( float& size, moduleA::TestEnum& enumValue,
 		std::string& text, moduleA::TestStruct& testStruct,
-		moduleA::DummyInterface*& dummyInterface, std::vector<co::int32>* intList,
-		co::RefVector<moduleA::DummyInterface>* interfaces );
+		moduleA::DummyInterface*& dummyInterface, std::vector<co::int32>& intList,
+		co::RefVector<moduleA::DummyInterface>& interfaces );
 
 	// co::TypeCreationTransaction methods:
 	co::ArrayRange<co::TypeBuilder* const> getTypeBuilders();

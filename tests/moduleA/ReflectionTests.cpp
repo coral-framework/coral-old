@@ -79,9 +79,12 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 	typeVec.push_back( co::getType( "co.MemberInfo" ) );
 	typeVec.push_back( co::getType( "co.AttributeInfo" ) );
 	typeVec.push_back( co::getType( "co.MethodInfo" ) );
+	
+	co::Any typeVecAny;
+	typeVecAny.set<std::vector<co::Type*>&>( typeVec );
 
-	EXPECT_THROW( reflector->setAttribute( ts, floatArrayAttrib, &typeVec ), co::IllegalCastException );
-	EXPECT_NO_THROW( reflector->setAttribute( ts, typeArrayAttrib, &typeVec ) );
+	EXPECT_THROW( reflector->setAttribute( ts, floatArrayAttrib, typeVecAny ), co::IllegalCastException );
+	EXPECT_NO_THROW( reflector->setAttribute( ts, typeArrayAttrib, typeVecAny ) );
 
 	ASSERT_EQ( 3, ts->typeArray.size() );
 	EXPECT_EQ( "co.MemberInfo", ts->typeArray[0]->getFullName() );

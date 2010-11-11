@@ -42,8 +42,8 @@ class CompoundTypeBinding
 {
 public:
 	/*!
-		Attempts to get the co::CompoundType* for the Coral object at \c index.
-		Returns NULL if the value at \c index is not a valid Coral object.
+		Attempts to get the co::CompoundType* for the Coral object at \a index.
+		Returns NULL if the value at \a index is not a valid Coral object.
 	 */
 	static co::CompoundType* getType( lua_State* L, int index );
 
@@ -76,8 +76,8 @@ protected:
 		Assumes the CompoundType's udata is at index 1 and the member name is at index 2.
 		Pushes a function and returns true, if the member is a method; or a light
 		userdata pointing to a co::MemberInfo, if the member is not a method.
-		If the member cannot be found and \c mustExist is false (default), pushes nil and
-		returns false; otherwise, if \c mustExist is true, an exception is thrown.
+		If the member cannot be found and \a mustExist is false (default), pushes nil and
+		returns false; otherwise, if \a mustExist is true, an exception is thrown.
 	 */
 	static bool pushMember( lua_State* L, co::CompoundType* ct, bool mustExist = false );
 

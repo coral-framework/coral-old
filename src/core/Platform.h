@@ -32,45 +32,16 @@
 
 #if defined(__APPLE__) && (defined(__GNUC__) || defined(__xlC__) || defined(__xlc__))
 	#define CORAL_OS_MAC
-	#define CORAL_OS_BSD4
-	#ifdef __LP64__
-		#define CORAL_OS_MAC64
-	#else
-		#define CORAL_OS_MAC32
-	#endif
-#elif defined(__CYGWIN__)
-	#define CORAL_OS_CYGWIN
-#elif defined(MSDOS) || defined(_MSDOS)
-	#define CORAL_OS_MSDOS
-#elif !defined(SAG_COM) && (defined(WIN64) || defined(_WIN64) || defined(__WIN64__))
-	#define CORAL_OS_WIN32
-	#define CORAL_OS_WIN64
-#elif !defined(SAG_COM) && (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__))
-	#define CORAL_OS_WIN32
 #elif defined(__linux__) || defined(__linux)
 	#define CORAL_OS_LINUX
-#elif defined(__FreeBSD__) || defined(__DragonFly__)
-	#define CORAL_OS_FREEBSD
-	#define CORAL_OS_BSD4
-#elif defined(__NetBSD__)
-	#define CORAL_OS_NETBSD
-	#define CORAL_OS_BSD4
-#elif defined(__OpenBSD__)
-	#define CORAL_OS_OPENBSD
-	#define CORAL_OS_BSD4
-#elif defined(__sgi)
-	#define CORAL_OS_IRIX
+#elif !defined(SAG_COM) && ( (defined(WIN64) || defined(_WIN64) || defined(__WIN64__)) \
+		|| (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)) )
+	#define CORAL_OS_WIN
 #else
 	#error Oops! Unknown or unsupported OS!
 #endif
 
-#if defined(CORAL_OS_WIN32) || defined(CORAL_OS_WIN64)
-	#define CORAL_OS_WIN
-#endif
-
-#if defined(CORAL_OS_MSDOS) || defined(CORAL_OS_WIN)
-	#undef CORAL_OS_UNIX
-#elif !defined(CORAL_OS_UNIX)
+#if !defined(CORAL_OS_WIN)
 	#define CORAL_OS_UNIX
 #endif
 
@@ -78,27 +49,18 @@
 
 #if defined(_MSC_VER)
 	#define CORAL_CC_MSVC
-	#if defined(__INTEL_COMPILER)
-		#define CORAL_CC_INTEL
-	#endif
 #elif defined(__GNUC__)
 	#define CORAL_CC_GNU
-	#if defined(__MINGW32__)
-		#define CORAL_CC_MINGW
-	#endif
-	#if defined(__INTEL_COMPILER)
-		#define CORAL_CC_INTEL
-	#endif
 #endif
 
 //------ Determine the CORAL_BUILD_KEY ---------------------------------------
 
-#if defined(CORAL_OS_WIN)
-	#define CORAL_OS_NAME "Windows"
-#elif defined(CORAL_OS_LINUX)
+#if defined(CORAL_OS_LINUX)
 	#define CORAL_OS_NAME "Linux"
 #elif defined(CORAL_OS_MAC)
 	#define CORAL_OS_NAME "MacOSX"
+#elif defined(CORAL_OS_WIN)
+	#define CORAL_OS_NAME "Windows"
 #else
 	#error "Unsupported operating system! Coral requires Windows, Linux or MacOSX."
 #endif
@@ -116,7 +78,7 @@
 #define CORAL_DO_STRINGIFY(X) #X
 #define CORAL_STRINGIFY(X) CORAL_DO_STRINGIFY(X)
 
-#if defined(CORAL_CC_MSVC) && !defined(CORAL_CC_INTEL)
+#if defined(CORAL_CC_MSVC)
 	#define CORAL_CC_NAME "msvc"
 	#if _MSC_VER > 1600
 		#error "Your MSVC compiler was not recognized by this Coral version (maybe it's too new?)."
@@ -129,7 +91,7 @@
 	#else
 		#error "Coral requires Visual Studio 8 (2005) or newer."
 	#endif
-#elif defined(CORAL_CC_GNU) && !defined(CORAL_CC_MINGW) && !defined(CORAL_CC_INTEL)
+#elif defined(CORAL_CC_GNU)
 	#define CORAL_CC_NAME "g++"
 	#define CORAL_CC_VERSION CORAL_STRINGIFY(__GNUC__) "." CORAL_STRINGIFY(__GNUC_MINOR__)
 #else
@@ -179,7 +141,7 @@ namespace co {
 #endif
 
 // Limits for the portable integer types.
-// (current definitions are only valid for the x86_* architectures)
+// (current definitions are only valid for x86 architectures)
 const int8		MIN_INT8	= -127 - 1;
 const int8		MAX_INT8	=  127;
 const uint8		MAX_UINT8	=  0xFF;

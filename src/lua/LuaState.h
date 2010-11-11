@@ -69,18 +69,18 @@ public:
 	//@}
 
 	/*!
-		Gets any value from the Lua stack, using \c expectedType to help interpret it.
-		If \c expectedType is NULL, this method will try to directly fit any Lua value into \c any.
-		On the other hand, if the \c expectedType is a co::Any, the method will first call
-		co::Any::createAny() on \c any and then try to fit a Lua value into the temporary co::Any.
-		If the value at \c index has no convertion to Coral, raises a lua::Exception.
+		Gets any value from the Lua stack, using \a expectedType to help interpret it.
+		If \a expectedType is NULL, this method will try to directly fit any Lua value into \a any.
+		On the other hand, if the \a expectedType is a co::Any, the method will first call
+		co::Any::createAny() on \a any and then try to fit a Lua value into the temporary co::Any.
+		If the value at \a index has no convertion to Coral, raises a lua::Exception.
 	 */
 	static void getAny( lua_State* L, int index, co::Type* expectedType, co::Any& any );
 
 	/*!
-		Gets the value at \c index in the Lua stack and assigns it to \c outputVar.
-		If the Lua value cannot be assigned to the var in \c outputVar, raises a lua::Exception.
-		\warning \c outputVar must be a valid output variable.
+		Gets the value at \a index in the Lua stack and assigns it to \a outputVar.
+		If the Lua value cannot be assigned to the var in \a outputVar, raises a lua::Exception.
+		\warning \a outputVar must be a valid output variable.
 	 */
 	static void getValue( lua_State* L, int index, const co::Any& outputVar );
 

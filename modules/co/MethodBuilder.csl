@@ -12,24 +12,24 @@ interface MethodBuilder
 	/*
 		Defines the return type of the method.
 		\throw UnsupportedOperationException if the method's return type was already defined or if the parent type was already created.
-		\throw IllegalArgumentException if the passed \c type is invalid (e.g. null).
+		\throw IllegalArgumentException if the passed \a type is invalid (e.g. null).
 	 */
-	void defineReturnType( in Type type ) 
+	void defineReturnType( in Type type )
 		raises UnsupportedOperationException, IllegalArgumentException;
 
 	/*
 		Adds a parameter to the method.
 		\throw UnsupportedOperationException if the parent type was already created.
-		\throw IllegalNameException if the passed \c name is not a valid identifier or clashes with other parameters.
-		\throw IllegalArgumentException if the passed \c type is invalid (e.g. null) or if both input and output are false.
+		\throw IllegalNameException if the passed \a name is not a valid identifier or clashes with other parameters.
+		\throw IllegalArgumentException if the passed \a type is invalid (e.g. null) or if both input and output are false.
 	 */
-	void defineParameter( in string name, in Type type, in bool input, in bool output ) 
+	void defineParameter( in string name, in Type type, in bool input, in bool output )
 		raises IllegalNameException, IllegalArgumentException;
 
 	/*
 		Adds an exception type that can be raised by the method.
 		\throw UnsupportedOperationException if the parent type was already created.
-		\throw IllegalArgumentException if the passed \c exceptionType is invalid (e.g. null).
+		\throw IllegalArgumentException if the passed \a exceptionType is invalid (e.g. null).
 	 */
 	void defineException( in ExceptionType exceptionType )
 		raises IllegalArgumentException;

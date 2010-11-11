@@ -11,7 +11,7 @@ extern "C" CORAL_DLL_EXPORT
 const char* coral_module_query_verification_data()
 {
 	return  "pattern=CORAL_MODULE_VERIFICATION_DATA\n"
-			"version=0.5.0\n"
+			"version=0.5.1\n"
 			"buildkey=" CORAL_BUILD_KEY "\n"
 			"buildmode=" CORAL_BUILD_MODE "\n";
 }
@@ -26,27 +26,28 @@ extern "C" CORAL_DLL_EXPORT
 const TypeDependency* coral_module_query_dependencies()
 {
 	static const TypeDependency s_dependencies[] = {
+		{ "co.ArrayType", "F29E701E-02C4-05EF-5678229EC3653D1C" },
+		{ "lua.Component", "93663B91-8382-6537-A2BCF4D6D0CEAAC5" },
+		{ "co.ModulePartLoader", "536A73D9-F4C8-F597-2FEB68C301937B8D" },
 		{ "lua.IState", "66505261-0E1B-2578-26DEB02C5163926F" },
-		{ "co.System", "C6E47013-73A8-D554-C221496BDAE2909C" },
+		{ "co.Interface", "C9F9F061-B481-151D-4751BCC4494CCD9F" },
+		{ "co.InterfaceType", "22FF144F-E1B5-1593-CA7DF461B59AB85C" },
 		{ "lua.ModulePartLoader", "6D1199C9-3749-0528-1D4385C12BE804F5" },
+		{ "co.DynamicProxyHandler", "3D9184B5-7492-151D-3A3C7C5A64FD64A1" },
 		{ "co.Reflector", "0AA79840-442C-E518-35F14DC5DA07D79A" },
+		{ "co.NativeClassType", "E06B94AA-0639-6524-D24AD3260F041B58" },
 		{ "lua.Universe", "CC1C2016-2A07-A536-0DE330A04496CC74" },
-		{ "co.ExceptionType", "A42F28BA-50B8-9593-346CABF6B6F93BD6" },
+		{ "co.ComponentType", "0B216603-8B57-1533-A9B552990562FB3C" },
 		{ "lua.ILauncher", "A7FCD03C-4219-A565-4232A36DF1E9BD58" },
 		{ "co.ModulePart", "A34C715E-954E-15CD-2B04800BA19B5052" },
-		{ "co.EnumType", "1847C34A-33F1-05F8-859BC2523056F718" },
-		{ "lua.lua", "CC83CD39-BDBB-A5E4-1B99D37111BCF066" },
-		{ "lua.Exception", "C9E07715-CB3A-652A-0D46896EFD6FD6AB" },
-		{ "co.ModulePartLoader", "536A73D9-F4C8-F597-2FEB68C301937B8D" },
-		{ "co.ComponentType", "0B216603-8B57-1533-A9B552990562FB3C" },
-		{ "co.ArrayType", "F29E701E-02C4-05EF-5678229EC3653D1C" },
-		{ "co.StructType", "10C22B97-2CDD-E5E9-6696678A6EAF792F" },
-		{ "co.InterfaceType", "22FF144F-E1B5-1593-CA7DF461B59AB85C" },
-		{ "lua.Component", "93663B91-8382-6537-A2BCF4D6D0CEAAC5" },
-		{ "co.NativeClassType", "E06B94AA-0639-6524-D24AD3260F041B58" },
 		{ "lua.ModulePart", "CC83CD39-BDBB-A5E4-1B99D37111BCF066" },
 		{ "co.Namespace", "4FD40C32-7A5E-75F8-05DDEE996453EF13" },
-		{ "co.Interface", "C9F9F061-B481-151D-4751BCC4494CCD9F" },
+		{ "lua.Exception", "C9E07715-CB3A-652A-0D46896EFD6FD6AB" },
+		{ "co.ExceptionType", "A42F28BA-50B8-9593-346CABF6B6F93BD6" },
+		{ "co.EnumType", "1847C34A-33F1-05F8-859BC2523056F718" },
+		{ "co.System", "C6E47013-73A8-D554-C221496BDAE2909C" },
+		{ "lua.lua", "CC83CD39-BDBB-A5E4-1B99D37111BCF066" },
+		{ "co.StructType", "10C22B97-2CDD-E5E9-6696678A6EAF792F" },
 		{ "lua.Launcher", "27D80973-9B0D-E5AC-FC3862D589367372" },
 		{ NULL, NULL }
 	};

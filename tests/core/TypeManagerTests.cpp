@@ -83,14 +83,8 @@ TEST( TypeManagerTests, loadType )
 {
 	co::TypeManager* tm = co::getSystem()->getTypes();
 
-	EXPECT_TRUE( tm->loadType( "", NULL ) == NULL );
-
-	EXPECT_TRUE( tm->loadType( "int32", NULL )->getKind() == co::TK_INT32 );
-
-	EXPECT_TRUE( tm->loadType( "TypeManagerTests.ErroneousStruct", NULL ) == NULL );
-
 	std::vector<co::CSLError> errorStack;
-	EXPECT_TRUE( tm->loadType( "TypeManagerTests.ErroneousStruct", &errorStack ) == NULL );
+	EXPECT_TRUE( tm->loadType( "TypeManagerTests.ErroneousStruct", errorStack ) == NULL );
 
 	EXPECT_EQ( 2, errorStack.size() );
 

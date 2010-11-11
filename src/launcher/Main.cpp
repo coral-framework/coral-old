@@ -352,7 +352,8 @@ int main( int argc, char* argv[] )
 				args.push_back( argv[index] );
 
 			co::Any res;
-			co::Any arg( &args );
+			co::Any arg;
+			arg.set<std::vector<std::string>&>( args );
 			reflector->invokeMethod( itf, method, co::ArrayRange<co::Any const>( &arg, 1 ), res );
 
 			// if the result is a number, use it as the return status; otherwise, print it

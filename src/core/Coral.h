@@ -125,15 +125,15 @@ CORAL_EXPORT Type* getType( const std::string& fullName );
 CORAL_EXPORT Component* newInstance( const std::string& fullName );
 
 /*!
-	Utility function to get the best provider of \c serviceType for clients of type \c clientType.
-	If \c clientType is null this function will retrieve the service's global instance.
+	Utility function to get the best provider of \a serviceType for clients of type \a clientType.
+	If \a clientType is null this function will retrieve the service's global instance.
 	Please refer to co::ServiceManager::getServiceForType() for the list of exceptions this function may throw.
 	\ingroup convenience
  */
 CORAL_EXPORT Interface* getServiceForType( InterfaceType* serviceType, InterfaceType* clientType );
 
 /*!
-	Utility function to get the best provider of \c serviceType for the given \c clientInstance.
+	Utility function to get the best provider of \a serviceType for the given \a clientInstance.
 	This is equivalent to calling: \code co::getSystem()->getServices()->getServiceForInstance() \endcode
 	Please refer to co::ServiceManager::getServiceForInstance() for the list of exceptions this function may throw.
 	\ingroup convenience
@@ -153,7 +153,7 @@ inline T* getService()
 
 /*!
 	Template function to get a <tt>clientType</tt>-specialized service by its interface type.
-	This picks the most appropriate service instance available for clients of the given \c clientType.
+	This picks the most appropriate service instance available for clients of the given \a clientType.
 	Please refer to co::ServiceManager::getServiceForType() for the list of exceptions this function may throw.
 	\ingroup convenience
  */
@@ -165,7 +165,7 @@ inline T* getService( co::InterfaceType* clientType )
 
 /*!
 	Template function to get a <tt>clientInstance</tt>-specialized service by its interface type.
-	This picks the most appropriate service instance available for the given \c clientInstance.
+	This picks the most appropriate service instance available for the given \a clientInstance.
 	Please refer to co::ServiceManager::getServiceForInstance() for the list of exceptions this function may throw.
 	\ingroup convenience
  */

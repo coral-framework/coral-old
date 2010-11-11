@@ -55,8 +55,8 @@ public:
 	Uuid( const Uuid &other );
 
 	/*!
-		Creates an UUID with the value specified by the DCE-compliant parameters: \c timeLow, \c timeMid,
-		\c timeHiAndVersion, \c clockSeqHiAndReserved, \c clockSeqLow and \c node. Example:
+		Creates an UUID with the value specified by the DCE-compliant parameters: \a timeLow, \a timeMid,
+		\a timeHiAndVersion, \a clockSeqHiAndReserved, \a clockSeqLow and \a node. Example:
 		\code
 		// {67C8770B-44F1-410A-AB9AF9B5446F13EE}
 		Uuid MyInterface( 0x67c8770b, 0x44f1, 0x410a, 0xab, 0x9a, 0xf9, 0xb5, 0x44, 0x6f, 0x13, 0xee )

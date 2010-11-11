@@ -29,9 +29,9 @@ interface IState
 	void push( in any value );
 
 	/*
-		Gets the value at \c index in the Lua stack and assigns it to \c outputVar.
-		If the Lua value cannot be assigned to the var in \c outputVar, raises a lua.Exception.
-		\warning \c outputVar must be a valid output variable.
+		Gets the value at \a index in the Lua stack and assigns it to \a outputVar.
+		If the Lua value cannot be assigned to the var in \a outputVar, raises a lua.Exception.
+		\warning \a outputVar must be a valid output variable.
 	 */
 	void getValue( in int32 index, in any outputVar );
 };

@@ -183,15 +183,15 @@ FUNCTION( CORAL_GENERATE_MODULE generatedSourceFiles moduleName )
 ENDFUNCTION()
 
 ################################################################################
-# Function to generate docs for a module (all extra args are passed to coralc)
+# Defines a target to generate docs for a module. Passes extra args to coralc.
 ################################################################################
-FUNCTION( CORAL_GENERATE_DOX moduleName outDir )
+FUNCTION( CORAL_GENERATE_DOX targetName moduleName outDir )
 	CORAL_GET_PATH_STRING( coralPathStr )
 
-	ADD_CUSTOM_COMMAND( OUTPUT "${outDir}/__module.dox"
+	ADD_CUSTOM_TARGET( ${targetName}
 		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" lua.Launcher co.compiler.cli --dox -g ${moduleName} -o ${outDir} ${ARGN}
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-		COMMENT "Running the Coral Compiler..."
+		COMMENT "Running the Coral Compiler to extract documentation..."
 	)
 ENDFUNCTION()
 

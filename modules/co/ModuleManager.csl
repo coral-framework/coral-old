@@ -24,7 +24,7 @@ interface ModuleManager
 	attribute bool binaryCompatibilityChecking;
 
 	/*
-		Finds an already loaded module given its fully-qualified \c moduleName.
+		Finds an already loaded module given its fully-qualified \a moduleName.
 		If the module was not previously loaded, returns null.
 	 */
 	Module findModule( in string moduleName );
@@ -42,7 +42,7 @@ interface ModuleManager
 	void uninstallLoader( in ModulePartLoader loader );
 
 	/*
-		Returns whether \c moduleName identifies a potentially loadable module
+		Returns whether \a moduleName identifies a potentially loadable module
 		(that is, whether one of the installed loaders identified a loadable artifact
 		within the module's directory).
 
@@ -52,7 +52,7 @@ interface ModuleManager
 	bool isLoadable( in string moduleName );
 
 	/*
-		Loads or retrieves the module with the given fully-qualified \c moduleName.
+		Loads or retrieves the module with the given fully-qualified \a moduleName.
 
 		If the specified module is not loaded and none of the installed loaders
 		is able to load it, a ModuleLoadException will be raised.

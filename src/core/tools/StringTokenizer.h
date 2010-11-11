@@ -20,7 +20,7 @@ class CORAL_EXPORT StringTokenizer
 public:
 	/*!
 		Constructs a string tokenizer for the specified string.
-		The argument \c delimiters indicates a list of characters that might be used to separate the tokens.
+		The argument \a delimiters indicates a list of characters that might be used to separate the tokens.
 	 */
 	StringTokenizer( const std::string& str, const std::string& delimiters );
 

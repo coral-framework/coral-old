@@ -13,9 +13,9 @@ interface TypeManager
 	attribute bool documentationParsing;
 
 	/*
-		Searches the database of loaded types for a type with the specified fully-qualified name.
+		Searches the database of loaded types for a type with the given fully-qualified name.
 		A suffix "[]" may be added to the name of a type to search for its corresponding ArrayType.
-		Returns null if a type with the given \c fullName is not currently loaded.
+		Returns null if a type with the given \a fullName is not currently loaded.
 	 */
  	Type findType( in string fullName );
 
@@ -26,21 +26,21 @@ interface TypeManager
  	Namespace findNamespace( in string fullName );
 
 	/*
-		Either retrieves or tries to load the type with the given fully-qualified \c typeName.
+		Either retrieves or tries to load the type with the given fully-qualified \a typeName.
 
-		This can also retrieve or create arrays: if \c typeName ends with "[]", this method will
-		call getArrayOf() passing as argument the element type specified in \c typeName.
+		This can also retrieve or create arrays: if \a typeName ends with "[]", this method will
+		call getArrayOf() passing as argument the element type specified in \a typeName.
 
-		\throw IllegalArgumentException if the passed \c typeName is empty.
+		\throw IllegalArgumentException if the passed \a typeName is empty.
 		\throw TypeLoadException if any error occurs while loading the type.
-		\throw IllegalArgumentException when dealing with arrays, this is thrown if \c typeName
+		\throw IllegalArgumentException when dealing with arrays, this is thrown if \a typeName
 			specifies an invalid array element type (i.e. an array, exception or component).
 	 */
 	Type getType( in string typeName ) raises IllegalArgumentException, TypeLoadException;
 
 	/*
-		Creates or retrieves an existing ArrayType whose elements are of type \c elementType.
-		\throw IllegalArgumentException if \c elementType is null, an array, an exception or a component.
+		Creates or retrieves an existing ArrayType whose elements are of type \a elementType.
+		\throw IllegalArgumentException if \a elementType is null, an array, an exception or a component.
 	 */
 	ArrayType getArrayOf( in Type elementType ) raises IllegalArgumentException;
 
@@ -48,8 +48,8 @@ interface TypeManager
 		A lower-level counterpart of getType() that either retrieves or tries to load a type
 		without raising exceptions.
 
-		In case of errors, this method will add detailed information to the \c errorStack
-		and return null. The \c errorStack is sorted from the outermost to the innermost error.
+		In case of errors, this method will add detailed information to the \a errorStack
+		and return null. The \a errorStack is sorted from the outermost to the innermost error.
 
 		\note This method does NOT create arrays, but can retrieve existing array types.
 	 */

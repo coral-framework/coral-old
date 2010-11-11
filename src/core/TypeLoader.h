@@ -26,7 +26,7 @@ class TypeManager;
 /*!
 	Locates and loads a co::Type from a CSL file in the filesystem.
 
-	The type is identified by the fully-qualified \c typeName passed in the
+	The type is identified by the fully-qualified \a typeName passed in the
 	constructor. The CSL file where the type is specified should reside in one of
 	the type repositories specified in the 'path' parameter, also in the constructor.
 
@@ -41,9 +41,9 @@ class CORAL_EXPORT TypeLoader : private csl::Parser
 {
 public:
 	/*!
-		Constructs a loader for the type with the given \c fullTypeName.
-		The type's CSL file is located using the given \c path (a list of type repositories).
-		Types are looked up and created within the context of the specified \c typeManager.
+		Constructs a loader for the type with the given \a fullTypeName.
+		The type's CSL file is located using the given \a path (a list of type repositories).
+		Types are looked up and created within the context of the specified \a typeManager.
 	 */
 	TypeLoader( const std::string& fullTypeName,
 				co::ArrayRange<const std::string> path,
@@ -97,21 +97,21 @@ private:
 	virtual co::Type* resolveType( const std::string& typeName, bool isArray = false );
 
 	/*
-		Processes a documentation chunk. If the \c member parameter is not specified, the
+		Processes a documentation chunk. If the \a member parameter is not specified, the
 		documentation is associated with the type itself. If a member already contains some
 		documentation, the extra docs are appended to previous contents.
 	 */
 	void addDocumentation( const std::string& member, const std::string& documentation );
 
-	// Appends the passed \c text to the CppBlockMap of our type.
+	// Appends the passed \a text to the CppBlockMap of our type.
 	void addCppBlock( const std::string& text );
 
-	//	Searches an existing type with the passed \c typeName. The name can be fully qualified
+	//	Searches an existing type with the passed \a typeName. The name can be fully qualified
 	//	or relative to the current type's location. Returns NULL if the type is not found.
 	co::Type* findDependency( const std::string& typeName );
 
 	/*
-		Tries to load the type with the passed \c typeName. The name can be fully qualified
+		Tries to load the type with the passed \a typeName. The name can be fully qualified
 		or relative to the current type's location. An exception is thrown if the type's CSL
 		file is not found. Otherwise, this method may return NULL if there's an error parsing
 		the CSL file.

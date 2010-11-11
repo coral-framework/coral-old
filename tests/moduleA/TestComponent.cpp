@@ -136,8 +136,8 @@ void TestComponent::testInParameters( float size, moduleA::TestEnum enumValue,
 
 void TestComponent::testOutParameters( float& size, moduleA::TestEnum& enumValue,
 		std::string& text, moduleA::TestStruct& testStruct,
-		moduleA::DummyInterface*& dummyInterface, std::vector<co::int32>* intList,
-		co::RefVector<moduleA::DummyInterface>* interfaces )
+		moduleA::DummyInterface*& dummyInterface, std::vector<co::int32>& intList,
+		co::RefVector<moduleA::DummyInterface>& interfaces )
 {
 	size = -1;
 	enumValue = moduleA::First;
@@ -148,16 +148,14 @@ void TestComponent::testOutParameters( float& size, moduleA::TestEnum& enumValue
 	text = "";
 
 	dummyInterface = NULL;
-	
-	assert( intList != NULL );
-	assert( !intList->empty() );
 
-	co::int32 myFirstInt = intList->at( 0 );
+	assert( !intList.empty() );
+
+	co::int32 myFirstInt = intList[0];
 	assert( myFirstInt > 0 );
 	myFirstInt = -1;
-	
-	assert( interfaces != NULL );
-	assert( !interfaces->empty() );
+
+	assert( !interfaces.empty() );
 	CORAL_UNUSED( interfaces );
 }
 

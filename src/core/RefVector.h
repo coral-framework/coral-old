@@ -26,14 +26,14 @@ public:
 	//! Default constructor.
 	inline RefVector() : std::vector< co::RefPtr<T> >() {;}
 
-	//! Creates a vector with \c n null pointers.
+	//! Creates a vector with \a n null pointers.
 	inline RefVector( size_t n ) : std::vector< co::RefPtr<T> >( n ) {;}
 
 	/*!
 		Performs a binary search on the sorted range [first,last] using a \c Comparator function.
 
 		Returns \c true if a matching element is found, or \c false if the key is not in the
-		sorted range. In either case, the parameter \c pos is set to the index where the element
+		sorted range. In either case, the parameter \a pos is set to the index where the element
 		should be located in the sorted range.
 
 		\note The \c Comparator function is defined as follows:

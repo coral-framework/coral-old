@@ -19,8 +19,8 @@
 <ul>
 	<li><a href="group__setup.html">System Setup and Shutdown</a></li>
 	<li><a href="group__convenience.html">Convenience Functions and Macros</a></li>
-	<li><a href="group__platform.html">Platform Abstraction</a></li>
 	<li><a href="group__debugevents.html">Debug Events API</a></li>
+	<li><a href="group__platform.html">Platform Utilities</a></li>
 </ul>
 </div>
 

@@ -9,6 +9,6 @@ interface MemberInfo
 	// The CompoundType that this member belongs to.
 	readonly attribute CompoundType owner;
 
-	// This member's index within its owner's \c members array.
+	// This member's index within its owner's \a members array.
 	readonly attribute uint32 index;
 };

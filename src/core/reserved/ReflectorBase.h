@@ -75,7 +75,7 @@ protected:
 	//! Raises co::IllegalArgumentException if handler is NULL.
 	void checValidProxyHandler( co::DynamicProxyHandler* handler );
 
-	//! Raises co::MissingInputException if \c numArgs is lesser than \c mi's expected number of args.
+	//! Raises co::MissingInputException if \a numArgs is lesser than \a mi's expected number of args.
 	void checkNumArguments( co::MethodInfo* mi, std::size_t numArgs );
 
 	//! Raises an exception because setAttribute() was called on a read-only attribute.

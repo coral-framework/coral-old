@@ -44,7 +44,7 @@ public:
 
 	virtual co::Type* getType( const std::string& typeName ) = 0;
 
-	virtual co::Type* loadType( const std::string& typeName, std::vector<co::CSLError>* errorStack ) = 0;
+	virtual co::Type* loadType( const std::string& typeName, std::vector<co::CSLError>& errorStack ) = 0;
 };
 
 } // namespace co

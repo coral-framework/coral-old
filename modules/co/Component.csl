@@ -18,20 +18,20 @@ interface Component
 	/*
 		Retrieves the interface instance "provided by" or "bound to" one of the component's interfaces.
 
-		If \c itfInfo is a \e facet, this method returns the corresponding interface instance
-		<em>provided by</em> this component. Otherwise, if \c itfInfo is a \e receptacle, this
+		If \a itfInfo is a \e facet, this method returns the corresponding interface instance
+		<em>provided by</em> this component. Otherwise, if \a itfInfo is a \e receptacle, this
 		method returns the interface instance that is currently <em>bound to</em> the receptacle
 		(in this case, the result can be null if nothing is bound to the receptacle).
 
-		\throw NoSuchInterfaceException if \c itfInfo is not a valid interface of this component.
+		\throw NoSuchInterfaceException if \a itfInfo is not a valid interface of this component.
 	 */
 	Interface getInterface( in InterfaceInfo itfInfo ) raises NoSuchInterfaceException;
 
 	/*
-		Binds an interface \c instance to one of the component's receptacles.
-		If an interface instance is already bound to the receptacle, it is replaced by the new \c instance.
-		\throw NoSuchInterfaceException if \c receptacle is not a valid receptacle of this component.
-		\throw IllegalArgumentException if the passed \c instance is incompatible with the receptacle.
+		Binds an interface \a instance to one of the component's receptacles.
+		If an interface instance is already bound to the receptacle, it is replaced by the new \a instance.
+		\throw NoSuchInterfaceException if \a receptacle is not a valid receptacle of this component.
+		\throw IllegalArgumentException if the passed \a instance is incompatible with the receptacle.
 	 */
 	void bindInterface( in InterfaceInfo receptacle, in Interface instance )
 		raises NoSuchInterfaceException, IllegalArgumentException;

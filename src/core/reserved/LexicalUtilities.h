@@ -20,14 +20,14 @@ class CORAL_EXPORT LexicalUtilities
 {
 public:
 	/*!
-		Returns whether the passed parameter \c str is a valid identifier.
+		Returns whether the passed parameter \a str is a valid identifier.
 		Identifiers must start with a letter, which can then be followed by more letters,
 		numbers and the underscore symbol.
 	 */
 	static bool isValidIdentifier( const std::string& str );
 
 	/*!
-		Returns whether the passed \c identifier is a valid attribute name (i.e. starts with lower case).
+		Returns whether the passed \a identifier is a valid attribute name (i.e. starts with lower case).
 		\warning this method assumes the passed parameter is already a valid identifier.
 		\sa isValidIdentifier
 	 */
@@ -42,7 +42,7 @@ public:
 
 	/*!
 		Generates an accessor name given an attribute name.
-		\warning This method assumes \c methodName is a valid identifier.
+		\warning This method assumes \a methodName is a valid identifier.
 	 */
 	static void formatAccessor( const std::string& attributeName,
 								AttributeAccessor accessorKind,
@@ -51,7 +51,7 @@ public:
 	/*!
 		Parses a method name looking for a specific acessor name pattern.
 		The passed method name will be searched for the patterns created by the formatAccessor() method.
-		Only the kind of accessors specified in the parameter \c accessorKinds will be searched for.
+		Only the kind of accessors specified in the parameter \a accessorKinds will be searched for.
 
 		If a prefix 'get' or 'set' is found, the subsequent character must be a capital letter
 		(or this method will return -1). If a valid pattern is found, the prefix is removed and
@@ -66,9 +66,9 @@ public:
 		\return One of the following values:
 			- co::LexicalUtilities::Getter if a \e getter name was parsed;
 			- co::LexicalUtilities::Setter if a \e setter name was parsed;
-			- -1 if \c methodName was not a valid accessor name.
+			- -1 if \a methodName was not a valid accessor name.
 
-		\warning This method assumes \c methodName is a valid identifier.
+		\warning This method assumes \a methodName is a valid identifier.
 	 */
 	static int parseAccessor( const std::string& methodName, int accessorKinds, std::string& attributeName );
 };

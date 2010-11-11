@@ -488,7 +488,8 @@ bool testAndCopyCompatibleReferences( const __any::State& from, __any::State& to
 		}
 		else
 		{
-			// array kinds other than co::ArrayRange must be retrieved by exact type
+			// array kinds other than co::ArrayRange must be retrieved by exact type, and cannot be null
+			assert( from.data.ptr != NULL );
 			return	to.arrayKind == from.arrayKind &&
 					to.type == from.type &&
 					to.isPointer == from.isPointer &&
@@ -624,9 +625,11 @@ void Any::setArray( ArrayKind arrayKind, Type* elementType, uint32 flags, void* 
 	switch( arrayKind )
 	{
 	case AK_StdVector:
+		assert( ptr != NULL );
 		_state.arrayKind = __any::State::AK_StdVector;
 		break;
 	case AK_RefVector:
+		assert( ptr != NULL );
 		flags |= ( VarIsPointer | VarIsPointerConst );
 		_state.arrayKind = __any::State::AK_RefVector;
 		break;
