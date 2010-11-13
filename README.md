@@ -1,7 +1,7 @@
 Coral
 =====
 
-Coral is a lightweight C++ component platform for soft real-time systems.
+Coral is a lightweight C++ component framework for soft real-time systems.
 
 More info here soon.
 

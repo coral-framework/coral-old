@@ -1,4 +1,8 @@
-- render "base" do
+!!! 5 iso-8859-1
+%html{:lang => "en"}
+	%head
+		%title Coral #{@config[:version]}: #{@item[:title]}
+		= render 'partials/head'
 	%body.bp
 		#header= render 'partials/header'
 		#container

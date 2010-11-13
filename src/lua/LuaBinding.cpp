@@ -1,5 +1,5 @@
 /*
- * Coral - A C++ Component Framework.
+ * Coral - Lightweight C++ Component Framework.
  * See Copyright Notice in Coral.h
  */
 
@@ -524,6 +524,7 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 	co::Any args[MAX_NUM_PARAMETERS];
 
 	int numRequiredArgs = numParams;
+	int numPassedArgs = lua_gettop( L ) - 1;
 	int i = 0;
 
 	try
@@ -532,9 +533,16 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 		{
 			co::ParameterInfo* paramInfo = paramList[i];
 			co::Type* paramType = paramInfo->getType();
-		
+
 			if( paramInfo->getIsIn() )
 			{
+				if( numPassedArgs <= i )
+				{
+					// a required argument was not passed, but we don't break the loop
+					// because we want to compute numRequiredArgs
+					continue; 
+				}
+
 				if( paramInfo->getIsOut() )
 				{
 					// inout: allocate an 'out' var and set it with the 'in' value.
@@ -561,7 +569,6 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 	}
 
 	// check the number of required/passed parameters
-	int numPassedArgs = lua_gettop( L ) - 1;
 	if( numRequiredArgs > numPassedArgs )
 	{
 		lua_pushfstring( L, "insufficient number of arguments to method '%s' (%d expected, got %d)",

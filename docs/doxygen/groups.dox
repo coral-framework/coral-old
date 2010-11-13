@@ -151,7 +151,7 @@ At least the following groups are still missing:
 		\name Platform Info
 		@{
 			\def CORAL_BYTE_ORDER
-				The host platform's byte order. Either \c CORAL_LITTLE_ENDIAN or \c CORAL_BIG_ENDIAN.
+				Detected machine byte order. Either \c CORAL_LITTLE_ENDIAN or \c CORAL_BIG_ENDIAN.
 			\def CORAL_POINTER_SIZE
 				The value of <tt>sizeof(void*)</tt>.
 			\def CORAL_OS_NAME

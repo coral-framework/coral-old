@@ -1,4 +1,11 @@
-- render "base" do
+!!! 5 iso-8859-1
+%html{:lang => "en"}
+	%head
+		%title= @item[:title]
+		:javascript
+			if( window.location.pathname.match( /^\/latest/ ) )
+				window.location.replace( window.location.href.replace( "/latest", "/#{@config[:version]}" ) );
+		= render 'partials/head'
 	%body.bp
 		#mainarea.standalone
 			#content
