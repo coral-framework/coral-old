@@ -70,6 +70,7 @@ ENDIF()
 
 FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output )
 ADD_TEST( tests_regen ${tests_regen_EXECUTABLE} --gtest_output=xml:../output/RegenerationTests.xml )
+CORAL_DEFAULT_TEST_PROPERTIES( tests_regen )
 
 ################################################################################
 # Source Groups

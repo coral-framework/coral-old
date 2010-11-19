@@ -71,6 +71,7 @@ TARGET_LINK_LIBRARIES( tests_moduleA
 
 FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output )
 ADD_TEST( tests_moduleA ${tests_moduleA_EXECUTABLE} --gtest_output=xml:../output/ModuleATests.xml )
+CORAL_DEFAULT_TEST_PROPERTIES( tests_moduleA )
 
 ################################################################################
 # Source Groups

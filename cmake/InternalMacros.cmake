@@ -5,6 +5,8 @@ MACRO( CORAL_TEST_TARGET_PROPERTIES targetName testExecutableVar )
 
 	CORAL_DEFAULT_TARGET_PROPERTIES( ${targetName} )
 
+
+
 	IF( XCODE_VERSION )
 		GET_TARGET_PROPERTY( _location ${targetName} LOCATION )
 		STRING( REPLACE "/$(CONFIGURATION)/" "/\$ENV{CONFIGURATION}/" ${testExecutableVar} ${_location} )
@@ -17,6 +19,16 @@ MACRO( CORAL_TEST_TARGET_PROPERTIES targetName testExecutableVar )
 	ENDIF()
 
 ENDMACRO( CORAL_TEST_TARGET_PROPERTIES )
+
+################################################################################
+# Macro to set common properties for CTest tests
+################################################################################
+MACRO( CORAL_DEFAULT_TEST_PROPERTIES testName )
+	IF( WIN32 )
+		SET_PROPERTY( TEST ${testName} PROPERTY ENVIRONMENT "PATH=$ENV{PATH};${CMAKE_BINARY_DIR}/lib" )
+	ENDIF()
+ENDMACRO( CORAL_DEFAULT_TEST_PROPERTIES )
+
 
 ################################################################################
 # Macro to enable generation of 'test coverage' data for a target.
