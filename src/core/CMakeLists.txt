@@ -141,7 +141,12 @@ SOURCE_GROUP( "Tools" FILES ${toolsFiles} )
 ################################################################################
 
 # install shared library
-INSTALL( TARGETS core DESTINATION lib COMPONENT Core )
+IF( NOT WIN32 )
+	INSTALL( TARGETS core DESTINATION lib COMPONENT Core )
+ELSE()
+	# on windows use a different approach, to copy the manifest and pdb files as well
+	INSTALL( DIRECTORY ${CMAKE_BINARY_DIR}/lib DESTINATION . COMPONENT Core )
+ENDIF()
 
 # install CMake package
 INSTALL( FILES ${CMAKE_SOURCE_DIR}/cmake/FindCoral.cmake DESTINATION cmake COMPONENT Core )

@@ -211,26 +211,29 @@ ENDIF()
 ################################################################################
 MACRO( CORAL_DEFAULT_TARGET_PROPERTIES targetName )
 
-	# On Windows, artifacts get a 'D' suffix when built in Debug mode
+	# On Windows, artifacts get a '_debug' suffix when built in Debug mode
 	IF( WIN32 )
-		SET_PROPERTY( TARGET ${targetName} PROPERTY OUTPUT_NAME_DEBUG "${targetName}_debug" )
+		SET_PROPERTY( TARGET ${targetName} PROPERTY DEBUG_POSTFIX "_debug" )
 
 		# Prevent the MSVC IDE from creating targets in "Debug"/"Release" subdirs
 		IF( MSVC_IDE )
 			SET_TARGET_PROPERTIES( ${targetName} PROPERTIES PREFIX "../" )
 		ENDIF()
 
-		# Generate all executables and shared libs (but not module libs) in /bin
+		# Generate executables in /bin and shared libs (but not module libs) in /lib
 		GET_TARGET_PROPERTY( _targetType ${targetName} TYPE )
 		IF( NOT _targetType STREQUAL "MODULE_LIBRARY" )
 			SET_TARGET_PROPERTIES( ${targetName} PROPERTIES
 				RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-				LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+				ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+				LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
 			)
 		ENDIF()
 	ENDIF()
 
+	# Disable unavoidable MSVC warnings
 	IF( MSVC )
+		ADD_DEFINITIONS( "/wd4275" ) # non dll-interface class used as base for dll-interface class
 		SET_PROPERTY( TARGET ${targetName} APPEND PROPERTY COMPILE_DEFINITIONS
 				"_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE" )
 	ENDIF()
@@ -257,7 +260,7 @@ ENDMACRO( CORAL_DEFAULT_TARGET_PROPERTIES )
 MACRO( CORAL_MODULE_TARGET_PROPERTIES moduleName )
 
 	# Add a suffix to module libraries built in Debug mode
-	SET_PROPERTY( TARGET ${moduleName} PROPERTY LIBRARY_OUTPUT_NAME_DEBUG "${moduleName}_debug" )
+	SET_PROPERTY( TARGET ${moduleName} PROPERTY DEBUG_POSTFIX "_debug" )
 
 	# Copy or generate the module library into /modules/${moduleName}/
 	IF( XCODE_VERSION )
@@ -299,41 +302,29 @@ ENDMACRO( CORAL_BUILD_CSL_MODULE )
 ################################################################################
 # CMake Package Configuration
 ################################################################################
-FUNCTION( _coral_find_program _name)
+FUNCTION( _coral_find_program _name )
 	FIND_PROGRAM( ${_name}
 		NAMES ${ARGN}
-		HINTS
-			../
-			$ENV{CORAL_ROOT}
-			${CORAL_ROOT}
-		PATH_SUFFIXES
-			.
-			bin
-			bin/Release
-			bin/Debug
+		HINTS ".." "$ENV{CORAL_ROOT}" "${CORAL_ROOT}"
+		PATH_SUFFIXES "." "bin"
 	)
+	MARK_AS_ADVANCED( ${_name} )
 ENDFUNCTION()
 
-FUNCTION( _coral_find_library _name)
+FUNCTION( _coral_find_library _name )
 	FIND_LIBRARY( ${_name}
 		NAMES ${ARGN}
-		HINTS
-			../
-			$ENV{CORAL_ROOT}
-			${CORAL_ROOT}
-		PATH_SUFFIXES
-			lib
-			lib/Release
-			lib/Debug
+		HINTS ".." "$ENV{CORAL_ROOT}" "${CORAL_ROOT}"
+		PATH_SUFFIXES "lib"
 	)
 	MARK_AS_ADVANCED( ${_name} )
 ENDFUNCTION()
 
 FIND_PATH( CORAL_INCLUDE_DIR co/Coral.h
 	HINTS
-		../include
-		$ENV{CORAL_ROOT}/include
-		${CORAL_ROOT}/include
+		"../include"
+		"$ENV{CORAL_ROOT}/include"
+		"${CORAL_ROOT}/include"
 )
 MARK_AS_ADVANCED( CORAL_INCLUDE_DIR )
 
@@ -342,16 +333,19 @@ IF( NOT CORAL_LAUNCHER )
 ENDIF()
 
 _coral_find_library( CORAL_LIBRARY			coral )
-_coral_find_library( CORAL_LIBRARY_DEBUG	corald )
+_coral_find_library( CORAL_LIBRARY_DEBUG	coral_debug )
+
+IF( CORAL_LIBRARY AND CORAL_LIBRARY_DEBUG )
+	SET( CORAL_LIBRARIES optimized ${CORAL_LIBRARY} debug ${CORAL_LIBRARY_DEBUG} )
+ELSEIF( CORAL_LIBRARY )
+	SET( CORAL_LIBRARIES general ${CORAL_LIBRARY} )
+ELSEIF( CORAL_LIBRARY_DEBUG )
+	SET( CORAL_LIBRARIES debug ${CORAL_LIBRARY_DEBUG} )
+ENDIF()
 
 INCLUDE( FindPackageHandleStandardArgs )
-FIND_PACKAGE_HANDLE_STANDARD_ARGS( Coral DEFAULT_MSG CORAL_LIBRARY CORAL_LAUNCHER CORAL_INCLUDE_DIR )
+FIND_PACKAGE_HANDLE_STANDARD_ARGS( Coral DEFAULT_MSG CORAL_LIBRARIES CORAL_LAUNCHER CORAL_INCLUDE_DIR )
 
 IF( CORAL_FOUND )
 	SET( CORAL_INCLUDE_DIRS ${CORAL_INCLUDE_DIR} )
-	IF( CORAL_LIBRARY_DEBUG )
-		SET( CORAL_LIBRARIES optimized ${CORAL_LIBRARY} debug ${CORAL_LIBRARY_DEBUG} )
-	ELSE()
-		SET( CORAL_LIBRARIES ${CORAL_LIBRARY} )
-	ENDIF()
 ENDIF()

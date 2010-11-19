@@ -18,7 +18,7 @@ INCLUDE( InternalMacros )
 
 IF( MSVC )
 	# Disable unavoidable MSVC warnings
-	ADD_DEFINITIONS( "/wd4251 /wd4275" )
+	ADD_DEFINITIONS( "/wd4251" )
 ENDIF()
 
 IF( UNIX )
@@ -56,6 +56,15 @@ SET( CORAL_VERSION "${CORAL_VERSION_MAJOR}.${CORAL_VERSION_MINOR}.${CORAL_VERSIO
 
 # Code generation rules revision.
 SET( CORAL_COMPILER_OUTPUT_REVISION 1 )
+
+################################################################################
+# Installation
+################################################################################
+
+# enforce a safe default CMAKE_INSTALL_PREFIX
+IF( NOT CMAKE_INSTALL_PREFIX MATCHES "coral" )
+	SET( CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/coral" )
+ENDIF()
 
 ################################################################################
 # Packaging
