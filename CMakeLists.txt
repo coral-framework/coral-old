@@ -20,9 +20,20 @@ IF( MSVC )
 	# Disable unavoidable MSVC warnings
 	ADD_DEFINITIONS( "/wd4251" )
 
+	MACRO( REPLACE_FLAG oldFlag newFlag flagType flagString )
+		STRING( REPLACE "${oldFlag}" "${newFlag}" _temp "${${flagType}}" )
+		SET( ${FLAG_TYPE} "${_temp}" CACHE STRING "${flagString}" FORCE )
+	ENDMACRO( REPLACE_FLAG )
+
 	# Always incorporate PDBs into targets
-	STRING( REPLACE "/Zi" "/Z7" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" )
-	STRING( REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}" )
+	REPLACE_FLAG( "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG
+		"Flags used by the compiler during debug builds" )
+	REPLACE_FLAG( "/Zi" "/Z7" CMAKE_CXX_FLAGS_RELWITHDEBINFO
+		"Flags used by the compiler during Release with Debug Info builds" )
+	REPLACE_FLAG( "/Zi" "/Z7" CMAKE_C_FLAGS_DEBUG
+		"Flags used by the compiler during debug builds" )
+	REPLACE_FLAG( "/Zi" "/Z7" CMAKE_C_FLAGS_RELWITHDEBINFO
+		"Flags used by the compiler during Release with Debug Info builds" )
 ENDIF()
 
 IF( UNIX )

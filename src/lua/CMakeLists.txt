@@ -51,7 +51,7 @@ SOURCE_GROUP( "@Generated" FILES ${GENERATED_LUA_SOURCES} )
 ################################################################################
 
 # install shared library
-INSTALL( DIRECTORY ${CMAKE_BINARY_DIR}/modules/lua DESTINATION modules COMPONENT "Lua Module" )
+INSTALL( TARGETS lua DESTINATION modules/lua COMPONENT "Lua Module" )
 
 # install CSL files
 INSTALL( DIRECTORY ${CMAKE_SOURCE_DIR}/modules/lua DESTINATION modules COMPONENT "Lua Module" )
