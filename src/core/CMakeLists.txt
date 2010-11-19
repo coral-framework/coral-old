@@ -90,7 +90,10 @@ SET_TARGET_PROPERTIES( core PROPERTIES
 
 CORAL_DEFAULT_TARGET_PROPERTIES( core )
 
-IF( NOT MSVC )
+IF( MSVC )
+	# Rename the PDB to avoid conflicts
+	SET_PROPERTY( TARGET core APPEND PROPERTY LINK_FLAGS_DEBUG "/PDB:core.pdb" )
+ELSE()
 	# Disable warnings for AntLR-generated source files
 	SET_PROPERTY( SOURCE csl/CSLLexer.cpp csl/CSLParser.cpp PROPERTY COMPILE_FLAGS "-Wno-all -Wno-extra -Wno-unused" )
 ENDIF()

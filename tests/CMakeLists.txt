@@ -19,7 +19,7 @@ IF( GTEST_FOUND )
 	# Check if Valgrind is available for the memory check tests
 	FIND_PROGRAM( VALGRIND_COMMAND valgrind )
 	IF( NOT VALGRIND_COMMAND )
-		MESSAGE( "WARNING: Valgrind was NOT FOUND - all memory tests have been disabled!" )
+		MESSAGE( "WARNING: valgrind not found - all memory tests have been disabled!" )
 	ENDIF()
 
 	ADD_SUBDIRECTORY( core )
@@ -33,6 +33,6 @@ IF( GTEST_FOUND )
 
 ELSE()
 
-	MESSAGE( "WARNING: GTest was NOT FOUND, all automated testing projects will be disabled." )
+	MESSAGE( "WARNING: gtest not found - all tests have been disabled!" )
 
 ENDIF()
