@@ -13,7 +13,7 @@ SET( CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH} )
 INCLUDE( InternalMacros )
 
 ################################################################################
-# Global Stuff
+# Global Build Settings
 ################################################################################
 
 IF( MSVC )
@@ -43,6 +43,11 @@ FIND_PACKAGE( Coral QUIET )
 
 # Shared include paths for all subprojects
 INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/include )
+
+# On Windows, add the lib dir to the PATH so test executables can find the coral DLL
+IF( WIN32 )
+	SET( ENV{PATH} $ENV{PATH} "${CMAKE_BINARY_DIR}/lib" )
+ENDIF()
 
 ################################################################################
 # Global Coral Settings
