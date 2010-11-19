@@ -22,7 +22,7 @@ IF( MSVC )
 
 	MACRO( REPLACE_FLAG oldFlag newFlag flagType flagString )
 		STRING( REPLACE "${oldFlag}" "${newFlag}" _temp "${${flagType}}" )
-		SET( ${FLAG_TYPE} "${_temp}" CACHE STRING "${flagString}" FORCE )
+		SET( ${flagType} "${_temp}" CACHE STRING "${flagString}" FORCE )
 	ENDMACRO( REPLACE_FLAG )
 
 	# Always incorporate PDBs into targets
