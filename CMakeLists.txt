@@ -20,8 +20,9 @@ IF( MSVC )
 	# Disable unavoidable MSVC warnings
 	ADD_DEFINITIONS( "/wd4251" )
 
-	# Incorporate PDBs into targets
-	SET( CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG} "/Z7" )
+	# Always incorporate PDBs into targets
+	SET( CMAKE_C_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG} /Z7" )
+	SET( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Z7" )
 ENDIF()
 
 IF( UNIX )
