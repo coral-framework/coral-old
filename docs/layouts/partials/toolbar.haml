@@ -1,13 +1,13 @@
 #breadcrumbs
-  %ul
-    - breadcrumbs_trail.each_with_index do |bc, index|
-      - next if index == 0
-      - next unless bc
-      - klass = "first" if index == 1
-      - klass = "last" if index == breadcrumbs_trail.size - 1
-      %li{ :class => klass }
-        = link_to_unless_current( bc[:title], bc )
+	%ul
+		- breadcrumbs_trail.each_with_index do |bc, index|
+			- next if index == 0
+			- next unless bc
+			- klass = "last" if index == breadcrumbs_trail.size - 1
+			- klass = "first" if index == 1
+			%li{ :class => klass }
+				= link_to_unless_current( bc[:title], bc )
 
 #docfeedback
-  %a(href="https://spreadsheets.google.com/viewform?formkey=dE9TZy1kLTctZ3NBdUd6T2ZBNVBXdmc6MQ&entry_0=#{ @item.identifier == "/doc/api/layout/" ? "$title" : @item.path.gsub("/#{@config[:version]}/", "") }&entry_2=#{ @item.identifier == "/doc/api/layout/" ? "$projectnumber" : @config[:version] }" title="Provide feedback about this documentation page." target="_blank")
-    [+] Documentation Feedback
+	%a(href="https://spreadsheets.google.com/viewform?formkey=dE9TZy1kLTctZ3NBdUd6T2ZBNVBXdmc6MQ&entry_0=#{ @item.identifier == "/doc/api/layout/" ? "$title" : @item.path.gsub("/#{@config[:version]}/", "") }&entry_2=#{ @item.identifier == "/doc/api/layout/" ? "$projectnumber" : @config[:version] }" title="Provide feedback about this documentation page." target="_blank")
+		[+] Documentation Feedback

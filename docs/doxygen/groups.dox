@@ -15,8 +15,8 @@ At least the following groups are still missing:
 	\defgroup setup System Setup and Shutdown
 	\brief Functions to setup and teardown the Coral framework.
 
-	The framework is initialized when getSystem() is called for the first time, and the
-	initialization will fail unless the Coral Path contains at least the <tt>'co'</tt> module.
+	The framework is initialized when getSystem() is called for the first time.
+	The initialization will fail if the Coral Path does not contain the <tt>'co'</tt> module.
 
 	If you are writing your own executable, the Coral Path is empty by default.
 	You must call addPath() to setup the Coral Path before the first call to getSystem().

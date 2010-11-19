@@ -1,5 +1,5 @@
 /*
- * Coral - Lightweight C++ Component Framework.
+ * Coral - A lightweight C++ component framework
  * See Copyright Notice in Coral.h
  */
 
@@ -322,7 +322,7 @@ struct VariableHelper<bool>
 	inline static void store( State& s, bool v ) { s.data.b = v; }
 	inline static bool retrieve( State& s ) { return s.data.b; }
 };
-	
+
 template<>
 struct VariableHelper<int8>
 {
@@ -336,7 +336,7 @@ struct VariableHelper<uint8>
 	inline static void store( State& s, uint8 v ) { s.data.u8 = v; }
 	inline static uint8 retrieve( State& s ) { return static_cast<uint8>( s.data.u8 ); }
 };
-	
+
 template<>
 struct VariableHelper<int16>
 {
@@ -415,11 +415,11 @@ struct VariableHelper<double>
 		- Automatic conversion between primitive values (boolean, arithmetic types and enum).
 		- Type-safe storage and retrieval of pointers and references.
 		- Storage and retrieval of arrays as pointers to \c std::vectors, \c co::RefVectors or \c co::ArrayRanges.
- 
+
 	\par What is NOT supported:
 		- Storing exceptions.
 		- Reference counting of interfaces. Stored interface pointers are \b not considered active references.
- 
+
 	\par Values vs. References
 		For efficiency, this class only allows the storage of values for \c enums and <em>primitive types</em>
 		(i.e. \c bool, <tt>[u]int{8|16|32|64}</tt>, \c float and \c double). All other types must be stored and
@@ -430,7 +430,7 @@ struct VariableHelper<double>
 		a reference. However, the opposite (retrieving a reference where a pointer was passed) is \b not
 		allowed, because the pointer could be NULL. This is not to be confused with retrieving a reference to a
 		pointer (<tt>Foo*&</tt>), which is allowed if the passed variable was truly a reference to a pointer.
- 
+
 	\par Arrays
 		An array can be passed using three possible representations:
 		  -# A \c co::ArrayRange, which is the most generic representation but cannot be used to add/remove elements;
@@ -464,7 +464,7 @@ struct VariableHelper<double>
 		passed by reference; and both <tt>\e SubInterface</tt> and <tt>\e SuperInterface</tt> are Coral
 		interfaces, where <tt>\e SubInterface</tt> is a subtype of <tt>\e SuperInterface</tt>, or both
 		are the same interface.
- 
+
  	\par Automatic Conversions for Values
 		All types storable as values in a co::Any can be converted to any other value type.
 		This includes \c enums and all primitive types (such as \c bool, integers and floats),
@@ -543,7 +543,7 @@ public:
 	{
 		setVariable( type, flags, ptr );
 	}
-	
+
 	/*!
 		Constructor corresponding to a setBasic() call.
 		Please, see setBasic()'s documentation for more info.
@@ -627,7 +627,7 @@ public:
 
 	/*!
 		Attempts to retrieve a stored variable, making the necessary casts whenever possible.
-	
+
 		\throw co::IllegalCastException if there is no valid cast from the stored variable's
 				type to the requested type \c T.
 	 */
@@ -645,7 +645,7 @@ public:
 
 		return __any::VariableHelper<T>::retrieve( temp._state );
 	}
-	
+
 	//! Provides read/write access to the internal state of a co::Any.
 	inline State& getState() { return _state; }
 
@@ -659,7 +659,7 @@ public:
 	/*!
 		Automatically stores any variable supported by the Coral type system.
 		Previous contents are discarded.
-	 
+
 		This method uses template meta-programming to statically infer a variable's type.
 		If you need to set a co::Any dynamically at runtime, use the "Custom Storage Methods" instead.
 
@@ -714,7 +714,7 @@ public:
 					loose). If \c flags specifies \c VarIsReference, \c ptr cannot be null.
 	 */
 	void setVariable( Type* type, uint32 flags, void* ptr );
-	
+
 	/*!
 		Alternative version of setVariable(), simplified for basic types.
 		Parameter 'kind' must range from co::TK_ANY to co::TK_STRING (i.e. types
@@ -747,7 +747,7 @@ public:
 	/*!
 		Prepares a co::Any for use as an 'out' argument of the specified type.
 		If the co::Any already contains a value, it will be preserved (if it's compatible).
-		Otherwise, a default-constructed, temporary object will be created. 
+		Otherwise, a default-constructed, temporary object will be created.
 		\param paramType the 'out' parameter type.
 		\throw co::Exception if the co::Any's current value is incompatible with 'paramType'.
 		\sa makeIn()

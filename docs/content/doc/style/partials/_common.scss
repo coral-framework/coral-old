@@ -86,13 +86,13 @@ pre {
 	padding: 15px 0px 0px 20px;
 	a:hover{ text-decoration: none; }
 	h1 {
-		top: 27px;
-		left: 65px;
+		top: 25px;
+		left: 69px;
 		position: absolute;
 		color: $link-color;
-		font-size: 30px;
-		font-weight: bolder;
-		letter-spacing: -2px;
+		font-size: 27px;
+		font-weight: 600;
+		font-family: $font-family-arial;
 	}
 }
 
@@ -108,7 +108,7 @@ pre {
 	padding: 8px 120px 0px 0px;
 	ul {
 		@include navlist;
-		font-size: 16px;
+		font-size: 15px;
 	}
 	li.selected {
 		a { color: $link-color; }

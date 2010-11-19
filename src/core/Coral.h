@@ -1,5 +1,5 @@
 /*
- * Coral - Lightweight C++ Component Framework.
+ * Coral - A lightweight C++ component framework
  * See Copyright Notice at the end of this file.
  */
 
