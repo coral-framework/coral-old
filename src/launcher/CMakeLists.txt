@@ -35,5 +35,8 @@ IF( NOT WIN32 )
 	INSTALL( TARGETS launcher DESTINATION bin COMPONENT Core )
 ELSE()
 	# on windows use a different approach, to copy the manifest and pdb files as well
-	INSTALL( DIRECTORY ${CMAKE_BINARY_DIR}/bin DESTINATION . COMPONENT Core FILES_MATCHING "coral*" )
+	INSTALL(
+		DIRECTORY ${CMAKE_BINARY_DIR}/bin DESTINATION . COMPONENT Core
+		FILES_MATCHING PATTERN "coral*"
+	)
 ENDIF()

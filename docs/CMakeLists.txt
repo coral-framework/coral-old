@@ -34,6 +34,6 @@ IF( NANOC )
 
 ELSE()
 
-	MESSAGE( WARNING "nanoc not found - cannot generate documentation." )
+	MESSAGE( WARNING "nanoc not found - documentation generation has been disabled." )
 
 ENDIF()
