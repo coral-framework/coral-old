@@ -85,12 +85,13 @@ ADD_LIBRARY( core SHARED ${MAPPING_HEADER_FILES} ${GENERATED_MODULE_FILES} ${HEA
 SET_TARGET_PROPERTIES( core PROPERTIES
 	OUTPUT_NAME   "coral"
 	PROJECT_LABEL "Coral Library"
+	TARGET_PDB    "core.pdb"
 )
 
 CORAL_DEFAULT_TARGET_PROPERTIES( core )
 
-# Disable warnings for AntLR-generated source files
-IF( UNIX )
+IF( NOT MSVC )
+	# Disable warnings for AntLR-generated source files
 	SET_PROPERTY( SOURCE csl/CSLLexer.cpp csl/CSLParser.cpp PROPERTY COMPILE_FLAGS "-Wno-all -Wno-extra -Wno-unused" )
 ENDIF()
 
@@ -142,6 +143,7 @@ SOURCE_GROUP( "Tools" FILES ${toolsFiles} )
 
 # install shared library
 INSTALL( TARGETS core DESTINATION lib COMPONENT Core )
+INSTALL( FILES ${CMAKE_BINARY_DIR}/bin/core.pdb DESTINATION lib COMPONENT Core OPTIONAL )
 
 # install CMake package
 INSTALL( FILES ${CMAKE_SOURCE_DIR}/cmake/FindCoral.cmake DESTINATION cmake COMPONENT Core )

@@ -17,26 +17,12 @@ INCLUDE( InternalMacros )
 ################################################################################
 
 IF( MSVC )
+
 	# Disable unavoidable MSVC warnings
 	ADD_DEFINITIONS( "/wd4251" )
 
-	MACRO( REPLACE_FLAG oldFlag newFlag flagType flagString )
-		STRING( REPLACE "${oldFlag}" "${newFlag}" _temp "${${flagType}}" )
-		SET( ${flagType} "${_temp}" CACHE STRING "${flagString}" FORCE )
-	ENDMACRO( REPLACE_FLAG )
+ELSE()
 
-	# Always incorporate PDBs into targets
-	REPLACE_FLAG( "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG
-		"Flags used by the compiler during debug builds" )
-	REPLACE_FLAG( "/Zi" "/Z7" CMAKE_CXX_FLAGS_RELWITHDEBINFO
-		"Flags used by the compiler during Release with Debug Info builds" )
-	REPLACE_FLAG( "/Zi" "/Z7" CMAKE_C_FLAGS_DEBUG
-		"Flags used by the compiler during debug builds" )
-	REPLACE_FLAG( "/Zi" "/Z7" CMAKE_C_FLAGS_RELWITHDEBINFO
-		"Flags used by the compiler during Release with Debug Info builds" )
-ENDIF()
-
-IF( UNIX )
 	# Enable extra GCC warnings for extra-nice code
 	ADD_DEFINITIONS( -Wall -Wextra -Wunused -Wwrite-strings )
 
@@ -49,6 +35,7 @@ IF( UNIX )
 
 	# For C++ sources only:
 	SET_PROPERTY( GLOBAL APPEND PROPERTY CMAKE_CXX_FLAGS "-Woverloaded-virtual" )
+
 ENDIF()
 
 # Include our own package, so we can use the CORAL_GENERATE_*() macros.

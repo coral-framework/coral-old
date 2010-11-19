@@ -52,6 +52,7 @@ SOURCE_GROUP( "@Generated" FILES ${GENERATED_LUA_SOURCES} )
 
 # install shared library
 INSTALL( TARGETS lua DESTINATION modules/lua COMPONENT "Lua Module" )
+INSTALL( FILES ${CMAKE_BINARY_DIR}/modules/lua/lua_debug.pdb DESTINATION modules/lua COMPONENT "Lua Module" OPTIONAL )
 
 # install CSL files
 INSTALL( DIRECTORY ${CMAKE_SOURCE_DIR}/modules/lua DESTINATION modules COMPONENT "Lua Module" )

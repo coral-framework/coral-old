@@ -22,6 +22,7 @@ TARGET_LINK_LIBRARIES( launcher core )
 SET_TARGET_PROPERTIES( launcher PROPERTIES
 	OUTPUT_NAME   "coral"
 	PROJECT_LABEL "Coral Launcher"
+	TARGET_PDB    "launcher.pdb"
 )
 
 CORAL_DEFAULT_TARGET_PROPERTIES( launcher )
@@ -32,3 +33,4 @@ CORAL_DEFAULT_TARGET_PROPERTIES( launcher )
 
 # install the launcher executable
 INSTALL( TARGETS launcher DESTINATION bin COMPONENT Core )
+INSTALL( FILES ${CMAKE_BINARY_DIR}/bin/launcher.pdb DESTINATION bin COMPONENT Core OPTIONAL )
