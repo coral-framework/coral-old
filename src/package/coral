@@ -16,4 +16,4 @@ fi
 
 export CORAL_PATH=$CORAL_ROOT/modules:$CORAL_PATH
 
-$CORAL_ROOT/bin/coral $@
+$CORAL_ROOT/bin/launcher $@

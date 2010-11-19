@@ -22,13 +22,8 @@ TARGET_LINK_LIBRARIES( launcher core )
 CORAL_DEFAULT_TARGET_PROPERTIES( launcher )
 
 SET_TARGET_PROPERTIES( launcher PROPERTIES
-	OUTPUT_NAME   "coral"
 	PROJECT_LABEL "Coral Launcher"
 )
-
-IF( MSVC )
-	SET_PROPERTY( TARGET launcher APPEND PROPERTY LINK_FLAGS_DEBUG "/PDB:launcher.pdb" )
-ENDIF()
 
 ################################################################################
 # Install Rules
