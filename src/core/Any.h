@@ -515,7 +515,7 @@ public:
 	/*!
 		Template constructor that stores any variable supported by the Coral type system.
 
-		\warning Since the template variable \c T must be inferred by the compiler, this constructor
+		\warning Since the template variable \a T must be inferred by the compiler, this constructor
 			is subject to language limitations that will make it miss the fact that a variable's type
 			is 'const' and/or a reference. Please call set() instead, passing the variable's type explicitly,
 			if you must store a reference or a 'const' variable.
@@ -629,7 +629,7 @@ public:
 		Attempts to retrieve a stored variable, making the necessary casts whenever possible.
 
 		\throw co::IllegalCastException if there is no valid cast from the stored variable's
-				type to the requested type \c T.
+				type to the requested type \a T.
 	 */
 	template<typename T>
 	inline T get() const
@@ -663,7 +663,7 @@ public:
 		This method uses template meta-programming to statically infer a variable's type.
 		If you need to set a co::Any dynamically at runtime, use the "Custom Storage Methods" instead.
 
-		\warning If you don't specify the template variable \c T explicitly, due to language limitations
+		\warning If you don't specify the template variable \a T explicitly, due to language limitations
 			the compiler will generally miss the fact that a variable's type is 'const' and/or a reference.
 	 */
 	template<typename T>
@@ -693,9 +693,9 @@ public:
 	/*!
 		Stores an interface pointer.
 
-		The \c type parameter is optional. When it's not passed, the interface type is
+		The \a type parameter is optional. When it's not passed, the interface type is
 		extracted from the interface instance, which in this case cannot be NULL. Always
-		pass the interface \c type for cases where the interface instance could be null.
+		pass the interface \a type for cases where the interface instance could be null.
 
 		This method does not take variable flags, variables are always pointers. If you
 		want to create a reference to an interface pointer, use setVariable() instead.
@@ -706,12 +706,12 @@ public:
 		Stores a single-value (non-array) variable.
 
 		\param type The variable's type.
-		\param flags One or more flags from the \c VariableFlags enum OR'ed together.
-					Please note that when \c VarIsPointer is specified, \c ptr should
+		\param flags One or more flags from the VariableFlags enum OR'ed together.
+					Please note that when \c VarIsPointer is specified, \a ptr should
 					be a pointer to the value, not a pointer to a pointer.
-		\param ptr The variable instance, which must really be an instance of \c type and
-					have the modifiers described in \c flags (otherwise, all hell will break
-					loose). If \c flags specifies \c VarIsReference, \c ptr cannot be null.
+		\param ptr The variable instance, which must really be an instance of \a type and
+					have the modifiers described in \a flags (otherwise, all hell will break
+					loose). If \a flags specifies \c VarIsReference, \a ptr cannot be null.
 	 */
 	void setVariable( Type* type, uint32 flags, void* ptr );
 
@@ -726,15 +726,15 @@ public:
 		Stores an array of any kind.
 
 		\param arrayKind The array representation being passed, which affects the expected
-					value of parameter \c ptr:
-					- \c AK_StdVector: \c ptr should be a pointer to a \c std::vector instance.
-					- \c AK_RefVector: \c ptr should be a pointer to a \c co::RefVector instance.
-					- \c AK_ArrayRange: \c ptr should be a pointer to the first array element,
-						while \c size should specify the number of elements in the range.
+					value of parameter \a ptr:
+					- \c AK_StdVector: \a ptr should be a pointer to a \c std::vector instance.
+					- \c AK_RefVector: \a ptr should be a pointer to a \c co::RefVector instance.
+					- \c AK_ArrayRange: \a ptr should be a pointer to the first array element,
+						while \a size should specify the number of elements in the range.
 		\param elementType The array element type.
 		\param flags Modifiers for the array elements.
 		\param ptr A pointer to the array instance, as described above.
-		\param size Only used if \c arrayKind is \c AK_ArrayRange.
+		\param size Only used if \a arrayKind is \c AK_ArrayRange.
 	 */
 	void setArray( ArrayKind arrayKind, Type* elementType, uint32 flags, void* ptr, std::size_t size = 0 );
 
@@ -790,8 +790,8 @@ public:
 	std::string& createString();
 
 	/*!
-		Creates a std::vector (or a co::RefVector, if \c elementType is an interface)
-		with \c n default-constructed elements of type \c elementType, and sets this
+		Creates a std::vector (or a co::RefVector, if \a elementType is an interface)
+		with \a n default-constructed elements of type \a elementType, and sets this
 		co::Any with a reference to the array.
 	 */
 	PseudoVector& createArray( Type* elementType, size_t n = 0 );
@@ -804,10 +804,20 @@ public:
 	void swapArray( const Any& other );
 
 	/*!
-		Creates an instance of the specified complex value \c type, and makes
+		Creates an instance of the specified complex value \a type and makes
 		this co::Any reference it.
 	 */
 	void* createComplexValue( Type* type );
+
+	/*!
+		Creates an instance of the complex value type \a T and makes this
+		co::Any reference it.
+	 */
+	template<typename T>
+	inline T& createComplexValue()
+	{
+		return *reinterpret_cast<T*>( createComplexValue( typeOf<T>::get() ) );
+	}
 
 	/*!
 		Calls the appropriate destructors and releases any memory allocated

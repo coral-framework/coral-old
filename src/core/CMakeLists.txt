@@ -145,7 +145,10 @@ IF( NOT WIN32 )
 	INSTALL( TARGETS core DESTINATION lib COMPONENT Core )
 ELSE()
 	# on windows use a different approach, to copy the manifest and pdb files as well
-	INSTALL( DIRECTORY ${CMAKE_BINARY_DIR}/lib DESTINATION . COMPONENT Core )
+	INSTALL(
+		DIRECTORY ${CMAKE_BINARY_DIR}/lib DESTINATION . COMPONENT Core
+		FILES_MATCHING PATTERN "coral*"
+	)
 ENDIF()
 
 # install CMake package
