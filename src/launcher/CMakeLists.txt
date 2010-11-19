@@ -31,13 +31,4 @@ CORAL_DEFAULT_TARGET_PROPERTIES( launcher )
 ################################################################################
 
 # install the launcher executable
-IF( NOT WIN32 )
-	INSTALL( TARGETS launcher DESTINATION bin COMPONENT Core )
-ELSE()
-	# on windows use a different approach, to copy the manifest and pdb files as well
-	FILE( GLOB _binFiles
-		"${CMAKE_BINARY_DIR}/bin/coral*.exe"
-		"${CMAKE_BINARY_DIR}/bin/coral*.pdb"
-	)
-	INSTALL( FILES ${_binFiles} DESTINATION bin COMPONENT Core )
-ENDIF()
+INSTALL( TARGETS launcher DESTINATION bin COMPONENT Core )

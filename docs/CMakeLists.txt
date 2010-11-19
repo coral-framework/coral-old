@@ -18,7 +18,6 @@ IF( NANOC )
 		COMMENT "Running nanoc to compile the general documentation..."
 	)
 
-
 	# Generate the API Documentation
 
 	SET( CORAL_PATH
@@ -34,6 +33,6 @@ IF( NANOC )
 
 ELSE()
 
-	MESSAGE( WARNING "nanoc not found - documentation generation has been disabled." )
+	MESSAGE( "WARNING: nanoc not found - documentation generation has been disabled." )
 
 ENDIF()
