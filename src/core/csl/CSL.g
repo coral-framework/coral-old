@@ -6,6 +6,11 @@ options {
 	k = 1;
 }
 
+@lexer::header
+{
+	#define	ANTLR3_INLINE_INPUT_8BIT
+}
+
 @parser::includes
 {
 	#define pANTLR3_PARSER	csl::Parser* parser; pANTLR3_PARSER
@@ -375,7 +380,7 @@ ID	: ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
 	;
 
 COMMENT
-	: '//' ~('\n'|'\r')*  '\r'?  '\n'
+	: '//' ~('\n')* '\n'
 	| '/*' ( options { greedy = false; } : . )* '*/'
 	;
 
@@ -388,5 +393,5 @@ CPP_TAG
 	;
 
 WS
-	:  (' '|'\t'|'\r'|'\n') { $channel = HIDDEN; }
+	:  (' '|'\t'|'\n') { $channel = HIDDEN; }
     ;

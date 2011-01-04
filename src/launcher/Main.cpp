@@ -256,7 +256,7 @@ int main( int argc, char* argv[] )
 			"  a component interface. If a method is not specified, one named 'main' will be\n"
 			"  searched for in all facets of the component. The called method must receive\n"
 			"  either no argument or an array of strings. If the method returns a number, it\n"
-			"  will be used as the application's return status."
+			"  will be used as the application's return status.\n"
 			"Examples:\n"
 			"  coral myModule.MyComponent arg1 arg2 arg3\n"
 			"  coral someModule.SomeComponent.someInterface:someMethod arg1 arg2\n"

@@ -28,8 +28,9 @@ IF( NANOC )
 	CORAL_GENERATE_DOX( docs-csl2dox co "${CMAKE_CURRENT_BINARY_DIR}/co" )
 
 	CORAL_GENERATE_DOXYGEN( docs doxygen/Doxyfile.in )
-
-	ADD_DEPENDENCIES( docs docs-general docs-csl2dox )
+	IF( DOXYGEN_FOUND )
+		ADD_DEPENDENCIES( docs docs-general docs-csl2dox )
+	ENDIF()
 
 ELSE()
 

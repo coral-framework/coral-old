@@ -19,6 +19,8 @@ class ColorizeCode < Nanoc3::Filter
 				extras = "--config-file=#{configDir}/cpp.lang"
 			when "csl"
 				extras = "--config-file=#{configDir}/csl.lang"
+			when "lua"
+				extras = "--config-file=#{configDir}/lua.lang"
 		end
 		IO.popen( "highlight -S #{language} --replace-tabs=4 -O xhtml -f --enclose-pre #{extras}", "r+" ) do |io|
 			io.write( code )

@@ -6,9 +6,9 @@
  * A number of initializers are provided in order that various character
  * sets can be supported from input files. The ANTLR3 C runtime expects
  * to deal with UTF32 characters only (the reasons for this are to
- * do with the simplification of C code when using this form of Unicode 
+ * do with the simplification of C code when using this form of Unicode
  * encoding, though this is not a panacea. More information can be
- * found on this by consulting: 
+ * found on this by consulting:
  *   - http://www.unicode.org/versions/Unicode4.0.0/ch02.pdf#G11178
  * Where a well grounded discussion of the encoding formats available
  * may be found.
@@ -88,7 +88,7 @@ antlr3AsciiFileStreamNew(pANTLR3_UINT8 fileName)
 	antlr3AsciiSetupStream(input, ANTLR3_CHARSTREAM);
 
 	// Now we can set up the file name
-	//	
+	//
 	input->istream->streamName	= input->strFactory->newStr(input->strFactory, fileName);
 	input->fileName				= input->istream->streamName;
 
@@ -109,7 +109,7 @@ antlr3readAscii(pANTLR3_INPUT_STREAM    input, pANTLR3_UINT8 fileName)
 
 	/* Open the OS file in read binary mode
 	*/
-	infile  = antlr3Fopen(fileName, "rt");
+	infile  = antlr3Fopen(fileName, "rb");
 
 	/* Check that it was there
 	*/
@@ -122,7 +122,7 @@ antlr3readAscii(pANTLR3_INPUT_STREAM    input, pANTLR3_UINT8 fileName)
 	*/
 	fSize   = antlr3Fsize(fileName);	/* Size of input file	*/
 
-	/* Allocate buffer for this input set   
+	/* Allocate buffer for this input set
 	*/
 	input->data	    = ANTLR3_MALLOC((size_t)fSize);
 	input->sizeBuf  = fSize;
@@ -147,9 +147,9 @@ antlr3readAscii(pANTLR3_INPUT_STREAM    input, pANTLR3_UINT8 fileName)
 }
 
 /** \brief Open an operating system file and return the descriptor
- * We just use the common open() and related functions here. 
+ * We just use the common open() and related functions here.
  * Later we might find better ways on systems
- * such as Windows and OpenVMS for instance. But the idea is to read the 
+ * such as Windows and OpenVMS for instance. But the idea is to read the
  * while file at once anyway, so it may be irrelevant.
  */
 ANTLR3_API ANTLR3_FDSC
@@ -168,7 +168,7 @@ antlr3Fclose(ANTLR3_FDSC fd)
 }
 ANTLR3_API ANTLR3_UINT32
 antlr3Fsize(pANTLR3_UINT8 fileName)
-{   
+{
     struct _stat	statbuf;
 
     _stat((const char *)fileName, &statbuf);
@@ -176,8 +176,16 @@ antlr3Fsize(pANTLR3_UINT8 fileName)
     return (ANTLR3_UINT32)statbuf.st_size;
 }
 
-ANTLR3_API ANTLR3_UINT32
-antlr3Fread(ANTLR3_FDSC fdsc, ANTLR3_UINT32 count,  void * data)
+ANTLR3_API ANTLR3_UINT32 antlr3Fread( ANTLR3_FDSC fdsc, ANTLR3_UINT32 count,  void* data )
 {
-    return  (ANTLR3_UINT32)fread(data, (size_t)count, 1, fdsc);
+	ANTLR3_UINT32 n = 0;
+	while( n < count )
+	{
+		int c = getc( fdsc );
+		if( c == EOF )
+			break;
+		if( c != '\r' )
+			( (pANTLR3_UINT8)data )[n++] = (ANTLR3_UINT8)c;
+	}
+    return n;
 }

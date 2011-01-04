@@ -414,3 +414,196 @@ Componentes (component)
 -----------------------
 
 Componentes só podem ser manipulados através da API de reflexão ou de suas interfaces servidoras (e.g. `co::Component`). Por isso, não geram nenhum tipo de mapeamento para C++. Para informações sobre como implementar um componente, veja a página de componentes.
+
+Temp
+====
+
+<code lang="csl">
+
+struct Circle
+{
+	Vec2 center;
+	double radius;
+};
+
+native class Vec2D ( <utility> std::pair<double, double> )
+{
+	attribute double x;
+	attribute double y;
+
+	readonly attribute double length;		//< Length.
+	readonly attribute double length2;		//< Squared length.
+
+	void set( in double x, in double y );	//< Set all coords.
+	void get( out double x, out double y );	//< Get all coords.
+
+	double dot( in Vec2D other ); 			//< Dot Product.
+};
+
+
+interface IMammal
+{
+	readonly attribute IMammal[] children;
+
+	void addChild( in IMammal child )
+			raises NotTheParentException;
+};
+
+interface IBat : IMammal
+{
+	readonly attribute bool bloodsucker;
+};
+
+interface IHuman : IMammal
+{
+	attribute string name;
+};
+
+interface IBatman : IHuman, IBat
+{
+	void fightCrime();
+};
+
+
+component Action
+{
+	provides IAction action;
+	receives ILogger logger;
+};
+
+component Logger
+{
+	provides ILogger logger;
+	receives IOutputStream output;
+};
+
+component File
+{
+	provides IOutputStream stream;
+};
+
+</code>
+
+### Mapping
+
+<code lang="csl">
+/*
+	Interface em CSL.
+ */
+interface User
+{
+	readonly attribute uint64 id;
+
+	attribute string email;
+
+	attribute User[] friends;
+
+	void addFriends( in User[] moreFriends );
+
+	bool minimalPathTo( in User someone, out User[] path );
+};
+
+
+/*
+	Podemos injetar métodos inline (e somente inline) nas interfaces.
+ */
+interface ServiceManager
+{
+	Interface getServiceFor( in co.InterfaceType subject );
+
+	<c++
+		template<typename T>
+		inline co::Interface* getServiceFor()
+		{
+			CORAL_STATIC_CHECK( co::kindOf<T>::kind == co::TK_INTERFACE );
+			return getServiceFor( co::typeOf<T>::get() );
+		}
+	c++>
+
+	// agora podemos escrever manager->getServiceFor<SomeInterface>();
+};
+
+</code>
+
+<div class="mapping-down-arrow"></div>
+
+<code lang="cpp">
+/*
+	Classe puramente virtual em C++
+ */
+class User
+{
+public:
+	virtual co::uint64 getId() = 0;
+
+	virtual const std::string& getEmail() = 0;
+	virtual void setEmail( const std::string& email ) = 0;
+
+	virtual co::ArrayRange<User* const> getFriends() = 0;
+	virtual void setFriends( co::ArrayRange<User* const> friends ) = 0;
+
+	virtual void addFriends( co::ArrayRange<User* const> moreFriends ) = 0;
+
+	virtual bool minimalPathTo( User* someone, co::RefVector<User> path ) = 0;
+};
+
+co::Type* t = co::getType( "media.playback.IAudioOut" );
+
+</code>
+
+oi
+
+<code lang="lua">
+
+-- cria um arquivo de log
+local file = co.new "io.File"
+file.file:open( "app.log", "w" )
+
+-- cria um logger e conecta com o arquivo
+local logger = co.new "log.Logger"
+logger.output = file.ostream
+
+-- cria um action e conecta o logger
+local runAction = co.new "action.Run"
+runAction.logger = logger.logger
+
+
+
+-- Componente com a interface action.IAction.
+local HelloAction = co.Component {
+	name = "action.Hello",
+	provides = { action = "action.IAction" }
+}
+
+-- Implementa o único método da interface.
+function HelloAction.action:onAction()
+	print "Hello!"
+end
+
+-- Formas de instanciar o componente:
+local instance1 = HelloAction()
+local instance2 = co.new "action.Hello"
+
+
+
+local M = {}
+
+function M.initialize( module )
+	print "initializing..."
+end
+
+function M.integrate( module )
+	print "integrating..."
+end
+
+function M.disintegrate( module )
+	print "disintegrating..."
+end
+
+function M.dispose( module )
+	print "disposing..."
+end
+
+return M
+
+</code>
