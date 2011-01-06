@@ -289,7 +289,7 @@ COMMA
 COMPONENT
 	: 'component'
 	;
-
+	
 ENUM
 	: 'enum'
 	;
@@ -380,7 +380,7 @@ ID	: ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
 	;
 
 COMMENT
-	: '//' ~('\n')* '\n'
+	: '//' ~('\n'|'\r')* ('\r\n'|'\r'|'\n'|EOF)
 	| '/*' ( options { greedy = false; } : . )* '*/'
 	;
 
@@ -393,5 +393,5 @@ CPP_TAG
 	;
 
 WS
-	:  (' '|'\t'|'\n') { $channel = HIDDEN; }
+	:  (' '|'\t'|'\r'|'\n') { $channel = HIDDEN; }
     ;

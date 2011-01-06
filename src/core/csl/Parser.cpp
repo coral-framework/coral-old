@@ -164,8 +164,6 @@ static void	reportLexerError( pANTLR3_BASE_RECOGNIZER recognizer )
 	if( recognizer->state->errorRecovery == ANTLR3_TRUE )
 		return;
 
-	handleError( recognizer );
-
 	std::string message;
 	formatErrorMessage( recognizer, message );
 

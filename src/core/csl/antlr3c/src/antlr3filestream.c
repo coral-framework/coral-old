@@ -175,17 +175,8 @@ antlr3Fsize(pANTLR3_UINT8 fileName)
 
     return (ANTLR3_UINT32)statbuf.st_size;
 }
-
-ANTLR3_API ANTLR3_UINT32 antlr3Fread( ANTLR3_FDSC fdsc, ANTLR3_UINT32 count,  void* data )
+ANTLR3_API ANTLR3_UINT32
+antlr3Fread( ANTLR3_FDSC fdsc, ANTLR3_UINT32 count,  void* data )
 {
-	ANTLR3_UINT32 n = 0;
-	while( n < count )
-	{
-		int c = getc( fdsc );
-		if( c == EOF )
-			break;
-		if( c != '\r' )
-			( (pANTLR3_UINT8)data )[n++] = (ANTLR3_UINT8)c;
-	}
-    return n;
+	return  (ANTLR3_UINT32)fread(data, (size_t)count, 1, fdsc);
 }

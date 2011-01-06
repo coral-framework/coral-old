@@ -9,6 +9,11 @@
 #include <co/AttributeInfo.h>
 #include <gtest/gtest.h>
 
+TEST( TypeLoaderTests, windowsLineBreaks )
+{
+	CSL_TEST( "TypeLoaderTests.WindowsLineBreaks" )
+}
+
 TEST( TypeLoaderTests, namespaceScope )
 {
 	CSL_TEST( "TypeLoaderTests.ImportClauseTests.Office" )
