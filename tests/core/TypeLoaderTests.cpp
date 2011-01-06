@@ -214,7 +214,9 @@ TEST( TypeLoaderTests, singleCppBlock )
 	co::InterfaceType* it = dynamic_cast<co::InterfaceType*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" ) );
 	ASSERT_TRUE( it != NULL );
 
-	EXPECT_EQ( "\n\t//This code block was injected by the compiler using the '<c++' tag\n\tvoid myInjectedFoo() {;}\n\t", it->getCppBlock() );
+	const std::string& str = it->getCppBlock();
+	EXPECT_TRUE( str.find( "\t//This code block was injected by the compiler using the '<c++' tag" ) != std::string::npos );
+	EXPECT_TRUE( str.find( "\tvoid myInjectedFoo() {;}" ) != std::string::npos );
 }
 
 TEST( TypeLoaderTests, multipleCppBlocks )
@@ -224,5 +226,7 @@ TEST( TypeLoaderTests, multipleCppBlocks )
 	co::InterfaceType* it = dynamic_cast<co::InterfaceType*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" ) );
 	ASSERT_TRUE( it != NULL );
 
-	EXPECT_EQ( "\n\tvoid myInjectedFoo() {;}\n\t\n\tvoid myLastInjectedFoo() {;}\n\t", it->getCppBlock() );
+	const std::string& str = it->getCppBlock();
+	EXPECT_TRUE( str.find( "\tvoid myInjectedFoo() {;}" ) != std::string::npos );
+	EXPECT_TRUE( str.find( "\tvoid myLastInjectedFoo() {;}" ) != std::string::npos );
 }
