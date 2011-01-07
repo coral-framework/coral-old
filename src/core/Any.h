@@ -521,7 +521,7 @@ public:
 			if you must store a reference or a 'const' variable.
 	 */
 	template<typename T>
-	inline Any( T var ) : _objectKind( TK_NONE )
+	inline Any( T var ) :  _state(), _objectKind( TK_NONE )
 	{
 		set<T>( var );
 	}
@@ -530,7 +530,7 @@ public:
 		Constructor corresponding to a setInterface() call.
 		Please, see setInterface()'s documentation for more info.
 	 */
-	inline Any( Interface* instance, InterfaceType* type ) : _objectKind( TK_NONE )
+	inline Any( Interface* instance, InterfaceType* type ) : _state(), _objectKind( TK_NONE )
 	{
 		setInterface( instance, type );
 	}
@@ -539,7 +539,7 @@ public:
 		Constructor corresponding to a setVariable() call.
 		Please, see setVariable()'s documentation for more info.
 	 */
-	inline Any( Type* type, uint32 flags, void* ptr ) : _objectKind( TK_NONE )
+	inline Any( Type* type, uint32 flags, void* ptr ) : _state(), _objectKind( TK_NONE )
 	{
 		setVariable( type, flags, ptr );
 	}
@@ -548,7 +548,7 @@ public:
 		Constructor corresponding to a setBasic() call.
 		Please, see setBasic()'s documentation for more info.
 	 */
-	inline Any( TypeKind kind, uint32 flags, void* ptr ) : _objectKind( TK_NONE )
+	inline Any( TypeKind kind, uint32 flags, void* ptr ) : _state(), _objectKind( TK_NONE )
 	{
 		setBasic( kind, flags, ptr );
 	}
@@ -558,7 +558,7 @@ public:
 		Please, see setArray()'s documentation for more info.
 	 */
 	inline Any( ArrayKind arrayKind, Type* elementType, uint32 flags, void* ptr, std::size_t arraySize = 0 )
-		: _objectKind( TK_NONE )
+		: _state(), _objectKind( TK_NONE )
 	{
 		setArray( arrayKind, elementType, flags, ptr, arraySize );
 	}

@@ -75,7 +75,12 @@ int opt_ip_multicast_loop(lua_State *L, p_socket ps)
 int opt_linger(lua_State *L, p_socket ps)
 {
     struct linger li;                      /* obj, name, table */
-    if (!lua_istable(L, 3)) luaL_typeerror(L, 3, lua_typename(L, LUA_TTABLE));
+    if( !lua_istable( L, 3 ) )
+	{
+		const char *msg = lua_pushfstring( L, "%s expected, got %s",
+							lua_typename( L, LUA_TTABLE ), luaL_typename( L, 3 ) );
+		return luaL_argerror( L, 3, msg );
+	}
     lua_pushstring(L, "on");
     lua_gettable(L, 3);
     if (!lua_isboolean(L, -1)) 
@@ -111,7 +116,13 @@ int opt_ip_drop_membersip(lua_State *L, p_socket ps)
 static int opt_setmembership(lua_State *L, p_socket ps, int level, int name)
 {
     struct ip_mreq val;                   /* obj, name, table */
-    if (!lua_istable(L, 3)) luaL_typeerror(L, 3, lua_typename(L, LUA_TTABLE));
+    if( !lua_istable( L, 3 ) )
+	{
+		
+		const char *msg = lua_pushfstring( L, "%s expected, got %s",
+							lua_typename( L, LUA_TTABLE ), luaL_typename( L, 3 ) );
+		return luaL_argerror( L, 3, msg );
+	}
     lua_pushstring(L, "multiaddr");
     lua_gettable(L, 3);
     if (!lua_isstring(L, -1)) 

@@ -13,6 +13,6 @@ set CORAL_LAUNCHER=%CORAL_ROOT%\bin\launcher_debug.exe
 IF EXIST "%CORAL_LAUNCHER%" (
 "%CORAL_LAUNCHER%" %*
 ) ELSE (
-echo ERROR: could not find the launcher executable (tried bin/launcher.exe and bin/launcher_debug.exe)
+echo "ERROR: could not find the launcher executable (tried bin/launcher.exe and bin/launcher_debug.exe)"
 exit /B 1
 )

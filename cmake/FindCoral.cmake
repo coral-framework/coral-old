@@ -211,6 +211,9 @@ ENDIF()
 ################################################################################
 MACRO( CORAL_DEFAULT_TARGET_PROPERTIES targetName )
 
+	# Targets built in 'RelWithDebInfo' mode are considered in 'release' mode
+	SET_PROPERTY( TARGET ${targetName} APPEND PROPERTY COMPILE_DEFINITIONS_RELWITHDEBINFO "NDEBUG" )
+
 	# On Windows, artifacts get a '_debug' suffix when built in Debug mode
 	IF( WIN32 )
 		SET_PROPERTY( TARGET ${targetName} PROPERTY DEBUG_POSTFIX "_debug" )

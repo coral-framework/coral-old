@@ -207,14 +207,12 @@ bool ModulePartLoader::checkVerificationData( const std::string& data )
 	if( !st.nextToken() || str != "buildmode" || !st.nextToken() )
 		return false;
 
-#ifdef CORAL_NDEBUG
-
-	// being in release mode, we cannot load modules built in debug mode
-	if( str == "debug" )
+	// in release mode we cannot load modules built in debug mode, and vice versa
+	if( str != CORAL_BUILD_MODE )
+	{
 		CORAL_THROW( co::ModuleLoadException, "incompatible build modes (module: "
 						<< str << "; core: " CORAL_BUILD_MODE ")" );
-
-#endif
+	}
 
 	return true;
 }
