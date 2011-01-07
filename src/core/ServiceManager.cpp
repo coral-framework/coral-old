@@ -225,11 +225,13 @@ void ServiceManager::createServiceInstance( co::InterfaceType* serviceType, Lazy
 	if( instance.hasInstance() )
 		return;
 
+	co::ComponentType* ct = instance.getComponentType();
+
 	try
 	{
-		co::Reflector* reflector = instance.getComponentType()->getReflector();
+		co::Reflector* reflector = ct->getReflector();
 		co::Component* component = reflector->newInstance();
-		co::InterfaceInfo* serviceItfInfo = getFacetInfo( instance.getComponentType(), serviceType );
+		co::InterfaceInfo* serviceItfInfo = getFacetInfo( ct, serviceType );
 		assert( serviceItfInfo );
 		instance.setInstance( component->getInterface( serviceItfInfo ) );
 	}
@@ -241,7 +243,7 @@ void ServiceManager::createServiceInstance( co::InterfaceType* serviceType, Lazy
 			removeService( serviceType );
 
 		CORAL_THROW( co::MissingServiceException, "error instantiating service '" << serviceType->getFullName()
-			<< "' from component type '" << instance.getComponentType()->getFullName() << "': " << e.what() );
+			<< "' from component type '" << ct->getFullName() << "': " << e.what() );
 	}
 }
 
