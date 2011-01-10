@@ -1279,8 +1279,12 @@ void Any::copy( const Any& other )
 			break;
 
 		case TK_STRUCT:
+			other._object.complex.reflector->copyValue( other._object.complex.ptr,
+					createComplexValue( other._object.complex.reflector->getType() ) );
+			break;
+
 		case TK_NATIVECLASS:
-			_object.complex.reflector->copyValue( other._object.complex.ptr,
+			other._object.complex.reflector->copyValue( other._object.complex.inplaceArea,
 					createComplexValue( other._object.complex.reflector->getType() ) );
 			break;
 

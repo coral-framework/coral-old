@@ -1121,3 +1121,37 @@ TEST( AnyTests, setArray )
 	manual.setArray( co::Any::AK_ArrayRange, co::getType( "int8" ), co::Any::VarIsValue, &int8Vec.front(), int8Vec.size() );
 	EXPECT_EQ( automatic, manual );
 }
+
+/***************************************************************************
+ *	Tests for the Temporary Objects API
+ ****************************************************************************/
+
+template<typename T>
+void testTemporaryComplexValue( const T& sample )
+{
+	co::Any a1;
+	a1.createComplexValue<T>();
+	ASSERT_NE( a1.get<T&>(), sample );
+
+	a1.get<T&>() = sample;
+	ASSERT_EQ( a1.get<T&>(), sample );
+
+	co::Any a2( a1 );
+	EXPECT_EQ( a2.get<T&>(), sample );
+	EXPECT_EQ( a1.get<T&>(), a2.get<T&>() );
+
+	a1.destroyObject();
+	EXPECT_EQ( a1.containsObject(), false );
+	EXPECT_EQ( a2.containsObject(), true );
+}
+
+TEST( AnyTests, temporaryComplexValues )
+{
+	testTemporaryComplexValue<co::Uuid>( co::Uuid::createRandom() );
+	
+	co::CSLError cslError;
+	cslError.filename = "filename";
+	cslError.message = "msg";
+	cslError.line = 3;
+	testTemporaryComplexValue<co::CSLError>( cslError );
+}

@@ -771,12 +771,8 @@ public:
 	 */
 	//@{
 
-	/*!
-		Returns the kind of temporary object contained in this co::Any, if any.
-		If isValid() is true but getContainedObjectKind() is co::TK_NONE, then
-		the co::Any contains only a reference, not an object instance.
-	 */
-	inline TypeKind getContainedObjectKind() const { return _objectKind; }
+	//! Returns whether this co::Any contains a temporary object.
+	inline bool containsObject() const { return _objectKind != TK_NONE; }
 
 	/*!
 		Creates a temporary co::Any instance and makes this co::Any reference it.
