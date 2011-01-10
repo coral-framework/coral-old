@@ -15,7 +15,6 @@
 #include <co/InterfaceType.h>
 #include <co/ParameterInfo.h>
 #include <co/ModuleManager.h>
-#include <cstring>
 
 /*
 	Helper function to initialize the Coral path.

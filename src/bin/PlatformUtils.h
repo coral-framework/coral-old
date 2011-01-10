@@ -9,6 +9,7 @@
 #include <core/tools/FileSystem.h>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <cassert>
 #include <sstream>
 #include <sys/stat.h>
@@ -24,6 +25,7 @@
 #else
 	#include <errno.h>
 	#include <unistd.h>
+	#include <sys/wait.h>
 	#define getCWD getcwd
 	#define DIR_SEP_STR "/"
 	#define PATH_SEP_STR ":"
@@ -35,12 +37,8 @@
 #if defined(CORAL_OS_WIN)
 	#define WIN32_LEAN_AND_MEAN
 	#include <Windows.h>
-#elif defined(CORAL_OS_LINUX)
-	#include <unistd.h>
 #elif defined(CORAL_OS_MAC)
 	#include <mach-o/dyld.h>
-#else
-	#error This platform is currently unsupported.
 #endif
 
 inline bool getCurrentExecutableDir( std::string& dir )
