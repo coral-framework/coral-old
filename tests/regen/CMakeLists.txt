@@ -45,8 +45,6 @@ SET_TARGET_PROPERTIES( tests_regen PROPERTIES
 	PROJECT_LABEL "Tests - Regeneration"
 )
 
-CORAL_TEST_TARGET_PROPERTIES( tests_regen tests_regen_EXECUTABLE )
-
 TARGET_LINK_LIBRARIES( tests_regen
 	antlr3c
 	${GTEST_LIBRARIES}
@@ -67,10 +65,11 @@ ENDIF()
 ################################################################################
 # Register the test with CTest
 ################################################################################
-
 FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output )
-ADD_TEST( tests_regen ${tests_regen_EXECUTABLE} --gtest_output=xml:../output/RegenerationTests.xml )
-CORAL_DEFAULT_TEST_PROPERTIES( tests_regen )
+ADD_TEST(
+	NAME tests_regen
+	COMMAND $<TARGET_FILE:tests_regen> --gtest_output=xml:../output/TestsRegeneration$<CONFIGURATION>.xml
+)
 
 ################################################################################
 # Source Groups

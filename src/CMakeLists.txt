@@ -3,7 +3,6 @@
 #	This is the parent dir of the main deployable targets.
 ################################################################################
 
+ADD_SUBDIRECTORY( bin )
 ADD_SUBDIRECTORY( core )
-ADD_SUBDIRECTORY( launcher )
 ADD_SUBDIRECTORY( lua )
-ADD_SUBDIRECTORY( package )

@@ -1,31 +1,4 @@
 ################################################################################
-# Macro to set common properties for a test target (test executable)
-################################################################################
-MACRO( CORAL_TEST_TARGET_PROPERTIES targetName testExecutableVar )
-
-	CORAL_DEFAULT_TARGET_PROPERTIES( ${targetName} )
-
-	IF( XCODE_VERSION )
-		GET_TARGET_PROPERTY( _location ${targetName} LOCATION )
-		STRING( REPLACE "/$(CONFIGURATION)/" "/\$ENV{CONFIGURATION}/" ${testExecutableVar} ${_location} )
-	ELSE()
-		IF( CMAKE_BUILD_TYPE MATCHES "Debug" )
-			GET_TARGET_PROPERTY( ${testExecutableVar} ${targetName} DEBUG_LOCATION )
-		ELSE()
-			GET_TARGET_PROPERTY( ${testExecutableVar} ${targetName} LOCATION )
-		ENDIF()
-	ENDIF()
-
-ENDMACRO( CORAL_TEST_TARGET_PROPERTIES )
-
-################################################################################
-# Macro to set common properties for CTest tests
-################################################################################
-MACRO( CORAL_DEFAULT_TEST_PROPERTIES testName )
-	# currently empty
-ENDMACRO( CORAL_DEFAULT_TEST_PROPERTIES )
-
-################################################################################
 # Macro to enable generation of 'test coverage' data for a target.
 # Only works on UNIX, and only if the global var 'TEST_COVERAGE' is enabled.
 ################################################################################

@@ -9,6 +9,7 @@
 //! \file FileSystem.h Auxiliary platform-specific structures and macros for filesystem operations.
 
 #include <co/Platform.h>
+#include <string>
 
 // enable large file support on Linux
 #ifndef _FILE_OFFSET_BITS

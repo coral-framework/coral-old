@@ -211,13 +211,13 @@ ENDIF()
 ################################################################################
 MACRO( CORAL_DEFAULT_TARGET_PROPERTIES targetName )
 
+	# Artifacts always get a '_debug' suffix when built in debug mode
+	SET_PROPERTY( TARGET ${targetName} PROPERTY DEBUG_POSTFIX "_debug" )
+
 	# Targets built in 'RelWithDebInfo' mode are considered in 'release' mode
 	SET_PROPERTY( TARGET ${targetName} APPEND PROPERTY COMPILE_DEFINITIONS_RELWITHDEBINFO "NDEBUG" )
 
-	# On Windows, artifacts get a '_debug' suffix when built in Debug mode
 	IF( WIN32 )
-		SET_PROPERTY( TARGET ${targetName} PROPERTY DEBUG_POSTFIX "_debug" )
-
 		# Prevent the MSVC IDE from creating targets in "Debug"/"Release" subdirs
 		IF( MSVC_IDE )
 			SET_TARGET_PROPERTIES( ${targetName} PROPERTIES PREFIX "../" )
@@ -261,9 +261,6 @@ ENDMACRO( CORAL_DEFAULT_TARGET_PROPERTIES )
 # Utility macro to set common properties for a module target (Coral Module)
 ################################################################################
 MACRO( CORAL_MODULE_TARGET_PROPERTIES moduleName )
-
-	# Add a suffix to module libraries built in Debug mode
-	SET_PROPERTY( TARGET ${moduleName} PROPERTY DEBUG_POSTFIX "_debug" )
 
 	# Copy or generate the module library into /modules/${moduleName}/
 	IF( XCODE_VERSION )
@@ -332,7 +329,7 @@ FIND_PATH( CORAL_INCLUDE_DIR co/Coral.h
 MARK_AS_ADVANCED( CORAL_INCLUDE_DIR )
 
 IF( NOT CORAL_LAUNCHER )
-	_coral_find_program( CORAL_LAUNCHER		coral.bat coral )
+	_coral_find_program( CORAL_LAUNCHER		coral.exe coral )
 ENDIF()
 
 _coral_find_library( CORAL_LIBRARY			coral )
@@ -341,7 +338,7 @@ _coral_find_library( CORAL_LIBRARY_DEBUG	coral_debug )
 IF( CORAL_LIBRARY AND CORAL_LIBRARY_DEBUG )
 	SET( CORAL_LIBRARIES optimized ${CORAL_LIBRARY} debug ${CORAL_LIBRARY_DEBUG} )
 ELSEIF( CORAL_LIBRARY )
-	SET( CORAL_LIBRARIES general ${CORAL_LIBRARY} )
+	SET( CORAL_LIBRARIES optimized ${CORAL_LIBRARY} )
 ELSEIF( CORAL_LIBRARY_DEBUG )
 	SET( CORAL_LIBRARIES debug ${CORAL_LIBRARY_DEBUG} )
 ENDIF()

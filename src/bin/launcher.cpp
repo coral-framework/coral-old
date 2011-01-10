@@ -3,6 +3,7 @@
  * See Copyright Notice in Coral.h
  */
 
+#include "PlatformUtils.h"
 #include <co/Coral.h>
 #include <co/System.h>
 #include <co/Component.h>
@@ -14,95 +15,7 @@
 #include <co/InterfaceType.h>
 #include <co/ParameterInfo.h>
 #include <co/ModuleManager.h>
-#include <core/tools/FileSystem.h>
-#include <cstdio>
-#include <cstdlib>
 #include <cstring>
-#include <cassert>
-#include <sstream>
-#include <sys/stat.h>
-
-/*
-	Misc platform-specific definitions.
- */
-#if defined(CORAL_OS_WIN)
-	#include <direct.h>
-	#define getCWD _getcwd
-	const char DIR_SEP_CHAR = '\\';
-#else
-	#include <unistd.h>
-	#define getCWD getcwd
-	const char DIR_SEP_CHAR = '/';
-#endif
-
-/*
-	Function to check if a directory exists.
- */
-static bool dirExists( const std::string& path )
-{
-	CORAL_STAT_STRUCT info;
-	if( CORAL_STAT_FUNC( path.c_str(), &info ) )
-		return false;
-	return S_ISDIR( info.st_mode ) != 0;
-}
-
-/*
-	Function to get the current executable's directory.
- */
-#if defined(CORAL_OS_WIN)
-	#define WIN32_LEAN_AND_MEAN
-	#include <Windows.h>
-#elif defined(CORAL_OS_LINUX)
-	#include <unistd.h>
-#elif defined(CORAL_OS_MAC)
-	#include <mach-o/dyld.h>
-#else
-	#error This platform is currently unsupported.
-#endif
-
-static bool getCurrentExecutableDir( std::string& dir )
-{
-	char buffer[FILENAME_MAX];
-
-#if defined(CORAL_OS_WIN)
-	DWORD count;
-	if( ( count = GetModuleFileNameA( NULL, buffer, sizeof(buffer) ) ) == 0 )
-		return false;
-	dir.assign( buffer, count );
-#elif defined(CORAL_OS_LINUX)
-	ssize_t count = readlink( "/proc/self/exe", buffer, sizeof(buffer) - 1 );
-	if( count == -1 )
-		return false;
-	dir.assign( buffer, count );
-#elif defined(CORAL_OS_MAC)
-	uint32_t count = sizeof(buffer);
-	if( _NSGetExecutablePath( buffer, &count ) != 0 )
-		return false;
-	char* realPath = realpath( buffer, NULL );
-	dir = realPath;
-	free( realPath );
-#else
-	#error This platform is currently unsupported.
-#endif
-
-	size_t lastSep = dir.rfind( DIR_SEP_CHAR );
-	if( lastSep != std::string::npos )
-		dir.resize( lastSep );
-
-	return true;
-}
-
-/*
-	Function to get the current working directory.
- */
-static bool getCurrentWorkingDir( std::string& dir )
-{
-	char buffer[FILENAME_MAX];
-	if( !getCWD( buffer, sizeof(buffer) ) )
-		return false;
-	dir = buffer;
-	return true;
-}
 
 /*
 	Helper function to initialize the Coral path.
@@ -149,7 +62,7 @@ static void addDefaultPaths()
 #endif
 }
 
-void resolveCallee( const std::string& calleeName, co::ComponentType*& ct, co::InterfaceInfo*& facet, co::MethodInfo*& method )
+static void resolveCallee( const std::string& calleeName, co::ComponentType*& ct, co::InterfaceInfo*& facet, co::MethodInfo*& method )
 {
 	// was a method name specified?
 	size_t colonPos = calleeName.rfind( ':' );
@@ -249,7 +162,7 @@ int main( int argc, char* argv[] )
 	if( index >= argc )
 	{
 		printf(
-			"Coral Application Launcher v" CORAL_VERSION_STR " (" CORAL_BUILD_KEY ")\n"
+			"Coral Application Launcher v" CORAL_VERSION_STR " (" CORAL_BUILD_KEY " " CORAL_BUILD_MODE ")\n"
 			"Usage: coral [options] callee [ARG] ...\n"
 			"Description:\n"
 			"  A 'callee' must be specified as either a component or a method name within\n"

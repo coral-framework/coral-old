@@ -58,8 +58,6 @@ SET_TARGET_PROPERTIES( tests_moduleA PROPERTIES
 	PROJECT_LABEL "Tests - Module A"
 )
 
-CORAL_TEST_TARGET_PROPERTIES( tests_moduleA tests_moduleA_EXECUTABLE )
-
 TARGET_LINK_LIBRARIES( tests_moduleA
 	core
 	${GTEST_LIBRARIES}
@@ -68,10 +66,11 @@ TARGET_LINK_LIBRARIES( tests_moduleA
 ################################################################################
 # Register the test with CTest
 ################################################################################
-
 FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output )
-ADD_TEST( tests_moduleA ${tests_moduleA_EXECUTABLE} --gtest_output=xml:../output/ModuleATests.xml )
-CORAL_DEFAULT_TEST_PROPERTIES( tests_moduleA )
+ADD_TEST(
+	NAME tests_moduleA
+	COMMAND $<TARGET_FILE:tests_moduleA> --gtest_output=xml:../output/TestsModuleA$<CONFIGURATION>.xml
+)
 
 ################################################################################
 # Source Groups
