@@ -116,7 +116,7 @@ inline void setEnvVar( const char* name, const std::string& value )
 {
 	int ok;
 #if defined(CORAL_OS_WIN)
-	ok = SetEnvironmentVariableA( name, value );
+	ok = SetEnvironmentVariableA( name, value.c_str() );
 #else
 	ok = !setenv( name, value.c_str(), 1 );
 #endif
@@ -156,7 +156,7 @@ inline int executeProgram( int argc, char* const* argv )
 	}
 
 	std::string cmdLine = ss.str();
-	if( CreateProcessA( 0, cmdLine.c_str(), 0, 0, 0, CREATE_DEFAULT_ERROR_MODE, 0, 0, &si, &pi ) == FALSE )
+	if( CreateProcessA( 0, const_cast<LPSTR>( cmdLine.c_str() ), 0, 0, 0, CREATE_DEFAULT_ERROR_MODE, 0, 0, &si, &pi ) == FALSE )
 	{
 		fprintf( stderr, "ERROR: could not spawn the launcher executable (error code %i)\n", GetLastError() );
 		return 127;
