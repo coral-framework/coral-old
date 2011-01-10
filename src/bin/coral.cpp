@@ -63,13 +63,6 @@ int main( int argc, char* argv[] )
 		}
 	}
 
-	// check if the launcher executable really exists
-	if( !fileExists( launcher ) )
-	{
-		fprintf( stderr, "ERROR: could not locate the launcher executable (%s)\n", launcher.c_str() );
-		return 127;
-	}
-
 	/*
 		Prepare the command-line to invoke the Coral Application Launcher.
 		first arg = program path; last arg = NULL;
