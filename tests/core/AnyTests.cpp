@@ -1136,11 +1136,15 @@ void testTemporaryComplexValue( const T& sample )
 	a1.get<T&>() = sample;
 	ASSERT_EQ( a1.get<T&>(), sample );
 
-	co::Any a2( a1 );
+	co::Any a2;
+	a2 = a1;
 	EXPECT_EQ( a2.get<T&>(), sample );
 	EXPECT_EQ( a1.get<T&>(), a2.get<T&>() );
-
+	
+	EXPECT_EQ( a1.containsObject(), true );
+	EXPECT_EQ( a2.containsObject(), true );
 	a1.destroyObject();
+
 	EXPECT_EQ( a1.containsObject(), false );
 	EXPECT_EQ( a2.containsObject(), true );
 }

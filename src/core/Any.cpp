@@ -1291,9 +1291,9 @@ void Any::copy( const Any& other )
 		default:
 			break;
 		}
-
-		assert( _objectKind == other._objectKind );
 	}
+
+	assert( _objectKind == other._objectKind );
 }
 
 } // namespace co
