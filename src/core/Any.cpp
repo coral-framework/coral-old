@@ -1184,11 +1184,6 @@ void Any::castFrom( const State& s )
 	THROW_ILLEGAL_CAST( s, _state, );
 }
 
-inline bool isInside( void* ptr, const Any& any )
-{
-	return ptr >= reinterpret_cast<const void*>( &any ) && ptr <= reinterpret_cast<const void*>( &any + 1 );
-}
-
 void Any::copy( const Any& other )
 {
 	_state = other._state;
@@ -1197,8 +1192,9 @@ void Any::copy( const Any& other )
 		destroyObject();
 
 	// is the variable a temporary object within 'other'?
-	if( other._objectKind != TK_NONE && ( _state.isPointer || _state.isReference || _state.kind == TK_ARRAY )
-		&& isInside( _state.data.ptr, other )  )
+	if( other._objectKind != TK_NONE
+	    && ( _state.isPointer || _state.isReference || _state.kind == TK_ARRAY )
+		&& _state.data.ptr == &other._object  )
 	{
 		// we should copy the object
 		switch( other._objectKind )
