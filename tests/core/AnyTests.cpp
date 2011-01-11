@@ -80,14 +80,14 @@ TEST( AnyTests, stdVectorMemoryLayout )
  *	retrieval tests for the values passed to the constructor.
  *****************************************************************************/
 
-void EXPECT_ANY_STREQ( co::Any any, const char* str )
+void EXPECT_ANY_STREQ( const co::Any& any, const char* str )
 {
 	std::stringstream ss;
 	ss << any;
 	EXPECT_STREQ( str, ss.str().c_str() );
 }
 
-void EXPECT_ANY_TYPE_STREQ( co::Any any, const char* str )
+void EXPECT_ANY_TYPE_STREQ( const co::Any& any, const char* str )
 {
 	std::stringstream ss;
 	ss << any.getState();

@@ -1191,12 +1191,9 @@ void Any::copy( const Any& other )
 	if( _objectKind != TK_NONE )
 		destroyObject();
 
-	// is the variable a temporary object within 'other'?
-	if( other._objectKind != TK_NONE
-	    && ( _state.isPointer || _state.isReference || _state.kind == TK_ARRAY )
-		&& _state.data.ptr == &other._object  )
+	// copy any temporary object from 'other'
+	if( other._objectKind != TK_NONE )
 	{
-		// we should copy the object
 		switch( other._objectKind )
 		{
 		case TK_ANY:
