@@ -39,8 +39,8 @@ int main( int argc, char* argv[] )
 			mode, an error is issued. However, if this option is omitted, the front-end
 			will use any available launcher, giving preference to one in Release mode.
 	 */
-	const char* launcherReleasePath = DIR_SEP_STR "bin" DIR_SEP_STR "launcher";
-	const char* launcherDebugPath = DIR_SEP_STR "bin" DIR_SEP_STR "launcher_debug";
+	const char* launcherReleasePath = DIR_SEP_STR "bin" DIR_SEP_STR "launcher" EXE_SUFFIX;
+	const char* launcherDebugPath = DIR_SEP_STR "bin" DIR_SEP_STR "launcher_debug" EXE_SUFFIX;
 
 	int argIndex = 1;
 	std::string launcher;
@@ -61,6 +61,12 @@ int main( int argc, char* argv[] )
 			// fallback to the debug executable
 			launcher = rootDir + launcherDebugPath;
 		}
+	}
+	
+	if( !fileExists( launcher ) )
+	{
+		fprintf( stderr, "ERROR: the launcher executable is not available (%s)\n", launcher.c_str() );
+		return -1;
 	}
 
 	/*

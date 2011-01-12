@@ -22,6 +22,7 @@
 	#define getCWD _getcwd
 	#define DIR_SEP_STR "\\"
 	#define PATH_SEP_STR ";"
+	#define EXE_SUFFIX ".exe"
 #else
 	#include <errno.h>
 	#include <unistd.h>
@@ -29,6 +30,7 @@
 	#define getCWD getcwd
 	#define DIR_SEP_STR "/"
 	#define PATH_SEP_STR ":"
+	#define EXE_SUFFIX
 #endif
 
 /*
