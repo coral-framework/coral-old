@@ -13,9 +13,11 @@ PROJECT( TESTS_MODULEA )
 # Build the 'moduleA' module library
 ################################################################################
 
-# Run the coral compiler on the module
+# Run the coral compiler on the module; we also set the CORAL_PATH with
+# a repeated CSL dir to check whether it would cause a problem.
 SET( CORAL_PATH
 	"${CMAKE_BINARY_DIR}/modules"
+	"${CMAKE_SOURCE_DIR}/modules"
 	"${CMAKE_SOURCE_DIR}/modules"
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 )

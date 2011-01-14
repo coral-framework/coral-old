@@ -7,8 +7,25 @@
 #include <co/RefPtr.h>
 #include <co/System.h>
 #include <co/TypeManager.h>
-
 #include <gtest/gtest.h>
+
+TEST( SystemTests, coralPathDirsAreUnique )
+{
+	co::ArrayRange<const std::string> pathsA = co::getPaths();
+	ASSERT_GT( pathsA.getSize(), 0 );
+
+	// adding the same dirs again shouldn't change the CORAL_PATH
+	std::string morePaths;
+	for( co::ArrayRange<const std::string> it( pathsA ); it; it.popFirst() )
+	{
+		morePaths.append( it.getFirst() );
+		morePaths.append( ";" );
+	}
+	co::addPath( morePaths );
+
+	co::ArrayRange<const std::string> pathsB = co::getPaths();
+	EXPECT_EQ( pathsA.getSize(), pathsB.getSize() );
+}
 
 TEST( SystemTests, startupShutdown )
 {

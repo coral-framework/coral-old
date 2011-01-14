@@ -130,11 +130,10 @@ function Compiler:generateMappings()
 		if t.kind ~= 'TK_COMPONENT' and not isBuiltInType( t ) then
 			numMappings = numMappings + 1
 			-- only regenerate out-of-date files
-			local sig = t.fullSignature:getString()
-			if cachedTypes[t.fullName] ~= sig then
+			if cachedTypes[t.fullName] ~= t.fullSignatureStr then
 				local dir = self.mappingsDir .. '/' .. t.namespace.fullName:gsub( '%.', '/' )
 				expand( dir, t.name .. '.h', mapping, self, t )
-				updatedTypes[t.fullName] = sig
+				updatedTypes[t.fullName] = t.fullSignatureStr
 			end
 		end
 	end
@@ -152,11 +151,10 @@ end
 function Compiler:generateModule( moduleName )
 	assert( self.moduleName == nil, "this compiler instance has already been used" )
 
-	self:loadCache()
-
 	self.moduleName = moduleName
 	self.moduleNS = self.utils.toCppName( moduleName )
 
+	self:loadCache()
 	self:loadModuleTypes()
 
 	local doing = ( next( self.cachedTypes ) and "Updating" or "Generating" )
@@ -322,16 +320,28 @@ local CACHE_FILE_NAME = '/__coralc_cache.lua'
 function Compiler:loadCache()
 	local cachedTypes = {}
 	local cachedNumModuleFiles
-	local filename = self.outDir .. CACHE_FILE_NAME
-	if path.isFile( filename ) then
-		cachedNumModuleFiles = loadCacheFile( filename, cachedTypes )
-	end
-	if self.mappingsDir and self.mappingsDir ~= self.outDir then
-		filename = self.mappingsDir .. CACHE_FILE_NAME
+
+	-- if one of the standard, compiler-generated files is missing, ignore the cache files and
+	-- force a full update; this is a workaround for IDEs with inflexible 'clean' routines (e.g. MSVC)
+	-- which delete most of the generated source files, but not the cache files.
+	local ignoreCache = (
+			( self.mappingsDir and not path.isFile( self.mappingsDir .. '/co/System.h' ) ) or
+			( self.moduleName and not path.isFile( self.outDir .. '/__Bootstrap.cpp' ) )
+		)
+
+	if not ignoreCache then
+		local filename = self.outDir .. CACHE_FILE_NAME
 		if path.isFile( filename ) then
-			loadCacheFile( filename, cachedTypes )
+			cachedNumModuleFiles = loadCacheFile( filename, cachedTypes )
+		end
+		if self.mappingsDir and self.mappingsDir ~= self.outDir then
+			filename = self.mappingsDir .. CACHE_FILE_NAME
+			if path.isFile( filename ) then
+				loadCacheFile( filename, cachedTypes )
+			end
 		end
 	end
+
 	self.cachedTypes = cachedTypes
 	self.cachedNumModuleFiles = cachedNumModuleFiles or 0
 end

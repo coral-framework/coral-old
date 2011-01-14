@@ -13,10 +13,13 @@
 #include <cstdio>
 #include <cstdarg>
 #include <cstdlib>
+#include <algorithm>
 
 #ifdef CORAL_OS_WIN
+	#define DIR_SEP_CHAR '\\'
 	static const char* PATH_SEPARATORS = ";,";
 #else
+	#define DIR_SEP_CHAR '/'
 	static const char* PATH_SEPARATORS = ";:,";
 #endif
 
@@ -36,7 +39,6 @@ co::ArrayRange<const std::string> co::getPaths()
 			co::addPath( envVar );
 		s_readEnvVar = true;
 	}
-
 	return sg_paths;
 }
 
@@ -45,8 +47,29 @@ void co::addPath( const std::string& path )
 	co::StringTokenizer st( path, PATH_SEPARATORS );
 	while( st.nextToken() )
 	{
-		const std::string& dirPath = st.getToken();
-		if( !dirPath.empty() )
+		std::string dirPath( st.getToken() );
+		size_t len = dirPath.length();
+		if( len == 0 )
+			continue;
+
+		/*
+			Normalize the dirPath:
+			- On Windows, convert any '/' to a '\'.
+			- Remove any trailing dir separators.
+		 */
+#if defined(CORAL_OS_WIN)
+		for( size_t i = 0; i < len; ++i )
+			if( dirPath[i] == '/' )
+				dirPath[i] = DIR_SEP_CHAR;
+#endif
+		while( dirPath[--len] == DIR_SEP_CHAR )
+			dirPath.resize( len );
+
+		/*
+			Check whether the dir is not the CORAL_PATH already.
+			This makes addPath() quadratic, but it should never be a problem.
+		 */
+		if( std::find( sg_paths.begin(), sg_paths.end(), dirPath ) == sg_paths.end() )
 			sg_paths.push_back( dirPath );
 	}
 }
