@@ -67,7 +67,7 @@ co::Type* TypeLoader::loadType()
 	co::Namespace* ns = _typeManager->getRootNS();
 
 	// iterate over all subparts
-	co::StringTokenizer st( relativePath, "/" );
+	co::StringTokenizer st( relativePath, CORAL_OS_DIR_SEP_STR );
 	st.nextToken();
 	std::string currentToken = st.getToken();
 	while( st.nextToken() )
@@ -188,7 +188,7 @@ co::Type* TypeLoader::loadDependency( const std::string& typeName )
 	relativePath.resize( length ); // removes the trailing '.csl'
 	for( std::size_t i = 0; i < length; ++i )
 	{
-		if( relativePath[i] == '/' )
+		if( relativePath[i] == CORAL_OS_DIR_SEP )
 			relativePath[i] = '.';
 	}
 

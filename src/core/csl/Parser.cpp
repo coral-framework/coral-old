@@ -183,7 +183,7 @@ void Parser::parse( const std::string& cslFilePath )
 	_cslFileBaseName = cslFilePath;
 	
 	// get file name without dir path
-	std::size_t lastBarPos = _cslFileBaseName.rfind( '/' );
+	std::size_t lastBarPos = _cslFileBaseName.rfind( CORAL_OS_DIR_SEP );
 	if( lastBarPos != std::string::npos )
 		_cslFileBaseName = _cslFileBaseName.substr( lastBarPos + 1 );
 	
