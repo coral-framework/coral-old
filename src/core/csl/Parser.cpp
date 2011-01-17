@@ -14,6 +14,7 @@
 #include <co/TypeLoadException.h>
 #include <co/TypeCreationTransaction.h>
 #include <co/IllegalArgumentException.h>
+#include <co/reserved/OS.h>
 #include <sstream>
 
 namespace csl {
