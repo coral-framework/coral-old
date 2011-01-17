@@ -4,10 +4,15 @@
 
 PROJECT( BIN )
 
-ADD_DEFINITIONS( -DCORAL_NO_EXPORT )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src ${CORE_SOURCE_DIR}/generated )
 
-SET( COMMON_EXTRA_SOURCES Utils.h ${CORE_SOURCE_DIR}/reserved/OS.h ${CORE_SOURCE_DIR}/reserved/OS.cpp )
+SET( COMMON_EXTRA_SOURCES
+	Utils.h
+	${CORE_SOURCE_DIR}/reserved/OS.h
+	${CORE_SOURCE_DIR}/reserved/OS.cpp
+	${CORE_SOURCE_DIR}/tools/StringTokenizer.h
+	${CORE_SOURCE_DIR}/tools/StringTokenizer.cpp
+)
 
 ################################################################################
 # Build the Coral Application Launcher Front-End
@@ -19,6 +24,7 @@ CORAL_DEFAULT_TARGET_PROPERTIES( coral )
 
 SET_TARGET_PROPERTIES( coral PROPERTIES
 	PROJECT_LABEL "Executable coral"
+	COMPILE_DEFINITIONS "CORAL_NO_EXPORT"
 )
 
 ################################################################################
@@ -31,6 +37,7 @@ CORAL_DEFAULT_TARGET_PROPERTIES( coralc )
 
 SET_TARGET_PROPERTIES( coralc PROPERTIES
 	PROJECT_LABEL "Executable coralc"
+	COMPILE_DEFINITIONS "CORAL_NO_EXPORT"
 )
 
 ################################################################################
