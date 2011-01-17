@@ -36,8 +36,12 @@ TEST( OSTests, getApplicationDir )
 
 	appPath.push_back( CORAL_OS_DIR_SEP );
 	appPath.append( "tests_core" );
-#ifndef CORAL_NDEBUG
+#if !defined(CORAL_NDEBUG)
 	appPath.append( "_debug" );
+#endif
+
+#if defined(CORAL_OS_WIN)
+	appPath.append( ".exe" );
 #endif
 
 	EXPECT_TRUE( co::OS::isFile( appPath ) );
@@ -76,58 +80,58 @@ TEST( OSTests, makeAbs )
 TEST( OSTests, searchFile2 )
 {
 	std::vector<std::string> coralPath;
-	coralPath.push_back( TESTS_DATA_DIR "/misc" );
+	coralPath.push_back( TESTS_DATA_DIR CORAL_OS_DIR_SEP_STR "misc" );
 
 	std::string filename, res;
 
 	filename = "file1.csl";
 	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::ArrayRange<const std::string>( &filename, 1 ), res ) );
-	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "/file1.csl" ) );
+	EXPECT_TRUE( TestHelper::stringEndsWith( res, CORAL_OS_DIR_SEP_STR "file1.csl" ) );
 
-	filename = "/file1.csl";
+	filename = CORAL_OS_DIR_SEP_STR "file1.csl";
 	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::ArrayRange<const std::string>( &filename, 1 ), res ) );
-	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "/file1.csl" ) );
+	EXPECT_TRUE( TestHelper::stringEndsWith( res, CORAL_OS_DIR_SEP_STR "file1.csl" ) );
 
-	filename = "/file1.jpg";
+	filename = CORAL_OS_DIR_SEP_STR "file1.jpg";
 	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::ArrayRange<const std::string>( &filename, 1 ), res ) );
-	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "/file1.jpg" ) );
+	EXPECT_TRUE( TestHelper::stringEndsWith( res, CORAL_OS_DIR_SEP_STR "file1.jpg" ) );
 
-	filename = "dot.separated.folder/file1.csl";
+	filename = "dot.separated.folder" CORAL_OS_DIR_SEP_STR "file1.csl";
 	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::ArrayRange<const std::string>( &filename, 1 ), res ) );
 
 	filename = "dot.separated.folder.file1.csl";
 	EXPECT_FALSE( co::OS::searchFile2( coralPath, co::ArrayRange<const std::string>( &filename, 1 ), res ) );
 
-	filename = "innerFolder/file1.csl";
+	filename = "innerFolder" CORAL_OS_DIR_SEP_STR "file1.csl";
 	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::ArrayRange<const std::string>( &filename, 1 ), res ) );
 
-	filename = "innerFolder/folder.csl";
+	filename = "innerFolder" CORAL_OS_DIR_SEP_STR "folder.csl";
 	EXPECT_FALSE( co::OS::searchFile2( coralPath, co::ArrayRange<const std::string>( &filename, 1 ), res ) );
 }
 
 TEST( STests, searchFile2WithAmbiguities )
 {
 	std::vector<std::string> coralPath;
-	coralPath.push_back( TESTS_DATA_DIR "/misc" );
-	coralPath.push_back( TESTS_DATA_DIR "/misc/innerFolder" );
+	coralPath.push_back( TESTS_DATA_DIR CORAL_OS_DIR_SEP_STR "misc" );
+	coralPath.push_back( TESTS_DATA_DIR CORAL_OS_DIR_SEP_STR "misc/innerFolder" );
 
 	std::string filename, res;
 
 	filename = "file1.csl";
 	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::ArrayRange<const std::string>( &filename, 1 ), res ) );
-	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "misc/file1.csl" ) );
+	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "misc" CORAL_OS_DIR_SEP_STR "file1.csl" ) );
 
 	filename = "file1.jpg";
 	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::ArrayRange<const std::string>( &filename, 1 ), res ) );
-	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "misc/file1.jpg" ) );
+	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "misc" CORAL_OS_DIR_SEP_STR "file1.jpg" ) );
 
 	filename = "file2.csl";
 	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::ArrayRange<const std::string>( &filename, 1 ), res ) );
-	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "innerFolder/file2.csl" ) );
+	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "innerFolder" CORAL_OS_DIR_SEP_STR "file2.csl" ) );
 
 	// invert the path order
 	std::swap( coralPath[0], coralPath[1] );
 	filename = "file1.csl";
 	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::ArrayRange<const std::string>( &filename, 1 ), res ) );
-	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "innerFolder/file1.csl" ) );
+	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "innerFolder" CORAL_OS_DIR_SEP_STR "file1.csl" ) );
 }
