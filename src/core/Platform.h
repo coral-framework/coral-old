@@ -107,6 +107,7 @@
 	#include <sys/types.h>
 #endif
 
+//! Coral's main namespace.
 namespace co {
 
 #if CORAL_POINTER_SIZE == 4
@@ -232,7 +233,6 @@ const int64		MIN_INT64	= -MAX_INT64 - 1;
 	#define CORAL_NO_INLINE __attribute__((noinline)) 
 #endif 
 
-//! Coral's main namespace.
 namespace co {
 
 #ifndef DOXYGEN
@@ -249,7 +249,7 @@ template<> struct CompileTimeError<true> {};
 
 #ifndef DOXYGEN
 
-#if defined(CORAL_OS_WIN)
+#if defined(CORAL_OS_WIN) && !defined(CORAL_NO_EXPORT)
 	#define CORAL_DLL_EXPORT __declspec(dllexport)
 	#define CORAL_DLL_IMPORT __declspec(dllimport)
 	#if defined(BUILDING_CORAL_CORE)

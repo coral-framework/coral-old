@@ -6,7 +6,7 @@
 #include "ParameterInfo.h"
 #include <co/IllegalNameException.h>
 #include <co/IllegalArgumentException.h>
-#include <co/reserved/LexicalUtilities.h>
+#include <co/reserved/LexicalUtils.h>
 #include <sstream>
 
 ParameterInfo::ParameterInfo() : _type( 0 ), _isIn( true ), _isOut( false )
@@ -21,7 +21,7 @@ ParameterInfo::~ParameterInfo()
 
 void ParameterInfo::init( const std::string& name, co::Type* type, bool isIn, bool isOut )
 {
-	if( !co::LexicalUtilities::isValidIdentifier( name ) )
+	if( !co::LexicalUtils::isValidIdentifier( name ) )
 		CORAL_THROW( co::IllegalNameException, "the passed parameter name is invalid" );
 	
 	if( type == NULL )

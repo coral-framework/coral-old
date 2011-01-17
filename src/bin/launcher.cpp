@@ -3,7 +3,7 @@
  * See Copyright Notice in Coral.h
  */
 
-#include "PlatformUtils.h"
+#include "Utils.h"
 #include <co/Coral.h>
 #include <co/System.h>
 #include <co/Component.h>
@@ -28,10 +28,10 @@ static void addDefaultPaths()
 
 	// add the '~/modules' dir (relative to the executable's dir) to the path
 	std::string path;
-	if( getCurrentExecutableDir( path ) )
+	if( co::OS::getApplicationDir( path ) )
 	{
 		path.append( "/modules" );
-		if( dirExists( path ) )
+		if( co::OS::isDir( path ) )
 			co::addPath( path );
 	}
 	else
@@ -40,12 +40,12 @@ static void addDefaultPaths()
 	}
 
 	// add the current working dir to the path
-	if( getCurrentWorkingDir( path ) )
+	if( co::OS::getCurrentWorkingDir( path ) )
 	{
 		// if the CWD contains a './modules' subdir, add it instead
 		std::string subDir( path );
 		subDir.append( "/modules" );
-		if( dirExists( subDir ) )
+		if( co::OS::isDir( subDir ) )
 			co::addPath( subDir );
 		else
 			co::addPath( path );

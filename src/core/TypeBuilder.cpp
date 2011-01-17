@@ -23,7 +23,7 @@
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/UnsupportedOperationException.h>
-#include <co/reserved/LexicalUtilities.h>
+#include <co/reserved/LexicalUtils.h>
 #include <algorithm>
 #include <sstream>
 
@@ -177,7 +177,7 @@ public:
 	{
 		assertNotCreated();
 
-		if( !co::LexicalUtilities::isValidIdentifier( name ) )
+		if( !co::LexicalUtils::isValidIdentifier( name ) )
 			CORAL_THROW( co::IllegalNameException, "invalid identifier '" << name << "'" );
 
 		std::vector<std::string>::iterator it = std::find( _identifiers.begin(), _identifiers.end(), name );
@@ -253,10 +253,10 @@ public:
 				CORAL_THROW( co::IllegalArgumentException, "a struct cannot contain itself recursively" );
 		}
 
-		if( !co::LexicalUtilities::isValidIdentifier( name ) )
+		if( !co::LexicalUtils::isValidIdentifier( name ) )
 			CORAL_THROW( co::IllegalNameException, "attribute name '" << name << "' is not a valid identifier" );
 
-		if( !co::LexicalUtilities::isValidAttributeName( name ) )
+		if( !co::LexicalUtils::isValidAttributeName( name ) )
 			CORAL_THROW( co::IllegalNameException, "attribute names must start with a lowercase letter" );
 
 		for( co::RefVector<co::AttributeInfo>::iterator it = _attributes.begin(); it != _attributes.end(); ++it )
@@ -330,7 +330,7 @@ public:
 	{
 		assertNotCreated();
 
-		if( !co::LexicalUtilities::isValidIdentifier( name ) )
+		if( !co::LexicalUtils::isValidIdentifier( name ) )
 			CORAL_THROW( co::IllegalNameException, "method name '" << name << "' is not a valid identifier" );
 
 		MethodBuilder* methodBuilder = new MethodBuilder;
@@ -529,7 +529,7 @@ public:
 		if( !interface )
 			CORAL_THROW( co::IllegalArgumentException, "illegal null interface" );
 
-		if( !co::LexicalUtilities::isValidIdentifier( name ) )
+		if( !co::LexicalUtils::isValidIdentifier( name ) )
 			CORAL_THROW( co::IllegalNameException, "interface name '" << name << "' is not a valid indentifier");
 
 		for( co::ArrayRange<co::InterfaceInfo* const> r( _interfaces ); r; r.popFirst() )

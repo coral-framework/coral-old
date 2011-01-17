@@ -27,12 +27,12 @@ bool StringTokenizer::nextToken()
 	std::size_t endPos = _str.find_first_of( _delimiters, startPos );
 	if( endPos == std::string::npos )
 	{
-		_token = _str.substr( startPos );
 		_offset = _str.length();
+		_token.assign( _str, startPos, _offset );
 		return true;
 	}
 
-	_token = _str.substr( startPos, endPos - startPos );
+	_token.assign( _str, startPos, endPos - startPos );
 	_offset = endPos;
 
 	return true;

@@ -11,7 +11,7 @@
 #include <co/AttributeInfo.h>
 #include <co/InterfaceType.h>
 #include <co/SemanticException.h>
-#include <co/reserved/LexicalUtilities.h>
+#include <co/reserved/LexicalUtils.h>
 #include <sstream>
 
 namespace co {
@@ -110,13 +110,13 @@ void TypeSemanticChecker::insertAttributeDeclaration( co::AttributeInfo* attribu
 	insertMemberDeclaration( MemberDeclaration( Attribute,  attribute->getName(), declaringType ) );
 
 	std::string name;
-	co::LexicalUtilities::formatAccessor( attribute->getName(), co::LexicalUtilities::Getter, name );
+	co::LexicalUtils::formatAccessor( attribute->getName(), co::LexicalUtils::Getter, name );
 	insertMemberDeclaration( MemberDeclaration( GetterMethod, name, declaringType ) );
 
 	if( attribute->getIsReadOnly() )
 		return;
 
-	co::LexicalUtilities::formatAccessor( attribute->getName(), co::LexicalUtilities::Setter, name );
+	co::LexicalUtils::formatAccessor( attribute->getName(), co::LexicalUtils::Setter, name );
 	insertMemberDeclaration( MemberDeclaration( SetterMethod, name, declaringType ) );
 }
 

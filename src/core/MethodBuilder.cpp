@@ -15,7 +15,7 @@
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/UnsupportedOperationException.h>
-#include <co/reserved/LexicalUtilities.h>
+#include <co/reserved/LexicalUtils.h>
 #include <sstream>
 
 MethodBuilder::MethodBuilder() : _returnType( NULL )
@@ -59,7 +59,7 @@ void MethodBuilder::defineReturnType( co::Type* type )
 
 void MethodBuilder::defineParameter( const std::string& name, co::Type* type, bool input, bool output )
 {
-	if( !co::LexicalUtilities::isValidIdentifier( name ) )
+	if( !co::LexicalUtils::isValidIdentifier( name ) )
 		CORAL_THROW( co::IllegalNameException, "parameter name '" << name << "' is not a valid identifier" );
 
 	for( co::ArrayRange<co::ParameterInfo* const> r( _parameters ); r; r.popFirst() )

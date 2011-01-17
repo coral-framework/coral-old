@@ -3,7 +3,7 @@
  * See Copyright Notice in Coral.h
  */
 
-#include <co/reserved/LexicalUtilities.h>
+#include <co/reserved/LexicalUtils.h>
 #include <cassert>
 #include <cctype>
 
@@ -22,7 +22,7 @@ inline bool isDigit( char c )
 	return ( c >= '0' && c <= '9' );
 }
 
-bool LexicalUtilities::isValidIdentifier( const std::string& str )
+bool LexicalUtils::isValidIdentifier( const std::string& str )
 {
 	std::size_t length = str.length();
 	if( length < 1 || !isAlphaOrUnderscore( str[0] ) )
@@ -38,12 +38,12 @@ bool LexicalUtilities::isValidIdentifier( const std::string& str )
 	return true;
 }
 
-bool LexicalUtilities::isValidAttributeName( const std::string& identifier )
+bool LexicalUtils::isValidAttributeName( const std::string& identifier )
 {
 	return !identifier.empty() && islower( identifier[0] ) != 0;
 }
 
-void LexicalUtilities::formatAccessor( const std::string& attributeName, AttributeAccessor kind, std::string& methodName )
+void LexicalUtils::formatAccessor( const std::string& attributeName, AttributeAccessor kind, std::string& methodName )
 {
 	assert( !attributeName.empty() );
 
@@ -71,7 +71,7 @@ inline bool startsWith( const std::string& str, const std::string& start )
 	return str.find( start ) == 0;
 }
 
-int LexicalUtilities::parseAccessor( const std::string& methodName, int accessorKinds, std::string& attributeName )
+int LexicalUtils::parseAccessor( const std::string& methodName, int accessorKinds, std::string& attributeName )
 {
 	assert( accessorKinds > 0 && accessorKinds < 4 );
 

@@ -3,21 +3,27 @@
  * See Copyright Notice in Coral.h
  */
 
-#include "PlatformUtils.h"
+#include "Utils.h"
+
+#if defined(CORAL_OS_WIN)
+	#define EXE_SUFFIX ".exe"
+#else
+	#define EXE_SUFFIX
+#endif
 
 int main( int argc, char* argv[] )
 {
 	// set CORAL_ROOT = this executable's dir
 	std::string rootDir;
-	getCurrentExecutableDir( rootDir );
+	co::OS::getApplicationDir( rootDir );
 	setEnvVar( "CORAL_ROOT", rootDir );
 
 	// add $CORAL_ROOT/modules to the CORAL_PATH
-	prependToEnvVar( "CORAL_PATH", rootDir + ( DIR_SEP_STR "modules" PATH_SEP_STR ) );
+	prependToEnvVar( "CORAL_PATH", rootDir + ( CORAL_OS_DIR_SEP_STR "modules" CORAL_OS_PATH_SEP_STR ) );
 
 	// set the OS-specific var that enables the system to locate the coral library
 	std::string libDir( rootDir );
-	libDir += DIR_SEP_STR "lib" PATH_SEP_STR;
+	libDir += CORAL_OS_DIR_SEP_STR "lib" CORAL_OS_PATH_SEP_STR;
 #if defined(CORAL_OS_WIN)
 	prependToEnvVar( "PATH", libDir );
 #elif defined(CORAL_OS_LINUX)
@@ -39,8 +45,8 @@ int main( int argc, char* argv[] )
 			mode, an error is issued. However, if this option is omitted, the front-end
 			will use any available launcher, giving preference to one in Release mode.
 	 */
-	const char* launcherReleasePath = DIR_SEP_STR "bin" DIR_SEP_STR "launcher" EXE_SUFFIX;
-	const char* launcherDebugPath = DIR_SEP_STR "bin" DIR_SEP_STR "launcher_debug" EXE_SUFFIX;
+	const char* launcherReleasePath = CORAL_OS_PATH_SEP_STR "bin" CORAL_OS_PATH_SEP_STR "launcher" EXE_SUFFIX;
+	const char* launcherDebugPath = CORAL_OS_PATH_SEP_STR "bin" CORAL_OS_PATH_SEP_STR "launcher_debug" EXE_SUFFIX;
 
 	int argIndex = 1;
 	std::string launcher;
@@ -56,14 +62,14 @@ int main( int argc, char* argv[] )
 	else // automatically choose a launcher executable
 	{
 		launcher = rootDir + launcherReleasePath;
-		if( !fileExists( launcher ) )
+		if( !co::OS::isFile( launcher ) )
 		{
 			// fallback to the debug executable
 			launcher = rootDir + launcherDebugPath;
 		}
 	}
 	
-	if( !fileExists( launcher ) )
+	if( !co::OS::isFile( launcher ) )
 	{
 		fprintf( stderr, "ERROR: the launcher executable is not available (%s)\n", launcher.c_str() );
 		return -1;

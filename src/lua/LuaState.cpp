@@ -6,7 +6,7 @@
 #include "LuaState.h"
 #include "LuaBinding.h"
 #include <co/Reflector.h>
-#include <co/reserved/FileLookUp.h>
+#include <co/reserved/OS.h>
 #include <lua/Exception.h>
 #include <sstream>
 
@@ -106,18 +106,16 @@ void LuaState::dumpStack( lua_State* L )
 bool LuaState::findScript( lua_State*, const std::string& name, std::string& filename )
 {
 	static const std::string s_extension( "lua" );
+	
+	// look for "?.lua" first, then "?/__init.lua"
+	std::string filePaths[2];
+	filePaths[0] = name;
+	co::OS::convertDotsToDirSeps( filePaths[0] );
+	filePaths[1] = filePaths[0];
+	filePaths[0].append( ".lua" );
+	filePaths[1].append( CORAL_OS_DIR_SEP_STR "__init.lua" );
 
-	co::FileLookUp fileLookUp( co::getPaths(), co::ArrayRange<const std::string>( &s_extension, 1 ) );
-
-	// look for '?.lua'
-	std::string filePath( name );
-	fileLookUp.addFilePath( filePath, true );
-
-	// look for '?/__init.lua'
-	filePath.append( ".__init" );
-	fileLookUp.addFilePath( filePath, true );
-
-	return fileLookUp.locate( filename );
+	return co::OS::searchFile2( co::getPaths(), co::ArrayRange<const std::string>( filePaths, 2 ), filename );
 }
 
 void LuaState::doFile( lua_State* L, const std::string& filename )

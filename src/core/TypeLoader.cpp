@@ -13,7 +13,7 @@
 #include <co/Namespace.h>
 #include <co/TypeBuilder.h>
 #include <co/MethodBuilder.h>
-#include <co/reserved/FileLookUp.h>
+#include <co/reserved/OS.h>
 #include <sstream>
 
 // Root Loader Contructor:
@@ -54,9 +54,9 @@ co::Namespace* getOrCreateChildNamespace( co::Namespace* parent, const std::stri
 
 co::Type* TypeLoader::loadType()
 {
-	std::string cslPath;
-	std::string foundRelativePath;
-	if( !findCslFile(_fullTypeName, cslPath, foundRelativePath ) )
+	std::string fullPath;
+	std::string relativePath;
+	if( !findCSL(_fullTypeName, fullPath, relativePath ) )
 	{
 		if( isRootLoader() )
 			_transaction->rollback();
@@ -67,7 +67,7 @@ co::Type* TypeLoader::loadType()
 	co::Namespace* ns = _typeManager->getRootNS();
 
 	// iterate over all subparts
-	co::StringTokenizer st( foundRelativePath, "/" );
+	co::StringTokenizer st( relativePath, "/" );
 	st.nextToken();
 	std::string currentToken = st.getToken();
 	while( st.nextToken() )
@@ -80,7 +80,7 @@ co::Type* TypeLoader::loadType()
 
 	try
 	{
-		parse( cslPath );
+		parse( fullPath );
 
 		setCurrentLine( -1 );
 
@@ -92,7 +92,7 @@ co::Type* TypeLoader::loadType()
 	catch( co::Exception& e )
 	{
 		// create a csl error, using the current one as inner error
-		_cslError = new csl::Error( e.getMessage(), cslPath, getCurrentLine(), _cslError.get() );
+		_cslError = new csl::Error( e.getMessage(), fullPath, getCurrentLine(), _cslError.get() );
 
 		if( isRootLoader() )
 			_transaction->rollback();
@@ -178,20 +178,21 @@ co::Type* TypeLoader::findDependency( const std::string& typeName )
 
 co::Type* TypeLoader::loadDependency( const std::string& typeName )
 {
-	std::string cslPath;
-	std::string foundFilePath;
-	if( !findCslFile( typeName, cslPath, foundFilePath ) )
+	std::string fullPath;
+	std::string relativePath;
+	if( !findCSL( typeName, fullPath, relativePath ) )
 		return NULL;
 
-	// convert slashes to dots in foundFilePath
-	std::size_t length = foundFilePath.length();
+	// convert the relativePath into a full type name
+	std::size_t length = relativePath.length() - 4;
+	relativePath.resize( length ); // removes the trailing '.csl'
 	for( std::size_t i = 0; i < length; ++i )
 	{
-		if( foundFilePath[i] == '/' )
-			foundFilePath[i] = '.';
+		if( relativePath[i] == '/' )
+			relativePath[i] = '.';
 	}
 
-	TypeLoader loader( foundFilePath, this );
+	TypeLoader loader( relativePath, this );
 	co::Type* type = loader.loadType();
 
 	// set the current error as the child loader error (then it will be set as the inner error
@@ -201,22 +202,32 @@ co::Type* TypeLoader::loadDependency( const std::string& typeName )
 	return type;
 }
 
-bool TypeLoader::findCslFile( const std::string& typeName, std::string& cslFilePath, std::string& foundRelativePath )
+bool TypeLoader::findCSL( const std::string& typeName, std::string& fullPath, std::string& relativePath )
 {
-	static std::vector<std::string> s_validExtensions;
-
-	if( s_validExtensions.empty() )
-		s_validExtensions.push_back( "csl" );
-
-	co::FileLookUp fileLookUp( _path, s_validExtensions );
+	std::string names[2];
+	int n = 0;
 
 	// if the current namespace is not the root, first try a relative path
 	if( _namespace && _namespace->getParentNamespace() )
-		fileLookUp.addFilePath( formatTypeInNamespace( _namespace, typeName ), true );
+	{
+		const std::string& fullNS = _namespace->getFullName();
+		names[n].reserve( fullNS.size() + typeName.size() + 5 );
+		names[n] = fullNS;
+		names[n].push_back( '.' );
+		names[n].append( typeName );
+		co::OS::convertDotsToDirSeps( names[n] );
+		names[n].append( ".csl" );
+		++n;
+	}
 
-	fileLookUp.addFilePath( typeName, true );
+	names[n].reserve( typeName.size() + 4 );
+	names[n] = typeName;
+	co::OS::convertDotsToDirSeps( names[n] );
+	names[n].append( ".csl" );
+	++n;
 
-	bool succeeded = fileLookUp.locate( cslFilePath, NULL, &foundRelativePath );
+	bool succeeded = co::OS::searchFile2( _path, co::ArrayRange<const std::string>( names, n ),
+											fullPath, NULL, &relativePath );
 	if( !succeeded )
 	{
 		std::string message( "type '" );

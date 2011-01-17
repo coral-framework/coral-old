@@ -10,7 +10,7 @@
 #include <co/Type.h>
 #include <co/IllegalNameException.h>
 #include <co/IllegalArgumentException.h>
-#include <co/reserved/LexicalUtilities.h>
+#include <co/reserved/LexicalUtils.h>
 #include <algorithm>
 #include <sstream>
 
@@ -141,7 +141,7 @@ co::TypeBuilder* Namespace::defineType( const std::string& name, co::TypeKind ty
 		CORAL_THROW( co::IllegalArgumentException, "'" << typeKind <<  "' is not a user-definable type kind." );
 	}
 
-	if( !co::LexicalUtilities::isValidIdentifier( name ) )
+	if( !co::LexicalUtils::isValidIdentifier( name ) )
 	{
 		CORAL_THROW( co::IllegalNameException, "'" << name << "' is not a valid identifier." );
 	}

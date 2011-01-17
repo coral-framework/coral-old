@@ -9,7 +9,6 @@
 #include <co/Platform.h>
 #include <string>
 
-//! Main namespace of this library.
 namespace co {
 
 /*!

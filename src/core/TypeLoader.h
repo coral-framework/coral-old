@@ -118,8 +118,8 @@ private:
 	 */
 	co::Type* loadDependency( const std::string& typeName );
 
-	// Searches the csl file within the current coral path and return true if the file was found.
-	bool findCslFile( const std::string& typeName, std::string& cslFilePath, std::string& foundRelativePath );
+	// Searches for a CSL file in the Coral Path. Returns true if the file was found.
+	bool findCSL( const std::string& typeName, std::string& fullPath, std::string& relativePath );
 
 private:
 	std::string _fullTypeName;

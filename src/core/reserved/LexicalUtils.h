@@ -14,9 +14,9 @@
 namespace co {
 
 /*!
-	\brief Static class containing lexical utility functions.
+	\brief Lexical utility functions in a static class.
  */
-class CORAL_EXPORT LexicalUtilities
+class CORAL_EXPORT LexicalUtils
 {
 public:
 	/*!
@@ -59,13 +59,13 @@ public:
 
 	 	\param[in] methodName an identifier representing a method name.
 		\param[in] accessorKinds a bitfield with one or more of the following values:
-			- co::LexicalUtilities::Getter meaning that the method should search for a \e getter.
-			- co::LexicalUtilities::Setter meaning that the method should search for a \e setter.
+			- co::LexicalUtils::Getter meaning that the method should search for a \e getter.
+			- co::LexicalUtils::Setter meaning that the method should search for a \e setter.
 		\param[out] attributeName the parsed attribute name, starting with a lower case letter.
 
 		\return One of the following values:
-			- co::LexicalUtilities::Getter if a \e getter name was parsed;
-			- co::LexicalUtilities::Setter if a \e setter name was parsed;
+			- co::LexicalUtils::Getter if a \e getter name was parsed;
+			- co::LexicalUtils::Setter if a \e setter name was parsed;
 			- -1 if \a methodName was not a valid accessor name.
 
 		\warning This method assumes \a methodName is a valid identifier.

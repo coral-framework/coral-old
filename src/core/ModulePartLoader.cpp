@@ -17,7 +17,7 @@
 #include <co/TypeLoadException.h>
 #include <co/ModuleLoadException.h>
 #include <co/IllegalArgumentException.h>
-#include <co/reserved/FileLookUp.h>
+#include <co/reserved/OS.h>
 #include <co/reserved/LibraryManager.h>
 #include <cstdio>
 #include <sstream>
@@ -89,68 +89,64 @@ co::ModulePart* ModulePartLoader::loadModulePart( const std::string& moduleName 
 	return part;
 }
 
+#if defined(CORAL_OS_WIN)
+	#define MODULE_LIB_EXT ".dll"
+#else
+	#define MODULE_LIB_EXT ".so"
+#endif
+
 bool ModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::string* filename )
 {
-	static std::vector<std::string> s_validExtensions;
-	if( s_validExtensions.empty() )
-	{
-#ifdef CORAL_OS_WIN
-		s_validExtensions.push_back( "dll" );
-#else
-		s_validExtensions.push_back( "so" );
-#endif
-
-#ifdef CORAL_OS_MAC
-		s_validExtensions.push_back( "dylib" );
-#endif
-	}
-
 	const char* moduleBaseName = moduleName.c_str();
 	size_t lastDotPos = moduleName.rfind( '.' );
 	if( lastDotPos != std::string::npos )
 		moduleBaseName += ( lastDotPos + 1 );
 
-	co::FileLookUp fileLookUp( co::getPaths(), s_validExtensions );
-
-	std::string filePath;
+	int n = 0;
+	std::string fileNames[4];
 
 	// avoid string re-alocations
-	const int PADDING = 1 + 3 + 6; // for '.', 'lib' and '_debug'
-	filePath.reserve( moduleName.length() + ( moduleBaseName - moduleName.c_str() ) + PADDING );
+	const int PADDING = 3 + 6 + 4; // for 'lib', '_debug' and '.dll'
+	size_t reserveLen = ( moduleName.length() + ( moduleBaseName - moduleName.c_str() ) + PADDING );
 
 #ifndef CORAL_NDEBUG
 	// in debug mode, first try moduleName/moduleName_debug
-	filePath = moduleName;
-	filePath.push_back( '.' );
-	filePath.append( moduleBaseName );
-	filePath.append( "_debug" );
-	fileLookUp.addFilePath( filePath, true );
+	fileNames[n].reserve( reserveLen );
+	fileNames[n].assign( moduleBaseName );
+	fileNames[n].append( "_debug" MODULE_LIB_EXT );
+	++n;
 
 	#ifdef CORAL_OS_UNIX
 		// on UNIX, also try moduleName/libmoduleName_debug
-		filePath = moduleName;
-		filePath.append( ".lib" );
-		filePath.append( moduleBaseName );
-		filePath.append( "_debug" );
-		fileLookUp.addFilePath( filePath, true );
+		fileNames[n].reserve( reserveLen );
+		fileNames[n].assign( "lib" );
+		fileNames[n].append( moduleBaseName );
+		fileNames[n].append( "_debug" MODULE_LIB_EXT );
+		++n;
 	#endif
 #endif
 
 	// try moduleName/moduleName
-	filePath = moduleName;
-	filePath.push_back( '.' );
-	filePath.append( moduleBaseName );
-	fileLookUp.addFilePath( filePath, true );
+	fileNames[n].assign( moduleBaseName );
+	fileNames[n].append( MODULE_LIB_EXT );
+	++n;
 
 #ifdef CORAL_OS_UNIX
 	// on UNIX, also try moduleName/libmoduleName
-	filePath = moduleName;
-	filePath.append( ".lib" );
-	filePath.append( moduleBaseName );
-	fileLookUp.addFilePath( filePath, true );
+	fileNames[n].reserve( reserveLen );
+	fileNames[n].assign( "lib" );
+	fileNames[n].append( moduleBaseName );
+	fileNames[n].append( MODULE_LIB_EXT );
+	++n;
 #endif
 
-	return fileLookUp.locate( filename ? *filename : filePath, NULL, NULL );
+	std::string modulePath( moduleName );
+	co::OS::convertDotsToDirSeps( modulePath );
+
+	return co::OS::searchFile3( co::getPaths(),
+								co::ArrayRange<const std::string>( &modulePath, 1 ),
+								co::ArrayRange<const std::string>( fileNames, n ),
+								filename ? *filename : modulePath );
 }
 
 void ModulePartLoader::resolveModuleFunctions( co::Library* lib, BootstrapFunctions& bf )

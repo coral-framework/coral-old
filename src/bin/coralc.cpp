@@ -3,17 +3,17 @@
  * See Copyright Notice in Coral.h
  */
 
-#include "PlatformUtils.h"
+#include "Utils.h"
 
 int main( int argc, char* argv[] )
 {
 	// resolve the CORAL_ROOT
 	std::string rootDir;
-	getCurrentExecutableDir( rootDir );
+	co::OS::getApplicationDir( rootDir );
 
 	// call $CORAL_ROOT/coral lua.Launcher co.compiler.cli $@
 	std::string program( rootDir );
-	program += DIR_SEP_STR "coral";
+	program += CORAL_OS_DIR_SEP_STR "coral";
 	
 	std::string arg1( "lua.Launcher" );
 	std::string arg2( "co.compiler.cli" );

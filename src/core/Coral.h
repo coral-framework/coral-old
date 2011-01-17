@@ -22,6 +22,7 @@ class InterfaceType;
 
 /*!
 	\brief Returns the list of type repositories in use by the system.
+	All paths are guaranteed to be absolute pathnames.
 	\ingroup setup
  */
 CORAL_EXPORT ArrayRange<const std::string> getPaths();
@@ -31,6 +32,8 @@ CORAL_EXPORT ArrayRange<const std::string> getPaths();
  
 	The passed string may contain a single directory or a list of directories,
 	separated by comma or semicolon (or colon, on UNIX systems).
+
+	This function will normalize and absolutize all directory paths.
 
 	\ingroup setup
  */

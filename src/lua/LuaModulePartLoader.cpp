@@ -8,7 +8,7 @@
 #include <co/Coral.h>
 #include <co/ModuleLoadException.h>
 #include <co/IllegalArgumentException.h>
-#include <co/reserved/FileLookUp.h>
+#include <co/reserved/OS.h>
 #include <lua/Exception.h>
 
 LuaModulePartLoader::LuaModulePartLoader()
@@ -48,23 +48,21 @@ co::ModulePart* LuaModulePartLoader::loadModulePart( const std::string& moduleNa
 
 bool LuaModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::string* filename )
 {
-	static const std::string s_extension( "lua" );
-
 	const char* moduleBaseName = moduleName.c_str();
 	size_t lastDotPos = moduleName.rfind( '.' );
 	if( lastDotPos != std::string::npos )
 		moduleBaseName += ( lastDotPos + 1 );
 
-	co::FileLookUp fileLookUp( co::getPaths(), co::ArrayRange<const std::string>( &s_extension, 1 ) );
-
 	std::string filePath;
-	filePath.reserve( moduleName.length() + ( moduleBaseName - moduleName.c_str() ) + 1 );
+	filePath.reserve( moduleName.length() + ( moduleBaseName - moduleName.c_str() ) + 5 );
 	filePath = moduleName;
-	filePath.push_back( '.' );
+	co::OS::convertDotsToDirSeps( filePath );
+	filePath.push_back( CORAL_OS_DIR_SEP );
 	filePath.append( moduleBaseName );
-	fileLookUp.addFilePath( filePath, true );
+	filePath.append( ".lua" );
 
-	return fileLookUp.locate( filename ? *filename : filePath, NULL, NULL );
+	return co::OS::searchFile2( co::getPaths(), co::ArrayRange<const std::string>( &filePath, 1 ),
+									filename ? *filename : filePath );
 }
 
 CORAL_EXPORT_COMPONENT( LuaModulePartLoader, ModulePartLoader );

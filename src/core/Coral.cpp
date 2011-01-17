@@ -9,6 +9,7 @@
 #include <co/Coral.h>
 #include <co/RefPtr.h>
 #include <co/Reflector.h>
+#include <co/reserved/OS.h>
 #include <co/reserved/LibraryManager.h>
 #include <cstdio>
 #include <cstdarg>
@@ -16,10 +17,8 @@
 #include <algorithm>
 
 #ifdef CORAL_OS_WIN
-	#define DIR_SEP_CHAR '\\'
 	static const char* PATH_SEPARATORS = ";,";
 #else
-	#define DIR_SEP_CHAR '/'
 	static const char* PATH_SEPARATORS = ";:,";
 #endif
 
@@ -30,15 +29,6 @@ static co::ServiceManager* sg_serviceManager( NULL );
 
 co::ArrayRange<const std::string> co::getPaths()
 {
-	static bool s_readEnvVar( false );
-	if( !s_readEnvVar )
-	{
-		// automatically add the CORAL_PATH env var
-		const char* envVar = getenv( "CORAL_PATH" );
-		if( envVar != NULL )
-			co::addPath( envVar );
-		s_readEnvVar = true;
-	}
 	return sg_paths;
 }
 
@@ -48,26 +38,15 @@ void co::addPath( const std::string& path )
 	while( st.nextToken() )
 	{
 		std::string dirPath( st.getToken() );
-		size_t len = dirPath.length();
-		if( len == 0 )
+		if( dirPath.empty() )
 			continue;
 
-		/*
-			Normalize the dirPath:
-			- On Windows, convert any '/' to a '\'.
-			- Remove any trailing dir separators.
-		 */
-#if defined(CORAL_OS_WIN)
-		for( size_t i = 0; i < len; ++i )
-			if( dirPath[i] == '/' )
-				dirPath[i] = DIR_SEP_CHAR;
-#endif
-		while( dirPath[--len] == DIR_SEP_CHAR )
-			dirPath.resize( len );
+		// normalize & absolutize the path
+		co::OS::makeAbs( dirPath );
 
 		/*
-			Check whether the dir is not the CORAL_PATH already.
-			This makes addPath() quadratic, but it should never be a problem.
+			Check whether the dir is not in the CORAL_PATH already.
+			This makes addPath() quadratic (what should never be a problem).
 		 */
 		if( std::find( sg_paths.begin(), sg_paths.end(), dirPath ) == sg_paths.end() )
 			sg_paths.push_back( dirPath );
