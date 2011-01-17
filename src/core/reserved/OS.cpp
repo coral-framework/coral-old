@@ -47,7 +47,6 @@
 #else
 	#include <errno.h>
 	#include <unistd.h>
-	#include <sys/wait.h>
 	#define getCWD getcwd
 #endif
 

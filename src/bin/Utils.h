@@ -7,12 +7,20 @@
 #define _BIN_UTILS_H_
 
 #include <co/reserved/OS.h>
-#include <cerrno>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <cassert>
 #include <sstream>
+
+#if defined(CORAL_OS_WIN)
+	#define WIN32_LEAN_AND_MEAN
+	#include <Windows.h>
+#else
+	#include <cerrno>
+	#include <unistd.h>
+	#include <sys/wait.h>
+#endif
 
 /*
 	Function to set the value of an environment variable.
