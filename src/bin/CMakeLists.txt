@@ -6,7 +6,7 @@ PROJECT( BIN )
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src ${CORE_SOURCE_DIR}/generated )
 
-SET( COMMON_EXTRA_SOURCES
+SET( EXTRA_SOURCES
 	Utils.h
 	${CORE_SOURCE_DIR}/reserved/OS.h
 	${CORE_SOURCE_DIR}/reserved/OS.cpp
@@ -18,7 +18,7 @@ SET( COMMON_EXTRA_SOURCES
 # Build the Coral Application Launcher Front-End
 ################################################################################
 
-ADD_EXECUTABLE( coral coral.cpp ${COMMON_EXTRA_SOURCES} )
+ADD_EXECUTABLE( coral coral.cpp ${EXTRA_SOURCES} )
 
 CORAL_DEFAULT_TARGET_PROPERTIES( coral )
 
@@ -31,7 +31,7 @@ SET_TARGET_PROPERTIES( coral PROPERTIES
 # Build the Coral Compiler Front-End
 ################################################################################
 
-ADD_EXECUTABLE( coralc coralc.cpp ${COMMON_EXTRA_SOURCES} )
+ADD_EXECUTABLE( coralc coralc.cpp ${EXTRA_SOURCES} )
 
 CORAL_DEFAULT_TARGET_PROPERTIES( coralc )
 
@@ -44,7 +44,7 @@ SET_TARGET_PROPERTIES( coralc PROPERTIES
 # Build the actual Coral Application Launcher
 ################################################################################
 
-ADD_EXECUTABLE( launcher launcher.cpp ${COMMON_EXTRA_SOURCES} )
+ADD_EXECUTABLE( launcher launcher.cpp Utils.h )
 ADD_DEPENDENCIES( launcher lua )
 
 TARGET_LINK_LIBRARIES( launcher core )
