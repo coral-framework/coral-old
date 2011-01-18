@@ -51,10 +51,10 @@ int main( int argc, char* argv[] )
 	int argIndex = 1;
 	std::string launcher;
 
-	if( argc >= 2 && strcmp( argv[1], "--mode" ) == 0 )
+	if( argc >= 2 && strCaseComp( argv[1], "--mode" ) == 0 )
 	{
 		argIndex = 3;
-		if( strcmp( argv[2], "Debug" ) == 0 )
+		if( strCaseComp( argv[2], "Debug" ) == 0 )
 			launcher = rootDir + launcherDebugPath;
 		else
 			launcher = rootDir + launcherReleasePath;

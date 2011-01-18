@@ -16,10 +16,13 @@
 #if defined(CORAL_OS_WIN)
 	#define WIN32_LEAN_AND_MEAN
 	#include <Windows.h>
+	#define strCaseComp _strcmpi
 #else
 	#include <cerrno>
 	#include <unistd.h>
+	#include <strings.h>
 	#include <sys/wait.h>
+	#define strCaseComp strcasecmp
 #endif
 
 /*

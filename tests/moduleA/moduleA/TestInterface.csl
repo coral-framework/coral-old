@@ -28,6 +28,8 @@ interface TestInterface
 
 	void testOutParameters( out float size, out TestEnum enumValue, out string text, out TestStruct testStruct, out DummyInterface dummyInterface, out int32[] intList, out DummyInterface[] interfaces );
 
+	any testAnyReturn( in any param );
+
 	<c++
 	inline int testCppBlock2()
 	{

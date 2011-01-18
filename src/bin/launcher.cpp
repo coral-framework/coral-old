@@ -146,7 +146,7 @@ int main( int argc, char* argv[] )
 			}
 			co::addPath( argv[index] );
 		}
-		else if( strcmp( argv[index] + 1, "-no-abi-checks" ) == 0 )
+		else if( strCaseComp( argv[index] + 1, "-no-abi-checks" ) == 0 )
 		{
 			abiChecks = false;
 		}

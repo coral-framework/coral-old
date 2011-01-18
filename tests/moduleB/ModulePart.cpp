@@ -3,48 +3,54 @@
  * See Copyright Notice in Coral.h
  */
 
-#include "ModulePart.h"
+#include "moduleB_Base.h"
 #include "ModuleInstaller.h"
 #include <co/System.h>
 #include <co/ModuleManager.h>
 
-ModulePart::ModulePart()
+class ModulePart : public moduleB::moduleB_Base
 {
-	// empty
-}
+public:
+    ModulePart()
+	{
+		// empty
+	}
 
-ModulePart::~ModulePart()
-{
-	// empty
-}
+	virtual ~ModulePart()
+	{
+		// empty
+	}
 
-void ModulePart::initialize( co::Module* )
-{
-	moduleB::ModuleInstaller::instance().install();
+	// co::ModulePart methods:
 
-	// require moduleA
-	co::getSystem()->getModules()->load( "moduleA" );
-}
+	void initialize( co::Module* )
+	{
+		moduleB::ModuleInstaller::instance().install();
+		
+		// require moduleA
+		co::getSystem()->getModules()->load( "moduleA" );
+	}
 
-void ModulePart::integrate( co::Module* )
-{
-	// empty
-}
+	void integrate( co::Module* )
+	{
+		// empty
+	}
 
-void ModulePart::integratePresentation( co::Module* )
-{
-	// empty
-}
+	void integratePresentation( co::Module* )
+	{
+		// empty
+	}
 
-void ModulePart::disintegrate( co::Module* )
-{
-	// empty
-}
+	void disintegrate( co::Module* )
+	{
+		// empty
+	}
 
-void ModulePart::dispose( co::Module* )
-{
-	moduleB::ModuleInstaller::instance().uninstall();
-}
+	void dispose( co::Module* )
+	{
+		moduleB::ModuleInstaller::instance().uninstall();
+	}
+};
 
 CORAL_EXPORT_COMPONENT( ModulePart, moduleB );
 

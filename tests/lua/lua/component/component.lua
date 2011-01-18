@@ -64,9 +64,18 @@ local TestComponent = co.Component{
 }
 
 local testStruct = co.new "moduleA.TestStruct"
+testStruct.anInt16 = 23456;
 
 function TestComponent.testItf:testOutParameters()
 	return 1.25, 'Second', "hello", testStruct, nil, { 1.5, 2.5, 3.5 }, nil
+end
+
+local resultsBag = { 3.14, true, false, testStruct, "str" }
+local resultsBagIdx = 1
+function TestComponent.testItf:testAnyReturn( param )
+	local res = resultsBag[resultsBagIdx]
+	resultsBagIdx = ( resultsBagIdx % #resultsBag ) + 1
+	return res
 end
 
 function M:initialize( module )
@@ -108,6 +117,22 @@ function M:initialize( module )
 	ASSERT_EQ( 3, #intList )
 	ASSERT_EQ( 2, intList[2] )
 	ASSERT_EQ( 0, #itfList )
+
+	-- test returning any's
+	local res = tc.testItf:testAnyReturn( "whatever" );
+	ASSERT_EQ( res, 3.14 )
+
+	res = tc.testItf:testAnyReturn( "whatever" );
+	ASSERT_EQ( res, true )
+
+	res = tc.testItf:testAnyReturn( "whatever" );
+	ASSERT_EQ( res, false )
+
+	res = tc.testItf:testAnyReturn( "whatever" )
+	ASSERT_EQ( res.anInt16, testStruct.anInt16 )
+
+	res = tc.testItf:testAnyReturn( "whatever" );
+	ASSERT_EQ( res, "str" )
 end
 
 return M

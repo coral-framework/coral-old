@@ -21,11 +21,8 @@ SET( EXTRA_SOURCES
 ADD_EXECUTABLE( coral coral.cpp ${EXTRA_SOURCES} )
 
 CORAL_DEFAULT_TARGET_PROPERTIES( coral )
-
-SET_TARGET_PROPERTIES( coral PROPERTIES
-	PROJECT_LABEL "Executable coral"
-	COMPILE_DEFINITIONS "CORAL_NO_EXPORT"
-)
+SET_PROPERTY( TARGET coral APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_NO_EXPORT" )
+SET_TARGET_PROPERTIES( coral PROPERTIES	PROJECT_LABEL "Executable coral" )
 
 ################################################################################
 # Build the Coral Compiler Front-End
@@ -34,11 +31,8 @@ SET_TARGET_PROPERTIES( coral PROPERTIES
 ADD_EXECUTABLE( coralc coralc.cpp ${EXTRA_SOURCES} )
 
 CORAL_DEFAULT_TARGET_PROPERTIES( coralc )
-
-SET_TARGET_PROPERTIES( coralc PROPERTIES
-	PROJECT_LABEL "Executable coralc"
-	COMPILE_DEFINITIONS "CORAL_NO_EXPORT"
-)
+SET_PROPERTY( TARGET coral APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_NO_EXPORT" )
+SET_TARGET_PROPERTIES( coralc PROPERTIES PROJECT_LABEL "Executable coralc" )
 
 ################################################################################
 # Build the actual Coral Application Launcher
