@@ -24,6 +24,7 @@ private:
 	static int addPath( lua_State* L );
 	static int getPaths( lua_State* L );
 	static int findScript( lua_State* L );
+	static int findModuleFile( lua_State* L );
 	static int getType( lua_State* L );
 	static int genericNew( lua_State* L );
 	static int newComponentType( lua_State* L );

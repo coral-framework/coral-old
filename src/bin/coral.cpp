@@ -45,8 +45,8 @@ int main( int argc, char* argv[] )
 			mode, an error is issued. However, if this option is omitted, the front-end
 			will use any available launcher, giving preference to one in Release mode.
 	 */
-	const char* launcherReleasePath = CORAL_OS_PATH_SEP_STR "bin" CORAL_OS_PATH_SEP_STR "launcher" EXE_SUFFIX;
-	const char* launcherDebugPath = CORAL_OS_PATH_SEP_STR "bin" CORAL_OS_PATH_SEP_STR "launcher_debug" EXE_SUFFIX;
+	const char* launcherReleasePath = CORAL_OS_DIR_SEP_STR "bin" CORAL_OS_DIR_SEP_STR "launcher" EXE_SUFFIX;
+	const char* launcherDebugPath = CORAL_OS_DIR_SEP_STR "bin" CORAL_OS_DIR_SEP_STR "launcher_debug" EXE_SUFFIX;
 
 	int argIndex = 1;
 	std::string launcher;

@@ -5,7 +5,7 @@
 interface IState
 {
 	/*
-		Searches for a Lua script with the given 'name' in the CORAL_PATH.
+		Searches the Coral path looking for a Lua script with the given \a name.
 		The search follows the same conventions used for locating Lua packages.
 		Returns false if no script could be found.
 	 */

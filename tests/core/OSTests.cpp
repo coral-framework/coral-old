@@ -109,7 +109,7 @@ TEST( OSTests, searchFile2 )
 	EXPECT_FALSE( co::OS::searchFile2( coralPath, co::ArrayRange<const std::string>( &filename, 1 ), res ) );
 }
 
-TEST( STests, searchFile2WithAmbiguities )
+TEST( OSTests, searchFile2WithAmbiguities )
 {
 	std::vector<std::string> coralPath;
 	coralPath.push_back( TESTS_DATA_DIR CORAL_OS_DIR_SEP_STR "misc" );
@@ -134,4 +134,18 @@ TEST( STests, searchFile2WithAmbiguities )
 	filename = "file1.csl";
 	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::ArrayRange<const std::string>( &filename, 1 ), res ) );
 	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "innerFolder" CORAL_OS_DIR_SEP_STR "file1.csl" ) );
+}
+
+TEST( OSTests, findModuleFile )
+{
+	std::string path;
+
+	EXPECT_TRUE( co::findModuleFile( "co", "Interface.csl", path ) );
+	EXPECT_TRUE( TestHelper::stringEndsWith( path, "co" CORAL_OS_DIR_SEP_STR "Interface.csl" ) );
+
+	EXPECT_FALSE( co::findModuleFile( "co", "NonExistingType.csl", path ) );
+
+	EXPECT_TRUE( co::findModuleFile( "TypeLoaderTests.NestedErrors", "Struct1.csl", path ) );
+	EXPECT_TRUE( TestHelper::stringEndsWith( path,
+		"TypeLoaderTests" CORAL_OS_DIR_SEP_STR "NestedErrors" CORAL_OS_DIR_SEP_STR "Struct1.csl" ) );
 }

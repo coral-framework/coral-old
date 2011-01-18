@@ -32,6 +32,14 @@ function M:initialize( module )
 	ASSERT_ERROR( function() co.new "co.SystemState" end, "co.SystemState is not instantiable" )
 	ASSERT_ERROR( function() co.new "int8" end, "int8 is not instantiable" )
 	ASSERT_ERROR( function() co.new "nonExistingType" end, "could not load type 'nonExistingType'" )
+
+	-- test findScript()
+	ASSERT_TRUE( co.findScript( "lua.coPackage.coPackage" ) )
+	ASSERT_TRUE( co.findScript( "lua.coPackage.nonExistingScript" ) == nil )
+
+	-- test findModuleFile
+	ASSERT_TRUE( co.findModuleFile( "lua.coPackage", "coPackage.lua" ) )
+	ASSERT_TRUE( co.findModuleFile( "lua.coPackage", "nonExisting.lua" ) == nil )
 end
 
 return M

@@ -71,6 +71,7 @@ void coPackage::open( lua_State* L )
 		{ "addPath", addPath },
 		{ "getPaths", getPaths },
 		{ "findScript", findScript },
+		{ "findModuleFile", findModuleFile },
 		{ "getType", getType },
 		{ "new", genericNew },
 		{ "newComponentType", newComponentType },
@@ -153,6 +154,18 @@ int coPackage::findScript( lua_State* L )
 	std::string filename;
 	if( LuaState::findScript( L, scriptName, filename ) )
 		lua_pushlstring( L, filename.data(), filename.length() );
+	else
+		lua_pushnil( L );
+	return 1;
+}
+
+int coPackage::findModuleFile( lua_State* L )
+{
+	const char* moduleName = luaL_checkstring( L, 1 );
+	const char* fileName = luaL_checkstring( L, 2 );
+	std::string path;
+	if( co::findModuleFile( moduleName, fileName, path ) )
+		lua_pushlstring( L, path.data(), path.length() );
 	else
 		lua_pushnil( L );
 	return 1;

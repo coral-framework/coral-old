@@ -44,6 +44,12 @@ void co::addPath( const std::string& path )
 		// normalize & absolutize the path
 		co::OS::makeAbs( dirPath );
 
+		if( !co::OS::isDir( dirPath ) )
+		{
+			co::debug( co::Dbg_Warning, "cannot add '%s' to the Coral path (not a dir)", dirPath.c_str() );
+			continue;
+		}
+
 		/*
 			Check whether the dir is not in the CORAL_PATH already.
 			This makes addPath() quadratic (what should never be a problem).
@@ -159,4 +165,14 @@ co::Interface* co::getServiceForType( co::InterfaceType* serviceType, co::Interf
 co::Interface* co::getServiceForInstance( co::InterfaceType* serviceType, co::Interface* clientInstance )
 {
 	return getServices()->getServiceForInstance( serviceType, clientInstance );
+}
+
+bool co::findModuleFile( const std::string& moduleName, const std::string& fileName, std::string& filePath )
+{
+	std::string modulePath( moduleName );
+	co::OS::convertDotsToDirSeps( modulePath );
+	return co::OS::searchFile3( co::getPaths(),
+				co::ArrayRange<const std::string>( &modulePath, 1 ),
+				co::ArrayRange<const std::string>( &fileName, 1 ),
+				filePath );
 }
