@@ -12,7 +12,7 @@
 TEST( SystemTests, coralPathDirsAreUnique )
 {
 	co::ArrayRange<const std::string> pathsA = co::getPaths();
-	ASSERT_GT( pathsA.getSize(), 0 );
+	ASSERT_GT( pathsA.getSize(), static_cast<size_t>( 0 ) );
 
 	// adding the same dirs again shouldn't change the CORAL_PATH
 	std::string morePaths;
