@@ -261,8 +261,13 @@ MACRO( CORAL_MODULE_TARGET_PROPERTIES moduleName )
 	IF( XCODE_VERSION OR MSVC_IDE )
 		# Copy the library after linking (makes sense for IDE's that create intermediate dirs)
 		FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/modules/${moduleName} )
+		IF( XCODE_VERSION )
+			SET( targetFileName "$(FULL_PRODUCT_NAME)" )
+		ELSE()
+			SET( targetFileName "$(TargetFileName)" ) # MSVC_IDE
+		ENDIF()
 		ADD_CUSTOM_COMMAND( TARGET ${moduleName} POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/*${CMAKE_SHARED_MODULE_SUFFIX}" ${CMAKE_BINARY_DIR}/modules/${moduleName}/
+			COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/${targetFileName}" ${CMAKE_BINARY_DIR}/modules/${moduleName}/
 			COMMENT "Copying module '${moduleName}'..."
 		)
 	ELSE()
