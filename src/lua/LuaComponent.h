@@ -56,7 +56,7 @@ private:
 	co::Interface* getDynamicInterface( co::InterfaceInfo* itfInfo );
 	void bindToDynamicReceptacle( co::InterfaceInfo* receptacle, co::Interface* instance );
 
-	void raiseUnsupportedOperationException();
+	void raiseNotSupportedException();
 
 private:
 	// co.ComponentType that describes this Lua Component

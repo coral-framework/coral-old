@@ -83,7 +83,7 @@ public:
 		TypeId_TypeLoadException,
 		TypeId_TypeManager,
 		TypeId_TypeManagerComponent,
-		TypeId_UnsupportedOperationException,
+		TypeId_NotSupportedException,
 		TypeId_Uuid,
 		TypeCount
 	};
@@ -188,7 +188,7 @@ co::Reflector* __createTypeKindReflector();
 co::Reflector* __createTypeLoadExceptionReflector();
 co::Reflector* __createTypeManagerReflector();
 co::Reflector* __createTypeManagerComponentReflector();
-co::Reflector* __createUnsupportedOperationExceptionReflector();
+co::Reflector* __createNotSupportedExceptionReflector();
 co::Reflector* __createUuidReflector();
 
 } // namespace co

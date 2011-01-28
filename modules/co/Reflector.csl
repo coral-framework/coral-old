@@ -16,7 +16,7 @@ interface Reflector
 			Constructs an instance of a struct or native class in the specified memory area.
 			\param[in] address memory address where the instance is to be constructed.
 			\param[in] length number of bytes (starting at \a address) reserved for the instance.
-			\throw UnsupportedOperationException if \a type is neither a StructType nor a NativeClassType.
+			\throw NotSupportedException if \a type is neither a StructType nor a NativeClassType.
 			\throw IllegalArgumentException if the passed \a length is not equal to the type's \a size.
 		 */
 		virtual void createValue( void* address, size_t length ) = 0;
@@ -32,16 +32,16 @@ interface Reflector
 			Destroys the struct or native class instance located at \a address.
 			The instance should have been constructed using createValue().
 			\warning Expect the worst if \a address does not point to an instance of this exact type.
-			\throw UnsupportedOperationException if \a type is neither a StructType nor a NativeClassType.
+			\throw NotSupportedException if \a type is neither a StructType nor a NativeClassType.
 		 */
 		virtual void destroyValue( void* address ) = 0;
 	c++>
 
 	/*
 		Instantiates a component.
-		\throw UnsupportedOperationException if \a type is not a ComponentType.
+		\throw NotSupportedException if \a type is not a ComponentType.
 	 */
-	Component newInstance() raises UnsupportedOperationException;
+	Component newInstance() raises NotSupportedException;
 
 	/*
 		Creates a proxy interface that forwards all calls to a given DynamicProxyHandler.
@@ -49,31 +49,31 @@ interface Reflector
 		A dynamic proxy is a lightweight interface instance (i.e. it is \e not a real component instance)
 		that forwards all its calls to a \a handler interface, or to the handler's component instance.
 
-		\throw UnsupportedOperationException if \a type is not an InterfaceType.
+		\throw NotSupportedException if \a type is not an InterfaceType.
 		\throw IllegalArgumentException if the passed \a handler is invalid (e.g. null).
 	 */
 	Interface newProxy( in DynamicProxyHandler handler )
-		raises UnsupportedOperationException, IllegalArgumentException;
+		raises NotSupportedException, IllegalArgumentException;
 
 	/*
 		Gets the current value of an attribute from a struct, interface or native class instance.
-		\throw UnsupportedOperationException if \a type is not an AttributeContainer.
+		\throw NotSupportedException if \a type is not an AttributeContainer.
 		\throw IllegalArgumentException if \a instance is not an instance of \a type, or if the
 			attribute \a ai does not belong to this type.
 	 */
 	void getAttribute( in any instance, in AttributeInfo ai, out any value )
-		raises UnsupportedOperationException, IllegalArgumentException;
+		raises NotSupportedException, IllegalArgumentException;
 
 	/*
 		Sets the current value of an attribute in a struct, interface or native class instance.
-		\throw UnsupportedOperationException if \a type is not an AttributeContainer.
+		\throw NotSupportedException if \a type is not an AttributeContainer.
 		\throw IllegalArgumentException if \a instance is not an instance of \a type; if the
 			attribute \a ai does not belong to this type, or if it is read-only.
 		\throw IllegalCastException if \a value has no valid conversion to the actual attribute type.
 			Please refer to Any's documentation for more information about type conversion rules.
 	 */
 	void setAttribute( in any instance, in AttributeInfo ai, in any value )
-		raises UnsupportedOperationException, IllegalArgumentException, IllegalCastException;
+		raises NotSupportedException, IllegalArgumentException, IllegalCastException;
 
 	/*
 		Invokes a method from an interface or native class instance.
@@ -87,7 +87,7 @@ interface Reflector
 		you must \e always pass a Any at this parameter, even when the callee is a \a void
 		method (in this case, the \a returnValue parameter will return unmodified).
 
-		\throw UnsupportedOperationException if \a type is not a MethodContainer.
+		\throw NotSupportedException if \a type is not a MethodContainer.
 		\throw IllegalArgumentException if \a instance is not an instance of \a type, or if the
 			method \a mi does not belong to this type.
 		\throw MissingInputException if \a args contains fewer elements than the number of parameters
@@ -97,5 +97,5 @@ interface Reflector
 			about type conversion rules.
 	 */
 	void invokeMethod( in any instance, in MethodInfo mi, in any[] args, out any returnValue )
-		raises UnsupportedOperationException, IllegalArgumentException, MissingInputException, IllegalCastException;
+		raises NotSupportedException, IllegalArgumentException, MissingInputException, IllegalCastException;
 };

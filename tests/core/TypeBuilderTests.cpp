@@ -24,7 +24,7 @@
 #include <co/IllegalNameException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
-#include <co/UnsupportedOperationException.h>
+#include <co/NotSupportedException.h>
 
 #include <gtest/gtest.h>
 
@@ -107,12 +107,12 @@ TEST( TypeBuilderTests, componentInvalidDefinitions )
 	co::InterfaceType* testInterfaceType = dynamic_cast<co::InterfaceType*>( auxbuilder->createType() );
 
 	// invalid component class definition
-	EXPECT_THROW( cbuilder->defineIdentifier( "identifier" ), co::UnsupportedOperationException );
-	EXPECT_THROW( cbuilder->defineAttribute( "attributeName", anyType, false ), co::UnsupportedOperationException );
-	EXPECT_THROW( cbuilder->defineSuperType( testInterfaceType ), co::UnsupportedOperationException );
+	EXPECT_THROW( cbuilder->defineIdentifier( "identifier" ), co::NotSupportedException );
+	EXPECT_THROW( cbuilder->defineAttribute( "attributeName", anyType, false ), co::NotSupportedException );
+	EXPECT_THROW( cbuilder->defineSuperType( testInterfaceType ), co::NotSupportedException );
 	EXPECT_THROW( cbuilder->defineInterface( "testIntMember", NULL, false ), co::IllegalArgumentException );
-	EXPECT_THROW( cbuilder->defineMethod( "testMethod" ), co::UnsupportedOperationException );
-	EXPECT_THROW( cbuilder->defineNativeClass( "testHeader", "testName" ), co::UnsupportedOperationException );
+	EXPECT_THROW( cbuilder->defineMethod( "testMethod" ), co::NotSupportedException );
+	EXPECT_THROW( cbuilder->defineNativeClass( "testHeader", "testName" ), co::NotSupportedException );
 
 	EXPECT_NO_THROW( tct->rollback() );
 }
@@ -223,8 +223,8 @@ TEST( TypeBuilderTests, enumInvalidDefinition )
 	co::InterfaceType* testInterfaceType = dynamic_cast<co::InterfaceType*>( auxbuilder->createType() );
 
 	EXPECT_THROW( ebuilder->defineIdentifier( "3identifier" ), co::IllegalNameException );
-	EXPECT_THROW( ebuilder->defineAttribute( "attributeName", anyType, false ), co::UnsupportedOperationException );
-	EXPECT_THROW( ebuilder->defineSuperType( testInterfaceType ), co::UnsupportedOperationException );
+	EXPECT_THROW( ebuilder->defineAttribute( "attributeName", anyType, false ), co::NotSupportedException );
+	EXPECT_THROW( ebuilder->defineSuperType( testInterfaceType ), co::NotSupportedException );
 
 	EXPECT_NO_THROW( tct->rollback() );
 }
@@ -341,7 +341,7 @@ TEST( TypeBuilderTests, exceptionsAfterCreation )
 	EXPECT_NO_THROW( builder->createType() );
 
 	// after the creation of the type, no changes can be made to the typeBuilder.
-	EXPECT_THROW( builder->defineAttribute( "fullName", TestHelper::type( "string" ), false ), co::UnsupportedOperationException );
+	EXPECT_THROW( builder->defineAttribute( "fullName", TestHelper::type( "string" ), false ), co::NotSupportedException );
 
 	EXPECT_NO_THROW( tct->commit() );
 }
@@ -363,13 +363,13 @@ TEST( TypeBuilderTests, interfaceInvalidDefinition )
 	co::InterfaceType* testInterfaceType = dynamic_cast<co::InterfaceType*>( auxbuilder->createType() );
 
 	// invalid interface definitions
-	EXPECT_THROW( ibuilder->defineIdentifier( "identifier" ), co::UnsupportedOperationException );
+	EXPECT_THROW( ibuilder->defineIdentifier( "identifier" ), co::NotSupportedException );
 	EXPECT_THROW( ibuilder->defineAttribute( "2attributeName", anyType, false ), co::IllegalNameException );
 	EXPECT_THROW( ibuilder->defineSuperType( NULL ), co::IllegalArgumentException );
-	EXPECT_THROW( ibuilder->defineInterface( "testIntMember", testInterfaceType, false ), co::UnsupportedOperationException );
+	EXPECT_THROW( ibuilder->defineInterface( "testIntMember", testInterfaceType, false ), co::NotSupportedException );
 	EXPECT_THROW( ibuilder->defineMethod( "$testMethod" ), co::IllegalNameException );
 	EXPECT_THROW( ibuilder->defineMethod( "" ), co::IllegalNameException );
-	EXPECT_THROW( ibuilder->defineNativeClass( "testHeader", "testName" ), co::UnsupportedOperationException );
+	EXPECT_THROW( ibuilder->defineNativeClass( "testHeader", "testName" ), co::NotSupportedException );
 
 	EXPECT_NO_THROW( tct->rollback() );
 }
@@ -464,10 +464,10 @@ TEST( TypeBuilderTests, nativeClassInvalidDefinitions )
 	co::InterfaceType* testInterfaceType = dynamic_cast<co::InterfaceType*>( auxbuilder->createType() );
 
 	// invalid native class definition
-	EXPECT_THROW( nbuilder->defineIdentifier( "identifier" ), co::UnsupportedOperationException );
+	EXPECT_THROW( nbuilder->defineIdentifier( "identifier" ), co::NotSupportedException );
 	EXPECT_THROW( nbuilder->defineAttribute( "0_attributeName", anyType, false ), co::IllegalNameException );
-	EXPECT_THROW( nbuilder->defineSuperType( testInterfaceType ), co::UnsupportedOperationException );
-	EXPECT_THROW( nbuilder->defineInterface( "testIntMember", testInterfaceType, false ), co::UnsupportedOperationException );
+	EXPECT_THROW( nbuilder->defineSuperType( testInterfaceType ), co::NotSupportedException );
+	EXPECT_THROW( nbuilder->defineInterface( "testIntMember", testInterfaceType, false ), co::NotSupportedException );
 	EXPECT_THROW( nbuilder->defineMethod( "" ), co::IllegalNameException );
 	EXPECT_THROW( nbuilder->defineNativeClass( "header", "" ), co::IllegalArgumentException );
 
@@ -555,12 +555,12 @@ TEST( TypeBuilderTests, structInvalidDefinition )
 	co::InterfaceType* testInterfaceType = dynamic_cast<co::InterfaceType*>( auxbuilder->createType() );
 
 	// invalid struct definitions
-	EXPECT_THROW( sbuilder->defineIdentifier( "identifier" ), co::UnsupportedOperationException );
+	EXPECT_THROW( sbuilder->defineIdentifier( "identifier" ), co::NotSupportedException );
 	EXPECT_THROW( sbuilder->defineAttribute( "1attributeName", anyType, false ), co::IllegalNameException );
-	EXPECT_THROW( sbuilder->defineSuperType( testInterfaceType ), co::UnsupportedOperationException );
-	EXPECT_THROW( sbuilder->defineInterface( "testIntMember", testInterfaceType, false ), co::UnsupportedOperationException );
-	EXPECT_THROW( sbuilder->defineMethod( "testMethod" ), co::UnsupportedOperationException );
-	EXPECT_THROW( sbuilder->defineNativeClass( "testHeader", "testName" ), co::UnsupportedOperationException );
+	EXPECT_THROW( sbuilder->defineSuperType( testInterfaceType ), co::NotSupportedException );
+	EXPECT_THROW( sbuilder->defineInterface( "testIntMember", testInterfaceType, false ), co::NotSupportedException );
+	EXPECT_THROW( sbuilder->defineMethod( "testMethod" ), co::NotSupportedException );
+	EXPECT_THROW( sbuilder->defineNativeClass( "testHeader", "testName" ), co::NotSupportedException );
 
 	EXPECT_NO_THROW( tct->rollback() );
 }

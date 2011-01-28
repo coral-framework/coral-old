@@ -20,7 +20,7 @@
 #include <co/MissingInputException.h>
 #include <co/TypeCreationTransaction.h>
 #include <co/IllegalArgumentException.h>
-#include <co/UnsupportedOperationException.h>
+#include <co/NotSupportedException.h>
 #include <gtest/gtest.h>
 
 TEST( ReflectorTests, basicTypes )
@@ -55,13 +55,13 @@ TEST( ReflectorTests, basicTypes )
 		EXPECT_EQ( types[i], reflector->getType() );
 		EXPECT_GT( reflector->getSize(), 0 );
 
-		EXPECT_THROW( reflector->createValue( NULL, 0 ), co::UnsupportedOperationException );
-		EXPECT_THROW( reflector->destroyValue( NULL ), co::UnsupportedOperationException );
-		EXPECT_THROW( reflector->newInstance(), co::UnsupportedOperationException );
-		EXPECT_THROW( reflector->newProxy( NULL ), co::UnsupportedOperationException );
-		EXPECT_THROW( reflector->getAttribute( any, NULL, any ), co::UnsupportedOperationException );
-		EXPECT_THROW( reflector->setAttribute( any, NULL, any ), co::UnsupportedOperationException );
-		EXPECT_THROW( reflector->invokeMethod( any, NULL, anyRange, any ), co::UnsupportedOperationException );
+		EXPECT_THROW( reflector->createValue( NULL, 0 ), co::NotSupportedException );
+		EXPECT_THROW( reflector->destroyValue( NULL ), co::NotSupportedException );
+		EXPECT_THROW( reflector->newInstance(), co::NotSupportedException );
+		EXPECT_THROW( reflector->newProxy( NULL ), co::NotSupportedException );
+		EXPECT_THROW( reflector->getAttribute( any, NULL, any ), co::NotSupportedException );
+		EXPECT_THROW( reflector->setAttribute( any, NULL, any ), co::NotSupportedException );
+		EXPECT_THROW( reflector->invokeMethod( any, NULL, anyRange, any ), co::NotSupportedException );
 	}
 }
 

@@ -14,7 +14,7 @@
 #include <co/IllegalNameException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
-#include <co/UnsupportedOperationException.h>
+#include <co/NotSupportedException.h>
 
 #include <gtest/gtest.h>
 
@@ -67,7 +67,7 @@ TEST( NamespaceTests, defineType )
 	EXPECT_THROW( transaction->commit(), co::MissingInputException );
 
 	EXPECT_NO_THROW( tb = rootNS->defineType( "missingInput2", co::TK_STRUCT, transaction.get() ) );
-	EXPECT_THROW( transaction->commit(), co::UnsupportedOperationException );
+	EXPECT_THROW( transaction->commit(), co::NotSupportedException );
 
 	EXPECT_NO_THROW( tb = rootNS->defineType( "missingInput3", co::TK_NATIVECLASS, transaction.get() ) );
 	EXPECT_NO_THROW( tb = rootNS->defineType( "missingInput4", co::TK_INTERFACE, transaction.get() ) );

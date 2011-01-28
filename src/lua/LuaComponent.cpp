@@ -9,7 +9,7 @@
 #include <co/ParameterInfo.h>
 #include <co/AttributeInfo.h>
 #include <co/InterfaceInfo.h>
-#include <co/UnsupportedOperationException.h>
+#include <co/NotSupportedException.h>
 #include <lua/Exception.h>
 #include <cctype>
 #include <cassert>
@@ -271,17 +271,17 @@ co::Type* LuaComponent::getType()
 
 void LuaComponent::createValue( void*, size_t )
 {
-	raiseUnsupportedOperationException();
+	raiseNotSupportedException();
 }
 
 void LuaComponent::copyValue( const void*, void* )
 {
-	raiseUnsupportedOperationException();
+	raiseNotSupportedException();
 }
 
 void LuaComponent::destroyValue( void* )
 {
-	raiseUnsupportedOperationException();
+	raiseNotSupportedException();
 }
 
 co::Component* LuaComponent::newInstance()
@@ -311,23 +311,23 @@ co::Component* LuaComponent::newInstance()
 
 co::Interface* LuaComponent::newProxy( co::DynamicProxyHandler* )
 {
-	raiseUnsupportedOperationException();
+	raiseNotSupportedException();
 	return NULL;
 }
 
 void LuaComponent::getAttribute( const co::Any&, co::AttributeInfo*, co::Any& )
 {
-	raiseUnsupportedOperationException();
+	raiseNotSupportedException();
 }
 
 void LuaComponent::setAttribute( const co::Any&, co::AttributeInfo*, const co::Any& )
 {
-	raiseUnsupportedOperationException();
+	raiseNotSupportedException();
 }
 
 void LuaComponent::invokeMethod( const co::Any&, co::MethodInfo*, co::ArrayRange<co::Any const>, co::Any& )
 {
-	raiseUnsupportedOperationException();
+	raiseNotSupportedException();
 }
 
 co::Interface* LuaComponent::getDynamicInterface( co::InterfaceInfo* itfInfo )
@@ -376,9 +376,9 @@ void LuaComponent::bindToDynamicReceptacle( co::InterfaceInfo* receptacle, co::I
 	__END_LUA_API_CODE__
 }
 
-void LuaComponent::raiseUnsupportedOperationException()
+void LuaComponent::raiseNotSupportedException()
 {
-	throw co::UnsupportedOperationException( "operation not supported by this reflector" );
+	throw co::NotSupportedException( "operation not supported by this reflector" );
 }
 
 CORAL_EXPORT_COMPONENT( LuaComponent, Component );

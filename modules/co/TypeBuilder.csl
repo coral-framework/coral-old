@@ -15,62 +15,62 @@ interface TypeBuilder
 	/*
 		Adds an identifier to an EnumType.
 		\note Values are assigned implicitly: the first defined identifier is zero, and so forth.
-		\throw UnsupportedOperationException if the builder's kind is not TK_ENUM or if the type was already created.
+		\throw NotSupportedException if the builder's kind is not TK_ENUM or if the type was already created.
 		\throw IllegalNameException if the passed \a name is not a valid identifier or clashes with other members.
 	 */
 	void defineIdentifier( in string name )
-		raises UnsupportedOperationException, IllegalNameException;
+		raises NotSupportedException, IllegalNameException;
 
 	/*
 		Adds an attribute to a StructType, NativeClassType or InterfaceType.
-		\throw UnsupportedOperationException if the builder's kind is neither TK_STRUCT, TK_NATIVECLASS nor TK_INTERFACE or if the type was already created.
+		\throw NotSupportedException if the builder's kind is neither TK_STRUCT, TK_NATIVECLASS nor TK_INTERFACE or if the type was already created.
 		\throw IllegalNameException if the passed \a name is not a valid identifier.
 		\throw IllegalArgumentException if the passed \a type is invalid (e.g. null or the type is a component or exception) or
 			   if the passed \a isReadOnly modifier is \a true and the builder's kind is TK_STRUCT (structs are always writable).
 		\throw IllegalNameException  if the passed \a name clashes with other members.
 	 */
 	void defineAttribute( in string name, in Type type, in bool isReadOnly )
-		raises UnsupportedOperationException, IllegalNameException, IllegalArgumentException;
+		raises NotSupportedException, IllegalNameException, IllegalArgumentException;
 
 	/*
 		Adds a parent interface to an InterfaceType.
-		\throw UnsupportedOperationException if the builder's kind is not TK_INTERFACE or if the type was already created.
+		\throw NotSupportedException if the builder's kind is not TK_INTERFACE or if the type was already created.
 		\throw IllegalArgumentException if the passed \a superType is invalid (e.g. not an InterfaceType) or already a super interface.
 	 */
 	void defineSuperType( in Type superType )
-		raises UnsupportedOperationException, IllegalArgumentException;
+		raises NotSupportedException, IllegalArgumentException;
 
 	/*
 		Adds an interface to a ComponentType.
-		\throw UnsupportedOperationException if the builder's kind is not TK_COMPONENT or if the type was already created.
+		\throw NotSupportedException if the builder's kind is not TK_COMPONENT or if the type was already created.
 		\throw IllegalNameException if the passed \a name is not a valid identifier or clashes with other members.
 		\throw IllegalArgumentException if the passed \a interfaceType is invalid (e.g. null).
 	 */
 	void defineInterface( in string name, in InterfaceType interfaceType, in bool isFacet )
-		raises UnsupportedOperationException, IllegalNameException, IllegalArgumentException;
+		raises NotSupportedException, IllegalNameException, IllegalArgumentException;
 
 	/*
 		Adds a method to a NativeClassType or InterfaceType.
 		\note The method is only really added when MethodBuilder::createMethod() is called.
-		\throw UnsupportedOperationException if the builder's kind is neither TK_NATIVECLASS nor TK_INTERFACE or if the type was already created.
+		\throw NotSupportedException if the builder's kind is neither TK_NATIVECLASS nor TK_INTERFACE or if the type was already created.
 		\throw IllegalNameException if the passed \a name is not a valid identifier.
 		\throw IllegalNameException  if the passed \a name clashes with other members.
 	 */
 	MethodBuilder defineMethod( in string name )
-		raises UnsupportedOperationException, IllegalNameException;
+		raises NotSupportedException, IllegalNameException;
 
 	/*
 		Defines the parameters to create a NativeClassType.
-		\throw UnsupportedOperationException if the builder's kind is not TK_NATIVECLASS or if the type was already created.
+		\throw NotSupportedException if the builder's kind is not TK_NATIVECLASS or if the type was already created.
 		\throw IllegalArgumentException if the passed \a nativeHeaderFile or \a nativeName parameters are empty.
 	 */
 	void defineNativeClass( in string nativeHeaderFile,  in string nativeName )
-		raises UnsupportedOperationException, IllegalNameException;
+		raises NotSupportedException, IllegalNameException;
 
 	/*
 		Fills the Type with all the definitions set and returns it.
 		This method should be called only once and after all definitions have been set.
-		\throw UnsupportedOperationException if the type is already created.
+		\throw NotSupportedException if the type is already created.
 		\throw MissingInputException if not all required definitions were set for this builder's type kind.
 	 */
 	Type createType() raises MissingInputException;

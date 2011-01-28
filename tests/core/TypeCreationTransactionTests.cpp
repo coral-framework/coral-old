@@ -13,7 +13,7 @@
 #include <co/TypeBuilder.h>
 #include <co/TypeManager.h>
 #include <co/MissingInputException.h>
-#include <co/UnsupportedOperationException.h>
+#include <co/NotSupportedException.h>
 
 #include <gtest/gtest.h>
 
@@ -27,8 +27,8 @@ TEST( TypeCreationTransactionTests, throwOnCommitAfterSuccessfullCommit )
 	EXPECT_NO_THROW( transaction->commit() );
 
 	// cannot commit nor rollback
-	EXPECT_THROW( transaction->commit(), co::UnsupportedOperationException );
-	EXPECT_THROW( transaction->rollback(), co::UnsupportedOperationException );
+	EXPECT_THROW( transaction->commit(), co::NotSupportedException );
+	EXPECT_THROW( transaction->rollback(), co::NotSupportedException );
 }
 
 TEST( TypeCreationTransactionTests, throwOnCommitAfterUnsuccessfullCommit )
@@ -43,7 +43,7 @@ TEST( TypeCreationTransactionTests, throwOnCommitAfterUnsuccessfullCommit )
 	builder->defineIdentifier( "foo" );
 
 	// cannot commit again even if the las commit was unsuccessful and the builder was corrected
-	EXPECT_THROW( transaction->commit(), co::UnsupportedOperationException );
+	EXPECT_THROW( transaction->commit(), co::NotSupportedException );
 	EXPECT_NO_THROW( transaction->rollback() );
 }
 

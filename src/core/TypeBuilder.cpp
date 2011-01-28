@@ -22,7 +22,7 @@
 #include <co/IllegalNameException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
-#include <co/UnsupportedOperationException.h>
+#include <co/NotSupportedException.h>
 #include <co/reserved/LexicalUtils.h>
 #include <algorithm>
 #include <sstream>
@@ -55,7 +55,7 @@ void TypeBuilder::destroyType()
 
 void TypeBuilder::addMethod( co::MethodInfo* )
 {
-	CORAL_THROW( co::UnsupportedOperationException, "the typeBuilder's kind is neither TK_NATIVECLASS nor TK_INTERFACE" );
+	CORAL_THROW( co::NotSupportedException, "the typeBuilder's kind is neither TK_NATIVECLASS nor TK_INTERFACE" );
 }
 
 co::Namespace* TypeBuilder::getNamespace()
@@ -75,32 +75,32 @@ const std::string& TypeBuilder::getTypeName()
 
 void TypeBuilder::defineIdentifier(  const std::string& )
 {
-	CORAL_THROW( co::UnsupportedOperationException, "the typeBuilder's kind is not TK_ENUM" );
+	CORAL_THROW( co::NotSupportedException, "the typeBuilder's kind is not TK_ENUM" );
 }
 
 void TypeBuilder::defineAttribute( const std::string&, co::Type*, bool )
 {
-	CORAL_THROW( co::UnsupportedOperationException, "the typeBuilder's kind is neither TK_STRUCT, TK_NATIVECLASS nor TK_INTERFACE" );
+	CORAL_THROW( co::NotSupportedException, "the typeBuilder's kind is neither TK_STRUCT, TK_NATIVECLASS nor TK_INTERFACE" );
 }
 
 void TypeBuilder::defineSuperType( co::Type* )
 {
-	CORAL_THROW( co::UnsupportedOperationException, "the typeBuilder's kind is not TK_INTERFACE" );
+	CORAL_THROW( co::NotSupportedException, "the typeBuilder's kind is not TK_INTERFACE" );
 }
 
 void TypeBuilder::defineInterface( const std::string&, co::InterfaceType*, bool )
 {
-	CORAL_THROW( co::UnsupportedOperationException, "the typeBuilder's kind is not TK_COMPONENT" );
+	CORAL_THROW( co::NotSupportedException, "the typeBuilder's kind is not TK_COMPONENT" );
 }
 
 co::MethodBuilder* TypeBuilder::defineMethod( const std::string& )
 {
-	CORAL_THROW( co::UnsupportedOperationException, "the typeBuilder's kind is neither TK_NATIVECLASS nor TK_INTERFACE" );
+	CORAL_THROW( co::NotSupportedException, "the typeBuilder's kind is neither TK_NATIVECLASS nor TK_INTERFACE" );
 }
 
 void TypeBuilder::defineNativeClass( const std::string&, const std::string& )
 {
-	CORAL_THROW( co::UnsupportedOperationException, "the typeBuilder's kind is not TK_NATIVECLASS" );
+	CORAL_THROW( co::NotSupportedException, "the typeBuilder's kind is not TK_NATIVECLASS" );
 }
 
 co::Type* TypeBuilder::createType()
@@ -139,7 +139,7 @@ void TypeBuilder::initialize( co::Namespace* ns, const std::string& name )
 void TypeBuilder::assertNotCreated()
 {
 	if( _typeWasCreated )
-		CORAL_THROW( co::UnsupportedOperationException, "type was already created" );
+		CORAL_THROW( co::NotSupportedException, "type was already created" );
 }
 
 // ------ EnumTypeBuilder -----------------------------------------------------
@@ -322,7 +322,7 @@ public:
 	void addMethod( co::MethodInfo* methodInfo )
 	{
 		if( _typeWasCreated )
-			CORAL_THROW( co::UnsupportedOperationException, "illegal to add a method after a type is created" );
+			CORAL_THROW( co::NotSupportedException, "illegal to add a method after a type is created" );
 		_methods.push_back( methodInfo );
 	}
 
@@ -480,7 +480,7 @@ public:
 		for( co::ArrayRange<co::InterfaceType* const> r( _superTypes ); r; r.popFirst() )
 		{
 			if( r.getFirst() == superType )
-				CORAL_THROW( co::UnsupportedOperationException,
+				CORAL_THROW( co::NotSupportedException,
 								"cannot inherit twice from '" << superType->getFullName() << "'" );
 		}
 
@@ -605,7 +605,7 @@ public:
 private:
 	void raiseNoTypeBuilderException()
 	{
-		throw co::UnsupportedOperationException( "" );
+		throw co::NotSupportedException( "" );
 	}
 };
 

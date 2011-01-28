@@ -1,2 +1,2 @@
 // Raised to indicate that the requested operation is not supported.
-exception UnsupportedOperationException;
+exception NotSupportedException;

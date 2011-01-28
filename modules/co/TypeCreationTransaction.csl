@@ -14,13 +14,13 @@ interface TypeCreationTransaction
 
 		\throw MissingInputException if any type is missing required input.
 		\throw SemanticException if one or more of the types contain semantic errors (e.g. cyclic inheritance).
-		\throw UnsupportedOperationException if a commit was already attempted, or if the transaction was rolled back.
+		\throw NotSupportedException if a commit was already attempted, or if the transaction was rolled back.
 	 */
-	void commit() raises MissingInputException, UnsupportedOperationException;
+	void commit() raises MissingInputException, NotSupportedException;
 
 	/*
 		Destroys and removes all references to partially created types associated with this transaction.
-		\throw UnsupportedOperationException if the transaction is already dead (i.e. committed or rolled back).
+		\throw NotSupportedException if the transaction is already dead (i.e. committed or rolled back).
 	 */
 	void rollback();
 };

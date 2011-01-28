@@ -14,7 +14,7 @@
 #include <co/IllegalNameException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
-#include <co/UnsupportedOperationException.h>
+#include <co/NotSupportedException.h>
 #include <co/reserved/LexicalUtils.h>
 #include <sstream>
 
@@ -49,7 +49,7 @@ const std::string& MethodBuilder::getMethodName()
 void MethodBuilder::defineReturnType( co::Type* type )
 {
 	if( _returnType )
-		CORAL_THROW( co::UnsupportedOperationException, "return type defined twice" );
+		CORAL_THROW( co::NotSupportedException, "return type defined twice" );
 
 	if( !type )
 		CORAL_THROW( co::IllegalArgumentException, "illegal null return type" );

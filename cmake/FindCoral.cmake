@@ -218,11 +218,6 @@ MACRO( CORAL_DEFAULT_TARGET_PROPERTIES targetName )
 	SET_PROPERTY( TARGET ${targetName} APPEND PROPERTY COMPILE_DEFINITIONS_RELWITHDEBINFO "NDEBUG" )
 
 	IF( WIN32 )
-		# Prevent the MSVC IDE from creating targets in "Debug"/"Release" subdirs
-		IF( MSVC_IDE )
-			SET_TARGET_PROPERTIES( ${targetName} PROPERTIES PREFIX "../" )
-		ENDIF()
-
 		# Generate executables in /bin and shared libs (but not module libs) in /lib
 		GET_TARGET_PROPERTY( _targetType ${targetName} TYPE )
 		IF( NOT _targetType STREQUAL "MODULE_LIBRARY" )
@@ -263,11 +258,11 @@ ENDMACRO( CORAL_DEFAULT_TARGET_PROPERTIES )
 MACRO( CORAL_MODULE_TARGET_PROPERTIES moduleName )
 
 	# Copy or generate the module library into /modules/${moduleName}/
-	IF( XCODE_VERSION )
+	IF( XCODE_VERSION OR MSVC_IDE )
 		# Copy the library after linking (makes sense for IDE's that create intermediate dirs)
 		FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/modules/${moduleName} )
 		ADD_CUSTOM_COMMAND( TARGET ${moduleName} POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy "$(CONFIGURATION_BUILD_DIR)/$(FULL_PRODUCT_NAME)" ${CMAKE_BINARY_DIR}/modules/${moduleName}/
+			COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/*${CMAKE_SHARED_MODULE_SUFFIX}" ${CMAKE_BINARY_DIR}/modules/${moduleName}/
 			COMMENT "Copying module '${moduleName}'..."
 		)
 	ELSE()

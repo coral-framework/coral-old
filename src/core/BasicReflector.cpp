@@ -6,7 +6,7 @@
 #include "BasicReflector.h"
 #include <co/Any.h>
 #include <co/Type.h>
-#include <co/UnsupportedOperationException.h>
+#include <co/NotSupportedException.h>
 
 BasicReflector::BasicReflector( co::Type* type ) : _type( type )
 {
@@ -57,7 +57,7 @@ co::int32 BasicReflector::getSize()
 co::Component* BasicReflector::newInstance()
 {
 	if( _type->getKind() == co::TK_COMPONENT )
-		throw co::UnsupportedOperationException( "cannot instantiate an internal component" );
+		throw co::NotSupportedException( "cannot instantiate an internal component" );
 
 	return ReflectorBase::newInstance();
 }

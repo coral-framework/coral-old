@@ -10,7 +10,7 @@
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
-#include <co/UnsupportedOperationException.h>
+#include <co/NotSupportedException.h>
 #include <sstream>
 
 namespace co {
@@ -83,44 +83,44 @@ void ReflectorBase::bindInterface( InterfaceInfo* receptacle, Interface* )
 
 void ReflectorBase::createValue( void*, size_t )
 {
-	raiseUnsupportedOperationException();
+	raiseNotSupportedException();
 }
 
 void ReflectorBase::copyValue( const void*, void* )
 {
-	raiseUnsupportedOperationException();
+	raiseNotSupportedException();
 }
 
 void ReflectorBase::destroyValue( void* )
 {
-	raiseUnsupportedOperationException();
+	raiseNotSupportedException();
 }
 
 Component* ReflectorBase::newInstance()
 {
-	raiseUnsupportedOperationException();
+	raiseNotSupportedException();
 	return NULL;
 }
 
 Interface* ReflectorBase::newProxy( DynamicProxyHandler* )
 {
-	raiseUnsupportedOperationException();
+	raiseNotSupportedException();
 	return NULL;
 }
 
 void ReflectorBase::getAttribute( const Any&, AttributeInfo*, Any& )
 {
-	raiseUnsupportedOperationException();
+	raiseNotSupportedException();
 }
 
 void ReflectorBase::setAttribute( const Any&, AttributeInfo*, const Any& )
 {
-	raiseUnsupportedOperationException();
+	raiseNotSupportedException();
 }
 
 void ReflectorBase::invokeMethod( const Any&, MethodInfo*, ArrayRange<Any const>, Any& )
 {
-	raiseUnsupportedOperationException();
+	raiseNotSupportedException();
 }
 
 void ReflectorBase::checkValidSize( size_t expectedSize, size_t actualSize )
@@ -164,9 +164,9 @@ void ReflectorBase::raiseUnexpectedMemberIndex()
 	throw co::IllegalArgumentException( "unexpected invalid member index" );
 }
 
-void ReflectorBase::raiseUnsupportedOperationException()
+void ReflectorBase::raiseNotSupportedException()
 {
-	throw co::UnsupportedOperationException( "operation not supported by this reflector" );
+	throw co::NotSupportedException( "operation not supported by this reflector" );
 }
 
 

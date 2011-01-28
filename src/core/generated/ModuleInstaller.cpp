@@ -122,7 +122,7 @@ co::Reflector* co::ModuleInstaller::createReflector( TypeId typeId )
 	case TypeId_TypeLoadException: res = co::__createTypeLoadExceptionReflector(); break;
 	case TypeId_TypeManager: res = co::__createTypeManagerReflector(); break;
 	case TypeId_TypeManagerComponent: res = co::__createTypeManagerComponentReflector(); break;
-	case TypeId_UnsupportedOperationException: res = co::__createUnsupportedOperationExceptionReflector(); break;
+	case TypeId_NotSupportedException: res = co::__createNotSupportedExceptionReflector(); break;
 	case TypeId_Uuid: res = co::__createUuidReflector(); break;
 	default: assert( false );
 	};

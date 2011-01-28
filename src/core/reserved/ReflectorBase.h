@@ -90,8 +90,8 @@ protected:
 	 */
 	void raiseUnexpectedMemberIndex();
 
-	//! Raises co::UnsupportedOperationException, e.g. for unimplemented methods.
-	void raiseUnsupportedOperationException();
+	//! Raises co::NotSupportedException, e.g. for unimplemented methods.
+	void raiseNotSupportedException();
 };
 
 } // namespace co

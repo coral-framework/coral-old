@@ -37,8 +37,8 @@ local function template( writer, c, t )
 		includeIfNotIncluded( "co.IllegalArgumentException" )
 	end
 
-	if t.fullName == 'co.Reflector' and not requiredTypes["co.UnsupportedOperationException"] then
-		writer( "#include <co/UnsupportedOperationException.h>\n" )
+	if t.fullName == 'co.Reflector' and not requiredTypes["co.NotSupportedException"] then
+		writer( "#include <co/NotSupportedException.h>\n" )
 	end
 
 	writer( "#include <co/reserved/ReflectorBase.h>\n" )
@@ -177,17 +177,17 @@ public:
 
 	void createValue( void*, size_t )
 	{
-		throw co::UnsupportedOperationException( "co::Reflector::createValue() cannot be called through a proxy interface." );
+		throw co::NotSupportedException( "co::Reflector::createValue() cannot be called through a proxy interface." );
 	}
 
 	void copyValue( const void*, void* )
 	{
-		throw co::UnsupportedOperationException( "co::Reflector::copyValue() cannot be called through a proxy interface." );
+		throw co::NotSupportedException( "co::Reflector::copyValue() cannot be called through a proxy interface." );
 	}
 
 	void destroyValue( void* )
 	{
-		throw co::UnsupportedOperationException( "co::Reflector::destroyValue() cannot be called through a proxy interface." );
+		throw co::NotSupportedException( "co::Reflector::destroyValue() cannot be called through a proxy interface." );
 	}
 
 ]]

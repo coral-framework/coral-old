@@ -11,7 +11,7 @@
 #include <co/Coral.h>
 #include <co/System.h>
 #include <co/MissingInputException.h>
-#include <co/UnsupportedOperationException.h>
+#include <co/NotSupportedException.h>
 #include <sstream>
 #include <iostream>
 
@@ -24,7 +24,7 @@ TypeCreationTransaction::TypeCreationTransaction()
 		co::debug( co::Dbg_Fatal, "Attempt to instantiate a co::TypeCreationTransaction while another "
 			"instance is active. Concurrent type creation is unsafe and disallowed in this Coral version." );
 
-		CORAL_THROW( co::UnsupportedOperationException,
+		CORAL_THROW( co::NotSupportedException,
 			"Only a single co::TypeCreationTransaction instance may exist at any moment in time" );
 	}
 
@@ -62,7 +62,7 @@ void TypeCreationTransaction::commit()
 			msg = "the transaction was already committed";
 		else
 			msg = "the transaction was already rolled back";		
-		CORAL_THROW( co::UnsupportedOperationException, msg );
+		CORAL_THROW( co::NotSupportedException, msg );
 	}
 
 	_commitAttempted = true;
@@ -93,7 +93,7 @@ void TypeCreationTransaction::commit()
 void TypeCreationTransaction::rollback()
 {
 	if( _commitSucceeded || _rolledBack )
-		CORAL_THROW( co::UnsupportedOperationException, "the transaction is already dead (e.g committed or rolled back)" );
+		CORAL_THROW( co::NotSupportedException, "the transaction is already dead (e.g committed or rolled back)" );
 
 	assert( sm_activeTransaction == this );
 	sm_activeTransaction = NULL;

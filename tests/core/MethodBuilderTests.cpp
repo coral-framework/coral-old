@@ -17,7 +17,7 @@
 #include <co/IllegalNameException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
-#include <co/UnsupportedOperationException.h>
+#include <co/NotSupportedException.h>
 
 #include <gtest/gtest.h>
 
@@ -85,5 +85,5 @@ TEST( MethodBuilderTests, theTest )
 
 	EXPECT_NO_THROW( tct->commit() );
 
-	EXPECT_THROW( mb->createMethod(), co::UnsupportedOperationException );
+	EXPECT_THROW( mb->createMethod(), co::NotSupportedException );
 }

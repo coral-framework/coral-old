@@ -12,7 +12,7 @@
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
-#include <co/UnsupportedOperationException.h>
+#include <co/NotSupportedException.h>
 #include <co/reserved/ReflectorBase.h>
 #include <sstream>
 #include <cassert>
@@ -107,17 +107,17 @@ public:
 
 	void createValue( void*, size_t )
 	{
-		throw co::UnsupportedOperationException( "co::Reflector::createValue() cannot be called through a proxy interface." );
+		throw co::NotSupportedException( "co::Reflector::createValue() cannot be called through a proxy interface." );
 	}
 
 	void copyValue( const void*, void* )
 	{
-		throw co::UnsupportedOperationException( "co::Reflector::copyValue() cannot be called through a proxy interface." );
+		throw co::NotSupportedException( "co::Reflector::copyValue() cannot be called through a proxy interface." );
 	}
 
 	void destroyValue( void* )
 	{
-		throw co::UnsupportedOperationException( "co::Reflector::destroyValue() cannot be called through a proxy interface." );
+		throw co::NotSupportedException( "co::Reflector::destroyValue() cannot be called through a proxy interface." );
 	}
 
 protected:
