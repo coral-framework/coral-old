@@ -36,28 +36,26 @@ public:
 	static void dumpStack( lua_State* L );
 
 	/*!
-		Searches for a Lua script with the given 'name' in the CORAL_PATH.
-		Returns false if no script could be found.
+		Looks for a Lua script with the given \a name in the Coral path.
+		The search follows the same conventions used for locating Lua modules.
+		Returns false if there is no script with the given name.
 	 */
 	static bool findScript( lua_State*L, const std::string& name, std::string& filename );
-
-	//! Loads and runs the given file. On error, raises a lua::Exception.
-	static void doFile( lua_State* L, const std::string& filename );
-
-	//! Loads and runs the given string. On error, raises a lua::Exception.
-	static void doString( lua_State* L, const char* code );
 
 	//! Pushes a chunk loaded from a file. On error, raises a lua::Exception.
 	static void loadFile( lua_State* L, const std::string& filename );
 
-	//! Pushes a chunk loaded from a string. On error, raises a lua::Exception.
-	static void loadString( lua_State* L, const char* code );
+	/*!
+		Pushes the result of <tt>require( moduleName )</tt> in Lua.
+		\throw lua::Exception if \c require() signals an error.
+	 */
+	static void require( lua_State* L, const std::string& moduleName );
 
 	/*!
 		Calls a Lua function using the same conventions as lua_call().
 		On error, raises a lua::Exception.
 	 */
-	static void call( lua_State* L, co::int32 numArgs, co::int32 numResults );
+	static void call( lua_State* L, int numArgs, int numResults );
 
 	//! Pushes any Coral value onto the Lua stack.
 	//@{
@@ -88,12 +86,10 @@ public:
     LuaState();
 	virtual ~LuaState();
 
-	// These methods delegate calls to their static counterparts, with L = LuaState::getL().
 	bool findScript( const std::string& name, std::string& filename );
-	void loadFile( const std::string& filename );
-	void call( co::int32 numArgs, co::int32 numResults );
-	void push( const co::Any& var );
-	void getValue( co::int32 index, const co::Any& outputVar );
+
+	co::int32 callFunction( const std::string& moduleName, const std::string& functionName,
+								co::ArrayRange<const co::Any> args, co::ArrayRange<const co::Any> results );
 
 private:
 	template<typename BindingClass, typename InstanceType>

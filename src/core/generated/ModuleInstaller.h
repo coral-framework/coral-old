@@ -62,6 +62,7 @@ public:
 		TypeId_NativeClassType,
 		TypeId_NativeClassTypeComponent,
 		TypeId_NoSuchInterfaceException,
+		TypeId_NotSupportedException,
 		TypeId_ParameterInfo,
 		TypeId_ParameterInfoComponent,
 		TypeId_Reflector,
@@ -83,7 +84,6 @@ public:
 		TypeId_TypeLoadException,
 		TypeId_TypeManager,
 		TypeId_TypeManagerComponent,
-		TypeId_NotSupportedException,
 		TypeId_Uuid,
 		TypeCount
 	};
@@ -167,6 +167,7 @@ co::Reflector* __createNamespaceComponentReflector();
 co::Reflector* __createNativeClassTypeReflector();
 co::Reflector* __createNativeClassTypeComponentReflector();
 co::Reflector* __createNoSuchInterfaceExceptionReflector();
+co::Reflector* __createNotSupportedExceptionReflector();
 co::Reflector* __createParameterInfoReflector();
 co::Reflector* __createParameterInfoComponentReflector();
 co::Reflector* __createReflectorReflector();
@@ -188,7 +189,6 @@ co::Reflector* __createTypeKindReflector();
 co::Reflector* __createTypeLoadExceptionReflector();
 co::Reflector* __createTypeManagerReflector();
 co::Reflector* __createTypeManagerComponentReflector();
-co::Reflector* __createNotSupportedExceptionReflector();
 co::Reflector* __createUuidReflector();
 
 } // namespace co

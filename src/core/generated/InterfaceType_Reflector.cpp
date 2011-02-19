@@ -6,10 +6,10 @@
 #include <co/InterfaceType.h>
 #include <co/DynamicProxyHandler.h>
 #include <co/InterfaceType.h>
-#include <co/Namespace.h>
 #include <co/AttributeInfo.h>
 #include <co/MethodInfo.h>
 #include <co/Reflector.h>
+#include <co/Namespace.h>
 #include <co/MemberInfo.h>
 #include <co/Uuid.h>
 #include <co/IllegalCastException.h>
@@ -59,6 +59,14 @@ public:
 		co::ArrayRange<co::Any const> range( args, 1 );
 		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::CompoundType>( 0 ), range );
 		return res.get< co::MemberInfo* >();
+	}
+
+	// co.AttributeContainer Methods:
+
+	co::ArrayRange<co::AttributeInfo* const> getMemberAttributes()
+	{
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::AttributeContainer>( 0 ) );
+        return res.get< co::ArrayRange<co::AttributeInfo* const> >();
 	}
 
 	// co.Type Methods:
@@ -118,14 +126,6 @@ public:
 	{
 		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodContainer>( 0 ) );
         return res.get< co::ArrayRange<co::MethodInfo* const> >();
-	}
-
-	// co.AttributeContainer Methods:
-
-	co::ArrayRange<co::AttributeInfo* const> getMemberAttributes()
-	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::AttributeContainer>( 0 ) );
-        return res.get< co::ArrayRange<co::AttributeInfo* const> >();
 	}
 
 	// co.InterfaceType Methods:

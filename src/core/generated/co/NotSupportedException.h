@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _CO_UNSUPPORTEDOPERATIONEXCEPTION_H_
-#define _CO_UNSUPPORTEDOPERATIONEXCEPTION_H_
+#ifndef _CO_NOTSUPPORTEDEXCEPTION_H_
+#define _CO_NOTSUPPORTEDEXCEPTION_H_
 
 #include <co/TypeTraits.h>
 #include <co/Exception.h>
@@ -31,4 +31,4 @@ template<> struct nameOf<co::NotSupportedException> { static const char* get() {
 template<> struct typeOf<co::NotSupportedException> : public typeOfBase<co::NotSupportedException, ExceptionType> {};
 } // namespace co
 
-#endif // _CO_UNSUPPORTEDOPERATIONEXCEPTION_H_
+#endif // _CO_NOTSUPPORTEDEXCEPTION_H_

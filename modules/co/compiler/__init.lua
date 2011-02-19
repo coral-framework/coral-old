@@ -108,6 +108,15 @@ end
 function Compiler:generateMappings()
 	assert( not self.updatedTypes, "this compiler instance has already been used" )
 
+	-- add implicit dependencies of the Coral API (e.g. Any.h)
+	self:addType( "co.EnumType" )
+	self:addType( "co.ArrayType" )
+	self:addType( "co.StructType" )
+	self:addType( "co.ExceptionType" )
+	self:addType( "co.InterfaceType" )
+	self:addType( "co.ComponentType" )
+	self:addType( "co.NativeClassType" )
+
 	if not self.mappingsDir then
 		self.mappingsDir = self.outDir
 	end
@@ -160,19 +169,11 @@ function Compiler:generateModule( moduleName )
 	local doing = ( next( self.cachedTypes ) and "Updating" or "Generating" )
 	self.log(  doing .. " code for module '" .. self.moduleName .. "' (" .. #self.types .. " types)..." )
 
-	-- add types that may not come as explicit dependencies, but are required by generated module code
+	-- add implicit dependencies of the generated module code
 	self:addType( "co.System" )
 	self:addType( "co.Namespace" )
 	self:addType( "co.Reflector" )
 	self:addType( "co.ModulePart" )
-	--  all type classes are implicit dependencies
-	self:addType( "co.EnumType" )
-	self:addType( "co.ArrayType" )
-	self:addType( "co.StructType" )
-	self:addType( "co.ExceptionType" )
-	self:addType( "co.InterfaceType" )
-	self:addType( "co.ComponentType" )
-	self:addType( "co.NativeClassType" )
 
 	-- generateMappings() also adds entries to self.dependencies
 	self:generateMappings()

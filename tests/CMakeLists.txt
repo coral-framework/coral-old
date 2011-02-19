@@ -1,10 +1,4 @@
-################################################################################
-# About This Directory:
-#	This is the parent dir of all test projects.
-################################################################################
-
-# Locate the Google C++ Testing Framework.
-
+# Locate the GTest Framework.
 FIND_PACKAGE( GTest )
 
 # We can only add the test projects if GTest is available.
@@ -32,7 +26,5 @@ IF( GTEST_FOUND )
 	ADD_CUSTOM_TARGET( tests DEPENDS tests_core tests_lua tests_moduleA tests_moduleB tests_regen )
 
 ELSE()
-
 	MESSAGE( "WARNING: gtest not found - all tests have been disabled!" )
-
 ENDIF()

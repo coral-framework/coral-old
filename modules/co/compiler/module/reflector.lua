@@ -324,7 +324,7 @@ public:
 
 		for i, a in ipairs( t.memberAttributes ) do
 			if a.type.kind == 'TK_ARRAY' then
-				writer( "\t\tcase ", a.index, ":\t\tsetArray<", t.formatInput( a.type.elementType ), ">( p->", a.name, ", value ); break;\n" )
+				writer( "\t\tcase ", a.index, ":\t\tvalue.get< ", t.formatInput( a.type ), " >().assignTo( p->", a.name, " ); break;\n" )
 			else
 				writer( "\t\tcase ", a.index, ":\t\tp->", a.name, " = value.get< ", t.formatInput( a.type ), " >(); break;\n" )
 			end

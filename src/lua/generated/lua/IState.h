@@ -8,6 +8,8 @@
 
 #include <co/TypeTraits.h>
 #include <co/Any.h>
+#include <co/ArrayRange.h>
+#include <vector>
 #include <co/Interface.h>
 
 // lua.IState Mapping:
@@ -18,15 +20,9 @@ class IState : public co::Interface
 public:
 	virtual ~IState() {;}
 
-	virtual void call( co::int32 numArgs, co::int32 numResults ) = 0;
+	virtual co::int32 callFunction( const std::string& moduleName, const std::string& functionName, co::ArrayRange<co::Any const> args, co::ArrayRange<co::Any const> results ) = 0;
 
 	virtual bool findScript( const std::string& name, std::string& filename ) = 0;
-
-	virtual void getValue( co::int32 index, const co::Any& outputVar ) = 0;
-
-	virtual void loadFile( const std::string& filename ) = 0;
-
-	virtual void push( const co::Any& value ) = 0;
 };
 
 } // namespace lua

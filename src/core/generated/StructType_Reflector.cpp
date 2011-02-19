@@ -6,8 +6,8 @@
 #include <co/StructType.h>
 #include <co/DynamicProxyHandler.h>
 #include <co/Reflector.h>
-#include <co/Namespace.h>
 #include <co/AttributeInfo.h>
+#include <co/Namespace.h>
 #include <co/MemberInfo.h>
 #include <co/Uuid.h>
 #include <co/MethodInfo.h>
@@ -60,6 +60,14 @@ public:
 		return res.get< co::MemberInfo* >();
 	}
 
+	// co.AttributeContainer Methods:
+
+	co::ArrayRange<co::AttributeInfo* const> getMemberAttributes()
+	{
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::AttributeContainer>( 0 ) );
+        return res.get< co::ArrayRange<co::AttributeInfo* const> >();
+	}
+
 	// co.Type Methods:
 
 	const co::Uuid& getBinarySignature()
@@ -109,14 +117,6 @@ public:
 		co::Any arg;
 		arg.set< co::Reflector* >( reflector_ );
 		_handler->handleSetAttribute( _cookie, getAttribInfo<co::Type>( 6 ), arg );
-	}
-
-	// co.AttributeContainer Methods:
-
-	co::ArrayRange<co::AttributeInfo* const> getMemberAttributes()
-	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::AttributeContainer>( 0 ) );
-        return res.get< co::ArrayRange<co::AttributeInfo* const> >();
 	}
 
 	// co.StructType Methods:

@@ -58,17 +58,6 @@ protected:
 		address->~T();
 	}
 
-	//! Useful in structs, for setting std::vector's from co::Any's.
-	template<typename T, typename VT>
-	void setArray( std::vector<VT>& vec, const co::Any& any )
-	{
-		vec.clear();
-		co::ArrayRange<const T> ar( any.get<co::ArrayRange<const T> >() );
-		vec.reserve( ar.getSize() );
-		for( ; ar; ar.popFirst() )
-			vec.push_back( ar.getFirst() );
-	}
-
 	//! Raises co::IllegalArgumentException if the passed sizes do not match.
 	void checkValidSize( size_t expectedSize, size_t actualSize );
 

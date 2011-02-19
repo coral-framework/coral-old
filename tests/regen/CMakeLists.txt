@@ -16,7 +16,7 @@ SET( CORAL_PATH
 	"${CMAKE_BINARY_DIR}/modules"
 	"${CMAKE_SOURCE_DIR}/modules"
 )
-CORAL_GENERATE_MODULE( GENERATED_CORE_SOURCES co )
+CORAL_GENERATE_MODULE( _GENERATED_FILES co )
 
 # Pass the CORAL_PATH as a precompiler definition
 CORAL_GET_PATH_STRING( coralPathStr )
@@ -35,7 +35,7 @@ INCLUDE_DIRECTORIES(
 
 # Create the test executable
 ADD_DEFINITIONS( -DBUILDING_CORAL_CORE )
-ADD_EXECUTABLE( tests_regen EXCLUDE_FROM_ALL ${CORE_HEADER_FILES} ${CORE_SOURCE_FILES} ${GENERATED_CORE_SOURCES} Main.cpp
+ADD_EXECUTABLE( tests_regen EXCLUDE_FROM_ALL ${CORE_HEADER_FILES} ${CORE_SOURCE_FILES} ${_GENERATED_FILES} Main.cpp
 	# Select a few tests from tests_core to run again in tests_regen
 	../core/AnyTests.cpp
 	../core/ReflectorTests.cpp
@@ -78,4 +78,4 @@ ADD_TEST(
 ################################################################################
 
 SOURCE_GROUP( "@Core" FILES ${CORE_HEADER_FILES} ${CORE_SOURCE_FILES} )
-SOURCE_GROUP( "@Generated" FILES ${GENERATED_CORE_SOURCES} )
+SOURCE_GROUP( "@Generated" FILES ${_GENERATED_FILES} )

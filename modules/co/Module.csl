@@ -19,7 +19,7 @@ interface Module
 	 */
 	attribute int32 rank;
 
-	//---------- Module Life Cycle Control Methods --------------------------//
+	//---------- Module Life Cycle Control Methods ----------//
 
 	/*
 		Runs the initialization phase on all module parts and leaves the module

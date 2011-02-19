@@ -1,11 +1,3 @@
-################################################################################
-# About This Directory:
-#	tests/lua provides a simple test executable for testing Coral modules and
-#	components implemented in Lua. It also contains a set of proof-of-concept
-#	Lua modules and components in the 'modules' subdir, all of which are
-#	tested by the tests_lua executable.
-################################################################################
-
 PROJECT( TESTS_LUA )
 
 ################################################################################
@@ -22,7 +14,7 @@ SET( CORAL_PATH
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
-CORAL_GENERATE_MAPPINGS( GENERATED_HEADERS co.System )
+CORAL_GENERATE_MAPPINGS( _GENERATED_FILES co.System lua.IState )
 
 # Pass the CORAL_PATH as a precompiler definition
 CORAL_GET_PATH_STRING( CORAL_PATH_STR )
@@ -34,7 +26,7 @@ INCLUDE_DIRECTORIES(
 )
 
 # Create test executable
-ADD_EXECUTABLE( tests_lua EXCLUDE_FROM_ALL Main.cpp LuaTests.cpp ${GENERATED_HEADERS} )
+ADD_EXECUTABLE( tests_lua EXCLUDE_FROM_ALL Main.cpp LuaTests.cpp ${_GENERATED_FILES} )
 ADD_DEPENDENCIES( tests_lua lua moduleA )
 
 CORAL_DEFAULT_TARGET_PROPERTIES( tests_lua )
@@ -73,4 +65,4 @@ ENDIF()
 # Source Groups
 ################################################################################
 
-SOURCE_GROUP( "@Mappings" FILES ${GENERATED_HEADERS} )
+SOURCE_GROUP( "@Mappings" FILES ${_GENERATED_FILES} )

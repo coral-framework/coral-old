@@ -118,18 +118,6 @@ bool LuaState::findScript( lua_State*, const std::string& name, std::string& fil
 	return co::OS::searchFile2( co::getPaths(), co::ArrayRange<const std::string>( filePaths, 2 ), filename );
 }
 
-void LuaState::doFile( lua_State* L, const std::string& filename )
-{
-	loadFile( L, filename );
-	call( L, 0, 0 );
-}
-
-void LuaState::doString( lua_State* L, const char* code )
-{
-	loadString( L, code );
-	call( L, 0, 0 );
-}
-
 void LuaState::loadFile( lua_State* L, const std::string& filename )
 {
 	int res = luaL_loadfile( L, filename.c_str() );
@@ -137,11 +125,23 @@ void LuaState::loadFile( lua_State* L, const std::string& filename )
 		raiseException( L, res );
 }
 
-void LuaState::loadString( lua_State* L, const char* code )
+void LuaState::require( lua_State* L, const std::string& moduleName )
 {
-	int res = luaL_loadstring( L, code );
-	if( res != LUA_OK )
-		raiseException( L, res );
+	// first we try to retrieve the value cached in 'package.loaded' directly.
+	lua_getfield( L, LUA_REGISTRYINDEX, "_LOADED" );
+	push( L, moduleName );
+	lua_gettable( L, -2 );
+	if( !lua_isnil( L, -1 ) )
+	{
+		lua_replace( L, -2 );
+		return;
+	}
+
+	// no luck, so we resort to calling the real "require" function
+	lua_pop( L, 2 );
+	lua_getglobal( L, "require" );
+	push( L, moduleName );
+	call( L, 1, 1 );
 }
 
 static int traceback( lua_State* L )
@@ -150,7 +150,7 @@ static int traceback( lua_State* L )
 	return 1;
 }
 
-void LuaState::call( lua_State* L, co::int32 numArgs, co::int32 numResults )
+void LuaState::call( lua_State* L, int numArgs, int numResults )
 {
 	int errFunc = lua_gettop( L ) - numArgs;
 	lua_pushcfunction( L, traceback );
@@ -554,24 +554,66 @@ bool LuaState::findScript( const std::string& name, std::string& filename )
 	return findScript( getL(), name, filename );
 }
 
-void LuaState::loadFile( const std::string& filename )
+co::int32 LuaState::callFunction( const std::string& moduleName, const std::string& functionName,
+									co::ArrayRange<const co::Any> args, co::ArrayRange<const co::Any> results )
 {
-	loadFile( getL(), filename );
-}
+	lua_State* L = getL();
+	int top = lua_gettop( L );
 
-void LuaState::call( co::int32 numArgs, co::int32 numResults )
-{
-	call( getL(), numArgs, numResults );
-}
+	try
+	{
+		require( L, moduleName );
 
-void LuaState::push( const co::Any& var )
-{
-	push( getL(), var );
-}
+		// should we retrieve a function from (presumably) the returned module table?
+		if( !functionName.empty() )
+		{
+			if( !lua_istable( L, -1 ) )
+				throw lua::Exception( "module did not return a table" );
 
-void LuaState::getValue( co::int32 index, const co::Any& outputVar )
-{
-	getValue( getL(), index, outputVar );
+			push( L, functionName );
+			lua_gettable( L, -2 );
+			lua_replace( L, -2 );
+
+			if( lua_isnil( L, -1 ) )
+				throw lua::Exception( "no such function" );
+		}
+
+		// push the args and call the function
+		int numArgs = static_cast<int>( args.getSize() );
+		for( int i = 0; i < numArgs; ++i )
+			push( L, args[i] );
+
+		call( L, numArgs, LUA_MULTRET );
+
+		int numResults = lua_gettop( L ) - top;
+		assert( numResults >= 0 );
+
+		int maxResults = std::min( numResults, static_cast<int>( results.getSize() ) );
+		for( int i = 0; i < maxResults; ++i )
+			getValue( L, top + i + 1, results[i] );
+
+		lua_settop( L, top );
+		
+		return numResults;
+	}
+	catch( co::Exception& e )
+	{
+		lua_settop( L, top );
+
+		std::stringstream ss;
+		ss << "error calling function ";
+		if( !functionName.empty() )
+			ss << "'" << functionName << "' ";
+		ss << "from Lua module '" << moduleName << "': " << e.getMessage();
+
+		throw lua::Exception( ss.str() );
+	}
+	catch( ... )
+	{
+		lua_settop( L, top );
+		CORAL_THROW( lua::Exception, "unexpected exception while calling function '" << functionName
+						<< "' from Lua module '" << moduleName << "'" );
+	}
 }
 
 void LuaState::pushInstancesTable( lua_State* L )

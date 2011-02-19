@@ -1,37 +1,43 @@
 /*
-	Interface for C++ components to interact with a Lua state.
-	Not meant to be called from Lua.
+	Interface for interacting with Lua.
+	The global Lua state is exposed as a global lua.IState service.
  */
 interface IState
 {
 	/*
-		Searches the Coral path looking for a Lua script with the given \a name.
-		The search follows the same conventions used for locating Lua packages.
-		Returns false if no script could be found.
+		Looks for a Lua script with the given \a name in the Coral path.
+		The search follows the same conventions used for locating Lua modules.
+		Returns false if there is no script with the given name.
 	 */
 	bool findScript( in string name, out string filename );
 
 	/*
-		Compiles a Lua script file and pushes a function onto the stack.
-		On error, raises a lua.Exception.
-	 */
-	void loadFile( in string filename ) raises Exception;
+		Calls a function from a Lua module.
 
-	/*
-		Calls a Lua function using the same conventions as lua_call().
-		On error, raises a lua.Exception.
-	 */
-	void call( in int32 numArgs, in int32 numResults ) raises Exception;
+		This method is roughly equivalent to the following code in Lua:
+		\code results = require( moduleName )[functionName]( args ) \encode
 
-	/*
-		Pushes any Coral value onto the Lua stack.
-	 */
-	void push( in any value );
+		The module is obtained through "require" (so it is only loaded once) and must return
+		either a function or a table containing functions. If the module returns a function,
+		you must pass an empty \a functionName; otherwise, you should specify the name of the
+		function to be called.
 
-	/*
-		Gets the value at \a index in the Lua stack and assigns it to \a outputVar.
-		If the Lua value cannot be assigned to the var in \a outputVar, raises a lua.Exception.
-		\warning \a outputVar must be a valid output variable.
+		The list of arguments passed to the function is given by \a args.
+
+		If \a results is non-empty, it will be assigned with the results of the function call,
+		up to either the number of returned values or the number of elements in \a results,
+		whichever is smaller. Each element in \a results must be a valid output variable, and
+		if a Lua value cannot be assigned to a var in \a results due to type incompatibilities,
+		an exception is raised.
+
+		\return the number of results actually returned by the function in Lua.
+
+		\throw lua.Exception if no module exists with the given \a moduleName.
+		\throw lua.Exception if functionName does not specify a valid function to be called.
+		\throw lua.Exception if the function raises any error.
+		\throw lua.Exception if one of the function results could not be assigned to
+					an output variable in \a results due to type incompatibilities.
 	 */
-	void getValue( in int32 index, in any outputVar );
+	int32 callFunction( in string moduleName, in string functionName, in any[] args, in any[] results )
+			raises Exception;
 };

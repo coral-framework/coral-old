@@ -1,10 +1,3 @@
-################################################################################
-# About This Directory:
-#	tests/moduleB defines a second Coral module for testing module dependency
-#	handling and inter-module interactions. This module depends on moduleA.
-#	General module tests are contained in the test executable tests_moduleB.
-################################################################################
-
 PROJECT( TESTS_MODULEB )
 
 ################################################################################
@@ -19,14 +12,14 @@ SET( CORAL_PATH
 	"${CMAKE_SOURCE_DIR}/tests/moduleB"
 )
 
-CORAL_GENERATE_MODULE( GENERATED_MODULEB_SOURCES moduleB
+CORAL_GENERATE_MODULE( _GENERATED_FILES moduleB
 	co.TypeCreationTransaction
 	moduleA.TestInterface
 )
 
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR}/generated )
 
-ADD_LIBRARY( moduleB MODULE EXCLUDE_FROM_ALL ModulePart.cpp ${GENERATED_MODULEB_SOURCES} )
+ADD_LIBRARY( moduleB MODULE EXCLUDE_FROM_ALL ModulePart.cpp ${_GENERATED_FILES} )
 
 CORAL_DEFAULT_TARGET_PROPERTIES( moduleB )
 CORAL_MODULE_TARGET_PROPERTIES( moduleB )
@@ -90,4 +83,4 @@ ENDIF()
 # Source Groups
 ################################################################################
 
-SOURCE_GROUP( "@Generated" FILES ${GENERATED_MODULEB_SOURCES} )
+SOURCE_GROUP( "@Generated" FILES ${_GENERATED_FILES} )

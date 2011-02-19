@@ -45,13 +45,16 @@ public:
 
 	// lua.IState Methods:
 
-	void call( co::int32 numArgs_, co::int32 numResults_ )
+	co::int32 callFunction( const std::string& moduleName_, const std::string& functionName_, co::ArrayRange<co::Any const> args_, co::ArrayRange<co::Any const> results_ )
 	{
-		co::Any args[2];
-		args[0].set< co::int32 >( numArgs_ );
-		args[1].set< co::int32 >( numResults_ );
-		co::ArrayRange<co::Any const> range( args, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 0 ), range );
+		co::Any args[4];
+		args[0].set< const std::string& >( moduleName_ );
+		args[1].set< const std::string& >( functionName_ );
+		args[2].set< co::ArrayRange<co::Any const> >( args_ );
+		args[3].set< co::ArrayRange<co::Any const> >( results_ );
+		co::ArrayRange<co::Any const> range( args, 4 );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 0 ), range );
+		return res.get< co::int32 >();
 	}
 
 	bool findScript( const std::string& name_, std::string& filename_ )
@@ -62,31 +65,6 @@ public:
 		co::ArrayRange<co::Any const> range( args, 2 );
 		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 1 ), range );
 		return res.get< bool >();
-	}
-
-	void getValue( co::int32 index_, const co::Any& outputVar_ )
-	{
-		co::Any args[2];
-		args[0].set< co::int32 >( index_ );
-		args[1].set< const co::Any& >( outputVar_ );
-		co::ArrayRange<co::Any const> range( args, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 2 ), range );
-	}
-
-	void loadFile( const std::string& filename_ )
-	{
-		co::Any args[1];
-		args[0].set< const std::string& >( filename_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 3 ), range );
-	}
-
-	void push( const co::Any& value_ )
-	{
-		co::Any args[1];
-		args[0].set< const co::Any& >( value_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 4 ), range );
 	}
 
 protected:
@@ -163,10 +141,12 @@ public:
 			{
 			case 0:
 				{
-					co::int32 numArgs_ = args[++argIndex].get< co::int32 >();
-					co::int32 numResults_ = args[++argIndex].get< co::int32 >();
+					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
+					const std::string& functionName_ = args[++argIndex].get< const std::string& >();
+					co::ArrayRange<co::Any const> args_ = args[++argIndex].get< co::ArrayRange<co::Any const> >();
+					co::ArrayRange<co::Any const> results_ = args[++argIndex].get< co::ArrayRange<co::Any const> >();
 					argIndex = -1;
-					p->call( numArgs_, numResults_ );
+					res.set< co::int32 >( p->callFunction( moduleName_, functionName_, args_, results_ ) );
 				}
 				break;
 			case 1:
@@ -175,28 +155,6 @@ public:
 					std::string& filename_ = args[++argIndex].get< std::string& >();
 					argIndex = -1;
 					res.set< bool >( p->findScript( name_, filename_ ) );
-				}
-				break;
-			case 2:
-				{
-					co::int32 index_ = args[++argIndex].get< co::int32 >();
-					const co::Any& outputVar_ = args[++argIndex].get< const co::Any& >();
-					argIndex = -1;
-					p->getValue( index_, outputVar_ );
-				}
-				break;
-			case 3:
-				{
-					const std::string& filename_ = args[++argIndex].get< const std::string& >();
-					argIndex = -1;
-					p->loadFile( filename_ );
-				}
-				break;
-			case 4:
-				{
-					const co::Any& value_ = args[++argIndex].get< const co::Any& >();
-					argIndex = -1;
-					p->push( value_ );
 				}
 				break;
 			default:

@@ -171,6 +171,28 @@ public:
 			--_end;
 	}
 
+	/*!
+		Assigns the range to a std::vector-compatible container.
+	 */
+	template<typename C>
+	inline void assignTo( C& container ) const
+	{
+		size_t size = getSize();
+		if( container.capacity() < size )
+		{
+			container.clear();
+			container.reserve( size );
+			for( size_t i = 0; i < size; ++i )
+				container.push_back( _start[i] );
+		}
+		else
+		{
+			container.resize( size );
+			for( size_t i = 0; i < size; ++i )
+				container[i] = _start[i];
+		}
+	}
+
 	//! Unchecked random access to range elements.
 	inline T& operator[]( int index ) { return *( _start + index ); }
 
@@ -185,12 +207,12 @@ private:
 #ifdef CORAL_CC_MSVC
 #pragma warning (pop)
 #endif
+	
+#ifndef DOXYGEN
 
 /****************************************************************************/
 /* All type-traits definitions related to co::ArrayRange are located below  */
 /****************************************************************************/
-
-#ifndef DOXYGEN
 
 template<typename T>
 struct kindOf<ArrayRange<T> > : public kindOfBase<TK_ARRAY> {};

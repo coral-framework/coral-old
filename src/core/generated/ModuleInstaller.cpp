@@ -101,6 +101,7 @@ co::Reflector* co::ModuleInstaller::createReflector( TypeId typeId )
 	case TypeId_NativeClassType: res = co::__createNativeClassTypeReflector(); break;
 	case TypeId_NativeClassTypeComponent: res = co::__createNativeClassTypeComponentReflector(); break;
 	case TypeId_NoSuchInterfaceException: res = co::__createNoSuchInterfaceExceptionReflector(); break;
+	case TypeId_NotSupportedException: res = co::__createNotSupportedExceptionReflector(); break;
 	case TypeId_ParameterInfo: res = co::__createParameterInfoReflector(); break;
 	case TypeId_ParameterInfoComponent: res = co::__createParameterInfoComponentReflector(); break;
 	case TypeId_Reflector: res = co::__createReflectorReflector(); break;
@@ -122,7 +123,6 @@ co::Reflector* co::ModuleInstaller::createReflector( TypeId typeId )
 	case TypeId_TypeLoadException: res = co::__createTypeLoadExceptionReflector(); break;
 	case TypeId_TypeManager: res = co::__createTypeManagerReflector(); break;
 	case TypeId_TypeManagerComponent: res = co::__createTypeManagerComponentReflector(); break;
-	case TypeId_NotSupportedException: res = co::__createNotSupportedExceptionReflector(); break;
 	case TypeId_Uuid: res = co::__createUuidReflector(); break;
 	default: assert( false );
 	};
