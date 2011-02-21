@@ -33,6 +33,11 @@ public:
 	{
 		return sizeof(co::NoSuchInterfaceException);
 	}
+
+	void raise( const std::string& message )
+	{
+		throw co::NoSuchInterfaceException( message );
+	}
 };
 
 // ------ Reflector Creation Function ------ //

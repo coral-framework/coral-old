@@ -33,6 +33,11 @@ public:
 	{
 		return sizeof(co::IllegalArgumentException);
 	}
+
+	void raise( const std::string& message )
+	{
+		throw co::IllegalArgumentException( message );
+	}
 };
 
 // ------ Reflector Creation Function ------ //

@@ -46,6 +46,7 @@ public:
     void getAttribute( const co::Any& instance, co::AttributeInfo* ai, co::Any& value );
     void setAttribute( const co::Any& instance, co::AttributeInfo* ai, const co::Any& value );
     void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& returnValue );
+	void raise( const std::string& message );
 
 private:
 	inline const std::string& getInterfaceName( co::int32 cookie );

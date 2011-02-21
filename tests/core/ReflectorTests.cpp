@@ -80,6 +80,29 @@ TEST( ReflectorTests, reflectorComponent )
 	EXPECT_EQ( reflector, reflectorComponent->getInterface( componentType->getInterfaces().getFirst() ) );
 }
 
+TEST( ReflectorTests, exceptions )
+{
+	// test raised exception types
+	ASSERT_THROW( co::getType( "co.Namespace" )->getReflector()->raise( "msg" ), co::NotSupportedException );
+	ASSERT_THROW( co::getType( "co.IllegalCastException" )->getReflector()->raise( "msg" ), co::IllegalCastException );
+	ASSERT_THROW( co::getType( "co.MissingInputException" )->getReflector()->raise( "msg" ), co::MissingInputException );
+
+	// test raised exception messages
+	try
+	{
+		co::getType( "co.IllegalArgumentException" )->getReflector()->raise( "my exception message!" );
+		FAIL() << "an exception should have been raised";
+	}
+	catch( co::IllegalArgumentException& e )
+	{
+		ASSERT_EQ( "my exception message!", e.getMessage() );
+	}
+	catch( ... )
+	{
+		FAIL() << "wrong exception type";
+	}
+}
+
 template<typename T>
 T* getMember( co::Type* type, const char* memberName )
 {

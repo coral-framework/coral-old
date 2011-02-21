@@ -1,8 +1,5 @@
 ################################################################################
-# About This Directory:
-#	src/core/reserved contains public (exported) classes whose usage is somehow
-#	limited (or reserved) to advanced users or automatically-generated code,
-#	due to the specificity or 'low-levelness' of their functionality.
+# Tools
 ################################################################################
 
 # Gather sources from the current directory

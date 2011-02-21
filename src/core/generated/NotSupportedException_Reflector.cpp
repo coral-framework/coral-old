@@ -33,6 +33,11 @@ public:
 	{
 		return sizeof(co::NotSupportedException);
 	}
+
+	void raise( const std::string& message )
+	{
+		throw co::NotSupportedException( message );
+	}
 };
 
 // ------ Reflector Creation Function ------ //

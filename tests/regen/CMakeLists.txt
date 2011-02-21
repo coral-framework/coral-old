@@ -1,8 +1,5 @@
 ################################################################################
-# About This Directory:
-#	tests/regen re-builds the 'coral' library using freshly regenerated code,
-#	produced by the most up-to-date coralc build. It also re-runs all
-#	reflection tests.
+# Tests the code generation rules applied by the Coral compiler
 ################################################################################
 
 PROJECT( TESTS_REGEN )
@@ -16,7 +13,10 @@ SET( CORAL_PATH
 	"${CMAKE_BINARY_DIR}/modules"
 	"${CMAKE_SOURCE_DIR}/modules"
 )
+
+SET( CORAL_LAUNCHER_FLAGS "--no-abi-checks" )
 CORAL_GENERATE_MODULE( _GENERATED_FILES co )
+SET( CORAL_LAUNCHER_FLAGS "" )
 
 # Pass the CORAL_PATH as a precompiler definition
 CORAL_GET_PATH_STRING( coralPathStr )

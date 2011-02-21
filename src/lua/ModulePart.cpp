@@ -14,6 +14,8 @@
 #include <co/ServiceManager.h>
 #include <lua/Exception.h>
 
+namespace lua {
+
 /*!
 	The Lua module's co.ModulePart.
  */
@@ -33,14 +35,14 @@ public:
 	void initialize( co::Module* module )
 	{
 		lua::ModuleInstaller::instance().install();
-		
+
 		// generally update this module AFTER all other modules
 		module->setRank( 100000 );
-		
+
 		// install our LuaModulePartLoader
 		_luaModulePartLoader = new LuaModulePartLoader;
 		co::getSystem()->getModules()->installLoader( _luaModulePartLoader.get() );
-		
+
 		/*
 			Manually load our Lua module ("lua/__init.lua"), which will in turn
 			install our loader function into Lua's package.loaders table, in order
@@ -50,12 +52,12 @@ public:
 		lua_State* L = LuaState::getL();
 		if( !LuaState::findScript( L, "lua", initScriptFileName ) )
 			throw lua::Exception( "could not find the Lua module's init script in the Coral path" );
-		
+
 		// call the 'lua/__init.lua' script passing in its filename as an arg
 		LuaState::loadFile( L, initScriptFileName );
 		LuaState::push( L, initScriptFileName );
 		LuaState::call( L, 1, 0 );
-		
+
 		// create and register the global lua.IState service
 		co::getSystem()->getServices()->addServiceImplementation( co::typeOf<lua::IState>::get(), "lua.Universe" );
 	}
@@ -85,8 +87,8 @@ private:
 	co::RefPtr<LuaModulePartLoader> _luaModulePartLoader;
 };
 
-CORAL_EXPORT_COMPONENT( ModulePart, lua );
+CORAL_EXPORT_MODULE_PART( ModulePart );
 
-namespace lua {
-	CORAL_EXPORT_MODULE_PART( ModulePart );
-}
+} // namespace lua
+
+CORAL_EXPORT_COMPONENT( lua::ModulePart, lua );

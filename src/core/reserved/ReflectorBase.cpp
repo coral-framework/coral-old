@@ -123,6 +123,11 @@ void ReflectorBase::invokeMethod( const Any&, MethodInfo*, ArrayRange<Any const>
 	raiseNotSupportedException();
 }
 
+void ReflectorBase::raise( const std::string& )
+{
+	raiseNotSupportedException();
+}
+
 void ReflectorBase::checkValidSize( size_t expectedSize, size_t actualSize )
 {
 	if( expectedSize != actualSize )

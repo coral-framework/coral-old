@@ -1,5 +1,5 @@
 ################################################################################
-# Lua Module: a two-way bridge between Coral and Lua.
+# Lua Module (fully integrates Coral and Lua)
 ################################################################################
 
 PROJECT( MODULE_LUA )

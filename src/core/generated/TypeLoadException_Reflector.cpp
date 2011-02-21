@@ -33,6 +33,11 @@ public:
 	{
 		return sizeof(co::TypeLoadException);
 	}
+
+	void raise( const std::string& message )
+	{
+		throw co::TypeLoadException( message );
+	}
 };
 
 // ------ Reflector Creation Function ------ //

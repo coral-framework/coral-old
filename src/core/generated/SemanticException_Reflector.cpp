@@ -33,6 +33,11 @@ public:
 	{
 		return sizeof(co::SemanticException);
 	}
+
+	void raise( const std::string& message )
+	{
+		throw co::SemanticException( message );
+	}
 };
 
 // ------ Reflector Creation Function ------ //

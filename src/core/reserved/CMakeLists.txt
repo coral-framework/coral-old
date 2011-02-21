@@ -1,7 +1,5 @@
 ################################################################################
-# About This Directory:
-#	src/core/tools contains general, auxiliary classes used internally by the
-#	core library (e.g. cryptography, filesystem and string manipulation stuff).
+# Reserved APIs
 ################################################################################
 
 # Gather sources from the current directory

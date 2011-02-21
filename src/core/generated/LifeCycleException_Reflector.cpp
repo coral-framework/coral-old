@@ -33,6 +33,11 @@ public:
 	{
 		return sizeof(co::LifeCycleException);
 	}
+
+	void raise( const std::string& message )
+	{
+		throw co::LifeCycleException( message );
+	}
 };
 
 // ------ Reflector Creation Function ------ //

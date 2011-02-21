@@ -36,6 +36,11 @@ public:
 	{
 		return sizeof(lua::Exception);
 	}
+
+	void raise( const std::string& message )
+	{
+		throw lua::Exception( message );
+	}
 };
 
 // ------ Reflector Creation Function ------ //

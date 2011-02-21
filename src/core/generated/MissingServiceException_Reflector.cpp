@@ -33,6 +33,11 @@ public:
 	{
 		return sizeof(co::MissingServiceException);
 	}
+
+	void raise( const std::string& message )
+	{
+		throw co::MissingServiceException( message );
+	}
 };
 
 // ------ Reflector Creation Function ------ //

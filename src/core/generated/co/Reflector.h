@@ -72,6 +72,8 @@ public:
 
 	virtual co::Interface* newProxy( co::DynamicProxyHandler* handler ) = 0;
 
+	virtual void raise( const std::string& message ) = 0;
+
 	virtual void setAttribute( const co::Any& instance, co::AttributeInfo* ai, const co::Any& value ) = 0;
 };
 

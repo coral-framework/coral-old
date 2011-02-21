@@ -34,7 +34,8 @@ interface IState
 
 		\throw lua.Exception if no module exists with the given \a moduleName.
 		\throw lua.Exception if functionName does not specify a valid function to be called.
-		\throw lua.Exception if the function raises any error.
+		\throw lua.Exception if the function raises any Lua error.
+		\throw co.Exception if the function raises any Coral exception using <tt>co.raise()</tt>.
 		\throw lua.Exception if one of the function results could not be assigned to
 					an output variable in \a results due to type incompatibilities.
 	 */

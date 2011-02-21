@@ -8,25 +8,29 @@
 #include <co/System.h>
 #include <co/ModuleManager.h>
 #include <co/ModuleLoadException.h>
+#include <co/MissingInputException.h>
+#include <co/IllegalArgumentException.h>
 #include <lua/IState.h>
+#include <lua/Exception.h>
 
 #define ASSERT_SUCCESS( moduleName ) \
 	try { co::getSystem()->getModules()->load( moduleName ); } \
 	catch( const std::exception& e ) { FAIL() << e.what(); }
 
-#define ASSERT_EXCEPTION( code, expectedMsg ) \
-	try { \
-		code; \
-		FAIL() << "an exception should have been raised"; \
-	} catch( const std::exception& e ) { \
+#define ASSERT_EXCEPTION( code, expectedType, expectedMsg ) \
+	try { code; FAIL() << "an exception should have been raised"; } \
+	catch( const expectedType & e ) { \
 		std::string raisedMsg( e.what() ); \
 		if( raisedMsg.find( expectedMsg ) == std::string::npos ) \
 			FAIL() << "raised message (\"" << raisedMsg << "\") does not contain the expected message (\"" \
 				<< expectedMsg << "\")"; \
-	}
+	} catch( std::exception& e ) { FAIL() << "wrong exception type (" #expectedType " expected): " << e.what(); }
+
+#define ASSERT_LUA_EXCEPTION( code, expectedMsg ) \
+	ASSERT_EXCEPTION( code, lua::Exception, expectedMsg )
 
 #define ASSERT_ERROR( moduleName, expectedMsg ) \
-	ASSERT_EXCEPTION( co::getSystem()->getModules()->load( moduleName ), expectedMsg )
+	ASSERT_EXCEPTION( co::getSystem()->getModules()->load( moduleName ), co::ModuleLoadException, expectedMsg )
 
 
 // --- Initialization --- //
@@ -193,7 +197,7 @@ TEST( LuaTests, callFunction )
 	results[2].set<co::int32&>( intVec[2] );
 	results[3].set<co::int32&>( intVec[3] );
 
-	ASSERT_NO_THROW( numRes = luaState->callFunction( "lua.plain.sum", "",
+	ASSERT_NO_THROW( numRes = luaState->callFunction( "lua.scripts.sum", "",
 									co::ArrayRange<const co::Any>( args, 4 ), resRange ) );
 	
 	ASSERT_EQ( 1, numRes );
@@ -204,7 +208,7 @@ TEST( LuaTests, callFunction )
 	 */
 
 	// passthrough() simply returns all of its args.
-	ASSERT_NO_THROW( numRes = luaState->callFunction( "lua.plain.manyFunctions", "passthrough",
+	ASSERT_NO_THROW( numRes = luaState->callFunction( "lua.scripts.manyFunctions", "passthrough",
 									co::ArrayRange<const co::Any>( args, 4 ), resRange ) );
 
 	ASSERT_EQ( 4, numRes );
@@ -226,7 +230,7 @@ TEST( LuaTests, callFunction )
 	results[4].set<std::string&>( str1 );
 	results[5].set<co::Any&>( any2 );
 
-	ASSERT_NO_THROW( numRes = luaState->callFunction( "lua.plain.manyFunctions", "constants",
+	ASSERT_NO_THROW( numRes = luaState->callFunction( "lua.scripts.manyFunctions", "constants",
 									co::ArrayRange<const co::Any>(), resRange ) );
 
 	ASSERT_EQ( 6, numRes );
@@ -241,7 +245,7 @@ TEST( LuaTests, callFunction )
 	results[0].set<std::string&>( str1 );
 	results[1].set<std::string&>( str2 );
 
-	ASSERT_NO_THROW( numRes = luaState->callFunction( "lua.plain.manyFunctions", "constants2",
+	ASSERT_NO_THROW( numRes = luaState->callFunction( "lua.scripts.manyFunctions", "constants2",
 						 co::ArrayRange<const co::Any>(), co::ArrayRange<const co::Any>( results, 2 ) ) );
 
 	ASSERT_EQ( 5, numRes );
@@ -252,21 +256,54 @@ TEST( LuaTests, callFunction )
 TEST( LuaTests, callFunctionErrors )
 {
 	co::RefPtr<lua::IState> luaState = co::getService<lua::IState>();
+	co::ArrayRange<const co::Any> empty;
 
-	co::ArrayRange<const co::Any> emptyRange;
+	ASSERT_LUA_EXCEPTION( luaState->callFunction( "lua.scripts.doesNotExist", "nope", empty, empty ),
+							"module 'lua.scripts.doesNotExist' not found" );
 
-	ASSERT_EXCEPTION( luaState->callFunction( "lua.plain.doesNotExist", "nope", emptyRange, emptyRange ),
-						"module 'lua.plain.doesNotExist' not found" );
+	ASSERT_LUA_EXCEPTION( luaState->callFunction( "lua.scripts.sum", "notATable", empty, empty ),
+							"module did not return a table" );
 
-	ASSERT_EXCEPTION( luaState->callFunction( "lua.plain.sum", "notATable", emptyRange, emptyRange ),
-						"module did not return a table" );
+	ASSERT_LUA_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions", "", empty, empty ),
+							"attempt to call a table value" );
 
-	ASSERT_EXCEPTION( luaState->callFunction( "lua.plain.manyFunctions", "", emptyRange, emptyRange ),
-						"attempt to call a table value" );
+	ASSERT_LUA_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions", "doesNotExist", empty, empty ),
+							"no such function" );
 
-	ASSERT_EXCEPTION( luaState->callFunction( "lua.plain.manyFunctions", "doesNotExist", emptyRange, emptyRange ),
-						"no such function" );
+	ASSERT_LUA_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions", "raiseError", empty, empty ),
+							"here is the error" );
+}
 
-	ASSERT_EXCEPTION( luaState->callFunction( "lua.plain.manyFunctions", "raiseError", emptyRange, emptyRange ),
-						"here is the error" );
+TEST( LuaTests, exceptionTypes )
+{
+	co::RefPtr<lua::IState> luaState = co::getService<lua::IState>();
+
+	std::string exceptionType;
+	std::string message;
+	co::Any args[2];
+	args[0].set<const std::string&>( exceptionType );
+	args[1].set<const std::string&>( message );
+
+	co::ArrayRange<const co::Any> empty;
+	co::ArrayRange<const co::Any> argRange( args, 2 );
+
+	exceptionType = "no type given";
+	message = "ignored";
+	ASSERT_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions", "raiseError", argRange, empty ),
+						lua::Exception, "no type given" );
+
+	exceptionType = "co.IllegalArgumentException";
+	message = "and here is the msg";
+	ASSERT_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions", "raise", argRange, empty ),
+						co::IllegalArgumentException, "and here is the msg" );
+
+	exceptionType = "co.MissingInputException";
+	message = "message here";
+	ASSERT_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions", "raise", argRange, empty ),
+						co::MissingInputException, "message here" );
+
+	exceptionType = "invalid type";
+	message = "message";
+	ASSERT_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions", "raise", argRange, empty ),
+						lua::Exception, "error throwing an exception of type 'invalid type' from Lua" );
 }

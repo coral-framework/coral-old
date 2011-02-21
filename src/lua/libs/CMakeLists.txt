@@ -1,12 +1,5 @@
 ###############################################################################
-# About This Directory:
-#	src/lua/libs contains copies of the following Lua libraries:
-#		- lua: Lua 5.2 (stripped of lua.c, luac.c and print.c)
-#		- lfs: LuaFileSystem - http://www.keplerproject.org/luafilesystem/
-#		- socket: LuaSocket - http://w3.impa.br/~diego/software/luasocket/
-#		- rings: Rings - http://www.keplerproject.org/rings/
-#	These are compiled into a static library and linked with the Lua Module.
-#	All these libraries are licensed under the MIT license (same as Coral).
+# Lua Libraries
 ###############################################################################
 
 PROJECT( LUALIBS C )

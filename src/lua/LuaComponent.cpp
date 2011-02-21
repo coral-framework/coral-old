@@ -330,6 +330,11 @@ void LuaComponent::invokeMethod( const co::Any&, co::MethodInfo*, co::ArrayRange
 	raiseNotSupportedException();
 }
 
+void LuaComponent::raise( const std::string& )
+{
+	raiseNotSupportedException();
+}
+
 co::Interface* LuaComponent::getDynamicInterface( co::InterfaceInfo* itfInfo )
 {
 	if( itfInfo->getIsFacet() )

@@ -33,6 +33,11 @@ public:
 	{
 		return sizeof(co::IllegalCastException);
 	}
+
+	void raise( const std::string& message )
+	{
+		throw co::IllegalCastException( message );
+	}
 };
 
 // ------ Reflector Creation Function ------ //

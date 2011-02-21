@@ -33,6 +33,11 @@ public:
 	{
 		return sizeof(co::IllegalNameException);
 	}
+
+	void raise( const std::string& message )
+	{
+		throw co::IllegalNameException( message );
+	}
 };
 
 // ------ Reflector Creation Function ------ //

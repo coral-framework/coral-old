@@ -264,7 +264,15 @@ public:
 		writer( "\tco::int32 getSize()\n\t{\n\t\treturn sizeof(", t.cppName, ");\n\t}\n" )
 	end
 
-	if t.kind == 'TK_STRUCT' or t.kind == 'TK_NATIVECLASS' then
+	if t.kind == 'TK_EXCEPTION' then
+		writer( [[
+
+	void raise( const std::string& message )
+	{
+		throw ]], t.cppName, [[( message );
+	}
+]] )
+	elseif t.kind == 'TK_STRUCT' or t.kind == 'TK_NATIVECLASS' then
 		writer( [[
 
 	void createValue( void* address, size_t length )

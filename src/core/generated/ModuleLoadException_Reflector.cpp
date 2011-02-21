@@ -33,6 +33,11 @@ public:
 	{
 		return sizeof(co::ModuleLoadException);
 	}
+
+	void raise( const std::string& message )
+	{
+		throw co::ModuleLoadException( message );
+	}
 };
 
 // ------ Reflector Creation Function ------ //

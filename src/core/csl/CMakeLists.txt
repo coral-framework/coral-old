@@ -1,7 +1,5 @@
 ################################################################################
-# About This Directory:
-#	src/core/csl contains both, hand-made and generated code for parsing and
-#	semantically checking CSL files.
+# CSL
 ################################################################################
 
 # Build the embedded ANTLR 3 C runtime as a dependency.

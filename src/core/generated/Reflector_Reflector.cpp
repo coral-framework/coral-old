@@ -93,6 +93,14 @@ public:
 		return res.get< co::Interface* >();
 	}
 
+	void raise( const std::string& message_ )
+	{
+		co::Any args[1];
+		args[0].set< const std::string& >( message_ );
+		co::ArrayRange<co::Any const> range( args, 1 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 4 ), range );
+	}
+
 	void setAttribute( const co::Any& instance_, co::AttributeInfo* ai_, const co::Any& value_ )
 	{
 		co::Any args[3];
@@ -100,7 +108,7 @@ public:
 		args[1].set< co::AttributeInfo* >( ai_ );
 		args[2].set< const co::Any& >( value_ );
 		co::ArrayRange<co::Any const> range( args, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 4 ), range );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Reflector>( 5 ), range );
 	}
 
 	// These co::Reflector methods are not part of the reflection system:
@@ -234,6 +242,13 @@ public:
 				}
 				break;
 			case 6:
+				{
+					const std::string& message_ = args[++argIndex].get< const std::string& >();
+					argIndex = -1;
+					p->raise( message_ );
+				}
+				break;
+			case 7:
 				{
 					const co::Any& instance_ = args[++argIndex].get< const co::Any& >();
 					co::AttributeInfo* ai_ = args[++argIndex].get< co::AttributeInfo* >();

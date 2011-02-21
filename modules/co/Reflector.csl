@@ -98,4 +98,10 @@ interface Reflector
 	 */
 	void invokeMethod( in any instance, in MethodInfo mi, in any[] args, out any returnValue )
 		raises NotSupportedException, IllegalArgumentException, MissingInputException, IllegalCastException;
+
+	/*
+		Raises an exception with the given \a message.
+		\throw NotSupportedException if \a type is not an ExceptionType.
+	 */
+	void raise( in string message ) raises NotSupportedException;
 };

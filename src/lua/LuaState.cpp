@@ -596,7 +596,7 @@ co::int32 LuaState::callFunction( const std::string& moduleName, const std::stri
 		
 		return numResults;
 	}
-	catch( co::Exception& e )
+	catch( lua::Exception& e )
 	{
 		lua_settop( L, top );
 
@@ -607,12 +607,6 @@ co::int32 LuaState::callFunction( const std::string& moduleName, const std::stri
 		ss << "from Lua module '" << moduleName << "': " << e.getMessage();
 
 		throw lua::Exception( ss.str() );
-	}
-	catch( ... )
-	{
-		lua_settop( L, top );
-		CORAL_THROW( lua::Exception, "unexpected exception while calling function '" << functionName
-						<< "' from Lua module '" << moduleName << "'" );
 	}
 }
 
@@ -807,10 +801,59 @@ void LuaState::raiseException( lua_State* L, int errorCode )
 		assert( false );
 	}
 
-	const char* msg = lua_tostring( L, -1 );
+	size_t size;
+	const char* msg = lua_tolstring( L, -1, &size );
 	lua_pop( L, 1 );
+	
+	/*
+		Exception messages in the form "{some.ExceptionType}some message" are raised
+		as instances of some.ExceptionType, using Coral's reflection API.
+	 */
 
-	throw lua::Exception( msg );
+	// the message must be at least 5 chars long and start with a parenthesis
+	if( size >= 5 && msg[0] == '{' )
+	{
+		const char* typeStart = msg + 1;
+		const char* typeEnd = typeStart + 1;
+		const char* msgStart = NULL;
+		const char* msgEnd = msg + size;
+
+		while( typeEnd < msgEnd )
+		{
+			if( *typeEnd == '}' )
+			{
+				msgStart = typeEnd + 1;
+				break;
+			}
+			++typeEnd;
+		}
+
+		// the parenthesis must have been closed
+		if( msgStart )
+		{
+			std::string typeName( typeStart, typeEnd - typeStart );
+			std::string parsedMsg( msgStart, msgEnd - msgStart );
+
+			// try to obtain an exception type/reflector
+			co::Reflector* reflector;
+			try
+			{
+				co::Type* type = co::getType( typeName );
+				if( type->getKind() != co::TK_EXCEPTION )
+					throw co::IllegalArgumentException( "type is not an exception" );
+				reflector = type->getReflector();
+			}
+			catch( std::exception& e )
+			{
+				CORAL_THROW( lua::Exception, "[error throwing an exception of type '" << typeName << "' from Lua: "
+								<< e.what() << "] " << parsedMsg );
+			}
+
+			reflector->raise( parsedMsg );
+		}
+	}
+
+	throw lua::Exception( std::string( msg, size ) );
 }
 
 CORAL_EXPORT_COMPONENT( LuaState, Universe );

@@ -68,6 +68,13 @@ local coType = setmetatable( {}, coTypeMT )
 co.Type = coType
 
 -------------------------------------------------------------------------------
+-- Function co.raise( exceptionType, message )
+
+co.raise = function( exceptionType, message )
+	error( "{" .. exceptionType .. "}" .. message, 0 )
+end
+
+-------------------------------------------------------------------------------
 -- interfaceInstance = co.getService( serviceName[, client] )
 --
 -- Performs all kinds of service lookups: global, specialized by client type,

@@ -50,6 +50,7 @@ public:
     void getAttribute( const Any& instance, AttributeInfo* ai, Any& value );
     void setAttribute( const Any& instance, AttributeInfo* ai, const Any& value );
     void invokeMethod( const Any& instance, MethodInfo* mi, ArrayRange<Any const> args, Any& returnValue );
+	void raise( const std::string& message );
 
 protected:
 	template<typename T>

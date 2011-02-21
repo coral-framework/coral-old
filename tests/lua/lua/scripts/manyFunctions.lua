@@ -12,8 +12,12 @@ function M.constants2()
 	return "one", "two", "three", "four", "five"
 end
 
-function M.raiseError()
-	error "here is the error"
+function M.raiseError( message )
+	error( message or "here is the error" )
+end
+
+function M.raise( exceptionType, message )
+	co.raise( exceptionType, message )
 end
 
 return M
