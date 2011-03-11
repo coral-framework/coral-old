@@ -41,7 +41,7 @@ TEST( AnyTests, sizeOf )
 	#else
 		// 32-bit system with 8-byte alignment
 		EXPECT_EQ( 24, sizeof(co::Any::State) );
-		EXPECT_EQ( 24 + 4 * 8 + sizeof(size_t), sizeof(co::Any) );
+		EXPECT_EQ( 24 + 5 * 8, sizeof(co::Any) );
 	#endif
 #elif CORAL_POINTER_SIZE == 8
 	// 64-bit system with 8-byte alignment
