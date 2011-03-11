@@ -123,14 +123,13 @@ template<typename T, typename ET>
 struct ArrayRangeAdaptor<T, RefVector<ET> >
 {
 	static const bool isValid = true;
-	static const uintptr ptrCheck = (uintptr)static_cast<T>( (ET*)0xCCCC );
 	static T* getData( RefVector<ET>& v )
 	{
 		/*
-			A conversion from ET* to T should need no offsetting.
-			This generally works for single, but not for multiple inheritance.
+			A conversion from ET* to T must not need a type cast.
+			Generally, this works for single, but not for multiple inheritance.
 		 */
-		CORAL_STATIC_CHECK( ptrCheck == 0xCCCC, incompatible_pointer_types_would_need_casting );
+		assert( static_cast<T>( (ET*)0xCCCC ) == (T)0xCCCC );
 		return v.empty() ? NULL : reinterpret_cast<T*>( &v[0] );
 	}
 	static size_t getSize( RefVector<ET>& v ) { return v.size(); }
