@@ -6,9 +6,9 @@
 #include <co/NativeClassType.h>
 #include <co/DynamicProxyHandler.h>
 #include <co/Reflector.h>
+#include <co/Namespace.h>
 #include <co/AttributeInfo.h>
 #include <co/MethodInfo.h>
-#include <co/Namespace.h>
 #include <co/MemberInfo.h>
 #include <co/Uuid.h>
 #include <co/IllegalCastException.h>
@@ -43,6 +43,14 @@ public:
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
+	// co.MethodContainer Methods:
+
+	co::ArrayRange<co::MethodInfo* const> getMemberMethods()
+	{
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodContainer>( 0 ) );
+        return res.get< co::ArrayRange<co::MethodInfo* const> >();
+	}
+
 	// co.CompoundType Methods:
 
 	co::ArrayRange<co::MemberInfo* const> getMembers()
@@ -58,14 +66,6 @@ public:
 		co::ArrayRange<co::Any const> range( args, 1 );
 		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::CompoundType>( 0 ), range );
 		return res.get< co::MemberInfo* >();
-	}
-
-	// co.AttributeContainer Methods:
-
-	co::ArrayRange<co::AttributeInfo* const> getMemberAttributes()
-	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::AttributeContainer>( 0 ) );
-        return res.get< co::ArrayRange<co::AttributeInfo* const> >();
 	}
 
 	// co.Type Methods:
@@ -119,12 +119,12 @@ public:
 		_handler->handleSetAttribute( _cookie, getAttribInfo<co::Type>( 6 ), arg );
 	}
 
-	// co.MethodContainer Methods:
+	// co.AttributeContainer Methods:
 
-	co::ArrayRange<co::MethodInfo* const> getMemberMethods()
+	co::ArrayRange<co::AttributeInfo* const> getMemberAttributes()
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::MethodContainer>( 0 ) );
-        return res.get< co::ArrayRange<co::MethodInfo* const> >();
+		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::AttributeContainer>( 0 ) );
+        return res.get< co::ArrayRange<co::AttributeInfo* const> >();
 	}
 
 	// co.NativeClassType Methods:

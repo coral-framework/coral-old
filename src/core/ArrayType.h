@@ -9,24 +9,28 @@
 #include "Type.h"
 #include "ArrayTypeComponent_Base.h"
 
+namespace co {
+
 /*!
 	Component that implements co.ArrayType.
  */
-class ArrayType : public co::ArrayTypeComponent_Base, public TypeImpl
+class ArrayTypeComponent : public ArrayTypeComponent_Base, public TypeImpl
 {
 public:
-	virtual ~ArrayType();
+	virtual ~ArrayTypeComponent();
 
 	// internal methods:
-	void setElementType( co::Type* type );
+	void setElementType( Type* type );
 
 	// co::ArrayType methods:
-	co::Type* getElementType();
+	Type* getElementType();
 
 	DELEGATE_CO_TYPE_METHODS( TypeImpl:: );
 
 private:
-	co::RefPtr<co::Type> _elementType;
+	RefPtr<Type> _elementType;
 };
+
+} // namespace co
 
 #endif

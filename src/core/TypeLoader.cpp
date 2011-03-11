@@ -16,16 +16,20 @@
 #include <co/reserved/OS.h>
 #include <sstream>
 
+namespace co {
+
 // Root Loader Contructor:
-TypeLoader::TypeLoader( const std::string& fullTypeName, co::ArrayRange<const std::string> path, co::TypeManager* tm )
+TypeLoader::TypeLoader( const std::string& fullTypeName,
+						ArrayRange<const std::string> path,
+						TypeManager* tm )
 	: _fullTypeName( fullTypeName ), _path( path )
 {
-	_typeManager = dynamic_cast<TypeManager*>( tm );
-	assert( _typeManager );
+	assert( dynamic_cast<TypeManagerComponent*>( tm ) );
+	_typeManager = static_cast<TypeManagerComponent*>( tm );
 
 	_parentLoader = NULL;
 	_namespace = NULL;
-	_transaction = new ::TypeCreationTransaction();
+	_transaction = new TypeCreationTransactionComponent();
 }
 
 // Non-Root Loader Constructor:
@@ -43,16 +47,16 @@ TypeLoader::~TypeLoader()
 	// empty
 }
 
-co::Namespace* getOrCreateChildNamespace( co::Namespace* parent, const std::string& name )
+Namespace* getOrCreateChildNamespace( Namespace* parent, const std::string& name )
 {
-	co::Namespace* childNs = parent->getChildNamespace( name );
+	Namespace* childNs = parent->getChildNamespace( name );
 	if( childNs != NULL )
 		return childNs;
 	else
 		return parent->defineChildNamespace( name );
 }
 
-co::Type* TypeLoader::loadType()
+Type* TypeLoader::loadType()
 {
 	std::string fullPath;
 	std::string relativePath;
@@ -64,10 +68,10 @@ co::Type* TypeLoader::loadType()
 		return NULL;
 	}
 
-	co::Namespace* ns = _typeManager->getRootNS();
+	Namespace* ns = _typeManager->getRootNS();
 
 	// iterate over all subparts
-	co::StringTokenizer st( relativePath, CORAL_OS_DIR_SEP_STR );
+	StringTokenizer st( relativePath, CORAL_OS_DIR_SEP_STR );
 	st.nextToken();
 	std::string currentToken = st.getToken();
 	while( st.nextToken() )
@@ -89,7 +93,7 @@ co::Type* TypeLoader::loadType()
 
 		return getType();
 	}
-	catch( co::Exception& e )
+	catch( Exception& e )
 	{
 		// create a csl error, using the current one as inner error
 		_cslError = new csl::Error( e.getMessage(), fullPath, getCurrentLine(), _cslError.get() );
@@ -101,23 +105,23 @@ co::Type* TypeLoader::loadType()
 	return NULL;
 }
 
-co::TypeBuilder* TypeLoader::createTypeBuilder( const std::string& typeName, co::TypeKind kind )
+TypeBuilder* TypeLoader::createTypeBuilder( const std::string& typeName, TypeKind kind )
 {
 	return _namespace->defineType( typeName, kind, _transaction.get() );
 }
 
-co::Type* TypeLoader::resolveType( const std::string& typeName, bool isArray )
+Type* TypeLoader::resolveType( const std::string& typeName, bool isArray )
 {
 	if( isArray )
 	{
-		co::Type* elementType = resolveType( typeName );
+		Type* elementType = resolveType( typeName );
 		if( !elementType )
-			CORAL_THROW( co::Exception, "error loading array element type '" << typeName << "'" );
+			CORAL_THROW( Exception, "error loading array element type '" << typeName << "'" );
 		return _typeManager->getArrayOf( elementType );
 	}
 
 	// try to find an imported type aliased as 'typeName'
-	co::Type* type = findImportedType( typeName );
+	Type* type = findImportedType( typeName );
 	if( type )
 		return type;
 
@@ -150,7 +154,7 @@ void TypeLoader::addCppBlock( const std::string& text )
 	_typeManager->addCppBlock( _fullTypeName, text );
 }
 
-inline std::string formatTypeInNamespace( co::Namespace* ns, const std::string& typeName )
+inline std::string formatTypeInNamespace( Namespace* ns, const std::string& typeName )
 {
 	const std::string& namespaceName = ns->getFullName();
 
@@ -163,12 +167,12 @@ inline std::string formatTypeInNamespace( co::Namespace* ns, const std::string& 
 	return str;
 }
 
-co::Type* TypeLoader::findDependency( const std::string& typeName )
+Type* TypeLoader::findDependency( const std::string& typeName )
 {
 	if( _namespace->getParentNamespace() )
 	{
 		// search _namespace if it is not the root namespace
-		co::Type* type = _typeManager->findType( formatTypeInNamespace( _namespace, typeName ) );
+		Type* type = _typeManager->findType( formatTypeInNamespace( _namespace, typeName ) );
 		if( type )
 			return type;
 	}
@@ -176,7 +180,7 @@ co::Type* TypeLoader::findDependency( const std::string& typeName )
 	return _typeManager->findType( typeName );
 }
 
-co::Type* TypeLoader::loadDependency( const std::string& typeName )
+Type* TypeLoader::loadDependency( const std::string& typeName )
 {
 	std::string fullPath;
 	std::string relativePath;
@@ -184,16 +188,16 @@ co::Type* TypeLoader::loadDependency( const std::string& typeName )
 		return NULL;
 
 	// convert the relativePath into a full type name
-	std::size_t length = relativePath.length() - 4;
+	size_t length = relativePath.length() - 4;
 	relativePath.resize( length ); // removes the trailing '.csl'
-	for( std::size_t i = 0; i < length; ++i )
+	for( size_t i = 0; i < length; ++i )
 	{
 		if( relativePath[i] == CORAL_OS_DIR_SEP )
 			relativePath[i] = '.';
 	}
 
 	TypeLoader loader( relativePath, this );
-	co::Type* type = loader.loadType();
+	Type* type = loader.loadType();
 
 	// set the current error as the child loader error (then it will be set as the inner error
 	// when this loader also detects the error)
@@ -215,18 +219,18 @@ bool TypeLoader::findCSL( const std::string& typeName, std::string& fullPath, st
 		names[n] = fullNS;
 		names[n].push_back( '.' );
 		names[n].append( typeName );
-		co::OS::convertDotsToDirSeps( names[n] );
+		OS::convertDotsToDirSeps( names[n] );
 		names[n].append( ".csl" );
 		++n;
 	}
 
 	names[n].reserve( typeName.size() + 4 );
 	names[n] = typeName;
-	co::OS::convertDotsToDirSeps( names[n] );
+	OS::convertDotsToDirSeps( names[n] );
 	names[n].append( ".csl" );
 	++n;
 
-	bool succeeded = co::OS::searchFile2( _path, co::ArrayRange<const std::string>( names, n ),
+	bool succeeded = OS::searchFile2( _path, ArrayRange<const std::string>( names, n ),
 											fullPath, NULL, &relativePath );
 	if( !succeeded )
 	{
@@ -238,3 +242,5 @@ bool TypeLoader::findCSL( const std::string& typeName, std::string& fullPath, st
 
 	return succeeded;
 }
+
+} // namespace co

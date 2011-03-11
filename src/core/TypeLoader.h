@@ -8,7 +8,6 @@
 
 #include "csl/Error.h"
 #include "csl/Parser.h"
-#include "tools/RefCounted.h"
 #include <co/RefPtr.h>
 #include <co/TypeKind.h>
 #include <co/Platform.h>
@@ -16,15 +15,15 @@
 #include <co/TypeCreationTransaction.h>
 
 namespace co {
-	class Type;
-	class Namespace;
-	class TypeBuilder;
-} // namespace co
 
+class Type;
+class Namespace;
+class TypeBuilder;
 class TypeManager;
+class TypeManagerComponent;
 
 /*!
-	Locates and loads a co::Type from a CSL file in the filesystem.
+	Locates and loads a Type from a CSL file in the filesystem.
 
 	The type is identified by the fully-qualified \a typeName passed in the
 	constructor. The CSL file where the type is specified should reside in one of
@@ -35,7 +34,7 @@ class TypeManager;
 	depth-first, recursive manner.
  
 	All search for dependencies and type creation is done within the context of a given
-	co::TypeManager, which should also be passed in the constructor.
+	TypeManager, which should also be passed in the constructor.
  */
 class CORAL_EXPORT TypeLoader : private csl::Parser
 {
@@ -46,8 +45,8 @@ public:
 		Types are looked up and created within the context of the specified \a typeManager.
 	 */
 	TypeLoader( const std::string& fullTypeName,
-				co::ArrayRange<const std::string> path,
-				co::TypeManager* typeManager );
+				ArrayRange<const std::string> path,
+				TypeManager* typeManager );
 
 	//! Destructor.
 	virtual ~TypeLoader();
@@ -61,14 +60,14 @@ public:
 
 		The CSL file is parsed and any type dependencies are loaded	recursively. If the
 		file is found in the filesystem and no error occurs while parsing the CSL files,
-		the loaded co::Type	instance is returned. Otherwise, this method returns NULL, and
+		the loaded Type	instance is returned. Otherwise, this method returns NULL, and
 		the exact error stack can be obtained through the getError() method.
 
 		\warning If any error occurs while loading a type, this method returns NULL
 			and all partially constructed types are rolled back.
 
 	 */
-	co::Type* loadType();
+	Type* loadType();
 
 private:
 	/*
@@ -82,7 +81,7 @@ private:
 	inline bool isRootLoader() const { return _parentLoader == NULL; }
 
 	// Template method implementation: instantiates a TypeBuilder for use by the Parser.
-	virtual co::TypeBuilder* createTypeBuilder( const std::string& typeName, co::TypeKind kind );
+	virtual TypeBuilder* createTypeBuilder( const std::string& typeName, TypeKind kind );
 
 	/*
 		Template method implementation: finds or loads a type dependency, given the
@@ -94,7 +93,7 @@ private:
 			 of error parsing the CSL file or if the file is not found in the
 			 filesystem (use getError() to access the error stack).
 	 */
-	virtual co::Type* resolveType( const std::string& typeName, bool isArray = false );
+	virtual Type* resolveType( const std::string& typeName, bool isArray = false );
 
 	/*
 		Processes a documentation chunk. If the \a member parameter is not specified, the
@@ -108,7 +107,7 @@ private:
 
 	//	Searches an existing type with the passed \a typeName. The name can be fully qualified
 	//	or relative to the current type's location. Returns NULL if the type is not found.
-	co::Type* findDependency( const std::string& typeName );
+	Type* findDependency( const std::string& typeName );
 
 	/*
 		Tries to load the type with the passed \a typeName. The name can be fully qualified
@@ -116,21 +115,23 @@ private:
 		file is not found. Otherwise, this method may return NULL if there's an error parsing
 		the CSL file.
 	 */
-	co::Type* loadDependency( const std::string& typeName );
+	Type* loadDependency( const std::string& typeName );
 
 	// Searches for a CSL file in the Coral Path. Returns true if the file was found.
 	bool findCSL( const std::string& typeName, std::string& fullPath, std::string& relativePath );
 
 private:
 	std::string _fullTypeName;
-	const co::ArrayRange<const std::string> _path;
-	TypeManager* _typeManager;
+	const ArrayRange<const std::string> _path;
+	TypeManagerComponent* _typeManager;
 	TypeLoader* _parentLoader;
 
-	co::Namespace* _namespace;
-	co::RefPtr<co::TypeCreationTransaction> _transaction;
+	Namespace* _namespace;
+	RefPtr<TypeCreationTransaction> _transaction;
 
-	co::RefPtr<csl::Error> _cslError;
+	RefPtr<csl::Error> _cslError;
 };
+
+} // namespace co
 
 #endif

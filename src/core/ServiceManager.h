@@ -10,31 +10,33 @@
 #include <co/ComponentType.h>
 #include <map>
 
+namespace co {
+
 /*!
 	Component that implements co.ServiceManager.
  */
-class ServiceManager : public co::ServiceManagerComponent_Base
+class ServiceManagerComponent : public ServiceManagerComponent_Base
 {
 public:
-	ServiceManager();
-	virtual ~ServiceManager();
+	ServiceManagerComponent();
+	virtual ~ServiceManagerComponent();
 
 	// internal methods:
 	void initialize();
 	void tearDown();
 
-	// co::ServiceManager methods:
+	// ServiceManager methods:
 	bool getIsLazy();
 	void setIsLazy( bool isLazy );
-	void addService( co::InterfaceType* serviceType, co::Interface* serviceInstance );
-	void addServiceForType( co::InterfaceType* serviceType, co::InterfaceType* clientType, co::Interface* serviceInstance );
-	void addServiceImplementation( co::InterfaceType* serviceType, const std::string& componentName );
-	void addServiceImplementationForType( co::InterfaceType* serviceType, co::InterfaceType* clientType, const std::string& componentName );
-	co::Interface* getService( co::InterfaceType* serviceType );
-	co::Interface* getServiceForType( co::InterfaceType* serviceType, co::InterfaceType* clientType );
-	co::Interface* getServiceForInstance( co::InterfaceType* serviceType, co::Interface* clientInstance );
-	void removeService( co::InterfaceType* serviceType );
-	void removeServiceForType( co::InterfaceType* serviceType, co::InterfaceType* clientType );
+	void addService( InterfaceType* serviceType, Interface* serviceInstance );
+	void addServiceForType( InterfaceType* serviceType, InterfaceType* clientType, Interface* serviceInstance );
+	void addServiceImplementation( InterfaceType* serviceType, const std::string& componentName );
+	void addServiceImplementationForType( InterfaceType* serviceType, InterfaceType* clientType, const std::string& componentName );
+	Interface* getService( InterfaceType* serviceType );
+	Interface* getServiceForType( InterfaceType* serviceType, InterfaceType* clientType );
+	Interface* getServiceForInstance( InterfaceType* serviceType, Interface* clientInstance );
+	void removeService( InterfaceType* serviceType );
+	void removeServiceForType( InterfaceType* serviceType, InterfaceType* clientType );
 
 private:
 	class LazyInstance
@@ -55,9 +57,9 @@ private:
 
 		inline bool hasInstance() const { return _hasInstance; }
 
-		inline co::Interface* getInstance() { return _instance; }
+		inline Interface* getInstance() { return _instance; }
 
-		inline void setInstance( co::Interface* instance )
+		inline void setInstance( Interface* instance )
 		{
 			clear();
 			_instance = instance;
@@ -65,9 +67,9 @@ private:
 			_hasInstance = true;
 		}
 
-		inline co::ComponentType* getComponentType() { return _implementation; }
+		inline ComponentType* getComponentType() { return _implementation; }
 
-		inline void setComponentType( co::ComponentType* type )
+		inline void setComponentType( ComponentType* type )
 		{
 			clear();
 			_implementation = type;
@@ -77,12 +79,12 @@ private:
 		bool _hasInstance; // true if we got an '_instance'; false if we got an '_implementation'.
 		union
 		{
-			co::Interface* _instance;
-			co::ComponentType* _implementation;
+			Interface* _instance;
+			ComponentType* _implementation;
 		};
 	};
 
-	typedef std::map<co::InterfaceType*, LazyInstance> CustomServicesMap;
+	typedef std::map<InterfaceType*, LazyInstance> CustomServicesMap;
 
 	struct ServiceRecord
 	{
@@ -90,23 +92,25 @@ private:
 		CustomServicesMap custom; // specialized by clientType
 	};
 
-	typedef std::map<co::InterfaceType*, ServiceRecord> ServiceMap;
+	typedef std::map<InterfaceType*, ServiceRecord> ServiceMap;
 
-	inline ServiceRecord& fetchServiceRecord( co::InterfaceType* serviceType );
-	inline co::InterfaceInfo* getFacetInfo( co::ComponentType* ct, co::InterfaceType* itfType );
+	inline ServiceRecord& fetchServiceRecord( InterfaceType* serviceType );
+	inline InterfaceInfo* getFacetInfo( ComponentType* ct, InterfaceType* itfType );
 
-	void validateClientType( co::InterfaceType* clientType );
-	void validateServiceInstance( co::InterfaceType* serviceType, co::Interface* serviceInstance );
-	co::ComponentType* validateComponentType( co::InterfaceType* serviceType, const std::string& componentName );
+	void validateClientType( InterfaceType* clientType );
+	void validateServiceInstance( InterfaceType* serviceType, Interface* serviceInstance );
+	ComponentType* validateComponentType( InterfaceType* serviceType, const std::string& componentName );
 	
-	void createServiceInstance( co::InterfaceType* serviceType, LazyInstance& instance, co::InterfaceType* clientType = 0 );
+	void createServiceInstance( InterfaceType* serviceType, LazyInstance& instance, InterfaceType* clientType = 0 );
 
-	co::Interface* getServiceForType( ServiceRecord& rec, co::InterfaceType* serviceType, co::InterfaceType* clientType );
-	LazyInstance* findSuitableInstance( ServiceRecord& rec, co::InterfaceType* serviceType, co::InterfaceType* clientType );
+	Interface* getServiceForType( ServiceRecord& rec, InterfaceType* serviceType, InterfaceType* clientType );
+	LazyInstance* findSuitableInstance( ServiceRecord& rec, InterfaceType* serviceType, InterfaceType* clientType );
 
 private:
 	bool _isLazy;
 	ServiceMap _services;
 };
+
+} // namespace co
 
 #endif

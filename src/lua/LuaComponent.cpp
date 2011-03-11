@@ -15,6 +15,8 @@
 #include <cassert>
 #include <sstream>
 
+namespace lua {
+
 /*
 	Helper macros to get a lua_State* L and protect
 	the Lua stack from eventual exceptions.
@@ -29,9 +31,7 @@
 	lua_settop( L, originalTop );
 
 
-/*****************************************************************************/
-/*  LuaComponent                                                             */
-/*****************************************************************************/
+// ------ LuaComponent ---------------------------------------------------------
 
 LuaComponent::LuaComponent()
 {
@@ -98,13 +98,13 @@ co::Interface* LuaComponent::getInterface( co::InterfaceInfo* itfInfo )
 	return lua::Component_Base::getInterface( itfInfo );
 }
 
-void LuaComponent::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
+void LuaComponent::setReceptacle( co::InterfaceInfo* receptacle, co::Interface* instance )
 {
 	co::CompoundType* owner = receptacle->getOwner();
 	if( owner == _componentType )
 		bindToDynamicReceptacle( receptacle, instance );
 	else
-		lua::Component_Base::bindInterface( receptacle, instance );
+		lua::Component_Base::setReceptacle( receptacle, instance );
 }
 
 co::int32 LuaComponent::registerProxyInterface( co::Interface* proxy )
@@ -387,3 +387,5 @@ void LuaComponent::raiseNotSupportedException()
 }
 
 CORAL_EXPORT_COMPONENT( LuaComponent, Component );
+
+} // namespace lua

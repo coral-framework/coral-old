@@ -11,22 +11,24 @@
 #include <co/reserved/OS.h>
 #include <lua/Exception.h>
 
-LuaModulePartLoader::LuaModulePartLoader()
+namespace lua {
+
+ModulePartLoader::ModulePartLoader()
 {
 	// empty
 }
 
-LuaModulePartLoader::~LuaModulePartLoader()
+ModulePartLoader::~ModulePartLoader()
 {
 	// empty
 }
 
-bool LuaModulePartLoader::canLoadModulePart( const std::string& moduleName )
+bool ModulePartLoader::canLoadModulePart( const std::string& moduleName )
 {
 	return locateModuleLibrary( moduleName );
 }
 
-co::ModulePart* LuaModulePartLoader::loadModulePart( const std::string& moduleName )
+co::ModulePart* ModulePartLoader::loadModulePart( const std::string& moduleName )
 {
 	std::string libraryFilename;
 	if( !locateModuleLibrary( moduleName, &libraryFilename ) )
@@ -43,10 +45,10 @@ co::ModulePart* LuaModulePartLoader::loadModulePart( const std::string& moduleNa
 		throw lua::Exception( "the module script must return a table" );
 	}
 
-	return new LuaModulePart;
+	return new ModulePart;
 }
 
-bool LuaModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::string* filename )
+bool ModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::string* filename )
 {
 	const char* moduleBaseName = moduleName.c_str();
 	size_t lastDotPos = moduleName.rfind( '.' );
@@ -65,4 +67,6 @@ bool LuaModulePartLoader::locateModuleLibrary( const std::string& moduleName, st
 									filename ? *filename : filePath );
 }
 
-CORAL_EXPORT_COMPONENT( LuaModulePartLoader, ModulePartLoader );
+CORAL_EXPORT_COMPONENT( ModulePartLoader, ModulePartLoader );
+
+} // namespace lua

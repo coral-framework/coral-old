@@ -9,28 +9,32 @@
 #include "MemberInfo.h"
 #include "AttributeInfoComponent_Base.h"
 
+namespace co {
+
 /*!
 	Component that implements co.AttributeInfo.
  */
-class AttributeInfo : public co::AttributeInfoComponent_Base, public MemberInfoImpl
+class AttributeInfoComponent : public AttributeInfoComponent_Base, public MemberInfoImpl
 {
 public:
-	AttributeInfo();
-	virtual ~AttributeInfo();
+	AttributeInfoComponent();
+	virtual ~AttributeInfoComponent();
 
 	// internal methods:
-	void setType( co::Type* type );
+	void setType( Type* type );
 	void setIsReadOnly( bool isReadOnly );
 
 	// co::AttributeInfo methods:
-	co::Type* getType();
+	Type* getType();
 	bool getIsReadOnly();
 
 	DELEGATE_CO_MEMBERINFO_METHODS( MemberInfoImpl:: );
 
 private:
-	co::Type* _type;
+	Type* _type;
 	bool _isReadOnly;
 };
+
+} // namespace co
 
 #endif

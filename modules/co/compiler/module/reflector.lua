@@ -51,6 +51,10 @@ local function template( writer, c, t )
 
 	c.revisionCheck( writer, c, t )
 
+	c.utils.openNamespaces( writer, c.moduleName )
+
+	writer( "\n" )
+
 	if t.kind == 'TK_COMPONENT' then
 		writer( [[
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
@@ -59,10 +63,6 @@ co::Component* __]], t.name, [[_newInstance();
 
 ]] )
 	end
-
-	c.utils.openNamespaces( writer, c.moduleName )
-
-	writer( "\n" )
 
 	if c.moduleName ~= 'co' then
 		writer [[

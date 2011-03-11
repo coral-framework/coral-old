@@ -17,6 +17,7 @@
 #include <co/reserved/OS.h>
 #include <sstream>
 
+namespace co {
 namespace csl {
 
 Parser::Parser()
@@ -156,7 +157,7 @@ static void	reportParserError( pANTLR3_BASE_RECOGNIZER recognizer )
 	Parser* parser = reinterpret_cast<Parser*>( recognizer->state->userp );
 	parser->setCurrentLine( recognizer->state->exception->line );
 
-	CORAL_THROW( co::TypeLoadException, message );
+	CORAL_THROW( TypeLoadException, message );
 }
 
 static void	reportLexerError( pANTLR3_BASE_RECOGNIZER recognizer )
@@ -175,7 +176,7 @@ static void	reportLexerError( pANTLR3_BASE_RECOGNIZER recognizer )
 	pANTLR3_LEXER lexer = reinterpret_cast<pANTLR3_LEXER>( recognizer->super );
 	parser->setCurrentLine( lexer->getLine( lexer ) );
 
-	CORAL_THROW( co::TypeLoadException, message );
+	CORAL_THROW( TypeLoadException, message );
 }
 
 void Parser::parse( const std::string& cslFilePath )
@@ -184,19 +185,19 @@ void Parser::parse( const std::string& cslFilePath )
 	_cslFileBaseName = cslFilePath;
 	
 	// get file name without dir path
-	std::size_t lastBarPos = _cslFileBaseName.rfind( CORAL_OS_DIR_SEP );
+	size_t lastBarPos = _cslFileBaseName.rfind( CORAL_OS_DIR_SEP );
 	if( lastBarPos != std::string::npos )
 		_cslFileBaseName = _cslFileBaseName.substr( lastBarPos + 1 );
 	
 	// get file name without extension
-	std::size_t lastDotPos = _cslFileBaseName.rfind( '.' );
+	size_t lastDotPos = _cslFileBaseName.rfind( '.' );
 	if( lastDotPos != std::string::npos )
 		_cslFileBaseName = _cslFileBaseName.substr( 0, lastDotPos );
 	
 	// create 	
 	_inputFileStream = antlr3AsciiFileStreamNew( (pANTLR3_UINT8)cslFilePath.c_str() );
 	if( _inputFileStream == NULL )
-		CORAL_THROW( co::IllegalArgumentException, "Error opening file '" << cslFilePath << "'" );
+		CORAL_THROW( IllegalArgumentException, "Error opening file '" << cslFilePath << "'" );
 
 	_lexer = CSLLexerNew( _inputFileStream );
 	assert( _lexer );
@@ -269,16 +270,16 @@ void Parser::onCppBlock( const std::string& text )
 	addCppBlock( text.substr( 4, text.length() - 8 ) );
 }
 
-void Parser::onTypeSpecification( const std::string& typeName, co::TypeKind kind )
+void Parser::onTypeSpecification( const std::string& typeName, TypeKind kind )
 {
 	if( _typeBuilder.isValid() )
 	{
-		CORAL_THROW( co::TypeLoadException, "only one type specification is allowed per file" );
+		CORAL_THROW( TypeLoadException, "only one type specification is allowed per file" );
 	}
 
 	if( typeName != _cslFileBaseName )
 	{
-		CORAL_THROW( co::TypeLoadException, "the name of the defined type must match its filename" );
+		CORAL_THROW( TypeLoadException, "the name of the defined type must match its filename" );
 	}
 
 	_typeBuilder = createTypeBuilder( typeName, kind );
@@ -302,11 +303,11 @@ void Parser::onImportClause( const std::string& importTypeName )
 	 */
 
 	if( _typeBuilder.isValid() )
-		CORAL_THROW( co::TypeLoadException, "all import clauses must come before the type specification" );
+		CORAL_THROW( TypeLoadException, "all import clauses must come before the type specification" );
 
-	std::size_t lastDotPos = importTypeName.rfind( '.' );
+	size_t lastDotPos = importTypeName.rfind( '.' );
 	if( lastDotPos == std::string::npos )
-		CORAL_THROW( co::TypeLoadException, "type '" << importTypeName
+		CORAL_THROW( TypeLoadException, "type '" << importTypeName
 						<< "' is in the same namespace and does not require importing" );
 
 	std::string localTypeName = importTypeName.substr( lastDotPos + 1 );
@@ -314,7 +315,7 @@ void Parser::onImportClause( const std::string& importTypeName )
 	// checks whether a type with the same local name was already imported
 	ImportTypeMap::iterator it = _importedTypes.find( localTypeName );
 	if( it != _importedTypes.end() )
-		CORAL_THROW( co::TypeLoadException, "import '" << importTypeName
+		CORAL_THROW( TypeLoadException, "import '" << importTypeName
 						<< "' conflicts with a previous import at line " << it->second.line  );
 
 	_importedTypes.insert( ImportTypeMap::value_type( localTypeName, ImportInfo( importTypeName, _currentLine ) ) );
@@ -329,9 +330,9 @@ void Parser::onNativeClass( const std::string& cppHeader, const std::string& cpp
 
 void Parser::onSuperType( const std::string& name )
 {
-	co::Type* type = resolveType( name );
+	Type* type = resolveType( name );
 	if( !type )
-		CORAL_THROW( co::TypeLoadException, "could not load super-type '" << name << "'" );
+		CORAL_THROW( TypeLoadException, "could not load super-type '" << name << "'" );
 
 	_typeBuilder->defineSuperType( type );
 }
@@ -350,9 +351,9 @@ void Parser::onIdentifierListItem( const std::string& name )
 
 void Parser::onComponentInterface( bool isFacet, const std::string& name )
 {
-	co::InterfaceType* interface = dynamic_cast<co::InterfaceType*>( getLastDeclaredType() );
+	InterfaceType* interface = dynamic_cast<InterfaceType*>( getLastDeclaredType() );
 	if( !interface )
-		CORAL_THROW( co::TypeLoadException, "an interface type was expected" );
+		CORAL_THROW( TypeLoadException, "an interface type was expected" );
 
 	_typeBuilder->defineInterface( name, interface, isFacet );
 	handleDocumentation( name );
@@ -368,7 +369,7 @@ void Parser::onMethod( const std::string& name )
 {
 	_methodBuilder = _typeBuilder->defineMethod( name );
 
-	co::Type* returnType = getLastDeclaredType();
+	Type* returnType = getLastDeclaredType();
 	if( returnType != NULL )
 		_methodBuilder->defineReturnType( returnType );
 
@@ -382,13 +383,13 @@ void Parser::onParameter( bool isIn, bool isOut, const std::string& name )
 
 void Parser::onExeptionRaised( const std::string& name )
 {
-	co::Type* type = resolveType( name );
+	Type* type = resolveType( name );
 	if( !type )
-		CORAL_THROW( co::TypeLoadException, "error loading exception type '" << name << "'" );
+		CORAL_THROW( TypeLoadException, "error loading exception type '" << name << "'" );
 
-	co::ExceptionType* exeptionType = dynamic_cast<co::ExceptionType*>( type );
+	ExceptionType* exeptionType = dynamic_cast<ExceptionType*>( type );
 	if( !exeptionType )
-		CORAL_THROW( co::TypeLoadException, "attempt to raise non-exception type '" << type->getFullName() << "'" );
+		CORAL_THROW( TypeLoadException, "attempt to raise non-exception type '" << type->getFullName() << "'" );
 
 	_methodBuilder->defineException( exeptionType );
 }
@@ -398,13 +399,13 @@ void Parser::onEndMethod()
 	_methodBuilder->createMethod();
 }
 
-co::Type* Parser::getType()
+Type* Parser::getType()
 {
 	assert( _typeBuilder.isValid() );
 	return _typeBuilder->createType();
 }
 
-co::Type* Parser::findImportedType( const std::string& alias )
+Type* Parser::findImportedType( const std::string& alias )
 {
 	ImportTypeMap::iterator it = _importedTypes.find( alias );
 	if( it != _importedTypes.end() )
@@ -427,7 +428,7 @@ void Parser::resolveImports()
 
 		it->second.type = resolveType( it->second.typeName.c_str() );
 		if( it->second.type == NULL )
-			CORAL_THROW( co::TypeLoadException, "could not import '" << it->second.typeName << "'" );
+			CORAL_THROW( TypeLoadException, "could not import '" << it->second.typeName << "'" );
 	}
 
 	// if no exceptions are raised, restore the original line.
@@ -446,9 +447,9 @@ void Parser::handleDocumentation( const std::string& member )
 	_docBuffer.clear();
 }
 
-co::Type* Parser::getLastDeclaredType()
+Type* Parser::getLastDeclaredType()
 {
-	co::Type* lastDeclaredType;
+	Type* lastDeclaredType;
 	if( _lastDeclaredTypeName == "void" )
 	{
 		lastDeclaredType = NULL;
@@ -457,9 +458,10 @@ co::Type* Parser::getLastDeclaredType()
 	{
 		lastDeclaredType = resolveType( _lastDeclaredTypeName, _lastDeclaredTypeIsArray );
 		if( !lastDeclaredType )
-			CORAL_THROW( co::TypeLoadException, "error loading dependency '" << _lastDeclaredTypeName << "'" );
+			CORAL_THROW( TypeLoadException, "error loading dependency '" << _lastDeclaredTypeName << "'" );
 	}
 	return lastDeclaredType;
 }
 
 } // namespace csl
+} // namespace co

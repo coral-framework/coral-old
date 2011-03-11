@@ -9,12 +9,17 @@
 #include <co/Coral.h>
 #include <co/RefPtr.h>
 #include <co/Reflector.h>
+#include <co/InterfaceInfo.h>
+#include <co/NoSuchInterfaceException.h>
 #include <co/reserved/OS.h>
 #include <co/reserved/LibraryManager.h>
 #include <cstdio>
 #include <cstdarg>
 #include <cstdlib>
+#include <sstream>
 #include <algorithm>
+
+namespace co {
 
 #ifdef CORAL_OS_WIN
 	static const char* PATH_SEPARATORS = ";,";
@@ -23,18 +28,18 @@
 #endif
 
 static std::vector<std::string> sg_paths;
-static co::RefPtr<System> sg_system;
-static co::TypeManager* sg_typeManager( NULL );
-static co::ServiceManager* sg_serviceManager( NULL );
+static RefPtr<SystemComponent> sg_system;
+static TypeManager* sg_typeManager( NULL );
+static ServiceManager* sg_serviceManager( NULL );
 
-co::ArrayRange<const std::string> co::getPaths()
+ArrayRange<const std::string> getPaths()
 {
 	return sg_paths;
 }
 
-void co::addPath( const std::string& path )
+void addPath( const std::string& path )
 {
-	co::StringTokenizer st( path, PATH_SEPARATORS );
+	StringTokenizer st( path, PATH_SEPARATORS );
 	while( st.nextToken() )
 	{
 		std::string dirPath( st.getToken() );
@@ -42,11 +47,11 @@ void co::addPath( const std::string& path )
 			continue;
 
 		// normalize & absolutize the path
-		co::OS::makeAbs( dirPath );
+		OS::makeAbs( dirPath );
 
-		if( !co::OS::isDir( dirPath ) )
+		if( !OS::isDir( dirPath ) )
 		{
-			co::debug( co::Dbg_Warning, "cannot add '%s' to the Coral path (not a dir)", dirPath.c_str() );
+			debug( Dbg_Warning, "cannot add '%s' to the Coral path (not a dir)", dirPath.c_str() );
 			continue;
 		}
 
@@ -59,33 +64,33 @@ void co::addPath( const std::string& path )
 	}
 }
 
-co::System* co::getSystem()
+System* getSystem()
 {
 	if( !sg_system )
 	{
-		sg_system = new ::System;
+		sg_system = new SystemComponent;
 		sg_system->initialize();
-		co::ModuleInstaller::instance().install();
+		ModuleInstaller::instance().install();
 	}
 	return sg_system.get();
 }
 
-void co::shutdown()
+void shutdown()
 {
 	if( !sg_system.isValid() )
 		return;
 
-	co::SystemState systemState = sg_system->getState();
+	SystemState systemState = sg_system->getState();
 
 	// System::setupBase() ran successfully but System::setupPresentation() was not called?
-	assert( systemState != co::SystemState_Integrated );
+	assert( systemState != SystemState_Integrated );
 
 	// tear down the system if it's still running
-	if( systemState == co::SystemState_Running )
+	if( systemState == SystemState_Running )
 		sg_system->tearDown();
 
 	// uninstall the 'core' module
-	co::ModuleInstaller::instance().uninstall();
+	ModuleInstaller::instance().uninstall();
 
 	// release the main system interfaces
 	sg_serviceManager = NULL;
@@ -93,34 +98,34 @@ void co::shutdown()
 	sg_system = NULL;
 
 	// flush all released libraries
-	co::LibraryManager::flush();
+	LibraryManager::flush();
 }
 
-static void defaultDebugEventHandler( co::DebugEvent ev, const char* message )
+static void defaultDebugEventHandler( DebugEvent ev, const char* message )
 {
 	static const char* s_eventName[] = { "DEBUG", "WARNING", "CRITICAL", "FATAL" };
 
 #ifdef CORAL_NDEBUG
-	if( ev == co::Dbg_Message )
+	if( ev == Dbg_Message )
 		return;
 #endif
 
-	const char* eventName = s_eventName[ev >= 0 && ev <= co::Dbg_Fatal ? ev : co::Dbg_Fatal];
+	const char* eventName = s_eventName[ev >= 0 && ev <= Dbg_Fatal ? ev : Dbg_Fatal];
 	fprintf( stderr, "[%s] %s\n", eventName, message );
-	if( ev == co::Dbg_Fatal )
+	if( ev == Dbg_Fatal )
 		abort();
 }
 
-static co::DebugEventHandler sg_debugEventHandler = defaultDebugEventHandler;
+static DebugEventHandler sg_debugEventHandler = defaultDebugEventHandler;
 
-co::DebugEventHandler co::installDebugEventHandler( co::DebugEventHandler handler )
+DebugEventHandler installDebugEventHandler( DebugEventHandler handler )
 {
-	co::DebugEventHandler previous = sg_debugEventHandler;
+	DebugEventHandler previous = sg_debugEventHandler;
 	sg_debugEventHandler = handler ? handler : defaultDebugEventHandler;
 	return previous;
 }
 
-void co::debug( co::DebugEvent event, const char* msg, ... )
+void debug( DebugEvent event, const char* msg, ... )
 {
 	char buffer[1024] = { 0 };
 	va_list va;
@@ -131,30 +136,41 @@ void co::debug( co::DebugEvent event, const char* msg, ... )
 	sg_debugEventHandler( event, buffer );
 }
 
-co::Type* co::getType( const std::string& fullName )
+Type* getType( const std::string& fullName )
 {
 	if( !sg_typeManager )
-		sg_typeManager = co::getSystem()->getTypes();
+		sg_typeManager = getSystem()->getTypes();
 	return sg_typeManager->getType( fullName );
 }
 
-co::Component* co::newInstance( const std::string& fullName )
+Component* newInstance( const std::string& fullName )
 {
-	co::Type* type = co::getType( fullName );
+	Type* type = getType( fullName );
 	assert( type );
-	co::Reflector* reflector = type->getReflector();
+	Reflector* reflector = type->getReflector();
 	assert( reflector );
 	return reflector->newInstance();
 }
 
-inline co::ServiceManager* getServices()
+void setReceptacleByName( Component* instance, const std::string& receptacleName, Interface* facet )
+{
+	assert( instance );
+	ComponentType* ct = instance->getComponentType();
+	InterfaceInfo* ii = dynamic_cast<InterfaceInfo*>( ct->getMember( receptacleName ) );
+	if( !ii )
+		CORAL_THROW( NoSuchInterfaceException, "no such interface '" << receptacleName
+						<< "' in component " << ct->getFullName() );
+	instance->setReceptacle( ii, facet );
+}
+
+inline ServiceManager* getServices()
 {
 	if( !sg_serviceManager )
-		sg_serviceManager = co::getSystem()->getServices();
+		sg_serviceManager = getSystem()->getServices();
 	return sg_serviceManager;
 }
 
-co::Interface* co::getServiceForType( co::InterfaceType* serviceType, co::InterfaceType* clientType )
+Interface* getServiceForType( InterfaceType* serviceType, InterfaceType* clientType )
 {
 	if( clientType )
 		return getServices()->getServiceForType( serviceType, clientType );
@@ -162,17 +178,19 @@ co::Interface* co::getServiceForType( co::InterfaceType* serviceType, co::Interf
 		return getServices()->getService( serviceType );
 }
 
-co::Interface* co::getServiceForInstance( co::InterfaceType* serviceType, co::Interface* clientInstance )
+Interface* getServiceForInstance( InterfaceType* serviceType, Interface* clientInstance )
 {
 	return getServices()->getServiceForInstance( serviceType, clientInstance );
 }
 
-bool co::findModuleFile( const std::string& moduleName, const std::string& fileName, std::string& filePath )
+bool findModuleFile( const std::string& moduleName, const std::string& fileName, std::string& filePath )
 {
 	std::string modulePath( moduleName );
-	co::OS::convertDotsToDirSeps( modulePath );
-	return co::OS::searchFile3( co::getPaths(),
-				co::ArrayRange<const std::string>( &modulePath, 1 ),
-				co::ArrayRange<const std::string>( &fileName, 1 ),
+	OS::convertDotsToDirSeps( modulePath );
+	return OS::searchFile3( getPaths(),
+				ArrayRange<const std::string>( &modulePath, 1 ),
+				ArrayRange<const std::string>( &fileName, 1 ),
 				filePath );
 }
+	
+} // namespace co

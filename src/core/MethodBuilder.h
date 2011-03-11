@@ -11,41 +11,43 @@
 #include <vector>
 
 namespace co {
-	class Type;
-	class MethodInfo;
-	class TypeBuilder;
-	class ExceptionType;
-	class ParameterInfo;
-}
+
+class Type;
+class MethodInfo;
+class TypeBuilder;
+class ExceptionType;
+class ParameterInfo;
 
 /*!
 	Component that implements co.MethodBuilder.
  */
-class MethodBuilder : public co::MethodBuilderComponent_Base
+class MethodBuilderComponent : public MethodBuilderComponent_Base
 {
 public:
-	MethodBuilder();
-	virtual ~MethodBuilder();
+	MethodBuilderComponent();
+	virtual ~MethodBuilderComponent();
 
 	// internal methods:
-	void init( co::TypeBuilder* typeBuilder, const std::string& name );
+	void init( TypeBuilder* typeBuilder, const std::string& name );
 
-	// co::MethodBuilder methods:
-	co::TypeBuilder* getTypeBuilder();
+	// MethodBuilder methods:
+	TypeBuilder* getTypeBuilder();
 	const std::string& getMethodName();
-	void defineReturnType( co::Type* type );
-	void defineParameter( const std::string& name, co::Type* type, bool input, bool output );
-	void defineException( co::ExceptionType* exception );
+	void defineReturnType( Type* type );
+	void defineParameter( const std::string& name, Type* type, bool input, bool output );
+	void defineException( ExceptionType* exception );
 	void createMethod();
 
 private:
 	std::string _name;
-	co::RefPtr<co::TypeBuilder> _typeBuilder;
-	co::RefPtr<co::MethodInfo> _createdMethodInfo;
+	RefPtr<TypeBuilder> _typeBuilder;
+	RefPtr<MethodInfo> _createdMethodInfo;
 
-	co::Type* _returnType;
-	co::RefVector<co::ParameterInfo> _parameters;
-	std::vector<co::ExceptionType*> _expectedExceptions;
+	Type* _returnType;
+	RefVector<ParameterInfo> _parameters;
+	std::vector<ExceptionType*> _expectedExceptions;
 };
+
+} // namespace co
 
 #endif

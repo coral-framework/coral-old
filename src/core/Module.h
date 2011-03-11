@@ -11,14 +11,16 @@
 #include <co/RefVector.h>
 #include <co/ModulePart.h>
 
+namespace co {
+
 /*!
 	Component that implements co.Module.
  */
-class Module : public co::ModuleComponent_Base
+class ModuleComponent : public ModuleComponent_Base
 {
 public:
-	Module();
-	virtual ~Module();
+	ModuleComponent();
+	virtual ~ModuleComponent();
 
 	// internal methods:
 	void initialize( const std::string& moduleName );
@@ -27,16 +29,16 @@ public:
 		Adds a ModulePart as a constituent part of this Module.
 
 		The module's state must be ModuleState_None when this method is called,
-		or a co::LifeCycleException will be raised.
+		or a LifeCycleException will be raised.
 	 */
-	void addPart( co::ModulePart* part );
+	void addPart( ModulePart* part );
 
-	// co::Module methods:
-	co::ModuleState getState();
-	co::Namespace* getNamespace();
-	co::ArrayRange<co::ModulePart* const> getParts();
-	co::int32 getRank();
-	void setRank( co::int32 rank );
+	// Module methods:
+	ModuleState getState();
+	Namespace* getNamespace();
+	ArrayRange<ModulePart* const> getParts();
+	int32 getRank();
+	void setRank( int32 rank );
 	void initialize();
 	void integrate();
 	void integratePresentation();
@@ -45,10 +47,12 @@ public:
 	void abort();
 
 private:
-	co::ModuleState _state;
-	co::Namespace* _namespace;
-	co::RefVector<co::ModulePart> _parts;
-	co::int32 _rank;
+	ModuleState _state;
+	Namespace* _namespace;
+	RefVector<ModulePart> _parts;
+	int32 _rank;
 };
+
+} // namespace co
 
 #endif

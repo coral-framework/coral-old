@@ -10,87 +10,92 @@
 #include <co/InterfaceType.h>
 #include <algorithm>
 
-// Helper comparators:
+namespace co {
 
-int memberInfoComparator( co::MemberInfo* memberInfo, const std::string& name )
+// ------ Helper Comparators ---------------------------------------------------
+
+inline int memberInfoComparator( MemberInfo* memberInfo, const std::string& name )
 {
 	return memberInfo->getName().compare( name );
 }
 
-bool typeThenNameMemberInfoComparator( const co::RefPtr<co::MemberInfo>& m1, const co::RefPtr<co::MemberInfo>& m2 )
+inline bool typeThenNameMemberInfoComparator( const RefPtr<MemberInfo>& m1, const RefPtr<MemberInfo>& m2 )
 {
-	const co::AttributeInfo* ai1 = dynamic_cast<const co::AttributeInfo*>( m1.get() );
-	const co::AttributeInfo* ai2 = dynamic_cast<const co::AttributeInfo*>( m2.get() );
+	const AttributeInfo* ai1 = dynamic_cast<const AttributeInfo*>( m1.get() );
+	const AttributeInfo* ai2 = dynamic_cast<const AttributeInfo*>( m2.get() );
 
 	if( ( !ai1 && ai2 ) || ( ai1 && !ai2 ) )
-	{
 		return ai1 != 0;
-	}
 
-	return const_cast<co::MemberInfo*>( m1.get() )->getName() < const_cast<co::MemberInfo*>( m2.get() )->getName();
+	return const_cast<MemberInfo*>( m1.get() )->getName() < const_cast<MemberInfo*>( m2.get() )->getName();
 }
 
-// --- AttributeAndMethodContainer ---
+// ------ AttributeAndMethodContainer ------------------------------------------
 
 AttributeAndMethodContainer::AttributeAndMethodContainer() : _firstMethodPos( -1 )
 {
 	// empty
 }
 
-void AttributeAndMethodContainer::addMembers( co::ArrayRange<co::MemberInfo* const> members )
+AttributeAndMethodContainer::~AttributeAndMethodContainer()
+{
+	// empty
+}
+
+void AttributeAndMethodContainer::addMembers( ArrayRange<MemberInfo* const> members )
 {
 	_members.reserve( _members.size() + members.getSize() );
 	for( ; members; members.popFirst() )
 		_members.push_back( members.getFirst() );
 }
 
-void AttributeAndMethodContainer::sortMembers( co::CompoundType* owner )
+void AttributeAndMethodContainer::sortMembers( CompoundType* owner )
 {
-	assert( _firstMethodPos == std::size_t( -1 ) );
+	assert( _firstMethodPos == size_t( -1 ) );
 
 	// sort the members	vector
 	std::sort( _members.begin(), _members.end(), typeThenNameMemberInfoComparator );
 
 	// notify members about their owner/index
-	std::size_t count = _members.size();
-	for( std::size_t i = 0; i < count; ++i )
+	size_t count = _members.size();
+	for( size_t i = 0; i < count; ++i )
 	{
 		MemberInfoImpl* mii = dynamic_cast<MemberInfoImpl*>( _members[i].get() );
 		assert( mii );
 		mii->setOwner( owner, i );
 
-		if( _firstMethodPos == std::size_t( -1 )
-				&& dynamic_cast<co::MethodInfo*>( _members[i].get() ) )
+		if( _firstMethodPos == size_t( -1 )
+				&& dynamic_cast<MethodInfo*>( _members[i].get() ) )
 			_firstMethodPos = i;
 	}
 
-	if( _firstMethodPos == std::size_t( -1 ) )
+	if( _firstMethodPos == size_t( -1 ) )
 		_firstMethodPos = count;
 }
 
-co::ArrayRange<co::MemberInfo* const> AttributeAndMethodContainer::getMembers()
+ArrayRange<MemberInfo* const> AttributeAndMethodContainer::getMembers()
 {
 	return _members;
 }
 
-co::MemberInfo* AttributeAndMethodContainer::getMember( const std::string& name )
+MemberInfo* AttributeAndMethodContainer::getMember( const std::string& name )
 {
-	std::size_t pos;
+	size_t pos;
 
 	// first, look for an attribute
 	if( _firstMethodPos > 0 && _members.sortedFind( name, memberInfoComparator, 0, _firstMethodPos - 1, pos ) )
 		return _members[pos].get();
 
 	// if it's not an attribute, look for a method
-	std::size_t membersSize = _members.size();
+	size_t membersSize = _members.size();
 	if( _firstMethodPos < membersSize && _members.sortedFind( name, memberInfoComparator, _firstMethodPos, membersSize - 1, pos ) )
 		return _members[pos].get();
 
 	// finally, search our ancestors (if any)
-	co::ArrayRange<co::CompoundType* const> ancestors = getCompoundTypeAncestors();
+	ArrayRange<CompoundType* const> ancestors = getCompoundTypeAncestors();
 	for( ; ancestors; ancestors.popFirst() )
 	{
-		co::MemberInfo* mi = ancestors.getFirst()->getMember( name );
+		MemberInfo* mi = ancestors.getFirst()->getMember( name );
 		if( mi )
 			return mi;
 	}
@@ -98,32 +103,34 @@ co::MemberInfo* AttributeAndMethodContainer::getMember( const std::string& name 
 	return NULL;
 }
 
-co::ArrayRange<co::AttributeInfo* const> AttributeAndMethodContainer::getMemberAttributes()
+ArrayRange<AttributeInfo* const> AttributeAndMethodContainer::getMemberAttributes()
 {
-	assert( _firstMethodPos != std::size_t( -1 ) );
+	assert( _firstMethodPos != size_t( -1 ) );
 
 	if( _firstMethodPos < 1 )
-		return co::ArrayRange<co::AttributeInfo* const>();
+		return ArrayRange<AttributeInfo* const>();
 
 	// create an array range downcasting MemberInfo* to AttributeInfo*
-	return co::ArrayRange<co::AttributeInfo* const>(
-		reinterpret_cast<co::AttributeInfo**>( &_members.front() ), _firstMethodPos );
+	return ArrayRange<AttributeInfo* const>(
+		reinterpret_cast<AttributeInfo**>( &_members.front() ), _firstMethodPos );
 }
 
-co::ArrayRange<co::MethodInfo* const> AttributeAndMethodContainer::getMemberMethods()
+ArrayRange<MethodInfo* const> AttributeAndMethodContainer::getMemberMethods()
 {
-	assert( _firstMethodPos != std::size_t( -1 ) );
+	assert( _firstMethodPos != size_t( -1 ) );
 
-	std::size_t membersSize = _members.size();
+	size_t membersSize = _members.size();
 	if( _firstMethodPos >= membersSize )
-		return co::ArrayRange<co::MethodInfo* const>();
+		return ArrayRange<MethodInfo* const>();
 
 	// create an array range downcasting MemberInfo* to MethodInfo*
-	return co::ArrayRange<co::MethodInfo* const>(
-		reinterpret_cast<co::MethodInfo**>( &_members.front() + _firstMethodPos ), membersSize - _firstMethodPos );
+	return ArrayRange<MethodInfo* const>(
+		reinterpret_cast<MethodInfo**>( &_members.front() + _firstMethodPos ), membersSize - _firstMethodPos );
 }
 
-co::ArrayRange<co::CompoundType* const> AttributeAndMethodContainer::getCompoundTypeAncestors()
+ArrayRange<CompoundType* const> AttributeAndMethodContainer::getCompoundTypeAncestors()
 {
-	return co::ArrayRange<co::CompoundType* const>();
+	return ArrayRange<CompoundType* const>();
 }
+
+} // namespace co

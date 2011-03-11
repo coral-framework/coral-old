@@ -57,7 +57,7 @@ public:
 		Adds the first length chars of data to the cryptographic hash.
 		\throw LifeCycleException if the hash result was already calculated.
 	 */
-	void addData( const uint8* data, std::size_t length );
+	void addData( const uint8* data, size_t length );
 
 	//! This is an overloaded member function, provided for convenience. See addData().
 	//@{

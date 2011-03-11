@@ -7,7 +7,9 @@
 #include "LuaState.h"
 #include <co/Module.h>
 
-LuaModulePart::LuaModulePart()
+namespace lua {
+
+ModulePart::ModulePart()
 {
 	lua_State* L = LuaState::getL();
 	assert( lua_type( L, -1 ) == LUA_TTABLE );
@@ -20,7 +22,7 @@ LuaModulePart::LuaModulePart()
 	lua_pop( L, 1 );
 }
 
-LuaModulePart::~LuaModulePart()
+ModulePart::~ModulePart()
 {
 	lua_State* L = LuaState::getL();
 
@@ -30,32 +32,32 @@ LuaModulePart::~LuaModulePart()
 	lua_rawset( L, LUA_REGISTRYINDEX );
 }
 
-void LuaModulePart::initialize( co::Module* module )
+void ModulePart::initialize( co::Module* module )
 {
 	callScriptMethod( "initialize", module );
 }
 
-void LuaModulePart::integrate( co::Module* module )
+void ModulePart::integrate( co::Module* module )
 {
 	callScriptMethod( "integrate", module );
 }
 
-void LuaModulePart::integratePresentation( co::Module* module )
+void ModulePart::integratePresentation( co::Module* module )
 {
 	callScriptMethod( "integratePresentation", module );
 }
 
-void LuaModulePart::disintegrate( co::Module* module )
+void ModulePart::disintegrate( co::Module* module )
 {
 	callScriptMethod( "disintegrate", module );
 }
 
-void LuaModulePart::dispose( co::Module* module )
+void ModulePart::dispose( co::Module* module )
 {
 	callScriptMethod( "dispose", module );
 }
 
-void LuaModulePart::callScriptMethod( const char* methodName, co::Module* module )
+void ModulePart::callScriptMethod( const char* methodName, co::Module* module )
 {
 	lua_State* L = LuaState::getL();
 
@@ -85,4 +87,6 @@ void LuaModulePart::callScriptMethod( const char* methodName, co::Module* module
 	LuaState::call( L, 2, 0 );
 }
 
-CORAL_EXPORT_COMPONENT( LuaModulePart, ModulePart );
+CORAL_EXPORT_COMPONENT( ModulePart, ModulePart );
+
+} // namespace lua

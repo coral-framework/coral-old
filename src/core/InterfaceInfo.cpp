@@ -5,35 +5,39 @@
 
 #include "InterfaceInfo.h"
 
-InterfaceInfo::InterfaceInfo() : _interfaceType( 0 ), _isFacet( true )
+namespace co {
+
+InterfaceInfoComponent::InterfaceInfoComponent() : _interfaceType( 0 ), _isFacet( true )
 {
 	// empty
 }
 
 
-InterfaceInfo::~InterfaceInfo()
+InterfaceInfoComponent::~InterfaceInfoComponent()
 {
 	// empty
 }
 
-void InterfaceInfo::setType( co::InterfaceType* interfaceType )
+void InterfaceInfoComponent::setType( InterfaceType* interfaceType )
 {
 	_interfaceType = interfaceType;
 }
 
-void InterfaceInfo::setIsFacet( bool isFacet )
+void InterfaceInfoComponent::setIsFacet( bool isFacet )
 {
 	_isFacet = isFacet;
 }
 
-co::InterfaceType* InterfaceInfo::getType()
+InterfaceType* InterfaceInfoComponent::getType()
 {
 	return _interfaceType;
 }
 
-bool InterfaceInfo::getIsFacet()
+bool InterfaceInfoComponent::getIsFacet()
 {
 	return _isFacet;
 }
 
-CORAL_EXPORT_COMPONENT( InterfaceInfo, InterfaceInfoComponent );
+CORAL_EXPORT_COMPONENT( InterfaceInfoComponent, InterfaceInfoComponent );
+
+} // namespace co

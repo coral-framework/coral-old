@@ -70,11 +70,11 @@ co::Interface* ModulePartLoaderComponent_Base::getInterface( co::InterfaceInfo* 
 	return res;
 }
 
-void ModulePartLoaderComponent_Base::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
+void ModulePartLoaderComponent_Base::setReceptacle( co::InterfaceInfo* receptacle, co::Interface* facet )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
-	CORAL_UNUSED( instance );
+	CORAL_UNUSED( facet );
 }
 
 } // namespace co

@@ -8,7 +8,9 @@
 #include <co/System.h>
 #include <co/ModuleManager.h>
 
-class ModulePart : public moduleB::moduleB_Base
+namespace moduleB {
+
+class ModulePart : public moduleB_Base
 {
 public:
     ModulePart()
@@ -53,7 +55,6 @@ public:
 };
 
 CORAL_EXPORT_COMPONENT( ModulePart, moduleB );
+CORAL_EXPORT_MODULE_PART( ModulePart );
 
-namespace moduleB {
-	CORAL_EXPORT_MODULE_PART( ModulePart );
-}
+} // namespace moduleB

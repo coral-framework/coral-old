@@ -116,8 +116,8 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 
 TEST( ReflectionTests, getAndBindComponentInterfaces )
 {
-	co::Component* testComponent = co::newInstance( "moduleA.TestComponent" );
-	ASSERT_TRUE( testComponent != NULL );
+	co::RefPtr<co::Component> testComponent = co::newInstance( "moduleA.TestComponent" );
+	ASSERT_TRUE( testComponent.isValid() );
 
 	EXPECT_THROW( testComponent->getInterface( NULL ), co::NoSuchInterfaceException );
 
@@ -132,7 +132,7 @@ TEST( ReflectionTests, getAndBindComponentInterfaces )
 	EXPECT_EQ( testComponent->getFacet<moduleA::TestInterface>(), itf );
 
 	// cannot 'bind' to a facet
-	EXPECT_THROW( testComponent->bindInterface( testInterfaceInfo, itf ), co::NoSuchInterfaceException );
+	EXPECT_THROW( testComponent->setReceptacle( testInterfaceInfo, itf ), co::NoSuchInterfaceException );
 
 	// get InterfaceInfo's for the receptacles
 	co::InterfaceInfo* typeItfInfo = dynamic_cast<co::InterfaceInfo*>( type->getMember( "type" ) );
@@ -144,18 +144,23 @@ TEST( ReflectionTests, getAndBindComponentInterfaces )
 
 	// attempting to bind a StructType to 'itfType' should produce an exception (it expects an InterfaceType)
 	co::Type* structType = co::getType( "moduleA.TestStruct" );
-	EXPECT_THROW( testComponent->bindInterface( itfTypeItfInfo, structType ), co::IllegalArgumentException );
+	EXPECT_THROW( testComponent->setReceptacle( itfTypeItfInfo, structType ), co::IllegalArgumentException );
 
 	// bind an InterfaceType to both receptacles
 	co::Type* itfType = co::getType( "moduleA.TestInterface" );
 
-	testComponent->bindInterface( typeItfInfo, itfType );
+	testComponent->setReceptacle( typeItfInfo, itfType );
 	itf = testComponent->getInterface( typeItfInfo );
 	EXPECT_EQ( itfType->getInterfaceOwner(), itf->getInterfaceOwner() );
 	EXPECT_EQ( itfType->getInterfaceName(), itf->getInterfaceName() );
 
-	testComponent->bindInterface( itfTypeItfInfo, itfType );
+	testComponent->setReceptacle( itfTypeItfInfo, itfType );
 	itf = testComponent->getInterface( itfTypeItfInfo );
 	EXPECT_EQ( itfType->getInterfaceOwner(), itf->getInterfaceOwner() );
 	EXPECT_EQ( itfType->getInterfaceName(), itf->getInterfaceName() );
+
+	// try setting a receptacle by name
+	co::setReceptacleByName( testComponent.get(), "type", NULL );
+	EXPECT_EQ( NULL, testComponent->getInterface( typeItfInfo ) );
+	EXPECT_THROW( co::setReceptacleByName( testComponent.get(), "noReceptacle", NULL ), co::NoSuchInterfaceException );
 }

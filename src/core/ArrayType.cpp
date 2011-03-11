@@ -5,19 +5,23 @@
 
 #include "ArrayType.h"
 
-ArrayType::~ArrayType()
+namespace co {
+
+ArrayTypeComponent::~ArrayTypeComponent()
 {
 	// empty
 }
 
-void ArrayType::setElementType( co::Type* type )
+void ArrayTypeComponent::setElementType( Type* type )
 {
 	_elementType = type;
 }
 
-co::Type* ArrayType::getElementType()
+Type* ArrayTypeComponent::getElementType()
 {
 	return _elementType.get();
 }
 
-CORAL_EXPORT_COMPONENT( ArrayType, ArrayTypeComponent );
+CORAL_EXPORT_COMPONENT( ArrayTypeComponent, ArrayTypeComponent );
+
+} // namespace co

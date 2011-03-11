@@ -19,15 +19,15 @@ namespace lua {
 /*!
 	The Lua module's co.ModulePart.
  */
-class ModulePart : public lua::lua_Base
+class ModulePartComponent : public lua::lua_Base
 {
 public:
-    ModulePart()
+    ModulePartComponent()
 	{
 		LuaState::setup();
 	}
 
-	virtual ~ModulePart()
+	virtual ~ModulePartComponent()
 	{
 		// empty
 	}
@@ -40,7 +40,7 @@ public:
 		module->setRank( 100000 );
 
 		// install our LuaModulePartLoader
-		_luaModulePartLoader = new LuaModulePartLoader;
+		_luaModulePartLoader = new ModulePartLoader;
 		co::getSystem()->getModules()->installLoader( _luaModulePartLoader.get() );
 
 		/*
@@ -84,11 +84,10 @@ public:
 	}
 
 private:
-	co::RefPtr<LuaModulePartLoader> _luaModulePartLoader;
+	co::RefPtr<ModulePartLoader> _luaModulePartLoader;
 };
-
-CORAL_EXPORT_MODULE_PART( ModulePart );
+	
+CORAL_EXPORT_COMPONENT( ModulePartComponent, lua );
+CORAL_EXPORT_MODULE_PART( ModulePartComponent );
 
 } // namespace lua
-
-CORAL_EXPORT_COMPONENT( lua::ModulePart, lua );

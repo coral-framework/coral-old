@@ -9,6 +9,8 @@
 #include "Universe_Base.h"
 #include <lua.hpp>
 
+namespace lua {
+
 /*!
 	A static component class that manages a Lua universe and
 	provides methods to exchange values between Lua and Coral.
@@ -20,7 +22,7 @@
 	the lua_State returned by LuaState::getL(), or a Lua thread	created by it.
 	Currently we do NOT support working with multiple independent lua_States.
  */
-class LuaState : public lua::Universe_Base
+class LuaState : public Universe_Base
 {
 public:
 	//! Returns our Lua universe (a main thread).
@@ -109,5 +111,7 @@ private:
 	static lua_State* sm_L;
 	static int sm_instancesTableRegIdx;
 };
+
+} // namespace lua
 
 #endif

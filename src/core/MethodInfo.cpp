@@ -5,17 +5,19 @@
 
 #include "MethodInfo.h"
 
-MethodInfo::~MethodInfo()
+namespace co {
+
+MethodInfoComponent::~MethodInfoComponent()
 {
 	// empty
 }
 
-void MethodInfo::setReturnType( co::Type* returnType )
+void MethodInfoComponent::setReturnType( Type* returnType )
 {
 	_returnType = returnType;
 }
 
-void MethodInfo::setParameters( co::ArrayRange<co::ParameterInfo* const> parameters )
+void MethodInfoComponent::setParameters( ArrayRange<ParameterInfo* const> parameters )
 {
 	assert( _parameters.size() == 0 );
 	_parameters.reserve( parameters.getSize() );
@@ -23,7 +25,7 @@ void MethodInfo::setParameters( co::ArrayRange<co::ParameterInfo* const> paramet
 		_parameters.push_back( parameters.getFirst() );
 }
 
-void MethodInfo::setExceptions( co::ArrayRange<co::ExceptionType* const> exceptions )
+void MethodInfoComponent::setExceptions( ArrayRange<ExceptionType* const> exceptions )
 {
 	assert( _exceptions.size() == 0 );
 	_exceptions.reserve( exceptions.getSize() );
@@ -31,19 +33,21 @@ void MethodInfo::setExceptions( co::ArrayRange<co::ExceptionType* const> excepti
 		_exceptions.push_back( exceptions.getFirst() );
 }
 
-co::Type* MethodInfo::getReturnType()
+Type* MethodInfoComponent::getReturnType()
 {
 	return _returnType;
 }
 
-co::ArrayRange<co::ParameterInfo* const> MethodInfo::getParameters()
+ArrayRange<ParameterInfo* const> MethodInfoComponent::getParameters()
 {
 	return _parameters;
 }
 
-co::ArrayRange<co::ExceptionType* const> MethodInfo::getExceptions()
+ArrayRange<ExceptionType* const> MethodInfoComponent::getExceptions()
 {
 	return _exceptions;
 }
 
-CORAL_EXPORT_COMPONENT( MethodInfo, MethodInfoComponent );
+CORAL_EXPORT_COMPONENT( MethodInfoComponent, MethodInfoComponent );
+
+} // namespace co

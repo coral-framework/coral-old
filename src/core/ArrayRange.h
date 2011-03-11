@@ -20,7 +20,7 @@ struct ArrayRangeAdaptor
 {
 	static const bool isValid = false;
 	static T* getData( C& ) { return 0; }
-	static std::size_t getSize( C& ) { return 0; }
+	static size_t getSize( C& ) { return 0; }
 };
 
 // We should always be able to create ArrayRanges out of const containers.
@@ -30,7 +30,7 @@ struct ArrayRangeAdaptor<T, const C>
 	typedef ArrayRangeAdaptor<T, C> NCA;
 	static const bool isValid = NCA::isValid;
 	static T* getData( const C& container ) { return NCA::getData( const_cast<C&>( container ) ); }
-	static std::size_t getSize( const C& container ) { return NCA::getSize( const_cast<C&>( container ) ); }
+	static size_t getSize( const C& container ) { return NCA::getSize( const_cast<C&>( container ) ); }
 };
 
 // Specialization for std::vectors of values.
@@ -39,7 +39,7 @@ struct ArrayRangeAdaptor<T, std::vector<ET> >
 {
 	static const bool isValid = true;
 	static T* getData( std::vector<ET>& v ) { return v.empty() ? NULL : &v[0]; }
-	static std::size_t getSize( std::vector<ET>& v ) { return v.size(); }
+	static size_t getSize( std::vector<ET>& v ) { return v.size(); }
 };
 
 // Specialization for std::vectors of pointers (allows coercions).
@@ -49,12 +49,16 @@ struct ArrayRangeAdaptor<T, std::vector<ET*> >
 	static const bool isValid = true;
 	static T* getData( std::vector<ET*>& v )
 	{
-		// ET must be castable to T
-		static const T s_castabilityTest = (ET*)0;
-		CORAL_UNUSED( s_castabilityTest );
+		/*
+			A conversion from ET* to T should need no offsetting.
+			This generally works for single, but not for multiple inheritance.
+		 */
+		static const T cp1 = static_cast<T>( (ET*)0xCCCC );
+		static const T cp2 = (T)0xCCCC;
+		CORAL_STATIC_CHECK( cp1 == cp2, incompatible_pointer_types_would_need_casting );
 		return v.empty() ? NULL : reinterpret_cast<T*>( &v[0] );
 	}
-	static std::size_t getSize( std::vector<ET*>& v ) { return v.size(); }
+	static size_t getSize( std::vector<ET*>& v ) { return v.size(); }
 };
 
 #endif // DOXYGEN
@@ -108,7 +112,7 @@ public:
 	}
 
 	//! Creates a range starting at 'array' and containing 'size' elements.
-	ArrayRange( T* array, std::size_t size ) : _start( array ), _end( array + size )
+	ArrayRange( T* array, size_t size ) : _start( array ), _end( array + size )
 	{;}
 
 	//! Non-const copy constructor.
@@ -140,7 +144,7 @@ public:
 	inline bool isEmpty() const { return _start == _end; }
 
 	//! Returns the number of elements in the range.
-	inline std::size_t getSize() const { return _end - _start; }
+	inline size_t getSize() const { return _end - _start; }
 
 	//! Testing the range is equivalent to testing if it's not empty.
 	inline operator bool() const { return _start != _end; }
@@ -207,7 +211,7 @@ private:
 #ifdef CORAL_CC_MSVC
 #pragma warning (pop)
 #endif
-	
+
 #ifndef DOXYGEN
 
 /****************************************************************************/

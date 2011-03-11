@@ -7,52 +7,54 @@
 #include <co/LifeCycleException.h>
 #include <co/reserved/LibraryManager.h>
 
-System::System()
+namespace co {
+
+SystemComponent::SystemComponent()
 {
-	_state = co::SystemState_None;
-	_types = new TypeManager;
-	_modules = new ModuleManager;
-	_services = new ServiceManager;
+	_state = SystemState_None;
+	_types = new TypeManagerComponent;
+	_modules = new ModuleManagerComponent;
+	_services = new ServiceManagerComponent;
 }
 
-System::~System()
+SystemComponent::~SystemComponent()
 {
 	// empty
 }
 
-void System::initialize()
+void SystemComponent::initialize()
 {
 	_types->initialize();
 	_modules->initialize();
 	_services->initialize();
 }
 
-co::SystemState System::getState()
+SystemState SystemComponent::getState()
 {
 	return _state;
 }
 
-co::TypeManager* System::getTypes()
+TypeManager* SystemComponent::getTypes()
 {
 	return _types.get();
 }
 
-co::ModuleManager* System::getModules()
+ModuleManager* SystemComponent::getModules()
 {
 	return _modules.get();
 }
 
-co::ServiceManager* System::getServices()
+ServiceManager* SystemComponent::getServices()
 {
 	return _services.get();
 }
 
-void System::setupBase( co::ArrayRange<std::string const> requiredModules )
+void SystemComponent::setupBase( ArrayRange<std::string const> requiredModules )
 {
-	if( _state != co::SystemState_None )
-		throw co::LifeCycleException( "the system's state is not SystemState_None" );
+	if( _state != SystemState_None )
+		throw LifeCycleException( "the system's state is not SystemState_None" );
 
-	_state = co::SystemState_Initializing;
+	_state = SystemState_Initializing;
 
 	try
 	{
@@ -61,45 +63,47 @@ void System::setupBase( co::ArrayRange<std::string const> requiredModules )
 	}
 	catch( ... )
 	{
-		_state = co::SystemState_None;
+		_state = SystemState_None;
 		throw;
 	}
 	
-	_state = co::SystemState_Integrating;
+	_state = SystemState_Integrating;
 
-	_modules->updateModules( co::ModuleState_Integrated );
+	_modules->updateModules( ModuleState_Integrated );
 
-	_state = co::SystemState_Integrated;
+	_state = SystemState_Integrated;
 }
 
-void System::setupPresentation()
+void SystemComponent::setupPresentation()
 {
-	if( _state != co::SystemState_Integrated )
-		throw co::LifeCycleException( "the system's state is not SystemState_Integrated" );
+	if( _state != SystemState_Integrated )
+		throw LifeCycleException( "the system's state is not SystemState_Integrated" );
 
-	_state = co::SystemState_IntegratingPresentation;
+	_state = SystemState_IntegratingPresentation;
 
-	_modules->updateModules( co::ModuleState_PresentationIntegrated );
+	_modules->updateModules( ModuleState_PresentationIntegrated );
 
-	_state = co::SystemState_Running;
+	_state = SystemState_Running;
 }
 
-void System::tearDown()
+void SystemComponent::tearDown()
 {
-	if( _state != co::SystemState_Running )
-		throw co::LifeCycleException( "the system's state is not SystemState_Running" );
+	if( _state != SystemState_Running )
+		throw LifeCycleException( "the system's state is not SystemState_Running" );
 
 	// dispose all modules
-	_modules->updateModules( co::ModuleState_Disintegrated );
-	_modules->updateModules( co::ModuleState_Disposed );
+	_modules->updateModules( ModuleState_Disintegrated );
+	_modules->updateModules( ModuleState_Disposed );
 
 	// release the remaining service instances
 	_services->tearDown();
 
 	// make sure all released library instances are unloaded
-	co::LibraryManager::flush();
+	LibraryManager::flush();
 
-	_state = co::SystemState_None;
+	_state = SystemState_None;
 }
 
-CORAL_EXPORT_COMPONENT( System, SystemComponent );
+CORAL_EXPORT_COMPONENT( SystemComponent, SystemComponent );
+
+} // namespace co

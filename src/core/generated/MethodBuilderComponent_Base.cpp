@@ -70,11 +70,11 @@ co::Interface* MethodBuilderComponent_Base::getInterface( co::InterfaceInfo* int
 	return res;
 }
 
-void MethodBuilderComponent_Base::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
+void MethodBuilderComponent_Base::setReceptacle( co::InterfaceInfo* receptacle, co::Interface* facet )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
-	CORAL_UNUSED( instance );
+	CORAL_UNUSED( facet );
 }
 
 } // namespace co

@@ -16,7 +16,7 @@ StringTokenizer::StringTokenizer( const std::string& str, const std::string& del
 bool StringTokenizer::nextToken()
 {
 	// skip delimiters at beginning
-	std::size_t startPos = _str.find_first_not_of( _delimiters, _offset );
+	size_t startPos = _str.find_first_not_of( _delimiters, _offset );
 	if( startPos == std::string::npos )
 	{
 		_offset = _str.length();
@@ -24,7 +24,7 @@ bool StringTokenizer::nextToken()
 	}
 
 	// find first delimiter after startPos
-	std::size_t endPos = _str.find_first_of( _delimiters, startPos );
+	size_t endPos = _str.find_first_of( _delimiters, startPos );
 	if( endPos == std::string::npos )
 	{
 		_offset = _str.length();

@@ -76,7 +76,7 @@ Interface* ModulePartBase::getInterface( InterfaceInfo* interfaceInfo )
 	return res;
 }
 
-void ModulePartBase::bindInterface( InterfaceInfo* receptacle, Interface* )
+void ModulePartBase::setReceptacle( InterfaceInfo* receptacle, Interface* )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();

@@ -11,33 +11,35 @@
 #include <co/Module.h>
 #include <co/RefVector.h>
 
+namespace co {
+
 /*!
 	Component that implements co.Namespace.
  */
-class Namespace : public co::NamespaceComponent_Base
+class NamespaceComponent : public NamespaceComponent_Base
 {
 public:
-	Namespace();
-	virtual ~Namespace();
+	NamespaceComponent();
+	virtual ~NamespaceComponent();
 	
 	// internal methods:
-	void setParentAndName( co::Namespace* parent, const std::string& name );
-	void setModule( co::Module* module );
-	void addType( co::Type* type );
-	void removeType( co::Type* type );
+	void setParentAndName( Namespace* parent, const std::string& name );
+	void setModule( Module* module );
+	void addType( Type* type );
+	void removeType( Type* type );
 	
-	// co::Namespace methods:
+	// Namespace methods:
 	const std::string& getName();
 	const std::string& getFullName();
-	co::Namespace* getParentNamespace();
-	co::ArrayRange<co::Type* const> getTypes();
-	co::ArrayRange<co::Namespace* const> getChildNamespaces();
-	co::Module* getModule();
-	co::Type* getType( const std::string& name );
-	co::Namespace* getChildNamespace( const std::string& name );
-	co::TypeBuilder* defineType( const std::string& name, co::TypeKind typeKind,
-									co::TypeCreationTransaction* transaction );
-	co::Namespace* defineChildNamespace( const std::string& name );
+	Namespace* getParentNamespace();
+	ArrayRange<Type* const> getTypes();
+	ArrayRange<Namespace* const> getChildNamespaces();
+	Module* getModule();
+	Type* getType( const std::string& name );
+	Namespace* getChildNamespace( const std::string& name );
+	TypeBuilder* defineType( const std::string& name, TypeKind typeKind,
+									TypeCreationTransaction* transaction );
+	Namespace* defineChildNamespace( const std::string& name );
 
 private:
 	std::string getNamespaceName();
@@ -47,15 +49,17 @@ private:
 private:
 	std::string _name;
 	std::string _fullName;
-	co::Namespace* _parent;
+	Namespace* _parent;
 
-	co::RefPtr<co::Module> _module;
+	RefPtr<Module> _module;
 
-	typedef co::RefVector<co::Type> TypeVector;
+	typedef RefVector<Type> TypeVector;
 	TypeVector _types;
 	
-	typedef co::RefVector<co::Namespace> NamespaceVector;
+	typedef RefVector<Namespace> NamespaceVector;
 	NamespaceVector _childNamespaces;
 };
+
+} // namespace co
 
 #endif

@@ -6,11 +6,11 @@
 #include <co/reserved/ReflectorBase.h>
 #include <cassert>
 
+namespace lua {
+
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
 co::int32 __Component_getSize();
 co::Component* __Component_newInstance();
-
-namespace lua {
 
 void moduleRetain();
 void moduleRelease();

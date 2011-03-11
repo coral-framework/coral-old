@@ -12,34 +12,38 @@
 #include <co/ExceptionType.h>
 #include <co/ParameterInfo.h>
 
+namespace co {
+
 /*!
 	Component that implements co.MethodInfo.
  */
-class MethodInfo : public co::MethodInfoComponent_Base, public MemberInfoImpl
+class MethodInfoComponent : public MethodInfoComponent_Base, public MemberInfoImpl
 {
 public:
-	virtual ~MethodInfo();
+	virtual ~MethodInfoComponent();
 
 	// internal methods:
-	void setReturnType( co::Type* returnType );
-	void setParameters( co::ArrayRange<co::ParameterInfo* const> parameters );
-	void setExceptions( co::ArrayRange<co::ExceptionType* const> exceptions );
+	void setReturnType( Type* returnType );
+	void setParameters( ArrayRange<ParameterInfo* const> parameters );
+	void setExceptions( ArrayRange<ExceptionType* const> exceptions );
 
-	// co::MethodInfo methods:
-	co::Type* getReturnType();
-	co::ArrayRange<co::ParameterInfo* const> getParameters();
-	co::ArrayRange<co::ExceptionType* const> getExceptions();
+	// MethodInfo methods:
+	Type* getReturnType();
+	ArrayRange<ParameterInfo* const> getParameters();
+	ArrayRange<ExceptionType* const> getExceptions();
 
 	DELEGATE_CO_MEMBERINFO_METHODS( MemberInfoImpl:: );
 
 private:
-	co::Type* _returnType;
+	Type* _returnType;
 
-	typedef co::RefVector<co::ParameterInfo> ParameterVector;
+	typedef RefVector<ParameterInfo> ParameterVector;
 	ParameterVector _parameters;
 
-	typedef std::vector<co::ExceptionType*> ExceptionVector;
+	typedef std::vector<ExceptionType*> ExceptionVector;
 	ExceptionVector _exceptions;
 };
+
+} // namespace co
 
 #endif

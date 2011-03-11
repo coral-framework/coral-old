@@ -5,35 +5,39 @@
 
 #include "AttributeInfo.h"
 
-AttributeInfo::AttributeInfo()
+namespace co {
+
+AttributeInfoComponent::AttributeInfoComponent()
 	: _type( 0 ), _isReadOnly( true )
 {
 	// empty
 }
 
-AttributeInfo::~AttributeInfo()
+AttributeInfoComponent::~AttributeInfoComponent()
 {
 	// empty
 }
 
-void AttributeInfo::setType( co::Type* type )
+void AttributeInfoComponent::setType( Type* type )
 {
 	_type = type;
 }
 
-void AttributeInfo::setIsReadOnly( bool isReadOnly )
+void AttributeInfoComponent::setIsReadOnly( bool isReadOnly )
 {
 	_isReadOnly = isReadOnly;
 }
 
-co::Type* AttributeInfo::getType()
+Type* AttributeInfoComponent::getType()
 {
 	return _type;
 }
 
-bool AttributeInfo::getIsReadOnly()
+bool AttributeInfoComponent::getIsReadOnly()
 {
 	return _isReadOnly;
 }
 
-CORAL_EXPORT_COMPONENT( AttributeInfo, AttributeInfoComponent );
+CORAL_EXPORT_COMPONENT( AttributeInfoComponent, AttributeInfoComponent );
+
+} // namespace co

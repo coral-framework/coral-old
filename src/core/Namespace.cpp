@@ -14,31 +14,33 @@
 #include <algorithm>
 #include <sstream>
 
-// Helper Comparators:
+namespace co {
 
-int typeComparator( co::Type* type, const std::string& name )
+// ------ Helper Comparators ---------------------------------------------------
+
+inline int typeComparator( Type* type, const std::string& name )
 {
 	return type->getName().compare( name );
 }
 
-int namespaceComparator( co::Namespace* ns, const std::string& name )
+inline int namespaceComparator( Namespace* ns, const std::string& name )
 {
 	return ns->getName().compare( name );
 }
 
-// --- Namespace ---
+// ------ Namespace ------------------------------------------------------------
 
-Namespace::Namespace() : _parent( 0 )
+NamespaceComponent::NamespaceComponent() : _parent( 0 )
 {
 	// empty
 }
 
-Namespace::~Namespace()
+NamespaceComponent::~NamespaceComponent()
 {
 	// empty
 }
 
-void Namespace::setParentAndName( co::Namespace* parent, const std::string& name )
+void NamespaceComponent::setParentAndName( Namespace* parent, const std::string& name )
 {
 	assert( _fullName.empty() );
 
@@ -55,18 +57,18 @@ void Namespace::setParentAndName( co::Namespace* parent, const std::string& name
 	_fullName.append( name );
 }
 
-void Namespace::setModule( co::Module* module )
+void NamespaceComponent::setModule( Module* module )
 {
 	_module = module;
 }
 
-void Namespace::addType( co::Type* type )
+void NamespaceComponent::addType( Type* type )
 {
 	assert( type->getNamespace() == this );
 	
 	const std::string& name = type->getName();
 
-	std::size_t pos;
+	size_t pos;
 	if( _childNamespaces.sortedFind( name, namespaceComparator, pos ) )
 		throwClashingNamespace( name );
 
@@ -74,13 +76,13 @@ void Namespace::addType( co::Type* type )
 		throwClashingType( name );
 }
 
-void Namespace::removeType( co::Type* type )
+void NamespaceComponent::removeType( Type* type )
 {
 	assert( type->getNamespace() == this );
 
 	const std::string& name = type->getName();
 
-	std::size_t pos;
+	size_t pos;
 	bool typeExists = _types.sortedFind( name, typeComparator, pos );
 	assert( typeExists );
 	CORAL_UNUSED( typeExists );
@@ -88,81 +90,81 @@ void Namespace::removeType( co::Type* type )
 	_types.erase( _types.begin() + pos );
 }
 
-const std::string& Namespace::getName()
+const std::string& NamespaceComponent::getName()
 {
 	return _name;
 }
 
-const std::string& Namespace::getFullName()
+const std::string& NamespaceComponent::getFullName()
 {
 	return _fullName;
 }
 
-co::Namespace* Namespace::getParentNamespace()
+Namespace* NamespaceComponent::getParentNamespace()
 {
 	return _parent;
 }
 
-co::ArrayRange<co::Type* const> Namespace::getTypes()
+ArrayRange<Type* const> NamespaceComponent::getTypes()
 {
 	return _types;
 }
 
-co::ArrayRange<co::Namespace* const> Namespace::getChildNamespaces()
+ArrayRange<Namespace* const> NamespaceComponent::getChildNamespaces()
 {
 	return _childNamespaces;
 }
 
-co::Module* Namespace::getModule()
+Module* NamespaceComponent::getModule()
 {
 	return _module.get();
 }
 
-co::Type* Namespace::getType( const std::string& name )
+Type* NamespaceComponent::getType( const std::string& name )
 {
-	std::size_t pos;
+	size_t pos;
 	if( _types.sortedFind( name, typeComparator, pos ) )
 		return _types[pos].get();
 	return NULL;
 }
 
-co::Namespace* Namespace::getChildNamespace( const std::string& name )
+Namespace* NamespaceComponent::getChildNamespace( const std::string& name )
 {
-	std::size_t pos;
+	size_t pos;
 	if( _childNamespaces.sortedFind( name, namespaceComparator, pos ) )
 		return _childNamespaces[pos].get();
 	return NULL;
 }
 
-co::TypeBuilder* Namespace::defineType( const std::string& name, co::TypeKind typeKind, co::TypeCreationTransaction* transaction )
+TypeBuilder* NamespaceComponent::defineType( const std::string& name, TypeKind typeKind, TypeCreationTransaction* transaction )
 {
-	if( typeKind <= co::TK_ARRAY || typeKind > co::TK_COMPONENT )
+	if( typeKind <= TK_ARRAY || typeKind > TK_COMPONENT )
 	{
-		CORAL_THROW( co::IllegalArgumentException, "'" << typeKind <<  "' is not a user-definable type kind." );
+		CORAL_THROW( IllegalArgumentException, "'" << typeKind <<  "' is not a user-definable type kind." );
 	}
 
-	if( !co::LexicalUtils::isValidIdentifier( name ) )
+	if( !LexicalUtils::isValidIdentifier( name ) )
 	{
-		CORAL_THROW( co::IllegalNameException, "'" << name << "' is not a valid identifier." );
+		CORAL_THROW( IllegalNameException, "'" << name << "' is not a valid identifier." );
 	}
 
-	std::size_t pos;
+	size_t pos;
 	if( _types.sortedFind( name, typeComparator, pos ) && _types[pos]->getFullName() != "co.Interface" )
 		throwClashingType( name );
 
 	if( _childNamespaces.sortedFind( name, namespaceComparator, pos ) )
 		throwClashingNamespace( name );
 
-	TypeBuilder* tb = TypeBuilder::create( typeKind, this, name );
+	TypeBuilder* tb = TypeBuilderComponent::create( typeKind, this, name );
 
-	static_cast<TypeCreationTransaction*>( transaction )->addTypeBuilder( tb );
+	static_cast<TypeCreationTransactionComponent*>( transaction )->addTypeBuilder( tb );
 
 	return tb;
 }
 
-co::Namespace* Namespace::defineChildNamespace( const std::string& name )
+Namespace* NamespaceComponent::defineChildNamespace( const std::string& name )
 {
-	::Namespace* ns = new ::Namespace();
+	NamespaceComponent* ns = new NamespaceComponent();
 	ns->setParentAndName( this, name );
 
 	if( !_childNamespaces.sortedInsert( name, ns, namespaceComparator ) )
@@ -174,7 +176,7 @@ co::Namespace* Namespace::defineChildNamespace( const std::string& name )
 	return ns;
 }
 
-std::string Namespace::getNamespaceName()
+std::string NamespaceComponent::getNamespaceName()
 {
 	if( !_parent )
 		return "root namespace";
@@ -188,14 +190,16 @@ std::string Namespace::getNamespaceName()
 	return str;
 }
 
-void Namespace::throwClashingType( const std::string& name )
+void NamespaceComponent::throwClashingType( const std::string& name )
 {
-	CORAL_THROW( co::IllegalNameException, getNamespaceName() <<  " already contains a type called '" << name << "'" );
+	CORAL_THROW( IllegalNameException, getNamespaceName() <<  " already contains a type called '" << name << "'" );
 }
 
-void Namespace::throwClashingNamespace( const std::string& name )
+void NamespaceComponent::throwClashingNamespace( const std::string& name )
 {
-	CORAL_THROW( co::IllegalNameException, getNamespaceName() << " already contains a namespace called '" << name << "'" );
+	CORAL_THROW( IllegalNameException, getNamespaceName() << " already contains a namespace called '" << name << "'" );
 }
 
-CORAL_EXPORT_COMPONENT( Namespace, NamespaceComponent );
+CORAL_EXPORT_COMPONENT( NamespaceComponent, NamespaceComponent );
+
+} // namespace co

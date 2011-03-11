@@ -49,22 +49,22 @@ public:
         return res.get< co::ComponentType* >();
 	}
 
-	void bindInterface( co::InterfaceInfo* receptacle_, co::Interface* instance_ )
-	{
-		co::Any args[2];
-		args[0].set< co::InterfaceInfo* >( receptacle_ );
-		args[1].set< co::Interface* >( instance_ );
-		co::ArrayRange<co::Any const> range( args, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 0 ), range );
-	}
-
 	co::Interface* getInterface( co::InterfaceInfo* itfInfo_ )
 	{
 		co::Any args[1];
 		args[0].set< co::InterfaceInfo* >( itfInfo_ );
 		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 1 ), range );
+		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 0 ), range );
 		return res.get< co::Interface* >();
+	}
+
+	void setReceptacle( co::InterfaceInfo* receptacle_, co::Interface* facet_ )
+	{
+		co::Any args[2];
+		args[0].set< co::InterfaceInfo* >( receptacle_ );
+		args[1].set< co::Interface* >( facet_ );
+		co::ArrayRange<co::Any const> range( args, 2 );
+		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::Component>( 1 ), range );
 	}
 
 protected:
@@ -149,17 +149,17 @@ public:
 			{
 			case 1:
 				{
-					co::InterfaceInfo* receptacle_ = args[++argIndex].get< co::InterfaceInfo* >();
-					co::Interface* instance_ = args[++argIndex].get< co::Interface* >();
+					co::InterfaceInfo* itfInfo_ = args[++argIndex].get< co::InterfaceInfo* >();
 					argIndex = -1;
-					p->bindInterface( receptacle_, instance_ );
+					res.set< co::Interface* >( p->getInterface( itfInfo_ ) );
 				}
 				break;
 			case 2:
 				{
-					co::InterfaceInfo* itfInfo_ = args[++argIndex].get< co::InterfaceInfo* >();
+					co::InterfaceInfo* receptacle_ = args[++argIndex].get< co::InterfaceInfo* >();
+					co::Interface* facet_ = args[++argIndex].get< co::Interface* >();
 					argIndex = -1;
-					res.set< co::Interface* >( p->getInterface( itfInfo_ ) );
+					p->setReceptacle( receptacle_, facet_ );
 				}
 				break;
 			default:

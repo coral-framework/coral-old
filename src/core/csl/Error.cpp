@@ -6,9 +6,10 @@
 #include "Error.h"
 #include <ostream>
 
+namespace co {
 namespace csl {
 
-Error::Error( const std::string& msg, const std::string& filename, co::int32 line, Error* innerError )
+Error::Error( const std::string& msg, const std::string& filename, int32 line, Error* innerError )
 	: _message( msg ), _filename( filename ), _line( line ), _innerError( innerError )
 {
 	// empty
@@ -20,12 +21,13 @@ Error::~Error()
 }
 
 } // namespace csl
+} // namespace co
 
-std::ostream& operator<<( std::ostream& out, const csl::Error& error )
+std::ostream& operator<<( std::ostream& out, const co::csl::Error& error )
 {
 	int level = 0;
 
-	const csl::Error* currentError = &error;
+	const co::csl::Error* currentError = &error;
 	while( currentError )
 	{
 		for( int i = 0; i < level; ++i )
@@ -38,12 +40,12 @@ std::ostream& operator<<( std::ostream& out, const csl::Error& error )
 			return out;
 		}
 
-		const csl::Error* nextError = currentError->getInnerError();
+		const co::csl::Error* nextError = currentError->getInnerError();
 		bool nextIsNotLast = ( nextError != NULL && nextError->getLine() != -1 );
 
-		out << ( nextIsNotLast ? "From " : "In file " );
-		out << currentError->getFileName() << ":" << currentError->getLine() << ": " << currentError->getMessage();
-		out << ( nextIsNotLast ? ":\n" : ".\n" );
+		out << ( nextIsNotLast ? "From " : "In file " )
+			<< currentError->getFileName() << ":" << currentError->getLine()
+			<< ": " << currentError->getMessage() << ( nextIsNotLast ? ":\n" : ".\n" );
 
 		++level;
 

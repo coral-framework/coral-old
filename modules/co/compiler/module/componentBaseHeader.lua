@@ -65,7 +65,7 @@ public:
 	// co::Component Methods:
 	co::ComponentType* getComponentType();
 	co::Interface* getInterface( co::InterfaceInfo* );
-	void bindInterface( co::InterfaceInfo*, co::Interface* );
+	void setReceptacle( co::InterfaceInfo*, co::Interface* );
 ]] )
 
 	if #receptacles > 0 then

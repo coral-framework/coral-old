@@ -6,6 +6,7 @@
 #include "TypeManager.h"
 #include "Type.h"
 #include "Coral.h"
+#include "Namespace.h"
 #include "ArrayType.h"
 #include "TypeLoader.h"
 #include "InterfaceType.h"
@@ -15,25 +16,27 @@
 #include <co/IllegalArgumentException.h>
 #include <sstream>
 
+namespace co {
+
 static const std::string sg_emptyString;
 
-TypeManager::TypeManager()
+TypeManagerComponent::TypeManagerComponent()
 {
-	_rootNS = new Namespace;
+	_rootNS = new NamespaceComponent;
 	_docParsing = true;
 }
 
-TypeManager::~TypeManager()
+TypeManagerComponent::~TypeManagerComponent()
 {
 	// empty
 }
 
-void TypeManager::initialize()
+void TypeManagerComponent::initialize()
 {
 	defineBuiltInTypes();
 }
 
-void TypeManager::addDocumentation( const std::string& typeOrMemberName, const std::string& text )
+void TypeManagerComponent::addDocumentation( const std::string& typeOrMemberName, const std::string& text )
 {
 	DocMap::iterator it = _docMap.find( typeOrMemberName );
 	if( it != _docMap.end() )
@@ -49,7 +52,7 @@ void TypeManager::addDocumentation( const std::string& typeOrMemberName, const s
 	}
 }
 
-void TypeManager::addCppBlock( const std::string& interfaceName, const std::string& text )
+void TypeManagerComponent::addCppBlock( const std::string& interfaceName, const std::string& text )
 {
 	CppBlockMap::iterator it = _cppBlockMap.find( interfaceName );
 	if( it != _cppBlockMap.end() )
@@ -58,7 +61,7 @@ void TypeManager::addCppBlock( const std::string& interfaceName, const std::stri
 		_cppBlockMap.insert( CppBlockMap::value_type( interfaceName, text) );
 }
 
-const std::string& TypeManager::getCppBlock( const std::string& interfaceName )
+const std::string& TypeManagerComponent::getCppBlock( const std::string& interfaceName )
 {
 	CppBlockMap::iterator it = _cppBlockMap.find( interfaceName );
 	if( it == _cppBlockMap.end() )
@@ -67,27 +70,27 @@ const std::string& TypeManager::getCppBlock( const std::string& interfaceName )
 	return it->second;
 }
 
-co::Namespace* TypeManager::getRootNS()
+Namespace* TypeManagerComponent::getRootNS()
 {
 	return _rootNS.get();
 }
 
-bool TypeManager::getDocumentationParsing()
+bool TypeManagerComponent::getDocumentationParsing()
 {
 	return _docParsing;
 }
 
-void TypeManager::setDocumentationParsing( bool documentationParsing )
+void TypeManagerComponent::setDocumentationParsing( bool documentationParsing )
 {
 	_docParsing = documentationParsing;
 }
 
-co::Type* TypeManager::findType( const std::string& fullName )
+Type* TypeManagerComponent::findType( const std::string& fullName )
 {
-	co::Namespace* ns = _rootNS.get();
+	Namespace* ns = _rootNS.get();
 	assert( ns );
 	
-	co::StringTokenizer st( fullName, "." );
+	StringTokenizer st( fullName, "." );
 	st.nextToken();
 	std::string currentToken = st.getToken();
 	while( st.nextToken() )
@@ -102,12 +105,12 @@ co::Type* TypeManager::findType( const std::string& fullName )
 	return ns->getType( currentToken );
 }
 
-co::Namespace* TypeManager::findNamespace( const std::string& fullName )
+Namespace* TypeManagerComponent::findNamespace( const std::string& fullName )
 {
-	co::Namespace* ns = _rootNS.get();
+	Namespace* ns = _rootNS.get();
 	assert( ns );
 
-	co::StringTokenizer st( fullName, "." );
+	StringTokenizer st( fullName, "." );
 	while( st.nextToken() )
 	{
 		ns = ns->getChildNamespace( st.getToken() );
@@ -118,30 +121,30 @@ co::Namespace* TypeManager::findNamespace( const std::string& fullName )
 	return ns;
 }
 
-co::Type* TypeManager::getType( const std::string& typeName )
+Type* TypeManagerComponent::getType( const std::string& typeName )
 {
 	if( typeName.empty() )
-		CORAL_THROW( co::IllegalArgumentException, "empty type name" );
+		CORAL_THROW( IllegalArgumentException, "empty type name" );
 
 	// is typeName an array?
 	if( typeName[typeName.length() - 1] == ']' )
 	{
 		// get the elementType by removing the "[]" suffix
-		co::Type* elementType = getType( std::string( typeName, 0, typeName.length() - 2 ) );
+		Type* elementType = getType( std::string( typeName, 0, typeName.length() - 2 ) );
 		return getArrayOf( elementType );
 	}
 
-	co::Type* type = findType( typeName );
+	Type* type = findType( typeName );
 	if( type )
 		return type;
 
 	return loadTypeOrThrow( typeName );
 }
 
-co::ArrayType* TypeManager::getArrayOf( co::Type* elementType )
+ArrayType* TypeManagerComponent::getArrayOf( Type* elementType )
 {
 	if( !elementType )
-		CORAL_THROW( co::IllegalArgumentException, "null element type" );
+		CORAL_THROW( IllegalArgumentException, "null element type" );
 
 	const std::string& elementTypeName = elementType->getName();
 
@@ -150,27 +153,28 @@ co::ArrayType* TypeManager::getArrayOf( co::Type* elementType )
 	arrayName.append( elementTypeName );
 	arrayName.append( "[]" );
 
-	Namespace* ns = static_cast<Namespace*>( elementType->getNamespace() );
+	assert( dynamic_cast<NamespaceComponent*>( elementType->getNamespace() ) );
+	NamespaceComponent* ns = static_cast<NamespaceComponent*>( elementType->getNamespace() );
 
 	// try to locate an existing array of this type
-	co::Type* existingArrayType = ns->getType( arrayName );
+	Type* existingArrayType = ns->getType( arrayName );
 	if( existingArrayType )
 	{
-		assert( dynamic_cast<co::ArrayType*>( existingArrayType ) );
-		return static_cast<co::ArrayType*>( existingArrayType );
+		assert( dynamic_cast<ArrayType*>( existingArrayType ) );
+		return static_cast<ArrayType*>( existingArrayType );
 	}
 
 	// otherwise, try to create it
-	co::TypeKind kind = elementType->getKind();
-	if( kind == co::TK_ARRAY )
-		CORAL_THROW( co::IllegalArgumentException, "arrays of arrays are illegal" );
+	TypeKind kind = elementType->getKind();
+	if( kind == TK_ARRAY )
+		CORAL_THROW( IllegalArgumentException, "arrays of arrays are illegal" );
 
-	if( kind == co::TK_EXCEPTION || kind == co::TK_COMPONENT )
-		CORAL_THROW( co::IllegalArgumentException, "arrays of " <<
-					( kind == co::TK_EXCEPTION ? "exception" : "component" ) << "s are illegal" );
+	if( kind == TK_EXCEPTION || kind == TK_COMPONENT )
+		CORAL_THROW( IllegalArgumentException, "arrays of " <<
+					( kind == TK_EXCEPTION ? "exception" : "component" ) << "s are illegal" );
 
-	co::RefPtr<ArrayType> arrayType = new ArrayType;
-	arrayType->setType( ns, elementType->getName() + "[]", co::TK_ARRAY );
+	RefPtr<ArrayTypeComponent> arrayType = new ArrayTypeComponent;
+	arrayType->setType( ns, elementType->getName() + "[]", TK_ARRAY );
 	arrayType->setElementType( elementType );
 
 	ns->addType( arrayType.get() );
@@ -178,13 +182,13 @@ co::ArrayType* TypeManager::getArrayOf( co::Type* elementType )
 	return arrayType.get();
 }
 
-co::Type* TypeManager::loadType( const std::string& typeName, std::vector<co::CSLError>& errorStack )
+Type* TypeManagerComponent::loadType( const std::string& typeName, std::vector<CSLError>& errorStack )
 {
-	co::Type* type = findType( typeName );
+	Type* type = findType( typeName );
 	if( type )
 		return type;
 
-	TypeLoader loader( typeName, co::getPaths(), this );
+	TypeLoader loader( typeName, getPaths(), this );
 
 	type = loader.loadType();
 	if( !type )
@@ -192,9 +196,9 @@ co::Type* TypeManager::loadType( const std::string& typeName, std::vector<co::CS
 		const csl::Error* currentError = loader.getError();
 		while( currentError )
 		{
-			errorStack.push_back( co::CSLError() );
+			errorStack.push_back( CSLError() );
 
-			co::CSLError& cslError = errorStack.back();
+			CSLError& cslError = errorStack.back();
 			cslError.filename = currentError->getFileName();
 			cslError.message = currentError->getMessage();
 			cslError.line = currentError->getLine();
@@ -206,45 +210,46 @@ co::Type* TypeManager::loadType( const std::string& typeName, std::vector<co::CS
 	return type;
 }
 
-co::Type* TypeManager::loadTypeOrThrow( const std::string& fullName )
+Type* TypeManagerComponent::loadTypeOrThrow( const std::string& fullName )
 {
-	TypeLoader loader( fullName, co::getPaths(), this );
+	TypeLoader loader( fullName, getPaths(), this );
 
-	co::Type* type = loader.loadType();
+	Type* type = loader.loadType();
 	if( !type )
-		CORAL_THROW( co::TypeLoadException, "could not load type '" << fullName << "':\n" << *loader.getError() );
+		CORAL_THROW( TypeLoadException, "could not load type '" << fullName << "':\n" << *loader.getError() );
 
 	return type;
 }
 
-void TypeManager::definePrimitiveType( Namespace* ns, const std::string& name, co::TypeKind kind )
+void TypeManagerComponent::definePrimitiveType( NamespaceComponent* ns, const std::string& name, TypeKind kind )
 {
-	co::RefPtr<Type> type = new Type;
+	RefPtr<TypeComponent> type = new TypeComponent;
 	type->setType( ns, name, kind );
 	ns->addType( type.get() );
 }
 
-void TypeManager::defineBuiltInTypes()
+void TypeManagerComponent::defineBuiltInTypes()
 {
-	Namespace* rootNS = _rootNS.get();
+	NamespaceComponent* rootNS = _rootNS.get();
 
 	// register all primitive types in the root namespace:
-	for( unsigned int i = co::TK_ANY; i <= co::TK_STRING; ++i )
-		definePrimitiveType( rootNS, co::TK_STRINGS[i], static_cast<co::TypeKind>( i ) );
+	for( unsigned int i = TK_ANY; i <= TK_STRING; ++i )
+		definePrimitiveType( rootNS, TK_STRINGS[i], static_cast<TypeKind>( i ) );
 
 	// pre-load the 'co.Interface' type and all its dependencies
-	Namespace* coNS = dynamic_cast<Namespace*>( rootNS->defineChildNamespace( "co" ) );
-	assert( coNS );
+	Namespace* coNS = rootNS->defineChildNamespace( "co" );
+	assert( dynamic_cast<NamespaceComponent*>( coNS ) );
+	NamespaceComponent* castNS = static_cast<NamespaceComponent*>( coNS );
 
-	co::RefPtr<InterfaceType> coInterfaceType = new InterfaceType;
-	coInterfaceType->setType( coNS, "Interface", co::TK_INTERFACE );
+	RefPtr<InterfaceTypeComponent> coInterfaceType = new InterfaceTypeComponent;
+	coInterfaceType->setType( coNS, "Interface", TK_INTERFACE );
 
-	coNS->addType( coInterfaceType.get() );
+	castNS->addType( coInterfaceType.get() );
 
 	loadTypeOrThrow( "co.Interface" );
 }
 
-const std::string& TypeManager::getDocumentation( const std::string& typeOrMemberName )
+const std::string& TypeManagerComponent::getDocumentation( const std::string& typeOrMemberName )
 {
 	DocMap::iterator it = _docMap.find( typeOrMemberName );
 	if( it == _docMap.end() )
@@ -253,4 +258,6 @@ const std::string& TypeManager::getDocumentation( const std::string& typeOrMembe
 	return it->second;
 }
 
-CORAL_EXPORT_COMPONENT( TypeManager, TypeManagerComponent );
+CORAL_EXPORT_COMPONENT( TypeManagerComponent, TypeManagerComponent );
+
+} // namespace co

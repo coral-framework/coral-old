@@ -5,9 +5,13 @@
 
 #include "StructType.h"
 
-StructType::~StructType()
+namespace co {
+
+StructTypeComponent::~StructTypeComponent()
 {
 	// empty
 }
 
-CORAL_EXPORT_COMPONENT( StructType, StructTypeComponent );
+CORAL_EXPORT_COMPONENT( StructTypeComponent, StructTypeComponent );
+
+} // namespace co

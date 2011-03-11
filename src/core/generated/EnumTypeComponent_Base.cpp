@@ -70,11 +70,11 @@ co::Interface* EnumTypeComponent_Base::getInterface( co::InterfaceInfo* interfac
 	return res;
 }
 
-void EnumTypeComponent_Base::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
+void EnumTypeComponent_Base::setReceptacle( co::InterfaceInfo* receptacle, co::Interface* facet )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
-	CORAL_UNUSED( instance );
+	CORAL_UNUSED( facet );
 }
 
 } // namespace co

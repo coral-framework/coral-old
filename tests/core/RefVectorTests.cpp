@@ -113,7 +113,7 @@ TEST( RefVectorTests, sortedRefVector )
 	// sanity check
 	EXPECT_NE( refVec[0], refVec[3] );
 
-	std::size_t pos;
+	size_t pos;
 	EXPECT_TRUE( refVec.sortedFind( std::string( "o3" ), pseudoInterfaceComparator, pos ) );
 	EXPECT_EQ( pos, 2 );
 }

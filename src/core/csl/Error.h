@@ -3,13 +3,14 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _CSL_ERROR_H_
-#define _CSL_ERROR_H_
+#ifndef _CO_CSL_ERROR_H_
+#define _CO_CSL_ERROR_H_
 
 #include <co/Platform.h>
 #include "../tools/RefCounted.h"
 #include <string>
 
+namespace co {
 namespace csl {
 
 /*!
@@ -18,10 +19,10 @@ namespace csl {
 	The error line and filename may not be available in some cases, such as "file not found" and
 	semantic errors. (In this case, the filename will be empty and the line will be -1.)
  */
-class CORAL_EXPORT Error : public co::RefCounted
+class CORAL_EXPORT Error : public RefCounted
 {
 public:
-	Error( const std::string& msg, const std::string& filename, co::int32 line, Error* innerError );
+	Error( const std::string& msg, const std::string& filename, int32 line, Error* innerError );
 
 	virtual ~Error();
 
@@ -29,18 +30,19 @@ public:
 
 	inline const std::string& getFileName() const { return _filename; }
 
-	inline co::int32 getLine() const { return _line; }
+	inline int32 getLine() const { return _line; }
 
 	inline const Error* getInnerError() const { return _innerError.get(); }
 
 private:
 	std::string _message;
 	std::string _filename;
-	co::int32 _line;
-	co::RefPtr<Error> _innerError;
+	int32 _line;
+	RefPtr<Error> _innerError;
 };
 
 } // namespace csl
+} // namespace co
 
 /*!
 	Prints a CSL error stack. The message is formatted as follows:
@@ -55,6 +57,6 @@ private:
 	b) In the case of semantic errors, lines and filenames are not available, and since these errors
 		are never nested, the formatted message is just a plain error message.
  */
-CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const csl::Error& error );
+CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::csl::Error& error );
 
-#endif // _CSL_ERROR_H_
+#endif // _CO_CSL_ERROR_H_

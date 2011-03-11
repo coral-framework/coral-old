@@ -9,28 +9,32 @@
 #include "MemberInfo.h"
 #include "InterfaceInfoComponent_Base.h"
 
+namespace co {
+
 /*!
 	Component that implements co.InterfaceInfo.
  */
-class InterfaceInfo : public co::InterfaceInfoComponent_Base, public MemberInfoImpl
+class InterfaceInfoComponent : public InterfaceInfoComponent_Base, public MemberInfoImpl
 {
 public:
-	InterfaceInfo();
-	virtual ~InterfaceInfo();
+	InterfaceInfoComponent();
+	virtual ~InterfaceInfoComponent();
 
 	// internal methods:
-	void setType( co::InterfaceType* interfaceType );
+	void setType( InterfaceType* interfaceType );
 	void setIsFacet( bool isFacet );
 
-	// co::InterfaceInfo methods:
-	co::InterfaceType* getType();
+	// InterfaceInfo methods:
+	InterfaceType* getType();
 	bool getIsFacet();
 
 	DELEGATE_CO_MEMBERINFO_METHODS( MemberInfoImpl:: );
 
 private:
-	co::InterfaceType* _interfaceType;
+	InterfaceType* _interfaceType;
 	bool _isFacet;
 };
+
+} // namespace co
 
 #endif

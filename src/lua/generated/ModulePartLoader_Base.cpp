@@ -73,11 +73,11 @@ co::Interface* ModulePartLoader_Base::getInterface( co::InterfaceInfo* interface
 	return res;
 }
 
-void ModulePartLoader_Base::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
+void ModulePartLoader_Base::setReceptacle( co::InterfaceInfo* receptacle, co::Interface* facet )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
-	CORAL_UNUSED( instance );
+	CORAL_UNUSED( facet );
 }
 
 } // namespace lua

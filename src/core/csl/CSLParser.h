@@ -96,10 +96,12 @@
  * =============================================================================
  */
 
-	#define pANTLR3_PARSER	csl::Parser* parser; pANTLR3_PARSER
+	#define pANTLR3_PARSER	co::csl::Parser* parser; pANTLR3_PARSER
+	namespace co {
 	namespace csl {
 		class Parser;
-	}
+	} // namespace csl
+	} // namespace co
 
  
 #ifdef __cplusplus

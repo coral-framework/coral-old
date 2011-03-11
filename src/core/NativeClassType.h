@@ -10,20 +10,22 @@
 #include "AttributeAndMethodContainer.h"
 #include "NativeClassTypeComponent_Base.h"
 
+namespace co {
+
 /*!
 	Component that implements co.NativeClassType.
  */
-class NativeClassType : public co::NativeClassTypeComponent_Base,
+class NativeClassTypeComponent : public NativeClassTypeComponent_Base,
 						public TypeImpl, public AttributeAndMethodContainer
 {
 public:
-	virtual ~NativeClassType();
+	virtual ~NativeClassTypeComponent();
 
 	// internal methods:
 	void setNativeName( const std::string& nativeName );
 	void setNativeHeaderFile( const std::string& nativeHeaderFile );
 
-	// co::NativeClassType methods:
+	// NativeClassType methods:
 	const std::string& getNativeName();
 	const std::string& getNativeHeaderFile();
 
@@ -36,5 +38,7 @@ private:
 	std::string _nativeName;
 	std::string _nativeHeaderFile;
 };
+
+} // namespace co
 
 #endif

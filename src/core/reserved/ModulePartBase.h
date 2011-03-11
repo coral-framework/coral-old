@@ -39,7 +39,7 @@ public:
     // co::Component methods:
     ComponentType* getComponentType();
     Interface* getInterface( InterfaceInfo* );
-    void bindInterface( InterfaceInfo*, Interface* );
+    void setReceptacle( InterfaceInfo*, Interface* );
 
 	// co::ModulePart methods:
 	void initialize( co::Module* module );

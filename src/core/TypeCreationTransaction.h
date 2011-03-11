@@ -10,33 +10,38 @@
 #include <co/RefVector.h>
 #include <co/TypeBuilder.h>
 
+namespace co {
+
 /*!
 	Component that implements co.TypeCreationTransaction.
  */
-class TypeCreationTransaction : public co::TypeCreationTransactionComponent_Base
+class TypeCreationTransactionComponent
+		: public TypeCreationTransactionComponent_Base
 {
 public:
-	TypeCreationTransaction();
-	virtual ~TypeCreationTransaction();
+	TypeCreationTransactionComponent();
+	virtual ~TypeCreationTransactionComponent();
 
 	// internal methods:
-	void addTypeBuilder( co::TypeBuilder* typeBuilder );
+	void addTypeBuilder( TypeBuilder* typeBuilder );
 
-	// co::TypeCreationTransaction methods:
-	co::ArrayRange<co::TypeBuilder* const> getTypeBuilders();
+	// TypeCreationTransaction methods:
+	ArrayRange<TypeBuilder* const> getTypeBuilders();
 	void commit();
 	void rollback();
 	
 private:
-	static TypeCreationTransaction* sm_activeTransaction;
+	static TypeCreationTransactionComponent* sm_activeTransaction;
 
 private:
 	bool _commitAttempted;
 	bool _commitSucceeded;
 	bool _rolledBack;
 
-	typedef co::RefVector<co::TypeBuilder> TypeBuilderList;
+	typedef RefVector<TypeBuilder> TypeBuilderList;
 	TypeBuilderList _typeBuilders;
 };
+
+} // namespace co
 
 #endif

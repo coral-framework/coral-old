@@ -37,7 +37,7 @@ private:
 	std::string _str;
 	std::string _delimiters;
 	std::string _token;
-	std::size_t _offset;
+	size_t _offset;
 };
 
 } // namespace co

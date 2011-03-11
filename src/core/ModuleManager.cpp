@@ -18,32 +18,34 @@
 #include <sstream>
 #include <iostream>
 
-ModuleManager::ModuleManager()
+namespace co {
+
+ModuleManagerComponent::ModuleManagerComponent()
 {
 	_binaryCompatibilityChecking = true;
 }
 
-ModuleManager::~ModuleManager()
+ModuleManagerComponent::~ModuleManagerComponent()
 {
 	// empty
 }
 
-void ModuleManager::initialize()
+void ModuleManagerComponent::initialize()
 {
 	// install the default ModulePartLoader
-	_loaders.push_back( new ModulePartLoader );
+	_loaders.push_back( new ModulePartLoaderComponent );
 }
 
-static bool sortByIncreasingRank( co::Module* a, co::Module* b )
+static bool sortByIncreasingRank( Module* a, Module* b )
 {
 	return a->getRank() < b->getRank();
 }
 
-void ModuleManager::updateModules( co::ModuleState state )
+void ModuleManagerComponent::updateModules( ModuleState state )
 {
 	size_t numModules = _modules.size();
 
-	std::vector<co::Module*> sortedModules;
+	std::vector<Module*> sortedModules;
 	sortedModules.reserve( numModules );
 
 	for( size_t i = 0; i < numModules; ++i )
@@ -53,7 +55,7 @@ void ModuleManager::updateModules( co::ModuleState state )
 
 	for( size_t i = 0; i < numModules; ++i )
 	{
-		co::Module* module = sortedModules[i];
+		Module* module = sortedModules[i];
 		try
 		{
 			updateModule( module, state );
@@ -61,42 +63,42 @@ void ModuleManager::updateModules( co::ModuleState state )
 		catch( std::exception& e )
 		{
 			module->abort();
-			co::debug( co::Dbg_Warning, "Module '%s' aborted due to exception: %s",
+			debug( Dbg_Warning, "Module '%s' aborted due to exception: %s",
 				module->getNamespace()->getFullName().c_str(), e.what() );
 		}
 	}
 }
 
-co::ArrayRange<co::Module* const> ModuleManager::getModules()
+ArrayRange<Module* const> ModuleManagerComponent::getModules()
 {
 	return _modules;
 }
 
-co::ArrayRange<co::ModulePartLoader* const> ModuleManager::getLoaders()
+ArrayRange<ModulePartLoader* const> ModuleManagerComponent::getLoaders()
 {
 	return _loaders;
 }
 
-bool ModuleManager::getBinaryCompatibilityChecking()
+bool ModuleManagerComponent::getBinaryCompatibilityChecking()
 {
 	return _binaryCompatibilityChecking;
 }
 
-void ModuleManager::setBinaryCompatibilityChecking( bool enabled )
+void ModuleManagerComponent::setBinaryCompatibilityChecking( bool enabled )
 {
 	_binaryCompatibilityChecking = enabled;
 }
 
-co::Module* ModuleManager::findModule( const std::string& moduleName )
+Module* ModuleManagerComponent::findModule( const std::string& moduleName )
 {
-	co::Namespace* ns = co::getSystem()->getTypes()->findNamespace( moduleName );
+	Namespace* ns = getSystem()->getTypes()->findNamespace( moduleName );
 	return ns ? ns->getModule() : NULL;
 }
 
-void ModuleManager::installLoader( co::ModulePartLoader* loader )
+void ModuleManagerComponent::installLoader( ModulePartLoader* loader )
 {
 	if( !loader )
-		throw co::IllegalArgumentException( "illegal null loader" );
+		throw IllegalArgumentException( "illegal null loader" );
 
 	// assert there are no duplicates
 	assert( std::find( _loaders.begin(), _loaders.end(), loader ) == _loaders.end() );
@@ -104,17 +106,17 @@ void ModuleManager::installLoader( co::ModulePartLoader* loader )
 	_loaders.push_back( loader );
 }
 
-void ModuleManager::uninstallLoader( co::ModulePartLoader* loader )
+void ModuleManagerComponent::uninstallLoader( ModulePartLoader* loader )
 {
 	ModulePartLoaderList::iterator newEnd = std::remove( _loaders.begin(), _loaders.end(), loader );
 
 	if( newEnd == _loaders.end() )
-		throw co::IllegalArgumentException( "the specified loader was not found" );
+		throw IllegalArgumentException( "the specified loader was not found" );
 
 	_loaders.erase( newEnd, _loaders.end() );
 }
 
-bool ModuleManager::isLoadable( const std::string& moduleName )
+bool ModuleManagerComponent::isLoadable( const std::string& moduleName )
 {
 	for( ModulePartLoaderList::iterator it = _loaders.begin(); it != _loaders.end(); ++it )
 		if( it->get()->canLoadModulePart( moduleName ) )
@@ -123,36 +125,36 @@ bool ModuleManager::isLoadable( const std::string& moduleName )
 	return false;
 }
 
-co::Module* ModuleManager::load( const std::string& moduleName )
+Module* ModuleManagerComponent::load( const std::string& moduleName )
 {
-	co::SystemState systemState = co::getSystem()->getState();
+	SystemState systemState = getSystem()->getState();
 
-	if( systemState < co::SystemState_Initializing )
-		throw co::LifeCycleException( "cannot load modules before the system is set up" );
+	if( systemState < SystemState_Initializing )
+		throw LifeCycleException( "cannot load modules before the system is set up" );
 
-	if( systemState > co::SystemState_Running )
-		throw co::LifeCycleException( "cannot load modules while the system is being torn down" );
+	if( systemState > SystemState_Running )
+		throw LifeCycleException( "cannot load modules while the system is being torn down" );
 
 	if( _loaders.empty() )
-		throw co::ModuleLoadException( "there are no installed module loaders" );
+		throw ModuleLoadException( "there are no installed module loaders" );
 
 	// check if the module was already loaded
-	co::Module* alreadyLoaded = findModule( moduleName );
+	Module* alreadyLoaded = findModule( moduleName );
 	if( alreadyLoaded )
 		return alreadyLoaded;
 
 	// load ModuleParts
-	Module* module = NULL;
+	ModuleComponent* module = NULL;
 	for( ModulePartLoaderList::iterator it = _loaders.begin(); it != _loaders.end(); ++it )
 	{
-		co::ModulePartLoader* loader = it->get();
+		ModulePartLoader* loader = it->get();
 		if( loader->canLoadModulePart( moduleName ) )
 		{
 			try
 			{
-				co::RefPtr<co::ModulePart> part = loader->loadModulePart( moduleName );
+				RefPtr<ModulePart> part = loader->loadModulePart( moduleName );
 				if( !part.isValid() )
-					throw co::Exception( "loader returned a null ModulePart" );
+					throw Exception( "loader returned a null ModulePart" );
 
 				// create the Module on demand
 				if( !module )
@@ -166,13 +168,13 @@ co::Module* ModuleManager::load( const std::string& moduleName )
 				if( module )
 					module->abort();
 
-				CORAL_THROW( co::ModuleLoadException, "error loading module '" << moduleName << "': " << e.what() );
+				CORAL_THROW( ModuleLoadException, "error loading module '" << moduleName << "': " << e.what() );
 			}
 		}
 	}
 
 	if( !module )
-		CORAL_THROW( co::ModuleLoadException, "none of the module loaders recognized '"
+		CORAL_THROW( ModuleLoadException, "none of the module loaders recognized '"
 						<< moduleName << "' as a module" );
 
 	// initialize the module
@@ -183,7 +185,7 @@ co::Module* ModuleManager::load( const std::string& moduleName )
 	catch( std::exception& e )
 	{
 		module->abort();
-		CORAL_THROW( co::ModuleLoadException, "exception raised by module '" << moduleName
+		CORAL_THROW( ModuleLoadException, "exception raised by module '" << moduleName
 						<< "' during initialization: " << e.what() );
 	}
 
@@ -193,9 +195,9 @@ co::Module* ModuleManager::load( const std::string& moduleName )
 	return module;
 }
 
-Module* ModuleManager::createModule( const std::string& moduleName )
+ModuleComponent* ModuleManagerComponent::createModule( const std::string& moduleName )
 {
-	Module* module = new Module;
+	ModuleComponent* module = new ModuleComponent;
 
 	// add it to the list of loaded modules
 	_modules.push_back( module );
@@ -205,34 +207,34 @@ Module* ModuleManager::createModule( const std::string& moduleName )
 	return module;
 }
 
-void ModuleManager::updateModule( co::Module* module, co::ModuleState toState )
+void ModuleManagerComponent::updateModule( Module* module, ModuleState toState )
 {
-	assert( toState > co::ModuleState_None && toState < co::ModuleState_Aborted );
+	assert( toState > ModuleState_None && toState < ModuleState_Aborted );
 
-	co::ModuleState fromState = module->getState();
-	if( fromState >= co::ModuleState_Disposed )
+	ModuleState fromState = module->getState();
+	if( fromState >= ModuleState_Disposed )
 		return;
 
-	if( fromState < co::ModuleState_Initialized )
+	if( fromState < ModuleState_Initialized )
 		module->initialize();
 
-	if( toState >= co::ModuleState_Integrated && fromState < co::ModuleState_Integrated )
+	if( toState >= ModuleState_Integrated && fromState < ModuleState_Integrated )
 		module->integrate();
 
-	if( toState >= co::ModuleState_PresentationIntegrated && fromState < co::ModuleState_PresentationIntegrated )
+	if( toState >= ModuleState_PresentationIntegrated && fromState < ModuleState_PresentationIntegrated )
 		module->integratePresentation();
 
-	if( toState >= co::ModuleState_Disintegrated && fromState < co::ModuleState_Disintegrated )
+	if( toState >= ModuleState_Disintegrated && fromState < ModuleState_Disintegrated )
 		module->disintegrate();
 
-	if( toState >= co::ModuleState_Disposed )
+	if( toState >= ModuleState_Disposed )
 		module->dispose();
 }
 
-void ModuleManager::verifyModuleIntegrity( co::Module* module )
+void ModuleManagerComponent::verifyModuleIntegrity( Module* module )
 {
 	// all module types must have their reflectors installed
-	co::ArrayRange<co::Type* const> types = module->getNamespace()->getTypes();
+	ArrayRange<Type* const> types = module->getNamespace()->getTypes();
 	try
 	{
 		for( ; types; types.popFirst() )
@@ -251,29 +253,29 @@ void ModuleManager::verifyModuleIntegrity( co::Module* module )
 	{
 		assert( !types.isEmpty() );
 		module->abort();
-		CORAL_THROW( co::ModuleLoadException, "module '"
+		CORAL_THROW( ModuleLoadException, "module '"
 				<< module->getNamespace()->getFullName()
 				<< "' was aborted because it did not provide a reflector for type '"
 				<< types.getFirst()->getFullName() << "' (" << e.what() << ")" );
 	}
 }
 
-void ModuleManager::syncModuleWithSystemState( co::Module* module )
+void ModuleManagerComponent::syncModuleWithSystemState( Module* module )
 {
 	try
 	{
-		switch( co::getSystem()->getState() )
+		switch( getSystem()->getState() )
 		{
-			case co::SystemState_Initializing:
+			case SystemState_Initializing:
 				// module is already initialized
 				break;
-			case co::SystemState_Integrating:
-			case co::SystemState_Integrated:
-				updateModule( module, co::ModuleState_Integrated );
+			case SystemState_Integrating:
+			case SystemState_Integrated:
+				updateModule( module, ModuleState_Integrated );
 				break;
-			case co::SystemState_IntegratingPresentation:
-			case co::SystemState_Running:
-				updateModule( module, co::ModuleState_PresentationIntegrated );
+			case SystemState_IntegratingPresentation:
+			case SystemState_Running:
+				updateModule( module, ModuleState_PresentationIntegrated );
 				break;
 			default:
 				assert( false );
@@ -282,10 +284,12 @@ void ModuleManager::syncModuleWithSystemState( co::Module* module )
 	catch( std::exception& e )
 	{
 		module->abort();
-		CORAL_THROW( co::ModuleLoadException, "exception raised by module '"
+		CORAL_THROW( ModuleLoadException, "exception raised by module '"
 						<< module->getNamespace()->getFullName()
 						<< "' during update: " << e.what() );
 	}
 }
 
-CORAL_EXPORT_COMPONENT( ModuleManager, ModuleManagerComponent );
+CORAL_EXPORT_COMPONENT( ModuleManagerComponent, ModuleManagerComponent );
+
+} // namespace co

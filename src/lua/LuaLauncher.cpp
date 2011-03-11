@@ -8,17 +8,19 @@
 #include <lua/Exception.h>
 #include <sstream>
 
-LuaLauncher::LuaLauncher()
+namespace lua {
+
+Launcher::Launcher()
 {
 	// empty
 }
 
-LuaLauncher::~LuaLauncher()
+Launcher::~Launcher()
 {
 	// empty
 }
 
-co::int32 LuaLauncher::main( co::ArrayRange<std::string const> args )
+co::int32 Launcher::main( co::ArrayRange<std::string const> args )
 {
 	if( args.isEmpty() )
 		throw lua::Exception( "lua.Launcher must receive a Lua script name as argument" );
@@ -48,4 +50,6 @@ co::int32 LuaLauncher::main( co::ArrayRange<std::string const> args )
 	return res;
 }
 
-CORAL_EXPORT_COMPONENT( LuaLauncher, Launcher );
+CORAL_EXPORT_COMPONENT( Launcher, Launcher );
+
+} // namespace lua

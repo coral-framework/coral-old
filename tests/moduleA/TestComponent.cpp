@@ -8,12 +8,14 @@
 #include <moduleA/DummyInterface.h>
 #include <cassert>
 
-class TestComponent : public moduleA::TestComponent_Base
+namespace moduleA {
+
+class TestComponent : public TestComponent_Base
 {
 public:
 	TestComponent() : _name( "NOT SET" ), _readOnlyString( "READONLY" )
 	{
-		_testEnum = moduleA::First;
+		_testEnum = First;
 	}
 
 	virtual ~TestComponent()
@@ -21,24 +23,24 @@ public:
 		// empty
 	}
 
-	// moduleA::TestInterface: methods:
+	// TestInterface: methods:
 
-	moduleA::DummyInterface* getDummyInterfaceAttribute()
+	DummyInterface* getDummyInterfaceAttribute()
 	{
 		return _dummyInterface.get();
 	}
 
-	void setDummyInterfaceAttribute( moduleA::DummyInterface* dummyInterfaceAttribute )
+	void setDummyInterfaceAttribute( DummyInterface* dummyInterfaceAttribute )
 	{
 		_dummyInterface = dummyInterfaceAttribute;
 	}
 
-	co::ArrayRange<moduleA::DummyInterface* const> getDummyInterfaces()
+	co::ArrayRange<DummyInterface* const> getDummyInterfaces()
 	{
 		return _dummyInterfaces;
 	}
 
-	void setDummyInterfaces( co::ArrayRange<moduleA::DummyInterface* const> dummyInterfaces )
+	void setDummyInterfaces( co::ArrayRange<DummyInterface* const> dummyInterfaces )
 	{
 		_dummyInterfaces.clear();
 		for( ; dummyInterfaces; dummyInterfaces.popFirst() )
@@ -72,37 +74,37 @@ public:
 			_names.push_back( names.getFirst() );
 	}
 
-	moduleA::TestInterface* getSelfReferenceAttrib()
+	TestInterface* getSelfReferenceAttrib()
 	{
 		return this;
 	}
 
-	moduleA::TestEnum getTestEnum()
+	TestEnum getTestEnum()
 	{
 		return _testEnum;
 	}
 
-	void setTestEnum( moduleA::TestEnum value )
+	void setTestEnum( TestEnum value )
 	{
 		_testEnum = value;
 	}
 
-	const moduleA::TestStruct& getTestStruct()
+	const TestStruct& getTestStruct()
 	{
 		return _testStruct;
 	}
 
-	void setTestStruct( const moduleA::TestStruct& value )
+	void setTestStruct( const TestStruct& value )
 	{
 		_testStruct = value;
 	}
 
-	co::ArrayRange<moduleA::TestStruct const> getTestStructArray()
+	co::ArrayRange<TestStruct const> getTestStructArray()
 	{
 		return _testStructArray;
 	}
 
-	void setTestStructArray( co::ArrayRange<moduleA::TestStruct const> range )
+	void setTestStructArray( co::ArrayRange<TestStruct const> range )
 	{
 		_testStructArray.clear();
 		_testStructArray.reserve( range.getSize() );
@@ -110,13 +112,13 @@ public:
 			_testStructArray.push_back( range.getFirst() );
 	}
 
-	void testInParameters( float size, moduleA::TestEnum enumValue,
-		const std::string& text, const moduleA::TestStruct& testStruct,
-		moduleA::DummyInterface* dummyInterface, co::ArrayRange<co::int32 const> intList,
-		co::ArrayRange<moduleA::DummyInterface* const> interfaces )
+	void testInParameters( float size, TestEnum enumValue,
+		const std::string& text, const TestStruct& testStruct,
+		DummyInterface* dummyInterface, co::ArrayRange<co::int32 const> intList,
+		co::ArrayRange<DummyInterface* const> interfaces )
 	{
 		size = -1;
-		enumValue = moduleA::First;
+		enumValue = First;
 		assert( text != "" );
 
 		assert( testStruct.anInt16 > 0 );
@@ -130,7 +132,7 @@ public:
 		myFirstInt = -1;
 
 		assert( !interfaces.isEmpty() );
-		moduleA::DummyInterface* firstInterface = interfaces.getFirst();
+		DummyInterface* firstInterface = interfaces.getFirst();
 		firstInterface = NULL;
 
 		// suppress warnings in release mode
@@ -139,13 +141,13 @@ public:
 		CORAL_UNUSED( interfaces );
 	}
 
-	void testOutParameters( float& size, moduleA::TestEnum& enumValue,
-		std::string& text, moduleA::TestStruct& testStruct,
-		moduleA::DummyInterface*& dummyInterface, std::vector<co::int32>& intList,
-		co::RefVector<moduleA::DummyInterface>& interfaces )
+	void testOutParameters( float& size, TestEnum& enumValue,
+		std::string& text, TestStruct& testStruct,
+		DummyInterface*& dummyInterface, std::vector<co::int32>& intList,
+		co::RefVector<DummyInterface>& interfaces )
 	{
 		size = -1;
-		enumValue = moduleA::First;
+		enumValue = First;
 		assert( text != "" );
 
 		assert( testStruct.anInt16 > 0 );
@@ -211,15 +213,17 @@ private:
 	co::RefPtr<co::InterfaceType> _itfType;
 	co::RefPtr<co::Type> _type;
 
-	co::RefPtr<moduleA::DummyInterface> _dummyInterface;
+	co::RefPtr<DummyInterface> _dummyInterface;
 	std::string _name;
 	std::string _readOnlyString;
 
 	std::vector<std::string> _names;
-	co::RefVector<moduleA::DummyInterface> _dummyInterfaces;
-	moduleA::TestEnum _testEnum;
-	moduleA::TestStruct _testStruct;
-	std::vector<moduleA::TestStruct> _testStructArray;
+	co::RefVector<DummyInterface> _dummyInterfaces;
+	TestEnum _testEnum;
+	TestStruct _testStruct;
+	std::vector<TestStruct> _testStructArray;
 };
 
 CORAL_EXPORT_COMPONENT( TestComponent, TestComponent );
+
+} // namespace co

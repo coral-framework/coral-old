@@ -24,11 +24,11 @@ inline bool isDigit( char c )
 
 bool LexicalUtils::isValidIdentifier( const std::string& str )
 {
-	std::size_t length = str.length();
+	size_t length = str.length();
 	if( length < 1 || !isAlphaOrUnderscore( str[0] ) )
 		return false;
 
-	for( std::size_t i = 1; i < length; ++i )
+	for( size_t i = 1; i < length; ++i )
 	{
 		char c = str[i];
 		if( !isAlphaOrUnderscore( c ) && !isDigit( c ) )

@@ -9,26 +9,28 @@
 #include <co/reserved/LexicalUtils.h>
 #include <sstream>
 
-ParameterInfo::ParameterInfo() : _type( 0 ), _isIn( true ), _isOut( false )
+namespace co {
+
+ParameterInfoComponent::ParameterInfoComponent() : _type( 0 ), _isIn( true ), _isOut( false )
 {
 	// empty
 }
 
-ParameterInfo::~ParameterInfo()
+ParameterInfoComponent::~ParameterInfoComponent()
 {
 	// empty
 }
 
-void ParameterInfo::init( const std::string& name, co::Type* type, bool isIn, bool isOut )
+void ParameterInfoComponent::init( const std::string& name, Type* type, bool isIn, bool isOut )
 {
-	if( !co::LexicalUtils::isValidIdentifier( name ) )
-		CORAL_THROW( co::IllegalNameException, "the passed parameter name is invalid" );
+	if( !LexicalUtils::isValidIdentifier( name ) )
+		CORAL_THROW( IllegalNameException, "the passed parameter name is invalid" );
 	
 	if( type == NULL )
-		CORAL_THROW( co::IllegalArgumentException, "the passed parameter type is invalid" );
+		CORAL_THROW( IllegalArgumentException, "the passed parameter type is invalid" );
 
 	if( isIn == false && isOut == false )
-		CORAL_THROW( co::IllegalArgumentException, "both isIn and isOut are false" );
+		CORAL_THROW( IllegalArgumentException, "both isIn and isOut are false" );
 
 	setName( name );
 	setType( type );
@@ -36,44 +38,46 @@ void ParameterInfo::init( const std::string& name, co::Type* type, bool isIn, bo
 	setIsOut( isOut );
 }
 
-void ParameterInfo::setName( const std::string& name )
+void ParameterInfoComponent::setName( const std::string& name )
 {
 	_name = name;
 }
 
-void ParameterInfo::setType( co::Type* type )
+void ParameterInfoComponent::setType( Type* type )
 {
 	_type = type;
 }
 
-void ParameterInfo::setIsIn( bool isIn )
+void ParameterInfoComponent::setIsIn( bool isIn )
 {
 	_isIn = isIn;
 }
 
-void ParameterInfo::setIsOut( bool isOut )
+void ParameterInfoComponent::setIsOut( bool isOut )
 {
 	_isOut = isOut;
 }
 
-const std::string& ParameterInfo::getName()
+const std::string& ParameterInfoComponent::getName()
 {
 	return _name;
 }
 
-co::Type* ParameterInfo::getType()
+Type* ParameterInfoComponent::getType()
 {
 	return _type;
 }
 
-bool ParameterInfo::getIsIn()
+bool ParameterInfoComponent::getIsIn()
 {
 	return _isIn;
 }
 
-bool ParameterInfo::getIsOut()
+bool ParameterInfoComponent::getIsOut()
 {
 	return _isOut;
 }
 
-CORAL_EXPORT_COMPONENT( ParameterInfo, ParameterInfoComponent );
+CORAL_EXPORT_COMPONENT( ParameterInfoComponent, ParameterInfoComponent );
+
+} // namespace co

@@ -5,29 +5,33 @@
 
 #include "NativeClassType.h"
 
-NativeClassType::~NativeClassType()
+namespace co {
+
+NativeClassTypeComponent::~NativeClassTypeComponent()
 {
 	// empty
 }
 
-void NativeClassType::setNativeName( const std::string& nativeName )
+void NativeClassTypeComponent::setNativeName( const std::string& nativeName )
 {
 	_nativeName = nativeName;
 }
 
-void NativeClassType::setNativeHeaderFile( const std::string& headerName )
+void NativeClassTypeComponent::setNativeHeaderFile( const std::string& headerName )
 {
 	_nativeHeaderFile = headerName;
 }
 
-const std::string& NativeClassType::getNativeName()
+const std::string& NativeClassTypeComponent::getNativeName()
 {
 	return _nativeName;
 }
 
-const std::string& NativeClassType::getNativeHeaderFile()
+const std::string& NativeClassTypeComponent::getNativeHeaderFile()
 {
 	return _nativeHeaderFile;
 }
 
-CORAL_EXPORT_COMPONENT( NativeClassType, NativeClassTypeComponent );
+CORAL_EXPORT_COMPONENT( NativeClassTypeComponent, NativeClassTypeComponent );
+
+} // namespace co

@@ -10,18 +10,22 @@
 #include "StructTypeComponent_Base.h"
 #include "AttributeAndMethodContainer.h"
 
+namespace co {
+
 /*!
 	Component that implements co.StructType.
  */
-class StructType : public co::StructTypeComponent_Base,
+class StructTypeComponent : public StructTypeComponent_Base,
 					public TypeImpl, public AttributeAndMethodContainer
 {
 public:
-	virtual ~StructType();
+	virtual ~StructTypeComponent();
 
 	DELEGATE_CO_TYPE_METHODS( TypeImpl:: );
 	DELEGATE_CO_COMPOUNDTYPE_METHODS( AttributeAndMethodContainer:: );
 	DELEGATE_CO_ATTRIBUTECONTAINER_METHODS( AttributeAndMethodContainer:: );
 };
+
+} // namespace co
 
 #endif

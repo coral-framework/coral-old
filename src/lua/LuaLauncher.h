@@ -8,17 +8,21 @@
 
 #include "Launcher_Base.h"
 
+namespace lua {
+
 /*!
 	A launcher component for use with the 'coral' launcher executable.
  */
-class LuaLauncher : public lua::Launcher_Base
+class Launcher : public Launcher_Base
 {
 public:
-    LuaLauncher();
-	virtual ~LuaLauncher();
+    Launcher();
+	virtual ~Launcher();
 
 	// lua::ILauncher methods:
 	co::int32 main( co::ArrayRange<std::string const> args );
 };
+
+} // namespace lua
 
 #endif

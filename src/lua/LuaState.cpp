@@ -16,6 +16,8 @@ extern "C" {
 	#include "socket/luasocket.h"
 }
 
+namespace lua {
+
 lua_State* LuaState::sm_L( NULL );
 int LuaState::sm_instancesTableRegIdx( 0 );
 
@@ -857,3 +859,5 @@ void LuaState::raiseException( lua_State* L, int errorCode )
 }
 
 CORAL_EXPORT_COMPONENT( LuaState, Universe );
+
+} // namespace lua

@@ -6,25 +6,27 @@
 #include "EnumType.h"
 #include <algorithm>
 
-EnumType::~EnumType()
+namespace co {
+
+EnumTypeComponent::~EnumTypeComponent()
 {
 	// empty
 }
 
-void EnumType::addIdentifier( const std::string& identifier )
+void EnumTypeComponent::addIdentifier( const std::string& identifier )
 {
 	_identifiers.push_back( identifier );
 }
 
-co::ArrayRange<std::string const> EnumType::getIdentifiers()
+ArrayRange<std::string const> EnumTypeComponent::getIdentifiers()
 {
 	return _identifiers;
 }
 
-co::int32 EnumType::getValueOf( const std::string& identifier )
+int32 EnumTypeComponent::getValueOf( const std::string& identifier )
 {
-	co::int32 count = static_cast<co::int32>( _identifiers.size() );
-	for( co::int32 i = 0; i < count; ++i )
+	int32 count = static_cast<int32>( _identifiers.size() );
+	for( int32 i = 0; i < count; ++i )
 	{
 		if( identifier == _identifiers[i] )
 			return i;
@@ -32,4 +34,6 @@ co::int32 EnumType::getValueOf( const std::string& identifier )
 	return -1;
 }
 
-CORAL_EXPORT_COMPONENT( EnumType, EnumTypeComponent );
+CORAL_EXPORT_COMPONENT( EnumTypeComponent, EnumTypeComponent );
+
+} // namespace co

@@ -10,33 +10,37 @@
 #include <co/RefPtr.h>
 #include <co/Platform.h>
 
+namespace co {
+
 /*!
 	Component that implements co.ParameterInfo.
  */
-class ParameterInfo : public co::ParameterInfoComponent_Base
+class ParameterInfoComponent : public ParameterInfoComponent_Base
 {
 public:
-	ParameterInfo();
-	virtual ~ParameterInfo();
+	ParameterInfoComponent();
+	virtual ~ParameterInfoComponent();
 
 	// internal methods:
-	void init( const std::string& name, co::Type* type, bool isIn, bool isOut );
+	void init( const std::string& name, Type* type, bool isIn, bool isOut );
 	void setName( const std::string& name );
-	void setType( co::Type* type );
+	void setType( Type* type );
 	void setIsIn( bool isIn );
 	void setIsOut( bool isOut );
 
-	// co::ParameterInfo methods
+	// ParameterInfo methods
 	const std::string& getName();
-	co::Type* getType();
+	Type* getType();
 	bool getIsIn();
 	bool getIsOut();
 
 private:
 	std::string _name;
-	co::Type* _type;
+	Type* _type;
 	bool _isIn;
 	bool _isOut;
 };
+
+} // namespace co
 
 #endif

@@ -22,7 +22,9 @@
 #include <cstdio>
 #include <sstream>
 
-//------ Module Bootstrap Functions -----------------------------------------//
+namespace co {
+
+// ------ Module Bootstrap Functions -------------------------------------------
 
 struct TypeDependency
 {
@@ -32,7 +34,7 @@ struct TypeDependency
 
 typedef const char* (*QueryVerificationDataFunction)();
 typedef const TypeDependency* (*QueryDependenciesFunction)();
-typedef co::ModulePart* (*ModulePartInstanceFunction)();
+typedef ModulePart* (*ModulePartInstanceFunction)();
 
 struct BootstrapFunctions
 {
@@ -42,31 +44,31 @@ struct BootstrapFunctions
 };
 
 
-//------ Default ModulePartLoader -------------------------------------------//
+// ------ Default ModulePartLoader ---------------------------------------------
 
-ModulePartLoader::ModulePartLoader()
+ModulePartLoaderComponent::ModulePartLoaderComponent()
 {
 	// empty
 }
 
-ModulePartLoader::~ModulePartLoader()
+ModulePartLoaderComponent::~ModulePartLoaderComponent()
 {
 	// empty
 }
 
-bool ModulePartLoader::canLoadModulePart( const std::string& moduleName )
+bool ModulePartLoaderComponent::canLoadModulePart( const std::string& moduleName )
 {
 	return locateModuleLibrary( moduleName );
 }
 
-co::ModulePart* ModulePartLoader::loadModulePart( const std::string& moduleName )
+ModulePart* ModulePartLoaderComponent::loadModulePart( const std::string& moduleName )
 {
 	std::string libraryFilename;
 	if( !locateModuleLibrary( moduleName, &libraryFilename ) )
-		throw co::ModuleLoadException( "unexpected missing module library file" );
+		throw ModuleLoadException( "unexpected missing module library file" );
 
-	co::RefPtr<co::Library> lib( new co::Library( libraryFilename ) );
-	lib->setLoadHints( co::Library::GlobalSymbolsHint );
+	RefPtr<Library> lib( new Library( libraryFilename ) );
+	lib->setLoadHints( Library::GlobalSymbolsHint );
 	lib->load();
 
 	// resolve module bootstrap functions
@@ -76,15 +78,15 @@ co::ModulePart* ModulePartLoader::loadModulePart( const std::string& moduleName 
 	// sanity check the module
 	const char* verificationData = bf.queryVerificationData();
 	if( !checkVerificationData( verificationData ) )
-		throw co::ModuleLoadException( "library contains malformed verification data" );
+		throw ModuleLoadException( "library contains malformed verification data" );
 
 	checkTypeDependencies( bf.queryDependencies() );
 
-	co::ModulePart* part = bf.modulePartInstance();
+	ModulePart* part = bf.modulePartInstance();
 	if( !part )
-		throw co::ModuleLoadException( "library provided a null ModulePart" );
+		throw ModuleLoadException( "library provided a null ModulePart" );
 
-	co::LibraryManager::add( part, lib.get() );
+	LibraryManager::add( part, lib.get() );
 
 	return part;
 }
@@ -95,7 +97,7 @@ co::ModulePart* ModulePartLoader::loadModulePart( const std::string& moduleName 
 	#define MODULE_LIB_EXT ".so"
 #endif
 
-bool ModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::string* filename )
+bool ModulePartLoaderComponent::locateModuleLibrary( const std::string& moduleName, std::string* filename )
 {
 	const char* moduleBaseName = moduleName.c_str();
 	size_t lastDotPos = moduleName.rfind( '.' );
@@ -141,15 +143,15 @@ bool ModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::
 #endif
 
 	std::string modulePath( moduleName );
-	co::OS::convertDotsToDirSeps( modulePath );
+	OS::convertDotsToDirSeps( modulePath );
 
-	return co::OS::searchFile3( co::getPaths(),
-								co::ArrayRange<const std::string>( &modulePath, 1 ),
-								co::ArrayRange<const std::string>( fileNames, n ),
-								filename ? *filename : modulePath );
+	return OS::searchFile3( getPaths(),
+							ArrayRange<const std::string>( &modulePath, 1 ),
+							ArrayRange<const std::string>( fileNames, n ),
+							filename ? *filename : modulePath );
 }
 
-void ModulePartLoader::resolveModuleFunctions( co::Library* lib, BootstrapFunctions& bf )
+void ModulePartLoaderComponent::resolveModuleFunctions( Library* lib, BootstrapFunctions& bf )
 {
 	bf.queryVerificationData = reinterpret_cast<QueryVerificationDataFunction>(
 												lib->resolve( "coral_module_query_verification_data" ) );
@@ -159,13 +161,13 @@ void ModulePartLoader::resolveModuleFunctions( co::Library* lib, BootstrapFuncti
 												lib->resolve( "coral_module_part_instance" ) );
 
 	if( !bf.queryVerificationData || !bf.queryDependencies || !bf.modulePartInstance )
-		CORAL_THROW( co::ModuleLoadException, "incompatible library: '" << lib->getFileName()
+		CORAL_THROW( ModuleLoadException, "incompatible library: '" << lib->getFileName()
 						<< "' does not properly export the module bootstrap functions" );
 }
 
-bool ModulePartLoader::checkVerificationData( const std::string& data )
+bool ModulePartLoaderComponent::checkVerificationData( const std::string& data )
 {
-	co::StringTokenizer st( data, "=\n" );
+	StringTokenizer st( data, "=\n" );
 	const std::string& str = st.getToken();
 
 	if( !st.nextToken() || str != "pattern" )
@@ -184,11 +186,11 @@ bool ModulePartLoader::checkVerificationData( const std::string& data )
 	 */
 	int major, minor;
 	if( sscanf( str.c_str(), " %d . %d . %*d", &major, &minor ) != 2 )
-		CORAL_THROW( co::ModuleLoadException, "malformed version string '"
+		CORAL_THROW( ModuleLoadException, "malformed version string '"
 						<< str << "' in module verification data" );
 
 	if( major > CORAL_VERSION_MAJOR || minor > CORAL_VERSION_MINOR )
-		CORAL_THROW( co::ModuleLoadException, "module was compiled for a newer Coral version ("
+		CORAL_THROW( ModuleLoadException, "module was compiled for a newer Coral version ("
 						<< major << '.' << minor << "; running: " CORAL_VERSION_STR ")" );
 
 	// check the build key; currently it must be a perfect match
@@ -196,7 +198,7 @@ bool ModulePartLoader::checkVerificationData( const std::string& data )
 		return false;
 
 	if( str != CORAL_BUILD_KEY )
-		CORAL_THROW( co::ModuleLoadException, "incompatible build keys (module: "
+		CORAL_THROW( ModuleLoadException, "incompatible build keys (module: "
 						<< str << "; core: " CORAL_BUILD_KEY ")" );
 
 	// check the build mode
@@ -206,23 +208,23 @@ bool ModulePartLoader::checkVerificationData( const std::string& data )
 	// in release mode we cannot load modules built in debug mode, and vice versa
 	if( str != CORAL_BUILD_MODE )
 	{
-		CORAL_THROW( co::ModuleLoadException, "incompatible build modes (module: "
+		CORAL_THROW( ModuleLoadException, "incompatible build modes (module: "
 						<< str << "; core: " CORAL_BUILD_MODE ")" );
 	}
 
 	return true;
 }
 
-void ModulePartLoader::checkTypeDependencies( const TypeDependency* td )
+void ModulePartLoaderComponent::checkTypeDependencies( const TypeDependency* td )
 {
 	std::string currentBinarySignature;
-	std::vector<co::Type*> incompatibleTypes;
+	std::vector<Type*> incompatibleTypes;
 
 	try
 	{
 		while( td->name && td->binarySignature )
 		{
-			co::Type* type = co::getType( td->name );
+			Type* type = getType( td->name );
 			type->getBinarySignature().getString( currentBinarySignature );
 
 			if( currentBinarySignature != td->binarySignature )
@@ -231,17 +233,17 @@ void ModulePartLoader::checkTypeDependencies( const TypeDependency* td )
 			++td;
 		}
 	}
-	catch( co::TypeLoadException& e )
+	catch( TypeLoadException& e )
 	{
-		CORAL_THROW( co::ModuleLoadException, "could not load required type '"
+		CORAL_THROW( ModuleLoadException, "could not load required type '"
 						<< td->name << "': " << e.getMessage() );
 	}
 	catch( std::exception& e )
 	{
-		CORAL_THROW( co::ModuleLoadException, "type dependency check error: " << e.what() );
+		CORAL_THROW( ModuleLoadException, "type dependency check error: " << e.what() );
 	}
 
-	if( !co::getSystem()->getModules()->getBinaryCompatibilityChecking() )
+	if( !getSystem()->getModules()->getBinaryCompatibilityChecking() )
 		return; // binary interface check errors are disabled
 
 	size_t numIncompatibleTypes = incompatibleTypes.size();
@@ -265,7 +267,9 @@ void ModulePartLoader::checkTypeDependencies( const TypeDependency* td )
 	if( numIncompatibleTypes == 1 )
 		ss << '\'';
 
-	throw co::ModuleLoadException( ss.str() );
+	throw ModuleLoadException( ss.str() );
 }
 
-CORAL_EXPORT_COMPONENT( ModulePartLoader, ModulePartLoaderComponent );
+CORAL_EXPORT_COMPONENT( ModulePartLoaderComponent, ModulePartLoaderComponent );
+
+} // namespace co

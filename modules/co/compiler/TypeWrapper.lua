@@ -200,7 +200,7 @@ function autoFields.typesNeededInReflector( t )
 				addType( a.type )
 			end
 
-			for i, m in ipairs( t.memberMethods ) do
+			for i, m in ipairs( ancestor.memberMethods ) do
 				local returnType = m.returnType
 				if returnType then
 					addType( returnType )

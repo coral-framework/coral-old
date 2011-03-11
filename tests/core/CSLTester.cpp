@@ -7,11 +7,6 @@
 #include <core/csl/Error.h>
 #include <gtest/gtest.h>
 
-#define THE_EXPECTED_ERROR_LINE_DOES_NOT_MATCH 0
-#define THE_EXPECTED_ERROR_FILE_DOES_NOT_MATCH 0
-#define THE_EXPECTED_ERROR_COUNT_DOES_NOT_MATCH 0
-#define THE_EXPECTED_ERROR_MESSAGE_DOES_NOT_MATCH 0
-
 CSLTester::CSLTester( const std::string& typeName, const LocationInfo& li  )
 	: _typeName( typeName ),  _loader( typeName, co::getPaths(), co::getSystem()->getTypes() ), _locationInfo( li )
 {
@@ -31,25 +26,27 @@ CSLTester& CSLTester::expectedError( const std::string& messageSubStr, const std
 
 void CSLTester::run()
 {
-	#define CSL_LOCATION "[CSLTester]: Error, from: " << _locationInfo.sourceFile << ":" << _locationInfo.sourceLine << ": "
+	#define CSL_LOCATION "[CSLTester] failed at " << _locationInfo.sourceFile << ":" << _locationInfo.sourceLine << ": "
 
 	ASSERT_NO_THROW( _loader.loadType() )
 		<< CSL_LOCATION  << "the CSL file for type '" << _typeName << "' does not exist!";
 
-	const csl::Error* error = _loader.getError();
+	const co::csl::Error* error = _loader.getError();
 
 	if( _expectedErrors.size() == 0 )
 	{		
 		// no errors were expected
-		ASSERT_TRUE( error == NULL ) << CSL_LOCATION << "no errors were expected at the loading of type '"
-									 << _typeName << "', but the loader has returned errors." << std::endl
-									 << "Actual error stack is: " << *error;
+		ASSERT_TRUE( error == NULL )
+			<< CSL_LOCATION << "no errors were expected at the loading of type '"
+			<< _typeName << "', but the loader has returned errors." << std::endl
+			<< "Actual error stack is: " << *error;
 	}
 	else
 	{
-		ASSERT_TRUE( error != NULL ) << CSL_LOCATION << _expectedErrors.size()
-									 << " error(s) were expected at the loading of type '"
-									 << _typeName << "', but the loader has returned no errors.";
+		ASSERT_TRUE( error != NULL )
+			<< CSL_LOCATION << _expectedErrors.size()
+			<< " error(s) were expected at the loading of type '"
+			<< _typeName << "', but the loader has returned no errors.";
 
 		// check the error hierarchy
 		unsigned int i = 0;
@@ -57,34 +54,36 @@ void CSLTester::run()
 		{
 			// assert error line
 			if( error->getLine() != _expectedErrors[i].line )
-				ASSERT_TRUE( THE_EXPECTED_ERROR_LINE_DOES_NOT_MATCH ) << CSL_LOCATION
-					<< "expected error of number " << i << " does not match actual error, "
-					<< "line number differs. Actual: " << error->getLine() << ". "
-					<< "Expected: " << _expectedErrors[i].line;
+				FAIL()
+					<< CSL_LOCATION << "line number mismatch"
+					<< " at level " << i << ". "
+					<< "Expected: " << _expectedErrors[i].line
+					<< ". Actual: " << error->getLine();
 
 			// assert error file
 			if( !TestHelper::stringEndsWith( error->getFileName(), _expectedErrors[i].filename ) )
-				ASSERT_TRUE( THE_EXPECTED_ERROR_FILE_DOES_NOT_MATCH ) << CSL_LOCATION
-					<< "expected error of number " << i << " does not match the actual error, "
-					<< "filename differs. Actual: '" << error->getFileName() << "'. "
-					<< "Expected: '" << _expectedErrors[i].filename << "'";
+				FAIL()
+					<< CSL_LOCATION << "filename mismatch"
+					<< " at level " << i << ". "
+					<< "Expected: '" << _expectedErrors[i].filename
+					<< "'. Actual: '" << error->getFileName();
 
 			// assert match of the error message substring
 			std::string::size_type found = error->getMessage().find( _expectedErrors[i].messageSubStr );
 			if( found == std::string::npos )
-				ASSERT_TRUE( THE_EXPECTED_ERROR_MESSAGE_DOES_NOT_MATCH ) << CSL_LOCATION
-					<< "expected error of number " << i << " does not match actual error, "
-					<< "message does not match. Actual: " << error->getMessage() << ". "
-					<< "Expected substring: " << _expectedErrors[i].messageSubStr;
+				FAIL()
+					<< CSL_LOCATION << "message mismatch"
+					<< " at level " << i << ". "
+					<< "Expected substring: '" << _expectedErrors[i].messageSubStr
+					<< "'. Actual message: " << error->getMessage();
 
 			error = error->getInnerError();
 			++i;
 		}
 
 		if( i != _expectedErrors.size() )
-			ASSERT_TRUE( THE_EXPECTED_ERROR_MESSAGE_DOES_NOT_MATCH ) << CSL_LOCATION
-					<< "actual error count is "
-					<< i << " but expected error count is "
-					<< _expectedErrors.size() << ".";
+			FAIL()
+				<< CSL_LOCATION << "error count mismatch ("
+				<< _expectedErrors.size() << " expected, got " << i << ")";
 	}
 }

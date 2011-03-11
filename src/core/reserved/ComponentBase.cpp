@@ -94,7 +94,7 @@ ComponentType* ComponentBase::getOrCreateSimpleInternalComponentType( const char
 	RefPtr<TypeCreationTransaction> tct =
 			newInstance( "co.TypeCreationTransactionComponent" )->getFacet<TypeCreationTransaction>();
 
-	std::size_t lastDotPos = fullTypeName.rfind( '.' );
+	size_t lastDotPos = fullTypeName.rfind( '.' );
 	assert( lastDotPos != std::string::npos ); // componentTypeName must be specified with a namespace
 
 	std::string namespaceName( fullTypeName.substr( 0, lastDotPos ) );

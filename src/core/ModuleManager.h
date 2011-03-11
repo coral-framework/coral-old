@@ -11,47 +11,51 @@
 #include <co/ModulePartLoader.h>
 #include <co/RefVector.h>
 
+namespace co {
+
 // forward declarations:
-class Module;
+class ModuleComponent;
 
 /*!
 	Component that implements co.ModuleManager.
  */
-class ModuleManager : public co::ModuleManagerComponent_Base
+class ModuleManagerComponent : public ModuleManagerComponent_Base
 {
 public:
-	ModuleManager();
-	virtual ~ModuleManager();
+	ModuleManagerComponent();
+	virtual ~ModuleManagerComponent();
 
 	// internal methods:
 	void initialize();
-	void updateModules( co::ModuleState toState );
+	void updateModules( ModuleState toState );
 
-	// co::ModuleManager methods:
-	co::ArrayRange<co::Module* const> getModules();
-	co::ArrayRange<co::ModulePartLoader* const> getLoaders();
+	// ModuleManager methods:
+	ArrayRange<Module* const> getModules();
+	ArrayRange<ModulePartLoader* const> getLoaders();
 	bool getBinaryCompatibilityChecking();
 	void setBinaryCompatibilityChecking( bool enabled );
-	co::Module* findModule( const std::string& moduleName );
-	void installLoader( co::ModulePartLoader* loader );
-	void uninstallLoader( co::ModulePartLoader* loader );
+	Module* findModule( const std::string& moduleName );
+	void installLoader( ModulePartLoader* loader );
+	void uninstallLoader( ModulePartLoader* loader );
 	bool isLoadable( const std::string& moduleName );
-	co::Module* load( const std::string& moduleName );
+	Module* load( const std::string& moduleName );
 
 private:
-	Module* createModule( const std::string& moduleName );
-	void updateModule( co::Module* module, co::ModuleState toState );
-	void verifyModuleIntegrity( co::Module* module );
-	void syncModuleWithSystemState( co::Module* module );
+	ModuleComponent* createModule( const std::string& moduleName );
+	void updateModule( Module* module, ModuleState toState );
+	void verifyModuleIntegrity( Module* module );
+	void syncModuleWithSystemState( Module* module );
 
 private:
-	typedef co::RefVector<co::Module> ModuleList;
+	typedef RefVector<Module> ModuleList;
 	ModuleList _modules;
 
-	typedef co::RefVector<co::ModulePartLoader> ModulePartLoaderList;
+	typedef RefVector<ModulePartLoader> ModulePartLoaderList;
 	ModulePartLoaderList _loaders;
 	
 	bool _binaryCompatibilityChecking;
 };
+
+} // namespace co
 
 #endif

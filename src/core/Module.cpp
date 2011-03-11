@@ -15,27 +15,29 @@
 #include <cassert>
 #include <iostream>
 
-Module::Module()
+namespace co {
+
+ModuleComponent::ModuleComponent()
 {
-	_state = co::ModuleState_None;
+	_state = ModuleState_None;
 	_namespace = NULL;
 	_rank = 0;
 }
 
-Module::~Module()
+ModuleComponent::~ModuleComponent()
 {
-	assert( _state >= co::ModuleState_Disposed );
+	assert( _state >= ModuleState_Disposed );
 }
 
-void Module::initialize( const std::string& moduleName )
+void ModuleComponent::initialize( const std::string& moduleName )
 {
 	// get or create a namespace for this module
-	co::Namespace* ns = co::getSystem()->getTypes()->getRootNS();
+	Namespace* ns = getSystem()->getTypes()->getRootNS();
 
-	co::StringTokenizer st( moduleName, "." );
+	StringTokenizer st( moduleName, "." );
 	while( st.nextToken() )
 	{
-		co::Namespace* childNS = ns->getChildNamespace( st.getToken() );
+		Namespace* childNS = ns->getChildNamespace( st.getToken() );
 		if( !childNS )
 			childNS = ns->defineChildNamespace( st.getToken() );
 
@@ -44,115 +46,115 @@ void Module::initialize( const std::string& moduleName )
 
 	_namespace = ns;
 
-	static_cast<Namespace*>( ns )->setModule( this );
+	static_cast<NamespaceComponent*>( ns )->setModule( this );
 }
 
-void Module::addPart( co::ModulePart* part )
+void ModuleComponent::addPart( ModulePart* part )
 {
-	if( _state != co::ModuleState_None )
-		throw co::LifeCycleException( "cannot add a ModulePart to a Module after it has been initialized" );
+	if( _state != ModuleState_None )
+		throw LifeCycleException( "cannot add a ModulePart to a Module after it has been initialized" );
 
 	assert( part );
 	_parts.push_back( part );
 }
 
-co::ModuleState Module::getState()
+ModuleState ModuleComponent::getState()
 {
 	return _state;
 }
 
-co::Namespace* Module::getNamespace()
+Namespace* ModuleComponent::getNamespace()
 {
 	assert( _namespace );
 	return _namespace;
 }
 
-co::ArrayRange<co::ModulePart* const> Module::getParts()
+ArrayRange<ModulePart* const> ModuleComponent::getParts()
 {
 	return _parts;
 }
 
-co::int32 Module::getRank()
+int32 ModuleComponent::getRank()
 {
 	return _rank;
 }
 
-void Module::setRank( co::int32 rank )
+void ModuleComponent::setRank( int32 rank )
 {
 	_rank = rank;
 }
 
-void Module::initialize()
+void ModuleComponent::initialize()
 {
-	if( _state != co::ModuleState_None )
-		throw co::LifeCycleException( "the Module's state is not ModuleState_None" );
+	if( _state != ModuleState_None )
+		throw LifeCycleException( "the Module's state is not ModuleState_None" );
 
-	for( co::ArrayRange<co::ModulePart*> ar( _parts ); ar; ar.popFirst() )
+	for( ArrayRange<ModulePart*> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->initialize( this );
 
-	_state = co::ModuleState_Initialized;
+	_state = ModuleState_Initialized;
 }
 
-void Module::integrate()
+void ModuleComponent::integrate()
 {
-	if( _state != co::ModuleState_Initialized )
-		throw co::LifeCycleException( "the Module's state is not ModuleState_Initialized" );
+	if( _state != ModuleState_Initialized )
+		throw LifeCycleException( "the Module's state is not ModuleState_Initialized" );
 
-	for( co::ArrayRange<co::ModulePart*> ar( _parts ); ar; ar.popFirst() )
+	for( ArrayRange<ModulePart*> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->integrate( this );
 
-	_state = co::ModuleState_Integrated;
+	_state = ModuleState_Integrated;
 }
 
-void Module::integratePresentation()
+void ModuleComponent::integratePresentation()
 {
-	if( _state != co::ModuleState_Integrated )
-		throw co::LifeCycleException( "the Module's state is not ModuleState_Integrated" );
+	if( _state != ModuleState_Integrated )
+		throw LifeCycleException( "the Module's state is not ModuleState_Integrated" );
 
-	for( co::ArrayRange<co::ModulePart*> ar( _parts ); ar; ar.popFirst() )
+	for( ArrayRange<ModulePart*> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->integratePresentation( this );
 
-	_state = co::ModuleState_PresentationIntegrated;
+	_state = ModuleState_PresentationIntegrated;
 }
 
-void Module::disintegrate()
+void ModuleComponent::disintegrate()
 {
-	if( _state != co::ModuleState_PresentationIntegrated )
-		throw co::LifeCycleException( "the Module's state is not ModuleState_PresentationIntegrated" );
+	if( _state != ModuleState_PresentationIntegrated )
+		throw LifeCycleException( "the Module's state is not ModuleState_PresentationIntegrated" );
 
-	for( co::ArrayRange<co::ModulePart*> ar( _parts ); ar; ar.popFirst() )
+	for( ArrayRange<ModulePart*> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->disintegrate( this );
 
-	_state = co::ModuleState_Disintegrated;
+	_state = ModuleState_Disintegrated;
 }
 
-void Module::dispose()
+void ModuleComponent::dispose()
 {
-	if( _state != co::ModuleState_Disintegrated )
-		throw co::LifeCycleException( "the Module's state is not ModuleState_Disintegrated" );
+	if( _state != ModuleState_Disintegrated )
+		throw LifeCycleException( "the Module's state is not ModuleState_Disintegrated" );
 
-	for( co::ArrayRange<co::ModulePart*> ar( _parts ); ar; ar.popFirst() )
+	for( ArrayRange<ModulePart*> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->dispose( this );
 
 	_parts.clear();
-	co::LibraryManager::flush();
+	LibraryManager::flush();
 
-	_state = co::ModuleState_Disposed;
+	_state = ModuleState_Disposed;
 }
 
-void Module::abort()
+void ModuleComponent::abort()
 {
-	if( _state >= co::ModuleState_Disintegrated )
-		throw co::LifeCycleException( "the Module is being or was already disposed" );
+	if( _state >= ModuleState_Disintegrated )
+		throw LifeCycleException( "the Module is being or was already disposed" );
 
 	// just ignore exceptions raised by ModuleParts from this point on
 	for( int i = 0; i < 2; ++i ) // this loop is just to avoid duplicating the 'catch' code
 	{
-		for( co::ArrayRange<co::ModulePart*> ar( _parts ); ar; ar.popFirst() )
+		for( ArrayRange<ModulePart*> ar( _parts ); ar; ar.popFirst() )
 		{
 			try
 			{
-				if( i == 0 && _state >= co::ModuleState_Integrated )
+				if( i == 0 && _state >= ModuleState_Integrated )
 					ar.getFirst()->disintegrate( this );
 
 				if( i == 1 )
@@ -160,16 +162,18 @@ void Module::abort()
 			}
 			catch( std::exception& e )
 			{
-				co::debug( co::Dbg_Critical, "Exception ignored while aborting module '%s': %s",
+				debug( Dbg_Critical, "Exception ignored while aborting module '%s': %s",
 						_namespace->getFullName().c_str(), e.what() );
 			}
 		}
 	}
 
 	_parts.clear();
-	co::LibraryManager::flush();
+	LibraryManager::flush();
 
-	_state = co::ModuleState_Aborted;
+	_state = ModuleState_Aborted;
 }
 
-CORAL_EXPORT_COMPONENT( Module, ModuleComponent );
+CORAL_EXPORT_COMPONENT( ModuleComponent, ModuleComponent );
+
+} // namespace co

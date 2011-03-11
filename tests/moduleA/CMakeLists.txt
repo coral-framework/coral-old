@@ -69,6 +69,18 @@ ADD_TEST(
 )
 
 ################################################################################
+# If Valgrind is available, repeat the test checking for memory leaks
+################################################################################
+IF( VALGRIND_COMMAND )
+	ADD_TEST(
+		NAME tests_moduleA_MemoryCheck
+		COMMAND ${VALGRIND_COMMAND} --leak-check=full --show-reachable=yes --num-callers=15 --dsymutil=yes
+		--log-file=${CMAKE_BINARY_DIR}/ValgrindModuleA$<CONFIGURATION>.log --error-exitcode=13
+		--suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp $<TARGET_FILE:tests_moduleA>
+	)
+ENDIF()
+
+################################################################################
 # Source Groups
 ################################################################################
 

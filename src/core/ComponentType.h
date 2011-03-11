@@ -11,39 +11,43 @@
 #include <co/RefVector.h>
 #include <co/InterfaceInfo.h>
 
+namespace co {
+
 /*!
 	Component that implements co.ComponentType.
  */
-class ComponentType : public co::ComponentTypeComponent_Base, public TypeImpl
+class ComponentTypeComponent : public ComponentTypeComponent_Base, public TypeImpl
 {
 public:
-	ComponentType();
-	virtual ~ComponentType();
+	ComponentTypeComponent();
+	virtual ~ComponentTypeComponent();
 
 	// internal methods:
 
 	//! Appends the given interfaces range to the interfaces list. After calling this
 	//! method the interfaces list must be re-sorted using the sortInterfaces() method.
-	void addInterfaces( co::ArrayRange<co::InterfaceInfo* const> interfaces );
+	void addInterfaces( ArrayRange<InterfaceInfo* const> interfaces );
 
 	//! Sorts the interface list by (isFacet, name) and updates _firstReceptacle.
 	void sortInterfaces();
 
-	// co::CompoundType methods:
-	co::ArrayRange<co::MemberInfo* const> getMembers();
-	co::MemberInfo* getMember( const std::string& name );
+	// CompoundType methods:
+	ArrayRange<MemberInfo* const> getMembers();
+	MemberInfo* getMember( const std::string& name );
 
-	// co::ComponentType methods:
-	co::ArrayRange<co::InterfaceInfo* const> getInterfaces();
-	co::ArrayRange<co::InterfaceInfo* const> getFacets();
-	co::ArrayRange<co::InterfaceInfo* const> getReceptacles();
+	// ComponentType methods:
+	ArrayRange<InterfaceInfo* const> getInterfaces();
+	ArrayRange<InterfaceInfo* const> getFacets();
+	ArrayRange<InterfaceInfo* const> getReceptacles();
 
 	DELEGATE_CO_TYPE_METHODS( TypeImpl:: );
 
 private:
-	typedef co::RefVector<co::InterfaceInfo> InterfacesVector;
+	typedef RefVector<InterfaceInfo> InterfacesVector;
 	InterfacesVector _interfaces;	// dual sorted vector: facets first, then receptacles.
-	std::size_t _firstReceptacle;	// dividing point: position of the first receptacle in _interfaces.
+	size_t _firstReceptacle;		// dividing point: position of the first receptacle in _interfaces.
 };
+
+} // namespace co
 
 #endif

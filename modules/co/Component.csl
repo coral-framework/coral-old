@@ -19,20 +19,20 @@ interface Component
 		Retrieves the interface instance "provided by" or "bound to" one of the component's interfaces.
 
 		If \a itfInfo is a \e facet, this method returns the corresponding interface instance
-		<em>provided by</em> this component. Otherwise, if \a itfInfo is a \e receptacle, this
-		method returns the interface instance that is currently <em>bound to</em> the receptacle
-		(in this case, the result can be null if nothing is bound to the receptacle).
+		<em>provided by</em> the component. Otherwise, if \a itfInfo is a \e receptacle, this
+		method returns the facet that is currently <em>bound to</em> the receptacle (or NULL if
+		no facet is bound to the receptacle).
 
-		\throw NoSuchInterfaceException if \a itfInfo is not a valid interface of this component.
+		\throw NoSuchInterfaceException if \a itfInfo is not a valid component interface.
 	 */
 	Interface getInterface( in InterfaceInfo itfInfo ) raises NoSuchInterfaceException;
 
 	/*
-		Binds an interface \a instance to one of the component's receptacles.
-		If an interface instance is already bound to the receptacle, it is replaced by the new \a instance.
-		\throw NoSuchInterfaceException if \a receptacle is not a valid receptacle of this component.
-		\throw IllegalArgumentException if the passed \a instance is incompatible with the receptacle.
+		Binds a \a facet to one of the component's receptacles.
+		\throw NoSuchInterfaceException if \a receptacle is not a valid component receptacle.
+		\throw IllegalArgumentException if the passed \a facet is incompatible with the receptacle.
+		\throw LifeCycleException if the receptacle cannot be changed in the component's current state.
 	 */
-	void bindInterface( in InterfaceInfo receptacle, in Interface instance )
-		raises NoSuchInterfaceException, IllegalArgumentException;
+	void setReceptacle( in InterfaceInfo receptacle, in Interface facet )
+		raises NoSuchInterfaceException, IllegalArgumentException, LifeCycleException;
 };

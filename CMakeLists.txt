@@ -57,7 +57,7 @@ SET( CORAL_VERSION_PATCH	"2" )
 SET( CORAL_VERSION "${CORAL_VERSION_MAJOR}.${CORAL_VERSION_MINOR}.${CORAL_VERSION_PATCH}" )
 
 # Code generation rules revision.
-SET( CORAL_COMPILER_OUTPUT_REVISION 2 )
+SET( CORAL_COMPILER_OUTPUT_REVISION 3 )
 
 ################################################################################
 # Installation

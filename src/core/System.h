@@ -12,32 +12,36 @@
 #include "SystemComponent_Base.h"
 #include <co/RefPtr.h>
 
+namespace co {
+
 /*!
 	Component that implements co.System.
  */
-class System : public co::SystemComponent_Base
+class SystemComponent : public SystemComponent_Base
 {
 public:
-	System();
-	virtual ~System();
+	SystemComponent();
+	virtual ~SystemComponent();
 
 	// internal methods:
 	void initialize();
 
-	// co::System methods:
-	co::SystemState getState();
-	co::TypeManager* getTypes();
-	co::ModuleManager* getModules();
-	co::ServiceManager* getServices();
-	void setupBase( co::ArrayRange<std::string const> requiredModules );
+	// System methods:
+	SystemState getState();
+	TypeManager* getTypes();
+	ModuleManager* getModules();
+	ServiceManager* getServices();
+	void setupBase( ArrayRange<std::string const> requiredModules );
 	void setupPresentation();
 	void tearDown();
 
 private:
-	co::SystemState _state;
-	co::RefPtr<TypeManager> _types;
-	co::RefPtr<ModuleManager> _modules;
-	co::RefPtr<ServiceManager> _services;
+	SystemState _state;
+	RefPtr<TypeManagerComponent> _types;
+	RefPtr<ModuleManagerComponent> _modules;
+	RefPtr<ServiceManagerComponent> _services;
 };
+
+} // namespace co
 
 #endif

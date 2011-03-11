@@ -202,11 +202,8 @@ ENDFUNCTION()
 # Common settings for the utility macros
 ################################################################################
 IF( APPLE )
-	# On OSX 10.6 (Darwin 10.0), use only the x86_64 architecture by default
-	IF( NOT ${CMAKE_HOST_SYSTEM_VERSION} VERSION_LESS 10 )
-		SET( CMAKE_OSX_ARCHITECTURES "x86_64" )
-		SET( CMAKE_OSX_DEPLOYMENT_TARGET "10.6" )
-	ENDIF()
+	# On OSX use only the standard 64-bit architecture by default
+	SET( CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_64_BIT)" )
 ENDIF()
 
 ################################################################################
@@ -239,20 +236,6 @@ MACRO( CORAL_DEFAULT_TARGET_PROPERTIES targetName )
 				"_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE" )
 	ENDIF()
 
-	IF( XCODE_VERSION )
-		IF( ${CMAKE_HOST_SYSTEM_VERSION} VERSION_LESS 10 )
-			# On Leopard, force usage of GCC 4.2
-			SET_TARGET_PROPERTIES( ${targetName} PROPERTIES
-				XCODE_ATTRIBUTE_GCC_VERSION "4.2"
-			)
-		ELSE()
-			# From Snow Leopard on, force usage of the x86_64 arch.
-			SET_TARGET_PROPERTIES( ${targetName} PROPERTIES
-				XCODE_ATTRIBUTE_ARCHS ${CMAKE_OSX_ARCHITECTURES}
-			)
-		ENDIF()
-	ENDIF()
-
 ENDMACRO( CORAL_DEFAULT_TARGET_PROPERTIES )
 
 ################################################################################
@@ -281,6 +264,25 @@ MACRO( CORAL_MODULE_TARGET_PROPERTIES moduleName )
 	ENDIF()
 
 ENDMACRO( CORAL_MODULE_TARGET_PROPERTIES )
+
+################################################################################
+# Utility macro to set env vars for a test so it finds the coral library
+################################################################################
+MACRO( CORAL_TEST_ENVIRONMENT testName )
+
+	IF( NOT CORAL_ROOT )
+		SET( CORAL_ROOT $ENV{CORAL_ROOT} )
+	ENDIF()
+
+	SET_PROPERTY(
+		TEST ${testName}
+		APPEND PROPERTY ENVIRONMENT
+			PATH=${CORAL_ROOT}/lib
+			LD_LIBRARY_PATH=${CORAL_ROOT}/lib
+			DYLD_LIBRARY_PATH=${CORAL_ROOT}/lib
+	)
+
+ENDMACRO( CORAL_TEST_ENVIRONMENT )
 
 ################################################################################
 # Utility macro to build a Coral Module that contains *only* CSL types

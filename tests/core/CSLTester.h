@@ -62,7 +62,7 @@ private:
 
 	std::string _typeName;
 
-	TypeLoader _loader;
+	co::TypeLoader _loader;
 	LocationInfo _locationInfo;
 };
 

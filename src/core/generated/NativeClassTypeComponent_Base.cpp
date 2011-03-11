@@ -70,11 +70,11 @@ co::Interface* NativeClassTypeComponent_Base::getInterface( co::InterfaceInfo* i
 	return res;
 }
 
-void NativeClassTypeComponent_Base::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
+void NativeClassTypeComponent_Base::setReceptacle( co::InterfaceInfo* receptacle, co::Interface* facet )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
-	CORAL_UNUSED( instance );
+	CORAL_UNUSED( facet );
 }
 
 } // namespace co

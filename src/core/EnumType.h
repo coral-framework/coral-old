@@ -10,20 +10,22 @@
 #include "EnumTypeComponent_Base.h"
 #include <co/RefVector.h>
 
+namespace co {
+
 /*!
 	Component that implements co.EnumType.
  */
-class EnumType : public co::EnumTypeComponent_Base, public TypeImpl
+class EnumTypeComponent : public EnumTypeComponent_Base, public TypeImpl
 {
 public:
-	virtual ~EnumType();
+	virtual ~EnumTypeComponent();
 
 	// internal methods:
 	void addIdentifier( const std::string& identifier );
 
-	// co::EnumType methods:
-	co::ArrayRange<std::string const> getIdentifiers();
-	co::int32 getValueOf( const std::string& identifier );
+	// EnumType methods:
+	ArrayRange<std::string const> getIdentifiers();
+	int32 getValueOf( const std::string& identifier );
 
 	DELEGATE_CO_TYPE_METHODS( TypeImpl:: );
 
@@ -31,5 +33,7 @@ private:
 	typedef std::vector<std::string> IdentifierVector;
 	IdentifierVector _identifiers;
 };
+
+} // namespace co
 
 #endif

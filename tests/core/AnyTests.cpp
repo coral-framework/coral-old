@@ -24,26 +24,29 @@
  *	Performance / Portability Tests
  ****************************************************************************/
 
-TEST( AnyTests, sizeOfState )
+TEST( AnyTests, sizeOf )
 {
-	// we assume std::size_t has the size of a pointer
-	EXPECT_EQ( CORAL_POINTER_SIZE, sizeof(std::size_t) );
+	// we assume size_t has the size of a pointer
+	EXPECT_EQ( CORAL_POINTER_SIZE, sizeof(size_t) );
 
 	/*
 		Make sure sizeof(co::Any::State) is as expected.
-		A co::Any::State instance contains a double, a pointer, a size_t, plus 3 bytes.
+		A co::Any::State instance contains a double, a pointer, a uint32 and 2 bytes.
 	 */
 #if CORAL_POINTER_SIZE == 4
 	#if defined(CORAL_OS_UNIX)
 		// 32-bit system with 4-byte alignment
 		EXPECT_EQ( 20, sizeof(co::Any::State) );
+		EXPECT_EQ( 20 + 4 * 8 + sizeof(size_t), sizeof(co::Any) );
 	#else
 		// 32-bit system with 8-byte alignment
 		EXPECT_EQ( 24, sizeof(co::Any::State) );
+		EXPECT_EQ( 24 + 4 * 8 + sizeof(size_t), sizeof(co::Any) );
 	#endif
 #elif CORAL_POINTER_SIZE == 8
 	// 64-bit system with 8-byte alignment
-	EXPECT_EQ( 32, sizeof(co::Any::State) );
+	EXPECT_EQ( 24, sizeof(co::Any::State) );
+	EXPECT_EQ( 24 + 4 * 8 + sizeof(size_t), sizeof(co::Any) );
 #else
 #error Huh, pointers are neither 32 nor 64 bit long?
 #endif

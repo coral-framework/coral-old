@@ -15,7 +15,7 @@ void MemberInfoImpl::setName( const std::string& name )
 	_name = name;
 }
 
-void MemberInfoImpl::setOwner( co::CompoundType* owner, std::size_t index )
+void MemberInfoImpl::setOwner( co::CompoundType* owner, size_t index )
 {
 	_owner = owner;
 

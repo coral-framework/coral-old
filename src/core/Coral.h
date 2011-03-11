@@ -11,14 +11,14 @@
 
 namespace co {
 
-// forward declarations:
+// Forward Decls:
 class Type;
 class System;
 class Component;
 class Interface;
 class InterfaceType;
 
-//---------- Coral Path -----------------------------------------------------//
+// ------ Coral Path -----------------------------------------------------------
 
 /*!
 	\brief Returns the list of type repositories in use by the system.
@@ -40,7 +40,7 @@ CORAL_EXPORT ArrayRange<const std::string> getPaths();
 CORAL_EXPORT void addPath( const std::string& path );
 
 
-//---------- Bootstrap and Shutdown -----------------------------------------//
+// ------ Bootstrap and Shutdown -----------------------------------------------
 
 /*!
 	\brief Returns the co.System bootstrap interface (a singleton).
@@ -59,7 +59,7 @@ CORAL_EXPORT System* getSystem();
 CORAL_EXPORT void shutdown();
 
 
-//---------- Debug Events ---------------------------------------------------//
+// ------ Debug Events ---------------------------------------------------------
 
 /*!
 	\brief The kind of events that can be sent to a DebugEventHandler.
@@ -109,7 +109,7 @@ CORAL_EXPORT DebugEventHandler installDebugEventHandler( DebugEventHandler handl
 CORAL_EXPORT void debug( DebugEvent event, const char* msg, ... );
 
 
-//---------- General Utility Functions --------------------------------------//
+// ------ General Utility Functions --------------------------------------------
 
 /*!
 	\brief Utility function to retrieve or load a type by name.
@@ -126,6 +126,13 @@ CORAL_EXPORT Type* getType( const std::string& fullName );
 	\ingroup convenience
  */
 CORAL_EXPORT Component* newInstance( const std::string& fullName );
+
+/*!
+	Binds a \a facet to the component receptacle identified by \a receptacleName.
+	You should generally use co::Component::setReceptacle() instead of this function.
+	Please refer to co::Component::setReceptacle() for the full list of exceptions this function may throw.
+ */
+CORAL_EXPORT void setReceptacleByName( Component* instance, const std::string& receptacleName, Interface* facet );
 
 /*!
 	\brief Utility function to get the best provider of \a serviceType for clients of type \a clientType.

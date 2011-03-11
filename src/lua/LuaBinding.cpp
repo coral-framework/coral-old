@@ -19,6 +19,8 @@
 #include <cstring>
 #include <sstream>
 
+namespace lua {
+
 /*****************************************************************************/
 /*  Helper Macros to Shield Lua from C++ Exceptions                          */
 /*****************************************************************************/
@@ -33,7 +35,7 @@
 /*  Helper Function to Handle C++ Exceptions and Push a Lua Error String     */
 /*****************************************************************************/
 
-namespace lua { class MsgOnStackException {}; }
+class MsgOnStackException {};
 
 static void handleException( lua_State* L )
 {
@@ -707,7 +709,7 @@ int ComponentBinding::newIndex( lua_State* L )
 		co::Any any;
 		any.setVariable( itfInfo->getType(), co::Any::VarIsPointer|co::Any::VarIsReference, &itf );
 		LuaState::getValue( L, 3, any );
-		component->bindInterface( itfInfo, itf );
+		component->setReceptacle( itfInfo, itf );
 	}
 
 	return 0;
@@ -971,3 +973,5 @@ int StructBinding::newIndex( lua_State* L )
 
 	__END_EXCEPTIONS_BARRIER__
 }
+
+} // namespace lua

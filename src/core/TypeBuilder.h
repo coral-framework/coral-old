@@ -6,32 +6,33 @@
 #ifndef _TYPEBUILDER_H_
 #define _TYPEBUILDER_H_
 
+#include "Namespace.h"
 #include "TypeBuilderComponent_Base.h"
 #include <co/RefPtr.h>
 
-class TypeImpl;
-
 namespace co {
-	class MethodInfo;
-	class AttributeInfo;
-	class InterfaceInfo;
-	class InterfaceType;
-}
+
+// Forward Decls:
+class TypeImpl;
+class AttributeInfo;
+class InterfaceInfo;
+class InterfaceType;
+class MethodInfoComponent;
 
 /*!
 	Component that implements co.TypeBuilder.
  */
-class TypeBuilder : public co::TypeBuilderComponent_Base
+class TypeBuilderComponent : public TypeBuilderComponent_Base
 {
 public:
 	/*!
 		Factory method.
-		\pre kind >= co::TK_ENUM.
+		\pre kind >= TK_ENUM.
 	 */
-	static TypeBuilder* create( co::TypeKind kind, co::Namespace* ns, const std::string& name );
+	static TypeBuilder* create( TypeKind kind, Namespace* ns, const std::string& name );
 
 public:
-	virtual ~TypeBuilder();
+	virtual ~TypeBuilderComponent();
 
 	/*!
 		Internal method. Destroys and removes all references to the type created by this builder.
@@ -40,25 +41,25 @@ public:
 	void destroyType();
 
 	//! Template method: tries to add a method definition (called from MethodBuilder).
-	virtual void addMethod( co::MethodInfo* methodInfo );
+	virtual void addMethod( MethodInfoComponent* methodInfo );
 
-	// co::TypeBuilder methods:
-	co::Namespace* getNamespace();
-	co::TypeKind getKind();
+	// TypeBuilder methods:
+	Namespace* getNamespace();
+	TypeKind getKind();
 	const std::string& getTypeName();
 	void defineIdentifier( const std::string& name );
-	void defineAttribute( const std::string& name, co::Type* type, bool isReadOnly );
-	void defineSuperType( co::Type* superType );
-	void defineInterface( const std::string& name, co::InterfaceType* interface, bool isFacet );
-	co::MethodBuilder* defineMethod( const std::string& name );
+	void defineAttribute( const std::string& name, Type* type, bool isReadOnly );
+	void defineSuperType( Type* superType );
+	void defineInterface( const std::string& name, InterfaceType* interface, bool isFacet );
+	MethodBuilder* defineMethod( const std::string& name );
 	void defineNativeClass( const std::string& nativeHeaderFile, const std::string& nativeName );
-	co::Type* createType();
+	Type* createType();
 
 protected:
-	TypeBuilder( co::TypeKind kind );
+	TypeBuilderComponent( TypeKind kind );
 
 	//! Common initialization code, triggers the pre-allocation of our (still empty) type.
-	void initialize( co::Namespace* ns, const std::string& name );
+	void initialize( Namespace* ns, const std::string& name );
 
 	//! Throws an exception if the type was already created (no further definitions allowed).
 	void assertNotCreated();
@@ -70,7 +71,7 @@ protected:
 	 */
 	virtual bool allocateType() = 0;
 
-	//! Template method to check for missing data (may throw co::MissingInputException).
+	//! Template method to check for missing data (may throw MissingInputException).
 	virtual void validate() = 0;
 
 	//! Template method to populate the type with the data we have collected.
@@ -78,12 +79,14 @@ protected:
 	virtual void fillType() = 0;
 
 protected:
-	co::TypeKind _kind;
-	co::RefPtr<co::Namespace> _namespace;
+	TypeKind _kind;
+	RefPtr<NamespaceComponent> _namespace;
 	std::string _name;
 
-	co::RefPtr<co::Type> _type;
+	RefPtr<Type> _type;
 	bool _typeWasCreated;
 };
+
+} // namespace co
 
 #endif

@@ -10,6 +10,8 @@
 #include <co/Any.h>
 #include <co/Component.h>
 
+namespace lua {
+
 /*!
 	Static class for opening and closing the 'co' package, which
 	contains the Coral global functions and the 'co.system' singleton.
@@ -187,5 +189,7 @@ public:
 	static int index( lua_State* L );
 	static int newIndex( lua_State* L );
 };
+
+} // namespace lua
 
 #endif

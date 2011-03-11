@@ -11,14 +11,16 @@
 #include <co/RefPtr.h>
 #include <map>
 
+namespace co {
+
 /*!
 	Component that implements co.TypeManager.
  */
-class TypeManager : public co::TypeManagerComponent_Base
+class TypeManagerComponent : public TypeManagerComponent_Base
 {
 public:
-	TypeManager();
-	virtual ~TypeManager();
+	TypeManagerComponent();
+	virtual ~TypeManagerComponent();
 
 	// internal methods:
 	void initialize();
@@ -26,27 +28,27 @@ public:
 	void addCppBlock( const std::string& interfaceName, const std::string& text );
 	const std::string& getCppBlock( const std::string& interfaceName );
 
-	// co::TypeManager methods:
-	co::Namespace* getRootNS();
+	// TypeManager methods:
+	Namespace* getRootNS();
 	bool getDocumentationParsing();
 	void setDocumentationParsing( bool documentationParsing );
-	co::Type* findType( const std::string& fullName );
-	co::Namespace* findNamespace( const std::string& fullName );
-	co::Type* getType( const std::string& typeName );
-	co::ArrayType* getArrayOf( co::Type* elementType );
-	co::Type* loadType( const std::string& typeName, std::vector<co::CSLError>& errorStack );
+	Type* findType( const std::string& fullName );
+	Namespace* findNamespace( const std::string& fullName );
+	Type* getType( const std::string& typeName );
+	ArrayType* getArrayOf( Type* elementType );
+	Type* loadType( const std::string& typeName, std::vector<CSLError>& errorStack );
 	const std::string& getDocumentation( const std::string& typeOrMemberName );
 
 private:
-	co::Type* loadTypeOrThrow( const std::string& fullName );
+	Type* loadTypeOrThrow( const std::string& fullName );
 
-	co::ArrayType* defineArrayType( co::Type* elementType );
+	ArrayType* defineArrayType( Type* elementType );
 
-	void definePrimitiveType( Namespace* ns, const std::string& name, co::TypeKind kind );
+	void definePrimitiveType( NamespaceComponent* ns, const std::string& name, TypeKind kind );
 	void defineBuiltInTypes();
 
 private:
-	co::RefPtr<Namespace> _rootNS;
+	RefPtr<NamespaceComponent> _rootNS;
 
 	bool _docParsing;
 
@@ -56,5 +58,7 @@ private:
 	typedef std::map<std::string, std::string> CppBlockMap;
 	CppBlockMap _cppBlockMap;
 };
+
+} // namespace co
 
 #endif

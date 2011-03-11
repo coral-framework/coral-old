@@ -6,11 +6,11 @@
 #include <co/reserved/ReflectorBase.h>
 #include <cassert>
 
+namespace co {
+
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
 co::int32 __MethodBuilderComponent_getSize();
 co::Component* __MethodBuilderComponent_newInstance();
-
-namespace co {
 
 // ------ Reflector ------ //
 

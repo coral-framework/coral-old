@@ -10,6 +10,8 @@
 #include "LuaState.h"
 #include <co/RefPtr.h>
 
+namespace lua {
+
 /*!
 	A dynamic component, with interfaces defined in run-time and methods implemented in Lua.
  */
@@ -26,7 +28,7 @@ public:
 	// co::Component methods:
 	co::ComponentType* getComponentType();
 	co::Interface* getInterface( co::InterfaceInfo* itfInfo );
-	void bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance );
+	void setReceptacle( co::InterfaceInfo* receptacle, co::Interface* instance );
 
 	// co::DynamicProxyHandler methods:
 	co::int32 registerProxyInterface( co::Interface* proxy );
@@ -83,5 +85,7 @@ private:
 	// used by the co::DynamicProxyHandler methods to return values
 	co::Any _res;
 };
+
+} // namespace lua
 
 #endif

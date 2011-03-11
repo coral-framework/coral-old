@@ -18,17 +18,19 @@
 #include <co/reserved/LexicalUtils.h>
 #include <sstream>
 
-MethodBuilder::MethodBuilder() : _returnType( NULL )
+namespace co {
+
+MethodBuilderComponent::MethodBuilderComponent() : _returnType( NULL )
 {
 	// empty
 }
 
-MethodBuilder::~MethodBuilder()
+MethodBuilderComponent::~MethodBuilderComponent()
 {
 	// empty
 }
 
-void MethodBuilder::init( co::TypeBuilder* typeBuilder, const std::string& name )
+void MethodBuilderComponent::init( TypeBuilder* typeBuilder, const std::string& name )
 {
 	assert( typeBuilder );
 
@@ -36,75 +38,78 @@ void MethodBuilder::init( co::TypeBuilder* typeBuilder, const std::string& name 
 	_name = name;
 }
 
-co::TypeBuilder* MethodBuilder::getTypeBuilder()
+TypeBuilder* MethodBuilderComponent::getTypeBuilder()
 {
 	return _typeBuilder.get();
 }
 
-const std::string& MethodBuilder::getMethodName()
+const std::string& MethodBuilderComponent::getMethodName()
 {
 	return _name;
 }
 
-void MethodBuilder::defineReturnType( co::Type* type )
+void MethodBuilderComponent::defineReturnType( Type* type )
 {
 	if( _returnType )
-		CORAL_THROW( co::NotSupportedException, "return type defined twice" );
+		CORAL_THROW( NotSupportedException, "return type defined twice" );
 
 	if( !type )
-		CORAL_THROW( co::IllegalArgumentException, "illegal null return type" );
+		CORAL_THROW( IllegalArgumentException, "illegal null return type" );
 
 	_returnType = type;
 }
 
-void MethodBuilder::defineParameter( const std::string& name, co::Type* type, bool input, bool output )
+void MethodBuilderComponent::defineParameter( const std::string& name, Type* type, bool input, bool output )
 {
-	if( !co::LexicalUtils::isValidIdentifier( name ) )
-		CORAL_THROW( co::IllegalNameException, "parameter name '" << name << "' is not a valid identifier" );
+	if( !LexicalUtils::isValidIdentifier( name ) )
+		CORAL_THROW( IllegalNameException, "parameter name '" << name << "' is not a valid identifier" );
 
-	for( co::ArrayRange<co::ParameterInfo* const> r( _parameters ); r; r.popFirst() )
+	for( ArrayRange<ParameterInfo* const> r( _parameters ); r; r.popFirst() )
 		if( r.getFirst()->getName() == name )
-			CORAL_THROW( co::IllegalNameException, "parameter '" << name << "' defined twice in method '" << _name << "()'" );
+			CORAL_THROW( IllegalNameException, "parameter '" << name << "' defined twice in method '" << _name << "()'" );
 
 	if( !type )
-		CORAL_THROW( co::IllegalArgumentException, "illegal null parameter type" );
+		CORAL_THROW( IllegalArgumentException, "illegal null parameter type" );
 
-	co::TypeKind kind = type->getKind();
-	if( kind == co::TK_EXCEPTION || kind == co::TK_COMPONENT )
-		CORAL_THROW( co::IllegalArgumentException, "illegal parameter '" << name << "' - " <<
-					( kind == co::TK_EXCEPTION ? "exceptions" : "components" ) << " cannot be passed as parameters" );
+	TypeKind kind = type->getKind();
+	if( kind == TK_EXCEPTION || kind == TK_COMPONENT )
+		CORAL_THROW( IllegalArgumentException, "illegal parameter '" << name << "' - " <<
+					( kind == TK_EXCEPTION ? "exceptions" : "components" ) << " cannot be passed as parameters" );
 
 	if( !input && !output )
-		CORAL_THROW( co::IllegalArgumentException, "parameter is neither input nor output" );
+		CORAL_THROW( IllegalArgumentException, "parameter is neither input nor output" );
 
-	ParameterInfo* paramInfo = new ParameterInfo();
+	ParameterInfoComponent* paramInfo = new ParameterInfoComponent();
 	paramInfo->init( name, type, input, output );
 
 	_parameters.push_back( paramInfo );
 }
 
-void MethodBuilder::defineException( co::ExceptionType* exception )
+void MethodBuilderComponent::defineException( ExceptionType* exception )
 {
 	if( !exception )
-		CORAL_THROW( co::IllegalArgumentException, "the passed exception is invalid" );
+		CORAL_THROW( IllegalArgumentException, "the passed exception is invalid" );
 
 	_expectedExceptions.push_back( exception );
 }
 
-void MethodBuilder::createMethod()
+void MethodBuilderComponent::createMethod()
 {
 	assert( _typeBuilder.isValid() );
 
-	co::RefPtr<MethodInfo> mi = new MethodInfo;
-	mi->setName( _name );
-	mi->setParameters( _parameters );
-	mi->setExceptions( _expectedExceptions );
-	mi->setReturnType( _returnType );
+	MethodInfoComponent* mic = new MethodInfoComponent;
+	_createdMethodInfo = mic;
 
-	_createdMethodInfo = mi.get();
+	mic->setName( _name );
+	mic->setParameters( _parameters );
+	mic->setExceptions( _expectedExceptions );
+	mic->setReturnType( _returnType );
 
 	// notice: the call to addMethod() below may throw an exception if the TB's type was already created
-	static_cast<TypeBuilder*>( _typeBuilder.get() )->addMethod( _createdMethodInfo.get() );
+	assert( dynamic_cast<TypeBuilderComponent*>( _typeBuilder.get() ) );
+	static_cast<TypeBuilderComponent*>( _typeBuilder.get() )->addMethod( mic );
 }
 
-CORAL_EXPORT_COMPONENT( MethodBuilder, MethodBuilderComponent );
+CORAL_EXPORT_COMPONENT( MethodBuilderComponent, MethodBuilderComponent );
+
+} // namespace co

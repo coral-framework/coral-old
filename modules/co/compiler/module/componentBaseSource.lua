@@ -119,7 +119,7 @@ co::Interface* ]], t.name, [[_Base::getInterface( co::InterfaceInfo* interfaceIn
 	return res;
 }
 
-void ]], t.name, [[_Base::bindInterface( co::InterfaceInfo* receptacle, co::Interface* instance )
+void ]], t.name, [[_Base::setReceptacle( co::InterfaceInfo* receptacle, co::Interface* facet )
 {
 	checkValidReceptacle( receptacle );
 ]] )
@@ -132,7 +132,7 @@ void ]], t.name, [[_Base::bindInterface( co::InterfaceInfo* receptacle, co::Inte
 
 		for i, itf in ipairs( receptacles ) do
 			writer( "\tcase ", itf.index, ":\t\t", t.formatAccessor( "setReceptacle", itf.name ),
-				"( checkedInterfaceCast<", itf.type.cppName, ">( instance ) ); break;\n" )
+				"( checkedInterfaceCast<", itf.type.cppName, ">( facet ) ); break;\n" )
 		end
 
 		writer( [[
@@ -142,7 +142,7 @@ void ]], t.name, [[_Base::bindInterface( co::InterfaceInfo* receptacle, co::Inte
 	else
 		writer( [[
 	raiseUnexpectedInterfaceIndex();
-	CORAL_UNUSED( instance );
+	CORAL_UNUSED( facet );
 ]] )
 	end
 

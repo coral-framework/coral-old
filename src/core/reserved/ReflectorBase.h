@@ -39,7 +39,7 @@ public:
     // co::Component methods:
     ComponentType* getComponentType();
     Interface* getInterface( InterfaceInfo* );
-    void bindInterface( InterfaceInfo*, Interface* );
+    void setReceptacle( InterfaceInfo*, Interface* );
 
 	// co::Reflector methods:
 	void createValue( void* address, size_t length );
@@ -66,7 +66,7 @@ protected:
 	void checValidProxyHandler( co::DynamicProxyHandler* handler );
 
 	//! Raises co::MissingInputException if \a numArgs is lesser than \a mi's expected number of args.
-	void checkNumArguments( co::MethodInfo* mi, std::size_t numArgs );
+	void checkNumArguments( co::MethodInfo* mi, size_t numArgs );
 
 	//! Raises an exception because setAttribute() was called on a read-only attribute.
 	void raiseAttributeIsReadOnly( co::AttributeInfo* ai );

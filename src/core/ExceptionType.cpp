@@ -5,9 +5,13 @@
 
 #include "ExceptionType.h"
 
-ExceptionType::~ExceptionType()
+namespace co {
+
+ExceptionTypeComponent::~ExceptionTypeComponent()
 {
 	// empty
 }
 
-CORAL_EXPORT_COMPONENT( ExceptionType, ExceptionTypeComponent );
+CORAL_EXPORT_COMPONENT( ExceptionTypeComponent, ExceptionTypeComponent );
+
+} // namespace co

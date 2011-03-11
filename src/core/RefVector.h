@@ -46,7 +46,7 @@ public:
 		\sa sortedInsert()
 	 */
 	template<class Key, class Comparator>
-	inline bool sortedFind( const Key& key, Comparator compare, std::size_t first, std::size_t last, std::size_t& pos )
+	inline bool sortedFind( const Key& key, Comparator compare, size_t first, size_t last, size_t& pos )
 	{
 		assert( last < this->size() );
 		while( first <= last )
@@ -73,7 +73,7 @@ public:
 		This overload operates on the whole co::RefVector, in the range [0, n - 1].
 	 */
 	template<class Key, class Comparator>
-	inline bool sortedFind( const Key& key, Comparator compare, std::size_t& pos )
+	inline bool sortedFind( const Key& key, Comparator compare, size_t& pos )
 	{
 		if( this->empty() )
 		{
@@ -94,7 +94,7 @@ public:
 	template<typename Key, typename Comparator>
 	inline bool sortedInsert( const Key& key, T* element, Comparator compare )
 	{
-		std::size_t pos;
+		size_t pos;
 		if( sortedFind( key, compare, pos ) )
 			return false;
 
@@ -102,7 +102,7 @@ public:
 		this->push_back( element );
 
 		// slide the new element to the correct position
-		for( std::size_t i = this->size() - 1; i > pos; --i )
+		for( size_t i = this->size() - 1; i > pos; --i )
 			(*this)[i - 1].swap( (*this)[i] );
 
 		return true;
@@ -125,12 +125,16 @@ struct ArrayRangeAdaptor<T, RefVector<ET> >
 	static const bool isValid = true;
 	static T* getData( RefVector<ET>& v )
 	{
-		// ET must be castable to T
-		static const T s_castabilityTest = (ET*)0;
-		CORAL_UNUSED( s_castabilityTest );
+		/*
+			A conversion from ET* to T should need no offsetting.
+			This generally works for single, but not for multiple inheritance.
+		 */
+		static const T cp1 = static_cast<T>( (ET*)0xCCCC );
+		static const T cp2 = (T)0xCCCC;
+		CORAL_STATIC_CHECK( cp1 == cp2, incompatible_pointer_types_would_need_casting );
 		return v.empty() ? NULL : reinterpret_cast<T*>( &v[0] );
 	}
-	static std::size_t getSize( RefVector<ET>& v ) { return v.size(); }
+	static size_t getSize( RefVector<ET>& v ) { return v.size(); }
 };
 
 /****************************************************************************/

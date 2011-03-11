@@ -57,6 +57,9 @@ struct State
 		InterfaceType* interfaceType;	// used for interfaces
 	};
 
+	// only used if arrayKind is AK_ArrayRange
+	uint32 arraySize;
+
 	// the kind of variable we're holding
 	uint8 kind;
 
@@ -66,10 +69,12 @@ struct State
 	uint8 isPointerConst : 1;
 	uint8 isReference : 1;
 
+	// what array representation was provided
 	enum ArrayKind { AK_StdVector, AK_RefVector, AK_ArrayRange };
-	uint8 arrayKind; // one of the enumerands above
+	uint8 arrayKind;
 
-	std::size_t arraySize; // only used if arrayKind is AK_ArrayRange
+	// reserved for use in co::Any:
+	uint8 objectKind;
 };
 
 template<typename TT>
@@ -120,7 +125,7 @@ struct PrepareStateFor<TK_INTERFACE, TT> : public PrepareWithType<TT> {};
 template<typename T, typename ATT>
 struct PrepareStateForArray
 {
-	inline static void prepare( State& s )
+	inline static void prepare( State& )
 	{
 		CORAL_STATIC_CHECK( false, unsupported_array_representation );
 	}
@@ -226,8 +231,8 @@ template<typename T>
 struct ValueHelper<TK_ARRAY, T>
 {
 	// std::vectors and co::RefVectors are handled by this case
-	static void store( State& s, T v ) { CORAL_STATIC_CHECK( false, arrays_must_be_passed_by_reference ); }
-	static T retrieve( State& s ) { CORAL_STATIC_CHECK( false, that_array_type_must_be_retrieved_by_reference ); }
+	static void store( State&, T ) { CORAL_STATIC_CHECK( false, arrays_must_be_passed_by_reference ); }
+	static T retrieve( State& ) { CORAL_STATIC_CHECK( false, that_array_type_must_be_retrieved_by_reference ); }
 };
 
 template<typename T>
@@ -237,7 +242,9 @@ struct ValueHelper<TK_ARRAY, ArrayRange<T> >
 	inline static void store( State& s, ArrayRange<T>& v )
 	{
 		s.data.cptr = &( v.getFirst() );
-		s.arraySize = v.getSize();
+		size_t size = v.getSize();
+		assert( size < MAX_UINT32 );
+		s.arraySize = static_cast<uint32>( size );
 	}
 
 	inline static ArrayRange<T> retrieve( State& s )
@@ -302,18 +309,53 @@ struct VariableHelper<const T&>
 	inline static const T& retrieve( State& s ) { return VariableHelper<T&>::retrieve( s ); }
 };
 
-template<typename T>
-struct VariableHelper<T*>
+template<bool isAmbiguous, typename T>
+struct InterfaceHelper
 {
+	// this case handles non-ambiguous interface pointers
+	inline static void store( State& s, T* ptr ) { s.data.itf = ptr; }
+	inline static T* retrieve( State& s ) { return static_cast<T*>( s.data.itf ); }
+};
+
+template<typename T>
+struct InterfaceHelper<true, T>
+{
+	// this case handles non-ambiguous interface pointers
+	inline static void store( State& s, T* ptr ) { s.data.itf = disambiguate<co::Interface, T>( ptr ); }
+	inline static T* retrieve( State& s ) { return dynamic_cast<T*>( s.data.itf ); }
+};
+
+template<TypeKind kind, typename T>
+struct PointerHelper
+{
+	// handles general pointers & references
 	inline static void store( State& s, T* ptr ) { s.data.ptr = ptr; }
 	inline static T* retrieve( State& s ) { return reinterpret_cast<T*>( s.data.ptr ); }
 };
 
 template<typename T>
+struct PointerHelper<TK_INTERFACE, T>
+{
+	// all interface pointers are forwarded to InterfaceHelper
+	typedef traits::hasAmbiguousBase<T, Interface> AB;
+	inline static void store( State& s, T* ptr ) { InterfaceHelper<AB::value, T>::store( s, ptr ); }
+	inline static T* retrieve( State& s ) { return InterfaceHelper<AB::value, T>::retrieve( s ); }
+};
+
+template<typename T>
+struct VariableHelper<T*>
+{
+	// all pointers are forwarded to PointerHelper
+	typedef traits::get<T> TT;
+	inline static void store( State& s, T* ptr ) { PointerHelper<TT::kind, T>::store( s, ptr ); }
+	inline static T* retrieve( State& s ) { return PointerHelper<TT::kind, T>::retrieve( s ); }
+};
+
+template<typename T>
 struct VariableHelper<T&>
 {
-	inline static void store( State& s, T& v ) { VariableHelper<T*>::store( s, &v ); }
-	inline static T& retrieve( State& s ) { return *VariableHelper<T*>::retrieve( s ); }
+	inline static void store( State& s, T& v ) { PointerHelper<TK_NONE, T>::store( s, &v ); }
+	inline static T& retrieve( State& s ) { return *PointerHelper<TK_NONE, T>::retrieve( s ); }
 };
 
 template<>
@@ -509,7 +551,7 @@ public:
 
 public:
 	//! Creates an invalid co::Any.
-	inline Any() : _state(), _objectKind( TK_NONE )
+	inline Any() : _state()
 	{;}
 
 	/*!
@@ -521,7 +563,7 @@ public:
 			if you must store a reference or a 'const' variable.
 	 */
 	template<typename T>
-	inline Any( T var ) :  _state(), _objectKind( TK_NONE )
+	inline Any( T var ) :  _state()
 	{
 		set<T>( var );
 	}
@@ -530,7 +572,7 @@ public:
 		Constructor corresponding to a setInterface() call.
 		Please, see setInterface()'s documentation for more info.
 	 */
-	inline Any( Interface* instance, InterfaceType* type ) : _state(), _objectKind( TK_NONE )
+	inline Any( Interface* instance, InterfaceType* type ) : _state()
 	{
 		setInterface( instance, type );
 	}
@@ -539,7 +581,7 @@ public:
 		Constructor corresponding to a setVariable() call.
 		Please, see setVariable()'s documentation for more info.
 	 */
-	inline Any( Type* type, uint32 flags, void* ptr ) : _state(), _objectKind( TK_NONE )
+	inline Any( Type* type, uint32 flags, void* ptr ) : _state()
 	{
 		setVariable( type, flags, ptr );
 	}
@@ -548,7 +590,7 @@ public:
 		Constructor corresponding to a setBasic() call.
 		Please, see setBasic()'s documentation for more info.
 	 */
-	inline Any( TypeKind kind, uint32 flags, void* ptr ) : _state(), _objectKind( TK_NONE )
+	inline Any( TypeKind kind, uint32 flags, void* ptr ) : _state()
 	{
 		setBasic( kind, flags, ptr );
 	}
@@ -557,14 +599,14 @@ public:
 		Constructor corresponding to a setArray() call.
 		Please, see setArray()'s documentation for more info.
 	 */
-	inline Any( ArrayKind arrayKind, Type* elementType, uint32 flags, void* ptr, std::size_t arraySize = 0 )
-		: _state(), _objectKind( TK_NONE )
+	inline Any( ArrayKind arrayKind, Type* elementType, uint32 flags, void* ptr, size_t arraySize = 0 )
+		: _state()
 	{
 		setArray( arrayKind, elementType, flags, ptr, arraySize );
 	}
 
 	//! Copy constructor.
-	inline Any( const Any& other ) : _state(), _objectKind( TK_NONE )
+	inline Any( const Any& other ) : _state()
 	{
 		copy( other );
 	}
@@ -572,7 +614,7 @@ public:
 	//! Destructor.
 	inline ~Any()
 	{
-		if( _objectKind != TK_NONE )
+		if( _state.objectKind != TK_NONE )
 			destroyObject();
 	}
 
@@ -736,7 +778,7 @@ public:
 		\param ptr A pointer to the array instance, as described above.
 		\param size Only used if \a arrayKind is \c AK_ArrayRange.
 	 */
-	void setArray( ArrayKind arrayKind, Type* elementType, uint32 flags, void* ptr, std::size_t size = 0 );
+	void setArray( ArrayKind arrayKind, Type* elementType, uint32 flags, void* ptr, size_t size = 0 );
 
 	//@}
 
@@ -772,7 +814,7 @@ public:
 	//@{
 
 	//! Returns whether this co::Any contains a temporary object.
-	inline bool containsObject() const { return _objectKind != TK_NONE; }
+	inline bool containsObject() const { return _state.objectKind != TK_NONE; }
 
 	/*!
 		Creates a temporary co::Any instance and makes this co::Any reference it.
@@ -850,15 +892,15 @@ private:
 	void copy( const Any& other );
 
 private:
-	State _state;
-
 	/*
-		Kind of temporary object currently stored in this co::Any (if any).
-		For complex values, it assumes special meanings:
-			- co::TK_STRUCT: the CV is larger than INPLACE_CAPACITY and is heap-allocated.
-			- co::TK_NATIVECLASS: the CV fits in INPLACE_CAPACITY and is kept in place.
+		Describes the variable stored in the co::Any.
+
+		_state.objectKind holds the kind of temporary object currently allocated in
+		the co::Any (if any). For complex values, it assumes special meanings:
+			- TK_STRUCT: the CV is larger than INPLACE_CAPACITY and is heap-allocated.
+			- TK_NATIVECLASS: the CV fits in INPLACE_CAPACITY and is kept in place.
 	 */
-	TypeKind _objectKind;
+	State _state;
 
 	/*
 		Performance Setting: number of 'doubles' that can be stored in a co::Any
@@ -869,7 +911,7 @@ private:
 		values lead to excessive stack consumption and performance degradation.
 		Also note that it does not make sense to set this value to less than 2.
 	 */
-	static const int INPLACE_DOUBLES = 4;
+	static const size_t INPLACE_DOUBLES = 4;
 	static const size_t INPLACE_CAPACITY = sizeof(double) * INPLACE_DOUBLES;
 
 	// Temporary object data.

@@ -3,15 +3,14 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _CSL_PARSER_H_
-#define _CSL_PARSER_H_
+#ifndef _CO_CSL_PARSER_H_
+#define _CO_CSL_PARSER_H_
 
 #include <co/System.h>
 #include <co/RefPtr.h>
 #include <co/TypeKind.h>
 #include <co/TypeBuilder.h>
 #include <co/MethodBuilder.h>
-
 #include <map>
 #include <string>
 
@@ -22,10 +21,10 @@ typedef struct ANTLR3_INPUT_STREAM_struct* pANTLR3_INPUT_STREAM;
 typedef struct ANTLR3_COMMON_TOKEN_STREAM_struct* pANTLR3_COMMON_TOKEN_STREAM;
 
 namespace co {
-	class Type;
-	class Namespace;
-	class TypeCreationTransaction;
-} // namespace co
+
+class Type;
+class Namespace;
+class TypeCreationTransaction;
 
 namespace csl {
 
@@ -39,15 +38,15 @@ public:
 	void parse( const std::string& cslFilePath );
 
 	//! Returns the current line number, as reported by the parser.
-	inline co::uint32 getCurrentLine() { return _currentLine; }
+	inline uint32 getCurrentLine() { return _currentLine; }
 
 	//! Updates the current line number. Errors are reported at this position.
-	inline void setCurrentLine( co::uint32 line ) { _currentLine = line; }
+	inline void setCurrentLine( uint32 line ) { _currentLine = line; }
 
 	//! Parser events
 	void onComment( const std::string& text );
 	void onCppBlock( const std::string& text );
-	void onTypeSpecification( const std::string& typeName, co::TypeKind kind );
+	void onTypeSpecification( const std::string& typeName, TypeKind kind );
 	void onTypeDeclaration( const std::string& qualifiedId, bool isArray );
 	void onImportClause( const std::string& importTypeName );
 	void onNativeClass( const std::string& cppType, const std::string& cppHeader );
@@ -63,11 +62,11 @@ public:
 
 protected:
 	//! Template method: creates the TypeBuilder for the type being parsed.
-	virtual co::TypeBuilder* createTypeBuilder( const std::string& typeName, co::TypeKind kind ) = 0;
+	virtual TypeBuilder* createTypeBuilder( const std::string& typeName, TypeKind kind ) = 0;
 
 	//! Template method: resolves a type given its \a typeName and whether it is an array.
 	//! \param typeName may be a full or relative type name.
-	virtual co::Type* resolveType( const std::string& typeName, bool isArray = false ) = 0;
+	virtual Type* resolveType( const std::string& typeName, bool isArray = false ) = 0;
 
 	/*!
 		Template method: adds the passed \a text as documentation for the specified \a member of the
@@ -80,22 +79,22 @@ protected:
 
 	//! Returns the type created by our TypeBuilder.
 	//! Notice that onTypeSpecification() should have been called before.
-	co::Type* getType();
+	Type* getType();
 
-	//! Retrieves an imported co::Type* given its local type name (i.e. its alias).
+	//! Retrieves an imported Type* given its local type name (i.e. its alias).
 	//! Returns NULL if the alias does not identify an imported type.
-	co::Type* findImportedType( const std::string& alias );
+	Type* findImportedType( const std::string& alias );
 
 private:
 	struct ImportInfo
 	{
-		ImportInfo( const std::string& typeName, co::uint32 line )
+		ImportInfo( const std::string& typeName, uint32 line )
 			: typeName( typeName ), line( line ), type( NULL )
 		{;}
 
 		std::string typeName;	// full or relative type name
-		co::uint32 line;		// line number of the import
-		co::Type* type;			// resolved type (only after calling resolveImports())
+		uint32 line;			// line number of the import
+		Type* type;				// resolved type (only after calling resolveImports())
 	};
 
 	typedef std::map<std::string, ImportInfo> ImportTypeMap;
@@ -112,15 +111,15 @@ private:
 	 */
 	void handleDocumentation( const std::string& member );
 
-	// formats the passed input removing any '\r' character 
+	// formats the passed input removing any '\r' character
 	void filterText( const std::string& input, std::string& output );
 
-	co::Type* getLastDeclaredType();
+	Type* getLastDeclaredType();
 
 private:
-	co::uint32 _currentLine;
-	co::RefPtr<co::TypeBuilder> _typeBuilder;
-	co::RefPtr<co::MethodBuilder> _methodBuilder;
+	uint32 _currentLine;
+	RefPtr<TypeBuilder> _typeBuilder;
+	RefPtr<MethodBuilder> _methodBuilder;
 
 	pCSLLexer _lexer;
 	pCSLParser _parser;
@@ -128,12 +127,12 @@ private:
 	pANTLR3_COMMON_TOKEN_STREAM _tokenStream;
 
 	std::string _lastDeclaredTypeName;
-	co::uint32 _lastDeclaredTypeLine;
+	uint32 _lastDeclaredTypeLine;
 	bool _lastDeclaredTypeIsArray;
 
 	// the base name of the file being parsed
 	std::string _cslFileBaseName;
-	
+
 	// keeps track of the last defined member
 	std::string _lastMember;
 
@@ -142,5 +141,6 @@ private:
 };
 
 } // namespace csl
+} // namespace co
 
-#endif // _CSL_PARSER_H_
+#endif // _CO_CSL_PARSER_H_

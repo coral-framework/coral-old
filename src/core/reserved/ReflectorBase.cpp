@@ -75,7 +75,7 @@ Interface* ReflectorBase::getInterface( InterfaceInfo* interfaceInfo )
 	return res;
 }
 
-void ReflectorBase::bindInterface( InterfaceInfo* receptacle, Interface* )
+void ReflectorBase::setReceptacle( InterfaceInfo* receptacle, Interface* )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
@@ -140,10 +140,10 @@ void ReflectorBase::checValidProxyHandler( co::DynamicProxyHandler* handler )
 		throw co::IllegalArgumentException( "illegal null co::DynamicProxyHandler" );
 }
 
-void ReflectorBase::checkNumArguments( co::MethodInfo* mi, std::size_t numArgs )
+void ReflectorBase::checkNumArguments( co::MethodInfo* mi, size_t numArgs )
 {
 	assert( mi );
-	std::size_t expectedNumArgs = mi->getParameters().getSize();
+	size_t expectedNumArgs = mi->getParameters().getSize();
 	if( numArgs < expectedNumArgs )
 		CORAL_THROW( co::MissingInputException, "method '" << mi->getName() << "' takes "
 					<< expectedNumArgs << " argument" << ( expectedNumArgs > 1 ? "s" : "" )
