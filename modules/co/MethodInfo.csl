@@ -1,14 +1,7 @@
 /*
-	Offers type introspection for a method, as a member of a MethodContainer.
+	Implements co.IMethodInfo.
  */
-interface MethodInfo : MemberInfo
+component MethodInfo
 {
-	// The method's return type.
-	readonly attribute Type returnType;
-
-	// The list of parameters that this method takes.
-	readonly attribute ParameterInfo[] parameters;
-
-	// The list of exceptions that might be thrown by this method.
-	readonly attribute ExceptionType[] exceptions;
+	provides IMethodInfo methodInfo;
 };

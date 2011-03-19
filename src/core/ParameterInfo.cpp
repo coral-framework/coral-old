@@ -11,21 +11,21 @@
 
 namespace co {
 
-ParameterInfoComponent::ParameterInfoComponent() : _type( 0 ), _isIn( true ), _isOut( false )
+ParameterInfo::ParameterInfo() : _type( 0 ), _isIn( true ), _isOut( false )
 {
 	// empty
 }
 
-ParameterInfoComponent::~ParameterInfoComponent()
+ParameterInfo::~ParameterInfo()
 {
 	// empty
 }
 
-void ParameterInfoComponent::init( const std::string& name, Type* type, bool isIn, bool isOut )
+void ParameterInfo::init( const std::string& name, IType* type, bool isIn, bool isOut )
 {
 	if( !LexicalUtils::isValidIdentifier( name ) )
 		CORAL_THROW( IllegalNameException, "the passed parameter name is invalid" );
-	
+
 	if( type == NULL )
 		CORAL_THROW( IllegalArgumentException, "the passed parameter type is invalid" );
 
@@ -38,46 +38,46 @@ void ParameterInfoComponent::init( const std::string& name, Type* type, bool isI
 	setIsOut( isOut );
 }
 
-void ParameterInfoComponent::setName( const std::string& name )
+void ParameterInfo::setName( const std::string& name )
 {
 	_name = name;
 }
 
-void ParameterInfoComponent::setType( Type* type )
+void ParameterInfo::setType( IType* type )
 {
 	_type = type;
 }
 
-void ParameterInfoComponent::setIsIn( bool isIn )
+void ParameterInfo::setIsIn( bool isIn )
 {
 	_isIn = isIn;
 }
 
-void ParameterInfoComponent::setIsOut( bool isOut )
+void ParameterInfo::setIsOut( bool isOut )
 {
 	_isOut = isOut;
 }
 
-const std::string& ParameterInfoComponent::getName()
+const std::string& ParameterInfo::getName()
 {
 	return _name;
 }
 
-Type* ParameterInfoComponent::getType()
+IType* ParameterInfo::getType()
 {
 	return _type;
 }
 
-bool ParameterInfoComponent::getIsIn()
+bool ParameterInfo::getIsIn()
 {
 	return _isIn;
 }
 
-bool ParameterInfoComponent::getIsOut()
+bool ParameterInfo::getIsOut()
 {
 	return _isOut;
 }
 
-CORAL_EXPORT_COMPONENT( ParameterInfoComponent, ParameterInfoComponent );
+CORAL_EXPORT_COMPONENT( ParameterInfo, ParameterInfo );
 
 } // namespace co

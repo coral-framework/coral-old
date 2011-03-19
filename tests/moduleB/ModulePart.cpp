@@ -5,8 +5,8 @@
 
 #include "moduleB_Base.h"
 #include "ModuleInstaller.h"
-#include <co/System.h>
-#include <co/ModuleManager.h>
+#include <co/ISystem.h>
+#include <co/IModuleManager.h>
 
 namespace moduleB {
 
@@ -23,32 +23,32 @@ public:
 		// empty
 	}
 
-	// co::ModulePart methods:
+	// co::IModulePart methods:
 
-	void initialize( co::Module* )
+	void initialize( co::IModule* )
 	{
 		moduleB::ModuleInstaller::instance().install();
-		
+
 		// require moduleA
 		co::getSystem()->getModules()->load( "moduleA" );
 	}
 
-	void integrate( co::Module* )
+	void integrate( co::IModule* )
 	{
 		// empty
 	}
 
-	void integratePresentation( co::Module* )
+	void integratePresentation( co::IModule* )
 	{
 		// empty
 	}
 
-	void disintegrate( co::Module* )
+	void disintegrate( co::IModule* )
 	{
 		// empty
 	}
 
-	void dispose( co::Module* )
+	void dispose( co::IModule* )
 	{
 		moduleB::ModuleInstaller::instance().uninstall();
 	}

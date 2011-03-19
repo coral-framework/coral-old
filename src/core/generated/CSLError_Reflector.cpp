@@ -4,7 +4,7 @@
  */
 
 #include <co/CSLError.h>
-#include <co/AttributeInfo.h>
+#include <co/IAttributeInfo.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/ReflectorBase.h>
@@ -13,7 +13,7 @@
 
 namespace co {
 
-// ------ Reflector ------ //
+// ------ IReflector ------ //
 
 class CSLError_Reflector : public co::ReflectorBase
 {
@@ -28,7 +28,7 @@ public:
 		// empty
 	}
 
-	co::Type* getType()
+	co::IType* getType()
 	{
 		return co::typeOf<co::CSLError>::get();
 	}
@@ -54,7 +54,7 @@ public:
 		callDestructor( reinterpret_cast<co::CSLError*>( address ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::AttributeInfo* ai, co::Any& value )
+	void getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value )
 	{
 		co::CSLError* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
@@ -66,7 +66,7 @@ public:
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::AttributeInfo* ai, const co::Any& value )
+	void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value )
 	{
 		co::CSLError* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
@@ -79,19 +79,19 @@ public:
 	}
 
 private:
-	co::CSLError* checkInstance( const co::Any& any, co::MemberInfo* member )
+	co::CSLError* checkInstance( const co::Any& any, co::IMemberInfo* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
 
 		// make sure that 'any' is an instance of this type
-		co::StructType* myType = co::typeOf<co::CSLError>::get();
+		co::IStructType* myType = co::typeOf<co::CSLError>::get();
 
 		if( any.getKind() != co::TK_STRUCT || any.getType() != myType || any.getState().data.ptr == NULL )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::CSLError*, but got " << any );
 
 		// make sure that 'member' belongs to this type
-		co::CompoundType* owner = member->getOwner();
+		co::ICompoundType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to co.CSLError" );
@@ -100,9 +100,9 @@ private:
 	}
 };
 
-// ------ Reflector Creation Function ------ //
+// ------ IReflector Creation Function ------ //
 
-co::Reflector* __createCSLErrorReflector()
+co::IReflector* __createCSLErrorIReflector()
 {
     return new CSLError_Reflector;
 }

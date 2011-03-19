@@ -1,0 +1,38 @@
+/*
+	The base interface implemented by all components.
+ */
+interface IComponent
+{
+	// The component's blueprint.
+	readonly attribute IComponentType componentType;
+
+	<c++
+		/*!
+			<tt>getFacet<T>()</tt>: convenience method that returns the instance of a facet 'T' provided
+			by this component. Please notice that this method only works for statically-defined components.
+			It will not retrieve proxy interfaces from dynamic components (such as those implemented in Lua).
+		 */
+		template<typename T> inline T* getFacet() { return dynamic_cast<T*>( this ); }
+	c++>
+
+	/*
+		Retrieves the interface instance "provided by" or "bound to" one of the component's interfaces.
+
+		If \a itfInfo is a \e facet, this method returns the corresponding interface instance
+		<em>provided by</em> the component. Otherwise, if \a itfInfo is a \e receptacle, this
+		method returns the facet that is currently <em>bound to</em> the receptacle (or NULL if
+		no facet is bound to the receptacle).
+
+		\throw NoSuchInterfaceException if \a itfInfo is not a valid component interface.
+	 */
+	Interface getInterface( in IInterfaceInfo itfInfo ) raises NoSuchInterfaceException;
+
+	/*
+		Binds a \a facet to one of the component's receptacles.
+		\throw NoSuchInterfaceException if \a receptacle is not a valid component receptacle.
+		\throw IllegalArgumentException if the passed \a facet is incompatible with the receptacle.
+		\throw LifeCycleException if the receptacle cannot be changed in the component's current state.
+	 */
+	void setReceptacle( in IInterfaceInfo receptacle, in Interface facet )
+		raises NoSuchInterfaceException, IllegalArgumentException, LifeCycleException;
+};

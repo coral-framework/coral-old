@@ -1,0 +1,14 @@
+/*
+	Base interface for members of a ICompoundType (i.e. an attribute, method, interface, etc.).
+ */
+interface IMemberInfo
+{
+	// Member name, which must be unique within a ICompoundType.
+	readonly attribute string name;
+
+	// ICompoundType that contains the member.
+	readonly attribute ICompoundType owner;
+
+	// Index of the member within its owner's \a members array.
+	readonly attribute uint16 index;
+};

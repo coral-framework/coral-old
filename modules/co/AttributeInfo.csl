@@ -1,14 +1,7 @@
 /*
-	Offers type introspection for an attribute, as a member of an AttributeContainer.
+	Implements co.IAttributeInfo.
  */
-interface AttributeInfo : MemberInfo
+component AttributeInfo
 {
-	// The attribute's type.
-	readonly attribute Type type;
-
-	/*
-		Whether the attribute is read-only.
-		\note For structs, this is always false (i.e. structs are always read/write).
-	 */
-	readonly attribute bool isReadOnly;
+	provides IAttributeInfo attributeInfo;
 };

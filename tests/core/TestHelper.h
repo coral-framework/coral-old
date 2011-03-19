@@ -7,24 +7,24 @@
 #define _TESTHELPER_H_
 
 #include <co/Coral.h>
-#include <co/Component.h>
-#include <co/Reflector.h>
-#include <co/TypeCreationTransaction.h>
+#include <co/IComponent.h>
+#include <co/IReflector.h>
+#include <co/ITypeCreationTransaction.h>
 #include <vector>
 #include <string>
 
 namespace co {
-	class Type;
-	class TypeBuilder;
-	class TypeCreationTransaction;
+	class IType;
+	class ITypeBuilder;
+	class ITypeCreationTransaction;
 }
 
-//! Helper function to instantiate a co::TypeCreationTransaction.
-inline co::TypeCreationTransaction* createTypeCreationTransaction()
+//! Helper function to instantiate a co::ITypeCreationTransaction.
+inline co::ITypeCreationTransaction* createTypeCreationTransaction()
 {
-	co::Component* component = co::newInstance( "co.TypeCreationTransactionComponent" );
+	co::IComponent* component = co::newInstance( "co.TypeCreationTransaction" );
 	assert( component );
-	co::TypeCreationTransaction* tct = component->getFacet<co::TypeCreationTransaction>();
+	co::ITypeCreationTransaction* tct = component->getFacet<co::ITypeCreationTransaction>();
 	assert( tct );
 	return tct;
 }
@@ -34,10 +34,10 @@ class TestHelper
 public:
 	// Creates a typeBuilder for the given fullTypeName, using the given
 	// transaction. It creates all namespaces needed to build the type.
-	static co::TypeBuilder* createBuilder( co::TypeKind kind, const std::string& fullTypeName, co::TypeCreationTransaction* tct );
+	static co::ITypeBuilder* createBuilder( co::TypeKind kind, const std::string& fullTypeName, co::ITypeCreationTransaction* tct );
 
 	// Gets a system type using fullTypeName
-	static co::Type* type( const std::string& fullTypeName );
+	static co::IType* type( const std::string& fullTypeName );
 
 	// Auxiliary string functions
 	inline static bool stringEndsWith( const std::string& str, const std::string& tail )

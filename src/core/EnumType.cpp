@@ -8,22 +8,22 @@
 
 namespace co {
 
-EnumTypeComponent::~EnumTypeComponent()
+EnumType::~EnumType()
 {
 	// empty
 }
 
-void EnumTypeComponent::addIdentifier( const std::string& identifier )
+void EnumType::addIdentifier( const std::string& identifier )
 {
 	_identifiers.push_back( identifier );
 }
 
-ArrayRange<std::string const> EnumTypeComponent::getIdentifiers()
+ArrayRange<std::string const> EnumType::getIdentifiers()
 {
 	return _identifiers;
 }
 
-int32 EnumTypeComponent::getValueOf( const std::string& identifier )
+int32 EnumType::getValueOf( const std::string& identifier )
 {
 	int32 count = static_cast<int32>( _identifiers.size() );
 	for( int32 i = 0; i < count; ++i )
@@ -34,6 +34,6 @@ int32 EnumTypeComponent::getValueOf( const std::string& identifier )
 	return -1;
 }
 
-CORAL_EXPORT_COMPONENT( EnumTypeComponent, EnumTypeComponent );
+CORAL_EXPORT_COMPONENT( EnumType, EnumType );
 
 } // namespace co

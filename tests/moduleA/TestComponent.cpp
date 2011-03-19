@@ -171,11 +171,11 @@ public:
 		return param;
 	}
 
-	// co::TypeCreationTransaction methods:
+	// co::ITypeCreationTransaction methods:
 
-	co::ArrayRange<co::TypeBuilder* const> getTypeBuilders()
+	co::ArrayRange<co::ITypeBuilder* const> getTypeBuilders()
 	{
-		return co::ArrayRange<co::TypeBuilder* const>();
+		return co::ArrayRange<co::ITypeBuilder* const>();
 	}
 
 	void commit()
@@ -189,29 +189,29 @@ public:
 	}	
 	
 protected:
-	co::InterfaceType* getReceptacleItfType()
+	co::IInterfaceType* getReceptacleItfType()
 	{
 		return _itfType.get();
 	}
 
-	void setReceptacleItfType( co::InterfaceType* itfType )
+	void setReceptacleItfType( co::IInterfaceType* itfType )
 	{
 		_itfType = itfType;
 	}
 
-	co::Type* getReceptacleType()
+	co::IType* getReceptacleType()
 	{
 		return _type.get();
 	}
 
-	void setReceptacleType( co::Type* type )
+	void setReceptacleType( co::IType* type )
 	{
 		_type = type;
 	}
 
 private:
-	co::RefPtr<co::InterfaceType> _itfType;
-	co::RefPtr<co::Type> _type;
+	co::RefPtr<co::IInterfaceType> _itfType;
+	co::RefPtr<co::IType> _type;
 
 	co::RefPtr<DummyInterface> _dummyInterface;
 	std::string _name;

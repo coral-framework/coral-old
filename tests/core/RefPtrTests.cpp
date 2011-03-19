@@ -22,8 +22,8 @@ public:
 	
 	inline co::int32 getRefCount() const { return _refCount; }
 
-	virtual co::InterfaceType* getInterfaceType() { return 0; }
-	virtual co::Component* getInterfaceOwner() { return 0; }
+	virtual co::IInterfaceType* getInterfaceType() { return 0; }
+	virtual co::IComponent* getInterfaceOwner() { return 0; }
 	virtual const std::string& getInterfaceName() { return _name; }
 	virtual void componentRetain() { ++_refCount; }
 	virtual void componentRelease() { if( --_refCount <= 0 ) delete this; }

@@ -8,24 +8,24 @@
 
 #include "Type.h"
 #include "AttributeAndMethodContainer.h"
-#include "NativeClassTypeComponent_Base.h"
+#include "NativeClassType_Base.h"
 
 namespace co {
 
 /*!
-	Component that implements co.NativeClassType.
+	Implements co.INativeClassType.
  */
-class NativeClassTypeComponent : public NativeClassTypeComponent_Base,
+class NativeClassType : public NativeClassType_Base,
 						public TypeImpl, public AttributeAndMethodContainer
 {
 public:
-	virtual ~NativeClassTypeComponent();
+	virtual ~NativeClassType();
 
 	// internal methods:
 	void setNativeName( const std::string& nativeName );
 	void setNativeHeaderFile( const std::string& nativeHeaderFile );
 
-	// NativeClassType methods:
+	// INativeClassType methods:
 	const std::string& getNativeName();
 	const std::string& getNativeHeaderFile();
 
@@ -33,7 +33,7 @@ public:
 	DELEGATE_CO_COMPOUNDTYPE_METHODS( AttributeAndMethodContainer:: );
 	DELEGATE_CO_ATTRIBUTECONTAINER_METHODS( AttributeAndMethodContainer:: );
 	DELEGATE_CO_METHODCONTAINER_METHODS( AttributeAndMethodContainer:: );
-	
+
 private:
 	std::string _nativeName;
 	std::string _nativeHeaderFile;

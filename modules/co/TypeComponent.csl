@@ -1,7 +1,0 @@
-/*
-	Implements co.Type.
- */
-component TypeComponent
-{
-	provides Type type;
-};

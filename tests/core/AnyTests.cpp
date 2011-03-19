@@ -7,17 +7,17 @@
 
 #include <co/Uuid.h>
 #include <co/Any.h>
-#include <co/System.h>
-#include <co/Module.h>
+#include <co/ISystem.h>
+#include <co/IModule.h>
 #include <co/CSLError.h>
-#include <co/Component.h>
-#include <co/Namespace.h>
-#include <co/MemberInfo.h>
-#include <co/StructType.h>
-#include <co/TypeManager.h>
-#include <co/InterfaceType.h>
-#include <co/NativeClassType.h>
-#include <co/AttributeContainer.h>
+#include <co/IComponent.h>
+#include <co/INamespace.h>
+#include <co/IMemberInfo.h>
+#include <co/IStructType.h>
+#include <co/ITypeManager.h>
+#include <co/IInterfaceType.h>
+#include <co/INativeClassType.h>
+#include <co/IAttributeContainer.h>
 #include <co/IllegalCastException.h>
 
 /****************************************************************************
@@ -98,7 +98,7 @@ void EXPECT_ANY_TYPE_STREQ( const co::Any& any, const char* str )
 }
 
 template<typename T>
-void constructorValueTest( const co::TypeKind kind, const T& sampleValue, co::Type* expectedType )
+void constructorValueTest( const co::TypeKind kind, const T& sampleValue, co::IType* expectedType )
 {
 	T v = sampleValue;
 	co::Any a1( v );
@@ -125,7 +125,7 @@ void constructorValueTest( const co::TypeKind kind, const T& sampleValue, co::Ty
 }
 
 template<typename T>
-void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::Type* expectedType )
+void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::IType* expectedType )
 {
 	T* p = sampleValue;
 	co::Any a3( p );
@@ -199,7 +199,7 @@ void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::Type* expe
 }
 
 template<typename T>
-void constructorRefTest( const co::TypeKind kind, const T& sampleValue, co::Type* expectedType )
+void constructorRefTest( const co::TypeKind kind, const T& sampleValue, co::IType* expectedType )
 {
 	T v = sampleValue;
 	
@@ -237,7 +237,7 @@ void constructorRefTest( const co::TypeKind kind, const T& sampleValue, co::Type
 }
 
 template<typename T>
-void constructorTest( const co::TypeKind kind, const T& sampleValue, co::Type* expectedType )
+void constructorTest( const co::TypeKind kind, const T& sampleValue, co::IType* expectedType )
 {
 	constructorValueTest( kind, sampleValue, expectedType );
 	constructorRefTest( kind, sampleValue, expectedType );
@@ -352,11 +352,11 @@ TEST( AnyTests, constructArray )
 		r3ReadBack.popFirst();
 	}
 
-	co::RefVector<co::InterfaceType> r4;
+	co::RefVector<co::IInterfaceType> r4;
 	co::Any a4;
-	a4.set<co::RefVector<co::InterfaceType>&>( r4 );
+	a4.set<co::RefVector<co::IInterfaceType>&>( r4 );
 	EXPECT_EQ( sizeof(void*), a4.getSize() );
-	EXPECT_ANY_TYPE_STREQ( a4, "co::RefVector<co::InterfaceType>" );
+	EXPECT_ANY_TYPE_STREQ( a4, "co::RefVector<co::IInterfaceType>" );
 
 	EXPECT_TRUE( co::TK_NATIVECLASS == co::kindOf<co::Uuid>::kind );
 	EXPECT_EQ( "co.Uuid", co::typeOf<co::Uuid>::get()->getFullName() );
@@ -407,8 +407,8 @@ TEST( AnyTests, constructNativeClass )
 
 TEST( AnyTests, constructInterface )
 {
-	constructorPtrTest<co::Namespace>( co::TK_INTERFACE, co::getSystem()->getTypes()->getRootNS(),
-											co::typeOf<co::Namespace>::get() );
+	constructorPtrTest<co::INamespace>( co::TK_INTERFACE, co::getSystem()->getTypes()->getRootNS(),
+											co::typeOf<co::INamespace>::get() );
 }
 
 /******************************************************************************
@@ -514,38 +514,38 @@ TEST( AnyTests, setGetString )
 TEST( AnyTests, setGetArrays )
 {
 	// --- co::ArrayRange ---
-	co::ArrayRange<co::Type* const> range = co::getSystem()->getTypes()->getRootNS()->getTypes();
+	co::ArrayRange<co::IType* const> range = co::getSystem()->getTypes()->getRootNS()->getTypes();
 	co::Any a1( range );
-	EXPECT_ANY_TYPE_STREQ( a1, "co::ArrayRange<co::Type* const>" );
+	EXPECT_ANY_TYPE_STREQ( a1, "co::ArrayRange<co::IType* const>" );
 	
 	// cannot drop 'const' from the array element type
-	EXPECT_THROW( a1.get<co::ArrayRange<co::Type*> >(), co::IllegalCastException );
+	EXPECT_THROW( a1.get<co::ArrayRange<co::IType*> >(), co::IllegalCastException );
 
 	co::Any a1Copy = a1;
-	co::ArrayRange<co::Type* const> retrievedRange = a1Copy.get<co::ArrayRange<co::Type* const> >();
+	co::ArrayRange<co::IType* const> retrievedRange = a1Copy.get<co::ArrayRange<co::IType* const> >();
 	EXPECT_EQ( range.getSize(), retrievedRange.getSize() );
 	EXPECT_EQ( range.getFirst(), retrievedRange.getFirst() );
 	EXPECT_EQ( range.getLast(), retrievedRange.getLast() );
 
 	// --- co::RefVector ---
-	co::RefVector<co::Type> refVector;
-	refVector.push_back( co::typeOf<co::Component>::get() );
-	refVector.push_back( co::typeOf<co::Module>::get() );
-	refVector.push_back( co::typeOf<co::Namespace>::get() );
+	co::RefVector<co::IType> refVector;
+	refVector.push_back( co::typeOf<co::IComponent>::get() );
+	refVector.push_back( co::typeOf<co::IModule>::get() );
+	refVector.push_back( co::typeOf<co::INamespace>::get() );
 
 	co::Any a2;
-	a2.set<co::RefVector<co::Type>&>( refVector );
-	EXPECT_ANY_TYPE_STREQ( a2, "co::RefVector<co::Type>" );
+	a2.set<co::RefVector<co::IType>&>( refVector );
+	EXPECT_ANY_TYPE_STREQ( a2, "co::RefVector<co::IType>" );
 
-	co::RefVector<co::Type>& refVectorRef = a2.get<co::RefVector<co::Type>&>();
+	co::RefVector<co::IType>& refVectorRef = a2.get<co::RefVector<co::IType>&>();
 	ASSERT_EQ( &refVector, &refVectorRef );
 
 	EXPECT_EQ( 3, refVectorRef.size() );
 
-	refVectorRef.push_back( co::typeOf<co::TypeManager>::get() );
+	refVectorRef.push_back( co::typeOf<co::ITypeManager>::get() );
 
 	EXPECT_EQ( 4, refVector.size() );
-	EXPECT_EQ( "co.TypeManager", refVector[3]->getFullName() );
+	EXPECT_EQ( "co.ITypeManager", refVector[3]->getFullName() );
 
 	// --- std::vector ---
 	std::vector<int> intVec;
@@ -604,14 +604,14 @@ TEST( AnyTests, setGetInterface )
 {
 	co::Any any;
 
-	// set 'any' with a co::InterfaceType instance
-	co::InterfaceType* input = co::typeOf<co::Namespace>::get();
+	// set 'any' with a co::IInterfaceType instance
+	co::IInterfaceType* input = co::typeOf<co::INamespace>::get();
 	any.set( input );
-	EXPECT_ANY_TYPE_STREQ( any, "co::InterfaceType*" );
+	EXPECT_ANY_TYPE_STREQ( any, "co::IInterfaceType*" );
 
-	// try to get the same co::InterfaceType back (exact retrieval)
+	// try to get the same co::IInterfaceType back (exact retrieval)
 	{
-		co::InterfaceType* output = any.get<co::InterfaceType*>();
+		co::IInterfaceType* output = any.get<co::IInterfaceType*>();
 		EXPECT_TRUE( areSamePtr( input, output ) );
 		EXPECT_EQ( input->getInterfaceOwner(), output->getInterfaceOwner() );
 		EXPECT_TRUE( output->isSubTypeOf( co::typeOf<co::Interface>::get() ) );
@@ -624,25 +624,25 @@ TEST( AnyTests, setGetInterface )
 		EXPECT_EQ( input->getInterfaceOwner(), output->getInterfaceOwner() );
 	}
 	
-	// try to get a co::CompoundType back (implicit upcasting)
+	// try to get a co::ICompoundType back (implicit upcasting)
 	{
-		co::CompoundType* output = any.get<co::CompoundType*>();
+		co::ICompoundType* output = any.get<co::ICompoundType*>();
 		EXPECT_TRUE( areSamePtr( input, output ) );
 		EXPECT_EQ( input->getInterfaceOwner(), output->getInterfaceOwner() );
-		co::MemberInfo* res = output->getMember( "name" );
+		co::IMemberInfo* res = output->getMember( "name" );
 		EXPECT_EQ( res->getName(), "name" );
 	}
 
 	// try to retrieve an invalid interface
-	EXPECT_THROW( any.get<co::Namespace*>(), co::IllegalCastException );
+	EXPECT_THROW( any.get<co::INamespace*>(), co::IllegalCastException );
 
 	// try to retrieve a value
 	EXPECT_THROW( any.get<co::uint32>(), co::IllegalCastException );
 
-	// set 'any' with the co::CompoundType facet of the co::InterfaceType instance
-	co::CompoundType* input2 = input;
+	// set 'any' with the co::ICompoundType facet of the co::IInterfaceType instance
+	co::ICompoundType* input2 = input;
 	any.set( input2 );
-	EXPECT_ANY_TYPE_STREQ( any, "co::InterfaceType*" );
+	EXPECT_ANY_TYPE_STREQ( any, "co::IInterfaceType*" );
 
 	// try to get a co::Interface back (implicit upcasting)
 	{
@@ -651,9 +651,9 @@ TEST( AnyTests, setGetInterface )
 		EXPECT_EQ( input2->getInterfaceOwner(), output->getInterfaceOwner() );
 	}
 
-	// try to retrieve a co::InterfaceType (implicit downcasting)
+	// try to retrieve a co::IInterfaceType (implicit downcasting)
 	{
-		co::InterfaceType* output = any.get<co::InterfaceType*>();
+		co::IInterfaceType* output = any.get<co::IInterfaceType*>();
 		EXPECT_TRUE( areSamePtr( input2, output ) );
 	}
 }
@@ -829,23 +829,23 @@ TEST( MappingTests, coercionBetweenEnums )
 
 TEST( AnyTests, coercionsFromInterface )
 {
-	co::Any a0( reinterpret_cast<co::Type*>( 0 ) );
-	co::Any a1( co::typeOf<co::Namespace>::get() );
+	co::Any a0( reinterpret_cast<co::IType*>( 0 ) );
+	co::Any a1( co::typeOf<co::INamespace>::get() );
 
-	EXPECT_ANY_STREQ( a0, "(co::Type*)NULL" );
-	EXPECT_ANY_TYPE_STREQ( a1, "co::InterfaceType*" );
+	EXPECT_ANY_STREQ( a0, "(co::IType*)NULL" );
+	EXPECT_ANY_TYPE_STREQ( a1, "co::IInterfaceType*" );
 
 	// to primitives (invalid retrievals):
 	EXPECT_THROW( a0.get<bool>(), co::IllegalCastException );
 	EXPECT_THROW( a1.get<co::int32>(), co::IllegalCastException );
 	EXPECT_THROW( a1.get<std::string*>(), co::IllegalCastException );
 	EXPECT_THROW( a0.get<co::TypeKind>(), co::IllegalCastException );
-	EXPECT_THROW( a0.get<co::Namespace*>(), co::IllegalCastException );
+	EXPECT_THROW( a0.get<co::INamespace*>(), co::IllegalCastException );
 
 	// valid coercions to super-types:
 	EXPECT_TRUE( a0.get<co::Interface*>() == NULL );
 	EXPECT_TRUE( a1.get<co::Interface*>() != NULL );
-	EXPECT_TRUE( a1.get<co::Type*>() != NULL );
+	EXPECT_TRUE( a1.get<co::IType*>() != NULL );
 }
 
 TEST( AnyTests, coercionsFromArrayRange )
@@ -871,19 +871,19 @@ TEST( AnyTests, coercionsFromArrayRange )
 	EXPECT_ANY_TYPE_STREQ( constValuePtrConstRangeAny, "co::ArrayRange<const float* const>" );
 
 	// SubInterface*
-	co::ArrayRange<co::InterfaceType*> interfaceRange;
+	co::ArrayRange<co::IInterfaceType*> interfaceRange;
 	co::Any interfaceRangeAny( interfaceRange );
-	EXPECT_ANY_TYPE_STREQ( interfaceRangeAny, "co::ArrayRange<co::InterfaceType*>" );
+	EXPECT_ANY_TYPE_STREQ( interfaceRangeAny, "co::ArrayRange<co::IInterfaceType*>" );
 
 	// SubInterface* const
-	co::ArrayRange<co::InterfaceType* const> constInterfaceRange;
+	co::ArrayRange<co::IInterfaceType* const> constInterfaceRange;
 	co::Any constInterfaceRangeAny( constInterfaceRange );
-	EXPECT_ANY_TYPE_STREQ( constInterfaceRangeAny, "co::ArrayRange<co::InterfaceType* const>" );
+	EXPECT_ANY_TYPE_STREQ( constInterfaceRangeAny, "co::ArrayRange<co::IInterfaceType* const>" );
 	
 	// SuperInterface*
-	co::ArrayRange<co::Type*> superInterfaceRange;
+	co::ArrayRange<co::IType*> superInterfaceRange;
 	co::Any superInterfaceRangeAny( superInterfaceRange );
-	EXPECT_ANY_TYPE_STREQ( superInterfaceRangeAny, "co::ArrayRange<co::Type*>" );
+	EXPECT_ANY_TYPE_STREQ( superInterfaceRangeAny, "co::ArrayRange<co::IType*>" );
 
 	// ValueType -> const ValueType
 	EXPECT_TRUE( valueRangeAny.get<co::ArrayRange<const float> >().isEmpty() );
@@ -913,47 +913,47 @@ TEST( AnyTests, coercionsFromArrayRange )
 	EXPECT_THROW( constValuePtrConstRangeAny.get<co::ArrayRange<const float*> >(), co::IllegalCastException );
 
 	// SubInterface* -> SubInterface* const
-	EXPECT_TRUE( interfaceRangeAny.get<co::ArrayRange<co::InterfaceType* const> >().isEmpty() );
+	EXPECT_TRUE( interfaceRangeAny.get<co::ArrayRange<co::IInterfaceType* const> >().isEmpty() );
 
 	// ILLEGAL: SubInterface* const -> SubInterface*
-	EXPECT_THROW( constInterfaceRangeAny.get<co::ArrayRange<co::InterfaceType*> >(), co::IllegalCastException );
+	EXPECT_THROW( constInterfaceRangeAny.get<co::ArrayRange<co::IInterfaceType*> >(), co::IllegalCastException );
 
 	// ILLEGAL: SubInterface* -> SuperInterface*
-	EXPECT_THROW( interfaceRangeAny.get<co::ArrayRange<co::Type*> >(), co::IllegalCastException );
+	EXPECT_THROW( interfaceRangeAny.get<co::ArrayRange<co::IType*> >(), co::IllegalCastException );
 
 	// SubInterface* -> SuperInterface* const
-	EXPECT_TRUE( interfaceRangeAny.get<co::ArrayRange<co::Type* const> >().isEmpty() );
+	EXPECT_TRUE( interfaceRangeAny.get<co::ArrayRange<co::IType* const> >().isEmpty() );
 
 	// SubInterface* const -> SuperInterface* const
-	EXPECT_TRUE( constInterfaceRangeAny.get<co::ArrayRange<co::Type* const> >().isEmpty() );
+	EXPECT_TRUE( constInterfaceRangeAny.get<co::ArrayRange<co::IType* const> >().isEmpty() );
 
 	// ILLEGAL: SuperInterface* -> SubInterface*
-	EXPECT_THROW( superInterfaceRangeAny.get<co::ArrayRange<co::InterfaceType*> >(), co::IllegalCastException );
+	EXPECT_THROW( superInterfaceRangeAny.get<co::ArrayRange<co::IInterfaceType*> >(), co::IllegalCastException );
 }
 
 TEST( AnyTests, coercionsFromRefVector )
 {
 	// SubInterface*
-	co::RefVector<co::InterfaceType> refVector;
-	refVector.push_back( co::typeOf<co::Module>::get() );
-	refVector.push_back( co::typeOf<co::Namespace>::get() );
+	co::RefVector<co::IInterfaceType> refVector;
+	refVector.push_back( co::typeOf<co::IModule>::get() );
+	refVector.push_back( co::typeOf<co::INamespace>::get() );
 
 	co::Any refVectorAny;
-	refVectorAny.set<co::RefVector<co::InterfaceType>&>( refVector );
-	EXPECT_ANY_TYPE_STREQ( refVectorAny, "co::RefVector<co::InterfaceType>" );
+	refVectorAny.set<co::RefVector<co::IInterfaceType>&>( refVector );
+	EXPECT_ANY_TYPE_STREQ( refVectorAny, "co::RefVector<co::IInterfaceType>" );
 
 	// co::RefVector<SubInterface> -> co::ArrayRange<SubInterface* const>
-	EXPECT_EQ( 2, refVectorAny.get<co::ArrayRange<co::InterfaceType* const> >().getSize() );
+	EXPECT_EQ( 2, refVectorAny.get<co::ArrayRange<co::IInterfaceType* const> >().getSize() );
 
 	// ILLEGAL: co::RefVector<SubInterface> -> co::ArrayRange<SubInterface*>
-	EXPECT_THROW( refVectorAny.get<co::ArrayRange<co::InterfaceType*> >(), co::IllegalCastException );
+	EXPECT_THROW( refVectorAny.get<co::ArrayRange<co::IInterfaceType*> >(), co::IllegalCastException );
 
 	// co::RefVector<SubInterface> -> co::ArrayRange<SuperInterface* const>
-	EXPECT_EQ( 2, refVectorAny.get<co::ArrayRange<co::Type* const> >().getSize() );
+	EXPECT_EQ( 2, refVectorAny.get<co::ArrayRange<co::IType* const> >().getSize() );
 
-	co::ArrayRange<co::Type* const> r = refVectorAny.get<co::ArrayRange<co::Type* const> >();
-	EXPECT_EQ( "co.Module", r.getFirst()->getFullName() );
-	EXPECT_EQ( "co.Namespace", r.getLast()->getFullName() );
+	co::ArrayRange<co::IType* const> r = refVectorAny.get<co::ArrayRange<co::IType* const> >();
+	EXPECT_EQ( "co.IModule", r.getFirst()->getFullName() );
+	EXPECT_EQ( "co.INamespace", r.getLast()->getFullName() );
 }
 
 TEST( AnyTests, coercionsFromStdVector )
@@ -975,19 +975,19 @@ TEST( AnyTests, coercionsFromStdVector )
 	EXPECT_ANY_TYPE_STREQ( constIntPtrVecAny, "std::vector<const co::int32*>" );
 
 	// SubInterface*
-	std::vector<co::InterfaceType*> subVec;
-	subVec.push_back( co::typeOf<co::Module>::get() );
-	subVec.push_back( co::typeOf<co::Namespace>::get() );
+	std::vector<co::IInterfaceType*> subVec;
+	subVec.push_back( co::typeOf<co::IModule>::get() );
+	subVec.push_back( co::typeOf<co::INamespace>::get() );
 
 	co::Any subVecAny;
-	subVecAny.set<std::vector<co::InterfaceType*>&>( subVec );
-	EXPECT_ANY_TYPE_STREQ( subVecAny, "std::vector<co::InterfaceType*>" );
+	subVecAny.set<std::vector<co::IInterfaceType*>&>( subVec );
+	EXPECT_ANY_TYPE_STREQ( subVecAny, "std::vector<co::IInterfaceType*>" );
 
 	// SuperInterface*
-	std::vector<co::Type*> superVec;	
+	std::vector<co::IType*> superVec;	
 	co::Any superVecAny;
-	superVecAny.set<std::vector<co::Type*>&>( superVec );
-	EXPECT_ANY_TYPE_STREQ( superVecAny, "std::vector<co::Type*>" );
+	superVecAny.set<std::vector<co::IType*>&>( superVec );
+	EXPECT_ANY_TYPE_STREQ( superVecAny, "std::vector<co::IType*>" );
 
 	// std::vector<ValueType> -> co::ArrayRange<const ValueType>
 	EXPECT_EQ( 3, intVecAny.get<co::ArrayRange<const int> >().getSize() );
@@ -1012,23 +1012,23 @@ TEST( AnyTests, coercionsFromStdVector )
 	EXPECT_THROW( constIntPtrVecAny.get<std::vector<int*>&>(), co::IllegalCastException );
 	
 	// std::vector<SubInterface*> -> co::ArrayRange<SubInterface* const>
-	EXPECT_EQ( 2, subVecAny.get<co::ArrayRange<co::InterfaceType* const> >().getSize() );
+	EXPECT_EQ( 2, subVecAny.get<co::ArrayRange<co::IInterfaceType* const> >().getSize() );
 
 	// std::vector<SubInterface*> -> co::ArrayRange<SubInterface*>
-	EXPECT_EQ( 2, subVecAny.get<co::ArrayRange<co::InterfaceType*> >().getSize() );
+	EXPECT_EQ( 2, subVecAny.get<co::ArrayRange<co::IInterfaceType*> >().getSize() );
 
 	// ILLEGAL: std::vector<SubInterface*> -> std::vector<SuperInterface*>
-	EXPECT_EQ( 2, subVecAny.get<std::vector<co::InterfaceType*>&>().size() );	
-	EXPECT_THROW( subVecAny.get<std::vector<co::Type*>&>(), co::IllegalCastException );
+	EXPECT_EQ( 2, subVecAny.get<std::vector<co::IInterfaceType*>&>().size() );	
+	EXPECT_THROW( subVecAny.get<std::vector<co::IType*>&>(), co::IllegalCastException );
 
 	// std::vector<SubInterface*> -> co::ArrayRange<SuperInterface* const>
-	EXPECT_EQ( 2, subVecAny.get<co::ArrayRange<co::Type* const> >().getSize() );
+	EXPECT_EQ( 2, subVecAny.get<co::ArrayRange<co::IType* const> >().getSize() );
 
 	// ILLEGAL: std::vector<SubInterface*> -> co::ArrayRange<SuperInterface*>
-	EXPECT_THROW( subVecAny.get<co::ArrayRange<co::Type*> >(), co::IllegalCastException );
+	EXPECT_THROW( subVecAny.get<co::ArrayRange<co::IType*> >(), co::IllegalCastException );
 
 	// ILLEGAL: std::vector<SuperInterface*> -> co::ArrayRange<SubInterface* const>
-	EXPECT_THROW( superVecAny.get<co::ArrayRange<co::InterfaceType* const> >(), co::IllegalCastException );
+	EXPECT_THROW( superVecAny.get<co::ArrayRange<co::IInterfaceType* const> >(), co::IllegalCastException );
 }
 
 /****************************************************************************
@@ -1037,7 +1037,7 @@ TEST( AnyTests, coercionsFromStdVector )
 
 TEST( AnyTests, setInterface )
 {
-	co::InterfaceType* nsType = co::typeOf<co::Namespace>::get();
+	co::IInterfaceType* nsType = co::typeOf<co::INamespace>::get();
 	co::Interface* nsTypeAsItf = co::disambiguate<co::Interface>( nsType );
 
 	co::Any automatic( nsTypeAsItf );
@@ -1045,7 +1045,7 @@ TEST( AnyTests, setInterface )
 	EXPECT_EQ( automatic, manual );
 
 	// try passing a null pointer
-	automatic.set<co::Namespace*>( NULL );
+	automatic.set<co::INamespace*>( NULL );
 	manual.setInterface( NULL, nsType );
 	EXPECT_EQ( automatic, manual );
 }
@@ -1100,9 +1100,9 @@ TEST( AnyTests, setArray )
 	int8Vec.push_back( 5 );
 	int8Vec.push_back( 7 );
 
-	co::RefVector<co::InterfaceType> refVector;
-	refVector.push_back( co::typeOf<co::Module>::get() );
-	refVector.push_back( co::typeOf<co::Namespace>::get() );
+	co::RefVector<co::IInterfaceType> refVector;
+	refVector.push_back( co::typeOf<co::IModule>::get() );
+	refVector.push_back( co::typeOf<co::INamespace>::get() );
 
 	co::ArrayRange<const float* const> floatArrayRange;
 	co::ArrayRange<co::int8> int8VecRange( int8Vec );
@@ -1112,8 +1112,8 @@ TEST( AnyTests, setArray )
 	co::Any manual( co::Any::AK_StdVector, co::getType( "int8" ), co::Any::VarIsValue, &int8Vec );
 	EXPECT_EQ( automatic, manual );
 
-	automatic.set<co::RefVector<co::InterfaceType>&>( refVector );
-	manual.setArray( co::Any::AK_RefVector, co::getType( "co.InterfaceType" ), co::Any::VarIsPointer, &refVector );
+	automatic.set<co::RefVector<co::IInterfaceType>&>( refVector );
+	manual.setArray( co::Any::AK_RefVector, co::getType( "co.IInterfaceType" ), co::Any::VarIsPointer, &refVector );
 	EXPECT_EQ( automatic, manual );
 
 	automatic.set( floatArrayRange );

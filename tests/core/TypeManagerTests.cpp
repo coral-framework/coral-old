@@ -3,20 +3,20 @@
  * See Copyright Notice in Coral.h
  */
 
-#include <co/Type.h>
+#include <co/IType.h>
 #include <co/Coral.h>
-#include <co/System.h>
+#include <co/ISystem.h>
 #include <co/CSLError.h>
-#include <co/ArrayType.h>
-#include <co/Namespace.h>
-#include <co/TypeManager.h>
+#include <co/IArrayType.h>
+#include <co/INamespace.h>
+#include <co/ITypeManager.h>
 #include <co/TypeLoadException.h>
 #include <co/IllegalArgumentException.h>
 #include <gtest/gtest.h>
 
 TEST( TypeManagerTests, preDefinedTypes )
 {
-	co::TypeManager* tm = co::getSystem()->getTypes();
+	co::ITypeManager* tm = co::getSystem()->getTypes();
 
 	// these are global predefined types:
 	EXPECT_TRUE( tm->findType( "any" ) != NULL );
@@ -39,7 +39,7 @@ TEST( TypeManagerTests, preDefinedTypes )
 
 TEST( TypeManagerTests, findType )
 {
-	co::TypeManager* tm = co::getSystem()->getTypes();
+	co::ITypeManager* tm = co::getSystem()->getTypes();
 
 	EXPECT_TRUE( tm->findType( "TypeManagerTests.BarStruct" ) == NULL );
 	EXPECT_TRUE( tm->findType( "TypeManagerTests.IFoo" ) == NULL );
@@ -52,7 +52,7 @@ TEST( TypeManagerTests, findType )
 
 TEST( TypeManagerTests, getType )
 {
-	co::TypeManager* tm = co::getSystem()->getTypes();
+	co::ITypeManager* tm = co::getSystem()->getTypes();
 
 	EXPECT_TRUE( tm->getType( "co.Uuid" ) != NULL );
 
@@ -62,7 +62,7 @@ TEST( TypeManagerTests, getType )
 
 TEST( TypeManagerTests, arrays )
 {
-	co::TypeManager* tm = co::getSystem()->getTypes();
+	co::ITypeManager* tm = co::getSystem()->getTypes();
 
 	EXPECT_TRUE( tm->findType( "TypeManagerTests.IFoo[]" ) == NULL );
 	EXPECT_TRUE( tm->getType( "TypeManagerTests.IFoo[]" ) != NULL );
@@ -70,7 +70,7 @@ TEST( TypeManagerTests, arrays )
 
 	EXPECT_TRUE( tm->findType( "TypeManagerTests.BarStruct[]" ) == NULL );
 	EXPECT_EQ( tm->getArrayOf( tm->getType( "TypeManagerTests.BarStruct" ) ),
-				static_cast<co::ArrayType*>( tm->getType( "TypeManagerTests.BarStruct[]" ) ) );
+				static_cast<co::IArrayType*>( tm->getType( "TypeManagerTests.BarStruct[]" ) ) );
 	EXPECT_TRUE( tm->findType( "TypeManagerTests.BarStruct[]" ) != NULL );
 
 	EXPECT_THROW( tm->getArrayOf( NULL ), co::IllegalArgumentException );
@@ -81,7 +81,7 @@ TEST( TypeManagerTests, arrays )
 
 TEST( TypeManagerTests, loadType )
 {
-	co::TypeManager* tm = co::getSystem()->getTypes();
+	co::ITypeManager* tm = co::getSystem()->getTypes();
 
 	std::vector<co::CSLError> errorStack;
 	EXPECT_TRUE( tm->loadType( "TypeManagerTests.ErroneousStruct", errorStack ) == NULL );
@@ -106,15 +106,15 @@ struct TypeStatistics
 		: numNamespaces( 0 ), numTypes( 0 ), numComplexTypes( 0 ), numTypesWithReflector( 0 )
 	{;}
 
-	void traverse( co::Namespace* ns )
+	void traverse( co::INamespace* ns )
 	{
 		++numNamespaces;
 
-		for( co::ArrayRange<co::Type* const> r( ns->getTypes() ); r; r.popFirst() )
+		for( co::ArrayRange<co::IType* const> r( ns->getTypes() ); r; r.popFirst() )
 		{
 			++numTypes;
 
-			co::Type* type = r.getFirst();
+			co::IType* type = r.getFirst();
 			if( type->getKind() > co::TK_EXCEPTION )
 				++numComplexTypes;
 
@@ -122,7 +122,7 @@ struct TypeStatistics
 			   ++numTypesWithReflector;
 		}
 
-		for( co::ArrayRange<co::Namespace* const> r( ns->getChildNamespaces() ); r; r.popFirst() )
+		for( co::ArrayRange<co::INamespace* const> r( ns->getChildNamespaces() ); r; r.popFirst() )
 			traverse( r.getFirst() );
 	}
 };

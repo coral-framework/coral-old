@@ -5,16 +5,16 @@ local M = {}
 function M:initialize( module )
 	-- test the co.system interface
 	ASSERT_TRUE( co.system )
-	ASSERT_EQ( co.system.interfaceType.fullName, "co.System" )
+	ASSERT_EQ( co.system.interfaceType.fullName, "co.ISystem" )
 
 	-- test the co.getType() function
 	ASSERT_EQ( co.getType( "bool" ).fullName, "bool" )
-	ASSERT_EQ( co.getType( "co.ArrayType" ).name, "ArrayType" )
+	ASSERT_EQ( co.getType( "co.IArrayType" ).name, "IArrayType" )
 	ASSERT_ERROR( function() co.getType( "nonExistingType" ) end, "could not load type 'nonExistingType'" )
 
 	-- test the co.Type table
 	ASSERT_EQ( co.Type "bool", co.getType( "bool" ) )
-	ASSERT_EQ( co.Type["co.ArrayType"], co.getType( "co.ArrayType" ) )
+	ASSERT_EQ( co.Type["co.IArrayType"], co.getType( "co.IArrayType" ) )
 	ASSERT_ERROR( function() return co.Type.nonExistingType end, "could not load type 'nonExistingType'" )
 
 	-- test the co.new() function
@@ -28,7 +28,7 @@ function M:initialize( module )
 	ASSERT_EQ( testNativeClass.x, 0 )
 	ASSERT_EQ( testNativeClass.y, 0 )
 
-	ASSERT_ERROR( function() co.new "co.Type" end, "co.Type is not instantiable" )
+	ASSERT_ERROR( function() co.new "co.IType" end, "co.IType is not instantiable" )
 	ASSERT_ERROR( function() co.new "co.SystemState" end, "co.SystemState is not instantiable" )
 	ASSERT_ERROR( function() co.new "int8" end, "int8 is not instantiable" )
 	ASSERT_ERROR( function() co.new "nonExistingType" end, "could not load type 'nonExistingType'" )

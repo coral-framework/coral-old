@@ -5,7 +5,7 @@
 
 #include <co/Coral.h>
 #include <co/RefPtr.h>
-#include <co/TypeManager.h>
+#include <co/ITypeManager.h>
 #include <co/reserved/LexicalUtils.h>
 #include <gtest/gtest.h>
 

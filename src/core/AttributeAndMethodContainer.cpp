@@ -5,29 +5,29 @@
 
 #include "AttributeAndMethodContainer.h"
 #include "MemberInfo.h"
-#include <co/MethodInfo.h>
-#include <co/AttributeInfo.h>
-#include <co/InterfaceType.h>
+#include <co/IMethodInfo.h>
+#include <co/IAttributeInfo.h>
+#include <co/IInterfaceType.h>
 #include <algorithm>
 
 namespace co {
 
 // ------ Helper Comparators ---------------------------------------------------
 
-inline int memberInfoComparator( MemberInfo* memberInfo, const std::string& name )
+inline int memberInfoComparator( IMemberInfo* memberInfo, const std::string& name )
 {
 	return memberInfo->getName().compare( name );
 }
 
-inline bool typeThenNameMemberInfoComparator( const RefPtr<MemberInfo>& m1, const RefPtr<MemberInfo>& m2 )
+inline bool typeThenNameMemberInfoComparator( const RefPtr<IMemberInfo>& m1, const RefPtr<IMemberInfo>& m2 )
 {
-	const AttributeInfo* ai1 = dynamic_cast<const AttributeInfo*>( m1.get() );
-	const AttributeInfo* ai2 = dynamic_cast<const AttributeInfo*>( m2.get() );
+	const IAttributeInfo* ai1 = dynamic_cast<const IAttributeInfo*>( m1.get() );
+	const IAttributeInfo* ai2 = dynamic_cast<const IAttributeInfo*>( m2.get() );
 
 	if( ( !ai1 && ai2 ) || ( ai1 && !ai2 ) )
 		return ai1 != 0;
 
-	return const_cast<MemberInfo*>( m1.get() )->getName() < const_cast<MemberInfo*>( m2.get() )->getName();
+	return const_cast<IMemberInfo*>( m1.get() )->getName() < const_cast<IMemberInfo*>( m2.get() )->getName();
 }
 
 // ------ AttributeAndMethodContainer ------------------------------------------
@@ -42,14 +42,14 @@ AttributeAndMethodContainer::~AttributeAndMethodContainer()
 	// empty
 }
 
-void AttributeAndMethodContainer::addMembers( ArrayRange<MemberInfo* const> members )
+void AttributeAndMethodContainer::addMembers( ArrayRange<IMemberInfo* const> members )
 {
 	_members.reserve( _members.size() + members.getSize() );
 	for( ; members; members.popFirst() )
 		_members.push_back( members.getFirst() );
 }
 
-void AttributeAndMethodContainer::sortMembers( CompoundType* owner )
+void AttributeAndMethodContainer::sortMembers( ICompoundType* owner )
 {
 	assert( _firstMethodPos == size_t( -1 ) );
 
@@ -65,7 +65,7 @@ void AttributeAndMethodContainer::sortMembers( CompoundType* owner )
 		mii->setOwner( owner, i );
 
 		if( _firstMethodPos == size_t( -1 )
-				&& dynamic_cast<MethodInfo*>( _members[i].get() ) )
+				&& dynamic_cast<IMethodInfo*>( _members[i].get() ) )
 			_firstMethodPos = i;
 	}
 
@@ -73,12 +73,12 @@ void AttributeAndMethodContainer::sortMembers( CompoundType* owner )
 		_firstMethodPos = count;
 }
 
-ArrayRange<MemberInfo* const> AttributeAndMethodContainer::getMembers()
+ArrayRange<IMemberInfo* const> AttributeAndMethodContainer::getMembers()
 {
 	return _members;
 }
 
-MemberInfo* AttributeAndMethodContainer::getMember( const std::string& name )
+IMemberInfo* AttributeAndMethodContainer::getMember( const std::string& name )
 {
 	size_t pos;
 
@@ -92,10 +92,10 @@ MemberInfo* AttributeAndMethodContainer::getMember( const std::string& name )
 		return _members[pos].get();
 
 	// finally, search our ancestors (if any)
-	ArrayRange<CompoundType* const> ancestors = getCompoundTypeAncestors();
+	ArrayRange<ICompoundType* const> ancestors = getCompoundTypeAncestors();
 	for( ; ancestors; ancestors.popFirst() )
 	{
-		MemberInfo* mi = ancestors.getFirst()->getMember( name );
+		IMemberInfo* mi = ancestors.getFirst()->getMember( name );
 		if( mi )
 			return mi;
 	}
@@ -103,34 +103,34 @@ MemberInfo* AttributeAndMethodContainer::getMember( const std::string& name )
 	return NULL;
 }
 
-ArrayRange<AttributeInfo* const> AttributeAndMethodContainer::getMemberAttributes()
+ArrayRange<IAttributeInfo* const> AttributeAndMethodContainer::getMemberAttributes()
 {
 	assert( _firstMethodPos != size_t( -1 ) );
 
 	if( _firstMethodPos < 1 )
-		return ArrayRange<AttributeInfo* const>();
+		return ArrayRange<IAttributeInfo* const>();
 
-	// create an array range downcasting MemberInfo* to AttributeInfo*
-	return ArrayRange<AttributeInfo* const>(
-		reinterpret_cast<AttributeInfo**>( &_members.front() ), _firstMethodPos );
+	// create an array range downcasting IMemberInfo* to IAttributeInfo*
+	return ArrayRange<IAttributeInfo* const>(
+		reinterpret_cast<IAttributeInfo**>( &_members.front() ), _firstMethodPos );
 }
 
-ArrayRange<MethodInfo* const> AttributeAndMethodContainer::getMemberMethods()
+ArrayRange<IMethodInfo* const> AttributeAndMethodContainer::getMemberMethods()
 {
 	assert( _firstMethodPos != size_t( -1 ) );
 
 	size_t membersSize = _members.size();
 	if( _firstMethodPos >= membersSize )
-		return ArrayRange<MethodInfo* const>();
+		return ArrayRange<IMethodInfo* const>();
 
-	// create an array range downcasting MemberInfo* to MethodInfo*
-	return ArrayRange<MethodInfo* const>(
-		reinterpret_cast<MethodInfo**>( &_members.front() + _firstMethodPos ), membersSize - _firstMethodPos );
+	// create an array range downcasting IMemberInfo* to IMethodInfo*
+	return ArrayRange<IMethodInfo* const>(
+		reinterpret_cast<IMethodInfo**>( &_members.front() + _firstMethodPos ), membersSize - _firstMethodPos );
 }
 
-ArrayRange<CompoundType* const> AttributeAndMethodContainer::getCompoundTypeAncestors()
+ArrayRange<ICompoundType* const> AttributeAndMethodContainer::getCompoundTypeAncestors()
 {
-	return ArrayRange<CompoundType* const>();
+	return ArrayRange<ICompoundType* const>();
 }
 
 } // namespace co

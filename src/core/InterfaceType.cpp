@@ -6,62 +6,62 @@
 #include "InterfaceType.h"
 #include "TypeManager.h"
 #include <co/Coral.h>
-#include <co/System.h>
+#include <co/ISystem.h>
 #include <algorithm>
 
 namespace co {
 
-InterfaceTypeComponent::~InterfaceTypeComponent()
+InterfaceType::~InterfaceType()
 {
 	// empty
 }
 
-void InterfaceTypeComponent::addSuperInterface( InterfaceType* superItf )
+void InterfaceType::addSuperInterface( IInterfaceType* superItf )
 {
 	_superInterfaces.push_back( superItf );
 }
 
-void InterfaceTypeComponent::addSubInterface( InterfaceType* subItf )
+void InterfaceType::addSubInterface( IInterfaceType* subItf )
 {
 	_subInterfaces.push_back( subItf );
 }
 
-ArrayRange<InterfaceType* const> InterfaceTypeComponent::getInterfaceAncestors()
+ArrayRange<IInterfaceType* const> InterfaceType::getInterfaceAncestors()
 {
 	updateAncestors();
 	return _ancestors;
 }
 
-ArrayRange<InterfaceType* const> InterfaceTypeComponent::getSuperInterfaces()
+ArrayRange<IInterfaceType* const> InterfaceType::getSuperInterfaces()
 {
 	return _superInterfaces;
 }
 
-ArrayRange<InterfaceType* const> InterfaceTypeComponent::getSubInterfaces()
+ArrayRange<IInterfaceType* const> InterfaceType::getSubInterfaces()
 {
 	return _subInterfaces;
 }
 
-const std::string& InterfaceTypeComponent::getCppBlock()
+const std::string& InterfaceType::getCppBlock()
 {
-	TypeManagerComponent* tm = dynamic_cast<TypeManagerComponent*>( getSystem()->getTypes() );
+	TypeManager* tm = dynamic_cast<TypeManager*>( getSystem()->getTypes() );
 	assert( tm );
 	return tm->getCppBlock( getFullName() );
 }
 
-bool InterfaceTypeComponent::isSubTypeOf( InterfaceType* itf )
+bool InterfaceType::isSubTypeOf( IInterfaceType* itf )
 {
 	updateAncestors();
 	return itf == this || std::binary_search( _ancestors.begin(), _ancestors.end(), itf );
 }
 
-ArrayRange<CompoundType* const> InterfaceTypeComponent::getCompoundTypeAncestors()
+ArrayRange<ICompoundType* const> InterfaceType::getCompoundTypeAncestors()
 {
 	updateAncestors();
 	return _ancestors;
 }
 
-void InterfaceTypeComponent::updateAncestors()
+void InterfaceType::updateAncestors()
 {
 	if( !_ancestors.empty() )
 		return;
@@ -70,10 +70,10 @@ void InterfaceTypeComponent::updateAncestors()
 	size_t count = _superInterfaces.size();
 	for( size_t i = 0; i < count; ++i )
 	{
-		InterfaceType* super = _superInterfaces[i];
+		IInterfaceType* super = _superInterfaces[i];
 		_ancestors.push_back( super );
 
-		ArrayRange<InterfaceType* const> ancestors = super->getInterfaceAncestors();
+		ArrayRange<IInterfaceType* const> ancestors = super->getInterfaceAncestors();
 		for( ; ancestors; ancestors.popFirst() )
 			_ancestors.push_back( ancestors.getFirst() );
 	}
@@ -83,6 +83,6 @@ void InterfaceTypeComponent::updateAncestors()
 	_ancestors.erase( std::unique( _ancestors.begin(), _ancestors.end() ), _ancestors.end() );
 }
 
-CORAL_EXPORT_COMPONENT( InterfaceTypeComponent, InterfaceTypeComponent );
+CORAL_EXPORT_COMPONENT( InterfaceType, InterfaceType );
 
 } // namespace co

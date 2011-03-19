@@ -28,7 +28,7 @@ public:
 namespace co {
 template<> struct kindOf<co::LifeCycleException> : public kindOfBase<TK_EXCEPTION> {};
 template<> struct nameOf<co::LifeCycleException> { static const char* get() { return "co.LifeCycleException"; } };
-template<> struct typeOf<co::LifeCycleException> : public typeOfBase<co::LifeCycleException, ExceptionType> {};
+template<> struct typeOf<co::LifeCycleException> : public typeOfBase<co::LifeCycleException, IExceptionType> {};
 } // namespace co
 
 #endif // _CO_LIFECYCLEEXCEPTION_H_

@@ -7,17 +7,17 @@
 #define _EXCEPTIONTYPE_H_
 
 #include "Type.h"
-#include "ExceptionTypeComponent_Base.h"
+#include "ExceptionType_Base.h"
 
 namespace co {
 
 /*!
-	Component that implements co.ExceptionType.
+	Implements co.IExceptionType.
  */
-class ExceptionTypeComponent : public ExceptionTypeComponent_Base, public TypeImpl
+class ExceptionType : public ExceptionType_Base, public TypeImpl
 {
 public:
-	virtual ~ExceptionTypeComponent();
+	virtual ~ExceptionType();
 
 	DELEGATE_CO_TYPE_METHODS( TypeImpl:: );
 };

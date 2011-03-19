@@ -4,8 +4,8 @@
  */
 
 #include <co/RefPtr.h>
-#include <co/Reflector.h>
-#include <co/ModulePart.h>
+#include <co/IReflector.h>
+#include <co/IModulePart.h>
 
 namespace co {
 
@@ -17,178 +17,178 @@ public:
 	enum TypeId
 	{
 		TypeId_ArrayType,
-		TypeId_ArrayTypeComponent,
-		TypeId_AttributeContainer,
 		TypeId_AttributeInfo,
-		TypeId_AttributeInfoComponent,
-		TypeId_Component,
 		TypeId_ComponentType,
-		TypeId_ComponentTypeComponent,
-		TypeId_CompoundType,
 		TypeId_CSLError,
-		TypeId_DynamicProxyHandler,
 		TypeId_EnumType,
-		TypeId_EnumTypeComponent,
 		TypeId_ExceptionType,
-		TypeId_ExceptionTypeComponent,
+		TypeId_IArrayType,
+		TypeId_IAttributeContainer,
+		TypeId_IAttributeInfo,
+		TypeId_IComponent,
+		TypeId_IComponentType,
+		TypeId_ICompoundType,
+		TypeId_IDynamicProxyHandler,
+		TypeId_IEnumType,
+		TypeId_IExceptionType,
+		TypeId_IInterfaceInfo,
+		TypeId_IInterfaceType,
 		TypeId_IllegalArgumentException,
 		TypeId_IllegalCastException,
 		TypeId_IllegalNameException,
+		TypeId_IMemberInfo,
+		TypeId_IMethodBuilder,
+		TypeId_IMethodContainer,
+		TypeId_IMethodInfo,
+		TypeId_IModule,
+		TypeId_IModuleManager,
+		TypeId_IModulePart,
+		TypeId_IModulePartLoader,
+		TypeId_INamespace,
+		TypeId_INativeClassType,
 		TypeId_Interface,
 		TypeId_InterfaceInfo,
-		TypeId_InterfaceInfoComponent,
 		TypeId_InterfaceType,
-		TypeId_InterfaceTypeComponent,
+		TypeId_IParameterInfo,
+		TypeId_IReflector,
+		TypeId_IServiceManager,
+		TypeId_IStructType,
+		TypeId_ISystem,
+		TypeId_IType,
+		TypeId_ITypeBuilder,
+		TypeId_ITypeCreationTransaction,
+		TypeId_ITypeManager,
 		TypeId_LifeCycleException,
-		TypeId_MemberInfo,
 		TypeId_MethodBuilder,
-		TypeId_MethodBuilderComponent,
-		TypeId_MethodContainer,
 		TypeId_MethodInfo,
-		TypeId_MethodInfoComponent,
 		TypeId_MissingInputException,
 		TypeId_MissingServiceException,
 		TypeId_Module,
-		TypeId_ModuleComponent,
 		TypeId_ModuleLoadException,
 		TypeId_ModuleManager,
-		TypeId_ModuleManagerComponent,
-		TypeId_ModulePart,
 		TypeId_ModulePartLoader,
-		TypeId_ModulePartLoaderComponent,
 		TypeId_ModuleState,
 		TypeId_Namespace,
-		TypeId_NamespaceComponent,
 		TypeId_NativeClassType,
-		TypeId_NativeClassTypeComponent,
 		TypeId_NoSuchInterfaceException,
 		TypeId_NotSupportedException,
 		TypeId_ParameterInfo,
-		TypeId_ParameterInfoComponent,
-		TypeId_Reflector,
 		TypeId_SemanticException,
 		TypeId_ServiceManager,
-		TypeId_ServiceManagerComponent,
 		TypeId_StructType,
-		TypeId_StructTypeComponent,
 		TypeId_System,
-		TypeId_SystemComponent,
 		TypeId_SystemState,
 		TypeId_Type,
 		TypeId_TypeBuilder,
-		TypeId_TypeBuilderComponent,
-		TypeId_TypeComponent,
 		TypeId_TypeCreationTransaction,
-		TypeId_TypeCreationTransactionComponent,
 		TypeId_TypeKind,
 		TypeId_TypeLoadException,
 		TypeId_TypeManager,
-		TypeId_TypeManagerComponent,
 		TypeId_Uuid,
 		TypeCount
 	};
 
 public:
-	//! Instantiates Reflectors for the module types that still don't have an assigned Reflector.
+	//! Instantiates Reflectors for the module types that still don't have an assigned IReflector.
 	void initialize();
 
-	//! Returns the Reflector that should be assigned to a module type.
-	inline co::Reflector* getReflector( TypeId typeId ) { return _reflectors[typeId].get(); }
+	//! Returns the IReflector that should be assigned to a module type.
+	inline co::IReflector* getReflector( TypeId typeId ) { return _reflectors[typeId].get(); }
 
-	//! Sets the Reflector instance that should be assigned to module type.
+	//! Sets the IReflector instance that should be assigned to module type.
 	//! \warning This method can only be called \b before calling install().
-	inline void setReflector( TypeId typeId, co::Reflector* reflector ) { _reflectors[typeId] = reflector; }
+	inline void setReflector( TypeId typeId, co::IReflector* reflector ) { _reflectors[typeId] = reflector; }
 
-	//! Assigns the Reflectors to their corresponding co::Type instances.
-	//! This method skips any co::Type instance that already has an assigned Reflector.
+	//! Assigns the reflectors to their corresponding co::IType instances.
+	//! This method skips any co::IType instance that already has an assigned IReflector.
 	void install();
 
-	//! Removes references to the Reflectors from their corresponding co::Type instances.
-	//! This ignores any co::Type instance whose current Reflector was not assigned by this class.
+	//! Removes references to the Reflectors from their corresponding co::IType instances.
+	//! This ignores any co::IType instance whose current IReflector was not assigned by this class.
 	void uninstall();
 
 private:
 	ModuleInstaller();
 	~ModuleInstaller();
 
-	co::Reflector* createReflector( TypeId typeId );
+	co::IReflector* createReflector( TypeId typeId );
 
 private:
 	static ModuleInstaller sm_instance;
 
 private:
-	co::RefPtr<co::Reflector> _reflectors[TypeCount];
+	co::RefPtr<co::IReflector> _reflectors[TypeCount];
 };
 
 // Module's reflector creation functions:
-co::Reflector* __createArrayTypeReflector();
-co::Reflector* __createArrayTypeComponentReflector();
-co::Reflector* __createAttributeContainerReflector();
-co::Reflector* __createAttributeInfoReflector();
-co::Reflector* __createAttributeInfoComponentReflector();
-co::Reflector* __createComponentReflector();
-co::Reflector* __createComponentTypeReflector();
-co::Reflector* __createComponentTypeComponentReflector();
-co::Reflector* __createCompoundTypeReflector();
-co::Reflector* __createCSLErrorReflector();
-co::Reflector* __createDynamicProxyHandlerReflector();
-co::Reflector* __createEnumTypeReflector();
-co::Reflector* __createEnumTypeComponentReflector();
-co::Reflector* __createExceptionTypeReflector();
-co::Reflector* __createExceptionTypeComponentReflector();
-co::Reflector* __createIllegalArgumentExceptionReflector();
-co::Reflector* __createIllegalCastExceptionReflector();
-co::Reflector* __createIllegalNameExceptionReflector();
-co::Reflector* __createInterfaceReflector();
-co::Reflector* __createInterfaceInfoReflector();
-co::Reflector* __createInterfaceInfoComponentReflector();
-co::Reflector* __createInterfaceTypeReflector();
-co::Reflector* __createInterfaceTypeComponentReflector();
-co::Reflector* __createLifeCycleExceptionReflector();
-co::Reflector* __createMemberInfoReflector();
-co::Reflector* __createMethodBuilderReflector();
-co::Reflector* __createMethodBuilderComponentReflector();
-co::Reflector* __createMethodContainerReflector();
-co::Reflector* __createMethodInfoReflector();
-co::Reflector* __createMethodInfoComponentReflector();
-co::Reflector* __createMissingInputExceptionReflector();
-co::Reflector* __createMissingServiceExceptionReflector();
-co::Reflector* __createModuleReflector();
-co::Reflector* __createModuleComponentReflector();
-co::Reflector* __createModuleLoadExceptionReflector();
-co::Reflector* __createModuleManagerReflector();
-co::Reflector* __createModuleManagerComponentReflector();
-co::Reflector* __createModulePartReflector();
-co::Reflector* __createModulePartLoaderReflector();
-co::Reflector* __createModulePartLoaderComponentReflector();
-co::Reflector* __createModuleStateReflector();
-co::Reflector* __createNamespaceReflector();
-co::Reflector* __createNamespaceComponentReflector();
-co::Reflector* __createNativeClassTypeReflector();
-co::Reflector* __createNativeClassTypeComponentReflector();
-co::Reflector* __createNoSuchInterfaceExceptionReflector();
-co::Reflector* __createNotSupportedExceptionReflector();
-co::Reflector* __createParameterInfoReflector();
-co::Reflector* __createParameterInfoComponentReflector();
-co::Reflector* __createReflectorReflector();
-co::Reflector* __createSemanticExceptionReflector();
-co::Reflector* __createServiceManagerReflector();
-co::Reflector* __createServiceManagerComponentReflector();
-co::Reflector* __createStructTypeReflector();
-co::Reflector* __createStructTypeComponentReflector();
-co::Reflector* __createSystemReflector();
-co::Reflector* __createSystemComponentReflector();
-co::Reflector* __createSystemStateReflector();
-co::Reflector* __createTypeReflector();
-co::Reflector* __createTypeBuilderReflector();
-co::Reflector* __createTypeBuilderComponentReflector();
-co::Reflector* __createTypeComponentReflector();
-co::Reflector* __createTypeCreationTransactionReflector();
-co::Reflector* __createTypeCreationTransactionComponentReflector();
-co::Reflector* __createTypeKindReflector();
-co::Reflector* __createTypeLoadExceptionReflector();
-co::Reflector* __createTypeManagerReflector();
-co::Reflector* __createTypeManagerComponentReflector();
-co::Reflector* __createUuidReflector();
+co::IReflector* __createArrayTypeIReflector();
+co::IReflector* __createAttributeInfoIReflector();
+co::IReflector* __createComponentTypeIReflector();
+co::IReflector* __createCSLErrorIReflector();
+co::IReflector* __createEnumTypeIReflector();
+co::IReflector* __createExceptionTypeIReflector();
+co::IReflector* __createIArrayTypeIReflector();
+co::IReflector* __createIAttributeContainerIReflector();
+co::IReflector* __createIAttributeInfoIReflector();
+co::IReflector* __createIComponentIReflector();
+co::IReflector* __createIComponentTypeIReflector();
+co::IReflector* __createICompoundTypeIReflector();
+co::IReflector* __createIDynamicProxyHandlerIReflector();
+co::IReflector* __createIEnumTypeIReflector();
+co::IReflector* __createIExceptionTypeIReflector();
+co::IReflector* __createIInterfaceInfoIReflector();
+co::IReflector* __createIInterfaceTypeIReflector();
+co::IReflector* __createIllegalArgumentExceptionIReflector();
+co::IReflector* __createIllegalCastExceptionIReflector();
+co::IReflector* __createIllegalNameExceptionIReflector();
+co::IReflector* __createIMemberInfoIReflector();
+co::IReflector* __createIMethodBuilderIReflector();
+co::IReflector* __createIMethodContainerIReflector();
+co::IReflector* __createIMethodInfoIReflector();
+co::IReflector* __createIModuleIReflector();
+co::IReflector* __createIModuleManagerIReflector();
+co::IReflector* __createIModulePartIReflector();
+co::IReflector* __createIModulePartLoaderIReflector();
+co::IReflector* __createINamespaceIReflector();
+co::IReflector* __createINativeClassTypeIReflector();
+co::IReflector* __createInterfaceIReflector();
+co::IReflector* __createInterfaceInfoIReflector();
+co::IReflector* __createInterfaceTypeIReflector();
+co::IReflector* __createIParameterInfoIReflector();
+co::IReflector* __createIReflectorIReflector();
+co::IReflector* __createIServiceManagerIReflector();
+co::IReflector* __createIStructTypeIReflector();
+co::IReflector* __createISystemIReflector();
+co::IReflector* __createITypeIReflector();
+co::IReflector* __createITypeBuilderIReflector();
+co::IReflector* __createITypeCreationTransactionIReflector();
+co::IReflector* __createITypeManagerIReflector();
+co::IReflector* __createLifeCycleExceptionIReflector();
+co::IReflector* __createMethodBuilderIReflector();
+co::IReflector* __createMethodInfoIReflector();
+co::IReflector* __createMissingInputExceptionIReflector();
+co::IReflector* __createMissingServiceExceptionIReflector();
+co::IReflector* __createModuleIReflector();
+co::IReflector* __createModuleLoadExceptionIReflector();
+co::IReflector* __createModuleManagerIReflector();
+co::IReflector* __createModulePartLoaderIReflector();
+co::IReflector* __createModuleStateIReflector();
+co::IReflector* __createNamespaceIReflector();
+co::IReflector* __createNativeClassTypeIReflector();
+co::IReflector* __createNoSuchInterfaceExceptionIReflector();
+co::IReflector* __createNotSupportedExceptionIReflector();
+co::IReflector* __createParameterInfoIReflector();
+co::IReflector* __createSemanticExceptionIReflector();
+co::IReflector* __createServiceManagerIReflector();
+co::IReflector* __createStructTypeIReflector();
+co::IReflector* __createSystemIReflector();
+co::IReflector* __createSystemStateIReflector();
+co::IReflector* __createTypeIReflector();
+co::IReflector* __createTypeBuilderIReflector();
+co::IReflector* __createTypeCreationTransactionIReflector();
+co::IReflector* __createTypeKindIReflector();
+co::IReflector* __createTypeLoadExceptionIReflector();
+co::IReflector* __createTypeManagerIReflector();
+co::IReflector* __createUuidIReflector();
 
 } // namespace co

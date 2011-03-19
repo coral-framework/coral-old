@@ -7,12 +7,12 @@
 #include "TypeManager.h"
 #include "TypeCreationTransaction.h"
 #include "tools/StringTokenizer.h"
-#include <co/Type.h>
-#include <co/ArrayType.h>
+#include <co/IType.h>
+#include <co/IArrayType.h>
 #include <co/Exception.h>
-#include <co/Namespace.h>
-#include <co/TypeBuilder.h>
-#include <co/MethodBuilder.h>
+#include <co/INamespace.h>
+#include <co/ITypeBuilder.h>
+#include <co/IMethodBuilder.h>
 #include <co/reserved/OS.h>
 #include <sstream>
 
@@ -21,15 +21,15 @@ namespace co {
 // Root Loader Contructor:
 TypeLoader::TypeLoader( const std::string& fullTypeName,
 						ArrayRange<const std::string> path,
-						TypeManager* tm )
+						ITypeManager* tm )
 	: _fullTypeName( fullTypeName ), _path( path )
 {
-	assert( dynamic_cast<TypeManagerComponent*>( tm ) );
-	_typeManager = static_cast<TypeManagerComponent*>( tm );
+	assert( dynamic_cast<TypeManager*>( tm ) );
+	_typeManager = static_cast<TypeManager*>( tm );
 
 	_parentLoader = NULL;
 	_namespace = NULL;
-	_transaction = new TypeCreationTransactionComponent();
+	_transaction = new TypeCreationTransaction();
 }
 
 // Non-Root Loader Constructor:
@@ -47,16 +47,16 @@ TypeLoader::~TypeLoader()
 	// empty
 }
 
-Namespace* getOrCreateChildNamespace( Namespace* parent, const std::string& name )
+INamespace* getOrCreateChildNamespace( INamespace* parent, const std::string& name )
 {
-	Namespace* childNs = parent->getChildNamespace( name );
+	INamespace* childNs = parent->getChildNamespace( name );
 	if( childNs != NULL )
 		return childNs;
 	else
 		return parent->defineChildNamespace( name );
 }
 
-Type* TypeLoader::loadType()
+IType* TypeLoader::loadType()
 {
 	std::string fullPath;
 	std::string relativePath;
@@ -68,7 +68,7 @@ Type* TypeLoader::loadType()
 		return NULL;
 	}
 
-	Namespace* ns = _typeManager->getRootNS();
+	INamespace* ns = _typeManager->getRootNS();
 
 	// iterate over all subparts
 	StringTokenizer st( relativePath, CORAL_OS_DIR_SEP_STR );
@@ -105,23 +105,23 @@ Type* TypeLoader::loadType()
 	return NULL;
 }
 
-TypeBuilder* TypeLoader::createTypeBuilder( const std::string& typeName, TypeKind kind )
+ITypeBuilder* TypeLoader::createTypeBuilder( const std::string& typeName, TypeKind kind )
 {
 	return _namespace->defineType( typeName, kind, _transaction.get() );
 }
 
-Type* TypeLoader::resolveType( const std::string& typeName, bool isArray )
+IType* TypeLoader::resolveType( const std::string& typeName, bool isArray )
 {
 	if( isArray )
 	{
-		Type* elementType = resolveType( typeName );
+		IType* elementType = resolveType( typeName );
 		if( !elementType )
 			CORAL_THROW( Exception, "error loading array element type '" << typeName << "'" );
 		return _typeManager->getArrayOf( elementType );
 	}
 
 	// try to find an imported type aliased as 'typeName'
-	Type* type = findImportedType( typeName );
+	IType* type = findImportedType( typeName );
 	if( type )
 		return type;
 
@@ -136,7 +136,7 @@ Type* TypeLoader::resolveType( const std::string& typeName, bool isArray )
 
 void TypeLoader::addDocumentation( const std::string& member, const std::string& text )
 {
-	// DocMap keys are like 'name.space.Type:memberName'	
+	// DocMap keys are like 'name.space.IType:memberName'
 	std::string key;
 	key.reserve( _fullTypeName.length() + member.length() + 1 );
 	key += _fullTypeName;
@@ -145,16 +145,16 @@ void TypeLoader::addDocumentation( const std::string& member, const std::string&
 		key += ":";
 		key += member;
 	}
-	
+
 	_typeManager->addDocumentation( key, text );
 }
 
 void TypeLoader::addCppBlock( const std::string& text )
-{	
+{
 	_typeManager->addCppBlock( _fullTypeName, text );
 }
 
-inline std::string formatTypeInNamespace( Namespace* ns, const std::string& typeName )
+inline std::string formatTypeInNamespace( INamespace* ns, const std::string& typeName )
 {
 	const std::string& namespaceName = ns->getFullName();
 
@@ -167,12 +167,12 @@ inline std::string formatTypeInNamespace( Namespace* ns, const std::string& type
 	return str;
 }
 
-Type* TypeLoader::findDependency( const std::string& typeName )
+IType* TypeLoader::findDependency( const std::string& typeName )
 {
 	if( _namespace->getParentNamespace() )
 	{
 		// search _namespace if it is not the root namespace
-		Type* type = _typeManager->findType( formatTypeInNamespace( _namespace, typeName ) );
+		IType* type = _typeManager->findType( formatTypeInNamespace( _namespace, typeName ) );
 		if( type )
 			return type;
 	}
@@ -180,7 +180,7 @@ Type* TypeLoader::findDependency( const std::string& typeName )
 	return _typeManager->findType( typeName );
 }
 
-Type* TypeLoader::loadDependency( const std::string& typeName )
+IType* TypeLoader::loadDependency( const std::string& typeName )
 {
 	std::string fullPath;
 	std::string relativePath;
@@ -197,7 +197,7 @@ Type* TypeLoader::loadDependency( const std::string& typeName )
 	}
 
 	TypeLoader loader( relativePath, this );
-	Type* type = loader.loadType();
+	IType* type = loader.loadType();
 
 	// set the current error as the child loader error (then it will be set as the inner error
 	// when this loader also detects the error)

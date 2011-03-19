@@ -8,22 +8,22 @@
 
 #include "ComponentBase.h"
 #include <co/RefPtr.h>
-#include <co/Module.h>
-#include <co/ModulePart.h>
-#include <co/ModulePartLoader.h>
+#include <co/IModule.h>
+#include <co/IModulePart.h>
+#include <co/IModulePartLoader.h>
 
 namespace co {
 
-//! ModulePartBase provides an interface named 'part', of type co::ModulePart.
-class CORAL_EXPORT ModulePartBase_co_ModulePart : public ModulePart
+//! ModulePartBase provides an interface named 'part', of type co::IModulePart.
+class CORAL_EXPORT ModulePartBase_co_ModulePart : public IModulePart
 {
 public:
-	virtual InterfaceType* getInterfaceType();
+	virtual IInterfaceType* getInterfaceType();
 	virtual const std::string& getInterfaceName();
 };
 
 /*!
-	Auxiliary base class used in generated code to implement the default co::ModulePart of a module.
+	Auxiliary base class used in generated code to implement the default co::IModulePart of a module.
  */
 class CORAL_EXPORT ModulePartBase : public ComponentBase, public ModulePartBase_co_ModulePart
 {
@@ -32,21 +32,21 @@ public:
 	virtual ~ModulePartBase();
 
 	// co::Interface methods:
-    Component* getInterfaceOwner();
+    IComponent* getInterfaceOwner();
     void componentRetain();
     void componentRelease();
 
-    // co::Component methods:
-    ComponentType* getComponentType();
-    Interface* getInterface( InterfaceInfo* );
-    void setReceptacle( InterfaceInfo*, Interface* );
+    // co::IComponent methods:
+    IComponentType* getComponentType();
+    Interface* getInterface( IInterfaceInfo* );
+    void setReceptacle( IInterfaceInfo*, Interface* );
 
-	// co::ModulePart methods:
-	void initialize( co::Module* module );
-	void integrate( co::Module* module );
-	void integratePresentation( co::Module* module );
-	void disintegrate( co::Module* module );
-	void dispose( co::Module* module );
+	// co::IModulePart methods:
+	void initialize( co::IModule* module );
+	void integrate( co::IModule* module );
+	void integratePresentation( co::IModule* module );
+	void disintegrate( co::IModule* module );
+	void dispose( co::IModule* module );
 };
 
 } // namespace co

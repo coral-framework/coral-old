@@ -4,8 +4,8 @@
 component Component
 {
 	// Handles requests to the proxy interfaces created for this component.
-	provides co.DynamicProxyHandler dynamicProxyHandler;
+	provides co.IDynamicProxyHandler dynamicProxyHandler;
 
 	// This component has its own built-in reflector.
-	provides co.Reflector reflector;
+	provides co.IReflector reflector;
 };

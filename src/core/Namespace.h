@@ -6,40 +6,40 @@
 #ifndef _NAMESPACE_H_
 #define _NAMESPACE_H_
 
-#include "NamespaceComponent_Base.h"
-#include <co/Type.h>
-#include <co/Module.h>
+#include "Namespace_Base.h"
+#include <co/IType.h>
+#include <co/IModule.h>
 #include <co/RefVector.h>
 
 namespace co {
 
 /*!
-	Component that implements co.Namespace.
+	Implements co.INamespace.
  */
-class NamespaceComponent : public NamespaceComponent_Base
+class Namespace : public Namespace_Base
 {
 public:
-	NamespaceComponent();
-	virtual ~NamespaceComponent();
+	Namespace();
+	virtual ~Namespace();
 	
 	// internal methods:
-	void setParentAndName( Namespace* parent, const std::string& name );
-	void setModule( Module* module );
-	void addType( Type* type );
-	void removeType( Type* type );
+	void setParentAndName( INamespace* parent, const std::string& name );
+	void setModule( IModule* module );
+	void addType( IType* type );
+	void removeType( IType* type );
 	
-	// Namespace methods:
+	// INamespace methods:
 	const std::string& getName();
 	const std::string& getFullName();
-	Namespace* getParentNamespace();
-	ArrayRange<Type* const> getTypes();
-	ArrayRange<Namespace* const> getChildNamespaces();
-	Module* getModule();
-	Type* getType( const std::string& name );
-	Namespace* getChildNamespace( const std::string& name );
-	TypeBuilder* defineType( const std::string& name, TypeKind typeKind,
-									TypeCreationTransaction* transaction );
-	Namespace* defineChildNamespace( const std::string& name );
+	INamespace* getParentNamespace();
+	ArrayRange<IType* const> getTypes();
+	ArrayRange<INamespace* const> getChildNamespaces();
+	IModule* getModule();
+	IType* getType( const std::string& name );
+	INamespace* getChildNamespace( const std::string& name );
+	ITypeBuilder* defineType( const std::string& name, TypeKind typeKind,
+									ITypeCreationTransaction* transaction );
+	INamespace* defineChildNamespace( const std::string& name );
 
 private:
 	std::string getNamespaceName();
@@ -49,14 +49,14 @@ private:
 private:
 	std::string _name;
 	std::string _fullName;
-	Namespace* _parent;
+	INamespace* _parent;
 
-	RefPtr<Module> _module;
+	RefPtr<IModule> _module;
 
-	typedef RefVector<Type> TypeVector;
+	typedef RefVector<IType> TypeVector;
 	TypeVector _types;
 	
-	typedef RefVector<Namespace> NamespaceVector;
+	typedef RefVector<INamespace> NamespaceVector;
 	NamespaceVector _childNamespaces;
 };
 

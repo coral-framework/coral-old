@@ -1,0 +1,107 @@
+/*
+	Provides reflective programming facilities for a \ref co::IType "type".
+ */
+interface IReflector
+{
+	// The type we are providing reflection for.
+	readonly attribute IType type;
+
+	// Number of bytes occupied by instances of this type.
+	readonly attribute int32 size;
+
+	<c++
+		// Memory manipulation of complex Coral values is only available from C++.
+
+		/*!
+			Constructs an instance of a struct or native class in the specified memory area.
+			\param[in] address memory address where the instance is to be constructed.
+			\param[in] length number of bytes (starting at \a address) reserved for the instance.
+			\throw NotSupportedException if \a type is neither a IStructType nor a INativeClassType.
+			\throw IllegalArgumentException if the passed \a length is not equal to the type's \a size.
+		 */
+		virtual void createValue( void* address, size_t length ) = 0;
+
+		/*!
+			Sets the complex value at 'toAddress' with a copy of the complex value at 'fromAddress'.
+			The copy is done using the type's assignment operator.
+			\warning Both pointers must point to instances of this exact 'type'.
+		 */
+		virtual void copyValue( const void* fromAddress, void* toAddress ) = 0;
+
+		/*!
+			Destroys the struct or native class instance located at \a address.
+			The instance should have been constructed using createValue().
+			\warning Expect the worst if \a address does not point to an instance of this exact type.
+			\throw NotSupportedException if \a type is neither a IStructType nor a INativeClassType.
+		 */
+		virtual void destroyValue( void* address ) = 0;
+	c++>
+
+	/*
+		Instantiates a component.
+		\throw NotSupportedException if \a type is not a IComponentType.
+	 */
+	IComponent newInstance() raises NotSupportedException;
+
+	/*
+		Creates a proxy interface that forwards all calls to a given IDynamicProxyHandler.
+
+		A dynamic proxy is a lightweight interface instance (i.e. it is \e not a real component instance)
+		that forwards all its calls to a \a handler interface, or to the handler's component instance.
+
+		\throw NotSupportedException if \a type is not an IInterfaceType.
+		\throw IllegalArgumentException if the passed \a handler is invalid (e.g. null).
+	 */
+	Interface newProxy( in IDynamicProxyHandler handler )
+		raises NotSupportedException, IllegalArgumentException;
+
+	/*
+		Gets the current value of an attribute from a struct, interface or native class instance.
+		\throw NotSupportedException if \a type is not an IAttributeContainer.
+		\throw IllegalArgumentException if \a instance is not an instance of \a type, or if the
+			attribute \a ai does not belong to this type.
+	 */
+	void getAttribute( in any instance, in IAttributeInfo ai, out any value )
+		raises NotSupportedException, IllegalArgumentException;
+
+	/*
+		Sets the current value of an attribute in a struct, interface or native class instance.
+		\throw NotSupportedException if \a type is not an IAttributeContainer.
+		\throw IllegalArgumentException if \a instance is not an instance of \a type; if the
+			attribute \a ai does not belong to this type, or if it is read-only.
+		\throw IllegalCastException if \a value has no valid conversion to the actual attribute type.
+			Please refer to Any's documentation for more information about type conversion rules.
+	 */
+	void setAttribute( in any instance, in IAttributeInfo ai, in any value )
+		raises NotSupportedException, IllegalArgumentException, IllegalCastException;
+
+	/*
+		Invokes a method from an interface or native class instance.
+
+		Method arguments are passed in the \a args array, in the same order they are expected
+		by the callee. If \a args contains more arguments than the number of method
+		parameters, the excess arguments are ignored. However, if \a args contains fewer
+		arguments than the number of parameters, a MissingInputException is raised.
+
+		Method return values are obtainable through the \a returnValue argument. Notice that
+		you must \e always pass a Any at this parameter, even when the callee is a \a void
+		method (in this case, the \a returnValue parameter will return unmodified).
+
+		\throw NotSupportedException if \a type is not a IMethodContainer.
+		\throw IllegalArgumentException if \a instance is not an instance of \a type, or if the
+			method \a mi does not belong to this type.
+		\throw MissingInputException if \a args contains fewer elements than the number of parameters
+			expected by the callee.
+		\throw IllegalCastException if one of the arguments in \a args has no valid conversion to the
+			actual parameter type. Please refer to Any's documentation for more information
+			about type conversion rules.
+	 */
+	void invokeMethod( in any instance, in IMethodInfo mi, in any[] args, out any returnValue )
+		raises NotSupportedException, IllegalArgumentException, MissingInputException, IllegalCastException;
+
+	/*
+		Raises an exception with the given \a message.
+		\throw NotSupportedException if \a type is not an IExceptionType.
+	 */
+	void raise( in string message ) raises NotSupportedException;
+};

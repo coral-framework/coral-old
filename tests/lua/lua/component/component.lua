@@ -3,8 +3,8 @@ require "lua.test"
 local M = {}
 
 -- Define a new component type in Lua
-local BatComponent = co.Component{
-	name = "lua.bat.Component",
+local BatComponent = co.IComponent{
+	name = "lua.bat.IComponent",
 	provides = {
 		vampireBat = "moduleA.IBat",
 		fruitBat = "moduleA.IBat",
@@ -46,7 +46,7 @@ function BatComponent:getReceptacleTarget1() return self.target1 end
 function BatComponent:setReceptacleTarget1( human ) self.target1 = human end
 
 local function testBatInstance( batInstance )
-	ASSERT_EQ( batInstance.componentType.fullName, "lua.bat.Component" )
+	ASSERT_EQ( batInstance.componentType.fullName, "lua.bat.IComponent" )
 	ASSERT_EQ( batInstance.vampireBat.bloodsucker, true )
 	ASSERT_EQ( batInstance.fruitBat.bloodsucker, false )
 	ASSERT_EQ( batInstance.batman.bloodsucker, false )
@@ -56,8 +56,8 @@ local function testBatInstance( batInstance )
 end
 
 -- Define another component type in Lua
-local TestComponent = co.Component{
-	name = "lua.test.Component",
+local TestComponent = co.IComponent{
+	name = "lua.test.IComponent",
 	provides = {
 		testItf = "moduleA.TestInterface"
 	}
@@ -83,7 +83,7 @@ function M:initialize( module )
 	testBatInstance( BatComponent{ bloodsucker = false } )
 	ASSERT_ERROR( function() testBatInstance( BatComponent{ bloodsucker = true } ) end, "true != false" )
 
-	local bc = co.new "lua.bat.Component"
+	local bc = co.new "lua.bat.IComponent"
 	testBatInstance( bc )
 
 	-- test getting & setting the receptacles
@@ -111,7 +111,7 @@ function M:initialize( module )
 	ASSERT_EQ( bc2.target1, bc.batman )
 
 	-- TestComponent tests
-	local tc = co.new "lua.test.Component"
+	local tc = co.new "lua.test.IComponent"
 	local size, enumValue, text, ts, dummyItf, intList, itfList = tc.testItf:testOutParameters()
 	ASSERT_EQ( 1.25, size )
 	ASSERT_EQ( 3, #intList )

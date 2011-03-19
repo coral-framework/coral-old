@@ -13,6 +13,19 @@ SET( CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH} )
 INCLUDE( InternalMacros )
 
 ################################################################################
+# Global Coral Settings
+################################################################################
+
+# Coral Version
+SET( CORAL_VERSION_MAJOR	"0" )
+SET( CORAL_VERSION_MINOR	"6" )
+SET( CORAL_VERSION_PATCH	"0" )
+SET( CORAL_VERSION "${CORAL_VERSION_MAJOR}.${CORAL_VERSION_MINOR}.${CORAL_VERSION_PATCH}" )
+
+# Code generation rules revision
+SET( CORAL_COMPILER_OUTPUT_REVISION 3 )
+
+################################################################################
 # Global Build Settings
 ################################################################################
 
@@ -47,30 +60,9 @@ FIND_PACKAGE( Coral QUIET )
 INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/include )
 
 ################################################################################
-# Global Coral Settings
+# Packaging and Installation
 ################################################################################
 
-# The official Coral Version
-SET( CORAL_VERSION_MAJOR	"0" )
-SET( CORAL_VERSION_MINOR	"6" )
-SET( CORAL_VERSION_PATCH	"0" )
-SET( CORAL_VERSION "${CORAL_VERSION_MAJOR}.${CORAL_VERSION_MINOR}.${CORAL_VERSION_PATCH}" )
-
-# Code generation rules revision.
-SET( CORAL_COMPILER_OUTPUT_REVISION 3 )
-
-################################################################################
-# Installation
-################################################################################
-
-# enforce a safe default CMAKE_INSTALL_PREFIX
-IF( NOT CMAKE_INSTALL_PREFIX MATCHES "coral" )
-	SET( CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/coral" )
-ENDIF()
-
-################################################################################
-# Packaging
-################################################################################
 SET( CPACK_PACKAGE_NAME					"coral" )
 SET( CPACK_PACKAGE_VERSION_MAJOR		"${CORAL_VERSION_MAJOR}" )
 SET( CPACK_PACKAGE_VERSION_MINOR		"${CORAL_VERSION_MINOR}" )
@@ -89,6 +81,11 @@ ELSE()
 ENDIF()
 
 INCLUDE( CPack )
+
+# Force a safe default CMAKE_INSTALL_PREFIX
+IF( NOT CMAKE_INSTALL_PREFIX MATCHES "coral" )
+	SET( CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/coral" )
+ENDIF()
 
 ################################################################################
 # Subdirectories

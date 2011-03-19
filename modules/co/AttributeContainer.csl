@@ -1,8 +1,0 @@
-/*
-	Mixin interface for types that may have attributes.
- */
-interface AttributeContainer
-{
-	// List of all member attributes.
-	readonly attribute AttributeInfo[] memberAttributes;
-};

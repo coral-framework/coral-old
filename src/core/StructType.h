@@ -7,19 +7,19 @@
 #define _STRUCTTYPE_H_
 
 #include "Type.h"
-#include "StructTypeComponent_Base.h"
+#include "StructType_Base.h"
 #include "AttributeAndMethodContainer.h"
 
 namespace co {
 
 /*!
-	Component that implements co.StructType.
+	Implements co.IStructType.
  */
-class StructTypeComponent : public StructTypeComponent_Base,
+class StructType : public StructType_Base,
 					public TypeImpl, public AttributeAndMethodContainer
 {
 public:
-	virtual ~StructTypeComponent();
+	virtual ~StructType();
 
 	DELEGATE_CO_TYPE_METHODS( TypeImpl:: );
 	DELEGATE_CO_COMPOUNDTYPE_METHODS( AttributeAndMethodContainer:: );

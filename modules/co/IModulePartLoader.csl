@@ -1,0 +1,19 @@
+/*
+	Interface responsible for recognizing and loading a IModulePart from a module's dir.
+
+	Please notice that a module may actually comprise a set of dirs scattered over the Coral path.
+ */
+interface IModulePartLoader
+{
+	/*
+		Returns whether the specified module's dir contains an artifact that can be loaded by this IModulePartLoader.
+	 */
+	bool canLoadModulePart( in string moduleName );
+
+	/*
+		Returns a IModulePart loaded from an artifact found in the specified module's dir.
+		This method assumes canLoadModulePart() was called and returned true for the passed moduleName.
+		Any exception raised by this method will force the module's abortion.
+	 */
+	IModulePart loadModulePart( in string moduleName );
+};

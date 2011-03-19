@@ -9,37 +9,37 @@
 #include "TypeManager.h"
 #include "ModuleManager.h"
 #include "ServiceManager.h"
-#include "SystemComponent_Base.h"
+#include "System_Base.h"
 #include <co/RefPtr.h>
 
 namespace co {
 
 /*!
-	Component that implements co.System.
+	Implements co.ISystem.
  */
-class SystemComponent : public SystemComponent_Base
+class System : public System_Base
 {
 public:
-	SystemComponent();
-	virtual ~SystemComponent();
+	System();
+	virtual ~System();
 
 	// internal methods:
 	void initialize();
 
-	// System methods:
+	// ISystem methods:
 	SystemState getState();
-	TypeManager* getTypes();
-	ModuleManager* getModules();
-	ServiceManager* getServices();
+	ITypeManager* getTypes();
+	IModuleManager* getModules();
+	IServiceManager* getServices();
 	void setupBase( ArrayRange<std::string const> requiredModules );
 	void setupPresentation();
 	void tearDown();
 
 private:
 	SystemState _state;
-	RefPtr<TypeManagerComponent> _types;
-	RefPtr<ModuleManagerComponent> _modules;
-	RefPtr<ServiceManagerComponent> _services;
+	RefPtr<TypeManager> _types;
+	RefPtr<ModuleManager> _modules;
+	RefPtr<ServiceManager> _services;
 };
 
 } // namespace co

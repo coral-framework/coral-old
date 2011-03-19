@@ -88,7 +88,7 @@ local function walkDependencies( types, maxDistance )
 	-- Flag a type as visited, and queue it for iteration.
 	local function enqueue( type, distance )
 		local kind = type.kind
-		-- If the passed type is a co.ArrayType, the enqueued type is the array's elementType.
+		-- If the passed type is a co.IArrayType, the enqueued type is the array's elementType.
 		if kind == 'TK_ARRAY' then
 			type = type.elementType
 			kind = type.kind

@@ -6,25 +6,25 @@
 #ifndef _LUA_COMPONENT_BASE_H_
 #define _LUA_COMPONENT_BASE_H_
 
-#include <co/Reflector.h>
-#include <co/DynamicProxyHandler.h>
+#include <co/IReflector.h>
+#include <co/IDynamicProxyHandler.h>
 #include <co/reserved/ComponentBase.h>
 
 namespace lua {
 
-//! lua.Component has a facet named 'dynamicProxyHandler', of type co.DynamicProxyHandler.
-class Component_co_DynamicProxyHandler : public co::DynamicProxyHandler
+//! lua.Component has a facet named 'dynamicProxyHandler', of type co.IDynamicProxyHandler.
+class Component_co_IDynamicProxyHandler : public co::IDynamicProxyHandler
 {
 public:
-	virtual co::InterfaceType* getInterfaceType();
+	virtual co::IInterfaceType* getInterfaceType();
 	virtual const std::string& getInterfaceName();
 };
 
-//! lua.Component has a facet named 'reflector', of type co.Reflector.
-class Component_co_Reflector : public co::Reflector
+//! lua.Component has a facet named 'reflector', of type co.IReflector.
+class Component_co_IReflector : public co::IReflector
 {
 public:
-	virtual co::InterfaceType* getInterfaceType();
+	virtual co::IInterfaceType* getInterfaceType();
 	virtual const std::string& getInterfaceName();
 };
 
@@ -32,22 +32,22 @@ public:
 	Inherit from this class to implement the component 'lua.Component'.
  */
 class Component_Base : public co::ComponentBase,
-	public Component_co_DynamicProxyHandler,
-	public Component_co_Reflector
+	public Component_co_IDynamicProxyHandler,
+	public Component_co_IReflector
 {
 public:
 	Component_Base();
 	virtual ~Component_Base();
 
 	// co::Interface Methods:
-	co::Component* getInterfaceOwner();
+	co::IComponent* getInterfaceOwner();
 	void componentRetain();
 	void componentRelease();
 
-	// co::Component Methods:
-	co::ComponentType* getComponentType();
-	co::Interface* getInterface( co::InterfaceInfo* );
-	void setReceptacle( co::InterfaceInfo*, co::Interface* );
+	// co::IComponent Methods:
+	co::IComponentType* getComponentType();
+	co::Interface* getInterface( co::IInterfaceInfo* );
+	void setReceptacle( co::IInterfaceInfo*, co::Interface* );
 };
 
 } // namespace lua

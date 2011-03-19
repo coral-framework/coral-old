@@ -11,10 +11,10 @@
 
 namespace co {
 
-class Type;
-class CompoundType;
-class AttributeInfo;
-class InterfaceType;
+class IType;
+class ICompoundType;
+class IAttributeInfo;
+class IInterfaceType;
 
 /*!
 	Performs several checks to assure a type is semantically consistent.
@@ -23,7 +23,7 @@ class TypeSemanticChecker
 {
 public:
 	//! The passed \a type and it's inheritance tree should be fully loaded.
-	TypeSemanticChecker( Type* type );
+	TypeSemanticChecker( IType* type );
 
 	//! Performs the semantic analysis of the type.
 	//! Throws a co::SemanticException in case of errors.
@@ -41,11 +41,11 @@ private:
 	class MemberDeclaration
 	{
 	public:
-		inline co::Type* getDeclaringType() const { return _declaringType; }
+		inline co::IType* getDeclaringType() const { return _declaringType; }
 		inline MemberType getMemberType() const { return _memberType; }
 		inline const std::string& getMemberName() const { return _memberName; }
 		
-		MemberDeclaration( MemberType memberType, const std::string& memberName, co::Type* declaringType )
+		MemberDeclaration( MemberType memberType, const std::string& memberName, co::IType* declaringType )
 			: _memberType( memberType ), _memberName( memberName ), _declaringType( declaringType )
 		{;}
 
@@ -62,14 +62,14 @@ private:
 	private:
 		MemberType _memberType;
 		const std::string _memberName;
-		co::Type* _declaringType;
+		co::IType* _declaringType;
 	};
 
 	// stream output operator support for MemberDeclaration
 	friend std::ostream& operator<<( std::ostream&, const co::TypeSemanticChecker::MemberDeclaration& );
 
 	// validates inheritance: checks for cyclic inheritance and multiple inheritance.
-	void checkInheritance( co::InterfaceType* interfaceType );
+	void checkInheritance( co::IInterfaceType* interfaceType );
 
 	// validates inherited members: checks for clashing names between the checked type and its super-types
 	void checkInheritedMemberClashing();
@@ -78,19 +78,19 @@ private:
 	void insertMemberDeclaration( const MemberDeclaration& memberDeclaration );
 
 	// inserts de attribute declarations - member name and accessors.
-	void insertAttributeDeclaration( co::AttributeInfo* attribute, co::Type* declaringType );
+	void insertAttributeDeclaration( co::IAttributeInfo* attribute, co::IType* declaringType );
 
 	// checks the type members declarations.
 	// If avilable checks for the attributes and methods possible clashes, and checks superTypes if they exist.
-	void checkMemberDeclarations( co::Type* type );
+	void checkMemberDeclarations( co::IType* type );
 
 private:
-	Type* _type;
+	IType* _type;
 
 	typedef std::set<MemberDeclaration> MemberSet;
 	MemberSet _memberDeclarations;
 
-	typedef std::set<Type*> TypeSet;
+	typedef std::set<IType*> TypeSet;
 	TypeSet _visitedTypes;
 };
 

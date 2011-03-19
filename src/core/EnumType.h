@@ -7,23 +7,23 @@
 #define _ENUMTYPE_H_
 
 #include "Type.h"
-#include "EnumTypeComponent_Base.h"
+#include "EnumType_Base.h"
 #include <co/RefVector.h>
 
 namespace co {
 
 /*!
-	Component that implements co.EnumType.
+	Implements co.IEnumType.
  */
-class EnumTypeComponent : public EnumTypeComponent_Base, public TypeImpl
+class EnumType : public EnumType_Base, public TypeImpl
 {
 public:
-	virtual ~EnumTypeComponent();
+	virtual ~EnumType();
 
 	// internal methods:
 	void addIdentifier( const std::string& identifier );
 
-	// EnumType methods:
+	// IEnumType methods:
 	ArrayRange<std::string const> getIdentifiers();
 	int32 getValueOf( const std::string& identifier );
 

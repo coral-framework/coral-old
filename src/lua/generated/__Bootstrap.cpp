@@ -4,7 +4,7 @@
  */
 
 #include <co/RefPtr.h>
-#include <co/ModulePart.h>
+#include <co/IModulePart.h>
 #include <co/reserved/LibraryManager.h>
 
 extern "C" CORAL_DLL_EXPORT
@@ -26,27 +26,28 @@ extern "C" CORAL_DLL_EXPORT
 const TypeDependency* coral_module_query_dependencies()
 {
 	static const TypeDependency s_dependencies[] = {
-		{ "co.EnumType", "1847C34A-33F1-05F8-859BC2523056F718" },
+		{ "lua.Component", "AF454F48-55CB-0516-915C1940A06B3A5B" },
+		{ "co.IArrayType", "2BFE916D-9C54-0525-4F9F6167B1DFE344" },
+		{ "lua.lua", "03A87259-7370-E5FE-7ABFE3B1F6BAE469" },
+		{ "lua.ModulePart", "03A87259-7370-E5FE-7ABFE3B1F6BAE469" },
+		{ "co.IModulePart", "9AEAF23D-97F7-7500-00CA0EF11E9ADC90" },
+		{ "co.IExceptionType", "ADE7F1DC-3FC5-15DB-CCB1891FAF6A6642" },
+		{ "lua.ILauncher", "8133E010-22EA-B55A-90591F019265425D" },
+		{ "co.IDynamicProxyHandler", "1C8CE65D-246B-F514-F19EFD0C268F5B8B" },
+		{ "co.IModulePartLoader", "677A483E-1073-E567-C9B40CA63BC34B82" },
+		{ "lua.Universe", "D2AC4C53-8C1E-C550-8861CDFB71770ED9" },
+		{ "co.INativeClassType", "173F02BB-D96E-2514-5EE3FE91AE668DFE" },
+		{ "co.IComponentType", "AA98203F-135A-2560-079020893681795B" },
+		{ "lua.Launcher", "38F26CA9-7E66-35CF-F0233D4E42B000F8" },
+		{ "co.IStructType", "9ED1574E-81B7-55D5-588DD9CCD7963776" },
+		{ "co.ISystem", "4A33AF0B-D818-35B9-09A4080EABB96D66" },
+		{ "co.IReflector", "E34CAAD5-F5B6-F5CB-CA8D71506D23BD96" },
+		{ "co.INamespace", "7762B1DA-748C-C54C-DE06D6861FF68B22" },
+		{ "co.IEnumType", "88ED98CD-E6ED-45F4-5959DF1BC07E6C04" },
+		{ "co.IInterfaceType", "B557FFDA-4913-75E4-B24E5C627261F0AE" },
+		{ "lua.ModulePartLoader", "A88972FE-8C9F-556F-9C7DAF80792E6695" },
 		{ "lua.Exception", "C9E07715-CB3A-652A-0D46896EFD6FD6AB" },
-		{ "co.Reflector", "3335FBD5-1E83-25DE-CB1E74105A9A11EE" },
-		{ "co.ModulePart", "A34C715E-954E-15CD-2B04800BA19B5052" },
-		{ "co.System", "C6E47013-73A8-D554-C221496BDAE2909C" },
-		{ "lua.IState", "94E8F9A6-0204-D526-87E0505447F2B922" },
-		{ "lua.Component", "64AA4ED0-5BBA-C58A-84E505A5AD965A44" },
-		{ "co.Namespace", "4FD40C32-7A5E-75F8-05DDEE996453EF13" },
-		{ "lua.ModulePartLoader", "6D1199C9-3749-0528-1D4385C12BE804F5" },
-		{ "lua.Universe", "6EE23D1C-C39D-A522-31FEF6DC95C59C01" },
-		{ "co.ArrayType", "F29E701E-02C4-05EF-5678229EC3653D1C" },
-		{ "lua.ModulePart", "CC83CD39-BDBB-A5E4-1B99D37111BCF066" },
-		{ "co.ModulePartLoader", "536A73D9-F4C8-F597-2FEB68C301937B8D" },
-		{ "co.ComponentType", "0B216603-8B57-1533-A9B552990562FB3C" },
-		{ "co.NativeClassType", "E06B94AA-0639-6524-D24AD3260F041B58" },
-		{ "co.StructType", "10C22B97-2CDD-E5E9-6696678A6EAF792F" },
-		{ "co.ExceptionType", "A42F28BA-50B8-9593-346CABF6B6F93BD6" },
-		{ "lua.Launcher", "27D80973-9B0D-E5AC-FC3862D589367372" },
-		{ "co.InterfaceType", "22FF144F-E1B5-1593-CA7DF461B59AB85C" },
-		{ "lua.lua", "CC83CD39-BDBB-A5E4-1B99D37111BCF066" },
-		{ "lua.ILauncher", "A7FCD03C-4219-A565-4232A36DF1E9BD58" },
+		{ "lua.IState", "0586479B-FEE0-057A-6CE2AB7232163A8D" },
 		{ NULL, NULL }
 	};
 	return s_dependencies;
@@ -54,8 +55,8 @@ const TypeDependency* coral_module_query_dependencies()
 
 namespace lua {
 
-// The module's ModulePart instance
-co::RefPtr<co::ModulePart> sg_instance;
+// The module's IModulePart instance
+co::RefPtr<co::IModulePart> sg_instance;
 
 // The module's internal reference count
 co::int32 sg_refCount( 0 );
@@ -67,7 +68,7 @@ void moduleRetain()
 
 void moduleRelease()
 {
-	// is the module's ModulePart the only active reference?
+	// is the module's IModulePart the only active reference?
 	if( --sg_refCount == 1 )
 	{
 		assert( sg_instance.isValid() );
@@ -76,12 +77,12 @@ void moduleRelease()
 }
 
 // implemented by CORAL_EXPORT_MODULE_PART()
-co::ModulePart* createModulePart();
+co::IModulePart* createModulePart();
 
 } // namespace lua
 
 extern "C" CORAL_DLL_EXPORT
-co::ModulePart* coral_module_part_instance()
+co::IModulePart* coral_module_part_instance()
 {
 	if( !lua::sg_instance.isValid() )
 	{

@@ -5,22 +5,22 @@
 
 #include "ModulePartBase.h"
 #include <co/Coral.h>
-#include <co/Module.h>
+#include <co/IModule.h>
 #include <co/RefPtr.h>
 #include <co/Exception.h>
-#include <co/Namespace.h>
-#include <co/TypeBuilder.h>
-#include <co/InterfaceInfo.h>
-#include <co/InterfaceType.h>
-#include <co/TypeCreationTransaction.h>
+#include <co/INamespace.h>
+#include <co/ITypeBuilder.h>
+#include <co/IInterfaceInfo.h>
+#include <co/IInterfaceType.h>
+#include <co/ITypeCreationTransaction.h>
 
 namespace co {
 
-// ------ ModulePartBase provides an interface named 'part', of type co::ModulePart ------ //
+// ------ ModulePartBase provides an interface named 'part', of type co::IModulePart ------ //
 
-InterfaceType* ModulePartBase_co_ModulePart::getInterfaceType()
+IInterfaceType* ModulePartBase_co_ModulePart::getInterfaceType()
 {
-	return co::typeOf<ModulePart>::get();
+	return co::typeOf<IModulePart>::get();
 }
 
 const std::string& ModulePartBase_co_ModulePart::getInterfaceName()
@@ -41,7 +41,7 @@ ModulePartBase::~ModulePartBase()
 	// empty
 }
 
-Component* ModulePartBase::getInterfaceOwner()
+IComponent* ModulePartBase::getInterfaceOwner()
 {
 	return this;
 }
@@ -56,19 +56,19 @@ void ModulePartBase::componentRelease()
 	decrementRefCount();
 }
 
-ComponentType* ModulePartBase::getComponentType()
+IComponentType* ModulePartBase::getComponentType()
 {
-	return getOrCreateSimpleInternalComponentType( "co.ModulePartBase", "co.ModulePart", "part" );
+	return getOrCreateSimpleInternalComponentType( "co.ModulePartBase", "co.IModulePart", "part" );
 }
 
-Interface* ModulePartBase::getInterface( InterfaceInfo* interfaceInfo )
+Interface* ModulePartBase::getInterface( IInterfaceInfo* interfaceInfo )
 {
 	checkValidInterface( interfaceInfo );
 
 	Interface* res = NULL;
 	switch( interfaceInfo->getIndex() )
 	{
-	case 0: res = static_cast<ModulePart*>( this ); break;
+	case 0: res = static_cast<IModulePart*>( this ); break;
 	default:
 		raiseUnexpectedInterfaceIndex();
 	}
@@ -76,33 +76,33 @@ Interface* ModulePartBase::getInterface( InterfaceInfo* interfaceInfo )
 	return res;
 }
 
-void ModulePartBase::setReceptacle( InterfaceInfo* receptacle, Interface* )
+void ModulePartBase::setReceptacle( IInterfaceInfo* receptacle, Interface* )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
 }
 
-void ModulePartBase::initialize( co::Module* )
+void ModulePartBase::initialize( co::IModule* )
 {
 	// empty
 }
 
-void ModulePartBase::integrate( co::Module* )
+void ModulePartBase::integrate( co::IModule* )
 {
 	// empty
 }
 
-void ModulePartBase::integratePresentation( co::Module* )
+void ModulePartBase::integratePresentation( co::IModule* )
 {
 	// empty
 }
 
-void ModulePartBase::disintegrate( co::Module* )
+void ModulePartBase::disintegrate( co::IModule* )
 {
 	// empty
 }
 
-void ModulePartBase::dispose( co::Module* )
+void ModulePartBase::dispose( co::IModule* )
 {
 	// empty
 }

@@ -1,4 +1,4 @@
 component moduleB
 {
-	provides co.ModulePart part;
+	provides co.IModulePart part;
 };

@@ -28,7 +28,7 @@ public:
 namespace co {
 template<> struct kindOf<co::SemanticException> : public kindOfBase<TK_EXCEPTION> {};
 template<> struct nameOf<co::SemanticException> { static const char* get() { return "co.SemanticException"; } };
-template<> struct typeOf<co::SemanticException> : public typeOfBase<co::SemanticException, ExceptionType> {};
+template<> struct typeOf<co::SemanticException> : public typeOfBase<co::SemanticException, IExceptionType> {};
 } // namespace co
 
 #endif // _CO_SEMANTICEXCEPTION_H_

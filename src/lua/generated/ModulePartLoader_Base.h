@@ -6,16 +6,16 @@
 #ifndef _LUA_MODULEPARTLOADER_BASE_H_
 #define _LUA_MODULEPARTLOADER_BASE_H_
 
-#include <co/ModulePartLoader.h>
+#include <co/IModulePartLoader.h>
 #include <co/reserved/ComponentBase.h>
 
 namespace lua {
 
-//! lua.ModulePartLoader has a facet named 'loader', of type co.ModulePartLoader.
-class ModulePartLoader_co_ModulePartLoader : public co::ModulePartLoader
+//! lua.ModulePartLoader has a facet named 'loader', of type co.IModulePartLoader.
+class ModulePartLoader_co_IModulePartLoader : public co::IModulePartLoader
 {
 public:
-	virtual co::InterfaceType* getInterfaceType();
+	virtual co::IInterfaceType* getInterfaceType();
 	virtual const std::string& getInterfaceName();
 };
 
@@ -23,21 +23,21 @@ public:
 	Inherit from this class to implement the component 'lua.ModulePartLoader'.
  */
 class ModulePartLoader_Base : public co::ComponentBase,
-	public ModulePartLoader_co_ModulePartLoader
+	public ModulePartLoader_co_IModulePartLoader
 {
 public:
 	ModulePartLoader_Base();
 	virtual ~ModulePartLoader_Base();
 
 	// co::Interface Methods:
-	co::Component* getInterfaceOwner();
+	co::IComponent* getInterfaceOwner();
 	void componentRetain();
 	void componentRelease();
 
-	// co::Component Methods:
-	co::ComponentType* getComponentType();
-	co::Interface* getInterface( co::InterfaceInfo* );
-	void setReceptacle( co::InterfaceInfo*, co::Interface* );
+	// co::IComponent Methods:
+	co::IComponentType* getComponentType();
+	co::Interface* getInterface( co::IInterfaceInfo* );
+	void setReceptacle( co::IInterfaceInfo*, co::Interface* );
 };
 
 } // namespace lua

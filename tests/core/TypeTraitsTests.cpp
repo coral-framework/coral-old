@@ -5,11 +5,11 @@
 
 #include <co/Uuid.h>
 #include <co/Coral.h>
-#include <co/ArrayType.h>
+#include <co/IArrayType.h>
 #include <co/Exception.h>
 #include <co/RefVector.h>
 #include <co/TypeTraits.h>
-#include <co/InterfaceType.h>
+#include <co/IInterfaceType.h>
 #include <gtest/gtest.h>
 
 using namespace co::traits;
@@ -152,7 +152,7 @@ TEST( TypeTraitsTests, kindOf )
 
 	EXPECT_TRUE( co::kindOf<co::ArrayRange<float> >::kind == co::TK_ARRAY );
 	EXPECT_TRUE( co::kindOf<co::ArrayRange<const std::string> >::kind == co::TK_ARRAY );
-	EXPECT_TRUE( co::kindOf<co::RefVector<co::InterfaceType> >::kind == co::TK_ARRAY );
+	EXPECT_TRUE( co::kindOf<co::RefVector<co::IInterfaceType> >::kind == co::TK_ARRAY );
 	EXPECT_TRUE( co::kindOf<std::vector<const co::Uuid*> >::kind == co::TK_ARRAY );
 }
 
@@ -174,7 +174,7 @@ TEST( TypeTraitsTests, nameOf )
 
 	EXPECT_STREQ( "float[]", co::nameOf<co::ArrayRange<float> >::get() );
 	EXPECT_STREQ( "string[]", co::nameOf<co::ArrayRange<const std::string> >::get() );
-	EXPECT_STREQ( "co.InterfaceType[]", co::nameOf<co::RefVector<co::InterfaceType> >::get() );
+	EXPECT_STREQ( "co.IInterfaceType[]", co::nameOf<co::RefVector<co::IInterfaceType> >::get() );
 	EXPECT_STREQ( "co.Uuid[]", co::nameOf<std::vector<const co::Uuid*> >::get() );
 }
 
@@ -191,9 +191,9 @@ TEST( TypeTraitsTests, typeOf )
 	EXPECT_EQ( co::TK_FLOAT, co::typeOf<co::ArrayRange<float> >::get()->getElementType()->getKind() );
 	EXPECT_EQ( co::TK_STRING, co::typeOf<co::ArrayRange<const std::string> >::get()->getElementType()->getKind() );
 	
-	co::ArrayType* at;
-	ASSERT_TRUE( NULL != ( at = co::typeOf<co::RefVector<co::InterfaceType> >::get() ) );
-	EXPECT_EQ( "co.InterfaceType", at->getElementType()->getFullName() );
+	co::IArrayType* at;
+	ASSERT_TRUE( NULL != ( at = co::typeOf<co::RefVector<co::IInterfaceType> >::get() ) );
+	EXPECT_EQ( "co.IInterfaceType", at->getElementType()->getFullName() );
 
 	ASSERT_TRUE( NULL != ( at = co::typeOf<std::vector<const co::Uuid*> >::get() ) );
 	EXPECT_EQ( "co.Uuid", at->getElementType()->getFullName() );

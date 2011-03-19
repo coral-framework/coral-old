@@ -9,7 +9,7 @@
 
 namespace co {
 
-// ------ Reflector ------ //
+// ------ IReflector ------ //
 
 class SystemState_Reflector : public co::ReflectorBase
 {
@@ -24,7 +24,7 @@ public:
 		// empty
 	}
 
-	co::Type* getType()
+	co::IType* getType()
 	{
 		return co::typeOf<co::SystemState>::get();
 	}
@@ -35,9 +35,9 @@ public:
 	}
 };
 
-// ------ Reflector Creation Function ------ //
+// ------ IReflector Creation Function ------ //
 
-co::Reflector* __createSystemStateReflector()
+co::IReflector* __createSystemStateIReflector()
 {
     return new SystemState_Reflector;
 }

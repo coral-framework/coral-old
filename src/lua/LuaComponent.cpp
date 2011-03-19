@@ -5,10 +5,10 @@
 
 #include "LuaComponent.h"
 #include "LuaBinding.h"
-#include <co/MethodInfo.h>
-#include <co/ParameterInfo.h>
-#include <co/AttributeInfo.h>
-#include <co/InterfaceInfo.h>
+#include <co/IMethodInfo.h>
+#include <co/IParameterInfo.h>
+#include <co/IAttributeInfo.h>
+#include <co/IInterfaceInfo.h>
 #include <co/NotSupportedException.h>
 #include <lua/Exception.h>
 #include <cctype>
@@ -51,7 +51,7 @@ LuaComponent::~LuaComponent()
 	delete[] _facets;
 }
 
-void LuaComponent::setComponentType( co::ComponentType* ct, int prototypeTableRef )
+void LuaComponent::setComponentType( co::IComponentType* ct, int prototypeTableRef )
 {
 	assert( ct != NULL && _componentType == NULL && _facets == NULL );
 
@@ -70,14 +70,14 @@ void LuaComponent::setComponentInstance( LuaComponent* prototype, int instanceTa
 	_tableRef = instanceTableRef;
 
 	// create proxy interfaces for our facets
-	co::ArrayRange<co::InterfaceInfo* const> facets = _componentType->getFacets();
+	co::ArrayRange<co::IInterfaceInfo* const> facets = _componentType->getFacets();
 	int numFacets = static_cast<int>( facets.getSize() );
 	_facets = new co::Interface*[numFacets];
 	for( int i = 0; i < numFacets; ++i )
 	{
 		/*
 			To avoid having exceptions raised here by getReflector(), we
-			should check all interface reflectors before creating the Component.
+			should check all interface reflectors before creating the IComponent.
 		 */
 		assert( _numFacets == i );
 		facets[i]->getType()->getReflector()->newProxy( this );
@@ -85,22 +85,22 @@ void LuaComponent::setComponentInstance( LuaComponent* prototype, int instanceTa
 	}
 }
 
-co::ComponentType* LuaComponent::getComponentType()
+co::IComponentType* LuaComponent::getComponentType()
 {
 	return _componentType ? _componentType : lua::Component_Base::getComponentType();
 }
 
-co::Interface* LuaComponent::getInterface( co::InterfaceInfo* itfInfo )
+co::Interface* LuaComponent::getInterface( co::IInterfaceInfo* itfInfo )
 {
-	co::CompoundType* owner = itfInfo->getOwner();
+	co::ICompoundType* owner = itfInfo->getOwner();
 	if( owner == _componentType )
 		return getDynamicInterface( itfInfo );
 	return lua::Component_Base::getInterface( itfInfo );
 }
 
-void LuaComponent::setReceptacle( co::InterfaceInfo* receptacle, co::Interface* instance )
+void LuaComponent::setReceptacle( co::IInterfaceInfo* receptacle, co::Interface* instance )
 {
-	co::CompoundType* owner = receptacle->getOwner();
+	co::ICompoundType* owner = receptacle->getOwner();
 	if( owner == _componentType )
 		bindToDynamicReceptacle( receptacle, instance );
 	else
@@ -159,7 +159,7 @@ void LuaComponent::getMethod( lua_State* L, int t, co::int32 cookie )
 	}
 }
 
-const co::Any& LuaComponent::handleGetAttribute( co::int32 cookie, co::AttributeInfo* ai )
+const co::Any& LuaComponent::handleGetAttribute( co::int32 cookie, co::IAttributeInfo* ai )
 {
 	__BEGIN_LUA_API_CODE__
 
@@ -175,7 +175,7 @@ const co::Any& LuaComponent::handleGetAttribute( co::int32 cookie, co::Attribute
 	return _res;
 }
 
-void LuaComponent::handleSetAttribute( co::int32 cookie, co::AttributeInfo* ai, const co::Any& value )
+void LuaComponent::handleSetAttribute( co::int32 cookie, co::IAttributeInfo* ai, const co::Any& value )
 {
 	__BEGIN_LUA_API_CODE__
 
@@ -189,7 +189,7 @@ void LuaComponent::handleSetAttribute( co::int32 cookie, co::AttributeInfo* ai, 
 	__END_LUA_API_CODE__
 }
 
-const co::Any& LuaComponent::handleMethodInvocation( co::int32 cookie, co::MethodInfo* mi, co::ArrayRange<co::Any const> args )
+const co::Any& LuaComponent::handleMethodInvocation( co::int32 cookie, co::IMethodInfo* mi, co::ArrayRange<co::Any const> args )
 {
 	__BEGIN_LUA_API_CODE__
 
@@ -198,17 +198,17 @@ const co::Any& LuaComponent::handleMethodInvocation( co::int32 cookie, co::Metho
 	getMethod( L, -2, cookie );
 	lua_pushvalue( L, -2 ); // push the 'self' argument
 
-	co::Type* returnType = mi->getReturnType();
+	co::IType* returnType = mi->getReturnType();
 	int numOut = returnType ? 1 : 0;
 	int numIn = 1;
 
-	co::ArrayRange<co::ParameterInfo* const> paramList = mi->getParameters();
+	co::ArrayRange<co::IParameterInfo* const> paramList = mi->getParameters();
 	assert( paramList.getSize() == args.getSize() );
 
 	int numArgs = static_cast<int>( args.getSize() );
 	for( int i = 0; i < numArgs; ++i )
 	{
-		co::ParameterInfo* param = paramList[i];
+		co::IParameterInfo* param = paramList[i];
 		if( param->getIsIn() )
 		{
 			LuaState::push( L, args[i] );
@@ -264,7 +264,7 @@ co::int32 LuaComponent::getSize()
 	return sizeof(LuaComponent);
 }
 
-co::Type* LuaComponent::getType()
+co::IType* LuaComponent::getType()
 {
 	return _componentType;
 }
@@ -284,7 +284,7 @@ void LuaComponent::destroyValue( void* )
 	raiseNotSupportedException();
 }
 
-co::Component* LuaComponent::newInstance()
+co::IComponent* LuaComponent::newInstance()
 {
 	assert( _facets == NULL && _tableRef != LUA_NOREF );
 
@@ -301,31 +301,31 @@ co::Component* LuaComponent::newInstance()
 
 	LuaState::call( L, 1, 1 );
 
-	// extract the returned co::Component
+	// extract the returned co::IComponent
 	CompoundTypeBinding::getInstance( L, -1, any );
 
 	__END_LUA_API_CODE__
 
-	return any.get<co::Component*>();
+	return any.get<co::IComponent*>();
 }
 
-co::Interface* LuaComponent::newProxy( co::DynamicProxyHandler* )
+co::Interface* LuaComponent::newProxy( co::IDynamicProxyHandler* )
 {
 	raiseNotSupportedException();
 	return NULL;
 }
 
-void LuaComponent::getAttribute( const co::Any&, co::AttributeInfo*, co::Any& )
+void LuaComponent::getAttribute( const co::Any&, co::IAttributeInfo*, co::Any& )
 {
 	raiseNotSupportedException();
 }
 
-void LuaComponent::setAttribute( const co::Any&, co::AttributeInfo*, const co::Any& )
+void LuaComponent::setAttribute( const co::Any&, co::IAttributeInfo*, const co::Any& )
 {
 	raiseNotSupportedException();
 }
 
-void LuaComponent::invokeMethod( const co::Any&, co::MethodInfo*, co::ArrayRange<co::Any const>, co::Any& )
+void LuaComponent::invokeMethod( const co::Any&, co::IMethodInfo*, co::ArrayRange<co::Any const>, co::Any& )
 {
 	raiseNotSupportedException();
 }
@@ -335,7 +335,7 @@ void LuaComponent::raise( const std::string& )
 	raiseNotSupportedException();
 }
 
-co::Interface* LuaComponent::getDynamicInterface( co::InterfaceInfo* itfInfo )
+co::Interface* LuaComponent::getDynamicInterface( co::IInterfaceInfo* itfInfo )
 {
 	if( itfInfo->getIsFacet() )
 		return _facets[itfInfo->getIndex()];
@@ -363,7 +363,7 @@ co::Interface* LuaComponent::getDynamicInterface( co::InterfaceInfo* itfInfo )
 	return res;
 }
 
-void LuaComponent::bindToDynamicReceptacle( co::InterfaceInfo* receptacle, co::Interface* instance )
+void LuaComponent::bindToDynamicReceptacle( co::IInterfaceInfo* receptacle, co::Interface* instance )
 {
 	// check interface compatibility
 	if( instance && !instance->getInterfaceType()->isSubTypeOf( receptacle->getType() ) )

@@ -1,7 +1,0 @@
-/*
-	Implements co.MethodBuilder.
- */
-component MethodBuilderComponent
-{
-	provides MethodBuilder methodBuilder;
-};

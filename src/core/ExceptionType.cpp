@@ -7,11 +7,11 @@
 
 namespace co {
 
-ExceptionTypeComponent::~ExceptionTypeComponent()
+ExceptionType::~ExceptionType()
 {
 	// empty
 }
 
-CORAL_EXPORT_COMPONENT( ExceptionTypeComponent, ExceptionTypeComponent );
+CORAL_EXPORT_COMPONENT( ExceptionType, ExceptionType );
 
 } // namespace co

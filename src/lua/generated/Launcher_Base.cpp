@@ -5,9 +5,9 @@
 
 #include "Launcher_Base.h"
 #include <co/Coral.h>
-#include <co/ComponentType.h>
-#include <co/InterfaceInfo.h>
-#include <co/InterfaceType.h>
+#include <co/IComponentType.h>
+#include <co/IInterfaceInfo.h>
+#include <co/IInterfaceType.h>
 
 namespace lua {
 
@@ -16,7 +16,7 @@ void moduleRelease();
 
 // ------ lua.Launcher provides an interface named 'launcher', of type lua.ILauncher ------ //
 
-co::InterfaceType* Launcher_lua_ILauncher::getInterfaceType()
+co::IInterfaceType* Launcher_lua_ILauncher::getInterfaceType()
 {
 	return co::typeOf<lua::ILauncher>::get();
 }
@@ -39,7 +39,7 @@ Launcher_Base::~Launcher_Base()
 	moduleRelease();
 }
 
-co::Component* Launcher_Base::getInterfaceOwner()
+co::IComponent* Launcher_Base::getInterfaceOwner()
 {
 	return this;
 }
@@ -54,14 +54,14 @@ void Launcher_Base::componentRelease()
 	decrementRefCount();
 }
 
-co::ComponentType* Launcher_Base::getComponentType()
+co::IComponentType* Launcher_Base::getComponentType()
 {
-	co::Type* type = co::getType( "lua.Launcher" );
-	assert( dynamic_cast<co::ComponentType*>( type ) );
-	return static_cast<co::ComponentType*>( type );
+	co::IType* type = co::getType( "lua.Launcher" );
+	assert( dynamic_cast<co::IComponentType*>( type ) );
+	return static_cast<co::IComponentType*>( type );
 }
 
-co::Interface* Launcher_Base::getInterface( co::InterfaceInfo* interfaceInfo )
+co::Interface* Launcher_Base::getInterface( co::IInterfaceInfo* interfaceInfo )
 {
 	checkValidInterface( interfaceInfo );
 	co::Interface* res = NULL;
@@ -73,7 +73,7 @@ co::Interface* Launcher_Base::getInterface( co::InterfaceInfo* interfaceInfo )
 	return res;
 }
 
-void Launcher_Base::setReceptacle( co::InterfaceInfo* receptacle, co::Interface* facet )
+void Launcher_Base::setReceptacle( co::IInterfaceInfo* receptacle, co::Interface* facet )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();

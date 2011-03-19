@@ -8,16 +8,16 @@
 #include "ModuleInstaller.h"
 #include "LuaModulePartLoader.h"
 #include <co/RefPtr.h>
-#include <co/System.h>
-#include <co/Module.h>
-#include <co/ModuleManager.h>
-#include <co/ServiceManager.h>
+#include <co/ISystem.h>
+#include <co/IModule.h>
+#include <co/IModuleManager.h>
+#include <co/IServiceManager.h>
 #include <lua/Exception.h>
 
 namespace lua {
 
 /*!
-	The Lua module's co.ModulePart.
+	The Lua module's co.IModulePart.
  */
 class ModulePartComponent : public lua::lua_Base
 {
@@ -32,7 +32,7 @@ public:
 		// empty
 	}
 
-	void initialize( co::Module* module )
+	void initialize( co::IModule* module )
 	{
 		lua::ModuleInstaller::instance().install();
 
@@ -40,7 +40,7 @@ public:
 		module->setRank( 100000 );
 
 		// install our LuaModulePartLoader
-		_luaModulePartLoader = new ModulePartLoader;
+		_luaModulePartLoader = new IModulePartLoader;
 		co::getSystem()->getModules()->installLoader( _luaModulePartLoader.get() );
 
 		/*
@@ -62,29 +62,29 @@ public:
 		co::getSystem()->getServices()->addServiceImplementation( co::typeOf<lua::IState>::get(), "lua.Universe" );
 	}
 
-	void integrate( co::Module* )
+	void integrate( co::IModule* )
 	{
 		// empty
 	}
 
-	void integratePresentation( co::Module* )
+	void integratePresentation( co::IModule* )
 	{
 		// empty
 	}
 
-	void disintegrate( co::Module* )
+	void disintegrate( co::IModule* )
 	{
 		co::getSystem()->getModules()->uninstallLoader( _luaModulePartLoader.get() );
 	}
 
-	void dispose( co::Module* )
+	void dispose( co::IModule* )
 	{
 		lua::ModuleInstaller::instance().uninstall();
 		LuaState::tearDown();
 	}
 
 private:
-	co::RefPtr<ModulePartLoader> _luaModulePartLoader;
+	co::RefPtr<IModulePartLoader> _luaModulePartLoader;
 };
 	
 CORAL_EXPORT_COMPONENT( ModulePartComponent, lua );

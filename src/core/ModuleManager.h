@@ -6,51 +6,51 @@
 #ifndef _MODULEMANAGER_H_
 #define _MODULEMANAGER_H_
 
-#include "ModuleManagerComponent_Base.h"
-#include <co/Module.h>
-#include <co/ModulePartLoader.h>
+#include "ModuleManager_Base.h"
+#include <co/IModule.h>
+#include <co/IModulePartLoader.h>
 #include <co/RefVector.h>
 
 namespace co {
 
 // forward declarations:
-class ModuleComponent;
+class Module;
 
 /*!
-	Component that implements co.ModuleManager.
+	Implements co.IModuleManager.
  */
-class ModuleManagerComponent : public ModuleManagerComponent_Base
+class ModuleManager : public ModuleManager_Base
 {
 public:
-	ModuleManagerComponent();
-	virtual ~ModuleManagerComponent();
+	ModuleManager();
+	virtual ~ModuleManager();
 
 	// internal methods:
 	void initialize();
 	void updateModules( ModuleState toState );
 
-	// ModuleManager methods:
-	ArrayRange<Module* const> getModules();
-	ArrayRange<ModulePartLoader* const> getLoaders();
+	// IModuleManager methods:
+	ArrayRange<IModule* const> getModules();
+	ArrayRange<IModulePartLoader* const> getLoaders();
 	bool getBinaryCompatibilityChecking();
 	void setBinaryCompatibilityChecking( bool enabled );
-	Module* findModule( const std::string& moduleName );
-	void installLoader( ModulePartLoader* loader );
-	void uninstallLoader( ModulePartLoader* loader );
+	IModule* findModule( const std::string& moduleName );
+	void installLoader( IModulePartLoader* loader );
+	void uninstallLoader( IModulePartLoader* loader );
 	bool isLoadable( const std::string& moduleName );
-	Module* load( const std::string& moduleName );
+	IModule* load( const std::string& moduleName );
 
 private:
-	ModuleComponent* createModule( const std::string& moduleName );
-	void updateModule( Module* module, ModuleState toState );
-	void verifyModuleIntegrity( Module* module );
-	void syncModuleWithSystemState( Module* module );
+	Module* createModule( const std::string& moduleName );
+	void updateModule( IModule* module, ModuleState toState );
+	void verifyModuleIntegrity( IModule* module );
+	void syncModuleWithSystemState( IModule* module );
 
 private:
-	typedef RefVector<Module> ModuleList;
+	typedef RefVector<IModule> ModuleList;
 	ModuleList _modules;
 
-	typedef RefVector<ModulePartLoader> ModulePartLoaderList;
+	typedef RefVector<IModulePartLoader> ModulePartLoaderList;
 	ModulePartLoaderList _loaders;
 	
 	bool _binaryCompatibilityChecking;

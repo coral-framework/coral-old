@@ -117,7 +117,7 @@ function co.getService( serviceName, client )
 end
 
 -------------------------------------------------------------------------------
--- componentPrototype = co.Component( desc )
+-- componentPrototype = co.IComponent( desc )
 --
 -- Defines a Coral component type implemented in Lua.
 --
@@ -136,7 +136,7 @@ end
 -- A method will only affect a specific facet if it is added to the facet's prototype
 -- table; conversely, it will affect all facets if added to the component's prototype
 -- table. For example:
---		local MyComponent = co.Component{ ... }
+--		local MyComponent = co.IComponent{ ... }
 --		function MyComponent:doSomething() print "all interfaces" end
 --		function MyComponent.someItf:doSomething() print "just someItf" end
 --
@@ -196,7 +196,7 @@ end
 
 local ComponentMT = {}
 
-function co.Component( t )
+function co.IComponent( t )
 	local fullName = t.name
 	if not fullName then
 		error( "you must specify a component name", 2 )
@@ -224,7 +224,7 @@ function co.Component( t )
 		error( "component name '" .. fullName .. "' clashes with an existing type", 2 )
 	end
 
-	local tct = coNew( "co.TypeCreationTransactionComponent" ).transaction
+	local tct = coNew( "co.TypeCreationTransaction" ).transaction
 	local ok, ct = pcall( defineComponentType, ns, typeName, tct, provides, receives )
 	if ok then
 		tct:commit()

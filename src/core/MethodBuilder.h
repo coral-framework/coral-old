@@ -6,46 +6,46 @@
 #ifndef _METHODBUILDER_H_
 #define _METHODBUILDER_H_
 
-#include "MethodBuilderComponent_Base.h"
+#include "MethodBuilder_Base.h"
 #include <co/RefVector.h>
 #include <vector>
 
 namespace co {
 
-class Type;
-class MethodInfo;
-class TypeBuilder;
-class ExceptionType;
-class ParameterInfo;
+class IType;
+class IMethodInfo;
+class ITypeBuilder;
+class IExceptionType;
+class IParameterInfo;
 
 /*!
-	Component that implements co.MethodBuilder.
+	Implements co.IMethodBuilder.
  */
-class MethodBuilderComponent : public MethodBuilderComponent_Base
+class MethodBuilder : public MethodBuilder_Base
 {
 public:
-	MethodBuilderComponent();
-	virtual ~MethodBuilderComponent();
+	MethodBuilder();
+	virtual ~MethodBuilder();
 
 	// internal methods:
-	void init( TypeBuilder* typeBuilder, const std::string& name );
+	void init( ITypeBuilder* typeBuilder, const std::string& name );
 
-	// MethodBuilder methods:
-	TypeBuilder* getTypeBuilder();
+	// IMethodBuilder methods:
+	ITypeBuilder* getTypeBuilder();
 	const std::string& getMethodName();
-	void defineReturnType( Type* type );
-	void defineParameter( const std::string& name, Type* type, bool input, bool output );
-	void defineException( ExceptionType* exception );
+	void defineReturnType( IType* type );
+	void defineParameter( const std::string& name, IType* type, bool input, bool output );
+	void defineException( IExceptionType* exception );
 	void createMethod();
 
 private:
 	std::string _name;
-	RefPtr<TypeBuilder> _typeBuilder;
-	RefPtr<MethodInfo> _createdMethodInfo;
+	RefPtr<ITypeBuilder> _typeBuilder;
+	RefPtr<IMethodInfo> _createdMethodInfo;
 
-	Type* _returnType;
-	RefVector<ParameterInfo> _parameters;
-	std::vector<ExceptionType*> _expectedExceptions;
+	IType* _returnType;
+	RefVector<IParameterInfo> _parameters;
+	std::vector<IExceptionType*> _expectedExceptions;
 };
 
 } // namespace co

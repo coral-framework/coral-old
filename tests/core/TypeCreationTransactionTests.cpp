@@ -5,13 +5,12 @@
 
 #include "TestHelper.h"
 
-#include <core/Namespace.h>
-
 #include <co/RefPtr.h>
-#include <co/System.h>
-#include <co/StructType.h>
-#include <co/TypeBuilder.h>
-#include <co/TypeManager.h>
+#include <co/ISystem.h>
+#include <co/INamespace.h>
+#include <co/IStructType.h>
+#include <co/ITypeBuilder.h>
+#include <co/ITypeManager.h>
 #include <co/MissingInputException.h>
 #include <co/NotSupportedException.h>
 
@@ -19,8 +18,8 @@
 
 TEST( TypeCreationTransactionTests, throwOnCommitAfterSuccessfullCommit )
 {
-	co::RefPtr<co::TypeCreationTransaction> transaction = createTypeCreationTransaction();
-	co::RefPtr<co::TypeBuilder> builder = TestHelper::createBuilder( co::TK_ENUM, "TypeCreationTransactionTests.throwOnCommitAfterSuccessfullCommit.EnumType", transaction.get() );
+	co::RefPtr<co::ITypeCreationTransaction> transaction = createTypeCreationTransaction();
+	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_ENUM, "TypeCreationTransactionTests.throwOnCommitAfterSuccessfullCommit.IEnumType", transaction.get() );
 
 	builder->defineIdentifier( "foo" );
 
@@ -33,8 +32,8 @@ TEST( TypeCreationTransactionTests, throwOnCommitAfterSuccessfullCommit )
 
 TEST( TypeCreationTransactionTests, throwOnCommitAfterUnsuccessfullCommit )
 {
-	co::RefPtr<co::TypeCreationTransaction> transaction = createTypeCreationTransaction();
-	co::RefPtr<co::TypeBuilder> builder = TestHelper::createBuilder( co::TK_ENUM, "TypeCreationTransactionTests.throwOnCommitAfterUnsuccessfullCommit.EnumType", transaction.get() );
+	co::RefPtr<co::ITypeCreationTransaction> transaction = createTypeCreationTransaction();
+	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_ENUM, "TypeCreationTransactionTests.throwOnCommitAfterUnsuccessfullCommit.IEnumType", transaction.get() );
 
 	// invalid type creation since the enum has no identifiers
 	EXPECT_THROW( transaction->commit(), co::MissingInputException );
@@ -49,9 +48,9 @@ TEST( TypeCreationTransactionTests, throwOnCommitAfterUnsuccessfullCommit )
 
 TEST( TypeCreationTransactionTests, rollbackWithoutCommit )
 {
-	co::RefPtr<co::TypeCreationTransaction> transaction = createTypeCreationTransaction();
-	co::RefPtr<co::TypeBuilder> enumBuilder = TestHelper::createBuilder( co::TK_ENUM, "TypeCreationTransactionTests.transactionRollbackTest.EnumType", transaction.get() );
-	co::RefPtr<co::TypeBuilder> structBuilder = TestHelper::createBuilder( co::TK_STRUCT, "TypeCreationTransactionTests.transactionRollbackTest.StructType", transaction.get() );
+	co::RefPtr<co::ITypeCreationTransaction> transaction = createTypeCreationTransaction();
+	co::RefPtr<co::ITypeBuilder> enumBuilder = TestHelper::createBuilder( co::TK_ENUM, "TypeCreationTransactionTests.transactionRollbackTest.IEnumType", transaction.get() );
+	co::RefPtr<co::ITypeBuilder> structBuilder = TestHelper::createBuilder( co::TK_STRUCT, "TypeCreationTransactionTests.transactionRollbackTest.IStructType", transaction.get() );
 
 	ASSERT_NO_THROW( enumBuilder->defineIdentifier( "foo" ) );
 	ASSERT_NO_THROW( structBuilder->defineAttribute( "name", enumBuilder->createType(), false ) );
@@ -59,13 +58,13 @@ TEST( TypeCreationTransactionTests, rollbackWithoutCommit )
 	// force the creation of an array for the struct
 	ASSERT_NO_THROW( co::getSystem()->getTypes()->getArrayOf( structBuilder->createType() ) );
 	
-	ASSERT_TRUE( TestHelper::type( "TypeCreationTransactionTests.transactionRollbackTest.EnumType" ) != NULL );
-	ASSERT_TRUE( TestHelper::type( "TypeCreationTransactionTests.transactionRollbackTest.StructType" ) != NULL );
-	ASSERT_TRUE( TestHelper::type( "TypeCreationTransactionTests.transactionRollbackTest.StructType[]" ) != NULL );
+	ASSERT_TRUE( TestHelper::type( "TypeCreationTransactionTests.transactionRollbackTest.IEnumType" ) != NULL );
+	ASSERT_TRUE( TestHelper::type( "TypeCreationTransactionTests.transactionRollbackTest.IStructType" ) != NULL );
+	ASSERT_TRUE( TestHelper::type( "TypeCreationTransactionTests.transactionRollbackTest.IStructType[]" ) != NULL );
 
 	EXPECT_NO_THROW( transaction->rollback() );
 
-	EXPECT_TRUE( TestHelper::type( "TypeCreationTransactionTests.transactionRollbackTest.EnumType" ) == NULL );
-	EXPECT_TRUE( TestHelper::type( "TypeCreationTransactionTests.transactionRollbackTest.StructType" ) == NULL );
-	EXPECT_TRUE( TestHelper::type( "TypeCreationTransactionTests.transactionRollbackTest.StructType[]" ) == NULL );
+	EXPECT_TRUE( TestHelper::type( "TypeCreationTransactionTests.transactionRollbackTest.IEnumType" ) == NULL );
+	EXPECT_TRUE( TestHelper::type( "TypeCreationTransactionTests.transactionRollbackTest.IStructType" ) == NULL );
+	EXPECT_TRUE( TestHelper::type( "TypeCreationTransactionTests.transactionRollbackTest.IStructType[]" ) == NULL );
 }

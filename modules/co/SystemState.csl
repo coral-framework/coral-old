@@ -18,9 +18,9 @@ enum SystemState
 	// Modules can present user interface elements.
 	SystemState_IntegratingPresentation,
 
-	// System is running normally. The presentation is live.
+	// ISystem is running normally. The presentation is live.
 	SystemState_Running,
 
-	// System is being torn down. Presentation is closing. Modules are being disposed.
+	// ISystem is being torn down. Presentation is closing. Modules are being disposed.
 	SystemState_Disintegrating
 };

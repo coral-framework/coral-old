@@ -9,47 +9,47 @@
 
 namespace co {
 
-SystemComponent::SystemComponent()
+System::System()
 {
 	_state = SystemState_None;
-	_types = new TypeManagerComponent;
-	_modules = new ModuleManagerComponent;
-	_services = new ServiceManagerComponent;
+	_types = new TypeManager;
+	_modules = new ModuleManager;
+	_services = new ServiceManager;
 }
 
-SystemComponent::~SystemComponent()
+System::~System()
 {
 	// empty
 }
 
-void SystemComponent::initialize()
+void System::initialize()
 {
 	_types->initialize();
 	_modules->initialize();
 	_services->initialize();
 }
 
-SystemState SystemComponent::getState()
+SystemState System::getState()
 {
 	return _state;
 }
 
-TypeManager* SystemComponent::getTypes()
+ITypeManager* System::getTypes()
 {
 	return _types.get();
 }
 
-ModuleManager* SystemComponent::getModules()
+IModuleManager* System::getModules()
 {
 	return _modules.get();
 }
 
-ServiceManager* SystemComponent::getServices()
+IServiceManager* System::getServices()
 {
 	return _services.get();
 }
 
-void SystemComponent::setupBase( ArrayRange<std::string const> requiredModules )
+void System::setupBase( ArrayRange<std::string const> requiredModules )
 {
 	if( _state != SystemState_None )
 		throw LifeCycleException( "the system's state is not SystemState_None" );
@@ -66,7 +66,7 @@ void SystemComponent::setupBase( ArrayRange<std::string const> requiredModules )
 		_state = SystemState_None;
 		throw;
 	}
-	
+
 	_state = SystemState_Integrating;
 
 	_modules->updateModules( ModuleState_Integrated );
@@ -74,7 +74,7 @@ void SystemComponent::setupBase( ArrayRange<std::string const> requiredModules )
 	_state = SystemState_Integrated;
 }
 
-void SystemComponent::setupPresentation()
+void System::setupPresentation()
 {
 	if( _state != SystemState_Integrated )
 		throw LifeCycleException( "the system's state is not SystemState_Integrated" );
@@ -86,7 +86,7 @@ void SystemComponent::setupPresentation()
 	_state = SystemState_Running;
 }
 
-void SystemComponent::tearDown()
+void System::tearDown()
 {
 	if( _state != SystemState_Running )
 		throw LifeCycleException( "the system's state is not SystemState_Running" );
@@ -104,6 +104,6 @@ void SystemComponent::tearDown()
 	_state = SystemState_None;
 }
 
-CORAL_EXPORT_COMPONENT( SystemComponent, SystemComponent );
+CORAL_EXPORT_COMPONENT( System, System );
 
 } // namespace co

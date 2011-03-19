@@ -1,0 +1,11 @@
+/*
+	Describes an interface (either a facet or receptacle) as part of a component.
+ */
+interface IInterfaceInfo : IMemberInfo
+{
+	// The interface type.
+	readonly attribute IInterfaceType type;
+
+	//! True if this interface is a facet. False if it is a receptacle.
+	readonly attribute bool isFacet;
+};

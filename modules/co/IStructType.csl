@@ -1,0 +1,6 @@
+/*
+	An ordered set of named fields of various types.
+ */
+interface IStructType : ICompoundType, IAttributeContainer
+{
+};

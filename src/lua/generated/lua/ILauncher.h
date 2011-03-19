@@ -27,7 +27,7 @@ public:
 namespace co {
 template<> struct kindOf<lua::ILauncher> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<lua::ILauncher> { static const char* get() { return "lua.ILauncher"; } };
-template<> struct typeOf<lua::ILauncher> : public typeOfBase<lua::ILauncher, InterfaceType> {};
+template<> struct typeOf<lua::ILauncher> : public typeOfBase<lua::ILauncher, IInterfaceType> {};
 } // namespace co
 
 #endif // _LUA_ILAUNCHER_H_

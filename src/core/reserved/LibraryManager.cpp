@@ -8,7 +8,7 @@
 #include <map>
 #include <vector>
 
-typedef std::map<co::ModulePart*, co::RefPtr<co::Library> > LibraryMap;
+typedef std::map<co::IModulePart*, co::RefPtr<co::Library> > LibraryMap;
 typedef std::vector<co::RefPtr<co::Library> > LibraryList;
 
 namespace
@@ -17,12 +17,12 @@ namespace
 	LibraryList sg_releasedLibs;
 }
 
-void co::LibraryManager::add( co::ModulePart* part, co::Library* library )
+void co::LibraryManager::add( co::IModulePart* part, co::Library* library )
 {	
 	sg_loadedLibs.insert( LibraryMap::value_type( part, library ) );
 }
 
-void co::LibraryManager::release( co::ModulePart* part )
+void co::LibraryManager::release( co::IModulePart* part )
 {
 	LibraryMap::iterator it = sg_loadedLibs.find( part );
 	if( it == sg_loadedLibs.end() )

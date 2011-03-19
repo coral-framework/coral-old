@@ -6,10 +6,10 @@
 #ifndef _MEMBERINFO_H_
 #define _MEMBERINFO_H_
 
-#include <co/MemberInfo.h>
+#include <co/IMemberInfo.h>
 
 /*!
-	Re-usable implementation of co::MemberInfo.
+	Re-usable implementation of co::IMemberInfo.
  */
 class MemberInfoImpl
 {
@@ -18,22 +18,22 @@ public:
 
 	// internal methods:
 	void setName( const std::string& name );
-	void setOwner( co::CompoundType* owner, size_t index );
+	void setOwner( co::ICompoundType* owner, size_t index );
 
-	// co::MemberInfo methods:
+	// co::IMemberInfo methods:
 	const std::string& getName();
-	co::CompoundType* getOwner();
-	co::uint32 getIndex();
+	co::ICompoundType* getOwner();
+	co::uint16 getIndex();
 
 private:
 	std::string _name;
-	co::CompoundType* _owner;
-	co::uint32 _index;
+	co::ICompoundType* _owner;
+	co::uint16 _index;
 };
 
 #define DELEGATE_CO_MEMBERINFO_METHODS( DELEGATE ) \
 	virtual const std::string& getName() { return DELEGATE getName(); } \
-	virtual co::CompoundType* getOwner() { return DELEGATE getOwner(); } \
-	virtual co::uint32 getIndex() { return DELEGATE getIndex(); }
+	virtual co::ICompoundType* getOwner() { return DELEGATE getOwner(); } \
+	virtual co::uint16 getIndex() { return DELEGATE getIndex(); }
 
 #endif

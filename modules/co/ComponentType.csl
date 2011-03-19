@@ -1,14 +1,7 @@
 /*
-	The blueprint of a component.
+	Implements co.IComponentType.
  */
-interface ComponentType : CompoundType
+component ComponentType
 {
-	// List of all member interfaces (both facets and receptacles) of this component.
-	readonly attribute InterfaceInfo[] interfaces;
-
-	// List of all facets (server interfaces) of this component.
-	readonly attribute InterfaceInfo[] facets;
-
-	// List of all receptacles (client interfaces) of this component.
-	readonly attribute InterfaceInfo[] receptacles;
+	provides IComponentType type;
 };

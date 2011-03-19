@@ -13,22 +13,22 @@
 
 namespace lua {
 
-ModulePartLoader::ModulePartLoader()
+IModulePartLoader::IModulePartLoader()
 {
 	// empty
 }
 
-ModulePartLoader::~ModulePartLoader()
+IModulePartLoader::~IModulePartLoader()
 {
 	// empty
 }
 
-bool ModulePartLoader::canLoadModulePart( const std::string& moduleName )
+bool IModulePartLoader::canLoadModulePart( const std::string& moduleName )
 {
 	return locateModuleLibrary( moduleName );
 }
 
-co::ModulePart* ModulePartLoader::loadModulePart( const std::string& moduleName )
+co::IModulePart* IModulePartLoader::loadModulePart( const std::string& moduleName )
 {
 	std::string libraryFilename;
 	if( !locateModuleLibrary( moduleName, &libraryFilename ) )
@@ -48,7 +48,7 @@ co::ModulePart* ModulePartLoader::loadModulePart( const std::string& moduleName 
 	return new ModulePart;
 }
 
-bool ModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::string* filename )
+bool IModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::string* filename )
 {
 	const char* moduleBaseName = moduleName.c_str();
 	size_t lastDotPos = moduleName.rfind( '.' );
@@ -67,6 +67,6 @@ bool ModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::
 									filename ? *filename : filePath );
 }
 
-CORAL_EXPORT_COMPONENT( ModulePartLoader, ModulePartLoader );
+CORAL_EXPORT_COMPONENT( IModulePartLoader, ModulePartLoader );
 
 } // namespace lua

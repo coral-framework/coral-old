@@ -24,53 +24,53 @@ ENDMACRO( CORAL_ENABLE_TEST_COVERAGE )
 ################################################################################
 # Adds a file to the list of files to be cleaned in a directory
 ################################################################################
-MACRO( CORAL_ADD_TO_CLEAN filename )
+MACRO( CORAL_ADD_TO_MAKE_CLEAN filename )
 	SET_PROPERTY( DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${filename}" )
-ENDMACRO( CORAL_ADD_TO_CLEAN )
+ENDMACRO( CORAL_ADD_TO_MAKE_CLEAN )
 
 ################################################################################
 # Doxygen Macro
 ################################################################################
 # Creates an optional target to generate documentation using Doxygen.
 #
-# This command will pre-process the file "${CMAKE_CURRENT_SOURCE_DIR}/${doxyfile_name}",
-# using the CONFIGURE_FILE() command, save it to "${CMAKE_CURRENT_BINARY_DIR}/${doxyfile_name}"
-# and then run doxygen on the saved file within the ${CMAKE_CURRENT_BINARY_DIR} dir.
+# This macro will preprocess the file "${CMAKE_CURRENT_SOURCE_DIR}/${doxyfileName}"
+# using CONFIGURE_FILE(), save the result to ${CMAKE_CURRENT_BINARY_DIR} and then
+# run Doxygen on the file from that dir.
 #
-# Prototype:
-#     CORAL_GENERATE_DOXYGEN( target_name doxyfile_name )
 # Parameters:
-#     target_name     Name given to the target that generates the documentation.
-#     doxyfile_name   Name of the Doxygen config file.
+#     targetName     Name given to the custom target.
+#     doxyfileName   Name of the Doxygen config file in the current source dir.
 #
-# Extra args are passed at the end of the custom target's list of args to Doxygen.
+# Extra arguments are passed along to Doxygen when invoking the command.
 #
-MACRO( CORAL_GENERATE_DOXYGEN target_name doxyfile_name )
+MACRO( CORAL_GENERATE_DOXYGEN targetName doxyfileName )
+
 	FIND_PACKAGE( Doxygen )
+
 	IF( DOXYGEN_FOUND )
 		SET( DOXYFILE_FOUND false )
-		IF( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${doxyfile_name}" )
+		IF( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${doxyfileName}" )
 			SET( DOXYFILE_FOUND true )
 		ENDIF()
 
 		IF( DOXYFILE_FOUND )
 
-			MESSAGE( STATUS "Setting up Doxygen target '${target_name}'..." )
+			MESSAGE( STATUS "Setting up Doxygen target '${targetName}'..." )
 
-			CONFIGURE_FILE( "${CMAKE_CURRENT_SOURCE_DIR}/${doxyfile_name}" "${CMAKE_CURRENT_BINARY_DIR}/${doxyfile_name}.configured" )
+			CONFIGURE_FILE( "${CMAKE_CURRENT_SOURCE_DIR}/${doxyfileName}" "${CMAKE_CURRENT_BINARY_DIR}/${doxyfileName}.configured" )
 
-			ADD_CUSTOM_TARGET( ${target_name}
+			ADD_CUSTOM_TARGET( ${targetName}
 				COMMENT "Running Doxygen..."
 				WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-				COMMAND ${DOXYGEN_EXECUTABLE} "${CMAKE_CURRENT_BINARY_DIR}/${doxyfile_name}.configured" ${ARGN}
+				COMMAND ${DOXYGEN_EXECUTABLE} "${CMAKE_CURRENT_BINARY_DIR}/${doxyfileName}.configured" ${ARGN}
 			)
 
-			SET_TARGET_PROPERTIES( ${target_name} PROPERTIES PROJECT_LABEL "Doxygen" )
+			SET_TARGET_PROPERTIES( ${targetName} PROPERTIES PROJECT_LABEL "Doxygen" )
 
 			# Add .tag file and generated documentation to the list of files we must erase when distcleaning
 
 			# Read doxygen configuration file
-			FILE( READ "${CMAKE_CURRENT_BINARY_DIR}/${doxyfile_name}.configured" DOXYFILE_CONTENTS )
+			FILE( READ "${CMAKE_CURRENT_BINARY_DIR}/${doxyfileName}.configured" DOXYFILE_CONTENTS )
 			STRING( REGEX REPLACE "\n" ";" DOXYFILE_LINES ${DOXYFILE_CONTENTS} )
 
 			# Parse .tag filename and add to list of files to delete if it exists
@@ -88,11 +88,11 @@ MACRO( CORAL_GENERATE_DOXYGEN target_name doxyfile_name )
 			FILE( TO_CMAKE_PATH "${DOXYGEN_HTML_OUTPUT}" DOXYGEN_HTML_OUTPUT )
 
 			IF( DOXYGEN_TAG_FILE )
-				CORAL_ADD_TO_CLEAN( "${CMAKE_CURRENT_BINARY_DIR}/${DOXYGEN_TAG_FILE}" )
+				CORAL_ADD_TO_MAKE_CLEAN( "${CMAKE_CURRENT_BINARY_DIR}/${DOXYGEN_TAG_FILE}" )
 			ENDIF()
 
 			IF( DOXYGEN_OUTPUT_DIRECTORY AND DOXYGEN_HTML_OUTPUT )
-				CORAL_ADD_TO_CLEAN( "${DOXYGEN_OUTPUT_DIRECTORY}/${DOXYGEN_HTML_OUTPUT}" )
+				CORAL_ADD_TO_MAKE_CLEAN( "${DOXYGEN_OUTPUT_DIRECTORY}/${DOXYGEN_HTML_OUTPUT}" )
 			ENDIF()
 
 		ELSE( DOXYFILE_FOUND )
@@ -101,4 +101,5 @@ MACRO( CORAL_GENERATE_DOXYGEN target_name doxyfile_name )
 	ELSE( DOXYGEN_FOUND )
 		MESSAGE( "Doxygen not found - documentation will not be generated." )
 	ENDIF( DOXYGEN_FOUND )
+
 ENDMACRO( CORAL_GENERATE_DOXYGEN )

@@ -18,7 +18,7 @@ local function template( writer, c, t )
 	end
 
 	if t.kind == 'TK_INTERFACE' then
-		includeIfNotIncluded( "co.DynamicProxyHandler" )
+		includeIfNotIncluded( "co.IDynamicProxyHandler" )
 	end
 
 	for fullName, type in pairs( requiredTypes ) do
@@ -26,10 +26,10 @@ local function template( writer, c, t )
 	end
 
 	if t.memberAttributes then
-		if t.memberMethods and not requiredTypes["co.MethodInfo"] then
-			includeIfNotIncluded( "co.MethodInfo" )
+		if t.memberMethods and not requiredTypes["co.IMethodInfo"] then
+			includeIfNotIncluded( "co.IMethodInfo" )
 		end
-		includeIfNotIncluded( "co.AttributeInfo" )
+		includeIfNotIncluded( "co.IAttributeInfo" )
 		if t.memberMethods then
 			includeIfNotIncluded( "co.IllegalCastException" )
 		end
@@ -37,7 +37,7 @@ local function template( writer, c, t )
 		includeIfNotIncluded( "co.IllegalArgumentException" )
 	end
 
-	if t.fullName == 'co.Reflector' and not requiredTypes["co.NotSupportedException"] then
+	if t.fullName == 'co.IReflector' and not requiredTypes["co.NotSupportedException"] then
 		writer( "#include <co/NotSupportedException.h>\n" )
 	end
 
@@ -59,7 +59,7 @@ local function template( writer, c, t )
 		writer( [[
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
 co::int32 __]], t.name, [[_getSize();
-co::Component* __]], t.name, [[_newInstance();
+co::IComponent* __]], t.name, [[_newInstance();
 
 ]] )
 	end
@@ -79,7 +79,7 @@ void moduleRelease();
 class ]], t.name, [[_Proxy : public ]], t.cppName, "\n", [[
 {
 public:
-	]], t.name, [[_Proxy( co::DynamicProxyHandler* handler ) : _handler( handler )
+	]], t.name, [[_Proxy( co::IDynamicProxyHandler* handler ) : _handler( handler )
 	{
 ]], c.moduleName == 'co' and '' or "\t\tmoduleRetain();\n", [[
 		_cookie = _handler->registerProxyInterface( co::disambiguate<co::Interface, ]], t.cppName, [[>( this ) );
@@ -92,8 +92,8 @@ public:
 
 	// co::Interface Methods:
 
-	co::InterfaceType* getInterfaceType() { return co::typeOf<]], t.cppName, [[>::get(); }
-	co::Component* getInterfaceOwner() { return _handler->getInterfaceOwner(); }
+	co::IInterfaceType* getInterfaceType() { return co::typeOf<]], t.cppName, [[>::get(); }
+	co::IComponent* getInterfaceOwner() { return _handler->getInterfaceOwner(); }
 	const std::string& getInterfaceName() { return _handler->getProxyInterfaceName( _cookie ); }
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
@@ -171,23 +171,23 @@ public:
 			generateProxyMethodsFor( t )
 		end
 
-		if t.fullName == 'co.Reflector' then
+		if t.fullName == 'co.IReflector' then
 			writer [[
-	// These co::Reflector methods are not part of the reflection system:
+	// These co::IReflector methods are not part of the reflection system:
 
 	void createValue( void*, size_t )
 	{
-		throw co::NotSupportedException( "co::Reflector::createValue() cannot be called through a proxy interface." );
+		throw co::NotSupportedException( "co::IReflector::createValue() cannot be called through a proxy interface." );
 	}
 
 	void copyValue( const void*, void* )
 	{
-		throw co::NotSupportedException( "co::Reflector::copyValue() cannot be called through a proxy interface." );
+		throw co::NotSupportedException( "co::IReflector::copyValue() cannot be called through a proxy interface." );
 	}
 
 	void destroyValue( void* )
 	{
-		throw co::NotSupportedException( "co::Reflector::destroyValue() cannot be called through a proxy interface." );
+		throw co::NotSupportedException( "co::IReflector::destroyValue() cannot be called through a proxy interface." );
 	}
 
 ]]
@@ -196,19 +196,19 @@ public:
 		writer( [[
 protected:
 	template<typename T>
-	co::AttributeInfo* getAttribInfo( co::uint32 index )
+	co::IAttributeInfo* getAttribInfo( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getMemberAttributes()[index];
 	}
 
 	template<typename T>
-	co::MethodInfo* getMethodInfo( co::uint32 index )
+	co::IMethodInfo* getMethodInfo( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getMemberMethods()[index];
 	}
 
 private:
-	co::DynamicProxyHandler* _handler;
+	co::IDynamicProxyHandler* _handler;
 	co::uint32 _cookie;
 };
 
@@ -219,7 +219,7 @@ private:
 	--- End of Interface Proxy ---
 
 	writer( [[
-// ------ Reflector ------ //
+// ------ IReflector ------ //
 
 class ]], t.name, [[_Reflector : public co::ReflectorBase
 {
@@ -234,7 +234,7 @@ public:
 		]], c.moduleName == 'co' and "// empty" or "moduleRelease();", "\n", [[
 	}
 
-	co::Type* getType()
+	co::IType* getType()
 	{
 		return ]] )
 
@@ -253,9 +253,9 @@ public:
 		return __]], t.name, [[_getSize();
 	}
 
-	co::Component* newInstance()
+	co::IComponent* newInstance()
 	{
-		co::Component* component = __]], t.name, [[_newInstance();
+		co::IComponent* component = __]], t.name, [[_newInstance();
 		assert( component->getComponentType()->getFullName() == "]], t.fullName, [[" );
 		return component;
 	}
@@ -294,7 +294,7 @@ public:
 	elseif t.kind == 'TK_INTERFACE' then
 		writer( [[
 
-	co::Interface* newProxy( co::DynamicProxyHandler* handler )
+	co::Interface* newProxy( co::IDynamicProxyHandler* handler )
 	{
 		checValidProxyHandler( handler );
 		return co::disambiguate<co::Interface, ]], t.cppName, [[>( new ]], c.moduleNS, [[::]], t.name, [[_Proxy( handler ) );
@@ -306,7 +306,7 @@ public:
 
 		writer( [[
 
-	void getAttribute( const co::Any& instance, co::AttributeInfo* ai, co::Any& value )
+	void getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value )
 	{
 		]], t.cppName, [[* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
@@ -323,7 +323,7 @@ public:
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::AttributeInfo* ai, const co::Any& value )
+	void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value )
 	{
 		]], t.cppName, [[* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
@@ -348,7 +348,7 @@ public:
 
 		local callPrefix = ( t.kind == 'TK_NATIVECLASS' and t.cppName .. "_Adapter::" or "p->" )
 
-		writer( "\n\tvoid getAttribute( const co::Any& instance, co::AttributeInfo* ai, co::Any& value )\n\t{\n" )
+		writer( "\n\tvoid getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value )\n\t{\n" )
 
 		if #t.memberAttributes > 0 then
 			writer( "\t\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "& r" or "* p" ), [[ = checkInstance( instance, ai );
@@ -375,7 +375,7 @@ public:
 		writer [[
 	}
 
-	void setAttribute( const co::Any& instance, co::AttributeInfo* ai, const co::Any& value )
+	void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value )
 	{
 ]]
 		if #t.memberAttributes > 0 then
@@ -409,7 +409,7 @@ public:
 		writer [[
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
+	void invokeMethod( const co::Any& instance, co::IMethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 ]]
 		if #t.memberMethods > 0 then
@@ -488,7 +488,7 @@ public:
 		if t.memberAttributes then
 			writer( "\nprivate:\n" )
 			writer( "\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "&" or "*" ),
-				[[ checkInstance( const co::Any& any, co::MemberInfo* member )
+				[[ checkInstance( const co::Any& any, co::IMemberInfo* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
@@ -509,7 +509,7 @@ public:
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid ]], t.cppName, [[*, but got " << any );
 
 		// make sure that 'member' belongs to this type
-		co::CompoundType* owner = member->getOwner();
+		co::ICompoundType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to ]], t.fullName, [[" );
@@ -530,9 +530,9 @@ public:
 	writer( [[
 };
 
-// ------ Reflector Creation Function ------ //
+// ------ IReflector Creation Function ------ //
 
-co::Reflector* __create]], t.name, [[Reflector()
+co::IReflector* __create]], t.name, [[IReflector()
 {
     return new ]], t.name, [[_Reflector;
 }

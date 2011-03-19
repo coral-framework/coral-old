@@ -7,36 +7,36 @@
 #define _MODULE_H_
 
 #include "Namespace.h"
-#include "ModuleComponent_Base.h"
+#include "Module_Base.h"
 #include <co/RefVector.h>
-#include <co/ModulePart.h>
+#include <co/IModulePart.h>
 
 namespace co {
 
 /*!
-	Component that implements co.Module.
+	Implements co.IModule.
  */
-class ModuleComponent : public ModuleComponent_Base
+class Module : public Module_Base
 {
 public:
-	ModuleComponent();
-	virtual ~ModuleComponent();
+	Module();
+	virtual ~Module();
 
 	// internal methods:
 	void initialize( const std::string& moduleName );
 
 	/*!
-		Adds a ModulePart as a constituent part of this Module.
+		Adds a constituent part of this module.
 
 		The module's state must be ModuleState_None when this method is called,
 		or a LifeCycleException will be raised.
 	 */
-	void addPart( ModulePart* part );
+	void addPart( IModulePart* part );
 
-	// Module methods:
+	// IModule methods:
 	ModuleState getState();
-	Namespace* getNamespace();
-	ArrayRange<ModulePart* const> getParts();
+	INamespace* getNamespace();
+	ArrayRange<IModulePart* const> getParts();
 	int32 getRank();
 	void setRank( int32 rank );
 	void initialize();
@@ -48,8 +48,8 @@ public:
 
 private:
 	ModuleState _state;
-	Namespace* _namespace;
-	RefVector<ModulePart> _parts;
+	INamespace* _namespace;
+	RefVector<IModulePart> _parts;
 	int32 _rank;
 };
 

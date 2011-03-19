@@ -9,7 +9,7 @@
 
 namespace co {
 
-// ------ Reflector ------ //
+// ------ IReflector ------ //
 
 class LifeCycleException_Reflector : public co::ReflectorBase
 {
@@ -24,7 +24,7 @@ public:
 		// empty
 	}
 
-	co::Type* getType()
+	co::IType* getType()
 	{
 		return co::typeOf<co::LifeCycleException>::get();
 	}
@@ -40,9 +40,9 @@ public:
 	}
 };
 
-// ------ Reflector Creation Function ------ //
+// ------ IReflector Creation Function ------ //
 
-co::Reflector* __createLifeCycleExceptionReflector()
+co::IReflector* __createLifeCycleExceptionIReflector()
 {
     return new LifeCycleException_Reflector;
 }

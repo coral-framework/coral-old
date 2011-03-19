@@ -9,7 +9,7 @@
 
 namespace co {
 
-// ------ Reflector ------ //
+// ------ IReflector ------ //
 
 class ModuleLoadException_Reflector : public co::ReflectorBase
 {
@@ -24,7 +24,7 @@ public:
 		// empty
 	}
 
-	co::Type* getType()
+	co::IType* getType()
 	{
 		return co::typeOf<co::ModuleLoadException>::get();
 	}
@@ -40,9 +40,9 @@ public:
 	}
 };
 
-// ------ Reflector Creation Function ------ //
+// ------ IReflector Creation Function ------ //
 
-co::Reflector* __createModuleLoadExceptionReflector()
+co::IReflector* __createModuleLoadExceptionIReflector()
 {
     return new ModuleLoadException_Reflector;
 }

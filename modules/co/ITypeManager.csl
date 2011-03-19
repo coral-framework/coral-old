@@ -1,0 +1,64 @@
+/*
+	Manages the database of loaded types, providing methods to load and create new types.
+ */
+interface ITypeManager
+{
+	// The 'global' (root) namespace, which gives hierarchical access to all types, namespaces and modules.
+	readonly attribute INamespace rootNS;
+
+	/*
+		If true, newly parsed CSL files will generate entries in the documentation database.
+		See getDocumentation(). Default is true. Can be set to false in order to save memory.
+	 */
+	attribute bool documentationParsing;
+
+	/*
+		Searches the database of loaded types for a type with the given fully-qualified name.
+		A suffix "[]" may be added to the name of a type to search for its corresponding IArrayType.
+		Returns null if a type with the given \a fullName is not currently loaded.
+	 */
+ 	IType findType( in string fullName );
+
+ 	/*
+ 		Searches the namespace hierarchy for a namespace with the given fully-qualified name.
+ 		Returns null if the namespace does not exist (i.e. has not been created yet).
+ 	 */
+ 	INamespace findNamespace( in string fullName );
+
+	/*
+		Either retrieves or tries to load the type with the given fully-qualified \a typeName.
+
+		This can also retrieve or create arrays: if \a typeName ends with "[]", this method will
+		call getArrayOf() passing as argument the element type specified in \a typeName.
+
+		\throw IllegalArgumentException if the passed \a typeName is empty.
+		\throw TypeLoadException if any error occurs while loading the type.
+		\throw IllegalArgumentException when dealing with arrays, this is thrown if \a typeName
+			specifies an invalid array element type (i.e. an array, exception or component).
+	 */
+	IType getType( in string typeName ) raises IllegalArgumentException, TypeLoadException;
+
+	/*
+		Creates or retrieves an existing IArrayType whose elements are of type \a elementType.
+		\throw IllegalArgumentException if \a elementType is null, an array, an exception or a component.
+	 */
+	IArrayType getArrayOf( in IType elementType ) raises IllegalArgumentException;
+
+	/*
+		A lower-level counterpart of getType() that either retrieves or tries to load a type
+		without raising exceptions.
+
+		In case of errors, this method will add detailed information to the \a errorStack
+		and return null. The \a errorStack is sorted from the outermost to the innermost error.
+
+		\note This method does NOT create arrays, but can retrieve existing array types.
+	 */
+	IType loadType( in string typeName, out CSLError[] errorStack );
+
+	/*
+		Gets the documentation associated with either a type or a member.
+		Returns an empty string if the type/member has no documentation, or if the type has not been
+		loaded yet. Member names are formatted like the following: <tt>"name.space.TypeName:memberName"</tt>.
+	 */
+	string getDocumentation( in string typeOrMemberName );
+};

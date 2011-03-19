@@ -1,0 +1,44 @@
+/*
+	Works in conjunction with a ITypeBuilder to define methods for new types.
+ */
+interface IMethodBuilder
+{
+	// The ITypeBuilder to which this IMethodBuilder belongs to.
+	readonly attribute ITypeBuilder typeBuilder;
+
+	// The future name of the method when it's created.
+	readonly attribute string methodName;
+
+	/*
+		Defines the return type of the method.
+		\throw NotSupportedException if the method's return type was already defined or if the parent type was already created.
+		\throw IllegalArgumentException if the passed \a type is invalid (e.g. null).
+	 */
+	void defineReturnType( in IType type )
+		raises NotSupportedException, IllegalArgumentException;
+
+	/*
+		Adds a parameter to the method.
+		\throw NotSupportedException if the parent type was already created.
+		\throw IllegalNameException if the passed \a name is not a valid identifier or clashes with other parameters.
+		\throw IllegalArgumentException if the passed \a type is invalid (e.g. null) or if both input and output are false.
+	 */
+	void defineParameter( in string name, in IType type, in bool input, in bool output )
+		raises IllegalNameException, IllegalArgumentException;
+
+	/*
+		Adds an exception type that can be raised by the method.
+		\throw NotSupportedException if the parent type was already created.
+		\throw IllegalArgumentException if the passed \a exceptionType is invalid (e.g. null).
+	 */
+	void defineException( in IExceptionType exceptionType )
+		raises IllegalArgumentException;
+
+	/*
+		Uses the data provided thus far to add a method to the ITypeBuilder that owns this IMethodBuilder.
+		\throw NotSupportedException if the parent type was already created.
+		\throw MemberClashException if another member with a clashing name was added to the type since this builder's creation.
+		\throw MissingInputException if the reference to the ITypeBuilder that owns this IMethodBuilder is null.
+	 */
+	void createMethod() raises IllegalNameException, MissingInputException;
+};

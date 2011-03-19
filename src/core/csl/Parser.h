@@ -6,11 +6,10 @@
 #ifndef _CO_CSL_PARSER_H_
 #define _CO_CSL_PARSER_H_
 
-#include <co/System.h>
 #include <co/RefPtr.h>
 #include <co/TypeKind.h>
-#include <co/TypeBuilder.h>
-#include <co/MethodBuilder.h>
+#include <co/ITypeBuilder.h>
+#include <co/IMethodBuilder.h>
 #include <map>
 #include <string>
 
@@ -22,9 +21,9 @@ typedef struct ANTLR3_COMMON_TOKEN_STREAM_struct* pANTLR3_COMMON_TOKEN_STREAM;
 
 namespace co {
 
-class Type;
-class Namespace;
-class TypeCreationTransaction;
+class IType;
+class INamespace;
+class ITypeCreationTransaction;
 
 namespace csl {
 
@@ -61,12 +60,12 @@ public:
 	void onEndMethod();
 
 protected:
-	//! Template method: creates the TypeBuilder for the type being parsed.
-	virtual TypeBuilder* createTypeBuilder( const std::string& typeName, TypeKind kind ) = 0;
+	//! Template method: creates the ITypeBuilder for the type being parsed.
+	virtual ITypeBuilder* createTypeBuilder( const std::string& typeName, TypeKind kind ) = 0;
 
 	//! Template method: resolves a type given its \a typeName and whether it is an array.
 	//! \param typeName may be a full or relative type name.
-	virtual Type* resolveType( const std::string& typeName, bool isArray = false ) = 0;
+	virtual IType* resolveType( const std::string& typeName, bool isArray = false ) = 0;
 
 	/*!
 		Template method: adds the passed \a text as documentation for the specified \a member of the
@@ -77,13 +76,13 @@ protected:
 	//!	Template method: adds the passed \a text as a c++ block to be used by the type that is beeing defined.
 	virtual void addCppBlock( const std::string& text ) = 0;
 
-	//! Returns the type created by our TypeBuilder.
+	//! Returns the type created by our ITypeBuilder.
 	//! Notice that onTypeSpecification() should have been called before.
-	Type* getType();
+	IType* getType();
 
-	//! Retrieves an imported Type* given its local type name (i.e. its alias).
+	//! Retrieves an imported IType* given its local type name (i.e. its alias).
 	//! Returns NULL if the alias does not identify an imported type.
-	Type* findImportedType( const std::string& alias );
+	IType* findImportedType( const std::string& alias );
 
 private:
 	struct ImportInfo
@@ -94,7 +93,7 @@ private:
 
 		std::string typeName;	// full or relative type name
 		uint32 line;			// line number of the import
-		Type* type;				// resolved type (only after calling resolveImports())
+		IType* type;				// resolved type (only after calling resolveImports())
 	};
 
 	typedef std::map<std::string, ImportInfo> ImportTypeMap;
@@ -114,12 +113,12 @@ private:
 	// formats the passed input removing any '\r' character
 	void filterText( const std::string& input, std::string& output );
 
-	Type* getLastDeclaredType();
+	IType* getLastDeclaredType();
 
 private:
 	uint32 _currentLine;
-	RefPtr<TypeBuilder> _typeBuilder;
-	RefPtr<MethodBuilder> _methodBuilder;
+	RefPtr<ITypeBuilder> _typeBuilder;
+	RefPtr<IMethodBuilder> _methodBuilder;
 
 	pCSLLexer _lexer;
 	pCSLParser _parser;

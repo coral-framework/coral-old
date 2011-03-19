@@ -5,7 +5,7 @@
 
 #include <co/RefVector.h>
 #include <co/Interface.h>
-#include <co/Namespace.h>
+#include <co/INamespace.h>
 #include <gtest/gtest.h>
 
 class PseudoInterface : public co::Interface
@@ -21,8 +21,8 @@ public:
 			*_setToTrueWhenDestroyed = true;
 	}
 
-	virtual co::InterfaceType* getInterfaceType() { return 0; }
-	virtual co::Component* getInterfaceOwner() { return 0; }
+	virtual co::IInterfaceType* getInterfaceType() { return 0; }
+	virtual co::IComponent* getInterfaceOwner() { return 0; }
 	virtual const std::string& getInterfaceName() { return _name; }
 	virtual void componentRetain() { ++_refCount; }
 	virtual void componentRelease() { if( --_refCount <= 0 ) delete this; }
@@ -84,7 +84,7 @@ TEST( RefVectorTests, castedPtrRange )
 	EXPECT_EQ( range.getSize(), 3 );
 	
 	// invalid usage sample (causes compile-time error):
-	//co::ArrayRange<co::Namespace*> invalidRange( refVec );
+	//co::ArrayRange<co::INamespace*> invalidRange( refVec );
 }
 
 inline int pseudoInterfaceComparator( PseudoInterface* element, const std::string& name )

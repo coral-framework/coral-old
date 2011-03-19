@@ -20,26 +20,28 @@ class RefPtr
 {
 public:
 	//! Default constructor.
-	RefPtr() : _ptr( 0 )
+	inline RefPtr() : _ptr( 0 )
 	{;}
 
 	//! Constructor taking a raw pointer.
-	RefPtr( T* p ) : _ptr( p )
+	inline RefPtr( T* p ) : _ptr( p )
 	{
 		tryRetain();
 	}
 
 	//! Copy constructor.
-	RefPtr( const RefPtr& other ) : _ptr( other._ptr )
+	inline RefPtr( const RefPtr& other ) : _ptr( other._ptr )
 	{
 		tryRetain();
 	}
 
-	//! Destructor
-	~RefPtr()
+	//! Destructor.
+	inline ~RefPtr()
 	{
 		tryRelease();
-		_ptr = 0;
+		#ifndef CORAL_NDEBUG
+			_ptr = 0;
+		#endif
 	}
 
 	//! Assignment operator.
@@ -100,8 +102,8 @@ public:
 
 	//! Member access operator.
 	//@{
-	inline T* operator->() { return _ptr; }
-	inline const T* operator->() const { return _ptr; }
+	inline T* operator -> () { return _ptr; }
+	inline const T* operator -> () const { return _ptr; }
 	//@}
 
 	//! Invalid (i.e. null) internal pointer test operator.
@@ -115,12 +117,12 @@ public:
 	inline T* get() { return _ptr; }
 	inline const T* get() const { return _ptr; }
 	//@}
-	
+
 	/*!
-		Efficiently swaps the internal pointers of two RefPtr's.
-		This saves two co::Interface::componentRetain() and two co::Interface::componentRelease() calls.
+		Efficiently swaps the internal pointers of two co::RefPtr's.
+		This saves two componentRetain() and two componentRelease() calls.
 	 */
-	void swap( RefPtr& other )
+	inline void swap( RefPtr& other )
 	{
 		T* temp = _ptr;
 		_ptr = other._ptr;
@@ -146,10 +148,13 @@ private:
 
 } // namespace co
 
+#ifndef DOXYGEN
+//! Output stream operator overload.
 template<typename T>
 inline std::ostream& operator << ( std::ostream& stream, const co::RefPtr<T>& rp )
 {
 	return stream << "co::RefPtr( " << rp.get() << " )";
 }
+#endif
 
 #endif

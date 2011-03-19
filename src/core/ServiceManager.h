@@ -6,37 +6,37 @@
 #ifndef _SERVICEMANAGER_H_
 #define _SERVICEMANAGER_H_
 
-#include "ServiceManagerComponent_Base.h"
-#include <co/ComponentType.h>
+#include "ServiceManager_Base.h"
+#include <co/IComponentType.h>
 #include <map>
 
 namespace co {
 
 /*!
-	Component that implements co.ServiceManager.
+	Implements co.IServiceManager.
  */
-class ServiceManagerComponent : public ServiceManagerComponent_Base
+class ServiceManager : public ServiceManager_Base
 {
 public:
-	ServiceManagerComponent();
-	virtual ~ServiceManagerComponent();
+	ServiceManager();
+	virtual ~ServiceManager();
 
 	// internal methods:
 	void initialize();
 	void tearDown();
 
-	// ServiceManager methods:
+	// IServiceManager methods:
 	bool getIsLazy();
 	void setIsLazy( bool isLazy );
-	void addService( InterfaceType* serviceType, Interface* serviceInstance );
-	void addServiceForType( InterfaceType* serviceType, InterfaceType* clientType, Interface* serviceInstance );
-	void addServiceImplementation( InterfaceType* serviceType, const std::string& componentName );
-	void addServiceImplementationForType( InterfaceType* serviceType, InterfaceType* clientType, const std::string& componentName );
-	Interface* getService( InterfaceType* serviceType );
-	Interface* getServiceForType( InterfaceType* serviceType, InterfaceType* clientType );
-	Interface* getServiceForInstance( InterfaceType* serviceType, Interface* clientInstance );
-	void removeService( InterfaceType* serviceType );
-	void removeServiceForType( InterfaceType* serviceType, InterfaceType* clientType );
+	void addService( IInterfaceType* serviceType, Interface* serviceInstance );
+	void addServiceForType( IInterfaceType* serviceType, IInterfaceType* clientType, Interface* serviceInstance );
+	void addServiceImplementation( IInterfaceType* serviceType, const std::string& componentName );
+	void addServiceImplementationForType( IInterfaceType* serviceType, IInterfaceType* clientType, const std::string& componentName );
+	Interface* getService( IInterfaceType* serviceType );
+	Interface* getServiceForType( IInterfaceType* serviceType, IInterfaceType* clientType );
+	Interface* getServiceForInstance( IInterfaceType* serviceType, Interface* clientInstance );
+	void removeService( IInterfaceType* serviceType );
+	void removeServiceForType( IInterfaceType* serviceType, IInterfaceType* clientType );
 
 private:
 	class LazyInstance
@@ -67,9 +67,9 @@ private:
 			_hasInstance = true;
 		}
 
-		inline ComponentType* getComponentType() { return _implementation; }
+		inline IComponentType* getComponentType() { return _implementation; }
 
-		inline void setComponentType( ComponentType* type )
+		inline void setComponentType( IComponentType* type )
 		{
 			clear();
 			_implementation = type;
@@ -80,11 +80,11 @@ private:
 		union
 		{
 			Interface* _instance;
-			ComponentType* _implementation;
+			IComponentType* _implementation;
 		};
 	};
 
-	typedef std::map<InterfaceType*, LazyInstance> CustomServicesMap;
+	typedef std::map<IInterfaceType*, LazyInstance> CustomServicesMap;
 
 	struct ServiceRecord
 	{
@@ -92,19 +92,19 @@ private:
 		CustomServicesMap custom; // specialized by clientType
 	};
 
-	typedef std::map<InterfaceType*, ServiceRecord> ServiceMap;
+	typedef std::map<IInterfaceType*, ServiceRecord> ServiceMap;
 
-	inline ServiceRecord& fetchServiceRecord( InterfaceType* serviceType );
-	inline InterfaceInfo* getFacetInfo( ComponentType* ct, InterfaceType* itfType );
+	inline ServiceRecord& fetchServiceRecord( IInterfaceType* serviceType );
+	inline IInterfaceInfo* getFacetInfo( IComponentType* ct, IInterfaceType* itfType );
 
-	void validateClientType( InterfaceType* clientType );
-	void validateServiceInstance( InterfaceType* serviceType, Interface* serviceInstance );
-	ComponentType* validateComponentType( InterfaceType* serviceType, const std::string& componentName );
+	void validateClientType( IInterfaceType* clientType );
+	void validateServiceInstance( IInterfaceType* serviceType, Interface* serviceInstance );
+	IComponentType* validateComponentType( IInterfaceType* serviceType, const std::string& componentName );
 	
-	void createServiceInstance( InterfaceType* serviceType, LazyInstance& instance, InterfaceType* clientType = 0 );
+	void createServiceInstance( IInterfaceType* serviceType, LazyInstance& instance, IInterfaceType* clientType = 0 );
 
-	Interface* getServiceForType( ServiceRecord& rec, InterfaceType* serviceType, InterfaceType* clientType );
-	LazyInstance* findSuitableInstance( ServiceRecord& rec, InterfaceType* serviceType, InterfaceType* clientType );
+	Interface* getServiceForType( ServiceRecord& rec, IInterfaceType* serviceType, IInterfaceType* clientType );
+	LazyInstance* findSuitableInstance( ServiceRecord& rec, IInterfaceType* serviceType, IInterfaceType* clientType );
 
 private:
 	bool _isLazy;

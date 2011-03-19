@@ -29,21 +29,21 @@
 
 namespace co {
 
-TypeBuilderComponent::TypeBuilderComponent( TypeKind kind ) : _kind( kind )
+TypeBuilder::TypeBuilder( TypeKind kind ) : _kind( kind )
 {
 	_namespace = NULL;
 	_typeWasCreated = false;
 }
 
-TypeBuilderComponent::~TypeBuilderComponent()
+TypeBuilder::~TypeBuilder()
 {
    // empty
 }
 
-void TypeBuilderComponent::destroyType()
+void TypeBuilder::destroyType()
 {
 	// remove any array created for the type before we destroy it
-	Type* arrayType = _namespace->getType( _type->getName() + "[]" );
+	IType* arrayType = _namespace->getType( _type->getName() + "[]" );
 	if( arrayType )
 		_namespace->removeType( arrayType );
 
@@ -53,57 +53,57 @@ void TypeBuilderComponent::destroyType()
 	_type = NULL;
 }
 
-void TypeBuilderComponent::addMethod( MethodInfoComponent* )
+void TypeBuilder::addMethod( MethodInfo* )
 {
 	CORAL_THROW( NotSupportedException, "the typeBuilder's kind is neither TK_NATIVECLASS nor TK_INTERFACE" );
 }
 
-Namespace* TypeBuilderComponent::getNamespace()
+INamespace* TypeBuilder::getNamespace()
 {
 	return _namespace.get();
 }
 
-TypeKind TypeBuilderComponent::getKind()
+TypeKind TypeBuilder::getKind()
 {
 	return _kind;
 }
 
-const std::string& TypeBuilderComponent::getTypeName()
+const std::string& TypeBuilder::getTypeName()
 {
 	return _name;
 }
 
-void TypeBuilderComponent::defineIdentifier(  const std::string& )
+void TypeBuilder::defineIdentifier(  const std::string& )
 {
 	CORAL_THROW( NotSupportedException, "the typeBuilder's kind is not TK_ENUM" );
 }
 
-void TypeBuilderComponent::defineAttribute( const std::string&, Type*, bool )
+void TypeBuilder::defineAttribute( const std::string&, IType*, bool )
 {
 	CORAL_THROW( NotSupportedException, "the typeBuilder's kind is neither TK_STRUCT, TK_NATIVECLASS nor TK_INTERFACE" );
 }
 
-void TypeBuilderComponent::defineSuperType( Type* )
+void TypeBuilder::defineSuperType( IType* )
 {
 	CORAL_THROW( NotSupportedException, "the typeBuilder's kind is not TK_INTERFACE" );
 }
 
-void TypeBuilderComponent::defineInterface( const std::string&, InterfaceType*, bool )
+void TypeBuilder::defineInterface( const std::string&, IInterfaceType*, bool )
 {
 	CORAL_THROW( NotSupportedException, "the typeBuilder's kind is not TK_COMPONENT" );
 }
 
-MethodBuilder* TypeBuilderComponent::defineMethod( const std::string& )
+IMethodBuilder* TypeBuilder::defineMethod( const std::string& )
 {
 	CORAL_THROW( NotSupportedException, "the typeBuilder's kind is neither TK_NATIVECLASS nor TK_INTERFACE" );
 }
 
-void TypeBuilderComponent::defineNativeClass( const std::string&, const std::string& )
+void TypeBuilder::defineNativeClass( const std::string&, const std::string& )
 {
 	CORAL_THROW( NotSupportedException, "the typeBuilder's kind is not TK_NATIVECLASS" );
 }
 
-Type* TypeBuilderComponent::createType()
+IType* TypeBuilder::createType()
 {
 	if( _typeWasCreated )
 		return _type.get();
@@ -116,10 +116,10 @@ Type* TypeBuilderComponent::createType()
 	return _type.get();
 }
 
-void TypeBuilderComponent::initialize( Namespace* ns, const std::string& name )
+void TypeBuilder::initialize( INamespace* ns, const std::string& name )
 {
-	assert( dynamic_cast<NamespaceComponent*>( ns ) );
-	_namespace = static_cast<NamespaceComponent*>( ns );
+	assert( dynamic_cast<Namespace*>( ns ) );
+	_namespace = static_cast<Namespace*>( ns );
 	_name = name;
 
 	// pre-allocate our empty type
@@ -137,7 +137,7 @@ void TypeBuilderComponent::initialize( Namespace* ns, const std::string& name )
 	assert( _type.isValid() );
 }
 
-void TypeBuilderComponent::assertNotCreated()
+void TypeBuilder::assertNotCreated()
 {
 	if( _typeWasCreated )
 		CORAL_THROW( NotSupportedException, "type was already created" );
@@ -145,10 +145,10 @@ void TypeBuilderComponent::assertNotCreated()
 
 // ------ EnumTypeBuilder ------------------------------------------------------
 
-class EnumTypeBuilder : public TypeBuilderComponent
+class EnumTypeBuilder : public TypeBuilder
 {
 public:
-	EnumTypeBuilder() : TypeBuilderComponent( TK_ENUM )
+	EnumTypeBuilder() : TypeBuilder( TK_ENUM )
 	{
 		_myType = NULL;
 	}
@@ -156,7 +156,7 @@ public:
 	bool allocateType()
 	{
 		assert( _myType == NULL );
-		_myType = new EnumTypeComponent;
+		_myType = new EnumType;
 		_type = _myType;
 		return true;	}
 
@@ -189,16 +189,16 @@ public:
 	}
 
 private:
-	EnumTypeComponent* _myType;
+	EnumType* _myType;
 	std::vector<std::string> _identifiers;
 };
 
 // ------ ExceptionTypeBuilder -------------------------------------------------
 
-class ExceptionTypeBuilder : public TypeBuilderComponent
+class ExceptionTypeBuilder : public TypeBuilder
 {
 public:
-	ExceptionTypeBuilder() : TypeBuilderComponent( TK_EXCEPTION )
+	ExceptionTypeBuilder() : TypeBuilder( TK_EXCEPTION )
 	{
 		_myType = NULL;
 	}
@@ -206,7 +206,7 @@ public:
 	bool allocateType()
 	{
 		assert( _myType == NULL );
-		_myType = new ExceptionTypeComponent;
+		_myType = new ExceptionType;
 		_type = _myType;
 		return true;
 	}
@@ -222,18 +222,18 @@ public:
 	}
 
 private:
-	ExceptionTypeComponent* _myType;
+	ExceptionType* _myType;
 };
 
 // ------ AttributeContainerTypeBuilder ----------------------------------------
 
-class AttributeContainerTypeBuilder : public TypeBuilderComponent
+class AttributeContainerTypeBuilder : public TypeBuilder
 {
 public:
-	AttributeContainerTypeBuilder( TypeKind kind ) : TypeBuilderComponent( kind )
+	AttributeContainerTypeBuilder( TypeKind kind ) : TypeBuilder( kind )
 	{;}
 
-	void defineAttribute( const std::string& name, Type* type, bool isReadOnly )
+	void defineAttribute( const std::string& name, IType* type, bool isReadOnly )
 	{
 		assertNotCreated();
 
@@ -267,7 +267,7 @@ public:
 				CORAL_THROW( IllegalNameException, "attribute name '" << name << "' clashes with a previous definition" );
 		}
 
-		AttributeInfoComponent* attr = new AttributeInfoComponent;
+		AttributeInfo* attr = new AttributeInfo;
 		attr->setType( type );
 		attr->setName( name );
 		attr->setIsReadOnly( isReadOnly );
@@ -276,7 +276,7 @@ public:
 	}
 
 protected:
-	RefVector<AttributeInfo> _attributes;
+	RefVector<IAttributeInfo> _attributes;
 };
 
 // ------ StructTypeBuilder ----------------------------------------------------
@@ -292,7 +292,7 @@ public:
 	bool allocateType()
 	{
 		assert( _myType == NULL );
-		_myType = new StructTypeComponent;
+		_myType = new StructType;
 		_type = _myType;
 		return true;
 	}
@@ -310,7 +310,7 @@ public:
 	}
 
 private:
-	StructTypeComponent* _myType;
+	StructType* _myType;
 };
 
 // ------ MethodContainerTypeBuilder -------------------------------------------
@@ -321,28 +321,28 @@ public:
 	MethodContainerTypeBuilder( TypeKind kind ) : AttributeContainerTypeBuilder( kind )
 	{;}
 
-	void addMethod( MethodInfoComponent* methodInfo )
+	void addMethod( MethodInfo* methodInfo )
 	{
 		if( _typeWasCreated )
 			CORAL_THROW( NotSupportedException, "illegal to add a method after a type is created" );
 		_methods.push_back( methodInfo );
 	}
 
-	MethodBuilder* defineMethod( const std::string& name )
+	IMethodBuilder* defineMethod( const std::string& name )
 	{
 		assertNotCreated();
 
 		if( !LexicalUtils::isValidIdentifier( name ) )
 			CORAL_THROW( IllegalNameException, "method name '" << name << "' is not a valid identifier" );
 
-		MethodBuilderComponent* methodBuilder = new MethodBuilderComponent;
+		MethodBuilder* methodBuilder = new MethodBuilder;
 		methodBuilder->init( this, name );
 
 		return methodBuilder;
 	}
 
 protected:
-	RefVector<MethodInfo> _methods;
+	RefVector<IMethodInfo> _methods;
 };
 
 // ------ NativeClassTypeBuilder -----------------------------------------------
@@ -358,7 +358,7 @@ public:
 	bool allocateType()
 	{
 		assert( _myType == NULL );
-		_myType = new NativeClassTypeComponent;
+		_myType = new NativeClassType;
 		_type = _myType;
 		return true;
 	}
@@ -400,7 +400,7 @@ public:
 	}
 
 private:
-	NativeClassTypeComponent* _myType;
+	NativeClassType* _myType;
 	std::string _nativeHeaderFile;
 	std::string _nativeName;
 };
@@ -419,16 +419,16 @@ public:
 	{
 		assert( _myType == NULL );
 
-		// the 'co.Interface' InterfaceType is pre-allocated by the TypeManager
+		// the 'co.Interface' IInterfaceType is pre-allocated by the ITypeManager
 		if( _name == "Interface" && _namespace->getName() == "co" )
 		{
-			_myType = static_cast<InterfaceTypeComponent*>( _namespace->getType( "Interface" ) );
+			_myType = static_cast<InterfaceType*>( _namespace->getType( "Interface" ) );
 			_type = _myType;
 			return false;
 		}
 		else
 		{
-			_myType = new InterfaceTypeComponent;
+			_myType = new InterfaceType;
 			_type = _myType;
 			return true;
 		}
@@ -445,8 +445,8 @@ public:
 		// if this interface has no explicit super-types, add the implicit 'co.Interface' super-type to the list
 		if( _superTypes.empty() )
 		{
-			InterfaceTypeComponent* coInterfaceType =
-				static_cast<InterfaceTypeComponent*>( typeOf<Interface>::get() );
+			InterfaceType* coInterfaceType =
+				static_cast<InterfaceType*>( typeOf<Interface>::get() );
 			// ... unless we're defining the co.Interface itself
 			if( _myType != coInterfaceType )
 				_superTypes.push_back( coInterfaceType );
@@ -456,7 +456,7 @@ public:
 		size_t count = _superTypes.size();
 		for( size_t i = 0; i < count; ++i )
 		{
-			InterfaceTypeComponent* superType = _superTypes[i].get();
+			InterfaceType* superType = _superTypes[i].get();
 			_myType->addSuperInterface( superType );
 			superType->addSubInterface( _myType );
 		}
@@ -466,14 +466,14 @@ public:
 		_myType->sortMembers( _myType );
 	}
 
-	void defineSuperType( Type* superType )
+	void defineSuperType( IType* superType )
 	{
 		assertNotCreated();
 
 		if( !superType )
 			CORAL_THROW( IllegalArgumentException, "illegal null supertype" );
 
-		InterfaceTypeComponent* interfaceType = dynamic_cast<InterfaceTypeComponent*>( superType );
+		InterfaceType* interfaceType = dynamic_cast<InterfaceType*>( superType );
 		if( !interfaceType )
 			CORAL_THROW( IllegalArgumentException, "illegal supertype - an interface was expected" );
 
@@ -481,7 +481,7 @@ public:
 		size_t count = _superTypes.size();
 		for( size_t i = 0; i < count; ++i )
 		{
-			InterfaceTypeComponent* anotherSuper = _superTypes[i].get();
+			InterfaceType* anotherSuper = _superTypes[i].get();
 			if( superType == anotherSuper )
 				CORAL_THROW( NotSupportedException, "cannot inherit twice from '"
 								<< superType->getFullName() << "'" );
@@ -491,16 +491,16 @@ public:
 	}
 
 private:
-	InterfaceTypeComponent* _myType;
-	RefVector<InterfaceTypeComponent> _superTypes;
+	InterfaceType* _myType;
+	RefVector<InterfaceType> _superTypes;
 };
 
 // ------ ComponentTypeBuilder -------------------------------------------------
 
-class ComponentTypeBuilder : public TypeBuilderComponent
+class ComponentTypeBuilder : public TypeBuilder
 {
 public:
-	ComponentTypeBuilder() : TypeBuilderComponent( TK_COMPONENT )
+	ComponentTypeBuilder() : TypeBuilder( TK_COMPONENT )
 	{
 		_myType = NULL;
 	}
@@ -508,7 +508,7 @@ public:
 	bool allocateType()
 	{
 		assert( _myType == NULL );
-		_myType = new ComponentTypeComponent;
+		_myType = new ComponentType;
 		_type = _myType;
 		return true;
 	}
@@ -525,7 +525,7 @@ public:
 		_myType->sortInterfaces();
 	}
 
-	void defineInterface( const std::string& name, InterfaceType* interface, bool isFacet )
+	void defineInterface( const std::string& name, IInterfaceType* interface, bool isFacet )
 	{
 		assertNotCreated();
 
@@ -535,13 +535,13 @@ public:
 		if( !LexicalUtils::isValidIdentifier( name ) )
 			CORAL_THROW( IllegalNameException, "interface name '" << name << "' is not a valid indentifier");
 
-		for( ArrayRange<InterfaceInfo* const> r( _interfaces ); r; r.popFirst() )
+		for( ArrayRange<IInterfaceInfo* const> r( _interfaces ); r; r.popFirst() )
 		{
 			if( r.getFirst()->getName() == name )
 				CORAL_THROW( IllegalNameException, "interface name '" << name << "' clashes with a previous definition" );
 		}
 
-		InterfaceInfoComponent* interfaceInfo = new InterfaceInfoComponent;
+		InterfaceInfo* interfaceInfo = new InterfaceInfo;
 		interfaceInfo->setName( name );
 		interfaceInfo->setType( interface );
 		interfaceInfo->setIsFacet( isFacet );
@@ -550,15 +550,15 @@ public:
 	}
 
 private:
-	ComponentTypeComponent* _myType;
-	RefVector<InterfaceInfo> _interfaces;
+	ComponentType* _myType;
+	RefVector<IInterfaceInfo> _interfaces;
 };
 
-// ------ TypeBuilder Factory Method -------------------------------------------
+// ------ ITypeBuilder Factory Method -------------------------------------------
 
-TypeBuilder* TypeBuilderComponent::create( TypeKind kind, Namespace* ns, const std::string& name )
+ITypeBuilder* TypeBuilder::create( TypeKind kind, INamespace* ns, const std::string& name )
 {
-	TypeBuilderComponent* tb = NULL;
+	TypeBuilder* tb = NULL;
 	switch( kind )
 	{
 	case TK_ENUM:			tb = new EnumTypeBuilder;			break;
@@ -580,13 +580,13 @@ TypeBuilder* TypeBuilderComponent::create( TypeKind kind, Namespace* ns, const s
 // ------ NoTypeBuilder --------------------------------------------------------
 
 /*
-	This is a dummy TypeBuilderComponent implementation that is instantiated
-	when the Reflection API is used (instead of Namespace::defineType()).
+	This is a dummy TypeBuilder implementation that is instantiated
+	when the Reflection API is used (instead of INamespace::defineType()).
  */
-class NoTypeBuilder : public TypeBuilderComponent
+class NoTypeBuilder : public TypeBuilder
 {
 public:
-	NoTypeBuilder() : TypeBuilderComponent( TK_NONE )
+	NoTypeBuilder() : TypeBuilder( TK_NONE )
 	{;}
 
 	bool allocateType()
@@ -599,12 +599,12 @@ public:
 	{
 		raiseNoTypeBuilderException();
 	}
-	
+
 	void fillType()
 	{
 		raiseNoTypeBuilderException();
 	}
-	
+
 private:
 	void raiseNoTypeBuilderException()
 	{
@@ -612,6 +612,6 @@ private:
 	}
 };
 
-CORAL_EXPORT_COMPONENT( NoTypeBuilder, TypeBuilderComponent );
+CORAL_EXPORT_COMPONENT( NoTypeBuilder, TypeBuilder );
 
 } // namespace co

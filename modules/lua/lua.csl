@@ -1,4 +1,4 @@
 component lua
 {
-	provides co.ModulePart part;
+	provides co.IModulePart part;
 };

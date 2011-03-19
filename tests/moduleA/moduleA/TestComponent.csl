@@ -2,10 +2,10 @@ component TestComponent
 {
 	provides TestInterface testInterface;
 
-	// dummy co.TypeCreationTransaction implementation, just to test cross-module inheritance
-	provides co.TypeCreationTransaction transaction;
+	// dummy co.ITypeCreationTransaction implementation, just to test cross-module inheritance
+	provides co.ITypeCreationTransaction transaction;
 
 	// test 'receives'
-	receives co.Type type;
-	receives co.InterfaceType itfType;
+	receives co.IType type;
+	receives co.IInterfaceType itfType;
 };

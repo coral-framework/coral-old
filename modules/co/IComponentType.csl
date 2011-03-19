@@ -1,0 +1,14 @@
+/*
+	The blueprint of a component.
+ */
+interface IComponentType : ICompoundType
+{
+	// List of all member interfaces (both facets and receptacles) of this component.
+	readonly attribute IInterfaceInfo[] interfaces;
+
+	// List of all facets (server interfaces) of this component.
+	readonly attribute IInterfaceInfo[] facets;
+
+	// List of all receptacles (client interfaces) of this component.
+	readonly attribute IInterfaceInfo[] receptacles;
+};

@@ -194,8 +194,8 @@ Todo campo do tipo interface é mapeado como um `co::RefPtr` (_smart pointer_) pa
 // em CSL
 struct Foo
 {
-	co.Type aType;
-	co.MemberInfo[] someMembers;
+	co.IType aType;
+	co.IMemberInfo[] someMembers;
 };
 </code>
 
@@ -205,8 +205,8 @@ struct Foo
 // em C++
 struct Foo
 {
-	co::RefPtr<co::Type> aType;
-	co::RefVector<co::MemberInfo> someMembers;
+	co::RefPtr<co::IType> aType;
+	co::RefVector<co::IMemberInfo> someMembers;
 };
 </code>
 
@@ -413,7 +413,7 @@ Observe que a declaração de exceções (_raises_) em CSL não são mapeadas diretame
 Componentes (component)
 -----------------------
 
-Componentes só podem ser manipulados através da API de reflexão ou de suas interfaces servidoras (e.g. `co::Component`). Por isso, não geram nenhum tipo de mapeamento para C++. Para informações sobre como implementar um componente, veja a página de componentes.
+Componentes só podem ser manipulados através da API de reflexão ou de suas interfaces servidoras (e.g. `co::IComponent`). Por isso, não geram nenhum tipo de mapeamento para C++. Para informações sobre como implementar um componente, veja a página de componentes.
 
 Temp
 ====
@@ -507,9 +507,9 @@ interface User
 /*
 	Podemos injetar métodos inline (e somente inline) nas interfaces.
  */
-interface ServiceManager
+interface IServiceManager
 {
-	Interface getServiceFor( in co.InterfaceType subject );
+	Interface getServiceFor( in co.IInterfaceType subject );
 
 	<c++
 		template<typename T>
@@ -547,7 +547,7 @@ public:
 	virtual bool minimalPathTo( User* someone, co::RefVector<User> path ) = 0;
 };
 
-co::Type* t = co::getType( "media.playback.IAudioOut" );
+co::IType* t = co::getType( "media.playback.IAudioOut" );
 
 </code>
 
@@ -570,7 +570,7 @@ runAction.logger = logger.logger
 
 
 -- Componente com a interface action.IAction.
-local HelloAction = co.Component {
+local HelloAction = co.IComponent {
 	name = "action.Hello",
 	provides = { action = "action.IAction" }
 }

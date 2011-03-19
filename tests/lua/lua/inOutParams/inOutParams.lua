@@ -2,21 +2,21 @@ require "lua.test"
 
 local M = {}
 
-local Component = co.Component{
+local IComponent = co.IComponent{
 	name = "lua.test.InOutParams",
 	provides = { shift = "moduleA.InOutTests", noret = "moduleA.InOutTests", const = "moduleA.InOutTests" }
 }
 
-function Component.shift:testAny( a, b )
+function IComponent.shift:testAny( a, b )
 	return a, b
 end
 
-Component.shift.testStruct = Component.shift.testAny
-Component.shift.testArrayOfInts = Component.shift.testAny
-Component.shift.testArrayOfAnys = Component.shift.testAny
-Component.shift.testArrayOfStructs = Component.shift.testAny
+IComponent.shift.testStruct = IComponent.shift.testAny
+IComponent.shift.testArrayOfInts = IComponent.shift.testAny
+IComponent.shift.testArrayOfAnys = IComponent.shift.testAny
+IComponent.shift.testArrayOfStructs = IComponent.shift.testAny
 
-function Component.noret:testAny( a, b )
+function IComponent.noret:testAny( a, b )
 	local tp = type( a )
 	if tp == 'table' then
 		ASSERT_EQ( #a, #b )
@@ -28,18 +28,18 @@ function Component.noret:testAny( a, b )
 	end
 end
 
-Component.noret.testStruct = Component.noret.testAny
-Component.noret.testArrayOfInts = Component.noret.testAny
-Component.noret.testArrayOfAnys = Component.noret.testAny
-Component.noret.testArrayOfStructs = Component.noret.testAny
+IComponent.noret.testStruct = IComponent.noret.testAny
+IComponent.noret.testArrayOfInts = IComponent.noret.testAny
+IComponent.noret.testArrayOfAnys = IComponent.noret.testAny
+IComponent.noret.testArrayOfStructs = IComponent.noret.testAny
 
-function Component:testAny( a, b )
+function IComponent:testAny( a, b )
 	ASSERT_EQ( a, 5.5 )
 	ASSERT_EQ( b.message, "B" )
 	return true, "str"
 end
 
-function Component:testStruct( a, b )
+function IComponent:testStruct( a, b )
 	ASSERT_EQ( a.testEnum, 'Second' )
 	ASSERT_EQ( a.innerStruct.message, "A" )
 	ASSERT_EQ( b.testEnum, 'Third' )
@@ -52,20 +52,20 @@ function Component:testStruct( a, b )
 	return res, co.new "moduleA.TestStruct"
 end
 
-function Component:testArrayOfInts( a, b )
+function IComponent:testArrayOfInts( a, b )
 	ASSERT_TRUE( #a == 3 and a[1] == 1 and a[2] == 2 and a[3] == 3 )
 	ASSERT_TRUE( #b == 2 and b[1] == 4 and b[2] == 5 )
 	return { 6, 7 }, { 8.1, 9.2, 0.3 }
 end
 
-function Component:testArrayOfAnys( a, b )
+function IComponent:testArrayOfAnys( a, b )
 	ASSERT_TRUE( #a == 3 and a[1] == 3.2 and a[2] == nil and a[3] == "str" )
 	ASSERT_TRUE( #b == 2 and b[1].message == "A" and b[2] == false )
 	return { 3.2, nil }, { "str", false }
 end
 
 function M:initialize( module )
-	local c = Component()
+	local c = IComponent()
 	local shift = c.shift
 	local noret = c.noret
 	local const = c.const

@@ -12,20 +12,20 @@
 namespace lua {
 
 /*!
-	A co.ModulePartLoader that allows Coral modules to be written in Lua.
+	A co.IModulePartLoader that allows Coral modules to be written in Lua.
 	If a module 'foo' contains a script named 'foo.lua', this component
-	will create a lua.ModulePart to wrap the script as a co.ModulePart.
+	will create a lua.ModulePart to wrap the script as a co.IModulePart.
  */
-class ModulePartLoader : public ModulePartLoader_Base
+class IModulePartLoader : public ModulePartLoader_Base
 {
 public:
-	ModulePartLoader();
-	virtual ~ModulePartLoader();
+	IModulePartLoader();
+	virtual ~IModulePartLoader();
 
-	// co::ModulePartLoader methods:
+	// co::IModulePartLoader methods:
 	bool canLoadModulePart( const std::string& moduleName );
-	co::ModulePart* loadModulePart( const std::string& moduleName );
-	
+	co::IModulePart* loadModulePart( const std::string& moduleName );
+
 private:
 	bool locateModuleLibrary( const std::string& moduleName, std::string* filename = 0 );
 };

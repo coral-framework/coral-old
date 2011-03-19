@@ -1,0 +1,77 @@
+/*
+	A generic builder of Coral Types.
+ */
+interface ITypeBuilder
+{
+	// INamespace where the new type should be placed when it's created.
+	readonly attribute INamespace namespace;
+
+	// TypeKind of the type under construction by this builder.
+	readonly attribute TypeKind kind;
+
+	// The future name of the type when it's created.
+	readonly attribute string typeName;
+
+	/*
+		Adds an identifier to an IEnumType.
+		\note Values are assigned implicitly: the first defined identifier is zero, and so forth.
+		\throw NotSupportedException if the builder's kind is not TK_ENUM or if the type was already created.
+		\throw IllegalNameException if the passed \a name is not a valid identifier or clashes with other members.
+	 */
+	void defineIdentifier( in string name )
+		raises NotSupportedException, IllegalNameException;
+
+	/*
+		Adds an attribute to a IStructType, INativeClassType or IInterfaceType.
+		\throw NotSupportedException if the builder's kind is neither TK_STRUCT, TK_NATIVECLASS nor TK_INTERFACE or if the type was already created.
+		\throw IllegalNameException if the passed \a name is not a valid identifier.
+		\throw IllegalArgumentException if the passed \a type is invalid (e.g. null or the type is a component or exception) or
+			   if the passed \a isReadOnly modifier is \a true and the builder's kind is TK_STRUCT (structs are always writable).
+		\throw IllegalNameException  if the passed \a name clashes with other members.
+	 */
+	void defineAttribute( in string name, in IType type, in bool isReadOnly )
+		raises NotSupportedException, IllegalNameException, IllegalArgumentException;
+
+	/*
+		Adds a parent interface to an IInterfaceType.
+		\throw NotSupportedException if the builder's kind is not TK_INTERFACE or if the type was already created.
+		\throw IllegalArgumentException if the passed \a superType is invalid (e.g. not an IInterfaceType) or already a super interface.
+	 */
+	void defineSuperType( in IType superType )
+		raises NotSupportedException, IllegalArgumentException;
+
+	/*
+		Adds an interface to a IComponentType.
+		\throw NotSupportedException if the builder's kind is not TK_COMPONENT or if the type was already created.
+		\throw IllegalNameException if the passed \a name is not a valid identifier or clashes with other members.
+		\throw IllegalArgumentException if the passed \a interfaceType is invalid (e.g. null).
+	 */
+	void defineInterface( in string name, in IInterfaceType interfaceType, in bool isFacet )
+		raises NotSupportedException, IllegalNameException, IllegalArgumentException;
+
+	/*
+		Adds a method to a INativeClassType or IInterfaceType.
+		\note The method is only really added when IMethodBuilder::createMethod() is called.
+		\throw NotSupportedException if the builder's kind is neither TK_NATIVECLASS nor TK_INTERFACE or if the type was already created.
+		\throw IllegalNameException if the passed \a name is not a valid identifier.
+		\throw IllegalNameException  if the passed \a name clashes with other members.
+	 */
+	IMethodBuilder defineMethod( in string name )
+		raises NotSupportedException, IllegalNameException;
+
+	/*
+		Defines the parameters to create a INativeClassType.
+		\throw NotSupportedException if the builder's kind is not TK_NATIVECLASS or if the type was already created.
+		\throw IllegalArgumentException if the passed \a nativeHeaderFile or \a nativeName parameters are empty.
+	 */
+	void defineNativeClass( in string nativeHeaderFile,  in string nativeName )
+		raises NotSupportedException, IllegalNameException;
+
+	/*
+		Fills the type with all the provided definitions and returns it.
+		This method should be called only once and after all definitions have been set.
+		\throw NotSupportedException if the type is already created.
+		\throw MissingInputException if not all required definitions were set for this builder's type kind.
+	 */
+	IType createType() raises MissingInputException;
+};

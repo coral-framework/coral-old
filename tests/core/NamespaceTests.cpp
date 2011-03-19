@@ -7,10 +7,10 @@
 
 #include <co/Coral.h>
 #include <co/RefPtr.h>
-#include <co/System.h>
-#include <co/Namespace.h>
-#include <co/TypeBuilder.h>
-#include <co/TypeManager.h>
+#include <co/ISystem.h>
+#include <co/INamespace.h>
+#include <co/ITypeBuilder.h>
+#include <co/ITypeManager.h>
 #include <co/IllegalNameException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -20,7 +20,7 @@
 
 TEST( NamespaceTests, rootNS )
 {
-	co::Namespace* rootNS = co::getSystem()->getTypes()->getRootNS();
+	co::INamespace* rootNS = co::getSystem()->getTypes()->getRootNS();
 
 	EXPECT_EQ( rootNS->getName(), "" );
 	EXPECT_EQ( rootNS->getFullName(), "" );
@@ -29,11 +29,11 @@ TEST( NamespaceTests, rootNS )
 
 TEST( NamespaceTests, defineType )
 {
-	co::Namespace* rootNS = co::getSystem()->getTypes()->getRootNS();
+	co::INamespace* rootNS = co::getSystem()->getTypes()->getRootNS();
 
 	// make sure these types are not user-definable
 
-	co::RefPtr<co::TypeCreationTransaction> transaction = createTypeCreationTransaction();
+	co::RefPtr<co::ITypeCreationTransaction> transaction = createTypeCreationTransaction();
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_NONE, transaction.get() ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_ANY, transaction.get() ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_BOOLEAN, transaction.get() ), co::IllegalArgumentException );
@@ -55,7 +55,7 @@ TEST( NamespaceTests, defineType )
 	EXPECT_THROW( rootNS->defineType( "DummyNamespace", co::TK_ENUM, transaction.get() ), co::IllegalNameException );
 
 	// test collision with another type
-	co::RefPtr<co::TypeBuilder> tb = rootNS->defineType( "DummyException", co::TK_EXCEPTION, transaction.get() );
+	co::RefPtr<co::ITypeBuilder> tb = rootNS->defineType( "DummyException", co::TK_EXCEPTION, transaction.get() );
 	ASSERT_TRUE( TestHelper::type( "DummyException" ) != NULL );
 
 	ASSERT_TRUE( rootNS->getType( "nonexistent" ) == NULL );
@@ -78,9 +78,9 @@ TEST( NamespaceTests, defineType )
 
 TEST( NamespaceTests, defineChildNamespace )
 {
-	co::Namespace* rootNS = co::getSystem()->getTypes()->getRootNS();
+	co::INamespace* rootNS = co::getSystem()->getTypes()->getRootNS();
 
-	co::Namespace* levelOneNS = rootNS->defineChildNamespace( "levelOne" );
+	co::INamespace* levelOneNS = rootNS->defineChildNamespace( "levelOne" );
 
 	EXPECT_EQ( levelOneNS->getName(), "levelOne" );
 	EXPECT_EQ( levelOneNS->getFullName(), "levelOne" );
@@ -88,7 +88,7 @@ TEST( NamespaceTests, defineChildNamespace )
 	EXPECT_TRUE( levelOneNS->getTypes().isEmpty() );
 	EXPECT_TRUE( levelOneNS->getChildNamespaces().isEmpty() );
 
-	co::Namespace* levelTwoNS = levelOneNS->defineChildNamespace( "levelTwo" );
+	co::INamespace* levelTwoNS = levelOneNS->defineChildNamespace( "levelTwo" );
 	
 	EXPECT_EQ( levelTwoNS->getName(), "levelTwo" );
 	EXPECT_EQ( levelTwoNS->getFullName(), "levelOne.levelTwo" );
@@ -98,7 +98,7 @@ TEST( NamespaceTests, defineChildNamespace )
 
 	EXPECT_EQ( levelOneNS->getTypes().getSize(), 0 );
 	EXPECT_EQ( levelOneNS->getChildNamespaces().getSize(), 1 );
-	EXPECT_EQ( levelOneNS->getType( "levelTwo" ), reinterpret_cast<co::Type*>( NULL ) );
+	EXPECT_EQ( levelOneNS->getType( "levelTwo" ), reinterpret_cast<co::IType*>( NULL ) );
 	EXPECT_EQ( levelOneNS->getChildNamespace( "levelTwo" ), levelTwoNS );
 
 	EXPECT_EQ( co::getSystem()->getTypes()->findNamespace( "levelOne.levelTwo" ), levelTwoNS );

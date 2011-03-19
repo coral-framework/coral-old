@@ -1,8 +1,7 @@
 /*
-	Type representing a unidimensional array of elements.
+	Implements co.IArrayType.
  */
-interface ArrayType : Type
+component ArrayType
 {
-	// The type of the array elements.
-	readonly attribute Type elementType;
+	provides IArrayType type;
 };

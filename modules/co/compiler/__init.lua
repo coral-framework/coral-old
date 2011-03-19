@@ -109,13 +109,13 @@ function Compiler:generateMappings()
 	assert( not self.updatedTypes, "this compiler instance has already been used" )
 
 	-- add implicit dependencies of the Coral API (e.g. Any.h)
-	self:addType( "co.EnumType" )
-	self:addType( "co.ArrayType" )
-	self:addType( "co.StructType" )
-	self:addType( "co.ExceptionType" )
-	self:addType( "co.InterfaceType" )
-	self:addType( "co.ComponentType" )
-	self:addType( "co.NativeClassType" )
+	self:addType( "co.IEnumType" )
+	self:addType( "co.IArrayType" )
+	self:addType( "co.IStructType" )
+	self:addType( "co.IExceptionType" )
+	self:addType( "co.IInterfaceType" )
+	self:addType( "co.IComponentType" )
+	self:addType( "co.INativeClassType" )
 
 	if not self.mappingsDir then
 		self.mappingsDir = self.outDir
@@ -170,10 +170,10 @@ function Compiler:generateModule( moduleName )
 	self.log(  doing .. " code for module '" .. self.moduleName .. "' (" .. #self.types .. " types)..." )
 
 	-- add implicit dependencies of the generated module code
-	self:addType( "co.System" )
-	self:addType( "co.Namespace" )
-	self:addType( "co.Reflector" )
-	self:addType( "co.ModulePart" )
+	self:addType( "co.ISystem" )
+	self:addType( "co.INamespace" )
+	self:addType( "co.IReflector" )
+	self:addType( "co.IModulePart" )
 
 	-- generateMappings() also adds entries to self.dependencies
 	self:generateMappings()
@@ -249,11 +249,11 @@ function Compiler:loadModuleTypes()
 	end
 end
 
--- Returns whether the module has a valid custom co.ModulePart.
+-- Returns whether the module has a valid custom co.IModulePart.
 function Compiler:hasCustomModulePart()
 	local localModuleName = self.moduleName:match( '.-([^%.]+)$' )
 	local t = co.system.types:findType( self.moduleName .. '.' .. localModuleName )
-	local modulePartItf = co.Type "co.ModulePart"
+	local modulePartItf = co.Type "co.IModulePart"
 	if t and t.kind == 'TK_COMPONENT' then
 		for i, facet in ipairs( t.facets ) do
 			if facet.type:isSubTypeOf( modulePartItf ) then
@@ -261,11 +261,11 @@ function Compiler:hasCustomModulePart()
 					return true
 				end
 				error( "Module '" .. self.moduleName .. "' contains a component named '" ..
-					self.moduleName .. "', but its co.ModulePart facet is not named 'part'.", 0  )
+					self.moduleName .. "', but its co.IModulePart facet is not named 'part'.", 0  )
 			end
 		end
 		error( "Module '" .. self.moduleName .. "' contains a component named '" ..
-			self.moduleName .. "', but it does not provide the co.ModulePart interface.", 0  )
+			self.moduleName .. "', but it does not provide the co.IModulePart interface.", 0  )
 	end
 	return false
 end
@@ -326,7 +326,7 @@ function Compiler:loadCache()
 	-- force a full update; this is a workaround for IDEs with inflexible 'clean' routines (e.g. MSVC)
 	-- which delete most of the generated source files, but not the cache files.
 	local ignoreCache = (
-			( self.mappingsDir and not path.isFile( self.mappingsDir .. '/co/System.h' ) ) or
+			( self.mappingsDir and not path.isFile( self.mappingsDir .. '/co/ISystem.h' ) ) or
 			( self.moduleName and not path.isFile( self.outDir .. '/__Bootstrap.cpp' ) )
 		)
 

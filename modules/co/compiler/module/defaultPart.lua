@@ -1,10 +1,10 @@
 local function template( writer, c )
-	c.header( writer, c, "Default co::ModulePart component generated for module '", c.moduleName, "'" )
+	c.header( writer, c, "Default co::IModulePart component generated for module '", c.moduleName, "'" )
 
 	writer( [[
 
 #include "ModuleInstaller.h"
-#include <co/Module.h>
+#include <co/IModule.h>
 #include <co/reserved/ModulePartBase.h>
 
 ]] )
@@ -31,12 +31,12 @@ public:
 		]], c.moduleNS, [[::moduleRelease();
 	}
 
-	void initialize( co::Module* )
+	void initialize( co::IModule* )
 	{
 		]], c.moduleNS, [[::ModuleInstaller::instance().install();
 	}
 
-	void dispose( co::Module* )
+	void dispose( co::IModule* )
 	{
 		]], c.moduleNS, [[::ModuleInstaller::instance().uninstall();
 	}

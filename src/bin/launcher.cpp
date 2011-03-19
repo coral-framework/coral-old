@@ -5,16 +5,16 @@
 
 #include "Utils.h"
 #include <co/Coral.h>
-#include <co/System.h>
-#include <co/Component.h>
+#include <co/ISystem.h>
+#include <co/IComponent.h>
 #include <co/Exception.h>
-#include <co/Reflector.h>
-#include <co/MethodInfo.h>
-#include <co/ComponentType.h>
-#include <co/InterfaceInfo.h>
-#include <co/InterfaceType.h>
-#include <co/ParameterInfo.h>
-#include <co/ModuleManager.h>
+#include <co/IReflector.h>
+#include <co/IMethodInfo.h>
+#include <co/IComponentType.h>
+#include <co/IInterfaceInfo.h>
+#include <co/IInterfaceType.h>
+#include <co/IParameterInfo.h>
+#include <co/IModuleManager.h>
 
 /*
 	Helper function to initialize the Coral path.
@@ -61,25 +61,25 @@ static void addDefaultPaths()
 #endif
 }
 
-static void resolveCallee( const std::string& calleeName, co::ComponentType*& ct, co::InterfaceInfo*& facet, co::MethodInfo*& method )
+static void resolveCallee( const std::string& calleeName, co::IComponentType*& ct, co::IInterfaceInfo*& facet, co::IMethodInfo*& method )
 {
 	// was a method name specified?
 	size_t colonPos = calleeName.rfind( ':' );
 	if( colonPos == std::string::npos )
 	{
 		// resolve component type
-		co::Type* type = co::getType( calleeName );
-		ct = dynamic_cast<co::ComponentType*>( type );
+		co::IType* type = co::getType( calleeName );
+		ct = dynamic_cast<co::IComponentType*>( type );
 		if( !ct )
 			CORAL_THROW( co::Exception, "'" << calleeName << "' is not a component." );
 
 		// search the component's list of facets
-		co::ArrayRange<co::InterfaceInfo* const> facets = ct->getFacets();
+		co::ArrayRange<co::IInterfaceInfo* const> facets = ct->getFacets();
 		for( ; facets; facets.popFirst() )
 		{
 			facet = facets.getFirst();
-			co::MemberInfo* member = facet->getType()->getMember( "main" );
-			if( member && ( method = dynamic_cast<co::MethodInfo*>( member ) ) )
+			co::IMemberInfo* member = facet->getType()->getMember( "main" );
+			if( member && ( method = dynamic_cast<co::IMethodInfo*>( member ) ) )
 				return;
 		}
 
@@ -98,17 +98,17 @@ static void resolveCallee( const std::string& calleeName, co::ComponentType*& ct
 	std::string componentName( calleeName, 0, interfaceDotPos );
 
 	// resolve component type
-	co::Type* type = co::getType( componentName );
-	ct = dynamic_cast<co::ComponentType*>( type );
+	co::IType* type = co::getType( componentName );
+	ct = dynamic_cast<co::IComponentType*>( type );
 	if( !ct )
 		CORAL_THROW( co::Exception, "'" << componentName << "' is not a component." );
 
 	// resolve interface type
-	co::MemberInfo* member = ct->getMember( interfaceName );
+	co::IMemberInfo* member = ct->getMember( interfaceName );
 	if( !member )
 		CORAL_THROW( co::Exception, "'" << componentName << "' has no interface named '" << interfaceName << "'." );
 
-	facet = dynamic_cast<co::InterfaceInfo*>( member );
+	facet = dynamic_cast<co::IInterfaceInfo*>( member );
 	assert( facet );
 
 	if( !facet || !facet->getIsFacet() )
@@ -120,7 +120,7 @@ static void resolveCallee( const std::string& calleeName, co::ComponentType*& ct
 		CORAL_THROW( co::Exception, "interface '" << facet->getType()->getFullName()
 						<< "' has no method named '" << methodName << "'." );
 
-	method = dynamic_cast<co::MethodInfo*>( member );
+	method = dynamic_cast<co::IMethodInfo*>( member );
 	if( !method )
 		CORAL_THROW( co::Exception, "interface '" << facet->getType()->getFullName()
 						<< "' has a member named '" << methodName << "', but it is not a method." );
@@ -185,7 +185,7 @@ int main( int argc, char* argv[] )
 	try
 	{
 		// initialize the Coral framework
-		co::System* system;
+		co::ISystem* system;
 		try
 		{
 			system = co::getSystem();
@@ -199,9 +199,9 @@ int main( int argc, char* argv[] )
 		}
 
 		// resolve the callee
-		co::ComponentType* ct = NULL;
-		co::InterfaceInfo* facet = NULL;
-		co::MethodInfo* method = NULL;
+		co::IComponentType* ct = NULL;
+		co::IInterfaceInfo* facet = NULL;
+		co::IMethodInfo* method = NULL;
 		try
 		{
 			resolveCallee( argv[index], ct, facet, method );
@@ -216,7 +216,7 @@ int main( int argc, char* argv[] )
 		// check the method signature
 		try
 		{
-			co::ArrayRange<co::ParameterInfo* const> params = method->getParameters();
+			co::ArrayRange<co::IParameterInfo* const> params = method->getParameters();
 			if( !params.isEmpty() && ( params.getSize() > 1 || params[0]->getType()->getFullName() != "string[]" ) )
 				throw co::Exception( "method can only have a single parameter, of type 'string[]'" );
 		}
@@ -228,7 +228,7 @@ int main( int argc, char* argv[] )
 		}
 
 		// instantiate the component & obtain the interface instance
-		co::RefPtr<co::Component> component;
+		co::RefPtr<co::IComponent> component;
 		co::Interface* itf;
 		try
 		{
@@ -245,7 +245,7 @@ int main( int argc, char* argv[] )
 		}
 
 		// prepare to invoke the method
-		co::Reflector* reflector;
+		co::IReflector* reflector;
 		try
 		{
 			reflector = method->getOwner()->getReflector();

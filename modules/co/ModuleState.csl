@@ -1,5 +1,5 @@
 /*
-	The life-cycle stages of a Module.
+	The life-cycle stages of a module.
  */
 enum ModuleState
 {

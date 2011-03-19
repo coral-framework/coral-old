@@ -5,9 +5,9 @@ local function template( writer, c, t )
 
 #include "]], t.name, [[_Base.h"
 #include <co/Coral.h>
-#include <co/ComponentType.h>
-#include <co/InterfaceInfo.h>
-#include <co/InterfaceType.h>
+#include <co/IComponentType.h>
+#include <co/IInterfaceInfo.h>
+#include <co/IInterfaceType.h>
 
 ]] )
 
@@ -31,7 +31,7 @@ void moduleRelease();
 
 // ------ ]], t.fullName, [[ provides an interface named ']], itf.name, [[', of type ]], itf.type.fullName, [[ ------ //
 
-co::InterfaceType* ]], t.name, [[_]], itf.type.fullNameUnderline, [[::getInterfaceType()
+co::IInterfaceType* ]], t.name, [[_]], itf.type.fullNameUnderline, [[::getInterfaceType()
 {
 	return co::typeOf<]], itf.type.cppName, [[>::get();
 }
@@ -74,7 +74,7 @@ const std::string& ]], t.name, [[_]], itf.type.fullNameUnderline, [[::getInterfa
 	writer( [[
 }
 
-co::Component* ]], t.name, [[_Base::getInterfaceOwner()
+co::IComponent* ]], t.name, [[_Base::getInterfaceOwner()
 {
 	return this;
 }
@@ -89,14 +89,14 @@ void ]], t.name, [[_Base::componentRelease()
 	decrementRefCount();
 }
 
-co::ComponentType* ]], t.name, [[_Base::getComponentType()
+co::IComponentType* ]], t.name, [[_Base::getComponentType()
 {
-	co::Type* type = co::getType( "]], t.fullName, [[" );
-	assert( dynamic_cast<co::ComponentType*>( type ) );
-	return static_cast<co::ComponentType*>( type );
+	co::IType* type = co::getType( "]], t.fullName, [[" );
+	assert( dynamic_cast<co::IComponentType*>( type ) );
+	return static_cast<co::IComponentType*>( type );
 }
 
-co::Interface* ]], t.name, [[_Base::getInterface( co::InterfaceInfo* interfaceInfo )
+co::Interface* ]], t.name, [[_Base::getInterface( co::IInterfaceInfo* interfaceInfo )
 {
 	checkValidInterface( interfaceInfo );
 	co::Interface* res = NULL;
@@ -119,7 +119,7 @@ co::Interface* ]], t.name, [[_Base::getInterface( co::InterfaceInfo* interfaceIn
 	return res;
 }
 
-void ]], t.name, [[_Base::setReceptacle( co::InterfaceInfo* receptacle, co::Interface* facet )
+void ]], t.name, [[_Base::setReceptacle( co::IInterfaceInfo* receptacle, co::Interface* facet )
 {
 	checkValidReceptacle( receptacle );
 ]] )

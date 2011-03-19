@@ -11,45 +11,45 @@ namespace co {
 
 // ------ Helper Comparators ---------------------------------------------------
 
-inline int itfInfoComparator( InterfaceInfo* interfaceInfo, const std::string& name )
+inline int itfInfoComparator( IInterfaceInfo* interfaceInfo, const std::string& name )
 {
 	return interfaceInfo->getName().compare( name );
 }
 
-inline bool sortInterfacesByKindThenName( const RefPtr<InterfaceInfo>& a, const RefPtr<InterfaceInfo>& b )
+inline bool sortInterfacesByKindThenName( const RefPtr<IInterfaceInfo>& a, const RefPtr<IInterfaceInfo>& b )
 {
-	bool isFacetA = const_cast<InterfaceInfo*>( a.get() )->getIsFacet();
-	bool isFacetB = const_cast<InterfaceInfo*>( b.get() )->getIsFacet();
+	bool isFacetA = const_cast<IInterfaceInfo*>( a.get() )->getIsFacet();
+	bool isFacetB = const_cast<IInterfaceInfo*>( b.get() )->getIsFacet();
 
 	if( ( !isFacetA && isFacetB ) || ( isFacetA && !isFacetB ) )
 	{
 		return isFacetA; // facets come first
 	}
 
-	return const_cast<InterfaceInfo*>( a.get() )->getName()
-			< const_cast<InterfaceInfo*>( b.get() )->getName();
+	return const_cast<IInterfaceInfo*>( a.get() )->getName()
+			< const_cast<IInterfaceInfo*>( b.get() )->getName();
 }
 
-// ------ ComponentTypeComponent -----------------------------------------------
+// ------ ComponentType -----------------------------------------------
 
-ComponentTypeComponent::ComponentTypeComponent() : _firstReceptacle( -1 )
+ComponentType::ComponentType() : _firstReceptacle( -1 )
 {
 	// empty
 }
 
-ComponentTypeComponent::~ComponentTypeComponent()
+ComponentType::~ComponentType()
 {
 	// empty
 }
 
-void ComponentTypeComponent::addInterfaces( ArrayRange<InterfaceInfo* const> interfaces )
+void ComponentType::addInterfaces( ArrayRange<IInterfaceInfo* const> interfaces )
 {
 	_interfaces.reserve( _interfaces.size() + interfaces.getSize() );
 	for( ; interfaces; interfaces.popFirst() )
 		_interfaces.push_back( interfaces.getFirst() );
 }
 
-void ComponentTypeComponent::sortInterfaces()
+void ComponentType::sortInterfaces()
 {
 	std::sort( _interfaces.begin(), _interfaces.end(), sortInterfacesByKindThenName );
 
@@ -69,12 +69,12 @@ void ComponentTypeComponent::sortInterfaces()
 		_firstReceptacle = count;
 }
 
-ArrayRange<MemberInfo* const> ComponentTypeComponent::getMembers()
+ArrayRange<IMemberInfo* const> ComponentType::getMembers()
 {
 	return _interfaces;
 }
 
-MemberInfo* ComponentTypeComponent::getMember( const std::string& name )
+IMemberInfo* ComponentType::getMember( const std::string& name )
 {
 	size_t pos;
 
@@ -90,34 +90,34 @@ MemberInfo* ComponentTypeComponent::getMember( const std::string& name )
 	return NULL;
 }
 
-ArrayRange<InterfaceInfo* const> ComponentTypeComponent::getInterfaces()
+ArrayRange<IInterfaceInfo* const> ComponentType::getInterfaces()
 {
 	return _interfaces;
 }
 
-ArrayRange<InterfaceInfo* const> ComponentTypeComponent::getFacets()
+ArrayRange<IInterfaceInfo* const> ComponentType::getFacets()
 {
 	assert( _firstReceptacle != size_t( -1 ) );
 
 	if( _firstReceptacle < 1 )
-		return ArrayRange<InterfaceInfo* const>();
+		return ArrayRange<IInterfaceInfo* const>();
 
-	return ArrayRange<InterfaceInfo* const>( reinterpret_cast<InterfaceInfo**>(
+	return ArrayRange<IInterfaceInfo* const>( reinterpret_cast<IInterfaceInfo**>(
 				&_interfaces.front() ), _firstReceptacle );
 }
 
-ArrayRange<InterfaceInfo* const> ComponentTypeComponent::getReceptacles()
+ArrayRange<IInterfaceInfo* const> ComponentType::getReceptacles()
 {
 	assert( _firstReceptacle != size_t( -1 ) );
-	
+
 	size_t numItfs = _interfaces.size();
 	if( _firstReceptacle >= numItfs )
-		return ArrayRange<InterfaceInfo* const>();
-	
-	return ArrayRange<InterfaceInfo* const>( reinterpret_cast<InterfaceInfo**>(
+		return ArrayRange<IInterfaceInfo* const>();
+
+	return ArrayRange<IInterfaceInfo* const>( reinterpret_cast<IInterfaceInfo**>(
 				&_interfaces.front() + _firstReceptacle ), numItfs - _firstReceptacle );
 }
 
-CORAL_EXPORT_COMPONENT( ComponentTypeComponent, ComponentTypeComponent );
+CORAL_EXPORT_COMPONENT( ComponentType, ComponentType );
 
 } // namespace co

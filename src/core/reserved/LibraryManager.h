@@ -11,7 +11,7 @@
 namespace co {
 
 class Library;
-class ModulePart;
+class IModulePart;
 
 /*!
 	\brief Reserved, auxiliary static class that keeps track of all loaded
@@ -21,13 +21,13 @@ class CORAL_EXPORT LibraryManager
 {
 public:
 	//! Registers a module part and its associated library.
-	static void add( ModulePart* part, Library* library );
+	static void add( IModulePart* part, Library* library );
 
 	/*!
 		Releases the library associated with a module part,
 		so it can be unloaded by the next flush().
 	 */
-	static void release( ModulePart* part );
+	static void release( IModulePart* part );
 
 	//! Releases all registered libraries.
 	static void releaseAll();

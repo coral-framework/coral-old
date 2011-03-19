@@ -8,8 +8,8 @@
 #include "tools/StringTokenizer.h"
 #include <co/Coral.h>
 #include <co/RefPtr.h>
-#include <co/Reflector.h>
-#include <co/InterfaceInfo.h>
+#include <co/IReflector.h>
+#include <co/IInterfaceInfo.h>
 #include <co/NoSuchInterfaceException.h>
 #include <co/reserved/OS.h>
 #include <co/reserved/LibraryManager.h>
@@ -28,9 +28,9 @@ namespace co {
 #endif
 
 static std::vector<std::string> sg_paths;
-static RefPtr<SystemComponent> sg_system;
-static TypeManager* sg_typeManager( NULL );
-static ServiceManager* sg_serviceManager( NULL );
+static RefPtr<System> sg_system;
+static ITypeManager* sg_typeManager( NULL );
+static IServiceManager* sg_serviceManager( NULL );
 
 ArrayRange<const std::string> getPaths()
 {
@@ -64,11 +64,11 @@ void addPath( const std::string& path )
 	}
 }
 
-System* getSystem()
+ISystem* getSystem()
 {
 	if( !sg_system )
 	{
-		sg_system = new SystemComponent;
+		sg_system = new System;
 		sg_system->initialize();
 		ModuleInstaller::instance().install();
 	}
@@ -82,7 +82,7 @@ void shutdown()
 
 	SystemState systemState = sg_system->getState();
 
-	// System::setupBase() ran successfully but System::setupPresentation() was not called?
+	// ISystem::setupBase() ran successfully but ISystem::setupPresentation() was not called?
 	assert( systemState != SystemState_Integrated );
 
 	// tear down the system if it's still running
@@ -136,41 +136,41 @@ void debug( DebugEvent event, const char* msg, ... )
 	sg_debugEventHandler( event, buffer );
 }
 
-Type* getType( const std::string& fullName )
+IType* getType( const std::string& fullName )
 {
 	if( !sg_typeManager )
 		sg_typeManager = getSystem()->getTypes();
 	return sg_typeManager->getType( fullName );
 }
 
-Component* newInstance( const std::string& fullName )
+IComponent* newInstance( const std::string& fullName )
 {
-	Type* type = getType( fullName );
+	IType* type = getType( fullName );
 	assert( type );
-	Reflector* reflector = type->getReflector();
+	IReflector* reflector = type->getReflector();
 	assert( reflector );
 	return reflector->newInstance();
 }
 
-void setReceptacleByName( Component* instance, const std::string& receptacleName, Interface* facet )
+void setReceptacleByName( IComponent* instance, const std::string& receptacleName, Interface* facet )
 {
 	assert( instance );
-	ComponentType* ct = instance->getComponentType();
-	InterfaceInfo* ii = dynamic_cast<InterfaceInfo*>( ct->getMember( receptacleName ) );
+	IComponentType* ct = instance->getComponentType();
+	IInterfaceInfo* ii = dynamic_cast<IInterfaceInfo*>( ct->getMember( receptacleName ) );
 	if( !ii )
 		CORAL_THROW( NoSuchInterfaceException, "no such interface '" << receptacleName
 						<< "' in component " << ct->getFullName() );
 	instance->setReceptacle( ii, facet );
 }
 
-inline ServiceManager* getServices()
+inline IServiceManager* getServices()
 {
 	if( !sg_serviceManager )
 		sg_serviceManager = getSystem()->getServices();
 	return sg_serviceManager;
 }
 
-Interface* getServiceForType( InterfaceType* serviceType, InterfaceType* clientType )
+Interface* getServiceForType( IInterfaceType* serviceType, IInterfaceType* clientType )
 {
 	if( clientType )
 		return getServices()->getServiceForType( serviceType, clientType );
@@ -178,7 +178,7 @@ Interface* getServiceForType( InterfaceType* serviceType, InterfaceType* clientT
 		return getServices()->getService( serviceType );
 }
 
-Interface* getServiceForInstance( InterfaceType* serviceType, Interface* clientInstance )
+Interface* getServiceForInstance( IInterfaceType* serviceType, Interface* clientInstance )
 {
 	return getServices()->getServiceForInstance( serviceType, clientInstance );
 }
@@ -192,5 +192,5 @@ bool findModuleFile( const std::string& moduleName, const std::string& fileName,
 				ArrayRange<const std::string>( &fileName, 1 ),
 				filePath );
 }
-	
+
 } // namespace co

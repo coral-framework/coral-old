@@ -7,9 +7,9 @@
 #include "BasicReflector.h"
 #include "SignatureCalculator.h"
 #include <co/Coral.h>
-#include <co/System.h>
-#include <co/Namespace.h>
-#include <co/ModuleManager.h>
+#include <co/ISystem.h>
+#include <co/INamespace.h>
+#include <co/IModuleManager.h>
 #include <co/ModuleLoadException.h>
 #include <cassert>
 #include <sstream>
@@ -24,15 +24,15 @@ TypeImpl::TypeImpl() : _namespace( NULL ), _kind( TK_NONE )
 	_isCalculatingSignatures = false;
 }
 
-void TypeImpl::setType( Namespace* parent, const std::string& name, TypeKind kind )
+void TypeImpl::setType( INamespace* parent, const std::string& name, TypeKind kind )
 {
 	assert( _kind == TK_NONE );
 	assert( _namespace == NULL );
-	
+
 	_namespace = parent;
 	_name = name;
 	_kind = kind;
-	
+
 	// compute our 'fullName'
 	if( _namespace->getParentNamespace() )
 	{
@@ -56,7 +56,7 @@ const std::string& TypeImpl::getFullName()
 	return _fullName;
 }
 
-Namespace* TypeImpl::getNamespace()
+INamespace* TypeImpl::getNamespace()
 {
 	return _namespace;
 }
@@ -66,7 +66,7 @@ TypeKind TypeImpl::getKind()
 	return _kind;
 }
 
-const Uuid& TypeImpl::getFullSignature( Type* myType )
+const Uuid& TypeImpl::getFullSignature( IType* myType )
 {
 	if( !_hasSignatures )
 		calculateSignatures( myType );
@@ -74,7 +74,7 @@ const Uuid& TypeImpl::getFullSignature( Type* myType )
 	return _fullSignature;
 }
 
-const Uuid& TypeImpl::getBinarySignature( Type* myType )
+const Uuid& TypeImpl::getBinarySignature( IType* myType )
 {
 	if( !_hasSignatures )
 		calculateSignatures( myType );
@@ -82,7 +82,7 @@ const Uuid& TypeImpl::getBinarySignature( Type* myType )
 	return _binarySignature;
 }
 
-Reflector* TypeImpl::getReflector( Type* myType )
+IReflector* TypeImpl::getReflector( IType* myType )
 {
 	if( !_reflector.isValid() )
 	{
@@ -96,7 +96,7 @@ Reflector* TypeImpl::getReflector( Type* myType )
 			/*
 				Loading the type's module should cause its reflector to be installed.
 				Notice that reflectors cannot be obtained before the system is set up
-				(System::setupBase()), since we cannot load modules before that.
+				(ISystem::setupBase()), since we cannot load modules before that.
 			 */
 			try
 			{
@@ -124,12 +124,12 @@ Reflector* TypeImpl::getReflector( Type* myType )
 	return _reflector.get();
 }
 
-void TypeImpl::setReflector( Reflector* reflector )
+void TypeImpl::setReflector( IReflector* reflector )
 {
 	_reflector = reflector;
 }
 
-void TypeImpl::calculateSignatures( Type* myType )
+void TypeImpl::calculateSignatures( IType* myType )
 {
 	assert( !_isCalculatingSignatures );
 	_isCalculatingSignatures = true;
@@ -144,13 +144,13 @@ void TypeImpl::calculateSignatures( Type* myType )
 	_isCalculatingSignatures = false;
 }
 
-// ------ Type -----------------------------------------------------------------
+// ------ IType -----------------------------------------------------------------
 
-TypeComponent::~TypeComponent()
+Type::~Type()
 {
 	// empty
 }
 
-CORAL_EXPORT_COMPONENT( TypeComponent, TypeComponent );
+CORAL_EXPORT_COMPONENT( Type, Type );
 
 } // namespace co

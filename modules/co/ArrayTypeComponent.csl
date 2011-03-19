@@ -1,7 +1,0 @@
-/*
-	Implements co.ArrayType.
- */
-component ArrayTypeComponent
-{
-	provides ArrayType type;
-};

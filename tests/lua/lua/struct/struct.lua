@@ -80,10 +80,10 @@ function M:initialize( module )
 	ts.typeArray = {}
 	ASSERT_EQ( 0, #ts.typeArray )
 
-	ts.typeArray = { co.Type "int32", co.Type "co.ArrayType", co.Type "any" }
+	ts.typeArray = { co.Type "int32", co.Type "co.IArrayType", co.Type "any" }
 	ASSERT_EQ( 3, #ts.typeArray )
 	ASSERT_EQ( "int32", ts.typeArray[1].fullName )
-	ASSERT_EQ( "co.ArrayType", ts.typeArray[2].fullName )
+	ASSERT_EQ( "co.IArrayType", ts.typeArray[2].fullName )
 end
 
 return M

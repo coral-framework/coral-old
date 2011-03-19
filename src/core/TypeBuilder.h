@@ -7,59 +7,59 @@
 #define _TYPEBUILDER_H_
 
 #include "Namespace.h"
-#include "TypeBuilderComponent_Base.h"
+#include "TypeBuilder_Base.h"
 #include <co/RefPtr.h>
 
 namespace co {
 
 // Forward Decls:
 class TypeImpl;
-class AttributeInfo;
-class InterfaceInfo;
-class InterfaceType;
-class MethodInfoComponent;
+class IAttributeInfo;
+class IInterfaceInfo;
+class IInterfaceType;
+class MethodInfo;
 
 /*!
-	Component that implements co.TypeBuilder.
+	Implements co.ITypeBuilder.
  */
-class TypeBuilderComponent : public TypeBuilderComponent_Base
+class TypeBuilder : public TypeBuilder_Base
 {
 public:
 	/*!
 		Factory method.
 		\pre kind >= TK_ENUM.
 	 */
-	static TypeBuilder* create( TypeKind kind, Namespace* ns, const std::string& name );
+	static ITypeBuilder* create( TypeKind kind, INamespace* ns, const std::string& name );
 
 public:
-	virtual ~TypeBuilderComponent();
+	virtual ~TypeBuilder();
 
 	/*!
 		Internal method. Destroys and removes all references to the type created by this builder.
-		This only works if the type was not committed, and is used in TypeCreationTransaction::rollback().
+		This only works if the type was not committed, and is used in ITypeCreationTransaction::rollback().
 	 */
 	void destroyType();
 
-	//! Template method: tries to add a method definition (called from MethodBuilder).
-	virtual void addMethod( MethodInfoComponent* methodInfo );
+	//! Template method: tries to add a method definition (called from IMethodBuilder).
+	virtual void addMethod( MethodInfo* methodInfo );
 
-	// TypeBuilder methods:
-	Namespace* getNamespace();
+	// ITypeBuilder methods:
+	INamespace* getNamespace();
 	TypeKind getKind();
 	const std::string& getTypeName();
 	void defineIdentifier( const std::string& name );
-	void defineAttribute( const std::string& name, Type* type, bool isReadOnly );
-	void defineSuperType( Type* superType );
-	void defineInterface( const std::string& name, InterfaceType* interface, bool isFacet );
-	MethodBuilder* defineMethod( const std::string& name );
+	void defineAttribute( const std::string& name, IType* type, bool isReadOnly );
+	void defineSuperType( IType* superType );
+	void defineInterface( const std::string& name, IInterfaceType* interface, bool isFacet );
+	IMethodBuilder* defineMethod( const std::string& name );
 	void defineNativeClass( const std::string& nativeHeaderFile, const std::string& nativeName );
-	Type* createType();
+	IType* createType();
 
 protected:
-	TypeBuilderComponent( TypeKind kind );
+	TypeBuilder( TypeKind kind );
 
 	//! Common initialization code, triggers the pre-allocation of our (still empty) type.
-	void initialize( Namespace* ns, const std::string& name );
+	void initialize( INamespace* ns, const std::string& name );
 
 	//! Throws an exception if the type was already created (no further definitions allowed).
 	void assertNotCreated();
@@ -80,10 +80,10 @@ protected:
 
 protected:
 	TypeKind _kind;
-	RefPtr<NamespaceComponent> _namespace;
+	RefPtr<Namespace> _namespace;
 	std::string _name;
 
-	RefPtr<Type> _type;
+	RefPtr<IType> _type;
 	bool _typeWasCreated;
 };
 

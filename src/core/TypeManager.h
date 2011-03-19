@@ -7,20 +7,20 @@
 #define _TYPEMANAGER_H_
 
 #include "Namespace.h"
-#include "TypeManagerComponent_Base.h"
+#include "TypeManager_Base.h"
 #include <co/RefPtr.h>
 #include <map>
 
 namespace co {
 
 /*!
-	Component that implements co.TypeManager.
+	Implements co.ITypeManager.
  */
-class TypeManagerComponent : public TypeManagerComponent_Base
+class TypeManager : public TypeManager_Base
 {
 public:
-	TypeManagerComponent();
-	virtual ~TypeManagerComponent();
+	TypeManager();
+	virtual ~TypeManager();
 
 	// internal methods:
 	void initialize();
@@ -28,27 +28,27 @@ public:
 	void addCppBlock( const std::string& interfaceName, const std::string& text );
 	const std::string& getCppBlock( const std::string& interfaceName );
 
-	// TypeManager methods:
-	Namespace* getRootNS();
+	// ITypeManager methods:
+	INamespace* getRootNS();
 	bool getDocumentationParsing();
 	void setDocumentationParsing( bool documentationParsing );
-	Type* findType( const std::string& fullName );
-	Namespace* findNamespace( const std::string& fullName );
-	Type* getType( const std::string& typeName );
-	ArrayType* getArrayOf( Type* elementType );
-	Type* loadType( const std::string& typeName, std::vector<CSLError>& errorStack );
+	IType* findType( const std::string& fullName );
+	INamespace* findNamespace( const std::string& fullName );
+	IType* getType( const std::string& typeName );
+	IArrayType* getArrayOf( IType* elementType );
+	IType* loadType( const std::string& typeName, std::vector<CSLError>& errorStack );
 	const std::string& getDocumentation( const std::string& typeOrMemberName );
 
 private:
-	Type* loadTypeOrThrow( const std::string& fullName );
+	IType* loadTypeOrThrow( const std::string& fullName );
 
-	ArrayType* defineArrayType( Type* elementType );
+	IArrayType* defineArrayType( IType* elementType );
 
-	void definePrimitiveType( NamespaceComponent* ns, const std::string& name, TypeKind kind );
+	void definePrimitiveType( Namespace* ns, const std::string& name, TypeKind kind );
 	void defineBuiltInTypes();
 
 private:
-	RefPtr<NamespaceComponent> _rootNS;
+	RefPtr<Namespace> _rootNS;
 
 	bool _docParsing;
 

@@ -7,21 +7,21 @@
 
 namespace co {
 
-ArrayTypeComponent::~ArrayTypeComponent()
+ArrayType::~ArrayType()
 {
 	// empty
 }
 
-void ArrayTypeComponent::setElementType( Type* type )
+void ArrayType::setElementType( IType* type )
 {
 	_elementType = type;
 }
 
-Type* ArrayTypeComponent::getElementType()
+IType* ArrayType::getElementType()
 {
 	return _elementType.get();
 }
 
-CORAL_EXPORT_COMPONENT( ArrayTypeComponent, ArrayTypeComponent );
+CORAL_EXPORT_COMPONENT( ArrayType, ArrayType );
 
 } // namespace co

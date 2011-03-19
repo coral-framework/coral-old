@@ -6,17 +6,17 @@
 #include <gtest/gtest.h>
 
 #include <co/Coral.h>
-#include <co/Module.h>
-#include <co/System.h>
-#include <co/Component.h>
-#include <co/Reflector.h>
+#include <co/IModule.h>
+#include <co/ISystem.h>
+#include <co/IComponent.h>
+#include <co/IReflector.h>
 #include <co/ModuleState.h>
-#include <co/CompoundType.h>
-#include <co/AttributeInfo.h>
-#include <co/ModuleManager.h>
-#include <co/ServiceManager.h>
+#include <co/ICompoundType.h>
+#include <co/IAttributeInfo.h>
+#include <co/IModuleManager.h>
+#include <co/IServiceManager.h>
 #include <co/LifeCycleException.h>
-#include <co/TypeCreationTransaction.h>
+#include <co/ITypeCreationTransaction.h>
 #include <co/IllegalArgumentException.h>
 #include <moduleA/TestInterface.h>
 
@@ -24,14 +24,14 @@ TEST( ModuleTests, setupSystemThenLoadModuleA )
 {
 	// shutdown and re-setup the system
 	co::shutdown();
-	co::System* system = co::getSystem();
+	co::ISystem* system = co::getSystem();
 	system->setup();
 
 	// moduleA should not have been loaded yet
 	EXPECT_TRUE( system->getModules()->findModule( "moduleA" ) == NULL );
 
 	// load moduleA: first call should load, second call should just retrieve the module
-	co::Module* moduleA = system->getModules()->load( "moduleA" );
+	co::IModule* moduleA = system->getModules()->load( "moduleA" );
 	ASSERT_TRUE( moduleA != NULL );
 	EXPECT_EQ( moduleA, system->getModules()->load( "moduleA" ) );
 
@@ -39,7 +39,7 @@ TEST( ModuleTests, setupSystemThenLoadModuleA )
 	EXPECT_EQ( moduleA, system->getModules()->findModule( "moduleA" ) );
 
 	// and its types should have reflectors
-	co::Type* type = co::getType( "moduleA.TestInterface" );
+	co::IType* type = co::getType( "moduleA.TestInterface" );
 	EXPECT_TRUE( type->getReflector() != NULL );
 }
 
@@ -47,7 +47,7 @@ TEST( ModuleTests, setupSystemRequiringModuleB )
 {
 	// shutdown and re-setup the system requiring moduleB
 	co::shutdown();
-	co::System* system = co::getSystem();
+	co::ISystem* system = co::getSystem();
 
 	// moduleA should not have been loaded yet
 	EXPECT_TRUE( system->getModules()->findModule( "moduleA" ) == NULL );
@@ -60,7 +60,7 @@ TEST( ModuleTests, setupSystemRequiringModuleB )
 	ASSERT_TRUE( system->getModules()->findModule( "moduleA" ) != NULL );
 
 	// and its types should have reflectors
-	co::Type* type = co::getType( "moduleA.TestInterface" );
+	co::IType* type = co::getType( "moduleA.TestInterface" );
 	EXPECT_TRUE( type->getReflector() != NULL );
 }
 
@@ -68,7 +68,7 @@ TEST( ModuleTests, systemAndModuleLifeCycles )
 {
 	// fully restart the system
 	co::shutdown();
-	co::System* system = co::getSystem();
+	co::ISystem* system = co::getSystem();
 
 	// cannot tearDown() before setting the system up
 	EXPECT_THROW( system->tearDown(), co::LifeCycleException );
@@ -81,8 +81,8 @@ TEST( ModuleTests, systemAndModuleLifeCycles )
 	system->setupBase( co::ArrayRange<std::string const>( &requiredModule, 1 ) );
 
 	// moduleA should have been loaded, but not moduleB
-	co::Module* moduleA = system->getModules()->findModule( "moduleA" );
-	co::Module* moduleB = system->getModules()->findModule( "moduleB" );
+	co::IModule* moduleA = system->getModules()->findModule( "moduleA" );
+	co::IModule* moduleB = system->getModules()->findModule( "moduleB" );
 	ASSERT_TRUE( moduleA != NULL );
 	ASSERT_TRUE( moduleB == NULL );
 
@@ -130,21 +130,21 @@ TEST( ModuleTests, systemAndModuleLifeCycles )
 TEST( ModuleTests, crossModuleInheritance )
 {
 	// instantiate a component from 'moduleA' that implements an interface from 'co'
-	co::RefPtr<co::Component> component = co::newInstance( "moduleA.TestComponent" );
+	co::RefPtr<co::IComponent> component = co::newInstance( "moduleA.TestComponent" );
 
 	// exercise dynamic_casts
 	moduleA::TestInterface* ti = component->getFacet<moduleA::TestInterface>();
 	EXPECT_EQ( component.get(), ti->getInterfaceOwner() );
 
-	co::TypeCreationTransaction* tct = component->getFacet<co::TypeCreationTransaction>();
+	co::ITypeCreationTransaction* tct = component->getFacet<co::ITypeCreationTransaction>();
 	EXPECT_EQ( component.get(), tct->getInterfaceOwner() );
 }
 
 TEST( ModuleTests, crossModuleReflection )
 {
 	// exercise the reflection API on one of moduleA's types
-	co::Type* type = co::getType( "moduleA.TestStruct" );
-	co::Reflector* reflector = type->getReflector();
+	co::IType* type = co::getType( "moduleA.TestStruct" );
+	co::IReflector* reflector = type->getReflector();
 	ASSERT_TRUE( reflector != NULL );
 
 	const int size = reflector->getSize();
@@ -155,11 +155,11 @@ TEST( ModuleTests, crossModuleReflection )
 	EXPECT_THROW( reflector->createValue( instancePtr, 1337 ), co::IllegalArgumentException );
 	EXPECT_NO_THROW( reflector->createValue( instancePtr, size ) );
 
-	// get an AttributeInfo
-	co::CompoundType* ct = dynamic_cast<co::CompoundType*>( type );
+	// get an IAttributeInfo
+	co::ICompoundType* ct = dynamic_cast<co::ICompoundType*>( type );
 	assert( ct );
 
-	co::AttributeInfo* anInt8Attrib = dynamic_cast<co::AttributeInfo*>( ct->getMember( "anInt8" ) );
+	co::IAttributeInfo* anInt8Attrib = dynamic_cast<co::IAttributeInfo*>( ct->getMember( "anInt8" ) );
 	assert( anInt8Attrib );
 
 	// exercise the reflection API
@@ -194,11 +194,11 @@ TEST( ModuleTests, serviceDependencies )
 {
 	// shutdown and re-setup the system
 	co::shutdown();
-	co::System* system = co::getSystem();
+	co::ISystem* system = co::getSystem();
 	system->setup();
 
-	co::ServiceManager* sm = system->getServices();
-	co::InterfaceType* serviceType = co::typeOf<moduleA::TestInterface>::get();
+	co::IServiceManager* sm = system->getServices();
+	co::IInterfaceType* serviceType = co::typeOf<moduleA::TestInterface>::get();
 
 	// register a service provided by moduleA
 	ASSERT_TRUE( sm->getIsLazy() );

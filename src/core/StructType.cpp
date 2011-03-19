@@ -7,11 +7,11 @@
 
 namespace co {
 
-StructTypeComponent::~StructTypeComponent()
+StructType::~StructType()
 {
 	// empty
 }
 
-CORAL_EXPORT_COMPONENT( StructTypeComponent, StructTypeComponent );
+CORAL_EXPORT_COMPONENT( StructType, StructType );
 
 } // namespace co

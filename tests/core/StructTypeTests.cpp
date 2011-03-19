@@ -23,7 +23,7 @@ TEST( StructTypeTests, conflictingType )
 	// loads the struct_valid type, in order produce a type conflict
 	// it checks if struct_valid is already loaded (to keep independence from
 	// the first struct test)
-	co::Type* structValid = TestHelper::type( "StructTypeTests.struct_valid" );
+	co::IType* structValid = TestHelper::type( "StructTypeTests.struct_valid" );
 	if( structValid == NULL )
 	{
 		CSL_TEST( "StructTypeTests.struct_valid" )

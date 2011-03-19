@@ -4,6 +4,7 @@
  */
 
 #include "CSLTester.h"
+#include <co/ISystem.h>
 #include <core/csl/Error.h>
 #include <gtest/gtest.h>
 

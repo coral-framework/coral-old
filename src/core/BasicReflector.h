@@ -17,16 +17,16 @@
 class BasicReflector : public co::ReflectorBase
 {
 public:
-	BasicReflector( co::Type* type );
+	BasicReflector( co::IType* type );
 	virtual ~BasicReflector();
 
-	// co::Reflector methods:
-	co::Type* getType();
+	// co::IReflector methods:
+	co::IType* getType();
 	co::int32 getSize();
-	Component* newInstance();
+	IComponent* newInstance();
 
 private:
-	co::Type* _type;
+	co::IType* _type;
 };
 
 #endif // _BASICREFLECTOR_H_

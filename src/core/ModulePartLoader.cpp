@@ -6,14 +6,14 @@
 #include "ModulePartLoader.h"
 #include "tools/Library.h"
 #include "tools/StringTokenizer.h"
-#include <co/Type.h>
 #include <co/Uuid.h>
 #include <co/Coral.h>
-#include <co/Module.h>
-#include <co/System.h>
-#include <co/Namespace.h>
-#include <co/ModulePart.h>
-#include <co/ModuleManager.h>
+#include <co/IType.h>
+#include <co/IModule.h>
+#include <co/ISystem.h>
+#include <co/INamespace.h>
+#include <co/IModulePart.h>
+#include <co/IModuleManager.h>
 #include <co/TypeLoadException.h>
 #include <co/ModuleLoadException.h>
 #include <co/IllegalArgumentException.h>
@@ -34,7 +34,7 @@ struct TypeDependency
 
 typedef const char* (*QueryVerificationDataFunction)();
 typedef const TypeDependency* (*QueryDependenciesFunction)();
-typedef ModulePart* (*ModulePartInstanceFunction)();
+typedef IModulePart* (*ModulePartInstanceFunction)();
 
 struct BootstrapFunctions
 {
@@ -44,24 +44,24 @@ struct BootstrapFunctions
 };
 
 
-// ------ Default ModulePartLoader ---------------------------------------------
+// ------ Default IModulePartLoader ---------------------------------------------
 
-ModulePartLoaderComponent::ModulePartLoaderComponent()
+ModulePartLoader::ModulePartLoader()
 {
 	// empty
 }
 
-ModulePartLoaderComponent::~ModulePartLoaderComponent()
+ModulePartLoader::~ModulePartLoader()
 {
 	// empty
 }
 
-bool ModulePartLoaderComponent::canLoadModulePart( const std::string& moduleName )
+bool ModulePartLoader::canLoadModulePart( const std::string& moduleName )
 {
 	return locateModuleLibrary( moduleName );
 }
 
-ModulePart* ModulePartLoaderComponent::loadModulePart( const std::string& moduleName )
+IModulePart* ModulePartLoader::loadModulePart( const std::string& moduleName )
 {
 	std::string libraryFilename;
 	if( !locateModuleLibrary( moduleName, &libraryFilename ) )
@@ -82,9 +82,9 @@ ModulePart* ModulePartLoaderComponent::loadModulePart( const std::string& module
 
 	checkTypeDependencies( bf.queryDependencies() );
 
-	ModulePart* part = bf.modulePartInstance();
+	IModulePart* part = bf.modulePartInstance();
 	if( !part )
-		throw ModuleLoadException( "library provided a null ModulePart" );
+		throw ModuleLoadException( "library provided a null IModulePart" );
 
 	LibraryManager::add( part, lib.get() );
 
@@ -97,7 +97,7 @@ ModulePart* ModulePartLoaderComponent::loadModulePart( const std::string& module
 	#define MODULE_LIB_EXT ".so"
 #endif
 
-bool ModulePartLoaderComponent::locateModuleLibrary( const std::string& moduleName, std::string* filename )
+bool ModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::string* filename )
 {
 	const char* moduleBaseName = moduleName.c_str();
 	size_t lastDotPos = moduleName.rfind( '.' );
@@ -151,7 +151,7 @@ bool ModulePartLoaderComponent::locateModuleLibrary( const std::string& moduleNa
 							filename ? *filename : modulePath );
 }
 
-void ModulePartLoaderComponent::resolveModuleFunctions( Library* lib, BootstrapFunctions& bf )
+void ModulePartLoader::resolveModuleFunctions( Library* lib, BootstrapFunctions& bf )
 {
 	bf.queryVerificationData = reinterpret_cast<QueryVerificationDataFunction>(
 												lib->resolve( "coral_module_query_verification_data" ) );
@@ -165,7 +165,7 @@ void ModulePartLoaderComponent::resolveModuleFunctions( Library* lib, BootstrapF
 						<< "' does not properly export the module bootstrap functions" );
 }
 
-bool ModulePartLoaderComponent::checkVerificationData( const std::string& data )
+bool ModulePartLoader::checkVerificationData( const std::string& data )
 {
 	StringTokenizer st( data, "=\n" );
 	const std::string& str = st.getToken();
@@ -215,16 +215,16 @@ bool ModulePartLoaderComponent::checkVerificationData( const std::string& data )
 	return true;
 }
 
-void ModulePartLoaderComponent::checkTypeDependencies( const TypeDependency* td )
+void ModulePartLoader::checkTypeDependencies( const TypeDependency* td )
 {
 	std::string currentBinarySignature;
-	std::vector<Type*> incompatibleTypes;
+	std::vector<IType*> incompatibleTypes;
 
 	try
 	{
 		while( td->name && td->binarySignature )
 		{
-			Type* type = getType( td->name );
+			IType* type = getType( td->name );
 			type->getBinarySignature().getString( currentBinarySignature );
 
 			if( currentBinarySignature != td->binarySignature )
@@ -251,7 +251,7 @@ void ModulePartLoaderComponent::checkTypeDependencies( const TypeDependency* td 
 		return;
 
 	std::stringstream ss;
-	
+
 	if( numIncompatibleTypes == 1 )
 		ss << "the module was compiled with a different, binary-incompatible version of '";
 	else
@@ -270,6 +270,6 @@ void ModulePartLoaderComponent::checkTypeDependencies( const TypeDependency* td 
 	throw ModuleLoadException( ss.str() );
 }
 
-CORAL_EXPORT_COMPONENT( ModulePartLoaderComponent, ModulePartLoaderComponent );
+CORAL_EXPORT_COMPONENT( ModulePartLoader, ModulePartLoader );
 
 } // namespace co

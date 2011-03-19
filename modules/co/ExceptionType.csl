@@ -1,6 +1,7 @@
 /*
-	Type representing a named exception that can be raised by methods.
+	Implements co.IExceptionType.
  */
-interface ExceptionType : Type
+component ExceptionType
 {
+	provides IExceptionType type;
 };

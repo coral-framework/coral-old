@@ -4,11 +4,11 @@
  */
 
 #include "Any.h"
-#include <co/Type.h>
-#include <co/EnumType.h>
-#include <co/Namespace.h>
-#include <co/Reflector.h>
-#include <co/InterfaceType.h>
+#include <co/IType.h>
+#include <co/IEnumType.h>
+#include <co/INamespace.h>
+#include <co/IReflector.h>
+#include <co/IInterfaceType.h>
 #include <co/IllegalCastException.h>
 #include <cstdlib>
 #include <iomanip>
@@ -57,10 +57,10 @@ std::ostream& operator<<( std::ostream& out, const co::__any::State& s )
 				s.kind == co::TK_INTERFACE );
 
 		static const int NAMESPACE_STACK_MAX_SIZE = 8;
-		co::Namespace* namespaceStack[NAMESPACE_STACK_MAX_SIZE];
+		co::INamespace* namespaceStack[NAMESPACE_STACK_MAX_SIZE];
 
 		int namespaceStackSize = 0;
-		co::Namespace* ns = s.type->getNamespace();
+		co::INamespace* ns = s.type->getNamespace();
 
 		while( ns )
 		{
@@ -432,7 +432,7 @@ void castValue( const __any::State& from, __any::State& to )
 		}
 
 		// check if the resulting value is well defined for the enum
-		if( to.data.u32 >= static_cast<EnumType*>( to.type )->getIdentifiers().getSize() )
+		if( to.data.u32 >= static_cast<IEnumType*>( to.type )->getIdentifiers().getSize() )
 			THROW_ILLEGAL_CAST( from, to, << ": value '" << to.data.u32 << "' is out of range for the enum" );
 		break;
 	}
@@ -509,7 +509,7 @@ bool testAndCopyCompatibleReferences( const __any::State& from, __any::State& to
 	}
 }
 
-void Any::setInterface( Interface* instance, InterfaceType* type )
+void Any::setInterface( Interface* instance, IInterfaceType* type )
 {
 	// type cannot be NULL when the instance is NULL
 	assert( type || instance );
@@ -531,7 +531,7 @@ inline void Any::setModifiers( uint32 flags )
 	_state.isReference = ( ( flags & VarIsReference ) != 0 );
 }
 
-void Any::setVariable( Type* type, uint32 flags, void* ptr )
+void Any::setVariable( IType* type, uint32 flags, void* ptr )
 {
 	assert( type );
 	TypeKind kind = type->getKind();
@@ -604,7 +604,7 @@ void Any::setBasic( TypeKind kind, uint32 flags, void* ptr )
 	}
 }
 
-void Any::setArray( ArrayKind arrayKind, Type* elementType, uint32 flags, void* ptr, size_t size )
+void Any::setArray( ArrayKind arrayKind, IType* elementType, uint32 flags, void* ptr, size_t size )
 {
 	assert( elementType );
 
@@ -654,7 +654,7 @@ void Any::setArray( ArrayKind arrayKind, Type* elementType, uint32 flags, void* 
 	_state.data.ptr = ptr;
 }
 
-void Any::makeOut( Type* paramType )
+void Any::makeOut( IType* paramType )
 {
 	TypeKind paramKind = paramType->getKind();
 	switch( paramKind )
@@ -762,10 +762,10 @@ void Any::makeOut( Type* paramType )
 			assert( getKind() == TK_ARRAY && isConst() == false );
 		else
 		{
-			ArrayType* arrayType = dynamic_cast<ArrayType*>( paramType );
+			IArrayType* arrayType = dynamic_cast<IArrayType*>( paramType );
 			assert( arrayType );
 
-			Type* elementType = arrayType->getElementType();
+			IType* elementType = arrayType->getElementType();
 			TypeKind elementKind = elementType->getKind();
 
 			PseudoVector& pv = createArray( elementType );
@@ -901,10 +901,10 @@ std::string& Any::createString()
 	return res;
 }
 
-Any::PseudoVector& Any::createArray( Type* elementType, size_t n )
+Any::PseudoVector& Any::createArray( IType* elementType, size_t n )
 {
 	destroyObject();
-	
+
 	_state.objectKind = TK_ARRAY;
 	_object.array.reflector = elementType->getReflector();
 
@@ -985,7 +985,7 @@ void Any::swapArray( const Any& other )
 	myVec->swap( *otherVec );
 }
 
-void* Any::createComplexValue( Type* type )
+void* Any::createComplexValue( IType* type )
 {
 	destroyObject();
 
@@ -1028,7 +1028,7 @@ void Any::destroyObject()
 	case TK_ARRAY:
 		{
 			// call the destructor of each element
-			PseudoVector* pv = reinterpret_cast<PseudoVector*>( _object.array.vectorArea );	
+			PseudoVector* pv = reinterpret_cast<PseudoVector*>( _object.array.vectorArea );
 			switch( _object.array.reflector->getType()->getKind() )
 			{
 			case TK_ANY:
@@ -1223,7 +1223,7 @@ void Any::copy( const Any& other )
 			{
 				_state.objectKind = TK_ARRAY;
 				_object.array.reflector = other._object.array.reflector;
-				Type* elementType = _object.array.reflector->getType();
+				IType* elementType = _object.array.reflector->getType();
 				switch( elementType->getKind() )
 				{
 				case TK_ANY:
@@ -1248,14 +1248,14 @@ void Any::copy( const Any& other )
 					break;
 
 				case TK_STRING:
-					new( _object.array.vectorArea ) std::vector<std::string>( 
+					new( _object.array.vectorArea ) std::vector<std::string>(
 							*reinterpretPtr<const std::vector<std::string> >( other._object.array.vectorArea ) );
 					break;
 
 				case TK_STRUCT:
 				case TK_NATIVECLASS:
 					{
-						const PseudoVector* opv = reinterpret_cast<const PseudoVector*>( other._object.array.vectorArea );				
+						const PseudoVector* opv = reinterpret_cast<const PseudoVector*>( other._object.array.vectorArea );
 						size_t arraySize = opv->size();
 
 						new( _object.array.vectorArea ) PseudoVector( arraySize );
@@ -1276,7 +1276,7 @@ void Any::copy( const Any& other )
 					break;
 
 				case TK_INTERFACE:
-					new( _object.array.vectorArea ) RefVector<Interface>( 
+					new( _object.array.vectorArea ) RefVector<Interface>(
 							*reinterpretPtr<const RefVector<Interface> >( other._object.array.vectorArea ) );
 					break;
 

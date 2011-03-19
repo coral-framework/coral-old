@@ -22,32 +22,32 @@ public:
 	virtual ~LuaComponent();
 
 	// internal methods:
-	void setComponentType( co::ComponentType* ct, int prototypeTableRef );
+	void setComponentType( co::IComponentType* ct, int prototypeTableRef );
 	void setComponentInstance( LuaComponent* prototype, int instanceTableRef );
 
-	// co::Component methods:
-	co::ComponentType* getComponentType();
-	co::Interface* getInterface( co::InterfaceInfo* itfInfo );
-	void setReceptacle( co::InterfaceInfo* receptacle, co::Interface* instance );
+	// co::IComponent methods:
+	co::IComponentType* getComponentType();
+	co::Interface* getInterface( co::IInterfaceInfo* itfInfo );
+	void setReceptacle( co::IInterfaceInfo* receptacle, co::Interface* instance );
 
-	// co::DynamicProxyHandler methods:
+	// co::IDynamicProxyHandler methods:
 	co::int32 registerProxyInterface( co::Interface* proxy );
 	const std::string& getProxyInterfaceName( co::int32 cookie );
-	const co::Any& handleGetAttribute( co::int32 cookie, co::AttributeInfo* ai );
-	void handleSetAttribute( co::int32 cookie, co::AttributeInfo* ai, const co::Any& value );
-	const co::Any& handleMethodInvocation( co::int32 cookie, co::MethodInfo* mi, co::ArrayRange<co::Any const> args );
+	const co::Any& handleGetAttribute( co::int32 cookie, co::IAttributeInfo* ai );
+	void handleSetAttribute( co::int32 cookie, co::IAttributeInfo* ai, const co::Any& value );
+	const co::Any& handleMethodInvocation( co::int32 cookie, co::IMethodInfo* mi, co::ArrayRange<co::Any const> args );
 
-	// co::Reflector methods:
+	// co::IReflector methods:
 	co::int32 getSize();
-	co::Type* getType();
+	co::IType* getType();
 	void createValue( void* address, size_t length );
     void copyValue( const void* fromAddress, void* toAddress );
     void destroyValue( void* address );
-	co::Component* newInstance();
-	co::Interface* newProxy( co::DynamicProxyHandler* handler );
-    void getAttribute( const co::Any& instance, co::AttributeInfo* ai, co::Any& value );
-    void setAttribute( const co::Any& instance, co::AttributeInfo* ai, const co::Any& value );
-    void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& returnValue );
+	co::IComponent* newInstance();
+	co::Interface* newProxy( co::IDynamicProxyHandler* handler );
+    void getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value );
+    void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value );
+    void invokeMethod( const co::Any& instance, co::IMethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& returnValue );
 	void raise( const std::string& message );
 
 private:
@@ -56,14 +56,14 @@ private:
 	void pushAccessorName( lua_State* L, const char* prefix, const std::string& attribName );
 	void getMethod( lua_State* L, int t, co::int32 cookie = -1 );
 
-	co::Interface* getDynamicInterface( co::InterfaceInfo* itfInfo );
-	void bindToDynamicReceptacle( co::InterfaceInfo* receptacle, co::Interface* instance );
+	co::Interface* getDynamicInterface( co::IInterfaceInfo* itfInfo );
+	void bindToDynamicReceptacle( co::IInterfaceInfo* receptacle, co::Interface* instance );
 
 	void raiseNotSupportedException();
 
 private:
-	// co.ComponentType that describes this Lua Component
-	co::ComponentType* _componentType;
+	// co.IComponentType that describes this Lua IComponent
+	co::IComponentType* _componentType;
 
 	/*
 		Array of proxy interfaces created for the component's facets. If '_facets'
@@ -82,7 +82,7 @@ private:
 	 */
 	int _tableRef;
 
-	// used by the co::DynamicProxyHandler methods to return values
+	// used by the co::IDynamicProxyHandler methods to return values
 	co::Any _res;
 };
 

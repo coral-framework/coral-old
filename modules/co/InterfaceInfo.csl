@@ -1,11 +1,7 @@
 /*
-	Describes an interface (either a facet or receptacle) as part of a component.
+	Implements co.IInterfaceInfo.
  */
-interface InterfaceInfo : MemberInfo
+component InterfaceInfo
 {
-	// The interface type.
-	readonly attribute InterfaceType type;
-
-	//! True if this interface is a facet. False if it is a receptacle.
-	readonly attribute bool isFacet;
+	provides IInterfaceInfo interfaceInfo;
 };

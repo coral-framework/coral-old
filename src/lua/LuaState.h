@@ -65,7 +65,7 @@ public:
 	static void push( lua_State* L, const co::Any& var, int depth );
 	static void push( lua_State* L, const std::string& str );
 	static void push( lua_State* L, co::Interface* itf );
-	static void push( lua_State* L, co::Component* component );
+	static void push( lua_State* L, co::IComponent* component );
 	//@}
 
 	/*!
@@ -75,7 +75,7 @@ public:
 		co::Any::createAny() on \a any and then try to fit a Lua value into the temporary co::Any.
 		If the value at \a index has no convertion to Coral, raises a lua::Exception.
 	 */
-	static void getAny( lua_State* L, int index, co::Type* expectedType, co::Any& any );
+	static void getAny( lua_State* L, int index, co::IType* expectedType, co::Any& any );
 
 	/*!
 		Gets the value at \a index in the Lua stack and assigns it to \a outputVar.
@@ -100,9 +100,9 @@ private:
 	static void pushInstancesTable( lua_State* L );
 
 	static void pushArray( lua_State* L, const co::Any& var );
-	static void toArray( lua_State* L, int index, co::Type* elementType, co::Any& var );
+	static void toArray( lua_State* L, int index, co::IType* elementType, co::Any& var );
 	
-	static co::int32 getEnumIdentifier( lua_State* L, int index, co::EnumType* enumType );
+	static co::int32 getEnumIdentifier( lua_State* L, int index, co::IEnumType* enumType );
 
 	static void checkType( lua_State* L, int index, int expectedType );
 	static void raiseException( lua_State* L, int errorCode );

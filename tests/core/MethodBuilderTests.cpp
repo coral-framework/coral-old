@@ -5,15 +5,16 @@
 
 #include "TestHelper.h"
 
-#include <core/MethodInfo.h>
-#include <core/MethodBuilder.h>
 
 #include <co/Coral.h>
 #include <co/RefPtr.h>
-#include <co/System.h>
-#include <co/Namespace.h>
-#include <co/TypeBuilder.h>
-#include <co/InterfaceType.h>
+#include <co/ISystem.h>
+#include <co/INamespace.h>
+#include <co/IMethodInfo.h>
+#include <co/ITypeBuilder.h>
+#include <co/IInterfaceType.h>
+#include <co/IMethodBuilder.h>
+#include <co/IParameterInfo.h>
 #include <co/IllegalNameException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -23,15 +24,15 @@
 
 TEST( MethodBuilderTests, theTest )
 {
-	co::RefPtr<co::TypeCreationTransaction> tct = createTypeCreationTransaction();
-	co::RefPtr<co::TypeBuilder> typeBuilder = TestHelper::createBuilder( co::TK_INTERFACE, "MethodBuilderbuilderTest.NewInterface", tct.get() );
+	co::RefPtr<co::ITypeCreationTransaction> tct = createTypeCreationTransaction();
+	co::RefPtr<co::ITypeBuilder> typeBuilder = TestHelper::createBuilder( co::TK_INTERFACE, "MethodBuilderbuilderTest.NewInterface", tct.get() );
 
-	co::Type* stringType = 	TestHelper::type( "string" );
+	co::IType* stringType = 	TestHelper::type( "string" );
 
-	co::RefPtr<co::TypeBuilder> exbuilder = TestHelper::createBuilder( co::TK_EXCEPTION, "MethodBuilderbuilderTest.NewException", tct.get() );
-	co::ExceptionType* testException = dynamic_cast<co::ExceptionType*>( exbuilder->createType() );
+	co::RefPtr<co::ITypeBuilder> exbuilder = TestHelper::createBuilder( co::TK_EXCEPTION, "MethodBuilderbuilderTest.NewException", tct.get() );
+	co::IExceptionType* testException = dynamic_cast<co::IExceptionType*>( exbuilder->createType() );
 
-	co::RefPtr<co::MethodBuilder> mb = typeBuilder->defineMethod( "testMethod" );
+	co::RefPtr<co::IMethodBuilder> mb = typeBuilder->defineMethod( "testMethod" );
 
 	EXPECT_THROW( mb->defineException( NULL ), co::IllegalArgumentException );
 	EXPECT_THROW( mb->defineReturnType( NULL ), co::IllegalArgumentException );
@@ -50,34 +51,34 @@ TEST( MethodBuilderTests, theTest )
 
 	EXPECT_NO_THROW( mb->createMethod() );
 
-	co::InterfaceType* interface = dynamic_cast<co::InterfaceType*>( typeBuilder->createType() );
+	co::IInterfaceType* interface = dynamic_cast<co::IInterfaceType*>( typeBuilder->createType() );
 	ASSERT_TRUE( interface != NULL );
 
-	co::MethodInfo* mInfo = dynamic_cast<co::MethodInfo*>( interface->getMember( "testMethod" ) );
+	co::IMethodInfo* mInfo = dynamic_cast<co::IMethodInfo*>( interface->getMember( "testMethod" ) );
 	ASSERT_TRUE( mInfo != NULL );
 
 	ASSERT_EQ( 3, mInfo->getParameters().getSize() );
 
-	co::ArrayRange<co::ParameterInfo* const> params = mInfo->getParameters();
-	co::ParameterInfo* p = params.getFirst();
+	co::ArrayRange<co::IParameterInfo* const> params = mInfo->getParameters();
+	co::IParameterInfo* p = params.getFirst();
 	ASSERT_EQ( "p1", p->getName() );
 	ASSERT_EQ( stringType, p->getType() );
-	ASSERT_EQ( false, p->getIsIn() );
-	ASSERT_EQ( true, p->getIsOut() );
+	ASSERT_FALSE( p->getIsIn() );
+	ASSERT_TRUE( p->getIsOut() );
 
 	params.popFirst();
 	p = params.getFirst();
 	ASSERT_EQ( "p2", p->getName() );
 	ASSERT_EQ( stringType, p->getType() );
-	ASSERT_EQ( true, p->getIsIn() );
-	ASSERT_EQ( true, p->getIsOut() );
+	ASSERT_TRUE( p->getIsIn() );
+	ASSERT_TRUE( p->getIsOut() );
 
 	params.popFirst();
 	p = params.getFirst();
 	ASSERT_EQ( "p3", p->getName() );
 	ASSERT_EQ( stringType, p->getType() );
-	ASSERT_EQ( true, p->getIsIn() );
-	ASSERT_EQ( false, p->getIsOut() );
+	ASSERT_TRUE( p->getIsIn() );
+	ASSERT_FALSE( p->getIsOut() );
 
 	ASSERT_EQ( stringType, mInfo->getReturnType() );
 

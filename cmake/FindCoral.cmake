@@ -1,20 +1,16 @@
-#	Locate the Coral framework.
+#	Find the Coral framework.
 #
 #	This module defines the following variables:
-#		CORAL_FOUND - Found the Coral framework.
-#		CORAL_INCLUDE_DIRS - Include directories.
+#		CORAL_FOUND - Whether the Coral framework was found.
+#		CORAL_INCLUDE_DIRS - Directories for including the Coral headers.
+#		CORAL_LIBRARIES - Coral's optimized and debug libraries (whichever are available).
 #		CORAL_LAUNCHER - Path to the 'coral' executable.
 #
-#	It also defines the library variable below, which contain
-#	debug/optimized keywords when a debug library is found:
-#		CORAL_LIBRARIES - libcoral.
-#
 #	The following variables are accepted as input:
-#		CORAL_ROOT - (as a CMake or environment variable)
-#			The root directory of the Coral install prefix.
-#		CORAL_PATH - (as a CMake or environment variable)
-#			Controls the type repositories path passed to the Coral Compiler
-#			when it is invoked by one of the helper functions listed below.
+#		CORAL_ROOT (as a CMake or environment variable)
+#			- Directory where Coral was installed (the "install prefix").
+#		CORAL_PATH (as a CMake or environment variable)
+#			- List of extra Coral repositories that should be passed to the Coral Compiler.
 #
 #	The following utility functions simplify the task of invoking the Coral Compiler.
 #
@@ -31,43 +27,44 @@
 #
 
 ################################################################################
-# Function to get the current CORAL_PATH as a CMake variable (List)
+# Initialization
 ################################################################################
-FUNCTION( CORAL_GET_PATH coralPath )
-	IF( CORAL_PATH )
-		SET( ${coralPath} ${CORAL_PATH} PARENT_SCOPE )
-	ELSEIF( ENV{CORAL_PATH} )
-		SET( ${coralPath} $ENV{CORAL_PATH} PARENT_SCOPE )
-	ELSEIF( CORAL_ROOT )
-		SET( ${coralPath} "${CORAL_ROOT}/modules" PARENT_SCOPE )
-	ELSE()
-		SET( ${coralPath} "$ENV{CORAL_ROOT}/modules" PARENT_SCOPE )
-	ENDIF()
-ENDFUNCTION()
+if( NOT CORAL_PATH )
+	if( ENV{CORAL_PATH} )
+		set( CORAL_PATH $ENV{CORAL_PATH} )
+	elseif( CORAL_ROOT )
+		set( CORAL_PATH "${CORAL_ROOT}/modules" )
+	elseif( ENV{CORAL_ROOT} )
+		set( CORAL_PATH "$ENV{CORAL_ROOT}/modules" )
+	endif()
+endif()
+
+if( APPLE )
+	# On OSX use only the standard 64-bit architecture by default
+	set( CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_64_BIT)" )
+endif()
 
 ################################################################################
 # Function to get the current CORAL_PATH as a comma-separated string
 ################################################################################
-FUNCTION( CORAL_GET_PATH_STRING coralPathStr )
-	CORAL_GET_PATH( coralPath )
-	SET( result )
-	FOREACH( repo ${coralPath} )
-		IF( result )
-			SET( result "${result},${repo}" )
-		ELSE()
-			SET( result "${repo}" )
-		ENDIF()
-	ENDFOREACH()
-	SET( ${coralPathStr} ${result} PARENT_SCOPE )
-ENDFUNCTION()
+function( CORAL_GET_PATH_STRING coralPathStr )
+	set( result )
+	foreach( repo ${CORAL_PATH} )
+		if( result )
+			set( result "${result},${repo}" )
+		else()
+			set( result "${repo}" )
+		endif()
+	endforeach()
+	set( ${coralPathStr} ${result} PARENT_SCOPE )
+endfunction()
 
 ################################################################################
 # Internal Macro to gather the list of types in a module
 ################################################################################
 MACRO( CORAL_GATHER_MODULE_TYPES _moduleTypeNames _moduleName )
-	CORAL_GET_PATH( _coralPath )
 	SET( _resultList )
-	FOREACH( _repo ${_coralPath} )
+	FOREACH( _repo ${CORAL_PATH} )
 		FILE( GLOB _cslFiles "${_repo}/${_moduleName}/*.csl" )
 		FOREACH( _file ${_cslFiles} )
 			# Get the type name and add it to the _resultList
@@ -98,7 +95,7 @@ FUNCTION( CORAL_GENERATE_MAPPINGS generatedHeaders )
 
 	# Initialize the list with important files that are always generated.
 	SET( resultList
-		"${outDir}/co/System.h"
+		"${outDir}/co/ISystem.h"
 	)
 
 	FOREACH( typeName ${ARGN} )
@@ -159,7 +156,7 @@ FUNCTION( CORAL_GENERATE_MODULE generatedSourceFiles moduleName )
 		LIST( APPEND resultList "${outDir}/${typeName}_Reflector.cpp" )
 	ENDFOREACH()
 
-	# If a ModulePart type was not declared, add the default one
+	# If a IModulePart type was not declared, add the default one
 	IF( NOT hasModulePart )
 		LIST( APPEND resultList "${outDir}/__ModulePart.cpp" )
 	ENDIF()
@@ -199,14 +196,6 @@ FUNCTION( CORAL_GENERATE_DOX targetName moduleName outDir )
 ENDFUNCTION()
 
 ################################################################################
-# Common settings for the utility macros
-################################################################################
-IF( APPLE )
-	# On OSX use only the standard 64-bit architecture by default
-	SET( CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_64_BIT)" )
-ENDIF()
-
-################################################################################
 # Utility macro to set common properties for all targets
 ################################################################################
 MACRO( CORAL_DEFAULT_TARGET_PROPERTIES targetName )
@@ -222,9 +211,9 @@ MACRO( CORAL_DEFAULT_TARGET_PROPERTIES targetName )
 		GET_TARGET_PROPERTY( _targetType ${targetName} TYPE )
 		IF( NOT _targetType STREQUAL "MODULE_LIBRARY" )
 			SET_TARGET_PROPERTIES( ${targetName} PROPERTIES
-				ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-				LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-				RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+				RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+				LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+				ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 			)
 		ENDIF()
 	ENDIF()
@@ -285,72 +274,61 @@ MACRO( CORAL_TEST_ENVIRONMENT testName )
 ENDMACRO( CORAL_TEST_ENVIRONMENT )
 
 ################################################################################
-# Utility macro to build a Coral Module that contains *only* CSL types
+# Macro to build a Coral module that *only* contains CSL types
 ################################################################################
-MACRO( CORAL_BUILD_CSL_MODULE moduleName )
-
+macro( CORAL_BUILD_CSL_MODULE moduleName )
 	CORAL_GENERATE_MODULE( _GENERATED_SOURCES ${moduleName} )
-
-	INCLUDE_DIRECTORIES( ${CORAL_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR}/generated )
-
-	ADD_LIBRARY( ${moduleName} MODULE ${_GENERATED_SOURCES} )
-
+	include_directories( ${CORAL_INCLUDE_DIRS} "${CMAKE_CURRENT_BINARY_DIR}/generated" )
+	add_library( ${moduleName} MODULE ${_GENERATED_SOURCES} )
 	CORAL_DEFAULT_TARGET_PROPERTIES( ${moduleName} )
 	CORAL_MODULE_TARGET_PROPERTIES( ${moduleName} )
-
-	TARGET_LINK_LIBRARIES( ${moduleName} ${CORAL_LIBRARIES} )
-
-	SOURCE_GROUP( "@Generated" FILES ${_GENERATED_SOURCES} )
-
-ENDMACRO( CORAL_BUILD_CSL_MODULE )
+	target_link_libraries( ${moduleName} ${CORAL_LIBRARIES} )
+	source_group( "@Generated" FILES ${_GENERATED_SOURCES} )
+endmacro( CORAL_BUILD_CSL_MODULE )
 
 ################################################################################
-# CMake Package Configuration
+# Find the Coral Framework
 ################################################################################
-FUNCTION( _coral_find_program _name )
-	FIND_PROGRAM( ${_name}
+function( _coral_find_program _name )
+	find_program( ${_name}
 		NAMES ${ARGN}
-		HINTS ".." "$ENV{CORAL_ROOT}" "${CORAL_ROOT}"
+		HINTS ".."
+		PATHS "${CORAL_ROOT}" ENV CORAL_ROOT
 		PATH_SUFFIXES "." "bin"
 	)
-	MARK_AS_ADVANCED( ${_name} )
-ENDFUNCTION()
+	mark_as_advanced( ${_name} )
+endfunction()
 
-FUNCTION( _coral_find_library _name )
-	FIND_LIBRARY( ${_name}
+function( _coral_find_library _name )
+	find_library( ${_name}
 		NAMES ${ARGN}
-		HINTS ".." "$ENV{CORAL_ROOT}" "${CORAL_ROOT}"
+		HINTS ".."
+		PATHS "${CORAL_ROOT}" ENV CORAL_ROOT
 		PATH_SUFFIXES "lib"
 	)
-	MARK_AS_ADVANCED( ${_name} )
-ENDFUNCTION()
+	mark_as_advanced( ${_name} )
+endfunction()
 
-FIND_PATH( CORAL_INCLUDE_DIR co/Coral.h
-	HINTS
-		"../include"
-		"$ENV{CORAL_ROOT}/include"
-		"${CORAL_ROOT}/include"
+find_path( CORAL_INCLUDE_DIRS "co/Coral.h"
+	HINTS ".."
+	PATHS "${CORAL_ROOT}" ENV CORAL_ROOT
+	PATH_SUFFIXES "include"
 )
-MARK_AS_ADVANCED( CORAL_INCLUDE_DIR )
 
-IF( NOT CORAL_LAUNCHER )
-	_coral_find_program( CORAL_LAUNCHER		coral.exe coral )
-ENDIF()
+if( NOT CORAL_LAUNCHER )
+	_coral_find_program( CORAL_LAUNCHER "coral.exe" "coral" )
+endif()
 
-_coral_find_library( CORAL_LIBRARY			coral )
-_coral_find_library( CORAL_LIBRARY_DEBUG	coral_debug )
+_coral_find_library( CORAL_LIBRARY "coral" )
+_coral_find_library( CORAL_LIBRARY_DEBUG "coral_debug" )
 
-IF( CORAL_LIBRARY AND CORAL_LIBRARY_DEBUG )
-	SET( CORAL_LIBRARIES optimized ${CORAL_LIBRARY} debug ${CORAL_LIBRARY_DEBUG} )
-ELSEIF( CORAL_LIBRARY )
-	SET( CORAL_LIBRARIES optimized ${CORAL_LIBRARY} )
-ELSEIF( CORAL_LIBRARY_DEBUG )
-	SET( CORAL_LIBRARIES debug ${CORAL_LIBRARY_DEBUG} )
-ENDIF()
+if( CORAL_LIBRARY AND CORAL_LIBRARY_DEBUG )
+	set( CORAL_LIBRARIES optimized ${CORAL_LIBRARY} debug ${CORAL_LIBRARY_DEBUG} )
+elseif( CORAL_LIBRARY )
+	set( CORAL_LIBRARIES optimized ${CORAL_LIBRARY} )
+elseif( CORAL_LIBRARY_DEBUG )
+	set( CORAL_LIBRARIES debug ${CORAL_LIBRARY_DEBUG} )
+endif()
 
-INCLUDE( FindPackageHandleStandardArgs )
-FIND_PACKAGE_HANDLE_STANDARD_ARGS( Coral DEFAULT_MSG CORAL_LIBRARIES CORAL_LAUNCHER CORAL_INCLUDE_DIR )
-
-IF( CORAL_FOUND )
-	SET( CORAL_INCLUDE_DIRS ${CORAL_INCLUDE_DIR} )
-ENDIF()
+include( FindPackageHandleStandardArgs )
+find_package_handle_standard_args( Coral DEFAULT_MSG CORAL_INCLUDE_DIRS CORAL_LIBRARIES CORAL_LAUNCHER )

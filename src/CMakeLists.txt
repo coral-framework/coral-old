@@ -1,6 +1,5 @@
 ################################################################################
-# About This Directory:
-#	This is the parent dir of the main deployable targets.
+# Subdirectories
 ################################################################################
 
 ADD_SUBDIRECTORY( core )

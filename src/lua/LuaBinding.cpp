@@ -6,13 +6,13 @@
 #include "LuaBinding.h"
 #include "LuaState.h"
 #include "LuaComponent.h"
-#include <co/System.h>
-#include <co/Component.h>
-#include <co/Reflector.h>
-#include <co/MethodInfo.h>
-#include <co/AttributeInfo.h>
-#include <co/InterfaceInfo.h>
-#include <co/ParameterInfo.h>
+#include <co/ISystem.h>
+#include <co/IComponent.h>
+#include <co/IReflector.h>
+#include <co/IMethodInfo.h>
+#include <co/IAttributeInfo.h>
+#include <co/IInterfaceInfo.h>
+#include <co/IParameterInfo.h>
 #include <co/ModuleLoadException.h>
 #include <co/IllegalArgumentException.h>
 #include <lua/Exception.h>
@@ -179,7 +179,7 @@ int coPackage::getType( lua_State* L )
 
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	co::Type* type = co::getType( typeName );
+	co::IType* type = co::getType( typeName );
 	LuaState::push( L, type );
 
 	return 1;
@@ -193,7 +193,7 @@ int coPackage::genericNew( lua_State* L )
 
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	co::Type* type = co::getType( typeName );
+	co::IType* type = co::getType( typeName );
 	co::TypeKind kind = type->getKind();
 	if( kind == co::TK_STRUCT || kind == co::TK_NATIVECLASS )
 	{
@@ -201,8 +201,8 @@ int coPackage::genericNew( lua_State* L )
 	}
 	else if( kind == co::TK_COMPONENT )
 	{
-		co::Reflector* reflector = type->getReflector();
-		co::RefPtr<co::Component> c = reflector->newInstance();
+		co::IReflector* reflector = type->getReflector();
+		co::RefPtr<co::IComponent> c = reflector->newInstance();
 		LuaState::push( L, c.get() );
 	}
 	else
@@ -226,7 +226,7 @@ int coPackage::newComponentType( lua_State* L )
 
 	co::Any any;
 	CompoundTypeBinding::getInstance( L, 1, any );
-	co::ComponentType* ct = any.get<co::ComponentType*>();
+	co::IComponentType* ct = any.get<co::IComponentType*>();
 	sm_luaComponentTypes.push_back( ct );
 
 	lua_pushvalue( L, 2 );
@@ -235,7 +235,7 @@ int coPackage::newComponentType( lua_State* L )
 	LuaComponent* lc = new LuaComponent;
 	lc->setComponentType( ct, tableRef );
 
-	LuaState::push( L, static_cast<co::Reflector*>( lc ) );
+	LuaState::push( L, static_cast<co::IReflector*>( lc ) );
 
 	return 1;
 
@@ -250,7 +250,7 @@ int coPackage::newComponentInstance( lua_State* L )
 
 	co::Any any;
 	CompoundTypeBinding::getInstance( L, 1, any );
-	LuaComponent* prototype = dynamic_cast<LuaComponent*>( any.get<co::Reflector*>() );
+	LuaComponent* prototype = dynamic_cast<LuaComponent*>( any.get<co::IReflector*>() );
 	if( !prototype )
 		throw lua::Exception( "bad argument #1 to co.newComponentInstance (lua.Component.reflector expected)" );
 
@@ -260,7 +260,7 @@ int coPackage::newComponentInstance( lua_State* L )
 	LuaComponent* lc = new LuaComponent;
 	lc->setComponentInstance( prototype, tableRef );
 
-	LuaState::push( L, static_cast<co::Component*>( lc ) );
+	LuaState::push( L, static_cast<co::IComponent*>( lc ) );
 
 	return 1;
 
@@ -273,7 +273,7 @@ int coPackage::newComponentInstance( lua_State* L )
 
 CompoundTypeBinding::CompoundTypeList CompoundTypeBinding::sm_boundTypes;
 
-co::CompoundType* CompoundTypeBinding::getType( lua_State* L, int udataIdx )
+co::ICompoundType* CompoundTypeBinding::getType( lua_State* L, int udataIdx )
 {
 	if( !lua_isuserdata( L, udataIdx ) )
 		return NULL;
@@ -281,9 +281,9 @@ co::CompoundType* CompoundTypeBinding::getType( lua_State* L, int udataIdx )
 	lua_getmetatable( L, udataIdx );
 	lua_rawgeti( L, -1, 1 );
 
-	co::CompoundType* ct = reinterpret_cast<co::CompoundType*>( lua_touserdata( L, -1 ) );
+	co::ICompoundType* ct = reinterpret_cast<co::ICompoundType*>( lua_touserdata( L, -1 ) );
 	lua_pop( L, 2 );
-	
+
 	return ct;
 }
 
@@ -295,7 +295,7 @@ void CompoundTypeBinding::getInstance( lua_State* L, int udataIdx, co::Any& inst
 
 bool CompoundTypeBinding::tryGetInstance( lua_State* L, int udataIdx, co::Any& instance )
 {
-	co::CompoundType* ct = getType( L, udataIdx );
+	co::ICompoundType* ct = getType( L, udataIdx );
 	if( !ct )
 		return false;
 
@@ -321,7 +321,7 @@ void CompoundTypeBinding::releaseBindings( lua_State* L )
 {
 	for( CompoundTypeList::iterator it = sm_boundTypes.begin(); it != sm_boundTypes.end(); ++it )
 	{
-		co::CompoundType* ct = *it;
+		co::ICompoundType* ct = *it;
 		lua_pushlightuserdata( L, ct );
 		lua_pushnil( L );
 		lua_rawset( L, LUA_REGISTRYINDEX );
@@ -344,7 +344,7 @@ static const Metamethods METAMETHODS_TABLE[] = {
 	{ ComponentBinding::index, ComponentBinding::newIndex, ComponentBinding::gc, ComponentBinding::toString }
 };
 
-void CompoundTypeBinding::pushMetatable( lua_State* L, co::CompoundType* ct, co::Reflector* reflector )
+void CompoundTypeBinding::pushMetatable( lua_State* L, co::ICompoundType* ct, co::IReflector* reflector )
 {
 	assert( ct );
 	lua_pushlightuserdata( L, ct );
@@ -354,7 +354,7 @@ void CompoundTypeBinding::pushMetatable( lua_State* L, co::CompoundType* ct, co:
 	if( lua_isnil( L, -1 ) )
 	{
 		co::TypeKind tag = ct->getKind();
-		if( tag == co::TK_INTERFACE && ct->getFullName() == "co.Component" )
+		if( tag == co::TK_INTERFACE && ct->getFullName() == "co.IComponent" )
 			tag = co::TK_COMPONENT;
 
 		assert( tag >= co::TK_STRUCT && tag <= co::TK_COMPONENT );
@@ -363,11 +363,11 @@ void CompoundTypeBinding::pushMetatable( lua_State* L, co::CompoundType* ct, co:
 		lua_pop( L, 1 );
 		lua_createtable( L, 1, 4 );
 
-		// save the CompoundType at MT[1]
+		// save the ICompoundType at MT[1]
 		lua_pushlightuserdata( L, ct );
 		lua_rawseti( L, -2, 1 );
 
-		// if a Reflector was provided, save it at MT[2]
+		// if a IReflector was provided, save it at MT[2]
 		if( reflector )
 		{
 			lua_pushlightuserdata( L, reflector );
@@ -403,7 +403,7 @@ void CompoundTypeBinding::pushMetatable( lua_State* L, co::CompoundType* ct, co:
 	}
 }
 
-bool CompoundTypeBinding::pushMember( lua_State* L, co::CompoundType* ct, bool mustExist )
+bool CompoundTypeBinding::pushMember( lua_State* L, co::ICompoundType* ct, bool mustExist )
 {
 	// check if member is cached (in the type's metatable)
 	lua_getmetatable( L, 1 );
@@ -420,7 +420,7 @@ bool CompoundTypeBinding::pushMember( lua_State* L, co::CompoundType* ct, bool m
 
 			// try to find the member
 			const char* memberName = lua_tostring( L, 2 );
-			co::MemberInfo* mi = ct->getMember( memberName );
+			co::IMemberInfo* mi = ct->getMember( memberName );
 			if( !mi )
 			{
 				if( mustExist )
@@ -440,7 +440,7 @@ bool CompoundTypeBinding::pushMember( lua_State* L, co::CompoundType* ct, bool m
 
 			// push the member
 			lua_pushlightuserdata( L, mi );
-			if( dynamic_cast<co::MethodInfo*>( mi ) != NULL )
+			if( dynamic_cast<co::IMethodInfo*>( mi ) != NULL )
 			{
 				lua_pushcclosure( L, callMethod, 1 );
 			}
@@ -466,21 +466,21 @@ bool CompoundTypeBinding::pushMember( lua_State* L, co::CompoundType* ct, bool m
 
 	// remove the metatable
 	lua_remove( L, -2 );
-	
+
 	return true;
 }
 
-inline co::AttributeInfo* checkAttributeInfo( lua_State* L, int index )
+inline co::IAttributeInfo* checkAttributeInfo( lua_State* L, int index )
 {
 	assert( lua_islightuserdata( L, index ) );
-	co::MemberInfo* mi = reinterpret_cast<co::MemberInfo*>( lua_touserdata( L, index ) );
-	return static_cast<co::AttributeInfo*>( mi );
+	co::IMemberInfo* mi = reinterpret_cast<co::IMemberInfo*>( lua_touserdata( L, index ) );
+	return static_cast<co::IAttributeInfo*>( mi );
 }
 
 void CompoundTypeBinding::getAttribute( lua_State* L, const co::Any& instance )
 {
-	co::AttributeInfo* ai = checkAttributeInfo( L, -1 );
-	co::Reflector* reflector = ai->getOwner()->getReflector();
+	co::IAttributeInfo* ai = checkAttributeInfo( L, -1 );
+	co::IReflector* reflector = ai->getOwner()->getReflector();
 	co::Any value;
 	reflector->getAttribute( instance, ai, value );
 	lua_pop( L, 1 );
@@ -489,8 +489,8 @@ void CompoundTypeBinding::getAttribute( lua_State* L, const co::Any& instance )
 
 void CompoundTypeBinding::setAttribute( lua_State* L, const co::Any& instance )
 {
-	co::AttributeInfo* ai = checkAttributeInfo( L, -2 );
-	co::Reflector* reflector = ai->getOwner()->getReflector();
+	co::IAttributeInfo* ai = checkAttributeInfo( L, -2 );
+	co::IReflector* reflector = ai->getOwner()->getReflector();
 	co::Any value;
 	LuaState::getAny( L, -1, ai->getType(), value );
 	reflector->setAttribute( instance, ai, value );
@@ -499,20 +499,20 @@ void CompoundTypeBinding::setAttribute( lua_State* L, const co::Any& instance )
 
 int CompoundTypeBinding::callMethod( lua_State* L )
 {
-	// get the co::MethodInfo* from upvalue 1
-	co::MethodInfo* mi = static_cast<co::MethodInfo*>(
-							reinterpret_cast<co::MemberInfo*>(
+	// get the co::IMethodInfo* from upvalue 1
+	co::IMethodInfo* mi = static_cast<co::IMethodInfo*>(
+							reinterpret_cast<co::IMemberInfo*>(
 								lua_touserdata( L, lua_upvalueindex( 1 ) ) ) );
 
 	// check the passed instance
-	co::CompoundType* objectType = mi->getOwner();
+	co::ICompoundType* objectType = mi->getOwner();
 
 	co::Any instance;
 	tryGetInstance( L, 1, instance );
 	if( !instance.isValid() ||
 		( instance.getType() != objectType &&
 			( instance.getKind() != co::TK_INTERFACE || objectType->getKind() != co::TK_INTERFACE ||
-				!instance.getInterfaceType()->isSubTypeOf( static_cast<co::InterfaceType*>( objectType ) ) ) ) )
+				!instance.getInterfaceType()->isSubTypeOf( static_cast<co::IInterfaceType*>( objectType ) ) ) ) )
 	{
 		const char* typeName = ( instance.isValid() ? instance.getType()->getFullName().c_str() : luaL_typename( L, 1 ) );
 		luaL_error( L, "bad instance for method '%s' (%s expected, got %s)",
@@ -520,7 +520,7 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 	}
 
 	// get the method's list of parameters
-	co::ArrayRange<co::ParameterInfo* const> paramList = mi->getParameters();
+	co::ArrayRange<co::IParameterInfo* const> paramList = mi->getParameters();
 
 	/*
 		We currently set a hardcoded limit on the number of method parameters.
@@ -546,8 +546,8 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 	{
 		for( ; i < numParams; ++i )
 		{
-			co::ParameterInfo* paramInfo = paramList[i];
-			co::Type* paramType = paramInfo->getType();
+			co::IParameterInfo* paramInfo = paramList[i];
+			co::IType* paramType = paramInfo->getType();
 
 			if( paramInfo->getIsIn() )
 			{
@@ -555,7 +555,7 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 				{
 					// a required argument was not passed, but we don't break the loop
 					// because we want to compute numRequiredArgs
-					continue; 
+					continue;
 				}
 
 				if( paramInfo->getIsOut() )
@@ -572,7 +572,7 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 			else // only 'out'
 			{
 				--numRequiredArgs;
-				args[i].makeOut( paramType );				
+				args[i].makeOut( paramType );
 			}
 		}
 	}
@@ -594,7 +594,7 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 	// invoke the method
 
 	co::Any returnValue;
-	co::Reflector* reflector = objectType->getReflector();
+	co::IReflector* reflector = objectType->getReflector();
 	reflector->invokeMethod( instance, mi, co::ArrayRange<co::Any const>( args, numParams ), returnValue );
 
 	// return result and output parameters
@@ -625,10 +625,10 @@ int CompoundTypeBinding::callMethod( lua_State* L )
 /*  Helper class for binding co::Components to Lua                           */
 /*****************************************************************************/
 
-void ComponentBinding::create( lua_State* L, co::Component* component )
+void ComponentBinding::create( lua_State* L, co::IComponent* component )
 {
 	// create the userdata
-	co::Component** ud = reinterpret_cast<co::Component**>( lua_newuserdata( L, sizeof(co::Component*) ) );
+	co::IComponent** ud = reinterpret_cast<co::IComponent**>( lua_newuserdata( L, sizeof(co::IComponent*) ) );
 
 	*ud = component;
 	component->componentRetain();
@@ -638,11 +638,11 @@ void ComponentBinding::create( lua_State* L, co::Component* component )
 	lua_setmetatable( L, -2 );
 }
 
-inline co::InterfaceInfo* checkInterfaceInfo( lua_State* L, int index )
+inline co::IInterfaceInfo* checkInterfaceInfo( lua_State* L, int index )
 {
 	assert( lua_islightuserdata( L, index ) );
-	co::MemberInfo* mi = reinterpret_cast<co::MemberInfo*>( lua_touserdata( L, index ) );
-	return static_cast<co::InterfaceInfo*>( mi );
+	co::IMemberInfo* mi = reinterpret_cast<co::IMemberInfo*>( lua_touserdata( L, index ) );
+	return static_cast<co::IInterfaceInfo*>( mi );
 }
 
 inline bool isStringComponentType( lua_State* L, int index )
@@ -654,13 +654,13 @@ inline bool isStringComponentType( lua_State* L, int index )
 
 int ComponentBinding::index( lua_State* L )
 {
-	co::Component** ud = reinterpret_cast<co::Component**>( lua_touserdata( L, 1 ) );
+	co::IComponent** ud = reinterpret_cast<co::IComponent**>( lua_touserdata( L, 1 ) );
 	assert( ud );
 	assert( lua_isstring( L, 2 ) );
 
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	co::Component* component = *ud;
+	co::IComponent* component = *ud;
 
 	if( isStringComponentType( L, 2 ) )
 	{
@@ -671,7 +671,7 @@ int ComponentBinding::index( lua_State* L )
 	if( pushMember( L, component->getComponentType() ) )
 	{
 		assert( lua_islightuserdata( L, -1 ) );
-		co::InterfaceInfo* itfInfo = checkInterfaceInfo( L, -1 );
+		co::IInterfaceInfo* itfInfo = checkInterfaceInfo( L, -1 );
 		co::Interface* itf = component->getInterface( itfInfo );
 		LuaState::push( L, itf );
 	}
@@ -683,7 +683,7 @@ int ComponentBinding::index( lua_State* L )
 
 int ComponentBinding::newIndex( lua_State* L )
 {
-	co::Component** ud = reinterpret_cast<co::Component**>( lua_touserdata( L, 1 ) );
+	co::IComponent** ud = reinterpret_cast<co::IComponent**>( lua_touserdata( L, 1 ) );
 	assert( ud );
 	assert( lua_isstring( L, 2 ) );
 
@@ -692,11 +692,11 @@ int ComponentBinding::newIndex( lua_State* L )
 	if( isStringComponentType( L, 2 ) )
 		throw co::IllegalArgumentException( "attribute 'componentType' is read-only and cannot be changed" );
 
-	co::Component* component = *ud;
+	co::IComponent* component = *ud;
 	pushMember( L, component->getComponentType(), true );
 	if( lua_islightuserdata( L, -1 ) )
 	{
-		co::InterfaceInfo* itfInfo = checkInterfaceInfo( L, -1 );
+		co::IInterfaceInfo* itfInfo = checkInterfaceInfo( L, -1 );
 		if( itfInfo->getIsFacet() )
 		{
 			lua_pushliteral( L, "'" );
@@ -719,7 +719,7 @@ int ComponentBinding::newIndex( lua_State* L )
 
 int ComponentBinding::gc( lua_State* L )
 {
-	co::Component** ud = reinterpret_cast<co::Component**>( lua_touserdata( L, 1 ) );
+	co::IComponent** ud = reinterpret_cast<co::IComponent**>( lua_touserdata( L, 1 ) );
 	assert( ud );
 
 	__BEGIN_EXCEPTIONS_BARRIER__
@@ -733,10 +733,10 @@ int ComponentBinding::gc( lua_State* L )
 
 int ComponentBinding::toString( lua_State* L )
 {
-	co::Component** ud = reinterpret_cast<co::Component**>( lua_touserdata( L, 1 ) );
+	co::IComponent** ud = reinterpret_cast<co::IComponent**>( lua_touserdata( L, 1 ) );
 	assert( ud );
 
-	co::Component* comp = *ud;
+	co::IComponent* comp = *ud;
 	lua_pushfstring( L, "%s: %p", comp->getComponentType()->getFullName().c_str(), comp );
 
 	return 1;
@@ -833,11 +833,11 @@ int InterfaceBinding::toString( lua_State* L )
 /*  Re-usable class for binding complex values to Lua                        */
 /*****************************************************************************/
 
-void ComplexValueBinding::push( lua_State* L, co::Type* type, void* instancePtr )
+void ComplexValueBinding::push( lua_State* L, co::IType* type, void* instancePtr )
 {
 	assert( type->getKind() == co::TK_STRUCT || type->getKind() == co::TK_NATIVECLASS );
 
-	co::Reflector* reflector = type->getReflector();
+	co::IReflector* reflector = type->getReflector();
 	reflector->componentRetain();
 
 	// create the userdata
@@ -850,19 +850,19 @@ void ComplexValueBinding::push( lua_State* L, co::Type* type, void* instancePtr 
 		reflector->copyValue( instancePtr, ud );
 
 	// set the userdata's metatable
-	pushMetatable( L, static_cast<co::CompoundType*>( type ), reflector );
+	pushMetatable( L, static_cast<co::ICompoundType*>( type ), reflector );
 	lua_setmetatable( L, -2 );
 }
 
 int ComplexValueBinding::gc( lua_State* L )
-{	
+{
 	__BEGIN_EXCEPTIONS_BARRIER__
 
 	lua_getmetatable( L, 1 );
 	lua_rawgeti( L, -1, 2 );
 	assert( lua_islightuserdata( L, -1 ) );
 
-	co::Reflector* reflector = reinterpret_cast<co::Reflector*>( lua_touserdata( L, -1 ) );
+	co::IReflector* reflector = reinterpret_cast<co::IReflector*>( lua_touserdata( L, -1 ) );
 	reflector->destroyValue( lua_touserdata( L, 1 ) );
 	reflector->componentRelease();
 
@@ -873,7 +873,7 @@ int ComplexValueBinding::gc( lua_State* L )
 
 int ComplexValueBinding::toString( lua_State* L )
 {
-	co::CompoundType* ct = getType( L, 1 );
+	co::ICompoundType* ct = getType( L, 1 );
 	assert( ct );
 
 	lua_pushfstring( L, "%s: %p", ct->getFullName().c_str(), lua_touserdata( L, 1 ) );
@@ -891,7 +891,7 @@ int NativeClassBinding::index( lua_State* L )
 
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	co::CompoundType* ct = getType( L, 1 );
+	co::ICompoundType* ct = getType( L, 1 );
 	assert( ct );
 
 	if( pushMember( L, ct ) )
@@ -909,7 +909,7 @@ int NativeClassBinding::newIndex( lua_State* L )
 
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	co::CompoundType* ct = getType( L, 1 );
+	co::ICompoundType* ct = getType( L, 1 );
 	assert( ct );
 
 	pushMember( L, ct, true );
@@ -940,7 +940,7 @@ int StructBinding::index( lua_State* L )
 
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	co::CompoundType* ct = getType( L, 1 );
+	co::ICompoundType* ct = getType( L, 1 );
 	assert( ct );
 
 	if( pushMember( L, ct ) )
@@ -960,7 +960,7 @@ int StructBinding::newIndex( lua_State* L )
 
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	co::CompoundType* ct = getType( L, 1 );
+	co::ICompoundType* ct = getType( L, 1 );
 	assert( ct );
 
 	pushMember( L, ct, true );

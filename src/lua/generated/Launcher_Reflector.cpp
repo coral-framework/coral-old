@@ -10,12 +10,12 @@ namespace lua {
 
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
 co::int32 __Launcher_getSize();
-co::Component* __Launcher_newInstance();
+co::IComponent* __Launcher_newInstance();
 
 void moduleRetain();
 void moduleRelease();
 
-// ------ Reflector ------ //
+// ------ IReflector ------ //
 
 class Launcher_Reflector : public co::ReflectorBase
 {
@@ -30,7 +30,7 @@ public:
 		moduleRelease();
 	}
 
-	co::Type* getType()
+	co::IType* getType()
 	{
 		return co::getType( "lua.Launcher" );
 	}
@@ -40,17 +40,17 @@ public:
 		return __Launcher_getSize();
 	}
 
-	co::Component* newInstance()
+	co::IComponent* newInstance()
 	{
-		co::Component* component = __Launcher_newInstance();
+		co::IComponent* component = __Launcher_newInstance();
 		assert( component->getComponentType()->getFullName() == "lua.Launcher" );
 		return component;
 	}
 };
 
-// ------ Reflector Creation Function ------ //
+// ------ IReflector Creation Function ------ //
 
-co::Reflector* __createLauncherReflector()
+co::IReflector* __createLauncherIReflector()
 {
     return new Launcher_Reflector;
 }

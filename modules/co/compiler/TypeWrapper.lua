@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- A TypeWrapper is a smart proxy to a real co.Type instance. Its purpose is
+-- A TypeWrapper is a smart proxy to a real co.IType instance. Its purpose is
 -- to augment types with efficient access to extra (computed) fields and
 -- methods, useful when writing template scripts.
 -------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ function TypeWrapper.__tostring( t )
 end
 
 function TypeWrapper:wrap( type )
-	assert( type and type.namespace,  "wrap() expects a co.Type as argument" )
+	assert( type and type.namespace,  "wrap() expects a co.IType as argument" )
 	local self = wrappedTypes[type]
 	if not self then
 		self = setmetatable( { _type = type }, TypeWrapper )
@@ -140,17 +140,17 @@ function autoFields.fullNameUpperUnderline( t )
 end
 
 local typeKindToInterfaceName = {
-	TK_ARRAY		= "ArrayType",
-	TK_ENUM			= "EnumType",
-	TK_EXCEPTION	= "ExceptionType",
-	TK_STRUCT		= "StructType",
-	TK_NATIVECLASS	= "NativeClassType",
-	TK_INTERFACE	= "InterfaceType",
-	TK_COMPONENT	= "ComponentType",
+	TK_ARRAY		= "IArrayType",
+	TK_ENUM			= "IEnumType",
+	TK_EXCEPTION	= "IExceptionType",
+	TK_STRUCT		= "IStructType",
+	TK_NATIVECLASS	= "INativeClassType",
+	TK_INTERFACE	= "IInterfaceType",
+	TK_COMPONENT	= "IComponentType",
 }
 
 function autoFields.typeInterfaceName( t )
-	return typeKindToInterfaceName[t.kind] or "Type"
+	return typeKindToInterfaceName[t.kind] or "IType"
 end
 
 function autoFields.headerName( t )

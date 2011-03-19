@@ -5,10 +5,10 @@
 
 #include "BasicReflector.h"
 #include <co/Any.h>
-#include <co/Type.h>
+#include <co/IType.h>
 #include <co/NotSupportedException.h>
 
-BasicReflector::BasicReflector( co::Type* type ) : _type( type )
+BasicReflector::BasicReflector( co::IType* type ) : _type( type )
 {
 	assert( _type );
 }
@@ -18,7 +18,7 @@ BasicReflector::~BasicReflector()
 	// empty
 }
 
-co::Type* BasicReflector::getType()
+co::IType* BasicReflector::getType()
 {
 	return _type;
 }
@@ -54,7 +54,7 @@ co::int32 BasicReflector::getSize()
 	return s_typeSizes[kind];
 }
 
-co::Component* BasicReflector::newInstance()
+co::IComponent* BasicReflector::newInstance()
 {
 	if( _type->getKind() == co::TK_COMPONENT )
 		throw co::NotSupportedException( "cannot instantiate an internal component" );

@@ -8,29 +8,29 @@
 
 #include "Type.h"
 #include "AttributeAndMethodContainer.h"
-#include "InterfaceTypeComponent_Base.h"
+#include "InterfaceType_Base.h"
 
 namespace co {
 
 /*!
-	Component that implements co.InterfaceType.
+	Implements co.IInterfaceType.
  */
-class InterfaceTypeComponent : public InterfaceTypeComponent_Base,
+class InterfaceType : public InterfaceType_Base,
 						public TypeImpl, public AttributeAndMethodContainer
 {
 public:
-	virtual ~InterfaceTypeComponent();
+	virtual ~InterfaceType();
 
 	// internal methods:
-	void addSuperInterface( InterfaceType* superItf );
-	void addSubInterface( InterfaceType* subItf );
+	void addSuperInterface( IInterfaceType* superItf );
+	void addSubInterface( IInterfaceType* subItf );
 
-	// InterfaceType methods:
-	ArrayRange<InterfaceType* const> getInterfaceAncestors();
-	ArrayRange<InterfaceType* const> getSuperInterfaces();
-	ArrayRange<InterfaceType* const> getSubInterfaces();
+	// IInterfaceType methods:
+	ArrayRange<IInterfaceType* const> getInterfaceAncestors();
+	ArrayRange<IInterfaceType* const> getSuperInterfaces();
+	ArrayRange<IInterfaceType* const> getSubInterfaces();
 	const std::string& getCppBlock();
-	bool isSubTypeOf( InterfaceType* itf );
+	bool isSubTypeOf( IInterfaceType* itf );
 
 	DELEGATE_CO_TYPE_METHODS( TypeImpl:: );
 	DELEGATE_CO_COMPOUNDTYPE_METHODS( AttributeAndMethodContainer:: );
@@ -38,13 +38,13 @@ public:
 	DELEGATE_CO_METHODCONTAINER_METHODS( AttributeAndMethodContainer:: );
 
 private:
-	ArrayRange<CompoundType* const> getCompoundTypeAncestors();
-	
+	ArrayRange<ICompoundType* const> getCompoundTypeAncestors();
+
 	// ancestors are computed lazily
 	void updateAncestors();
 
 private:
-	typedef std::vector<InterfaceType*> InterfaceVector;
+	typedef std::vector<IInterfaceType*> InterfaceVector;
 	InterfaceVector _ancestors;
 	InterfaceVector _superInterfaces;
 	InterfaceVector _subInterfaces;

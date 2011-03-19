@@ -28,7 +28,7 @@ public:
 namespace co {
 template<> struct kindOf<co::NoSuchInterfaceException> : public kindOfBase<TK_EXCEPTION> {};
 template<> struct nameOf<co::NoSuchInterfaceException> { static const char* get() { return "co.NoSuchInterfaceException"; } };
-template<> struct typeOf<co::NoSuchInterfaceException> : public typeOfBase<co::NoSuchInterfaceException, ExceptionType> {};
+template<> struct typeOf<co::NoSuchInterfaceException> : public typeOfBase<co::NoSuchInterfaceException, IExceptionType> {};
 } // namespace co
 
 #endif // _CO_NOSUCHINTERFACEEXCEPTION_H_

@@ -4,7 +4,7 @@ local function template( writer, c, t )
 	writer( [[
 
 #include "ModuleInstaller.h"
-#include <co/Type.h>
+#include <co/IType.h>
 
 ]] )
 
@@ -37,7 +37,7 @@ void ]], c.moduleNS, [[::ModuleInstaller::install()
 
 	for( unsigned int i = 0; i < TypeCount; ++i )
 	{
-		co::Reflector* reflector = _reflectors[i].get();
+		co::IReflector* reflector = _reflectors[i].get();
 		reflector->getType()->setReflector( reflector );
 	}
 }
@@ -54,15 +54,15 @@ void ]], c.moduleNS, [[::ModuleInstaller::uninstall()
 	}
 }
 
-co::Reflector* ]], c.moduleNS, [[::ModuleInstaller::createReflector( TypeId typeId )
+co::IReflector* ]], c.moduleNS, [[::ModuleInstaller::createReflector( TypeId typeId )
 {
-	co::Reflector* res = NULL;
+	co::IReflector* res = NULL;
 	switch( typeId )
 	{
 ]] )
 
 	for i, t in ipairs( c.types ) do
-		writer( "\tcase TypeId_", t.name, ": res = ", c.moduleNS, "::__create", t.name, "Reflector(); break;\n" )
+		writer( "\tcase TypeId_", t.name, ": res = ", c.moduleNS, "::__create", t.name, "IReflector(); break;\n" )
 	end
 
 	writer( [[

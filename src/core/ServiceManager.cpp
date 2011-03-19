@@ -5,11 +5,11 @@
 
 #include "ServiceManager.h"
 #include <co/Coral.h>
-#include <co/Component.h>
-#include <co/Reflector.h>
-#include <co/ComponentType.h>
-#include <co/InterfaceInfo.h>
-#include <co/InterfaceType.h>
+#include <co/IComponent.h>
+#include <co/IReflector.h>
+#include <co/IComponentType.h>
+#include <co/IInterfaceInfo.h>
+#include <co/IInterfaceType.h>
 #include <co/MissingServiceException.h>
 #include <co/NoSuchInterfaceException.h>
 #include <co/IllegalArgumentException.h>
@@ -17,32 +17,32 @@
 
 namespace co {
 
-ServiceManagerComponent::ServiceManagerComponent()
+ServiceManager::ServiceManager()
 {
 	_isLazy = true;
 }
 
-ServiceManagerComponent::~ServiceManagerComponent()
+ServiceManager::~ServiceManager()
 {
 	// empty
 }
 
-void ServiceManagerComponent::initialize()
+void ServiceManager::initialize()
 {
 	// empty
 }
 
-void ServiceManagerComponent::tearDown()
+void ServiceManager::tearDown()
 {
 	_services.clear();
 }
 
-bool ServiceManagerComponent::getIsLazy()
+bool ServiceManager::getIsLazy()
 {
 	return _isLazy;
 }
 
-void ServiceManagerComponent::setIsLazy( bool isLazy )
+void ServiceManager::setIsLazy( bool isLazy )
 {
 	_isLazy = isLazy;
 }
@@ -50,22 +50,22 @@ void ServiceManagerComponent::setIsLazy( bool isLazy )
 #define CHECK_NOT_NULL( paramName ) \
 	if( !paramName ) throw IllegalArgumentException( "illegal null " #paramName );
 
-void ServiceManagerComponent::addService( InterfaceType* serviceType, Interface* serviceInstance )
+void ServiceManager::addService( IInterfaceType* serviceType, Interface* serviceInstance )
 {
 	validateServiceInstance( serviceType, serviceInstance );
 	_services[serviceType].global.setInstance( serviceInstance );
 }
 
-void ServiceManagerComponent::addServiceForType( InterfaceType* serviceType, InterfaceType* clientType, Interface* serviceInstance )
+void ServiceManager::addServiceForType( IInterfaceType* serviceType, IInterfaceType* clientType, Interface* serviceInstance )
 {
 	validateClientType( clientType );
 	validateServiceInstance( serviceType, serviceInstance );
 	_services[serviceType].custom[clientType].setInstance( serviceInstance );
 }
 
-void ServiceManagerComponent::addServiceImplementation( InterfaceType* serviceType, const std::string& componentName )
+void ServiceManager::addServiceImplementation( IInterfaceType* serviceType, const std::string& componentName )
 {
-	ComponentType* ct = validateComponentType( serviceType, componentName );
+	IComponentType* ct = validateComponentType( serviceType, componentName );
 
 	LazyInstance& instance = _services[serviceType].global;
 	instance.setComponentType( ct );
@@ -74,10 +74,10 @@ void ServiceManagerComponent::addServiceImplementation( InterfaceType* serviceTy
 		createServiceInstance( serviceType, instance );
 }
 
-void ServiceManagerComponent::addServiceImplementationForType( InterfaceType* serviceType, InterfaceType* clientType, const std::string& componentName )
+void ServiceManager::addServiceImplementationForType( IInterfaceType* serviceType, IInterfaceType* clientType, const std::string& componentName )
 {
 	validateClientType( clientType );
-	ComponentType* ct = validateComponentType( serviceType, componentName );
+	IComponentType* ct = validateComponentType( serviceType, componentName );
 
 	LazyInstance& instance = _services[serviceType].custom[clientType];
 	instance.setComponentType( ct );
@@ -86,7 +86,7 @@ void ServiceManagerComponent::addServiceImplementationForType( InterfaceType* se
 		createServiceInstance( serviceType, instance, clientType );
 }
 
-ServiceManagerComponent::ServiceRecord& ServiceManagerComponent::fetchServiceRecord( InterfaceType* serviceType )
+ServiceManager::ServiceRecord& ServiceManager::fetchServiceRecord( IInterfaceType* serviceType )
 {
 	ServiceMap::iterator it = _services.find( serviceType );
 	if( it == _services.end() )
@@ -94,7 +94,7 @@ ServiceManagerComponent::ServiceRecord& ServiceManagerComponent::fetchServiceRec
 	return it->second;
 }
 
-Interface* ServiceManagerComponent::getService( InterfaceType* serviceType )
+Interface* ServiceManager::getService( IInterfaceType* serviceType )
 {
 	CHECK_NOT_NULL( serviceType );
 
@@ -107,16 +107,16 @@ Interface* ServiceManagerComponent::getService( InterfaceType* serviceType )
 	return rec.global.getInstance();
 }
 
-Interface* ServiceManagerComponent::getServiceForType( InterfaceType* serviceType, InterfaceType* clientType )
+Interface* ServiceManager::getServiceForType( IInterfaceType* serviceType, IInterfaceType* clientType )
 {
 	CHECK_NOT_NULL( serviceType );
 	CHECK_NOT_NULL( clientType );
 	return getServiceForType( fetchServiceRecord( serviceType ), serviceType, clientType );
 }
 
-InterfaceInfo* ServiceManagerComponent::getFacetInfo( ComponentType* ct, InterfaceType* itfType )
+IInterfaceInfo* ServiceManager::getFacetInfo( IComponentType* ct, IInterfaceType* itfType )
 {
-	ArrayRange<InterfaceInfo* const> facets = ct->getFacets();
+	ArrayRange<IInterfaceInfo* const> facets = ct->getFacets();
 	for( ; facets; facets.popFirst() )
 	{
 		if( facets.getFirst()->getType()->isSubTypeOf( itfType ) )
@@ -125,15 +125,15 @@ InterfaceInfo* ServiceManagerComponent::getFacetInfo( ComponentType* ct, Interfa
 	return NULL;
 }
 
-Interface* ServiceManagerComponent::getServiceForInstance( InterfaceType* serviceType, Interface* clientInstance )
+Interface* ServiceManager::getServiceForInstance( IInterfaceType* serviceType, Interface* clientInstance )
 {
 	CHECK_NOT_NULL( serviceType );
 	CHECK_NOT_NULL( clientInstance );
 
 	// give preference the component's instance of the service interface, if available
-	Component* component = clientInstance->getInterfaceOwner();
-	ComponentType* ct = component->getComponentType();
-	InterfaceInfo* itfInfo = getFacetInfo( ct, serviceType );
+	IComponent* component = clientInstance->getInterfaceOwner();
+	IComponentType* ct = component->getComponentType();
+	IInterfaceInfo* itfInfo = getFacetInfo( ct, serviceType );
 	if( itfInfo )
 		return component->getInterface( itfInfo );
 
@@ -141,7 +141,7 @@ Interface* ServiceManagerComponent::getServiceForInstance( InterfaceType* servic
 	return getServiceForType( fetchServiceRecord( serviceType ), serviceType, clientInstance->getInterfaceType() );
 }
 
-void ServiceManagerComponent::removeService( InterfaceType* serviceType )
+void ServiceManager::removeService( IInterfaceType* serviceType )
 {
 	CHECK_NOT_NULL( serviceType );
 
@@ -161,7 +161,7 @@ void ServiceManagerComponent::removeService( InterfaceType* serviceType )
 	throw MissingServiceException( "nothing to remove" );
 }
 
-void ServiceManagerComponent::removeServiceForType( InterfaceType* serviceType, InterfaceType* clientType )
+void ServiceManager::removeServiceForType( IInterfaceType* serviceType, IInterfaceType* clientType )
 {
 	CHECK_NOT_NULL( serviceType );
 	CHECK_NOT_NULL( clientType );
@@ -183,7 +183,7 @@ void ServiceManagerComponent::removeServiceForType( InterfaceType* serviceType, 
 	throw MissingServiceException( "nothing to remove" );
 }
 
-void ServiceManagerComponent::validateClientType( InterfaceType* clientType )
+void ServiceManager::validateClientType( IInterfaceType* clientType )
 {
 	CHECK_NOT_NULL( clientType );
 
@@ -192,7 +192,7 @@ void ServiceManagerComponent::validateClientType( InterfaceType* clientType )
 		throw IllegalArgumentException( "illegal clientType (co.Interface)" );
 }
 
-void ServiceManagerComponent::validateServiceInstance( InterfaceType* serviceType, Interface* serviceInstance )
+void ServiceManager::validateServiceInstance( IInterfaceType* serviceType, Interface* serviceInstance )
 {
 	CHECK_NOT_NULL( serviceType );
 	CHECK_NOT_NULL( serviceInstance );
@@ -200,14 +200,14 @@ void ServiceManagerComponent::validateServiceInstance( InterfaceType* serviceTyp
 		CORAL_THROW( IllegalArgumentException, "invalid serviceInstance (not a " << serviceType->getFullName() << ")" );
 }
 
-ComponentType* ServiceManagerComponent::validateComponentType( InterfaceType* serviceType, const std::string& componentName )
+IComponentType* ServiceManager::validateComponentType( IInterfaceType* serviceType, const std::string& componentName )
 {
 	CHECK_NOT_NULL( serviceType );
 
-	ComponentType* ct = NULL;
+	IComponentType* ct = NULL;
 	try
 	{
-		ct = dynamic_cast<ComponentType*>( getType( componentName ) );
+		ct = dynamic_cast<IComponentType*>( getType( componentName ) );
 	}
 	catch( ... )
 	{;}
@@ -222,18 +222,18 @@ ComponentType* ServiceManagerComponent::validateComponentType( InterfaceType* se
 			<< "' does not provide the service interface ('" << serviceType->getFullName() << "')" );
 }
 
-void ServiceManagerComponent::createServiceInstance( InterfaceType* serviceType, LazyInstance& instance, InterfaceType* clientType )
+void ServiceManager::createServiceInstance( IInterfaceType* serviceType, LazyInstance& instance, IInterfaceType* clientType )
 {
 	if( instance.hasInstance() )
 		return;
 
-	ComponentType* ct = instance.getComponentType();
+	IComponentType* ct = instance.getComponentType();
 
 	try
 	{
-		Reflector* reflector = ct->getReflector();
-		Component* component = reflector->newInstance();
-		InterfaceInfo* serviceItfInfo = getFacetInfo( ct, serviceType );
+		IReflector* reflector = ct->getReflector();
+		IComponent* component = reflector->newInstance();
+		IInterfaceInfo* serviceItfInfo = getFacetInfo( ct, serviceType );
 		assert( serviceItfInfo );
 		instance.setInstance( component->getInterface( serviceItfInfo ) );
 	}
@@ -249,7 +249,7 @@ void ServiceManagerComponent::createServiceInstance( InterfaceType* serviceType,
 	}
 }
 
-Interface* ServiceManagerComponent::getServiceForType( ServiceRecord& rec, InterfaceType* serviceType, InterfaceType* clientType )
+Interface* ServiceManager::getServiceForType( ServiceRecord& rec, IInterfaceType* serviceType, IInterfaceType* clientType )
 {
 	// pick the first service instance available for (a super-type of) clientType
 	LazyInstance* instance = findSuitableInstance( rec, serviceType, clientType );
@@ -270,9 +270,9 @@ Interface* ServiceManagerComponent::getServiceForType( ServiceRecord& rec, Inter
 	return instance->getInstance();
 }
 
-ServiceManagerComponent::LazyInstance* ServiceManagerComponent::findSuitableInstance( ServiceRecord& rec, InterfaceType* serviceType, InterfaceType* clientType )
+ServiceManager::LazyInstance* ServiceManager::findSuitableInstance( ServiceRecord& rec, IInterfaceType* serviceType, IInterfaceType* clientType )
 {
-	ArrayRange<InterfaceType* const> superInterfaces = clientType->getSuperInterfaces();
+	ArrayRange<IInterfaceType* const> superInterfaces = clientType->getSuperInterfaces();
 	if( superInterfaces.isEmpty() )
 		return NULL; // we reached a co.Interface
 
@@ -292,6 +292,6 @@ ServiceManagerComponent::LazyInstance* ServiceManagerComponent::findSuitableInst
 	return NULL;
 }
 
-CORAL_EXPORT_COMPONENT( ServiceManagerComponent, ServiceManagerComponent );
+CORAL_EXPORT_COMPONENT( ServiceManager, ServiceManager );
 
 } // namespace co

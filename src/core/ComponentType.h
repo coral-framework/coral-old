@@ -7,43 +7,43 @@
 #define _COMPONENTTYPE_H_
 
 #include "Type.h"
-#include "ComponentTypeComponent_Base.h"
+#include "ComponentType_Base.h"
 #include <co/RefVector.h>
-#include <co/InterfaceInfo.h>
+#include <co/IInterfaceInfo.h>
 
 namespace co {
 
 /*!
-	Component that implements co.ComponentType.
+	Implements co.IComponentType.
  */
-class ComponentTypeComponent : public ComponentTypeComponent_Base, public TypeImpl
+class ComponentType : public ComponentType_Base, public TypeImpl
 {
 public:
-	ComponentTypeComponent();
-	virtual ~ComponentTypeComponent();
+	ComponentType();
+	virtual ~ComponentType();
 
 	// internal methods:
 
 	//! Appends the given interfaces range to the interfaces list. After calling this
 	//! method the interfaces list must be re-sorted using the sortInterfaces() method.
-	void addInterfaces( ArrayRange<InterfaceInfo* const> interfaces );
+	void addInterfaces( ArrayRange<IInterfaceInfo* const> interfaces );
 
 	//! Sorts the interface list by (isFacet, name) and updates _firstReceptacle.
 	void sortInterfaces();
 
-	// CompoundType methods:
-	ArrayRange<MemberInfo* const> getMembers();
-	MemberInfo* getMember( const std::string& name );
+	// ICompoundType methods:
+	ArrayRange<IMemberInfo* const> getMembers();
+	IMemberInfo* getMember( const std::string& name );
 
-	// ComponentType methods:
-	ArrayRange<InterfaceInfo* const> getInterfaces();
-	ArrayRange<InterfaceInfo* const> getFacets();
-	ArrayRange<InterfaceInfo* const> getReceptacles();
+	// IComponentType methods:
+	ArrayRange<IInterfaceInfo* const> getInterfaces();
+	ArrayRange<IInterfaceInfo* const> getFacets();
+	ArrayRange<IInterfaceInfo* const> getReceptacles();
 
 	DELEGATE_CO_TYPE_METHODS( TypeImpl:: );
 
 private:
-	typedef RefVector<InterfaceInfo> InterfacesVector;
+	typedef RefVector<IInterfaceInfo> InterfacesVector;
 	InterfacesVector _interfaces;	// dual sorted vector: facets first, then receptacles.
 	size_t _firstReceptacle;		// dividing point: position of the first receptacle in _interfaces.
 };

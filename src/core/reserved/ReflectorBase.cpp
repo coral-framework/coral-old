@@ -4,9 +4,9 @@
  */
 
 #include "ReflectorBase.h"
-#include <co/MethodInfo.h>
-#include <co/AttributeInfo.h>
-#include <co/InterfaceInfo.h>
+#include <co/IMethodInfo.h>
+#include <co/IAttributeInfo.h>
+#include <co/IInterfaceInfo.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -15,11 +15,11 @@
 
 namespace co {
 
-// ------ ReflectorBase provides an interface named 'reflector', of type co::Reflector ------ //
+// ------ ReflectorBase provides an interface named 'reflector', of type co::IReflector ------ //
 
-InterfaceType* ReflectorBase_co_Reflector::getInterfaceType()
+IInterfaceType* ReflectorBase_co_Reflector::getInterfaceType()
 {
-	return co::typeOf<Reflector>::get();
+	return co::typeOf<IReflector>::get();
 }
 
 const std::string& ReflectorBase_co_Reflector::getInterfaceName()
@@ -40,7 +40,7 @@ ReflectorBase::~ReflectorBase()
 	// empty
 }
 
-Component* ReflectorBase::getInterfaceOwner()
+IComponent* ReflectorBase::getInterfaceOwner()
 {
 	return this;
 }
@@ -55,19 +55,19 @@ void ReflectorBase::componentRelease()
 	decrementRefCount();
 }
 
-ComponentType* ReflectorBase::getComponentType()
+IComponentType* ReflectorBase::getComponentType()
 {
-	return getOrCreateSimpleInternalComponentType( "co.ReflectorBase", "co.Reflector", "reflector" );
+	return getOrCreateSimpleInternalComponentType( "co.ReflectorBase", "co.IReflector", "reflector" );
 }
 
-Interface* ReflectorBase::getInterface( InterfaceInfo* interfaceInfo )
+Interface* ReflectorBase::getInterface( IInterfaceInfo* interfaceInfo )
 {
 	checkValidInterface( interfaceInfo );
 
 	Interface* res = NULL;
 	switch( interfaceInfo->getIndex() )
 	{
-	case 0: res = static_cast<Reflector*>( this ); break;
+	case 0: res = static_cast<IReflector*>( this ); break;
 	default:
 		raiseUnexpectedInterfaceIndex();
 	}
@@ -75,7 +75,7 @@ Interface* ReflectorBase::getInterface( InterfaceInfo* interfaceInfo )
 	return res;
 }
 
-void ReflectorBase::setReceptacle( InterfaceInfo* receptacle, Interface* )
+void ReflectorBase::setReceptacle( IInterfaceInfo* receptacle, Interface* )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
@@ -96,29 +96,29 @@ void ReflectorBase::destroyValue( void* )
 	raiseNotSupportedException();
 }
 
-Component* ReflectorBase::newInstance()
+IComponent* ReflectorBase::newInstance()
 {
 	raiseNotSupportedException();
 	return NULL;
 }
 
-Interface* ReflectorBase::newProxy( DynamicProxyHandler* )
+Interface* ReflectorBase::newProxy( IDynamicProxyHandler* )
 {
 	raiseNotSupportedException();
 	return NULL;
 }
 
-void ReflectorBase::getAttribute( const Any&, AttributeInfo*, Any& )
+void ReflectorBase::getAttribute( const Any&, IAttributeInfo*, Any& )
 {
 	raiseNotSupportedException();
 }
 
-void ReflectorBase::setAttribute( const Any&, AttributeInfo*, const Any& )
+void ReflectorBase::setAttribute( const Any&, IAttributeInfo*, const Any& )
 {
 	raiseNotSupportedException();
 }
 
-void ReflectorBase::invokeMethod( const Any&, MethodInfo*, ArrayRange<Any const>, Any& )
+void ReflectorBase::invokeMethod( const Any&, IMethodInfo*, ArrayRange<Any const>, Any& )
 {
 	raiseNotSupportedException();
 }
@@ -134,13 +134,13 @@ void ReflectorBase::checkValidSize( size_t expectedSize, size_t actualSize )
 		throw co::IllegalArgumentException( "instance size mismatch" );
 }
 
-void ReflectorBase::checValidProxyHandler( co::DynamicProxyHandler* handler )
+void ReflectorBase::checValidProxyHandler( co::IDynamicProxyHandler* handler )
 {
 	if( handler == NULL )
-		throw co::IllegalArgumentException( "illegal null co::DynamicProxyHandler" );
+		throw co::IllegalArgumentException( "illegal null co::IDynamicProxyHandler" );
 }
 
-void ReflectorBase::checkNumArguments( co::MethodInfo* mi, size_t numArgs )
+void ReflectorBase::checkNumArguments( co::IMethodInfo* mi, size_t numArgs )
 {
 	assert( mi );
 	size_t expectedNumArgs = mi->getParameters().getSize();
@@ -150,14 +150,14 @@ void ReflectorBase::checkNumArguments( co::MethodInfo* mi, size_t numArgs )
 					<< ", but only " << numArgs << ( numArgs > 1 ? " were" : " was" ) << " passed" );
 }
 
-void ReflectorBase::raiseAttributeIsReadOnly( co::AttributeInfo* ai )
+void ReflectorBase::raiseAttributeIsReadOnly( co::IAttributeInfo* ai )
 {
 	assert( ai && ai->getIsReadOnly() );
 	CORAL_THROW( co::IllegalArgumentException, "attribute '" << ai->getName()
 					<< "' is read-only and cannot be changed" );
 }
 
-void ReflectorBase::raiseArgumentTypeException( co::MethodInfo* mi, int argIndex, const co::IllegalCastException& e )
+void ReflectorBase::raiseArgumentTypeException( co::IMethodInfo* mi, int argIndex, const co::IllegalCastException& e )
 {
 	CORAL_THROW( co::IllegalCastException, "invalid argument #" << argIndex + 1 << " to method "
 					<< mi->getName() << "(): " << e.getMessage() );

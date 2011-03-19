@@ -6,37 +6,37 @@
 #ifndef _PARAMETERINFO_H_
 #define _PARAMETERINFO_H_
 
-#include "ParameterInfoComponent_Base.h"
+#include "ParameterInfo_Base.h"
 #include <co/RefPtr.h>
 #include <co/Platform.h>
 
 namespace co {
 
 /*!
-	Component that implements co.ParameterInfo.
+	Implements co.IParameterInfo.
  */
-class ParameterInfoComponent : public ParameterInfoComponent_Base
+class ParameterInfo : public ParameterInfo_Base
 {
 public:
-	ParameterInfoComponent();
-	virtual ~ParameterInfoComponent();
+	ParameterInfo();
+	virtual ~ParameterInfo();
 
 	// internal methods:
-	void init( const std::string& name, Type* type, bool isIn, bool isOut );
+	void init( const std::string& name, IType* type, bool isIn, bool isOut );
 	void setName( const std::string& name );
-	void setType( Type* type );
+	void setType( IType* type );
 	void setIsIn( bool isIn );
 	void setIsOut( bool isOut );
 
-	// ParameterInfo methods
+	// IParameterInfo methods
 	const std::string& getName();
-	Type* getType();
+	IType* getType();
 	bool getIsIn();
 	bool getIsOut();
 
 private:
 	std::string _name;
-	Type* _type;
+	IType* _type;
 	bool _isIn;
 	bool _isOut;
 };

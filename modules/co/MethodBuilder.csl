@@ -1,44 +1,7 @@
 /*
-	Works in conjunction with a TypeBuilder to define methods for new types.
+	Implements co.IMethodBuilder.
  */
-interface MethodBuilder
+component MethodBuilder
 {
-	// The TypeBuilder to which this MethodBuilder belongs to.
-	readonly attribute TypeBuilder typeBuilder;
-
-	// The future name of the method when it's created.
-	readonly attribute string methodName;
-
-	/*
-		Defines the return type of the method.
-		\throw NotSupportedException if the method's return type was already defined or if the parent type was already created.
-		\throw IllegalArgumentException if the passed \a type is invalid (e.g. null).
-	 */
-	void defineReturnType( in Type type )
-		raises NotSupportedException, IllegalArgumentException;
-
-	/*
-		Adds a parameter to the method.
-		\throw NotSupportedException if the parent type was already created.
-		\throw IllegalNameException if the passed \a name is not a valid identifier or clashes with other parameters.
-		\throw IllegalArgumentException if the passed \a type is invalid (e.g. null) or if both input and output are false.
-	 */
-	void defineParameter( in string name, in Type type, in bool input, in bool output )
-		raises IllegalNameException, IllegalArgumentException;
-
-	/*
-		Adds an exception type that can be raised by the method.
-		\throw NotSupportedException if the parent type was already created.
-		\throw IllegalArgumentException if the passed \a exceptionType is invalid (e.g. null).
-	 */
-	void defineException( in ExceptionType exceptionType )
-		raises IllegalArgumentException;
-
-	/*
-		Uses the data provided thus far to add a method to the TypeBuilder that owns this MethodBuilder.
-		\throw NotSupportedException if the parent type was already created.
-		\throw MemberClashException if another member with a clashing name was added to the type since this builder's creation.
-		\throw MissingInputException if the reference to the TypeBuilder that owns this MethodBuilder is null.
-	 */
-	void createMethod() raises IllegalNameException, MissingInputException;
+	provides IMethodBuilder methodBuilder;
 };

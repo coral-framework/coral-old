@@ -4,9 +4,9 @@
  */
 
 #include <lua/ILauncher.h>
-#include <co/DynamicProxyHandler.h>
-#include <co/MethodInfo.h>
-#include <co/AttributeInfo.h>
+#include <co/IDynamicProxyHandler.h>
+#include <co/IMethodInfo.h>
+#include <co/IAttributeInfo.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -24,7 +24,7 @@ void moduleRelease();
 class ILauncher_Proxy : public lua::ILauncher
 {
 public:
-	ILauncher_Proxy( co::DynamicProxyHandler* handler ) : _handler( handler )
+	ILauncher_Proxy( co::IDynamicProxyHandler* handler ) : _handler( handler )
 	{
 		moduleRetain();
 		_cookie = _handler->registerProxyInterface( co::disambiguate<co::Interface, lua::ILauncher>( this ) );
@@ -37,8 +37,8 @@ public:
 
 	// co::Interface Methods:
 
-	co::InterfaceType* getInterfaceType() { return co::typeOf<lua::ILauncher>::get(); }
-	co::Component* getInterfaceOwner() { return _handler->getInterfaceOwner(); }
+	co::IInterfaceType* getInterfaceType() { return co::typeOf<lua::ILauncher>::get(); }
+	co::IComponent* getInterfaceOwner() { return _handler->getInterfaceOwner(); }
 	const std::string& getInterfaceName() { return _handler->getProxyInterfaceName( _cookie ); }
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
@@ -56,23 +56,23 @@ public:
 
 protected:
 	template<typename T>
-	co::AttributeInfo* getAttribInfo( co::uint32 index )
+	co::IAttributeInfo* getAttribInfo( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getMemberAttributes()[index];
 	}
 
 	template<typename T>
-	co::MethodInfo* getMethodInfo( co::uint32 index )
+	co::IMethodInfo* getMethodInfo( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getMemberMethods()[index];
 	}
 
 private:
-	co::DynamicProxyHandler* _handler;
+	co::IDynamicProxyHandler* _handler;
 	co::uint32 _cookie;
 };
 
-// ------ Reflector ------ //
+// ------ IReflector ------ //
 
 class ILauncher_Reflector : public co::ReflectorBase
 {
@@ -87,7 +87,7 @@ public:
 		moduleRelease();
 	}
 
-	co::Type* getType()
+	co::IType* getType()
 	{
 		return co::typeOf<lua::ILauncher>::get();
 	}
@@ -97,27 +97,27 @@ public:
 		return sizeof(lua::ILauncher);
 	}
 
-	co::Interface* newProxy( co::DynamicProxyHandler* handler )
+	co::Interface* newProxy( co::IDynamicProxyHandler* handler )
 	{
 		checValidProxyHandler( handler );
 		return co::disambiguate<co::Interface, lua::ILauncher>( new lua::ILauncher_Proxy( handler ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::AttributeInfo* ai, co::Any& value )
+	void getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value )
 	{
 		checkInstance( instance, ai );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
-	void setAttribute( const co::Any& instance, co::AttributeInfo* ai, const co::Any& value )
+	void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value )
 	{
 		checkInstance( instance, ai );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
+	void invokeMethod( const co::Any& instance, co::IMethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		lua::ILauncher* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -151,20 +151,20 @@ public:
 	}
 
 private:
-	lua::ILauncher* checkInstance( const co::Any& any, co::MemberInfo* member )
+	lua::ILauncher* checkInstance( const co::Any& any, co::IMemberInfo* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
 
 		// make sure that 'any' is an instance of this type
-		co::InterfaceType* myType = co::typeOf<lua::ILauncher>::get();
+		co::IInterfaceType* myType = co::typeOf<lua::ILauncher>::get();
 
 		lua::ILauncher* res;
 		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<lua::ILauncher*>( any.getState().data.itf ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid lua::ILauncher*, but got " << any );
 
 		// make sure that 'member' belongs to this type
-		co::CompoundType* owner = member->getOwner();
+		co::ICompoundType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to lua.ILauncher" );
@@ -173,9 +173,9 @@ private:
 	}
 };
 
-// ------ Reflector Creation Function ------ //
+// ------ IReflector Creation Function ------ //
 
-co::Reflector* __createILauncherReflector()
+co::IReflector* __createILauncherIReflector()
 {
     return new ILauncher_Reflector;
 }

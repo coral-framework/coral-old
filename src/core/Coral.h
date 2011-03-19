@@ -12,11 +12,11 @@
 namespace co {
 
 // Forward Decls:
-class Type;
-class System;
-class Component;
+class IType;
+class ISystem;
+class IComponent;
 class Interface;
-class InterfaceType;
+class IInterfaceType;
 
 // ------ Coral Path -----------------------------------------------------------
 
@@ -43,14 +43,14 @@ CORAL_EXPORT void addPath( const std::string& path );
 // ------ Bootstrap and Shutdown -----------------------------------------------
 
 /*!
-	\brief Returns the co.System bootstrap interface (a singleton).
+	\brief Returns the co.ISystem bootstrap interface (a singleton).
 
 	This first call to this function (ever, or since the last call to co::shutdown())
 	initializes the Coral framework.
 
 	\ingroup setup
  */
-CORAL_EXPORT System* getSystem();
+CORAL_EXPORT ISystem* getSystem();
 
 /*!
 	\brief Tears down and destroys the system, releasing all memory and resources.
@@ -114,10 +114,10 @@ CORAL_EXPORT void debug( DebugEvent event, const char* msg, ... );
 /*!
 	\brief Utility function to retrieve or load a type by name.
 	This is equivalent to calling: \code co::getSystem()->getTypes()->getType( fullName ) \endcode
-	Please refer to co::TypeManager::getType() for the list of exceptions this function may throw.
+	Please refer to co::ITypeManager::getType() for the list of exceptions this function may throw.
 	\ingroup convenience
  */
-CORAL_EXPORT Type* getType( const std::string& fullName );
+CORAL_EXPORT IType* getType( const std::string& fullName );
 
 /*!
 	\brief Utility function to instantiate a component given its full type name.
@@ -125,34 +125,34 @@ CORAL_EXPORT Type* getType( const std::string& fullName );
 	Please note that this function may raise all exceptions raised by the aforementioned methods.
 	\ingroup convenience
  */
-CORAL_EXPORT Component* newInstance( const std::string& fullName );
+CORAL_EXPORT IComponent* newInstance( const std::string& fullName );
 
 /*!
 	Binds a \a facet to the component receptacle identified by \a receptacleName.
-	You should generally use co::Component::setReceptacle() instead of this function.
-	Please refer to co::Component::setReceptacle() for the full list of exceptions this function may throw.
+	You should generally use co::IComponent::setReceptacle() instead of this function.
+	Please refer to co::IComponent::setReceptacle() for the full list of exceptions this function may throw.
  */
-CORAL_EXPORT void setReceptacleByName( Component* instance, const std::string& receptacleName, Interface* facet );
+CORAL_EXPORT void setReceptacleByName( IComponent* instance, const std::string& receptacleName, Interface* facet );
 
 /*!
 	\brief Utility function to get the best provider of \a serviceType for clients of type \a clientType.
 	If \a clientType is null this function will retrieve the service's global instance.
-	Please refer to co::ServiceManager::getServiceForType() for the list of exceptions this function may throw.
+	Please refer to co::IServiceManager::getServiceForType() for the list of exceptions this function may throw.
 	\ingroup convenience
  */
-CORAL_EXPORT Interface* getServiceForType( InterfaceType* serviceType, InterfaceType* clientType );
+CORAL_EXPORT Interface* getServiceForType( IInterfaceType* serviceType, IInterfaceType* clientType );
 
 /*!
 	\brief Utility function to get the best provider of \a serviceType for the given \a clientInstance.
 	This is equivalent to calling: \code co::getSystem()->getServices()->getServiceForInstance() \endcode
-	Please refer to co::ServiceManager::getServiceForInstance() for the list of exceptions this function may throw.
+	Please refer to co::IServiceManager::getServiceForInstance() for the list of exceptions this function may throw.
 	\ingroup convenience
  */
-CORAL_EXPORT Interface* getServiceForInstance( InterfaceType* serviceType, Interface* clientInstance );
+CORAL_EXPORT Interface* getServiceForInstance( IInterfaceType* serviceType, Interface* clientInstance );
 
 /*!
 	\brief Template function to get a global service by its interface type.
-	Please refer to co::ServiceManager::getService() for the list of exceptions this function may throw.
+	Please refer to co::IServiceManager::getService() for the list of exceptions this function may throw.
 	\ingroup convenience
  */
 template<typename T>
@@ -164,11 +164,11 @@ inline T* getService()
 /*!
 	\brief Template function to get a <tt>clientType</tt>-specialized service by its interface type.
 	This picks the most appropriate service instance available for clients of the given \a clientType.
-	Please refer to co::ServiceManager::getServiceForType() for the list of exceptions this function may throw.
+	Please refer to co::IServiceManager::getServiceForType() for the list of exceptions this function may throw.
 	\ingroup convenience
  */
 template<typename T>
-inline T* getService( co::InterfaceType* clientType )
+inline T* getService( co::IInterfaceType* clientType )
 {
 	return static_cast<T*>( getServiceForType( co::typeOf<T>::get(), clientType ) );
 }
@@ -176,7 +176,7 @@ inline T* getService( co::InterfaceType* clientType )
 /*!
 	\brief Template function to get a <tt>clientInstance</tt>-specialized service by its interface type.
 	This picks the most appropriate service instance available for the given \a clientInstance.
-	Please refer to co::ServiceManager::getServiceForInstance() for the list of exceptions this function may throw.
+	Please refer to co::IServiceManager::getServiceForInstance() for the list of exceptions this function may throw.
 	\ingroup convenience
  */
 template<typename T>

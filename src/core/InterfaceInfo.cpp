@@ -7,37 +7,37 @@
 
 namespace co {
 
-InterfaceInfoComponent::InterfaceInfoComponent() : _interfaceType( 0 ), _isFacet( true )
+InterfaceInfo::InterfaceInfo() : _interfaceType( 0 ), _isFacet( true )
 {
 	// empty
 }
 
 
-InterfaceInfoComponent::~InterfaceInfoComponent()
+InterfaceInfo::~InterfaceInfo()
 {
 	// empty
 }
 
-void InterfaceInfoComponent::setType( InterfaceType* interfaceType )
+void InterfaceInfo::setType( IInterfaceType* interfaceType )
 {
 	_interfaceType = interfaceType;
 }
 
-void InterfaceInfoComponent::setIsFacet( bool isFacet )
+void InterfaceInfo::setIsFacet( bool isFacet )
 {
 	_isFacet = isFacet;
 }
 
-InterfaceType* InterfaceInfoComponent::getType()
+IInterfaceType* InterfaceInfo::getType()
 {
 	return _interfaceType;
 }
 
-bool InterfaceInfoComponent::getIsFacet()
+bool InterfaceInfo::getIsFacet()
 {
 	return _isFacet;
 }
 
-CORAL_EXPORT_COMPONENT( InterfaceInfoComponent, InterfaceInfoComponent );
+CORAL_EXPORT_COMPONENT( InterfaceInfo, InterfaceInfo );
 
 } // namespace co

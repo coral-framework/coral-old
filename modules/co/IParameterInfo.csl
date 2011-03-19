@@ -1,0 +1,17 @@
+/*
+	Describes a \ref co::IMethodInfo "method" parameter.
+ */
+interface IParameterInfo
+{
+	// The parameter's name.
+	readonly attribute string name;
+
+	// The parameter's type.
+	readonly attribute IType type;
+
+	// Whether the paremeter is used for input.
+	readonly attribute bool isIn;
+
+	// Whether the parameter is used for output.
+	readonly attribute bool isOut;
+};

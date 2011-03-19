@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 #include <co/Coral.h>
-#include <co/Component.h>
+#include <co/IComponent.h>
 #include <moduleA/Vec2D.h>
 #include <moduleA/TestEnum.h>
 #include <moduleA/TestStruct.h>
@@ -57,7 +57,7 @@ TEST( MappingTests, structFields )
 	ASSERT_EQ( moduleA::Second, dummyStruct.enumArray[0] );
 
 	dummyStruct.typeArray.push_back( NULL );
-	co::ArrayRange<co::Type* const> typeRange( dummyStruct.typeArray );
+	co::ArrayRange<co::IType* const> typeRange( dummyStruct.typeArray );
 	ASSERT_EQ( 1, typeRange.getSize() );
 	ASSERT_EQ( dummyStruct.typeArray.front().get(), typeRange.getFirst() );
 }
@@ -104,7 +104,7 @@ TEST( MappingTests, exception )
 
 TEST( MappingTests, interface )
 {
-	co::RefPtr<co::Component> testComponent = co::newInstance( "moduleA.TestComponent" );
+	co::RefPtr<co::IComponent> testComponent = co::newInstance( "moduleA.TestComponent" );
 
 	moduleA::TestInterface* ti = testComponent->getFacet<moduleA::TestInterface>();
 

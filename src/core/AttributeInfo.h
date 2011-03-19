@@ -7,31 +7,31 @@
 #define _ATTRIBUTEINFO_H_
 
 #include "MemberInfo.h"
-#include "AttributeInfoComponent_Base.h"
+#include "AttributeInfo_Base.h"
 
 namespace co {
 
 /*!
-	Component that implements co.AttributeInfo.
+	Implements co.IAttributeInfo.
  */
-class AttributeInfoComponent : public AttributeInfoComponent_Base, public MemberInfoImpl
+class AttributeInfo : public AttributeInfo_Base, public MemberInfoImpl
 {
 public:
-	AttributeInfoComponent();
-	virtual ~AttributeInfoComponent();
+	AttributeInfo();
+	virtual ~AttributeInfo();
 
 	// internal methods:
-	void setType( Type* type );
+	void setType( IType* type );
 	void setIsReadOnly( bool isReadOnly );
 
-	// co::AttributeInfo methods:
-	Type* getType();
+	// co::IAttributeInfo methods:
+	IType* getType();
 	bool getIsReadOnly();
 
 	DELEGATE_CO_MEMBERINFO_METHODS( MemberInfoImpl:: );
 
 private:
-	Type* _type;
+	IType* _type;
 	bool _isReadOnly;
 };
 

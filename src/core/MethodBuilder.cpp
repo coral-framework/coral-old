@@ -8,9 +8,9 @@
 #include "TypeBuilder.h"
 #include "ParameterInfo.h"
 #include <co/Coral.h>
-#include <co/System.h>
+#include <co/ISystem.h>
 #include <co/ArrayRange.h>
-#include <co/TypeManager.h>
+#include <co/ITypeManager.h>
 #include <co/IllegalNameException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -20,17 +20,17 @@
 
 namespace co {
 
-MethodBuilderComponent::MethodBuilderComponent() : _returnType( NULL )
+MethodBuilder::MethodBuilder() : _returnType( NULL )
 {
 	// empty
 }
 
-MethodBuilderComponent::~MethodBuilderComponent()
+MethodBuilder::~MethodBuilder()
 {
 	// empty
 }
 
-void MethodBuilderComponent::init( TypeBuilder* typeBuilder, const std::string& name )
+void MethodBuilder::init( ITypeBuilder* typeBuilder, const std::string& name )
 {
 	assert( typeBuilder );
 
@@ -38,17 +38,17 @@ void MethodBuilderComponent::init( TypeBuilder* typeBuilder, const std::string& 
 	_name = name;
 }
 
-TypeBuilder* MethodBuilderComponent::getTypeBuilder()
+ITypeBuilder* MethodBuilder::getTypeBuilder()
 {
 	return _typeBuilder.get();
 }
 
-const std::string& MethodBuilderComponent::getMethodName()
+const std::string& MethodBuilder::getMethodName()
 {
 	return _name;
 }
 
-void MethodBuilderComponent::defineReturnType( Type* type )
+void MethodBuilder::defineReturnType( IType* type )
 {
 	if( _returnType )
 		CORAL_THROW( NotSupportedException, "return type defined twice" );
@@ -59,12 +59,12 @@ void MethodBuilderComponent::defineReturnType( Type* type )
 	_returnType = type;
 }
 
-void MethodBuilderComponent::defineParameter( const std::string& name, Type* type, bool input, bool output )
+void MethodBuilder::defineParameter( const std::string& name, IType* type, bool input, bool output )
 {
 	if( !LexicalUtils::isValidIdentifier( name ) )
 		CORAL_THROW( IllegalNameException, "parameter name '" << name << "' is not a valid identifier" );
 
-	for( ArrayRange<ParameterInfo* const> r( _parameters ); r; r.popFirst() )
+	for( ArrayRange<IParameterInfo* const> r( _parameters ); r; r.popFirst() )
 		if( r.getFirst()->getName() == name )
 			CORAL_THROW( IllegalNameException, "parameter '" << name << "' defined twice in method '" << _name << "()'" );
 
@@ -79,13 +79,13 @@ void MethodBuilderComponent::defineParameter( const std::string& name, Type* typ
 	if( !input && !output )
 		CORAL_THROW( IllegalArgumentException, "parameter is neither input nor output" );
 
-	ParameterInfoComponent* paramInfo = new ParameterInfoComponent();
+	ParameterInfo* paramInfo = new ParameterInfo();
 	paramInfo->init( name, type, input, output );
 
 	_parameters.push_back( paramInfo );
 }
 
-void MethodBuilderComponent::defineException( ExceptionType* exception )
+void MethodBuilder::defineException( IExceptionType* exception )
 {
 	if( !exception )
 		CORAL_THROW( IllegalArgumentException, "the passed exception is invalid" );
@@ -93,11 +93,11 @@ void MethodBuilderComponent::defineException( ExceptionType* exception )
 	_expectedExceptions.push_back( exception );
 }
 
-void MethodBuilderComponent::createMethod()
+void MethodBuilder::createMethod()
 {
 	assert( _typeBuilder.isValid() );
 
-	MethodInfoComponent* mic = new MethodInfoComponent;
+	MethodInfo* mic = new MethodInfo;
 	_createdMethodInfo = mic;
 
 	mic->setName( _name );
@@ -106,10 +106,10 @@ void MethodBuilderComponent::createMethod()
 	mic->setReturnType( _returnType );
 
 	// notice: the call to addMethod() below may throw an exception if the TB's type was already created
-	assert( dynamic_cast<TypeBuilderComponent*>( _typeBuilder.get() ) );
-	static_cast<TypeBuilderComponent*>( _typeBuilder.get() )->addMethod( mic );
+	assert( dynamic_cast<TypeBuilder*>( _typeBuilder.get() ) );
+	static_cast<TypeBuilder*>( _typeBuilder.get() )->addMethod( mic );
 }
 
-CORAL_EXPORT_COMPONENT( MethodBuilderComponent, MethodBuilderComponent );
+CORAL_EXPORT_COMPONENT( MethodBuilder, MethodBuilder );
 
 } // namespace co

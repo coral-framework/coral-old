@@ -11,7 +11,7 @@ local function addDoc( writer, compoundName, memberName )
 	if text == "" then
 		writer( "//! Not documented.\n" )
 	else
-		-- filter the text, escaping the words "Interface" and "Component" so
+		-- filter the text, escaping the words "Interface" and "IComponent" so
 		-- they are not turned into links.
 		text = text:gsub( "(%p?[%w]+)", wordSubstitutions )
 
@@ -113,7 +113,7 @@ function write.TK_INTERFACE( writer, t )
 end
 
 function write.TK_COMPONENT( writer, t )
-	writer( "ref class ", t.name, " : co::Component\n{\n" )
+	writer( "ref class ", t.name, " : co::IComponent\n{\n" )
 	writer( "\t//! \\name Facets\n\t//@{\n\n" )
 	for i, itf in ipairs( t.facets ) do
 		addDoc( writer, t.fullName, itf.name )

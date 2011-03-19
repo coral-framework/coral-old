@@ -7,31 +7,31 @@
 #define _INTERFACEINFO_H_
 
 #include "MemberInfo.h"
-#include "InterfaceInfoComponent_Base.h"
+#include "InterfaceInfo_Base.h"
 
 namespace co {
 
 /*!
-	Component that implements co.InterfaceInfo.
+	Implements co.IInterfaceInfo.
  */
-class InterfaceInfoComponent : public InterfaceInfoComponent_Base, public MemberInfoImpl
+class InterfaceInfo : public InterfaceInfo_Base, public MemberInfoImpl
 {
 public:
-	InterfaceInfoComponent();
-	virtual ~InterfaceInfoComponent();
+	InterfaceInfo();
+	virtual ~InterfaceInfo();
 
 	// internal methods:
-	void setType( InterfaceType* interfaceType );
+	void setType( IInterfaceType* interfaceType );
 	void setIsFacet( bool isFacet );
 
-	// InterfaceInfo methods:
-	InterfaceType* getType();
+	// IInterfaceInfo methods:
+	IInterfaceType* getType();
 	bool getIsFacet();
 
 	DELEGATE_CO_MEMBERINFO_METHODS( MemberInfoImpl:: );
 
 private:
-	InterfaceType* _interfaceType;
+	IInterfaceType* _interfaceType;
 	bool _isFacet;
 };
 

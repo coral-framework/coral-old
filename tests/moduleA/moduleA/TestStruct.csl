@@ -4,11 +4,11 @@ struct TestStruct
 	int16 anInt16;
 
 	TestEnum testEnum;
-	co.Type aType;
+	co.IType aType;
 
 	co.CSLError innerStruct;
 
 	float[] floatArray;
 	TestEnum[] enumArray;
-	co.Type[] typeArray;
+	co.IType[] typeArray;
 };

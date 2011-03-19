@@ -4,7 +4,7 @@ local function template( writer, c )
 	writer( [[
 
 #include <co/RefPtr.h>
-#include <co/ModulePart.h>
+#include <co/IModulePart.h>
 #include <co/reserved/LibraryManager.h>
 
 ]] )
@@ -49,8 +49,8 @@ const TypeDependency* coral_module_query_dependencies()
 
 	writer( [[
 
-// The module's ModulePart instance
-co::RefPtr<co::ModulePart> sg_instance;
+// The module's IModulePart instance
+co::RefPtr<co::IModulePart> sg_instance;
 
 // The module's internal reference count
 co::int32 sg_refCount( 0 );
@@ -62,7 +62,7 @@ void moduleRetain()
 
 void moduleRelease()
 {
-	// is the module's ModulePart the only active reference?
+	// is the module's IModulePart the only active reference?
 	if( --sg_refCount == 1 )
 	{
 		assert( sg_instance.isValid() );
@@ -71,7 +71,7 @@ void moduleRelease()
 }
 
 // implemented by CORAL_EXPORT_MODULE_PART()
-co::ModulePart* createModulePart();
+co::IModulePart* createModulePart();
 
 ]] )
 
@@ -80,7 +80,7 @@ co::ModulePart* createModulePart();
 	writer( [[
 
 extern "C" CORAL_DLL_EXPORT
-co::ModulePart* coral_module_part_instance()
+co::IModulePart* coral_module_part_instance()
 {
 	if( !]], c.moduleNS, [[::sg_instance.isValid() )
 	{

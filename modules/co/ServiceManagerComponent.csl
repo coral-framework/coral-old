@@ -1,7 +1,0 @@
-/*
-	Implements co.ServiceManager.
- */
-component ServiceManagerComponent
-{
-	provides ServiceManager serviceManager;
-};

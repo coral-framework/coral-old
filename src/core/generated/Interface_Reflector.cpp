@@ -4,11 +4,11 @@
  */
 
 #include <co/Interface.h>
-#include <co/DynamicProxyHandler.h>
-#include <co/Component.h>
-#include <co/InterfaceType.h>
-#include <co/MethodInfo.h>
-#include <co/AttributeInfo.h>
+#include <co/IDynamicProxyHandler.h>
+#include <co/IComponent.h>
+#include <co/IInterfaceType.h>
+#include <co/IMethodInfo.h>
+#include <co/IAttributeInfo.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -23,7 +23,7 @@ namespace co {
 class Interface_Proxy : public co::Interface
 {
 public:
-	Interface_Proxy( co::DynamicProxyHandler* handler ) : _handler( handler )
+	Interface_Proxy( co::IDynamicProxyHandler* handler ) : _handler( handler )
 	{
 		_cookie = _handler->registerProxyInterface( co::disambiguate<co::Interface, co::Interface>( this ) );
 	}
@@ -35,31 +35,31 @@ public:
 
 	// co::Interface Methods:
 
-	co::InterfaceType* getInterfaceType() { return co::typeOf<co::Interface>::get(); }
-	co::Component* getInterfaceOwner() { return _handler->getInterfaceOwner(); }
+	co::IInterfaceType* getInterfaceType() { return co::typeOf<co::Interface>::get(); }
+	co::IComponent* getInterfaceOwner() { return _handler->getInterfaceOwner(); }
 	const std::string& getInterfaceName() { return _handler->getProxyInterfaceName( _cookie ); }
 	void componentRetain() { _handler->componentRetain(); }
 	void componentRelease() { _handler->componentRelease(); }
 
 protected:
 	template<typename T>
-	co::AttributeInfo* getAttribInfo( co::uint32 index )
+	co::IAttributeInfo* getAttribInfo( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getMemberAttributes()[index];
 	}
 
 	template<typename T>
-	co::MethodInfo* getMethodInfo( co::uint32 index )
+	co::IMethodInfo* getMethodInfo( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getMemberMethods()[index];
 	}
 
 private:
-	co::DynamicProxyHandler* _handler;
+	co::IDynamicProxyHandler* _handler;
 	co::uint32 _cookie;
 };
 
-// ------ Reflector ------ //
+// ------ IReflector ------ //
 
 class Interface_Reflector : public co::ReflectorBase
 {
@@ -74,7 +74,7 @@ public:
 		// empty
 	}
 
-	co::Type* getType()
+	co::IType* getType()
 	{
 		return co::typeOf<co::Interface>::get();
 	}
@@ -84,25 +84,25 @@ public:
 		return sizeof(co::Interface);
 	}
 
-	co::Interface* newProxy( co::DynamicProxyHandler* handler )
+	co::Interface* newProxy( co::IDynamicProxyHandler* handler )
 	{
 		checValidProxyHandler( handler );
 		return co::disambiguate<co::Interface, co::Interface>( new co::Interface_Proxy( handler ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::AttributeInfo* ai, co::Any& value )
+	void getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value )
 	{
 		co::Interface* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
 		case 0:		value.set< const std::string& >( p->getInterfaceName() ); break;
-		case 1:		value.set< co::Component* >( p->getInterfaceOwner() ); break;
-		case 2:		value.set< co::InterfaceType* >( p->getInterfaceType() ); break;
+		case 1:		value.set< co::IComponent* >( p->getInterfaceOwner() ); break;
+		case 2:		value.set< co::IInterfaceType* >( p->getInterfaceType() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::AttributeInfo* ai, const co::Any& value )
+	void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value )
 	{
 		co::Interface* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
@@ -116,7 +116,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
+	void invokeMethod( const co::Any& instance, co::IMethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		co::Interface* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -153,20 +153,20 @@ public:
 	}
 
 private:
-	co::Interface* checkInstance( const co::Any& any, co::MemberInfo* member )
+	co::Interface* checkInstance( const co::Any& any, co::IMemberInfo* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
 
 		// make sure that 'any' is an instance of this type
-		co::InterfaceType* myType = co::typeOf<co::Interface>::get();
+		co::IInterfaceType* myType = co::typeOf<co::Interface>::get();
 
 		co::Interface* res;
 		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::Interface*>( any.getState().data.itf ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::Interface*, but got " << any );
 
 		// make sure that 'member' belongs to this type
-		co::CompoundType* owner = member->getOwner();
+		co::ICompoundType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to co.Interface" );
@@ -175,9 +175,9 @@ private:
 	}
 };
 
-// ------ Reflector Creation Function ------ //
+// ------ IReflector Creation Function ------ //
 
-co::Reflector* __createInterfaceReflector()
+co::IReflector* __createInterfaceIReflector()
 {
     return new Interface_Reflector;
 }

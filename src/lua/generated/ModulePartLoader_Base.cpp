@@ -5,23 +5,23 @@
 
 #include "ModulePartLoader_Base.h"
 #include <co/Coral.h>
-#include <co/ComponentType.h>
-#include <co/InterfaceInfo.h>
-#include <co/InterfaceType.h>
+#include <co/IComponentType.h>
+#include <co/IInterfaceInfo.h>
+#include <co/IInterfaceType.h>
 
 namespace lua {
 
 void moduleRetain();
 void moduleRelease();
 
-// ------ lua.ModulePartLoader provides an interface named 'loader', of type co.ModulePartLoader ------ //
+// ------ lua.ModulePartLoader provides an interface named 'loader', of type co.IModulePartLoader ------ //
 
-co::InterfaceType* ModulePartLoader_co_ModulePartLoader::getInterfaceType()
+co::IInterfaceType* ModulePartLoader_co_IModulePartLoader::getInterfaceType()
 {
-	return co::typeOf<co::ModulePartLoader>::get();
+	return co::typeOf<co::IModulePartLoader>::get();
 }
 
-const std::string& ModulePartLoader_co_ModulePartLoader::getInterfaceName()
+const std::string& ModulePartLoader_co_IModulePartLoader::getInterfaceName()
 {
 	static const std::string s_interfaceName( "loader" );
 	return s_interfaceName;
@@ -39,7 +39,7 @@ ModulePartLoader_Base::~ModulePartLoader_Base()
 	moduleRelease();
 }
 
-co::Component* ModulePartLoader_Base::getInterfaceOwner()
+co::IComponent* ModulePartLoader_Base::getInterfaceOwner()
 {
 	return this;
 }
@@ -54,26 +54,26 @@ void ModulePartLoader_Base::componentRelease()
 	decrementRefCount();
 }
 
-co::ComponentType* ModulePartLoader_Base::getComponentType()
+co::IComponentType* ModulePartLoader_Base::getComponentType()
 {
-	co::Type* type = co::getType( "lua.ModulePartLoader" );
-	assert( dynamic_cast<co::ComponentType*>( type ) );
-	return static_cast<co::ComponentType*>( type );
+	co::IType* type = co::getType( "lua.ModulePartLoader" );
+	assert( dynamic_cast<co::IComponentType*>( type ) );
+	return static_cast<co::IComponentType*>( type );
 }
 
-co::Interface* ModulePartLoader_Base::getInterface( co::InterfaceInfo* interfaceInfo )
+co::Interface* ModulePartLoader_Base::getInterface( co::IInterfaceInfo* interfaceInfo )
 {
 	checkValidInterface( interfaceInfo );
 	co::Interface* res = NULL;
 	switch( interfaceInfo->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::Interface, co::ModulePartLoader>( this ); break;
+	case 0:		res = co::disambiguate<co::Interface, co::IModulePartLoader>( this ); break;
 	default:	raiseUnexpectedInterfaceIndex();
 	}
 	return res;
 }
 
-void ModulePartLoader_Base::setReceptacle( co::InterfaceInfo* receptacle, co::Interface* facet )
+void ModulePartLoader_Base::setReceptacle( co::IInterfaceInfo* receptacle, co::Interface* facet )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();

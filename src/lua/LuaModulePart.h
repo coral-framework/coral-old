@@ -11,7 +11,7 @@
 namespace lua {
 
 /*!
-	A co.ModulePart that wraps a Lua script in a module's dir.
+	A co.IModulePart that wraps a Lua script in a module's dir.
  */
 class ModulePart : public ModulePart_Base
 {
@@ -19,15 +19,15 @@ public:
     ModulePart();
 	virtual ~ModulePart();
 
-	// co::ModulePart methods:
-	void initialize( co::Module* module );
-	void integrate( co::Module* module );
-	void integratePresentation( co::Module* module );
-	void disintegrate( co::Module* module );
-	void dispose( co::Module* module );
+	// co::IModulePart methods:
+	void initialize( co::IModule* module );
+	void integrate( co::IModule* module );
+	void integratePresentation( co::IModule* module );
+	void disintegrate( co::IModule* module );
+	void dispose( co::IModule* module );
 
 private:
-	void callScriptMethod( const char* methodName, co::Module* module );
+	void callScriptMethod( const char* methodName, co::IModule* module );
 };
 
 } // namespace lua

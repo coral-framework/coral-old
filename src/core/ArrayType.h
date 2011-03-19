@@ -7,28 +7,28 @@
 #define _ARRAYTYPE_H_
 
 #include "Type.h"
-#include "ArrayTypeComponent_Base.h"
+#include "ArrayType_Base.h"
 
 namespace co {
 
 /*!
-	Component that implements co.ArrayType.
+	Implements co.IArrayType.
  */
-class ArrayTypeComponent : public ArrayTypeComponent_Base, public TypeImpl
+class ArrayType : public ArrayType_Base, public TypeImpl
 {
 public:
-	virtual ~ArrayTypeComponent();
+	virtual ~ArrayType();
 
 	// internal methods:
-	void setElementType( Type* type );
+	void setElementType( IType* type );
 
-	// co::ArrayType methods:
-	Type* getElementType();
+	// co::IArrayType methods:
+	IType* getElementType();
 
 	DELEGATE_CO_TYPE_METHODS( TypeImpl:: );
 
 private:
-	RefPtr<Type> _elementType;
+	RefPtr<IType> _elementType;
 };
 
 } // namespace co

@@ -6,39 +6,39 @@
 #ifndef _TYPECREATIONTRANSACTION_H_
 #define _TYPECREATIONTRANSACTION_H_
 
-#include "TypeCreationTransactionComponent_Base.h"
+#include "TypeCreationTransaction_Base.h"
 #include <co/RefVector.h>
-#include <co/TypeBuilder.h>
+#include <co/ITypeBuilder.h>
 
 namespace co {
 
 /*!
-	Component that implements co.TypeCreationTransaction.
+	Implements co.ITypeCreationTransaction.
  */
-class TypeCreationTransactionComponent
-		: public TypeCreationTransactionComponent_Base
+class TypeCreationTransaction
+		: public TypeCreationTransaction_Base
 {
 public:
-	TypeCreationTransactionComponent();
-	virtual ~TypeCreationTransactionComponent();
+	TypeCreationTransaction();
+	virtual ~TypeCreationTransaction();
 
 	// internal methods:
-	void addTypeBuilder( TypeBuilder* typeBuilder );
+	void addTypeBuilder( ITypeBuilder* typeBuilder );
 
-	// TypeCreationTransaction methods:
-	ArrayRange<TypeBuilder* const> getTypeBuilders();
+	// ITypeCreationTransaction methods:
+	ArrayRange<ITypeBuilder* const> getTypeBuilders();
 	void commit();
 	void rollback();
 	
 private:
-	static TypeCreationTransactionComponent* sm_activeTransaction;
+	static TypeCreationTransaction* sm_activeTransaction;
 
 private:
 	bool _commitAttempted;
 	bool _commitSucceeded;
 	bool _rolledBack;
 
-	typedef RefVector<TypeBuilder> TypeBuilderList;
+	typedef RefVector<ITypeBuilder> TypeBuilderList;
 	TypeBuilderList _typeBuilders;
 };
 

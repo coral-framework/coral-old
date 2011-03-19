@@ -1,7 +1,0 @@
-/*
-	Implements co.StructType.
- */
-component StructTypeComponent
-{
-	provides StructType type;
-};

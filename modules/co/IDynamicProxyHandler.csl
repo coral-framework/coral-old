@@ -1,0 +1,20 @@
+/*
+	Interface responsible for handling requests to a proxy interface.
+ */
+interface IDynamicProxyHandler
+{
+	// Registers a new proxy interface and returns a 'cookie' for it.
+	int32 registerProxyInterface( in Interface proxy );
+
+	// Retrieves a proxy interface's name given its cookie.
+	string getProxyInterfaceName( in int32 cookie );
+
+	// Handles a request for retrieving an attribute value.
+	any handleGetAttribute( in int32 cookie, in IAttributeInfo ai );
+
+	// Handles a request for setting an attribute value.
+	void handleSetAttribute( in int32 cookie, in IAttributeInfo ai, in any value );
+
+	// Handles a call to one of the proxy interface's methods.
+	any handleMethodInvocation( in int32 cookie, in IMethodInfo mi, in any[] args );
+};

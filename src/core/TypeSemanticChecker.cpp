@@ -6,17 +6,17 @@
 #include "TypeSemanticChecker.h"
 #include "AttributeAndMethodContainer.h"
 #include <co/ArrayRange.h>
-#include <co/MethodInfo.h>
-#include <co/CompoundType.h>
-#include <co/AttributeInfo.h>
-#include <co/InterfaceType.h>
+#include <co/IMethodInfo.h>
+#include <co/ICompoundType.h>
+#include <co/IAttributeInfo.h>
+#include <co/IInterfaceType.h>
 #include <co/SemanticException.h>
 #include <co/reserved/LexicalUtils.h>
 #include <sstream>
 
 namespace co {
 
-TypeSemanticChecker::TypeSemanticChecker( Type* type ) : _type( type )
+TypeSemanticChecker::TypeSemanticChecker( IType* type ) : _type( type )
 {
 	// empty
 }
@@ -24,23 +24,23 @@ TypeSemanticChecker::TypeSemanticChecker( Type* type ) : _type( type )
 void TypeSemanticChecker::check()
 {
 	// we don't need to check non-compound types
-	if( dynamic_cast<CompoundType*>( _type ) == NULL )
+	if( dynamic_cast<ICompoundType*>( _type ) == NULL )
 		return;
 
-	co::InterfaceType* interfaceType = dynamic_cast<InterfaceType*>( _type );
+	co::IInterfaceType* interfaceType = dynamic_cast<IInterfaceType*>( _type );
 	if( interfaceType )
 		checkInheritance( interfaceType );
 
 	checkMemberDeclarations( _type );
 }
 
-void TypeSemanticChecker::checkInheritance( co::InterfaceType* interfaceType )
+void TypeSemanticChecker::checkInheritance( co::IInterfaceType* interfaceType )
 {
 	// assert no multiple inheritance from the same type
-	co::ArrayRange<co::InterfaceType* const> superTypes = interfaceType->getSuperInterfaces();
+	co::ArrayRange<co::IInterfaceType* const> superTypes = interfaceType->getSuperInterfaces();
 	for( ; superTypes; superTypes.popFirst() )
 	{
-		co::InterfaceType* currentSuper = superTypes.getFirst();
+		co::IInterfaceType* currentSuper = superTypes.getFirst();
 
 		// check for cyclic inheritance
 		if( currentSuper->isSubTypeOf( interfaceType ) )
@@ -55,13 +55,13 @@ void TypeSemanticChecker::checkInheritance( co::InterfaceType* interfaceType )
 			This method actually checks if theres more than one way of reaching an ancestral
 			(i.e. indirect super-type) from the _type's list of direct super-types.
 		 */
-		co::ArrayRange<co::InterfaceType* const> subList( superTypes );
+		co::ArrayRange<co::IInterfaceType* const> subList( superTypes );
 		for( subList.popFirst(); subList; subList.popFirst() )
 		{
 			// check if there is more than one way of reaching a super-type
-			co::InterfaceType* anotherSuper = subList.getFirst();
+			co::IInterfaceType* anotherSuper = subList.getFirst();
 
-			co::InterfaceType* toBlame = NULL;
+			co::IInterfaceType* toBlame = NULL;
 			if( anotherSuper->isSubTypeOf( currentSuper ) )
 				toBlame = currentSuper;
 			else if( currentSuper->isSubTypeOf( anotherSuper ) )
@@ -105,7 +105,7 @@ void TypeSemanticChecker::insertMemberDeclaration( const MemberDeclaration& memb
 	_memberDeclarations.insert( memberDeclaration );
 }
 
-void TypeSemanticChecker::insertAttributeDeclaration( co::AttributeInfo* attribute, co::Type* declaringType )
+void TypeSemanticChecker::insertAttributeDeclaration( co::IAttributeInfo* attribute, co::IType* declaringType )
 {
 	insertMemberDeclaration( MemberDeclaration( Attribute,  attribute->getName(), declaringType ) );
 
@@ -120,7 +120,7 @@ void TypeSemanticChecker::insertAttributeDeclaration( co::AttributeInfo* attribu
 	insertMemberDeclaration( MemberDeclaration( SetterMethod, name, declaringType ) );
 }
 
-void TypeSemanticChecker::checkMemberDeclarations( co::Type* type )
+void TypeSemanticChecker::checkMemberDeclarations( co::IType* type )
 {
 	TypeSet::iterator it = _visitedTypes.find( type );
 	if( it != _visitedTypes.end() )
@@ -131,19 +131,19 @@ void TypeSemanticChecker::checkMemberDeclarations( co::Type* type )
 	AttributeAndMethodContainer* container = dynamic_cast<AttributeAndMethodContainer*>( type );
 	if( container )
 	{
-		co::ArrayRange<co::MethodInfo* const> methods = container->getMemberMethods();
+		co::ArrayRange<co::IMethodInfo* const> methods = container->getMemberMethods();
 		for( ; methods; methods.popFirst() )
 			insertMemberDeclaration( MemberDeclaration( Method, methods.getFirst()->getName(), type ) );
 	
-		co::ArrayRange<co::AttributeInfo* const> attributes = container->getMemberAttributes();
+		co::ArrayRange<co::IAttributeInfo* const> attributes = container->getMemberAttributes();
 		for( ; attributes; attributes.popFirst() )
 			insertAttributeDeclaration( attributes.getFirst(), type );
 	}
 
-	co::InterfaceType* interface = dynamic_cast<co::InterfaceType*>( type );
+	co::IInterfaceType* interface = dynamic_cast<co::IInterfaceType*>( type );
 	if( interface )
 	{
-		co::ArrayRange<co::InterfaceType* const> superTypes = interface->getSuperInterfaces();
+		co::ArrayRange<co::IInterfaceType* const> superTypes = interface->getSuperInterfaces();
 		for( ; superTypes; superTypes.popFirst() )
 			checkMemberDeclarations( superTypes.getFirst() );
 	}

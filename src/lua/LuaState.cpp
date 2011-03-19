@@ -5,7 +5,7 @@
 
 #include "LuaState.h"
 #include "LuaBinding.h"
-#include <co/Reflector.h>
+#include <co/IReflector.h>
 #include <co/reserved/OS.h>
 #include <lua/Exception.h>
 #include <sstream>
@@ -241,7 +241,7 @@ void LuaState::push( lua_State* L, const co::Any& var, int depth )
 		break;
 	case co::TK_ENUM:
 		{
-			co::ArrayRange<std::string const> ids = static_cast<co::EnumType*>( s.type )->getIdentifiers();
+			co::ArrayRange<std::string const> ids = static_cast<co::IEnumType*>( s.type )->getIdentifiers();
 			co::uint32 id = d->u32;
 			if( id < ids.getSize() )
 				push( L, ids[id] );
@@ -254,10 +254,10 @@ void LuaState::push( lua_State* L, const co::Any& var, int depth )
 		}
 		break;
 	case co::TK_STRUCT:
-		StructBinding::push( L, static_cast<co::StructType*>( s.type ), s.data.ptr );
+		StructBinding::push( L, static_cast<co::IStructType*>( s.type ), s.data.ptr );
 		break;
 	case co::TK_NATIVECLASS:
-		NativeClassBinding::push( L, static_cast<co::NativeClassType*>( s.type ), s.data.ptr );
+		NativeClassBinding::push( L, static_cast<co::INativeClassType*>( s.type ), s.data.ptr );
 		break;
 	case co::TK_INTERFACE:
 		push( L, reinterpret_cast<co::Interface*>( s.data.ptr ) );
@@ -307,18 +307,18 @@ inline void LuaState::pushInstance( lua_State* L, InstanceType* ptr )
 
 void LuaState::push( lua_State* L, co::Interface* itf )
 {
-	if( itf && itf->getInterfaceType()->getFullName() == "co.Component" )
-		push( L, static_cast<co::Component*>( itf ) );
+	if( itf && itf->getInterfaceType()->getFullName() == "co.IComponent" )
+		push( L, static_cast<co::IComponent*>( itf ) );
 	else
 		pushInstance<InterfaceBinding, co::Interface>( L, itf );
 }
 
-void LuaState::push( lua_State* L, co::Component* component )
+void LuaState::push( lua_State* L, co::IComponent* component )
 {
-	pushInstance<ComponentBinding, co::Component>( L, component );
+	pushInstance<ComponentBinding, co::IComponent>( L, component );
 }
 
-void LuaState::getAny( lua_State* L, int index, co::Type* expectedType, co::Any& any )
+void LuaState::getAny( lua_State* L, int index, co::IType* expectedType, co::Any& any )
 {
 	co::Any* var;
 	co::TypeKind expectedKind = ( !expectedType ? co::TK_NONE : expectedType->getKind() );
@@ -329,7 +329,7 @@ void LuaState::getAny( lua_State* L, int index, co::Type* expectedType, co::Any&
 		break;
 
 	case co::TK_ENUM:
-		any.set( getEnumIdentifier( L, index, static_cast<co::EnumType*>( expectedType ) ) );
+		any.set( getEnumIdentifier( L, index, static_cast<co::IEnumType*>( expectedType ) ) );
 		return;
 
 	case co::TK_NONE:
@@ -345,7 +345,7 @@ void LuaState::getAny( lua_State* L, int index, co::Type* expectedType, co::Any&
 	case LUA_TNIL:
 		if( expectedKind == co::TK_INTERFACE )
 		{
-			var->setInterface( NULL, static_cast<co::InterfaceType*>( expectedType ) );
+			var->setInterface( NULL, static_cast<co::IInterfaceType*>( expectedType ) );
 			break;
 		}
 		else if( expectedKind == co::TK_ANY )
@@ -377,7 +377,7 @@ void LuaState::getAny( lua_State* L, int index, co::Type* expectedType, co::Any&
 
 	case LUA_TTABLE:
 		if( expectedKind == co::TK_ARRAY )
-			toArray( L, index, static_cast<co::ArrayType*>( expectedType )->getElementType(), *var );
+			toArray( L, index, static_cast<co::IArrayType*>( expectedType )->getElementType(), *var );
 		else
 			throw lua::Exception( expectedKind != co::TK_ANY ? "no conversion from a Lua table" :
 						"unsupported conversion from a Lua table to a Coral 'any'" );
@@ -494,13 +494,13 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 		break;
 	case co::TK_ENUM:
 		*reinterpret_cast<co::uint32*>( var.getState().data.ptr ) =
-			getEnumIdentifier( L, index, static_cast<co::EnumType*>( var.getType() ) );
+			getEnumIdentifier( L, index, static_cast<co::IEnumType*>( var.getType() ) );
 		break;
 	case co::TK_STRUCT:
 	case co::TK_NATIVECLASS:
 		{
-			co::Type* expected = var.getType();
-			co::CompoundType* actual = CompoundTypeBinding::getType( L, index );
+			co::IType* expected = var.getType();
+			co::ICompoundType* actual = CompoundTypeBinding::getType( L, index );
 			if( actual != expected )
 				CORAL_THROW( lua::Exception, expected->getFullName() << " expected, got " <<
 					( actual ? actual->getFullName().c_str() : lua_typename( L, lua_type( L, index ) ) ) );
@@ -515,7 +515,7 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 		else
 		{
 			co::Interface* itf = NULL;
-			co::CompoundType* ct = NULL;
+			co::ICompoundType* ct = NULL;
 
 			int stackTop = lua_gettop( L );
 			int tp = lua_type( L, index );
@@ -701,10 +701,10 @@ void LuaState::pushArray( lua_State* L, const co::Any& var )
 	}
 }
 
-void LuaState::toArray( lua_State* L, int index, co::Type* elementType, co::Any& var )
+void LuaState::toArray( lua_State* L, int index, co::IType* elementType, co::Any& var )
 {
 	co::TypeKind elementKind = elementType->getKind();
-	co::Reflector* elementReflector = elementType->getReflector();
+	co::IReflector* elementReflector = elementType->getReflector();
 	co::int32 elementSize = elementReflector->getSize();
 
 	int len = static_cast<int>( lua_rawlen( L, index ) );
@@ -753,7 +753,7 @@ void LuaState::toArray( lua_State* L, int index, co::Type* elementType, co::Any&
 	}
 }
 
-co::int32 LuaState::getEnumIdentifier( lua_State* L, int index, co::EnumType* enumType )
+co::int32 LuaState::getEnumIdentifier( lua_State* L, int index, co::IEnumType* enumType )
 {
 	co::int32 res;
 	int type = lua_type( L, index );
@@ -808,8 +808,8 @@ void LuaState::raiseException( lua_State* L, int errorCode )
 	lua_pop( L, 1 );
 	
 	/*
-		Exception messages in the form "{some.ExceptionType}some message" are raised
-		as instances of some.ExceptionType, using Coral's reflection API.
+		Exception messages in the form "{some.IExceptionType}some message" are raised
+		as instances of some.IExceptionType, using Coral's reflection API.
 	 */
 
 	// the message must be at least 5 chars long and start with a parenthesis
@@ -837,10 +837,10 @@ void LuaState::raiseException( lua_State* L, int errorCode )
 			std::string parsedMsg( msgStart, msgEnd - msgStart );
 
 			// try to obtain an exception type/reflector
-			co::Reflector* reflector;
+			co::IReflector* reflector;
 			try
 			{
-				co::Type* type = co::getType( typeName );
+				co::IType* type = co::getType( typeName );
 				if( type->getKind() != co::TK_EXCEPTION )
 					throw co::IllegalArgumentException( "type is not an exception" );
 				reflector = type->getReflector();

@@ -7,17 +7,17 @@
 
 namespace co {
 
-MethodInfoComponent::~MethodInfoComponent()
+MethodInfo::~MethodInfo()
 {
 	// empty
 }
 
-void MethodInfoComponent::setReturnType( Type* returnType )
+void MethodInfo::setReturnType( IType* returnType )
 {
 	_returnType = returnType;
 }
 
-void MethodInfoComponent::setParameters( ArrayRange<ParameterInfo* const> parameters )
+void MethodInfo::setParameters( ArrayRange<IParameterInfo* const> parameters )
 {
 	assert( _parameters.size() == 0 );
 	_parameters.reserve( parameters.getSize() );
@@ -25,7 +25,7 @@ void MethodInfoComponent::setParameters( ArrayRange<ParameterInfo* const> parame
 		_parameters.push_back( parameters.getFirst() );
 }
 
-void MethodInfoComponent::setExceptions( ArrayRange<ExceptionType* const> exceptions )
+void MethodInfo::setExceptions( ArrayRange<IExceptionType* const> exceptions )
 {
 	assert( _exceptions.size() == 0 );
 	_exceptions.reserve( exceptions.getSize() );
@@ -33,21 +33,21 @@ void MethodInfoComponent::setExceptions( ArrayRange<ExceptionType* const> except
 		_exceptions.push_back( exceptions.getFirst() );
 }
 
-Type* MethodInfoComponent::getReturnType()
+IType* MethodInfo::getReturnType()
 {
 	return _returnType;
 }
 
-ArrayRange<ParameterInfo* const> MethodInfoComponent::getParameters()
+ArrayRange<IParameterInfo* const> MethodInfo::getParameters()
 {
 	return _parameters;
 }
 
-ArrayRange<ExceptionType* const> MethodInfoComponent::getExceptions()
+ArrayRange<IExceptionType* const> MethodInfo::getExceptions()
 {
 	return _exceptions;
 }
 
-CORAL_EXPORT_COMPONENT( MethodInfoComponent, MethodInfoComponent );
+CORAL_EXPORT_COMPONENT( MethodInfo, MethodInfo );
 
 } // namespace co

@@ -1,63 +1,7 @@
 /*
-	Coral's bootstrap interface (a singleton).
-	Controls the system's life cycle and provides access to all Coral types, modules and services.
+	Implements co.ISystem.
  */
-interface System
+component System
 {
-	// Current system state. See the life cycle control methods: setup(), tearDown(), etc.
-	readonly attribute SystemState state;
-
-	// Interface responsible for maintaining the types database, as well as loading new types.
-	readonly attribute TypeManager types;
-
-	// Interface responsible for loading and maintaining the life cycle of all modules.
-	readonly attribute ModuleManager modules;
-
-	// Interface that manages the services database and provides contextualized service lookups.
-	readonly attribute ServiceManager services;
-
-	//--------- System Life Cycle Control Methods ---------//
-
-	/*
-		Loads the modules in 'requiredModules' in the same order they're listed,
-		and leaves the system in the SystemState_Integrated state.
-
-		The system's state must be SystemState_None when this method is called,
-		or a LifeCycleException will be raised.
-
-		If any of the modules listed in 'requiredModules' cannot be loaded,
-		a ModuleLoadException will be raised and the system's state will
-		regress to SystemState_None.
-	 */
-	void setupBase( in string[] requiredModules ) raises LifeCycleException, ModuleLoadException;
-
-	/*
-		Sets up the presentation part of the system and leaves it in the SystemState_Running state.
-
-		The system's state must be SystemState_Integrated when this method is called,
-		or a LifeCycleException will be raised.
-	 */
-	void setupPresentation() raises LifeCycleException;
-
-	/*
-		Tears down the system and resets it to the SystemState_None state.
-
-		The system's state must be SystemState_Running when this method is called,
-		or a LifeCycleException will be raised.
-	 */
-	void tearDown() raises LifeCycleException;
-
-	<c++
-		//! Convenience method to setup the entire system without requiring any module.
-		inline void setup() { setup( ArrayRange<std::string const>() ); }
-
-		//! Convenience method to setup the entire system.
-		inline void setup( ArrayRange<std::string const> requiredModules )
-		{
-			setupBase( requiredModules );
-			setupPresentation();
-		}
-	c++>
-
-	//--------- End of System Life Cycle Control Methods ---------//
+	provides ISystem system;
 };

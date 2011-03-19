@@ -6,13 +6,13 @@
 #include "Parser.h"
 #include "CSLLexer.h"
 #include "CSLParser.h"
-#include <co/Namespace.h>
-#include <co/TypeBuilder.h>
-#include <co/MethodBuilder.h>
-#include <co/InterfaceType.h>
-#include <co/ExceptionType.h>
+#include <co/INamespace.h>
+#include <co/ITypeBuilder.h>
+#include <co/IMethodBuilder.h>
+#include <co/IInterfaceType.h>
+#include <co/IExceptionType.h>
 #include <co/TypeLoadException.h>
-#include <co/TypeCreationTransaction.h>
+#include <co/ITypeCreationTransaction.h>
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/OS.h>
 #include <sstream>
@@ -330,7 +330,7 @@ void Parser::onNativeClass( const std::string& cppHeader, const std::string& cpp
 
 void Parser::onSuperType( const std::string& name )
 {
-	Type* type = resolveType( name );
+	IType* type = resolveType( name );
 	if( !type )
 		CORAL_THROW( TypeLoadException, "could not load super-type '" << name << "'" );
 
@@ -351,7 +351,7 @@ void Parser::onIdentifierListItem( const std::string& name )
 
 void Parser::onComponentInterface( bool isFacet, const std::string& name )
 {
-	InterfaceType* interface = dynamic_cast<InterfaceType*>( getLastDeclaredType() );
+	IInterfaceType* interface = dynamic_cast<IInterfaceType*>( getLastDeclaredType() );
 	if( !interface )
 		CORAL_THROW( TypeLoadException, "an interface type was expected" );
 
@@ -369,7 +369,7 @@ void Parser::onMethod( const std::string& name )
 {
 	_methodBuilder = _typeBuilder->defineMethod( name );
 
-	Type* returnType = getLastDeclaredType();
+	IType* returnType = getLastDeclaredType();
 	if( returnType != NULL )
 		_methodBuilder->defineReturnType( returnType );
 
@@ -383,11 +383,11 @@ void Parser::onParameter( bool isIn, bool isOut, const std::string& name )
 
 void Parser::onExeptionRaised( const std::string& name )
 {
-	Type* type = resolveType( name );
+	IType* type = resolveType( name );
 	if( !type )
 		CORAL_THROW( TypeLoadException, "error loading exception type '" << name << "'" );
 
-	ExceptionType* exeptionType = dynamic_cast<ExceptionType*>( type );
+	IExceptionType* exeptionType = dynamic_cast<IExceptionType*>( type );
 	if( !exeptionType )
 		CORAL_THROW( TypeLoadException, "attempt to raise non-exception type '" << type->getFullName() << "'" );
 
@@ -399,13 +399,13 @@ void Parser::onEndMethod()
 	_methodBuilder->createMethod();
 }
 
-Type* Parser::getType()
+IType* Parser::getType()
 {
 	assert( _typeBuilder.isValid() );
 	return _typeBuilder->createType();
 }
 
-Type* Parser::findImportedType( const std::string& alias )
+IType* Parser::findImportedType( const std::string& alias )
 {
 	ImportTypeMap::iterator it = _importedTypes.find( alias );
 	if( it != _importedTypes.end() )
@@ -447,9 +447,9 @@ void Parser::handleDocumentation( const std::string& member )
 	_docBuffer.clear();
 }
 
-Type* Parser::getLastDeclaredType()
+IType* Parser::getLastDeclaredType()
 {
-	Type* lastDeclaredType;
+	IType* lastDeclaredType;
 	if( _lastDeclaredTypeName == "void" )
 	{
 		lastDeclaredType = NULL;

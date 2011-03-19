@@ -7,23 +7,23 @@
 #define _CO_RESERVED_REFLECTORBASE_H_
 
 #include "ComponentBase.h"
-#include <co/Reflector.h>
+#include <co/IReflector.h>
 
 namespace co {
 
 // forward declarations:
 class IllegalCastException;
 
-//! ReflectorBase provides an interface named 'reflector', of type co::Reflector.
-class CORAL_EXPORT ReflectorBase_co_Reflector : public Reflector
+//! ReflectorBase provides an interface named 'reflector', of type co::IReflector.
+class CORAL_EXPORT ReflectorBase_co_Reflector : public IReflector
 {
 public:
-	virtual InterfaceType* getInterfaceType();
+	virtual IInterfaceType* getInterfaceType();
 	virtual const std::string& getInterfaceName();
 };
 
 /*!
-	Inherit from this class to implement a Reflector.
+	Inherit from this class to implement a IReflector.
  */
 class CORAL_EXPORT ReflectorBase : public ComponentBase, public ReflectorBase_co_Reflector
 {
@@ -32,24 +32,24 @@ public:
 	virtual ~ReflectorBase();
 
 	// co::Interface methods:
-    Component* getInterfaceOwner();
+    IComponent* getInterfaceOwner();
     void componentRetain();
     void componentRelease();
 
-    // co::Component methods:
-    ComponentType* getComponentType();
-    Interface* getInterface( InterfaceInfo* );
-    void setReceptacle( InterfaceInfo*, Interface* );
+    // co::IComponent methods:
+    IComponentType* getComponentType();
+    Interface* getInterface( IInterfaceInfo* );
+    void setReceptacle( IInterfaceInfo*, Interface* );
 
-	// co::Reflector methods:
+	// co::IReflector methods:
 	void createValue( void* address, size_t length );
     void copyValue( const void* fromAddress, void* toAddress );
     void destroyValue( void* address );
-    Component* newInstance();
-    Interface* newProxy( DynamicProxyHandler* handler );
-    void getAttribute( const Any& instance, AttributeInfo* ai, Any& value );
-    void setAttribute( const Any& instance, AttributeInfo* ai, const Any& value );
-    void invokeMethod( const Any& instance, MethodInfo* mi, ArrayRange<Any const> args, Any& returnValue );
+    IComponent* newInstance();
+    Interface* newProxy( IDynamicProxyHandler* handler );
+    void getAttribute( const Any& instance, IAttributeInfo* ai, Any& value );
+    void setAttribute( const Any& instance, IAttributeInfo* ai, const Any& value );
+    void invokeMethod( const Any& instance, IMethodInfo* mi, ArrayRange<Any const> args, Any& returnValue );
 	void raise( const std::string& message );
 
 protected:
@@ -63,16 +63,16 @@ protected:
 	void checkValidSize( size_t expectedSize, size_t actualSize );
 
 	//! Raises co::IllegalArgumentException if handler is NULL.
-	void checValidProxyHandler( co::DynamicProxyHandler* handler );
+	void checValidProxyHandler( co::IDynamicProxyHandler* handler );
 
 	//! Raises co::MissingInputException if \a numArgs is lesser than \a mi's expected number of args.
-	void checkNumArguments( co::MethodInfo* mi, size_t numArgs );
+	void checkNumArguments( co::IMethodInfo* mi, size_t numArgs );
 
 	//! Raises an exception because setAttribute() was called on a read-only attribute.
-	void raiseAttributeIsReadOnly( co::AttributeInfo* ai );
+	void raiseAttributeIsReadOnly( co::IAttributeInfo* ai );
 
 	//! Re-raises a co::IllegalCastException with info about which method parameter raised the exception.
-	void raiseArgumentTypeException( co::MethodInfo* mi, int argIndex, const co::IllegalCastException& e );
+	void raiseArgumentTypeException( co::IMethodInfo* mi, int argIndex, const co::IllegalCastException& e );
 
 	/*!
 		Raises a co::IllegalArgumentException for cases (that "should never happen")

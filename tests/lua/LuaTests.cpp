@@ -5,8 +5,8 @@
 
 #include <gtest/gtest.h>
 #include <co/Coral.h>
-#include <co/System.h>
-#include <co/ModuleManager.h>
+#include <co/ISystem.h>
+#include <co/IModuleManager.h>
 #include <co/ModuleLoadException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -103,7 +103,7 @@ TEST( LuaTests, array )
 	ASSERT_SUCCESS( "lua.array" );
 }
 
-// --- Component Binding Tests --- //
+// --- IComponent Binding Tests --- //
 
 TEST( LuaTests, componentManipulation )
 {
@@ -136,7 +136,7 @@ TEST( LuaTests, struct )
 	ASSERT_SUCCESS( "lua.struct" );
 }
 
-// --- Lua Component Tests --- //
+// --- Lua IComponent Tests --- //
 
 TEST( LuaTests, component )
 {

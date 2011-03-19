@@ -15,7 +15,7 @@ namespace lua {
 class Launcher_lua_ILauncher : public lua::ILauncher
 {
 public:
-	virtual co::InterfaceType* getInterfaceType();
+	virtual co::IInterfaceType* getInterfaceType();
 	virtual const std::string& getInterfaceName();
 };
 
@@ -30,14 +30,14 @@ public:
 	virtual ~Launcher_Base();
 
 	// co::Interface Methods:
-	co::Component* getInterfaceOwner();
+	co::IComponent* getInterfaceOwner();
 	void componentRetain();
 	void componentRelease();
 
-	// co::Component Methods:
-	co::ComponentType* getComponentType();
-	co::Interface* getInterface( co::InterfaceInfo* );
-	void setReceptacle( co::InterfaceInfo*, co::Interface* );
+	// co::IComponent Methods:
+	co::IComponentType* getComponentType();
+	co::Interface* getInterface( co::IInterfaceInfo* );
+	void setReceptacle( co::IInterfaceInfo*, co::Interface* );
 };
 
 } // namespace lua

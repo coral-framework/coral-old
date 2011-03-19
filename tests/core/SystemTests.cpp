@@ -5,8 +5,8 @@
 
 #include <co/Coral.h>
 #include <co/RefPtr.h>
-#include <co/System.h>
-#include <co/TypeManager.h>
+#include <co/ISystem.h>
+#include <co/ITypeManager.h>
 #include <gtest/gtest.h>
 
 TEST( SystemTests, coralPathDirsAreUnique )
@@ -29,12 +29,12 @@ TEST( SystemTests, coralPathDirsAreUnique )
 
 TEST( SystemTests, startupShutdown )
 {
-	co::RefPtr<co::System> system1 = co::getSystem();
+	co::RefPtr<co::ISystem> system1 = co::getSystem();
 	ASSERT_TRUE( system1.isValid() );
 
 	co::shutdown();
 
-	co::RefPtr<co::System> system2 = co::getSystem();
+	co::RefPtr<co::ISystem> system2 = co::getSystem();
 	ASSERT_TRUE( system2.isValid() );
 
 	ASSERT_NE( system1, system2 );
@@ -44,8 +44,8 @@ TEST( SystemTests, startupShutdown )
 
 TEST( SystemTests, typeManager )
 {
-	co::RefPtr<co::System> system = co::getSystem();
-	co::RefPtr<co::TypeManager> types = system->getTypes();
+	co::RefPtr<co::ISystem> system = co::getSystem();
+	co::RefPtr<co::ITypeManager> types = system->getTypes();
 	ASSERT_TRUE( types.isValid() );
-	EXPECT_TRUE( types->findType( "co.System" ) != NULL );
+	EXPECT_TRUE( types->findType( "co.ISystem" ) != NULL );
 }

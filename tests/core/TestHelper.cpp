@@ -5,35 +5,35 @@
 
 #include "TestHelper.h"
 #include <co/RefPtr.h>
-#include <co/System.h>
-#include <co/Namespace.h>
-#include <co/TypeManager.h>
+#include <co/ISystem.h>
+#include <co/INamespace.h>
+#include <co/ITypeManager.h>
 #include <core/tools/StringTokenizer.h>
 #include <gtest/gtest.h>
 
-co::TypeBuilder* TestHelper::createBuilder( co::TypeKind kind, const std::string& fullTypeName, co::TypeCreationTransaction* tct )
+co::ITypeBuilder* TestHelper::createBuilder( co::TypeKind kind, const std::string& fullTypeName, co::ITypeCreationTransaction* tct )
 {
-	co::Namespace* ns = co::getSystem()->getTypes()->getRootNS();
+	co::INamespace* ns = co::getSystem()->getTypes()->getRootNS();
 
 	co::StringTokenizer st( fullTypeName, "." );
 	st.nextToken();
 	std::string currentToken = st.getToken();
 	while( st.nextToken() )
 	{
-		co::Namespace* childNS = ns->getChildNamespace( currentToken );
+		co::INamespace* childNS = ns->getChildNamespace( currentToken );
 		if( !childNS )
 			childNS = ns->defineChildNamespace( currentToken );
 		ns = childNS;
 		currentToken = st.getToken();
 	}
 
-	co::TypeBuilder* typeBuilder = ns->defineType( currentToken, kind, tct );
+	co::ITypeBuilder* typeBuilder = ns->defineType( currentToken, kind, tct );
 	EXPECT_TRUE( typeBuilder != NULL );
 
 	return typeBuilder;
 }
 
-co::Type* TestHelper::type( const std::string& fullTypeName )
+co::IType* TestHelper::type( const std::string& fullTypeName )
 {
 	return co::getSystem()->getTypes()->findType( fullTypeName );
 }

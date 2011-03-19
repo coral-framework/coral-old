@@ -10,17 +10,17 @@
 #include "tools/CryptoHash.h"
 
 namespace co {
-	class Type;
-	class MethodInfo;
+	class IType;
+	class IMethodInfo;
 } // namespace co
 
 /*!
 	Calculates version hashes for binary or full type compatibility checking.
- 
+
 	The \b binary signature keeps track of changes that break binary compatibility between
 	versions of a C++ type mapping, while the \b full signature also keeps track of changes
 	that could break source (or reflective) code compatibility (e.g. renaming struct fields).
- 
+
 	\par References:
 		- http://techbase.kde.org/Policies/Binary_Compatibility_Issues_With_C++
 		- http://techbase.kde.org/Policies/Binary_Compatibility_Examples
@@ -36,8 +36,8 @@ namespace co {
 class SignatureCalculator
 {
 public:
-	//! Type for whom we should calculate (and on which we should set) the signatures.
-	SignatureCalculator( co::Type* type );
+	//! Type for whom we should calculate, and on which we should set, the signatures.
+	SignatureCalculator( co::IType* type );
 
 	//! Destructor.
 	~SignatureCalculator();
@@ -74,10 +74,10 @@ private:
 		type's signature would imply in mutual dependencies (i.e. method
 		parameters and return types).
 	 */
-	void addTypeWithNoSignature( co::Type* type );
+	void addTypeWithNoSignature( co::IType* type );
 
 private:
-	co::Type* _type;
+	co::IType* _type;
 
 	co::Uuid _fullSignature;
 	co::Uuid _binarySignature;

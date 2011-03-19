@@ -8,7 +8,7 @@
 
 #include <lua.hpp>
 #include <co/Any.h>
-#include <co/Component.h>
+#include <co/IComponent.h>
 
 namespace lua {
 
@@ -33,7 +33,7 @@ private:
 	static int newComponentInstance( lua_State* L );
 
 private:
-	typedef std::vector<co::ComponentType*> ComponentTypeList;
+	typedef std::vector<co::IComponentType*> ComponentTypeList;
 	static ComponentTypeList sm_luaComponentTypes;
 };
 
@@ -45,10 +45,10 @@ class CompoundTypeBinding
 {
 public:
 	/*!
-		Attempts to get the co::CompoundType* for the Coral object at \a index.
+		Attempts to get the co::ICompoundType* for the Coral object at \a index.
 		Returns NULL if the value at \a index is not a valid Coral object.
 	 */
-	static co::CompoundType* getType( lua_State* L, int index );
+	static co::ICompoundType* getType( lua_State* L, int index );
 
 	/*!
 		Given a userdata's index, attempts to set a co::Any with a reference to
@@ -64,34 +64,34 @@ public:
 	static bool tryGetInstance( lua_State* L, int index, co::Any& instance );
 
 	/*!
-		Removes all references to CompoundType metatables from the Lua registry.
+		Removes all references to ICompoundType metatables from the Lua registry.
 	 */
 	static void releaseBindings( lua_State* L );
 
 protected:
 	/*!
-		Pushes a metatable for a userdata of the specified co::CompoundType.
-		The metatable is cached in the registry, indexed by the co::CompoundType pointer.
+		Pushes a metatable for a userdata of the specified co::ICompoundType.
+		The metatable is cached in the registry, indexed by the co::ICompoundType pointer.
 	 */
-	static void pushMetatable( lua_State* L, co::CompoundType* ct, co::Reflector* reflector = 0 );
+	static void pushMetatable( lua_State* L, co::ICompoundType* ct, co::IReflector* reflector = 0 );
 
 	/*!
-		Assumes the CompoundType's udata is at index 1 and the member name is at index 2.
+		Assumes the ICompoundType's udata is at index 1 and the member name is at index 2.
 		Pushes a function and returns true, if the member is a method; or a light
-		userdata pointing to a co::MemberInfo, if the member is not a method.
+		userdata pointing to a co::IMemberInfo, if the member is not a method.
 		If the member cannot be found and \a mustExist is false (default), pushes nil and
 		returns false; otherwise, if \a mustExist is true, an exception is thrown.
 	 */
-	static bool pushMember( lua_State* L, co::CompoundType* ct, bool mustExist = false );
+	static bool pushMember( lua_State* L, co::ICompoundType* ct, bool mustExist = false );
 
 	/*!
-		Pops a light userdata (co::AttributeInfo*) from the stack.
+		Pops a light userdata (co::IAttributeInfo*) from the stack.
 		Pushes the corresponding attribute value of the given 'instance'.
 	 */
 	static void getAttribute( lua_State* L, const co::Any& instance );
 
 	/*!
-		Pops a value and a light userdata (co::AttributeInfo*) from the stack.
+		Pops a value and a light userdata (co::IAttributeInfo*) from the stack.
 		Assigns the value to the corresponding attribute of the given 'instance'.
 	 */
 	static void setAttribute( lua_State* L, const co::Any& instance );
@@ -102,7 +102,7 @@ protected:
 	static int callMethod( lua_State* L );
 
 private:
-	typedef std::vector<co::CompoundType*> CompoundTypeList;
+	typedef std::vector<co::ICompoundType*> CompoundTypeList;
 	static CompoundTypeList sm_boundTypes;
 };
 
@@ -112,8 +112,8 @@ private:
 class ComponentBinding : public CompoundTypeBinding
 {
 public:
-	//! Pushes a new instance of a co::Component* userdata onto the stack.
-	static void create( lua_State* L, co::Component* component );
+	//! Pushes a new instance of a co::IComponent* userdata onto the stack.
+	static void create( lua_State* L, co::IComponent* component );
 
 	// --- Metamethods ---
 	static int index( lua_State* L );
@@ -155,7 +155,7 @@ public:
 		If an instancePtr is provided, the pushed complex value will be a copy of it.
 		Otherwise, if instancePtr is NULL, a default-constructed complex value will be pushed.
 	 */
-	static void push( lua_State* L, co::Type* type, void* instancePtr );
+	static void push( lua_State* L, co::IType* type, void* instancePtr );
 
 	//! Gets the instance pointer of a verified Coral CV userdata.
 	inline static void* getInstance( lua_State* L, int index )

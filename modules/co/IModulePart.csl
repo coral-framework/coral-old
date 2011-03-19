@@ -1,0 +1,36 @@
+/*
+	Controls the life-cycle of an <em>abstract artifact</em> (such as a dynamic library or a script bundle) loaded as part of a module.
+ */
+interface IModulePart
+{
+	/*
+		Initialization Phase - registration of services provided by the IModulePart.
+
+		\note This phase should install Reflectors for all module types. If a missing IReflector
+			is detected after the initialization phase is complete, the module will be aborted.
+	 */
+	void initialize( in IModule module );
+
+	/*
+		Integration Phase - consumption of services provided by other modules.
+		May throw an exception to indicate that the module cannot be loaded due to a missing service.
+		\throw MissingServiceException if a required service was not available.
+	 */
+	void integrate( in IModule module ) raises MissingServiceException;
+
+	/*
+		Presentation Integration Phase - addition of user interface elements to the application.
+	 */
+	void integratePresentation( in IModule module );
+
+	/*
+		Disintegration Phase - responsible for severing connections with other modules and
+		cleaning up presentation elements installed by the IModulePart.
+	 */
+	void disintegrate( in IModule module );
+
+	/*
+		Disposal Phase - responsible for freeing resources allocated by the IModulePart.
+	 */
+	void dispose( in IModule module );
+};

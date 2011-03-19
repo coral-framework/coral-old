@@ -6,12 +6,12 @@
 #ifndef _CO_RESERVED_COMPONENTBASE_H_
 #define _CO_RESERVED_COMPONENTBASE_H_
 
-#include <co/Component.h>
+#include <co/IComponent.h>
 #include <co/IllegalArgumentException.h>
 
 namespace co {
 
-class CORAL_EXPORT ComponentBase : public Component
+class CORAL_EXPORT ComponentBase : public IComponent
 {
 public:
 	ComponentBase() : _refCount( 0 )
@@ -19,8 +19,8 @@ public:
 
 	virtual ~ComponentBase();
 
-	// co::Interface methods for the 'component' (co::Component) interface:
-	InterfaceType* getInterfaceType();
+	// co::Interface methods for the 'component' (co::IComponent) interface:
+	IInterfaceType* getInterfaceType();
 	const std::string& getInterfaceName();
 
 protected:
@@ -36,10 +36,10 @@ protected:
 	}
 
 	//! Raises co::NoSuchInterfaceException if \a itfInfo isn't one of the component's interfaces.
-	void checkValidInterface( InterfaceInfo* itfInfo );
+	void checkValidInterface( IInterfaceInfo* itfInfo );
 
 	//! Similar to checkValidInterface(), but also raises an exception if \a receptacle is a facet.
-	void checkValidReceptacle( InterfaceInfo* receptacle );
+	void checkValidReceptacle( IInterfaceInfo* receptacle );
 
 	/*!
 		Raises a co::NoSuchInterfaceException for cases that simply "should never happen"
@@ -59,18 +59,18 @@ protected:
 	}
 
 	//! Raises an IllegalArgumentException stating the passed 'ptr' was not of the 'expectedType'.
-	void raiseIncompatibleInterface( InterfaceType* expectedType, Interface* ptr );
+	void raiseIncompatibleInterface( IInterfaceType* expectedType, Interface* ptr );
 
 	/*!
 		Utility method to dynamically define simple, internal component types (i.e.
 		components that provide a single interface and don't have reflectors). Used
-		internally by the core for all Reflectors and default ModulePart components.
+		internally by the core for all Reflectors and default IModulePart components.
 
-		\param componentTypeName fully-qualified name of the ComponentType.
+		\param componentTypeName fully-qualified name of the IComponentType.
 		\param interfaceTypeName type name of the component's sole facet.
 		\param interfaceName interface name of the component's sole facet.
 	 */
-	ComponentType* getOrCreateSimpleInternalComponentType( const char* componentTypeName,
+	IComponentType* getOrCreateSimpleInternalComponentType( const char* componentTypeName,
 														   const char* interfaceTypeName,
 														   const char* interfaceName );
 
@@ -86,13 +86,13 @@ private:
  */
 #define CORAL_EXPORT_COMPONENT( ClassName, ComponentName ) \
 	co::int32 __##ComponentName##_getSize() { return sizeof(ClassName); } \
-	co::Component* __##ComponentName##_newInstance() { return new ClassName; }
+	co::IComponent* __##ComponentName##_newInstance() { return new ClassName; }
 
 /*!
-	Macro that should be called once for each module's main co::ModulePart class.
+	Macro that should be called once for each module's main co::IModulePart class.
 	\note Both the class and the macro call should be within the module's namespace.
  */
 #define CORAL_EXPORT_MODULE_PART( ClassName ) \
-	co::ModulePart* createModulePart() { return new ClassName; }
+	co::IModulePart* createModulePart() { return new ClassName; }
 
 #endif // _CO_RESERVED_COMPONENTBASE_H_

@@ -13,8 +13,8 @@ namespace co {
 USING_CORAL_INTEGER_TYPES;
 
 // Forward declarations:
-class Component;
-class InterfaceType;
+class IComponent;
+class IInterfaceType;
 
 /*!
 	The co::Interface pseudo-interface, implicitly inherited by all Coral interfaces.
@@ -24,9 +24,9 @@ class Interface
 public:
 	virtual ~Interface() {;}
 
-	virtual InterfaceType* getInterfaceType() = 0;
+	virtual IInterfaceType* getInterfaceType() = 0;
 
-	virtual Component* getInterfaceOwner() = 0;
+	virtual IComponent* getInterfaceOwner() = 0;
 
 	virtual const std::string& getInterfaceName() = 0;
 
@@ -37,11 +37,11 @@ public:
 
 template<> struct kindOf<Interface> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<Interface> { static const char* get() { return "co.Interface"; } };
-template<> struct typeOf<Interface> : public typeOfBase<Interface, InterfaceType> {};
+template<> struct typeOf<Interface> : public typeOfBase<Interface, IInterfaceType> {};
 
 #define CORAL_DISAMBIGUATE_CO_INTERFACE( Super ) \
-	co::InterfaceType* getInterfaceType() = 0; \
-	co::Component* getInterfaceOwner() = 0; \
+	co::IInterfaceType* getInterfaceType() = 0; \
+	co::IComponent* getInterfaceOwner() = 0; \
 	const std::string& getInterfaceName() = 0; \
 	void componentRetain() = 0; \
 	void componentRelease() = 0;

@@ -5,7 +5,7 @@
 
 #include "LuaModulePart.h"
 #include "LuaState.h"
-#include <co/Module.h>
+#include <co/IModule.h>
 
 namespace lua {
 
@@ -32,32 +32,32 @@ ModulePart::~ModulePart()
 	lua_rawset( L, LUA_REGISTRYINDEX );
 }
 
-void ModulePart::initialize( co::Module* module )
+void ModulePart::initialize( co::IModule* module )
 {
 	callScriptMethod( "initialize", module );
 }
 
-void ModulePart::integrate( co::Module* module )
+void ModulePart::integrate( co::IModule* module )
 {
 	callScriptMethod( "integrate", module );
 }
 
-void ModulePart::integratePresentation( co::Module* module )
+void ModulePart::integratePresentation( co::IModule* module )
 {
 	callScriptMethod( "integratePresentation", module );
 }
 
-void ModulePart::disintegrate( co::Module* module )
+void ModulePart::disintegrate( co::IModule* module )
 {
 	callScriptMethod( "disintegrate", module );
 }
 
-void ModulePart::dispose( co::Module* module )
+void ModulePart::dispose( co::IModule* module )
 {
 	callScriptMethod( "dispose", module );
 }
 
-void ModulePart::callScriptMethod( const char* methodName, co::Module* module )
+void ModulePart::callScriptMethod( const char* methodName, co::IModule* module )
 {
 	lua_State* L = LuaState::getL();
 

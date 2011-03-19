@@ -7,37 +7,37 @@
 
 namespace co {
 
-AttributeInfoComponent::AttributeInfoComponent()
+AttributeInfo::AttributeInfo()
 	: _type( 0 ), _isReadOnly( true )
 {
 	// empty
 }
 
-AttributeInfoComponent::~AttributeInfoComponent()
+AttributeInfo::~AttributeInfo()
 {
 	// empty
 }
 
-void AttributeInfoComponent::setType( Type* type )
+void AttributeInfo::setType( IType* type )
 {
 	_type = type;
 }
 
-void AttributeInfoComponent::setIsReadOnly( bool isReadOnly )
+void AttributeInfo::setIsReadOnly( bool isReadOnly )
 {
 	_isReadOnly = isReadOnly;
 }
 
-Type* AttributeInfoComponent::getType()
+IType* AttributeInfo::getType()
 {
 	return _type;
 }
 
-bool AttributeInfoComponent::getIsReadOnly()
+bool AttributeInfo::getIsReadOnly()
 {
 	return _isReadOnly;
 }
 
-CORAL_EXPORT_COMPONENT( AttributeInfoComponent, AttributeInfoComponent );
+CORAL_EXPORT_COMPONENT( AttributeInfo, AttributeInfo );
 
 } // namespace co

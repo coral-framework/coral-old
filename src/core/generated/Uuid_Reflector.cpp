@@ -4,8 +4,8 @@
  */
 
 #include <Uuid_Adapter.h>
-#include <co/MethodInfo.h>
-#include <co/AttributeInfo.h>
+#include <co/IMethodInfo.h>
+#include <co/IAttributeInfo.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -15,7 +15,7 @@
 
 namespace co {
 
-// ------ Reflector ------ //
+// ------ IReflector ------ //
 
 class Uuid_Reflector : public co::ReflectorBase
 {
@@ -30,7 +30,7 @@ public:
 		// empty
 	}
 
-	co::Type* getType()
+	co::IType* getType()
 	{
 		return co::typeOf<co::Uuid>::get();
 	}
@@ -56,7 +56,7 @@ public:
 		callDestructor( reinterpret_cast<co::Uuid*>( address ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::AttributeInfo* ai, co::Any& value )
+	void getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value )
 	{
 		co::Uuid& r = checkInstance( instance, ai );
 		switch( ai->getIndex() )
@@ -66,7 +66,7 @@ public:
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::AttributeInfo* ai, const co::Any& value )
+	void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value )
 	{
 		co::Uuid& r = checkInstance( instance, ai );
 		switch( ai->getIndex() )
@@ -78,7 +78,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::MethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
+	void invokeMethod( const co::Any& instance, co::IMethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
 	{
 		co::Uuid& r = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -136,19 +136,19 @@ public:
 	}
 
 private:
-	co::Uuid& checkInstance( const co::Any& any, co::MemberInfo* member )
+	co::Uuid& checkInstance( const co::Any& any, co::IMemberInfo* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
 
 		// make sure that 'any' is an instance of this type
-		co::NativeClassType* myType = co::typeOf<co::Uuid>::get();
+		co::INativeClassType* myType = co::typeOf<co::Uuid>::get();
 
 		if( any.getKind() != co::TK_NATIVECLASS || any.getType() != myType || any.getState().data.ptr == NULL )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::Uuid*, but got " << any );
 
 		// make sure that 'member' belongs to this type
-		co::CompoundType* owner = member->getOwner();
+		co::ICompoundType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to co.Uuid" );
@@ -157,9 +157,9 @@ private:
 	}
 };
 
-// ------ Reflector Creation Function ------ //
+// ------ IReflector Creation Function ------ //
 
-co::Reflector* __createUuidReflector()
+co::IReflector* __createUuidIReflector()
 {
     return new Uuid_Reflector;
 }

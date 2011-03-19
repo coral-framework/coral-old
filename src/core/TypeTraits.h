@@ -14,14 +14,14 @@
 namespace co {
 
 // forward declarations:
-class Type;
-class ArrayType;
-class EnumType;
-class ExceptionType;
-class StructType;
-class NativeClassType;
-class InterfaceType;
-class ComponentType;
+class IType;
+class IArrayType;
+class IEnumType;
+class IExceptionType;
+class IStructType;
+class INativeClassType;
+class IInterfaceType;
+class IComponentType;
 
 /*!
 	Array that maps a co::TypeKind to its Coral-style string representation.
@@ -87,7 +87,7 @@ template<> struct nameOf<TypeKind> { static const char* get() { return "co.TypeK
 
 
 /****************************************************************************/
-/* co::typeOf<T>::get() returns the co::Type instance of a Coral type.      */
+/* co::typeOf<T>::get() returns the co::IType instance of a Coral type.      */
 /****************************************************************************/
 
 //! Common implementation of co::typeOf<T>:
@@ -96,14 +96,14 @@ struct typeOfBase
 {
 	static R* get()
 	{
-		Type* type = getType( nameOf<T>::get() );
+		IType* type = getType( nameOf<T>::get() );
 		assert( dynamic_cast<R*>( type ) );
 		return static_cast<R*>( type );
 	}
 };
 
 template<typename T>
-struct typeOf : public typeOfBase<T, Type> {};
+struct typeOf : public typeOfBase<T, IType> {};
 
 
 /****************************************************************************/
@@ -136,7 +136,7 @@ template<typename>
 struct isConst : public FalseType {};
 
 template<typename T>
-struct isConst<T const> : public TrueType {};	
+struct isConst<T const> : public TrueType {};
 
 // Whether a type is a pointer:
 template<typename>
@@ -246,7 +246,7 @@ struct nameOfArrayBase
 	typedef typename traits::get<ET> ETT; // element type traits
 	static const char* get()
 	{
-		static const std::string s_name( std::string( nameOf<typename ETT::CoreType>::get() ) + "[]" );		
+		static const std::string s_name( std::string( nameOf<typename ETT::CoreType>::get() ) + "[]" );
 		return s_name.c_str();
 	}
 };
@@ -258,11 +258,11 @@ struct nameOf<std::vector<T> > : public nameOfArrayBase<T> {};
 template<typename ET>
 struct typeOfArrayBase
 {
-	static ArrayType* get()
+	static IArrayType* get()
 	{
-		co::Type* type = getType( nameOf<std::vector<ET> >::get() );
-		assert( dynamic_cast<ArrayType*>( type ) );
-		return static_cast<ArrayType*>( type );
+		co::IType* type = getType( nameOf<std::vector<ET> >::get() );
+		assert( dynamic_cast<IArrayType*>( type ) );
+		return static_cast<IArrayType*>( type );
 	}
 };
 

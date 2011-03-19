@@ -7,31 +7,31 @@
 
 namespace co {
 
-NativeClassTypeComponent::~NativeClassTypeComponent()
+NativeClassType::~NativeClassType()
 {
 	// empty
 }
 
-void NativeClassTypeComponent::setNativeName( const std::string& nativeName )
+void NativeClassType::setNativeName( const std::string& nativeName )
 {
 	_nativeName = nativeName;
 }
 
-void NativeClassTypeComponent::setNativeHeaderFile( const std::string& headerName )
+void NativeClassType::setNativeHeaderFile( const std::string& headerName )
 {
 	_nativeHeaderFile = headerName;
 }
 
-const std::string& NativeClassTypeComponent::getNativeName()
+const std::string& NativeClassType::getNativeName()
 {
 	return _nativeName;
 }
 
-const std::string& NativeClassTypeComponent::getNativeHeaderFile()
+const std::string& NativeClassType::getNativeHeaderFile()
 {
 	return _nativeHeaderFile;
 }
 
-CORAL_EXPORT_COMPONENT( NativeClassTypeComponent, NativeClassTypeComponent );
+CORAL_EXPORT_COMPONENT( NativeClassType, NativeClassType );
 
 } // namespace co

@@ -7,9 +7,9 @@
 #include "TypeBuilder.h"
 #include "TypeManager.h"
 #include "TypeSemanticChecker.h"
-#include <co/Type.h>
+#include <co/IType.h>
 #include <co/Coral.h>
-#include <co/System.h>
+#include <co/ISystem.h>
 #include <co/MissingInputException.h>
 #include <co/NotSupportedException.h>
 #include <sstream>
@@ -17,18 +17,18 @@
 
 namespace co {
 
-TypeCreationTransactionComponent*
-	TypeCreationTransactionComponent::sm_activeTransaction( NULL );
+TypeCreationTransaction*
+	TypeCreationTransaction::sm_activeTransaction( NULL );
 
-TypeCreationTransactionComponent::TypeCreationTransactionComponent()
+TypeCreationTransaction::TypeCreationTransaction()
 {
 	if( sm_activeTransaction )
 	{
-		debug( Dbg_Fatal, "Attempt to instantiate a TypeCreationTransaction while another "
+		debug( Dbg_Fatal, "Attempt to instantiate a ITypeCreationTransaction while another "
 			"instance is active. Concurrent type creation is unsafe and disallowed in this Coral version." );
 
 		CORAL_THROW( NotSupportedException,
-			"Only a single TypeCreationTransaction instance may exist at any moment in time" );
+			"Only a single ITypeCreationTransaction instance may exist at any moment in time" );
 	}
 
 	sm_activeTransaction = this;
@@ -38,23 +38,23 @@ TypeCreationTransactionComponent::TypeCreationTransactionComponent()
 	_rolledBack = false;
 }
 
-TypeCreationTransactionComponent::~TypeCreationTransactionComponent()
+TypeCreationTransaction::~TypeCreationTransaction()
 {
 	if( !_commitSucceeded && !_rolledBack )
-		debug( Dbg_Critical, "TypeCreationTransaction not committed nor rolled back." );
+		debug( Dbg_Critical, "ITypeCreationTransaction not committed nor rolled back." );
 }
 
-void TypeCreationTransactionComponent::addTypeBuilder( TypeBuilder* typeBuilder )
+void TypeCreationTransaction::addTypeBuilder( ITypeBuilder* typeBuilder )
 {
 	_typeBuilders.push_back( typeBuilder );
 }
 
-ArrayRange<TypeBuilder* const> TypeCreationTransactionComponent::getTypeBuilders()
+ArrayRange<ITypeBuilder* const> TypeCreationTransaction::getTypeBuilders()
 {
 	return _typeBuilders;
 }
 
-void TypeCreationTransactionComponent::commit()
+void TypeCreationTransaction::commit()
 {
 	if( _commitAttempted || _rolledBack )
 	{
@@ -64,7 +64,7 @@ void TypeCreationTransactionComponent::commit()
 		else if( _commitSucceeded )
 			msg = "the transaction was already committed";
 		else
-			msg = "the transaction was already rolled back";		
+			msg = "the transaction was already rolled back";
 		CORAL_THROW( NotSupportedException, msg );
 	}
 
@@ -73,10 +73,10 @@ void TypeCreationTransactionComponent::commit()
 	// create all types not yet created
 	for( TypeBuilderList::iterator it = _typeBuilders.begin(); it != _typeBuilders.end(); ++it )
 	{
-		static_cast<TypeBuilder*>( it->get() )->createType();
+		static_cast<ITypeBuilder*>( it->get() )->createType();
 	}
 
-	TypeManager* tm = dynamic_cast<TypeManager*>( getSystem()->getTypes() );
+	ITypeManager* tm = dynamic_cast<ITypeManager*>( getSystem()->getTypes() );
 	assert( tm );
 	CORAL_UNUSED( tm );
 
@@ -93,7 +93,7 @@ void TypeCreationTransactionComponent::commit()
 	sm_activeTransaction = NULL;
 }
 
-void TypeCreationTransactionComponent::rollback()
+void TypeCreationTransaction::rollback()
 {
 	if( _commitSucceeded || _rolledBack )
 		CORAL_THROW( NotSupportedException, "the transaction is already dead (e.g committed or rolled back)" );
@@ -104,12 +104,12 @@ void TypeCreationTransactionComponent::rollback()
 	// destroy all types
 	for( TypeBuilderList::iterator it = _typeBuilders.begin(); it != _typeBuilders.end(); ++it )
 	{
-		static_cast<TypeBuilderComponent*>( it->get() )->destroyType();
+		static_cast<TypeBuilder*>( it->get() )->destroyType();
 	}
 
 	_rolledBack = true;
 }
 
-CORAL_EXPORT_COMPONENT( TypeCreationTransactionComponent, TypeCreationTransactionComponent );
+CORAL_EXPORT_COMPONENT( TypeCreationTransaction, TypeCreationTransaction );
 
 } // namespace co

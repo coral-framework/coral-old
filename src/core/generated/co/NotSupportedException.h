@@ -28,7 +28,7 @@ public:
 namespace co {
 template<> struct kindOf<co::NotSupportedException> : public kindOfBase<TK_EXCEPTION> {};
 template<> struct nameOf<co::NotSupportedException> { static const char* get() { return "co.NotSupportedException"; } };
-template<> struct typeOf<co::NotSupportedException> : public typeOfBase<co::NotSupportedException, ExceptionType> {};
+template<> struct typeOf<co::NotSupportedException> : public typeOfBase<co::NotSupportedException, IExceptionType> {};
 } // namespace co
 
 #endif // _CO_NOTSUPPORTEDEXCEPTION_H_

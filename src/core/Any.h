@@ -11,13 +11,13 @@
 #include <co/RefVector.h>
 #include <co/TypeTraits.h>
 
-#include <co/EnumType.h>
-#include <co/ArrayType.h>
-#include <co/StructType.h>
-#include <co/ExceptionType.h>
-#include <co/InterfaceType.h>
-#include <co/ComponentType.h>
-#include <co/NativeClassType.h>
+#include <co/IEnumType.h>
+#include <co/IArrayType.h>
+#include <co/IStructType.h>
+#include <co/IExceptionType.h>
+#include <co/IInterfaceType.h>
+#include <co/IComponentType.h>
+#include <co/INativeClassType.h>
 
 namespace co {
 
@@ -50,11 +50,11 @@ struct State
 	}
 	data;
 
-	// co::Type of the variable; or, if this is an array, the array element's co::Type.
+	// co::IType of the variable; or, if this is an array, the array element's co::IType.
 	union
 	{
-		Type* type;						// used for arrays, enums, structs and native classes
-		InterfaceType* interfaceType;	// used for interfaces
+		IType* type;						// used for arrays, enums, structs and native classes
+		IInterfaceType* interfaceType;	// used for interfaces
 	};
 
 	// only used if arrayKind is AK_ArrayRange
@@ -572,7 +572,7 @@ public:
 		Constructor corresponding to a setInterface() call.
 		Please, see setInterface()'s documentation for more info.
 	 */
-	inline Any( Interface* instance, InterfaceType* type ) : _state()
+	inline Any( Interface* instance, IInterfaceType* type ) : _state()
 	{
 		setInterface( instance, type );
 	}
@@ -581,7 +581,7 @@ public:
 		Constructor corresponding to a setVariable() call.
 		Please, see setVariable()'s documentation for more info.
 	 */
-	inline Any( Type* type, uint32 flags, void* ptr ) : _state()
+	inline Any( IType* type, uint32 flags, void* ptr ) : _state()
 	{
 		setVariable( type, flags, ptr );
 	}
@@ -599,7 +599,7 @@ public:
 		Constructor corresponding to a setArray() call.
 		Please, see setArray()'s documentation for more info.
 	 */
-	inline Any( ArrayKind arrayKind, Type* elementType, uint32 flags, void* ptr, size_t arraySize = 0 )
+	inline Any( ArrayKind arrayKind, IType* elementType, uint32 flags, void* ptr, size_t arraySize = 0 )
 		: _state()
 	{
 		setArray( arrayKind, elementType, flags, ptr, arraySize );
@@ -643,15 +643,15 @@ public:
 	inline bool isReference() const { return _state.isReference != 0; }
 
 	/*!
-		For \c enums, \c structs and \c native \c classes, this returns the co::Type of the stored variable.
+		For \c enums, \c structs and \c native \c classes, this returns the co::IType of the stored variable.
 		For \c arrays, this returns the array element type.
 		For \c interfaces you should call getInterfaceType() instead.
 		For all other type kinds, this returns NULL.
 	 */
-	inline Type* getType() const { return _state.type; }
+	inline IType* getType() const { return _state.type; }
 
-	//! Returns the co::InterfaceType of the stored interface instance.
-	inline InterfaceType* getInterfaceType() const
+	//! Returns the co::IInterfaceType of the stored interface instance.
+	inline IInterfaceType* getInterfaceType() const
 	{
 		assert( _state.kind == TK_INTERFACE );
 		return _state.interfaceType;
@@ -742,7 +742,7 @@ public:
 		This method does not take variable flags, variables are always pointers. If you
 		want to create a reference to an interface pointer, use setVariable() instead.
 	 */
-	void setInterface( Interface* instance, InterfaceType* type = 0 );
+	void setInterface( Interface* instance, IInterfaceType* type = 0 );
 
 	/*!
 		Stores a single-value (non-array) variable.
@@ -755,7 +755,7 @@ public:
 					have the modifiers described in \a flags (otherwise, all hell will break
 					loose). If \a flags specifies \c VarIsReference, \a ptr cannot be null.
 	 */
-	void setVariable( Type* type, uint32 flags, void* ptr );
+	void setVariable( IType* type, uint32 flags, void* ptr );
 
 	/*!
 		Alternative version of setVariable(), simplified for basic types.
@@ -778,7 +778,7 @@ public:
 		\param ptr A pointer to the array instance, as described above.
 		\param size Only used if \a arrayKind is \c AK_ArrayRange.
 	 */
-	void setArray( ArrayKind arrayKind, Type* elementType, uint32 flags, void* ptr, size_t size = 0 );
+	void setArray( ArrayKind arrayKind, IType* elementType, uint32 flags, void* ptr, size_t size = 0 );
 
 	//@}
 
@@ -794,7 +794,7 @@ public:
 		\throw co::Exception if the co::Any's current value is incompatible with 'paramType'.
 		\sa makeIn()
 	 */
-	void makeOut( Type* paramType );
+	void makeOut( IType* paramType );
 
 	/*!
 		Should be used after a call to makeOut(), to return an argument to its 'in' condition.
@@ -832,7 +832,7 @@ public:
 		with \a n default-constructed elements of type \a elementType, and sets this
 		co::Any with a reference to the array.
 	 */
-	PseudoVector& createArray( Type* elementType, size_t n = 0 );
+	PseudoVector& createArray( IType* elementType, size_t n = 0 );
 
 	/*!
 		Swaps the temporary std::vector or co::RefVector contained in this
@@ -845,7 +845,7 @@ public:
 		Creates an instance of the specified complex value \a type and makes
 		this co::Any reference it.
 	 */
-	void* createComplexValue( Type* type );
+	void* createComplexValue( IType* type );
 
 	/*!
 		Creates an instance of the complex value type \a T and makes this
@@ -922,13 +922,13 @@ private:
 		struct
 		{
 			uint8 vectorArea[sizeof(PseudoVector)];
-			Reflector* reflector;
+			IReflector* reflector;
 		}
 		array;
 		struct
 		{
 			union { void* ptr; double inplaceArea[INPLACE_DOUBLES]; };
-			Reflector* reflector;
+			IReflector* reflector;
 		}
 		complex;
 	}

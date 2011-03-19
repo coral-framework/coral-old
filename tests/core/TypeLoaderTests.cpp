@@ -4,9 +4,10 @@
  */
 
 #include "CSLTester.h"
-#include <co/TypeManager.h>
-#include <co/InterfaceType.h>
-#include <co/AttributeInfo.h>
+#include <co/ISystem.h>
+#include <co/ITypeManager.h>
+#include <co/IInterfaceType.h>
+#include <co/IAttributeInfo.h>
 #include <gtest/gtest.h>
 
 TEST( TypeLoaderTests, windowsLineBreaks )
@@ -29,11 +30,11 @@ TEST( TypeLoaderTests, clashingImports )
 TEST( TypeLoaderTests, validImport )
 {
 	CSL_TEST( "TypeLoaderTests.ImportClauseTests.ValidImports" );
-	co::InterfaceType* designer = dynamic_cast<co::InterfaceType*>( TestHelper::type( "TypeLoaderTests.ImportClauseTests.Roles.Designer") );
+	co::IInterfaceType* designer = dynamic_cast<co::IInterfaceType*>( TestHelper::type( "TypeLoaderTests.ImportClauseTests.Roles.Designer") );
 
 	ASSERT_TRUE( designer != NULL );
 
-	co::AttributeInfo* attribute = dynamic_cast<co::AttributeInfo*>( designer->getMember( "mainOffice" ) );
+	co::IAttributeInfo* attribute = dynamic_cast<co::IAttributeInfo*>( designer->getMember( "mainOffice" ) );
 
 	ASSERT_TRUE( attribute != NULL );
 
@@ -211,7 +212,7 @@ TEST( TypeLoaderTests, singleCppBlock )
 {
 	CSL_TEST( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" );
 	
-	co::InterfaceType* it = dynamic_cast<co::InterfaceType*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" ) );
+	co::IInterfaceType* it = dynamic_cast<co::IInterfaceType*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" ) );
 	ASSERT_TRUE( it != NULL );
 
 	const std::string& str = it->getCppBlock();
@@ -223,7 +224,7 @@ TEST( TypeLoaderTests, multipleCppBlocks )
 {
 	CSL_TEST( "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" );
 
-	co::InterfaceType* it = dynamic_cast<co::InterfaceType*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" ) );
+	co::IInterfaceType* it = dynamic_cast<co::IInterfaceType*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" ) );
 	ASSERT_TRUE( it != NULL );
 
 	const std::string& str = it->getCppBlock();

@@ -6,16 +6,16 @@
 #ifndef _TYPE_H_
 #define _TYPE_H_
 
-#include "TypeComponent_Base.h"
+#include "Type_Base.h"
 #include <co/Uuid.h>
 #include <co/RefPtr.h>
-#include <co/Namespace.h>
-#include <co/Reflector.h>
+#include <co/INamespace.h>
+#include <co/IReflector.h>
 
 namespace co {
 
 /*!
-	Re-usable implementation of Type.
+	Re-usable implementation of IType.
  */
 class TypeImpl
 {
@@ -23,23 +23,23 @@ public:
 	TypeImpl();
 
    	// internal methods:
-	void setType( Namespace* parent, const std::string& name, TypeKind kind );
+	void setType( INamespace* parent, const std::string& name, TypeKind kind );
 
-	// Type methods:
+	// IType methods:
 	const std::string& getName();
 	const std::string& getFullName();
-	Namespace* getNamespace();
+	INamespace* getNamespace();
 	TypeKind getKind();
-	const Uuid& getFullSignature( Type* myType );
-	const Uuid& getBinarySignature( Type* myType );
-	Reflector* getReflector( Type* myType );
-	void setReflector( Reflector* reflector );
+	const Uuid& getFullSignature( IType* myType );
+	const Uuid& getBinarySignature( IType* myType );
+	IReflector* getReflector( IType* myType );
+	void setReflector( IReflector* reflector );
 
 private:
-	void calculateSignatures( Type* myType );
+	void calculateSignatures( IType* myType );
 
 private:
-	Namespace* _namespace;
+	INamespace* _namespace;
 	std::string _name;
 	std::string _fullName;
 	TypeKind _kind;
@@ -50,26 +50,26 @@ private:
 	Uuid _fullSignature;
 	Uuid _binarySignature;
 
-	RefPtr<Reflector> _reflector;
+	RefPtr<IReflector> _reflector;
 };
 
 #define DELEGATE_CO_TYPE_METHODS( DELEGATE ) \
 	virtual const std::string& getName() { return DELEGATE getName(); } \
 	virtual const std::string& getFullName() { return DELEGATE getFullName(); } \
-	virtual Namespace* getNamespace() { return DELEGATE getNamespace(); } \
+	virtual INamespace* getNamespace() { return DELEGATE getNamespace(); } \
 	virtual TypeKind getKind() { return DELEGATE getKind(); } \
 	virtual const Uuid& getFullSignature() { return DELEGATE getFullSignature( this ); } \
 	virtual const Uuid& getBinarySignature() { return DELEGATE getBinarySignature( this ); } \
-	virtual Reflector* getReflector() { return DELEGATE getReflector( this ); } \
-	virtual void setReflector( Reflector* reflector ) { DELEGATE setReflector( reflector ); } \
+	virtual IReflector* getReflector() { return DELEGATE getReflector( this ); } \
+	virtual void setReflector( IReflector* reflector ) { DELEGATE setReflector( reflector ); } \
 
 /*!
-	Component that implements co.Type.
+	Implements co.IType.
  */
-class TypeComponent : public TypeComponent_Base, public TypeImpl
+class Type : public Type_Base, public TypeImpl
 {
 public:
-	virtual ~TypeComponent();
+	virtual ~Type();
 
 	DELEGATE_CO_TYPE_METHODS( TypeImpl:: );
 };
