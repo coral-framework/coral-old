@@ -27,12 +27,19 @@
 TEST( AnyTests, sizeOf )
 {
 	// we assume size_t has the size of a pointer
-	EXPECT_EQ( CORAL_POINTER_SIZE, sizeof(size_t) );
+	EXPECT_EQ( CORAL_POINTER_SIZE, sizeof(void*) );
+	EXPECT_EQ( sizeof(void*), sizeof(size_t) );
 
 	/*
 		Make sure sizeof(co::Any::State) is as expected.
 		A co::Any::State instance contains a double, a pointer, a uint32 and 2 bytes.
 	 */
+	const size_t INPLACE_DOUBLES = 4;
+	const size_t INPLACE_CAPACITY = sizeof(double) * INPLACE_DOUBLES;
+	EXPECT_LE( sizeof(co::Any::State::Data), INPLACE_CAPACITY );
+	EXPECT_LE( sizeof(std::string), INPLACE_CAPACITY );
+	EXPECT_LE( sizeof(sizeof(co::Any::PseudoVector)), INPLACE_CAPACITY );
+
 #if CORAL_POINTER_SIZE == 4
 	#if defined(CORAL_OS_UNIX)
 		// 32-bit system with 4-byte alignment
@@ -41,7 +48,7 @@ TEST( AnyTests, sizeOf )
 	#else
 		// 32-bit system with 8-byte alignment
 		EXPECT_EQ( 24, sizeof(co::Any::State) );
-		EXPECT_EQ( 24 + 5 * 8, sizeof(co::Any) );
+		EXPECT_EQ( 24 + 4 * 8 + sizeof(size_t) + 4, sizeof(co::Any) );
 	#endif
 #elif CORAL_POINTER_SIZE == 8
 	// 64-bit system with 8-byte alignment
@@ -699,9 +706,9 @@ TEST( AnyTests, coercionsFromUInt64 )
 	EXPECT_ANY_STREQ( a2, "(co::uint64)18446744073709551615" );
 
 	// to bool
-	EXPECT_EQ( false, a0.get<bool>() );
-	EXPECT_EQ( true, a1.get<bool>() );
-	EXPECT_EQ( true, a2.get<bool>() );
+	EXPECT_FALSE( a0.get<bool>() );
+	EXPECT_TRUE( a1.get<bool>() );
+	EXPECT_TRUE( a2.get<bool>() );
 
 	// to int16
 	EXPECT_EQ( 0, a0.get<co::int16>() );
@@ -735,9 +742,9 @@ TEST( AnyTests, coercionsFromDouble )
 	EXPECT_ANY_STREQ( a2, "(double)-9.99" );
 
 	// to bool
-	EXPECT_EQ( false, a0.get<bool>() );
-	EXPECT_EQ( true, a1.get<bool>() );
-	EXPECT_EQ( true, a2.get<bool>() );
+	EXPECT_FALSE( a0.get<bool>() );
+	EXPECT_TRUE( a1.get<bool>() );
+	EXPECT_TRUE( a2.get<bool>() );
 	
 	// to int16
 	EXPECT_EQ( 0, a0.get<co::int16>() );
@@ -771,9 +778,9 @@ TEST( AnyTests, coercionsFromEnum )
 	EXPECT_ANY_STREQ( a2, "(co::TypeKind)20" );
 
 	// to bool
-	EXPECT_EQ( false, a0.get<bool>() );
-	EXPECT_EQ( true, a1.get<bool>() );
-	EXPECT_EQ( true, a2.get<bool>() );	
+	EXPECT_FALSE( a0.get<bool>() );
+	EXPECT_TRUE( a1.get<bool>() );
+	EXPECT_TRUE( a2.get<bool>() );	
 
 	// to int16
 	EXPECT_EQ( 0, a0.get<co::int16>() );
