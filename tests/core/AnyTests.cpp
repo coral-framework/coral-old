@@ -30,30 +30,29 @@ TEST( AnyTests, sizeOf )
 	EXPECT_EQ( CORAL_POINTER_SIZE, sizeof(void*) );
 	EXPECT_EQ( sizeof(void*), sizeof(size_t) );
 
+	// make sure a co::Any is able to store all basic types inplace
+	EXPECT_GE( co::Any::INPLACE_CAPACITY, sizeof(co::Any::State::Data) );
+	EXPECT_GE( co::Any::INPLACE_CAPACITY, sizeof(std::string) );
+	EXPECT_GE( co::Any::INPLACE_CAPACITY, sizeof(sizeof(co::Any::PseudoVector)) );
+
 	/*
 		Make sure sizeof(co::Any::State) is as expected.
 		A co::Any::State instance contains a double, a pointer, a uint32 and 2 bytes.
 	 */
-	const size_t INPLACE_DOUBLES = 4;
-	const size_t INPLACE_CAPACITY = sizeof(double) * INPLACE_DOUBLES;
-	EXPECT_LE( sizeof(co::Any::State::Data), INPLACE_CAPACITY );
-	EXPECT_LE( sizeof(std::string), INPLACE_CAPACITY );
-	EXPECT_LE( sizeof(sizeof(co::Any::PseudoVector)), INPLACE_CAPACITY );
-
 #if CORAL_POINTER_SIZE == 4
 	#if defined(CORAL_OS_UNIX)
 		// 32-bit system with 4-byte alignment
 		EXPECT_EQ( 20, sizeof(co::Any::State) );
-		EXPECT_EQ( 20 + 4 * 8 + sizeof(size_t), sizeof(co::Any) );
+		EXPECT_EQ( 20 + co::Any::INPLACE_CAPACITY + sizeof(size_t), sizeof(co::Any) );
 	#else
 		// 32-bit system with 8-byte alignment
 		EXPECT_EQ( 24, sizeof(co::Any::State) );
-		EXPECT_EQ( 24 + 4 * 8 + sizeof(size_t) + 4, sizeof(co::Any) );
+		EXPECT_EQ( 24 + co::Any::INPLACE_CAPACITY + sizeof(size_t) + 4, sizeof(co::Any) );
 	#endif
 #elif CORAL_POINTER_SIZE == 8
 	// 64-bit system with 8-byte alignment
 	EXPECT_EQ( 24, sizeof(co::Any::State) );
-	EXPECT_EQ( 24 + 4 * 8 + sizeof(size_t), sizeof(co::Any) );
+	EXPECT_EQ( 24 + co::Any::INPLACE_CAPACITY + sizeof(size_t), sizeof(co::Any) );
 #else
 #error Huh, pointers are neither 32 nor 64 bit long?
 #endif

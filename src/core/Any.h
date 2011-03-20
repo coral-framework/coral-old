@@ -549,6 +549,30 @@ public:
 		AK_ArrayRange	//!< Indicates the variable is a \c co::ArrayRange.
 	};
 
+	/*!
+		Performance Settings:
+
+		MIN_CAPACITY: minimum number of bytes that should be storable in a co::Any
+		without resorting to dynamic memory allocation. For instance, if you want
+		your double-precision quaternion native class to be handled efficiently, set
+		this to 32. If you want your single-precision (float) 4x4 matrix class to
+		be handled efficiently, you could set this to 64. Please note that large
+		values lead to excessive memory consumption and performance degradation.
+		Settings this to less than 3*sizeof(void*) makes no sense on most platforms.
+
+		INPLACE_CAPACITY: actual number of bytes that can be stored in a co::Any
+		without resorting to dynamic memory allocation. Automatically set based
+		on MIN_CAPACITY and the size of other basic types.
+	 */
+	enum PerformanceSettings
+	{
+		MIN_CAPACITY = 4 * sizeof(double),
+		REQ_VEC_CAPACITY = sizeof(PseudoVector),
+		REQ_STR_CAPACITY = sizeof(std::string),
+		REQ_BASIC_CAPACITY = REQ_VEC_CAPACITY > REQ_STR_CAPACITY ? REQ_VEC_CAPACITY : REQ_STR_CAPACITY,
+		INPLACE_CAPACITY = MIN_CAPACITY > REQ_BASIC_CAPACITY ? MIN_CAPACITY : REQ_BASIC_CAPACITY
+	};
+
 public:
 	//! Creates an invalid co::Any.
 	inline Any() : _state()
@@ -902,18 +926,6 @@ private:
 	 */
 	State _state;
 
-	/*
-		Performance Setting: number of 'doubles' that can be stored in a co::Any
-		without resorting to dynamic memory allocation. For instance, if you want
-		your double-precision Quaternion native class to be handled efficiently,
-		set this to 4. If you want your single-precision (float) 4x4 matrix class
-		to be handled efficiently, you could set this to 8. Please note that large
-		values lead to excessive stack consumption and performance degradation.
-		Also note that it does not make sense to set this value to less than 2.
-	 */
-	static const size_t INPLACE_DOUBLES = 4;
-	static const size_t INPLACE_CAPACITY = sizeof(double) * INPLACE_DOUBLES;
-
 	// Temporary object data.
 	union
 	{
@@ -927,7 +939,7 @@ private:
 		array;
 		struct
 		{
-			union { void* ptr; double inplaceArea[INPLACE_DOUBLES]; };
+			union { void* ptr; uint8 inplaceArea[INPLACE_CAPACITY]; };
 			IReflector* reflector;
 		}
 		complex;
