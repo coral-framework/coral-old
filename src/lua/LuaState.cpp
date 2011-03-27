@@ -117,7 +117,7 @@ bool LuaState::findScript( lua_State*, const std::string& name, std::string& fil
 	filePaths[0].append( ".lua" );
 	filePaths[1].append( CORAL_OS_DIR_SEP_STR "__init.lua" );
 
-	return co::OS::searchFile2( co::getPaths(), co::ArrayRange<const std::string>( filePaths, 2 ), filename );
+	return co::OS::searchFile2( co::getPaths(), co::Range<const std::string>( filePaths, 2 ), filename );
 }
 
 void LuaState::loadFile( lua_State* L, const std::string& filename )
@@ -241,7 +241,7 @@ void LuaState::push( lua_State* L, const co::Any& var, int depth )
 		break;
 	case co::TK_ENUM:
 		{
-			co::ArrayRange<std::string const> ids = static_cast<co::IEnumType*>( s.type )->getIdentifiers();
+			co::Range<std::string const> ids = static_cast<co::IEnum*>( s.type )->getIdentifiers();
 			co::uint32 id = d->u32;
 			if( id < ids.getSize() )
 				push( L, ids[id] );
@@ -254,13 +254,13 @@ void LuaState::push( lua_State* L, const co::Any& var, int depth )
 		}
 		break;
 	case co::TK_STRUCT:
-		StructBinding::push( L, static_cast<co::IStructType*>( s.type ), s.data.ptr );
+		StructBinding::push( L, static_cast<co::IStruct*>( s.type ), s.data.ptr );
 		break;
 	case co::TK_NATIVECLASS:
-		NativeClassBinding::push( L, static_cast<co::INativeClassType*>( s.type ), s.data.ptr );
+		NativeClassBinding::push( L, static_cast<co::INativeClass*>( s.type ), s.data.ptr );
 		break;
 	case co::TK_INTERFACE:
-		push( L, reinterpret_cast<co::Interface*>( s.data.ptr ) );
+		push( L, reinterpret_cast<co::IService*>( s.data.ptr ) );
 		break;
 	default:
 		assert( false );
@@ -305,17 +305,17 @@ inline void LuaState::pushInstance( lua_State* L, InstanceType* ptr )
 	lua_remove( L, -2 );
 }
 
-void LuaState::push( lua_State* L, co::Interface* itf )
+void LuaState::push( lua_State* L, co::IService* itf )
 {
-	if( itf && itf->getInterfaceType()->getFullName() == "co.IComponent" )
-		push( L, static_cast<co::IComponent*>( itf ) );
+	if( itf && itf->getInterfaceType()->getFullName() == "co.IObject" )
+		push( L, static_cast<co::IObject*>( itf ) );
 	else
-		pushInstance<InterfaceBinding, co::Interface>( L, itf );
+		pushInstance<InterfaceBinding, co::IService>( L, itf );
 }
 
-void LuaState::push( lua_State* L, co::IComponent* component )
+void LuaState::push( lua_State* L, co::IObject* component )
 {
-	pushInstance<ComponentBinding, co::IComponent>( L, component );
+	pushInstance<ComponentBinding, co::IObject>( L, component );
 }
 
 void LuaState::getAny( lua_State* L, int index, co::IType* expectedType, co::Any& any )
@@ -329,7 +329,7 @@ void LuaState::getAny( lua_State* L, int index, co::IType* expectedType, co::Any
 		break;
 
 	case co::TK_ENUM:
-		any.set( getEnumIdentifier( L, index, static_cast<co::IEnumType*>( expectedType ) ) );
+		any.set( getEnumIdentifier( L, index, static_cast<co::IEnum*>( expectedType ) ) );
 		return;
 
 	case co::TK_NONE:
@@ -345,7 +345,7 @@ void LuaState::getAny( lua_State* L, int index, co::IType* expectedType, co::Any
 	case LUA_TNIL:
 		if( expectedKind == co::TK_INTERFACE )
 		{
-			var->setInterface( NULL, static_cast<co::IInterfaceType*>( expectedType ) );
+			var->setInterface( NULL, static_cast<co::IInterface*>( expectedType ) );
 			break;
 		}
 		else if( expectedKind == co::TK_ANY )
@@ -377,7 +377,7 @@ void LuaState::getAny( lua_State* L, int index, co::IType* expectedType, co::Any
 
 	case LUA_TTABLE:
 		if( expectedKind == co::TK_ARRAY )
-			toArray( L, index, static_cast<co::IArrayType*>( expectedType )->getElementType(), *var );
+			toArray( L, index, static_cast<co::IArray*>( expectedType )->getElementType(), *var );
 		else
 			throw lua::Exception( expectedKind != co::TK_ANY ? "no conversion from a Lua table" :
 						"unsupported conversion from a Lua table to a Coral 'any'" );
@@ -388,7 +388,7 @@ void LuaState::getAny( lua_State* L, int index, co::IType* expectedType, co::Any
 		break;
 
 	case LUA_TUSERDATA:
-		CompoundTypeBinding::getInstance( L, index, *var );
+		CompositeTypeBinding::getInstance( L, index, *var );
 		break;
 
 	case LUA_TTHREAD:
@@ -494,13 +494,13 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 		break;
 	case co::TK_ENUM:
 		*reinterpret_cast<co::uint32*>( var.getState().data.ptr ) =
-			getEnumIdentifier( L, index, static_cast<co::IEnumType*>( var.getType() ) );
+			getEnumIdentifier( L, index, static_cast<co::IEnum*>( var.getType() ) );
 		break;
 	case co::TK_STRUCT:
 	case co::TK_NATIVECLASS:
 		{
 			co::IType* expected = var.getType();
-			co::ICompoundType* actual = CompoundTypeBinding::getType( L, index );
+			co::ICompositeType* actual = CompositeTypeBinding::getType( L, index );
 			if( actual != expected )
 				CORAL_THROW( lua::Exception, expected->getFullName() << " expected, got " <<
 					( actual ? actual->getFullName().c_str() : lua_typename( L, lua_type( L, index ) ) ) );
@@ -510,12 +510,12 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 	case co::TK_INTERFACE:
 		if( lua_isnil( L, index ) )
 		{
-			*reinterpret_cast<co::Interface**>( var.getState().data.ptr ) = NULL;
+			*reinterpret_cast<co::IService**>( var.getState().data.ptr ) = NULL;
 		}
 		else
 		{
-			co::Interface* itf = NULL;
-			co::ICompoundType* ct = NULL;
+			co::IService* itf = NULL;
+			co::ICompositeType* ct = NULL;
 
 			int stackTop = lua_gettop( L );
 			int tp = lua_type( L, index );
@@ -531,7 +531,7 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 
 			if( tp == LUA_TUSERDATA )
 			{
-				ct = CompoundTypeBinding::getType( L, index );
+				ct = CompositeTypeBinding::getType( L, index );
 				co::TypeKind kind = ct ? ct->getKind() : co::TK_NONE;
 				if( kind == co::TK_INTERFACE || kind == co::TK_COMPONENT )
 					itf = InterfaceBinding::getInstance( L, index );
@@ -543,7 +543,7 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 				CORAL_THROW( lua::Exception, var.getInterfaceType()->getFullName() << " expected, got "
 								<< ( ct ? ct->getFullName().c_str() : lua_typename( L, tp ) ) );
 
-			*reinterpret_cast<co::Interface**>( var.getState().data.ptr ) = itf;
+			*reinterpret_cast<co::IService**>( var.getState().data.ptr ) = itf;
 		}
 		break;
 	default:
@@ -557,7 +557,7 @@ bool LuaState::findScript( const std::string& name, std::string& filename )
 }
 
 co::int32 LuaState::callFunction( const std::string& moduleName, const std::string& functionName,
-									co::ArrayRange<const co::Any> args, co::ArrayRange<const co::Any> results )
+									co::Range<const co::Any> args, co::Range<const co::Any> results )
 {
 	lua_State* L = getL();
 	int top = lua_gettop( L );
@@ -670,7 +670,7 @@ void LuaState::pushArray( lua_State* L, const co::Any& var )
 	{
 		for( int i = 0; i < elemCount; ++i )
 		{
-			co::Interface* itf = *reinterpret_cast<co::Interface**>( blockStart + i * sizeof(void*) );
+			co::IService* itf = *reinterpret_cast<co::IService**>( blockStart + i * sizeof(void*) );
 			if( itf )
 				push( L, itf );
 			else
@@ -728,9 +728,9 @@ void LuaState::toArray( lua_State* L, int index, co::IType* elementType, co::Any
 			if( elementKind == co::TK_INTERFACE )
 			{
 				// emulate a co::RefVector
-				co::Interface* oldItf = elementVar.get<co::Interface*&>();
+				co::IService* oldItf = elementVar.get<co::IService*&>();
 				getValue( L, -1, elementVar );
-				co::Interface* newItf = elementVar.get<co::Interface*&>();
+				co::IService* newItf = elementVar.get<co::IService*&>();
 				if( newItf )
 					newItf->componentRetain();
 				if( oldItf )
@@ -753,7 +753,7 @@ void LuaState::toArray( lua_State* L, int index, co::IType* elementType, co::Any
 	}
 }
 
-co::int32 LuaState::getEnumIdentifier( lua_State* L, int index, co::IEnumType* enumType )
+co::int32 LuaState::getEnumIdentifier( lua_State* L, int index, co::IEnum* enumType )
 {
 	co::int32 res;
 	int type = lua_type( L, index );
@@ -808,8 +808,8 @@ void LuaState::raiseException( lua_State* L, int errorCode )
 	lua_pop( L, 1 );
 	
 	/*
-		Exception messages in the form "{some.IExceptionType}some message" are raised
-		as instances of some.IExceptionType, using Coral's reflection API.
+		Exception messages in the form "{some.IException}some message" are raised
+		as instances of some.IException, using Coral's reflection API.
 	 */
 
 	// the message must be at least 5 chars long and start with a parenthesis

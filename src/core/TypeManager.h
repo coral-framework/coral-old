@@ -35,14 +35,14 @@ public:
 	IType* findType( const std::string& fullName );
 	INamespace* findNamespace( const std::string& fullName );
 	IType* getType( const std::string& typeName );
-	IArrayType* getArrayOf( IType* elementType );
+	IArray* getArrayOf( IType* elementType );
 	IType* loadType( const std::string& typeName, std::vector<CSLError>& errorStack );
 	const std::string& getDocumentation( const std::string& typeOrMemberName );
 
 private:
 	IType* loadTypeOrThrow( const std::string& fullName );
 
-	IArrayType* defineArrayType( IType* elementType );
+	IArray* defineArrayType( IType* elementType );
 
 	void definePrimitiveType( Namespace* ns, const std::string& name, TypeKind kind );
 	void defineBuiltInTypes();

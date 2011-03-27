@@ -7,16 +7,16 @@
 #define _LUA_COMPONENT_BASE_H_
 
 #include <co/IReflector.h>
-#include <co/IDynamicProxyHandler.h>
+#include <co/IDynamicServiceProvider.h>
 #include <co/reserved/ComponentBase.h>
 
 namespace lua {
 
-//! lua.Component has a facet named 'dynamicProxyHandler', of type co.IDynamicProxyHandler.
-class Component_co_IDynamicProxyHandler : public co::IDynamicProxyHandler
+//! lua.Component has a facet named 'dynamicProxyHandler', of type co.IDynamicServiceProvider.
+class Component_co_IDynamicServiceProvider : public co::IDynamicServiceProvider
 {
 public:
-	virtual co::IInterfaceType* getInterfaceType();
+	virtual co::IInterface* getInterfaceType();
 	virtual const std::string& getInterfaceName();
 };
 
@@ -24,7 +24,7 @@ public:
 class Component_co_IReflector : public co::IReflector
 {
 public:
-	virtual co::IInterfaceType* getInterfaceType();
+	virtual co::IInterface* getInterfaceType();
 	virtual const std::string& getInterfaceName();
 };
 
@@ -32,22 +32,22 @@ public:
 	Inherit from this class to implement the component 'lua.Component'.
  */
 class Component_Base : public co::ComponentBase,
-	public Component_co_IDynamicProxyHandler,
+	public Component_co_IDynamicServiceProvider,
 	public Component_co_IReflector
 {
 public:
 	Component_Base();
 	virtual ~Component_Base();
 
-	// co::Interface Methods:
-	co::IComponent* getInterfaceOwner();
+	// co::IService Methods:
+	co::IObject* getInterfaceOwner();
 	void componentRetain();
 	void componentRelease();
 
-	// co::IComponent Methods:
-	co::IComponentType* getComponentType();
-	co::Interface* getInterface( co::IInterfaceInfo* );
-	void setReceptacle( co::IInterfaceInfo*, co::Interface* );
+	// co::IObject Methods:
+	co::IComponent* getComponentType();
+	co::IService* getInterface( co::IPort* );
+	void setReceptacle( co::IPort*, co::IService* );
 };
 
 } // namespace lua

@@ -1,7 +1,0 @@
-/*
-	Type representing a named exception that can be raised by methods.
- */
-interface IExceptionType : IType
-{
-	// no members
-};

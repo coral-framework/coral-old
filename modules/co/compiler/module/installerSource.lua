@@ -62,7 +62,7 @@ co::IReflector* ]], c.moduleNS, [[::ModuleInstaller::createReflector( TypeId typ
 ]] )
 
 	for i, t in ipairs( c.types ) do
-		writer( "\tcase TypeId_", t.name, ": res = ", c.moduleNS, "::__create", t.name, "IReflector(); break;\n" )
+		writer( "\tcase TypeId_", t.name, ": res = ", c.moduleNS, "::__create", t.name, "Reflector(); break;\n" )
 	end
 
 	writer( [[

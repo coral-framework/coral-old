@@ -9,7 +9,7 @@
 
 namespace co {
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class LifeCycleException_Reflector : public co::ReflectorBase
 {
@@ -40,9 +40,9 @@ public:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createLifeCycleExceptionIReflector()
+co::IReflector* __createLifeCycleExceptionReflector()
 {
     return new LifeCycleException_Reflector;
 }

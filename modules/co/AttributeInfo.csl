@@ -1,7 +1,0 @@
-/*
-	Implements co.IAttributeInfo.
- */
-component AttributeInfo
-{
-	provides IAttributeInfo attributeInfo;
-};

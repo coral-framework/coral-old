@@ -12,27 +12,27 @@
 #include <co/INamespace.h>
 #include <co/ITypeBuilder.h>
 #include <co/ITypeManager.h>
-#include <co/IExceptionType.h>
-#include <co/IInterfaceType.h>
+#include <co/IException.h>
+#include <co/IInterface.h>
 #include <co/IMethodBuilder.h>
 #include <co/IllegalNameException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/MissingInputException.h>
 #include <gtest/gtest.h>
 
-static co::IInterfaceType* createDummyInterface( const std::string& name, co::ITypeCreationTransaction* tct )
+static co::IInterface* createDummyInterface( const std::string& name, co::ITypeTransaction* tct )
 {
 	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_INTERFACE, name, tct );
 	builder->defineAttribute( "dummyAtr", TestHelper::type( "string" ), false );
 
-	return dynamic_cast<co::IInterfaceType*>( builder->createType() );
+	return dynamic_cast<co::IInterface*>( builder->createType() );
 }
 
 TEST( SignatureCalculatorTests, binarySignatureIndependsOnAttributeDefineOrder )
 {
 	co::IType* stringType = TestHelper::type( "string" );
 
-	co::RefPtr<co::ITypeCreationTransaction> tct = createTypeCreationTransaction();
+	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
 	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_INTERFACE, "createBinarySignatureTests.First", tct.get() );
 
 	builder->defineAttribute( "a", stringType, false );
@@ -59,11 +59,11 @@ TEST( SignatureCalculatorTests, binarySignatureIndependsOnAttributeDefineOrder )
 
 TEST( SignatureCalculatorTests, arraySignatures )
 {
-	co::RefPtr<co::ITypeCreationTransaction> transaction = createTypeCreationTransaction();
+	co::RefPtr<co::ITypeTransaction> transaction = createTypeTransaction();
 
 	co::IType* stringType = TestHelper::type( "string" );
 	co::IType* int32Type = TestHelper::type( "int32" );
-	co::IType* interfaceTest = createDummyInterface( "ArraySignaturesTest.Interface", transaction.get() );
+	co::IType* interfaceTest = createDummyInterface( "ArraySignaturesTest.IService", transaction.get() );
 	co::IType* interfaceCopy = createDummyInterface( "ArraySignaturesTest.InterfaceCopy", transaction.get() );
 
 	co::ITypeManager* tm = co::getSystem()->getTypes();
@@ -76,7 +76,7 @@ TEST( SignatureCalculatorTests, arraySignatures )
 
 	co::IType* first = tm->findType( "string[]" );
 	co::IType* second = tm->findType( "int32[]" );
-	co::IType* third = tm->findType( "ArraySignaturesTest.Interface[]" );
+	co::IType* third = tm->findType( "ArraySignaturesTest.IService[]" );
 	co::IType* fourth = tm->findType( "ArraySignaturesTest.InterfaceCopy[]" );
 
 	EXPECT_FALSE( first->getBinarySignature().isNull() );
@@ -97,7 +97,7 @@ TEST( SignatureCalculatorTests, arraySignatures )
 
 TEST( SignatureCalculatorTests, enumSignature )
 {
-	co::RefPtr<co::ITypeCreationTransaction> tct = createTypeCreationTransaction();
+	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
 	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_ENUM, "EnumSignatureTest.First", tct.get() );
 
 	builder->defineIdentifier( "Test_1" );
@@ -142,20 +142,20 @@ TEST( SignatureCalculatorTests, enumSignature )
 
 TEST( SignatureCalculatorTests, methodSignature )
 {
-	co::RefPtr<co::ITypeCreationTransaction> tct = createTypeCreationTransaction();
+	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
 
 	co::RefPtr<co::ITypeBuilder> builder1 = TestHelper::createBuilder( co::TK_INTERFACE, "MethodSignatureTest.First", tct.get() );
 	co::RefPtr<co::IMethodBuilder> methodBuilder1 = builder1->defineMethod( "Ask" );
 	methodBuilder1->defineParameter( "question", TestHelper::type( "string" ), true, false );
 	methodBuilder1->createMethod();
-	co::IInterfaceType* first = dynamic_cast<co::IInterfaceType*>( builder1->createType() );
+	co::IInterface* first = dynamic_cast<co::IInterface*>( builder1->createType() );
 
 	// variations with diferent signature
 	co::RefPtr<co::ITypeBuilder> var1builder = TestHelper::createBuilder( co::TK_INTERFACE, "MethodSignatureTest.Variation1", tct.get() );
 	co::RefPtr<co::IMethodBuilder> var1methodBuilder = var1builder->defineMethod( "Ask" );
 	var1methodBuilder->defineParameter( "question", TestHelper::type( "string" ), true, true );
 	var1methodBuilder->createMethod();
-	co::IInterfaceType* variation1 = dynamic_cast<co::IInterfaceType*>( var1builder->createType() );
+	co::IInterface* variation1 = dynamic_cast<co::IInterface*>( var1builder->createType() );
 
 	EXPECT_TRUE( first->getBinarySignature() != variation1->getBinarySignature() );
 	EXPECT_TRUE( first->getFullSignature() != variation1->getFullSignature() );
@@ -164,7 +164,7 @@ TEST( SignatureCalculatorTests, methodSignature )
 	co::RefPtr<co::IMethodBuilder> var2methodBuilder = var2builder->defineMethod( "Ask" );
 	var2methodBuilder->defineParameter( "question", TestHelper::type( "string" ), false, true );
 	var2methodBuilder->createMethod();
-	co::IInterfaceType* variation2 = dynamic_cast<co::IInterfaceType*>( var2builder->createType() );
+	co::IInterface* variation2 = dynamic_cast<co::IInterface*>( var2builder->createType() );
 
 	EXPECT_TRUE( first->getBinarySignature() != variation2->getBinarySignature() );
 	EXPECT_TRUE( first->getFullSignature() != variation2->getFullSignature() );
@@ -173,7 +173,7 @@ TEST( SignatureCalculatorTests, methodSignature )
 	co::RefPtr<co::IMethodBuilder> var3methodBuilder = var3builder->defineMethod( "Ask" );
 	var3methodBuilder->defineParameter( "question", TestHelper::type( "int32" ), true, false );
 	var3methodBuilder->createMethod();
-	co::IInterfaceType* variation3 = dynamic_cast<co::IInterfaceType*>( var3builder->createType() );
+	co::IInterface* variation3 = dynamic_cast<co::IInterface*>( var3builder->createType() );
 
 	EXPECT_TRUE( first->getBinarySignature() != variation3->getBinarySignature() );
 	EXPECT_TRUE( first->getFullSignature() != variation3->getFullSignature() );
@@ -183,7 +183,7 @@ TEST( SignatureCalculatorTests, methodSignature )
 	var4methodBuilder->defineParameter( "question", TestHelper::type( "string" ), true, false );
 	var4methodBuilder->defineReturnType( TestHelper::type("string") );
 	var4methodBuilder->createMethod();
-	co::IInterfaceType* variation4 = dynamic_cast<co::IInterfaceType*>( var4builder->createType() );
+	co::IInterface* variation4 = dynamic_cast<co::IInterface*>( var4builder->createType() );
 
 	EXPECT_TRUE( first->getBinarySignature() != variation4->getBinarySignature() );
 	EXPECT_TRUE( first->getFullSignature() != variation4->getFullSignature() );
@@ -193,7 +193,7 @@ TEST( SignatureCalculatorTests, methodSignature )
 	var5methodBuilder->defineParameter( "question", TestHelper::type( "string" ), true, false );
 	var5methodBuilder->defineReturnType( TestHelper::type("int32") );
 	var5methodBuilder->createMethod();
-	co::IInterfaceType* variation5 = dynamic_cast<co::IInterfaceType*>( var5builder->createType() );
+	co::IInterface* variation5 = dynamic_cast<co::IInterface*>( var5builder->createType() );
 
 	EXPECT_TRUE( first->getBinarySignature() != variation5->getBinarySignature() );
 	EXPECT_TRUE( first->getFullSignature() != variation5->getFullSignature() );
@@ -204,29 +204,29 @@ TEST( SignatureCalculatorTests, methodSignature )
 
 TEST( SignatureCalculatorTests, attributeSignature )
 {
-	co::RefPtr<co::ITypeCreationTransaction> tct = createTypeCreationTransaction();
+	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
 
 	co::RefPtr<co::ITypeBuilder> builder1 = TestHelper::createBuilder( co::TK_INTERFACE, "AttributeSignatureTest.First", tct.get() );
 	builder1->defineAttribute( "name", TestHelper::type( "string" ), true );
-	co::IInterfaceType* first = dynamic_cast<co::IInterfaceType*>( builder1->createType() );
+	co::IInterface* first = dynamic_cast<co::IInterface*>( builder1->createType() );
 
 	//variations with the same binary signature
 	co::RefPtr<co::ITypeBuilder> builder2 = TestHelper::createBuilder( co::TK_INTERFACE, "AttributeSignatureTest.SameBinary1", tct.get() );
 	builder2->defineAttribute( "name", TestHelper::type( "string" ), true );
-	co::IInterfaceType* sameBinary1 = dynamic_cast<co::IInterfaceType*>( builder2->createType() );
+	co::IInterface* sameBinary1 = dynamic_cast<co::IInterface*>( builder2->createType() );
 
 	co::RefPtr<co::ITypeBuilder> builder3 = TestHelper::createBuilder( co::TK_INTERFACE, "AttributeSignatureTest.SameBinary2", tct.get() );
 	builder3->defineAttribute( "fullName", TestHelper::type( "string" ), true );
-	co::IInterfaceType* sameBinary2 = dynamic_cast<co::IInterfaceType*>( builder3->createType() );
+	co::IInterface* sameBinary2 = dynamic_cast<co::IInterface*>( builder3->createType() );
 
 	// variations with diferent signature
 	co::RefPtr<co::ITypeBuilder> builder4 = TestHelper::createBuilder( co::TK_INTERFACE, "AttributeSignatureTest.Variation1", tct.get() );
 	builder4->defineAttribute( "fullName", TestHelper::type( "string" ), false );
-	co::IInterfaceType* variation1 = dynamic_cast<co::IInterfaceType*>( builder4->createType() );
+	co::IInterface* variation1 = dynamic_cast<co::IInterface*>( builder4->createType() );
 
 	co::RefPtr<co::ITypeBuilder> builder5 = TestHelper::createBuilder( co::TK_INTERFACE, "AttributeSignatureTest.Variation2", tct.get() );
 	builder5->defineAttribute( "name", TestHelper::type( "int32" ), false );
-	co::IInterfaceType* variation2 = dynamic_cast<co::IInterfaceType*>( builder5->createType() );
+	co::IInterface* variation2 = dynamic_cast<co::IInterface*>( builder5->createType() );
 
 	ASSERT_NO_THROW( tct->commit() );
 

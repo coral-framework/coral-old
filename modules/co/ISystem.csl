@@ -7,13 +7,13 @@ interface ISystem
 	// Current system state. See the life cycle control methods: setup(), tearDown(), etc.
 	readonly attribute SystemState state;
 
-	// Interface responsible for maintaining the types database, as well as loading new types.
+	// Service responsible for maintaining the types database, as well as loading new types.
 	readonly attribute ITypeManager types;
 
-	// Interface responsible for loading and maintaining the life cycle of all modules.
+	// Service responsible for loading and maintaining the life cycle of all modules.
 	readonly attribute IModuleManager modules;
 
-	// Interface that manages the services database and provides contextualized service lookups.
+	// Service that manages the service database and provides contextualized service lookups.
 	readonly attribute IServiceManager services;
 
 	//--------- ISystem Life Cycle Control Methods ---------//
@@ -49,10 +49,10 @@ interface ISystem
 
 	<c++
 		//! Convenience method to setup the entire system without requiring any module.
-		inline void setup() { setup( ArrayRange<std::string const>() ); }
+		inline void setup() { setup( Range<std::string const>() ); }
 
 		//! Convenience method to setup the entire system.
-		inline void setup( ArrayRange<std::string const> requiredModules )
+		inline void setup( Range<std::string const> requiredModules )
 		{
 			setupBase( requiredModules );
 			setupPresentation();

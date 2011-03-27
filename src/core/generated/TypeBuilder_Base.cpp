@@ -5,15 +5,15 @@
 
 #include "TypeBuilder_Base.h"
 #include <co/Coral.h>
-#include <co/IComponentType.h>
-#include <co/IInterfaceInfo.h>
-#include <co/IInterfaceType.h>
+#include <co/IComponent.h>
+#include <co/IPort.h>
+#include <co/IInterface.h>
 
 namespace co {
 
 // ------ co.TypeBuilder provides an interface named 'typeBuilder', of type co.ITypeBuilder ------ //
 
-co::IInterfaceType* TypeBuilder_co_ITypeBuilder::getInterfaceType()
+co::IInterface* TypeBuilder_co_ITypeBuilder::getInterfaceType()
 {
 	return co::typeOf<co::ITypeBuilder>::get();
 }
@@ -36,7 +36,7 @@ TypeBuilder_Base::~TypeBuilder_Base()
 	// empty
 }
 
-co::IComponent* TypeBuilder_Base::getInterfaceOwner()
+co::IObject* TypeBuilder_Base::getInterfaceOwner()
 {
 	return this;
 }
@@ -51,26 +51,26 @@ void TypeBuilder_Base::componentRelease()
 	decrementRefCount();
 }
 
-co::IComponentType* TypeBuilder_Base::getComponentType()
+co::IComponent* TypeBuilder_Base::getComponentType()
 {
 	co::IType* type = co::getType( "co.TypeBuilder" );
-	assert( dynamic_cast<co::IComponentType*>( type ) );
-	return static_cast<co::IComponentType*>( type );
+	assert( dynamic_cast<co::IComponent*>( type ) );
+	return static_cast<co::IComponent*>( type );
 }
 
-co::Interface* TypeBuilder_Base::getInterface( co::IInterfaceInfo* interfaceInfo )
+co::IService* TypeBuilder_Base::getInterface( co::IPort* port )
 {
-	checkValidInterface( interfaceInfo );
-	co::Interface* res = NULL;
-	switch( interfaceInfo->getIndex() )
+	checkValidPort( port );
+	co::IService* res = NULL;
+	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::Interface, co::ITypeBuilder>( this ); break;
+	case 0:		res = co::disambiguate<co::IService, co::ITypeBuilder>( this ); break;
 	default:	raiseUnexpectedInterfaceIndex();
 	}
 	return res;
 }
 
-void TypeBuilder_Base::setReceptacle( co::IInterfaceInfo* receptacle, co::Interface* facet )
+void TypeBuilder_Base::setReceptacle( co::IPort* receptacle, co::IService* facet )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();

@@ -9,10 +9,10 @@
 #include <co/INamespace.h>
 #include <co/ITypeBuilder.h>
 #include <co/IMethodBuilder.h>
-#include <co/IInterfaceType.h>
-#include <co/IExceptionType.h>
+#include <co/IInterface.h>
+#include <co/IException.h>
 #include <co/TypeLoadException.h>
-#include <co/ITypeCreationTransaction.h>
+#include <co/ITypeTransaction.h>
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/OS.h>
 #include <sstream>
@@ -351,7 +351,7 @@ void Parser::onIdentifierListItem( const std::string& name )
 
 void Parser::onComponentInterface( bool isFacet, const std::string& name )
 {
-	IInterfaceType* interface = dynamic_cast<IInterfaceType*>( getLastDeclaredType() );
+	IInterface* interface = dynamic_cast<IInterface*>( getLastDeclaredType() );
 	if( !interface )
 		CORAL_THROW( TypeLoadException, "an interface type was expected" );
 
@@ -387,7 +387,7 @@ void Parser::onExeptionRaised( const std::string& name )
 	if( !type )
 		CORAL_THROW( TypeLoadException, "error loading exception type '" << name << "'" );
 
-	IExceptionType* exeptionType = dynamic_cast<IExceptionType*>( type );
+	IException* exeptionType = dynamic_cast<IException*>( type );
 	if( !exeptionType )
 		CORAL_THROW( TypeLoadException, "attempt to raise non-exception type '" << type->getFullName() << "'" );
 

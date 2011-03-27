@@ -20,7 +20,7 @@ public:
 	virtual ~Launcher();
 
 	// lua::ILauncher methods:
-	co::int32 main( co::ArrayRange<std::string const> args );
+	co::int32 main( co::Range<std::string const> args );
 };
 
 } // namespace lua

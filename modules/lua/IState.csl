@@ -1,6 +1,5 @@
 /*
-	Interface for interacting with Lua.
-	The global Lua state is exposed as a global lua.IState service.
+	For interfacing with Lua. The main Lua state is exposed as a global lua.IState service.
  */
 interface IState
 {

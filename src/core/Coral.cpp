@@ -9,7 +9,7 @@
 #include <co/Coral.h>
 #include <co/RefPtr.h>
 #include <co/IReflector.h>
-#include <co/IInterfaceInfo.h>
+#include <co/IPort.h>
 #include <co/NoSuchInterfaceException.h>
 #include <co/reserved/OS.h>
 #include <co/reserved/LibraryManager.h>
@@ -32,7 +32,7 @@ static RefPtr<System> sg_system;
 static ITypeManager* sg_typeManager( NULL );
 static IServiceManager* sg_serviceManager( NULL );
 
-ArrayRange<const std::string> getPaths()
+Range<const std::string> getPaths()
 {
 	return sg_paths;
 }
@@ -143,7 +143,7 @@ IType* getType( const std::string& fullName )
 	return sg_typeManager->getType( fullName );
 }
 
-IComponent* newInstance( const std::string& fullName )
+IObject* newInstance( const std::string& fullName )
 {
 	IType* type = getType( fullName );
 	assert( type );
@@ -152,11 +152,11 @@ IComponent* newInstance( const std::string& fullName )
 	return reflector->newInstance();
 }
 
-void setReceptacleByName( IComponent* instance, const std::string& receptacleName, Interface* facet )
+void setReceptacleByName( IObject* instance, const std::string& receptacleName, IService* facet )
 {
 	assert( instance );
-	IComponentType* ct = instance->getComponentType();
-	IInterfaceInfo* ii = dynamic_cast<IInterfaceInfo*>( ct->getMember( receptacleName ) );
+	IComponent* ct = instance->getComponentType();
+	IPort* ii = dynamic_cast<IPort*>( ct->getMember( receptacleName ) );
 	if( !ii )
 		CORAL_THROW( NoSuchInterfaceException, "no such interface '" << receptacleName
 						<< "' in component " << ct->getFullName() );
@@ -170,7 +170,7 @@ inline IServiceManager* getServices()
 	return sg_serviceManager;
 }
 
-Interface* getServiceForType( IInterfaceType* serviceType, IInterfaceType* clientType )
+IService* getServiceForType( IInterface* serviceType, IInterface* clientType )
 {
 	if( clientType )
 		return getServices()->getServiceForType( serviceType, clientType );
@@ -178,7 +178,7 @@ Interface* getServiceForType( IInterfaceType* serviceType, IInterfaceType* clien
 		return getServices()->getService( serviceType );
 }
 
-Interface* getServiceForInstance( IInterfaceType* serviceType, Interface* clientInstance )
+IService* getServiceForInstance( IInterface* serviceType, IService* clientInstance )
 {
 	return getServices()->getServiceForInstance( serviceType, clientInstance );
 }
@@ -188,8 +188,8 @@ bool findModuleFile( const std::string& moduleName, const std::string& fileName,
 	std::string modulePath( moduleName );
 	OS::convertDotsToDirSeps( modulePath );
 	return OS::searchFile3( getPaths(),
-				ArrayRange<const std::string>( &modulePath, 1 ),
-				ArrayRange<const std::string>( &fileName, 1 ),
+				Range<const std::string>( &modulePath, 1 ),
+				Range<const std::string>( &fileName, 1 ),
 				filePath );
 }
 

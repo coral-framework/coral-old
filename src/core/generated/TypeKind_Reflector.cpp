@@ -9,7 +9,7 @@
 
 namespace co {
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class TypeKind_Reflector : public co::ReflectorBase
 {
@@ -35,9 +35,9 @@ public:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createTypeKindIReflector()
+co::IReflector* __createTypeKindReflector()
 {
     return new TypeKind_Reflector;
 }

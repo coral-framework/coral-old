@@ -9,7 +9,7 @@
 
 namespace co {
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class SemanticException_Reflector : public co::ReflectorBase
 {
@@ -40,9 +40,9 @@ public:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createSemanticExceptionIReflector()
+co::IReflector* __createSemanticExceptionReflector()
 {
     return new SemanticException_Reflector;
 }

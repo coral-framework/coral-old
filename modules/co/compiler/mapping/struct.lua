@@ -22,7 +22,7 @@ local function estimateFieldSize( t )
 	local kind = t.kind
 	if kind == 'TK_STRUCT' then
 		local res = 0
-		for i, a in ipairs( t.memberAttributes ) do
+		for i, a in ipairs( t.fields ) do
 			res = res + estimateFieldSize( a.type )
 		end
 		return res
@@ -34,7 +34,7 @@ end
 local function template( writer, c, t )
 	writer( "struct ", t.name, "\n{\n" )
 
-	local fields = t.memberAttributes
+	local fields = t.fields
 	local fieldSizes = {}
 	local sortedIndices = {}
 	for i, field in ipairs( fields ) do

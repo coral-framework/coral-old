@@ -31,7 +31,7 @@ local function template( writer, c, t )
 class ]], t.name , [[_]], itf.type.fullNameUnderline, [[ : public ]], itf.type.cppName, "\n", [[
 {
 public:
-	virtual co::IInterfaceType* getInterfaceType();
+	virtual co::IInterface* getInterfaceType();
 	virtual const std::string& getInterfaceName();
 };
 
@@ -57,15 +57,15 @@ public:
 	]], t.name, [[_Base();
 	virtual ~]], t.name, [[_Base();
 
-	// co::Interface Methods:
-	co::IComponent* getInterfaceOwner();
+	// co::IService Methods:
+	co::IObject* getInterfaceOwner();
 	void componentRetain();
 	void componentRelease();
 
-	// co::IComponent Methods:
-	co::IComponentType* getComponentType();
-	co::Interface* getInterface( co::IInterfaceInfo* );
-	void setReceptacle( co::IInterfaceInfo*, co::Interface* );
+	// co::IObject Methods:
+	co::IComponent* getComponentType();
+	co::IService* getInterface( co::IPort* );
+	void setReceptacle( co::IPort*, co::IService* );
 ]] )
 
 	if #receptacles > 0 then

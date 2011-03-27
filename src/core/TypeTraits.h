@@ -15,13 +15,13 @@ namespace co {
 
 // forward declarations:
 class IType;
-class IArrayType;
-class IEnumType;
-class IExceptionType;
-class IStructType;
-class INativeClassType;
-class IInterfaceType;
-class IComponentType;
+class IArray;
+class IEnum;
+class IException;
+class IStruct;
+class INativeClass;
+class IInterface;
+class IComponent;
 
 /*!
 	Array that maps a co::TypeKind to its Coral-style string representation.
@@ -258,11 +258,11 @@ struct nameOf<std::vector<T> > : public nameOfArrayBase<T> {};
 template<typename ET>
 struct typeOfArrayBase
 {
-	static IArrayType* get()
+	static IArray* get()
 	{
 		co::IType* type = getType( nameOf<std::vector<ET> >::get() );
-		assert( dynamic_cast<IArrayType*>( type ) );
-		return static_cast<IArrayType*>( type );
+		assert( dynamic_cast<IArray*>( type ) );
+		return static_cast<IArray*>( type );
 	}
 };
 

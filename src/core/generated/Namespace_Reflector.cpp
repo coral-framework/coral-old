@@ -10,9 +10,9 @@ namespace co {
 
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
 co::int32 __Namespace_getSize();
-co::IComponent* __Namespace_newInstance();
+co::IObject* __Namespace_newInstance();
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class Namespace_Reflector : public co::ReflectorBase
 {
@@ -37,17 +37,17 @@ public:
 		return __Namespace_getSize();
 	}
 
-	co::IComponent* newInstance()
+	co::IObject* newInstance()
 	{
-		co::IComponent* component = __Namespace_newInstance();
+		co::IObject* component = __Namespace_newInstance();
 		assert( component->getComponentType()->getFullName() == "co.Namespace" );
 		return component;
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createNamespaceIReflector()
+co::IReflector* __createNamespaceReflector()
 {
     return new Namespace_Reflector;
 }

@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 #include <co/Coral.h>
-#include <co/IComponent.h>
+#include <co/IObject.h>
 #include <moduleA/Vec2D.h>
 #include <moduleA/TestEnum.h>
 #include <moduleA/TestStruct.h>
@@ -57,7 +57,7 @@ TEST( MappingTests, structFields )
 	ASSERT_EQ( moduleA::Second, dummyStruct.enumArray[0] );
 
 	dummyStruct.typeArray.push_back( NULL );
-	co::ArrayRange<co::IType* const> typeRange( dummyStruct.typeArray );
+	co::Range<co::IType* const> typeRange( dummyStruct.typeArray );
 	ASSERT_EQ( 1, typeRange.getSize() );
 	ASSERT_EQ( dummyStruct.typeArray.front().get(), typeRange.getFirst() );
 }
@@ -104,7 +104,7 @@ TEST( MappingTests, exception )
 
 TEST( MappingTests, interface )
 {
-	co::RefPtr<co::IComponent> testComponent = co::newInstance( "moduleA.TestComponent" );
+	co::RefPtr<co::IObject> testComponent = co::newInstance( "moduleA.TestComponent" );
 
 	moduleA::TestInterface* ti = testComponent->getFacet<moduleA::TestInterface>();
 
@@ -123,7 +123,7 @@ TEST( MappingTests, interface )
 	moduleA::TestStruct testStruct;
 	testStruct.anInt16 = 42;
 	std::vector<co::int32> intVector( 1, 1 );
-	co::ArrayRange<co::int32 const> intList(  intVector );
+	co::Range<co::int32 const> intList(  intVector );
 
 	co::RefVector<moduleA::DummyInterface> interfaceRefVector;
 	interfaceRefVector.push_back( NULL );
@@ -131,7 +131,7 @@ TEST( MappingTests, interface )
 	std::vector<moduleA::DummyInterface*> interfaceVector;
 	interfaceVector.push_back( NULL );
 
-	co::ArrayRange<moduleA::DummyInterface* const> interfaceList( interfaceVector );
+	co::Range<moduleA::DummyInterface* const> interfaceList( interfaceVector );
 
 	// Callling this method should NOT alter the parameters
 	ti->testInParameters( size, enumValue, text, testStruct, NULL, intList, interfaceList );
@@ -155,13 +155,13 @@ TEST( MappingTests, interface )
 
 TEST( MappingTests, interfaceDisambiguation )
 {
-	EXPECT_FALSE( ( co::traits::hasAmbiguousBase<moduleA::IBat, co::Interface>::value ) );
+	EXPECT_FALSE( ( co::traits::hasAmbiguousBase<moduleA::IBat, co::IService>::value ) );
 
-	EXPECT_TRUE( ( co::traits::hasAmbiguousBase<moduleA::IBatman, co::Interface>::value ) );
+	EXPECT_TRUE( ( co::traits::hasAmbiguousBase<moduleA::IBatman, co::IService>::value ) );
 	EXPECT_TRUE( ( co::traits::hasAmbiguousBase<moduleA::IBatman, moduleA::IMammal>::value ) );
 
 	moduleA::IBatman* batman = NULL;
-	co::Interface* itf = co::disambiguate<co::Interface>( batman );
+	co::IService* itf = co::disambiguate<co::IService>( batman );
 	moduleA::IMammal* mammalItf = co::disambiguate<moduleA::IMammal>( batman );
 
 	CORAL_UNUSED( itf );

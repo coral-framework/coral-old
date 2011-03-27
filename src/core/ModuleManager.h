@@ -30,8 +30,8 @@ public:
 	void updateModules( ModuleState toState );
 
 	// IModuleManager methods:
-	ArrayRange<IModule* const> getModules();
-	ArrayRange<IModulePartLoader* const> getLoaders();
+	Range<IModule* const> getModules();
+	Range<IModulePartLoader* const> getLoaders();
 	bool getBinaryCompatibilityChecking();
 	void setBinaryCompatibilityChecking( bool enabled );
 	IModule* findModule( const std::string& moduleName );

@@ -62,7 +62,7 @@ Exceções (exception)
 
 - Somente exceções podem ser lançadas (raises) por métodos.
 - Não podem ser passadas como parâmetro e nem fazer parte de outros tipos.
-- Toda exceção herda implicitamente de co::UserException.
+- Toda exceção herda implicitamente de co::Exception.
 
 Estruturas (struct)
 -------------------

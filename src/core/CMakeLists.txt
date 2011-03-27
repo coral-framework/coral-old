@@ -29,12 +29,12 @@ FILE( GLOB CORAL_PUBLIC_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} reserved/*.
 
 SET( CORAL_PUBLIC_HEADERS
 	Any.h
-	ArrayRange.h
 	Coral.h
 	Endian.h
 	Exception.h
-	Interface.h
+	IService.h
 	Platform.h
+	Range.h
 	RefPtr.h
 	RefVector.h
 	TypeKind.h
@@ -122,7 +122,9 @@ FILE( GLOB reflectionFiles Any* *Reflector* )
 SOURCE_GROUP( "Reflection" FILES ${reflectionFiles} )
 
 # Type System Files
-FILE( GLOB typeFiles *Type*.* *Info.* AttributeAndMethodContainer.* MethodBuilder.* Namespace.* SignatureCalculator.* )
+FILE( GLOB typeFiles *Type*.* Array.* Enum.* Struct.* Component.* Interface.*
+	NativeClass.* Member.* Field.* Method.* Port.* Parameter.* MethodBuilder.*
+	Namespace.* SignatureCalculator.* )
 SOURCE_GROUP( "Type" FILES ${typeFiles} )
 
 # CSL Loading Files

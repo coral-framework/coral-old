@@ -35,7 +35,7 @@ Os tipos básicos de CSL são traduzidos para C++ seguindo a tabela abaixo:
 Arrays
 ------
 
-Arrays, quando aparecem em um método ou no tipo de um atributo de uma interface, são traduzidos como um co::ArrayRange, uma espécie de **iterador** que abstrai a representação de array utilizada internamente pela implementação de um componente.
+Arrays, quando aparecem em um método ou no tipo de um atributo de uma interface, são traduzidos como um co::Range, uma espécie de **iterador** que abstrai a representação de array utilizada internamente pela implementação de um componente.
 
 <table cellspacing="0" style="width: 360px">
 	<thead>
@@ -44,12 +44,12 @@ Arrays, quando aparecem em um método ou no tipo de um atributo de uma interface,
 	<tbody>
 		<tr>
 			<td><em>Type</em> <tt>[]</tt></td>
-			<td><tt>co::ArrayRange&lt;</tt> <em>Type</em> <tt>&gt;</tt></td>
+			<td><tt>co::Range&lt;</tt> <em>Type</em> <tt>&gt;</tt></td>
 		</tr>
 	</tbody>
 </table>
 
-Veja a documentação do _co::ArrayRange_ para saber como iterá-lo ou construí-lo um a partir de um std::vector ou qualquer seqüência de elementos em memória. Observe que um co::ArrayRange é apenas um iterador &mdash; não é possível adicionar ou remover elementos de um array através de um co::ArrayRange!
+Veja a documentação do _co::ArrayRange_ para saber como iterá-lo ou construí-lo um a partir de um std::vector ou qualquer seqüência de elementos em memória. Observe que um co::Range é apenas um iterador &mdash; não é possível adicionar ou remover elementos de um array através de um co::Range!
 
 
 Namespaces
@@ -111,7 +111,7 @@ enum Numbers
 Exceções (exception)
 --------------------
 
-Um `exception` com um determinado nome é mapeado para uma classe em C++, de mesmo nome, que herda de co::UserException.
+Um `exception` com um determinado nome é mapeado para uma classe em C++, de mesmo nome, que herda de co::Exception.
 
 <code lang="csl">
 // especificação em CSL
@@ -122,7 +122,7 @@ exception MyException;
 
 <code lang="cpp">
 // mapeamento para C++
-class MyException : public co::UserException
+class MyException : public co::Exception
 {
 public:
     MyException();
@@ -163,7 +163,7 @@ O tipo dos campos são mapeados segundo as regras gerais, exceto quando o tipo é 
 
 ### Campos do tipo Array
 
-Todo campo do tipo array é mapeado como um `std::vector`, já que um `co::ArrayRange` não pode armazenar elementos. Exemplo:
+Todo campo do tipo array é mapeado como um `std::vector`, já que um `co::Range` não pode armazenar elementos. Exemplo:
 
 <code lang="csl">
 // em CSL
@@ -195,7 +195,7 @@ Todo campo do tipo interface é mapeado como um `co::RefPtr` (_smart pointer_) pa
 struct Foo
 {
 	co.IType aType;
-	co.IMemberInfo[] someMembers;
+	co.IMember[] someMembers;
 };
 </code>
 
@@ -206,7 +206,7 @@ struct Foo
 struct Foo
 {
 	co::RefPtr<co::IType> aType;
-	co::RefVector<co::IMemberInfo> someMembers;
+	co::RefVector<co::IMember> someMembers;
 };
 </code>
 
@@ -274,11 +274,11 @@ As regras para passagem e retorno de parâmetros nos métodos foram definidas de f
 		</tr>
 		<tr>
 			<td>Arrays de Valores</td>
-			<td>Passagem de um <tt>co::ArrayRange&lt;const Type&gt;</tt></td>
+			<td>Passagem de um <tt>co::Range&lt;const Type&gt;</tt></td>
 		</tr>
 		<tr>
 			<td>Arrays de Referências</td>
-			<td>Passagem de um <tt>co::ArrayRange&lt;Type* const&gt;</tt></td>
+			<td>Passagem de um <tt>co::Range&lt;Type* const&gt;</tt></td>
 		</tr>
 	</tbody>
 </table>
@@ -390,7 +390,7 @@ interface Service
 class Service
 {
 public:
-	virtual co::ArrayRange<const co::Uuid> getForbiddenClientIds() = 0;
+	virtual co::Range<const co::Uuid> getForbiddenClientIds() = 0;
 
 	virtual void registerDelegate( RequestType t, ServiceDelegate* d ) = 0;
 
@@ -413,7 +413,7 @@ Observe que a declaração de exceções (_raises_) em CSL não são mapeadas diretame
 Componentes (component)
 -----------------------
 
-Componentes só podem ser manipulados através da API de reflexão ou de suas interfaces servidoras (e.g. `co::IComponent`). Por isso, não geram nenhum tipo de mapeamento para C++. Para informações sobre como implementar um componente, veja a página de componentes.
+Componentes só podem ser manipulados através da API de reflexão ou de suas interfaces servidoras (e.g. `co::IObject`). Por isso, não geram nenhum tipo de mapeamento para C++. Para informações sobre como implementar um componente, veja a página de componentes.
 
 Temp
 ====
@@ -428,11 +428,11 @@ struct Circle
 
 native class Vec2D ( <utility> std::pair<double, double> )
 {
-	attribute double x;
-	attribute double y;
+	double x;
+	double y;
 
-	readonly attribute double length;		//< Length.
-	readonly attribute double length2;		//< Squared length.
+	readonly double length;		//< Length.
+	readonly double length2;	//< Squared length.
 
 	void set( in double x, in double y );	//< Set all coords.
 	void get( out double x, out double y );	//< Get all coords.
@@ -443,7 +443,7 @@ native class Vec2D ( <utility> std::pair<double, double> )
 
 interface IMammal
 {
-	readonly attribute IMammal[] children;
+	readonly IMammal[] children;
 
 	void addChild( in IMammal child )
 			raises NotTheParentException;
@@ -451,12 +451,12 @@ interface IMammal
 
 interface IBat : IMammal
 {
-	readonly attribute bool bloodsucker;
+	readonly bool bloodsucker;
 };
 
 interface IHuman : IMammal
 {
-	attribute string name;
+	string name;
 };
 
 interface IBatman : IHuman, IBat
@@ -509,11 +509,11 @@ interface User
  */
 interface IServiceManager
 {
-	Interface getServiceFor( in co.IInterfaceType subject );
+	Interface getServiceFor( in co.IInterface subject );
 
 	<c++
 		template<typename T>
-		inline co::Interface* getServiceFor()
+		inline co::IService* getServiceFor()
 		{
 			CORAL_STATIC_CHECK( co::kindOf<T>::kind == co::TK_INTERFACE );
 			return getServiceFor( co::typeOf<T>::get() );
@@ -539,10 +539,10 @@ public:
 	virtual const std::string& getEmail() = 0;
 	virtual void setEmail( const std::string& email ) = 0;
 
-	virtual co::ArrayRange<User* const> getFriends() = 0;
-	virtual void setFriends( co::ArrayRange<User* const> friends ) = 0;
+	virtual co::Range<User* const> getFriends() = 0;
+	virtual void setFriends( co::Range<User* const> friends ) = 0;
 
-	virtual void addFriends( co::ArrayRange<User* const> moreFriends ) = 0;
+	virtual void addFriends( co::Range<User* const> moreFriends ) = 0;
 
 	virtual bool minimalPathTo( User* someone, co::RefVector<User> path ) = 0;
 };
@@ -570,7 +570,7 @@ runAction.logger = logger.logger
 
 
 -- Componente com a interface action.IAction.
-local HelloAction = co.IComponent {
+local HelloAction = co.IObject {
 	name = "action.Hello",
 	provides = { action = "action.IAction" }
 }

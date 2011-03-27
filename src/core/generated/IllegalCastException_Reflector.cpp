@@ -9,7 +9,7 @@
 
 namespace co {
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class IllegalCastException_Reflector : public co::ReflectorBase
 {
@@ -40,9 +40,9 @@ public:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createIllegalCastExceptionIReflector()
+co::IReflector* __createIllegalCastExceptionReflector()
 {
     return new IllegalCastException_Reflector;
 }

@@ -15,7 +15,7 @@ namespace co {
 class System_co_ISystem : public co::ISystem
 {
 public:
-	virtual co::IInterfaceType* getInterfaceType();
+	virtual co::IInterface* getInterfaceType();
 	virtual const std::string& getInterfaceName();
 };
 
@@ -29,15 +29,15 @@ public:
 	System_Base();
 	virtual ~System_Base();
 
-	// co::Interface Methods:
-	co::IComponent* getInterfaceOwner();
+	// co::IService Methods:
+	co::IObject* getInterfaceOwner();
 	void componentRetain();
 	void componentRelease();
 
-	// co::IComponent Methods:
-	co::IComponentType* getComponentType();
-	co::Interface* getInterface( co::IInterfaceInfo* );
-	void setReceptacle( co::IInterfaceInfo*, co::Interface* );
+	// co::IObject Methods:
+	co::IComponent* getComponentType();
+	co::IService* getInterface( co::IPort* );
+	void setReceptacle( co::IPort*, co::IService* );
 };
 
 } // namespace co

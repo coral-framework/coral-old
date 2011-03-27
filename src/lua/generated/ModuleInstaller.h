@@ -61,14 +61,14 @@ private:
 };
 
 // Module's reflector creation functions:
-co::IReflector* __createComponentIReflector();
-co::IReflector* __createExceptionIReflector();
-co::IReflector* __createILauncherIReflector();
-co::IReflector* __createIStateIReflector();
-co::IReflector* __createLauncherIReflector();
-co::IReflector* __createluaIReflector();
-co::IReflector* __createModulePartIReflector();
-co::IReflector* __createModulePartLoaderIReflector();
-co::IReflector* __createUniverseIReflector();
+co::IReflector* __createComponentReflector();
+co::IReflector* __createExceptionReflector();
+co::IReflector* __createILauncherReflector();
+co::IReflector* __createIStateReflector();
+co::IReflector* __createLauncherReflector();
+co::IReflector* __createluaReflector();
+co::IReflector* __createModulePartReflector();
+co::IReflector* __createModulePartLoaderReflector();
+co::IReflector* __createUniverseReflector();
 
 } // namespace lua

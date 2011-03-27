@@ -53,7 +53,7 @@ private:
 	RefPtr<IReflector> _reflector;
 };
 
-#define DELEGATE_CO_TYPE_METHODS( DELEGATE ) \
+#define DELEGATE_co_IType( DELEGATE ) \
 	virtual const std::string& getName() { return DELEGATE getName(); } \
 	virtual const std::string& getFullName() { return DELEGATE getFullName(); } \
 	virtual INamespace* getNamespace() { return DELEGATE getNamespace(); } \
@@ -71,7 +71,7 @@ class Type : public Type_Base, public TypeImpl
 public:
 	virtual ~Type();
 
-	DELEGATE_CO_TYPE_METHODS( TypeImpl:: );
+	DELEGATE_co_IType( TypeImpl:: );
 };
 
 } // namespace co

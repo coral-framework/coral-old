@@ -33,7 +33,7 @@ TEST( NamespaceTests, defineType )
 
 	// make sure these types are not user-definable
 
-	co::RefPtr<co::ITypeCreationTransaction> transaction = createTypeCreationTransaction();
+	co::RefPtr<co::ITypeTransaction> transaction = createTypeTransaction();
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_NONE, transaction.get() ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_ANY, transaction.get() ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_BOOLEAN, transaction.get() ), co::IllegalArgumentException );

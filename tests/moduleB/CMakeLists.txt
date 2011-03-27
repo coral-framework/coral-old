@@ -17,7 +17,7 @@ SET( CORAL_PATH
 )
 
 CORAL_GENERATE_MODULE( _GENERATED_FILES moduleB
-	co.ITypeCreationTransaction
+	co.ITypeTransaction
 	moduleA.TestInterface
 )
 

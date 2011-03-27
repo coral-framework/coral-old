@@ -7,8 +7,8 @@
 #define _CO_ISYSTEM_H_
 
 #include <co/TypeTraits.h>
-#include <co/ArrayRange.h>
-#include <co/Interface.h>
+#include <co/IService.h>
+#include <co/Range.h>
 #include <vector>
 #include <co/SystemState.h>
 
@@ -23,7 +23,7 @@ namespace co {
 // co.ISystem Mapping:
 namespace co {
 
-class ISystem : public co::Interface
+class ISystem : public co::IService
 {
 public:
 	virtual ~ISystem() {;}
@@ -31,10 +31,10 @@ public:
 	// Code From <c++ Block:
 	
 		//! Convenience method to setup the entire system without requiring any module.
-		inline void setup() { setup( ArrayRange<std::string const>() ); }
+		inline void setup() { setup( Range<std::string const>() ); }
 
 		//! Convenience method to setup the entire system.
-		inline void setup( ArrayRange<std::string const> requiredModules )
+		inline void setup( Range<std::string const> requiredModules )
 		{
 			setupBase( requiredModules );
 			setupPresentation();
@@ -50,7 +50,7 @@ public:
 
 	virtual co::ITypeManager* getTypes() = 0;
 
-	virtual void setupBase( co::ArrayRange<std::string const> requiredModules ) = 0;
+	virtual void setupBase( co::Range<std::string const> requiredModules ) = 0;
 
 	virtual void setupPresentation() = 0;
 
@@ -62,7 +62,7 @@ public:
 namespace co {
 template<> struct kindOf<co::ISystem> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::ISystem> { static const char* get() { return "co.ISystem"; } };
-template<> struct typeOf<co::ISystem> : public typeOfBase<co::ISystem, IInterfaceType> {};
+template<> struct typeOf<co::ISystem> : public typeOfBase<co::ISystem, IInterface> {};
 } // namespace co
 
 #endif // _CO_ISYSTEM_H_

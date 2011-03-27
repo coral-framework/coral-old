@@ -1,8 +1,0 @@
-/*
-	Type representing a unidimensional array of elements.
- */
-interface IArrayType : IType
-{
-	// The type of the array elements.
-	readonly attribute IType elementType;
-};

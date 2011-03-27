@@ -7,16 +7,15 @@
 #define _CO_REFVECTOR_H_
 
 #include <co/RefPtr.h>
-#include <co/ArrayRange.h>
+#include <co/Range.h>
 
 namespace co {
 
 /*!
 	\brief An enhanced std::vector of co::RefPtr's.
- 
-	\tparam T an interface type (co::Interface).
- 
-	Supports automatic coercion to co::ArrayRange< T* >.
+	\tparam T a service type (co::IService).
+
+	Supports automatic coercion to co::Range< T* >.
 	Also offers extra methods for sorted arrays: sortedInsert() and sortedFind().
  */
 template<class T>
@@ -118,9 +117,9 @@ public:
 
 #ifndef DOXYGEN
 
-// ArrayRangeAdaptor to extract an interface-pointer array out of a RefVector.
+// RangeAdaptor to extract an interface-pointer array out of a RefVector.
 template<typename T, typename ET>
-struct ArrayRangeAdaptor<T, RefVector<ET> >
+struct RangeAdaptor<T, RefVector<ET> >
 {
 	static const bool isValid = true;
 	static T* getData( RefVector<ET>& v )

@@ -12,7 +12,7 @@ namespace lua {
 void moduleRetain();
 void moduleRelease();
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class Exception_Reflector : public co::ReflectorBase
 {
@@ -43,9 +43,9 @@ public:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createExceptionIReflector()
+co::IReflector* __createExceptionReflector()
 {
     return new Exception_Reflector;
 }

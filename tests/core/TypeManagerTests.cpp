@@ -7,7 +7,7 @@
 #include <co/Coral.h>
 #include <co/ISystem.h>
 #include <co/CSLError.h>
-#include <co/IArrayType.h>
+#include <co/IArray.h>
 #include <co/INamespace.h>
 #include <co/ITypeManager.h>
 #include <co/TypeLoadException.h>
@@ -70,7 +70,7 @@ TEST( TypeManagerTests, arrays )
 
 	EXPECT_TRUE( tm->findType( "TypeManagerTests.BarStruct[]" ) == NULL );
 	EXPECT_EQ( tm->getArrayOf( tm->getType( "TypeManagerTests.BarStruct" ) ),
-				static_cast<co::IArrayType*>( tm->getType( "TypeManagerTests.BarStruct[]" ) ) );
+				static_cast<co::IArray*>( tm->getType( "TypeManagerTests.BarStruct[]" ) ) );
 	EXPECT_TRUE( tm->findType( "TypeManagerTests.BarStruct[]" ) != NULL );
 
 	EXPECT_THROW( tm->getArrayOf( NULL ), co::IllegalArgumentException );
@@ -110,7 +110,7 @@ struct TypeStatistics
 	{
 		++numNamespaces;
 
-		for( co::ArrayRange<co::IType* const> r( ns->getTypes() ); r; r.popFirst() )
+		for( co::Range<co::IType* const> r( ns->getTypes() ); r; r.popFirst() )
 		{
 			++numTypes;
 
@@ -122,7 +122,7 @@ struct TypeStatistics
 			   ++numTypesWithReflector;
 		}
 
-		for( co::ArrayRange<co::INamespace* const> r( ns->getChildNamespaces() ); r; r.popFirst() )
+		for( co::Range<co::INamespace* const> r( ns->getChildNamespaces() ); r; r.popFirst() )
 			traverse( r.getFirst() );
 	}
 };

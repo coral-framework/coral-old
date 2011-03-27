@@ -11,8 +11,8 @@
 #include <co/RefPtr.h>
 #include <co/TypeKind.h>
 #include <co/Platform.h>
-#include <co/ArrayRange.h>
-#include <co/ITypeCreationTransaction.h>
+#include <co/Range.h>
+#include <co/ITypeTransaction.h>
 
 namespace co {
 
@@ -45,7 +45,7 @@ public:
 		Types are looked up and created within the context of the specified \a typeManager.
 	 */
 	TypeLoader( const std::string& fullTypeName,
-				ArrayRange<const std::string> path,
+				Range<const std::string> path,
 				ITypeManager* typeManager );
 
 	//! Destructor.
@@ -122,12 +122,12 @@ private:
 
 private:
 	std::string _fullTypeName;
-	const ArrayRange<const std::string> _path;
+	const Range<const std::string> _path;
 	TypeManager* _typeManager;
 	TypeLoader* _parentLoader;
 
 	INamespace* _namespace;
-	RefPtr<ITypeCreationTransaction> _transaction;
+	RefPtr<ITypeTransaction> _transaction;
 
 	RefPtr<csl::Error> _cslError;
 };

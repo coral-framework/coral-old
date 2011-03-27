@@ -18,19 +18,19 @@ local function template( writer, c, t )
 	end
 
 	if t.kind == 'TK_INTERFACE' then
-		includeIfNotIncluded( "co.IDynamicProxyHandler" )
+		includeIfNotIncluded( "co.IDynamicServiceProvider" )
 	end
 
 	for fullName, type in pairs( requiredTypes ) do
 		writer( "#include <", type.headerName, ">\n" )
 	end
 
-	if t.memberAttributes then
-		if t.memberMethods and not requiredTypes["co.IMethodInfo"] then
-			includeIfNotIncluded( "co.IMethodInfo" )
+	if t.fields then
+		if t.methods and not requiredTypes["co.IMethod"] then
+			includeIfNotIncluded( "co.IMethod" )
 		end
-		includeIfNotIncluded( "co.IAttributeInfo" )
-		if t.memberMethods then
+		includeIfNotIncluded( "co.IField" )
+		if t.methods then
 			includeIfNotIncluded( "co.IllegalCastException" )
 		end
 		includeIfNotIncluded( "co.MissingInputException" )
@@ -43,7 +43,7 @@ local function template( writer, c, t )
 
 	writer( "#include <co/reserved/ReflectorBase.h>\n" )
 
-	if t.memberAttributes then
+	if t.fields then
 		writer( "#include <sstream>\n" )
 	end
 
@@ -59,7 +59,7 @@ local function template( writer, c, t )
 		writer( [[
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
 co::int32 __]], t.name, [[_getSize();
-co::IComponent* __]], t.name, [[_newInstance();
+co::IObject* __]], t.name, [[_newInstance();
 
 ]] )
 	end
@@ -74,15 +74,15 @@ void moduleRelease();
 
 	if t.kind == 'TK_INTERFACE' then
 		writer( [[
-// ------ Proxy Interface ------ //
+// ------ Dynamic Service Proxy ------ //
 
 class ]], t.name, [[_Proxy : public ]], t.cppName, "\n", [[
 {
 public:
-	]], t.name, [[_Proxy( co::IDynamicProxyHandler* handler ) : _handler( handler )
+	]], t.name, [[_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
 ]], c.moduleName == 'co' and '' or "\t\tmoduleRetain();\n", [[
-		_cookie = _handler->registerProxyInterface( co::disambiguate<co::Interface, ]], t.cppName, [[>( this ) );
+		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, ]], t.cppName, [[>( this ) );
 	}
 
 	virtual ~]], t.name, [[_Proxy()
@@ -90,13 +90,13 @@ public:
 		]], c.moduleName == 'co' and "// empty" or "moduleRelease();", "\n", [[
 	}
 
-	// co::Interface Methods:
+	// co::IService Methods:
 
-	co::IInterfaceType* getInterfaceType() { return co::typeOf<]], t.cppName, [[>::get(); }
-	co::IComponent* getInterfaceOwner() { return _handler->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _handler->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _handler->componentRetain(); }
-	void componentRelease() { _handler->componentRelease(); }
+	co::IInterface* getInterfaceType() { return co::typeOf<]], t.cppName, [[>::get(); }
+	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
+	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
+	void componentRetain() { _provider->componentRetain(); }
+	void componentRelease() { _provider->componentRelease(); }
 
 ]] )
 
@@ -104,11 +104,11 @@ public:
 			writer( "\t// ", itf.fullName, " Methods:\n\n" )
 
 			-- Attribute Accessors
-			for i, a in ipairs( itf.memberAttributes ) do
+			for i, a in ipairs( itf.fields ) do
 				local inputType = itf.formatInput( a.type )
 				writer( "\t", inputType, " ", itf.formatAccessor( "get", a.name ), "()\n", [[
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<]], itf.cppName, [[>( ]], i - 1, [[ ) );
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<]], itf.cppName, [[>( ]], i - 1, [[ ) );
         return res.get< ]], inputType, [[ >();
 	}
 
@@ -118,7 +118,7 @@ public:
 	{
 		co::Any arg;
 		arg.set< ]], inputType, [[ >( ]], a.name, [[_ );
-		_handler->handleSetAttribute( _cookie, getAttribInfo<]], itf.cppName, [[>( ]], i - 1, [[ ), arg );
+		_provider->handleSetAttribute( _cookie, getAttribInfo<]], itf.cppName, [[>( ]], i - 1, [[ ), arg );
 	}
 
 ]] )
@@ -126,7 +126,7 @@ public:
 			end
 
 			-- Methods
-			for i, m in ipairs( itf.memberMethods ) do
+			for i, m in ipairs( itf.methods ) do
 				local formattedReturnType = itf.formatInput( m.returnType )
 				writer( "\t", formattedReturnType, " ", m.name, "(" )
 				local params = m.parameters
@@ -145,15 +145,15 @@ public:
 						local paramType = ( p.isOut and itf.formatOutput or itf.formatInput )( p.type )
 						writer( "\t\targs[", i - 1, "].set< ", paramType, " >( ", p.name, "_ );\n" )
 					end
-					writer( "\t\tco::ArrayRange<co::Any const> range( args, ", #params, " );\n" )
+					writer( "\t\tco::Range<co::Any const> range( args, ", #params, " );\n" )
 				else
-					writer( "\t\tco::ArrayRange<co::Any const> range;\n" )
+					writer( "\t\tco::Range<co::Any const> range;\n" )
 				end
 				writer( "\t\t" )
 				if m.returnType then
 					writer( "const co::Any& res = " )
 				end
-				writer( "_handler->handleMethodInvocation( _cookie, getMethodInfo<", itf.cppName, ">( ", i - 1, " ), range );\n" )
+				writer( "_provider->handleMethodInvocation( _cookie, getMethodInfo<", itf.cppName, ">( ", i - 1, " ), range );\n" )
 				if m.returnType then
 					writer( "\t\treturn res.get< ", formattedReturnType, " >();\n" )
 				end
@@ -162,12 +162,12 @@ public:
 		end
 
 		for i, ancestor in ipairs( t.interfaceAncestors ) do
-			if ancestor.fullName ~= 'co.Interface' then
+			if ancestor.fullName ~= 'co.IService' then
 				generateProxyMethodsFor( ancestor )
 			end
 		end
 
-		if t.fullName ~= 'co.Interface' then
+		if t.fullName ~= 'co.IService' then
 			generateProxyMethodsFor( t )
 		end
 
@@ -196,19 +196,19 @@ public:
 		writer( [[
 protected:
 	template<typename T>
-	co::IAttributeInfo* getAttribInfo( co::uint32 index )
+	co::IField* getAttribInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberAttributes()[index];
+		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethodInfo* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethodInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberMethods()[index];
+		return co::typeOf<T>::get()->getMethods()[index];
 	}
 
 private:
-	co::IDynamicProxyHandler* _handler;
+	co::IDynamicServiceProvider* _provider;
 	co::uint32 _cookie;
 };
 
@@ -216,10 +216,10 @@ private:
 
 	end
 
-	--- End of Interface Proxy ---
+	--- End of Dynamic Service Proxy ---
 
 	writer( [[
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class ]], t.name, [[_Reflector : public co::ReflectorBase
 {
@@ -253,9 +253,9 @@ public:
 		return __]], t.name, [[_getSize();
 	}
 
-	co::IComponent* newInstance()
+	co::IObject* newInstance()
 	{
-		co::IComponent* component = __]], t.name, [[_newInstance();
+		co::IObject* component = __]], t.name, [[_newInstance();
 		assert( component->getComponentType()->getFullName() == "]], t.fullName, [[" );
 		return component;
 	}
@@ -294,10 +294,10 @@ public:
 	elseif t.kind == 'TK_INTERFACE' then
 		writer( [[
 
-	co::Interface* newProxy( co::IDynamicProxyHandler* handler )
+	co::IService* newProxy( co::IDynamicServiceProvider* provider )
 	{
-		checValidProxyHandler( handler );
-		return co::disambiguate<co::Interface, ]], t.cppName, [[>( new ]], c.moduleNS, [[::]], t.name, [[_Proxy( handler ) );
+		checkValidDynamicProvider( provider );
+		return co::disambiguate<co::IService, ]], t.cppName, [[>( new ]], c.moduleNS, [[::]], t.name, [[_Proxy( provider ) );
 	}
 ]] )
 	end
@@ -306,13 +306,13 @@ public:
 
 		writer( [[
 
-	void getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value )
+	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
 	{
 		]], t.cppName, [[* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
 ]] )
-		for i, a in ipairs( t.memberAttributes ) do
+		for i, a in ipairs( t.fields ) do
 			local inputType = t.formatInput( a.type )
 			local optionalGet = ( a.type.kind == 'TK_INTERFACE' and ".get()" or "" )
 			writer( "\t\tcase ", a.index, ":\t\tvalue.set< ", inputType, " >( p->", a.name, optionalGet, " ); break;\n" )
@@ -323,14 +323,14 @@ public:
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value )
+	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
 	{
 		]], t.cppName, [[* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
 ]] )
 
-		for i, a in ipairs( t.memberAttributes ) do
+		for i, a in ipairs( t.fields ) do
 			if a.type.kind == 'TK_ARRAY' then
 				writer( "\t\tcase ", a.index, ":\t\tvalue.get< ", t.formatInput( a.type ), " >().assignTo( p->", a.name, " ); break;\n" )
 			else
@@ -348,14 +348,14 @@ public:
 
 		local callPrefix = ( t.kind == 'TK_NATIVECLASS' and t.cppName .. "_Adapter::" or "p->" )
 
-		writer( "\n\tvoid getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value )\n\t{\n" )
+		writer( "\n\tvoid getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )\n\t{\n" )
 
-		if #t.memberAttributes > 0 then
+		if #t.fields > 0 then
 			writer( "\t\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "& r" or "* p" ), [[ = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
 ]] )
-			for i, a in ipairs( t.memberAttributes ) do
+			for i, a in ipairs( t.fields ) do
 				writer( "\t\tcase ", a.index, ":\t\tvalue.set< ", t.formatInput( a.type ), " >( ", callPrefix,
 					t.formatAccessor( "get", a.name ), "(", ( t.kind == 'TK_NATIVECLASS' and " r " or "" ), ") ); break;\n" )
 			end
@@ -375,15 +375,15 @@ public:
 		writer [[
 	}
 
-	void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value )
+	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
 	{
 ]]
-		if #t.memberAttributes > 0 then
+		if #t.fields > 0 then
 			writer( "\t\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "& r" or "* p" ), [[ = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
 ]] )
-			for i, a in ipairs( t.memberAttributes ) do
+			for i, a in ipairs( t.fields ) do
 				if a.isReadOnly then
 					writer( "\t\tcase ", a.index, ":\t\traiseAttributeIsReadOnly( ai ); break;\n" )
 				else
@@ -409,10 +409,10 @@ public:
 		writer [[
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
+	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
 	{
 ]]
-		if #t.memberMethods > 0 then
+		if #t.methods > 0 then
 			writer( "\t\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "& r" or "* p" ), [[ = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
 		int argIndex = -1;
@@ -421,7 +421,7 @@ public:
 			switch( mi->getIndex() )
 			{
 ]] )
-			for i, m in ipairs( t.memberMethods ) do
+			for i, m in ipairs( t.methods ) do
 				writer( "\t\t\tcase ", m.index, ":\n\t\t\t\t{\n" )
 				for i, p in ipairs( m.parameters ) do
 					local paramType = ( p.isOut and t.formatOutput or t.formatInput )( p.type )
@@ -485,10 +485,10 @@ public:
 	end
 
 	if t.kind ~= 'TK_COMPONENT' then
-		if t.memberAttributes then
+		if t.fields then
 			writer( "\nprivate:\n" )
 			writer( "\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "&" or "*" ),
-				[[ checkInstance( const co::Any& any, co::IMemberInfo* member )
+				[[ checkInstance( const co::Any& any, co::IMember* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
@@ -509,7 +509,7 @@ public:
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid ]], t.cppName, [[*, but got " << any );
 
 		// make sure that 'member' belongs to this type
-		co::ICompoundType* owner = member->getOwner();
+		co::ICompositeType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to ]], t.fullName, [[" );
@@ -530,9 +530,9 @@ public:
 	writer( [[
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __create]], t.name, [[IReflector()
+co::IReflector* __create]], t.name, [[Reflector()
 {
     return new ]], t.name, [[_Reflector;
 }

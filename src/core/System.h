@@ -31,7 +31,7 @@ public:
 	ITypeManager* getTypes();
 	IModuleManager* getModules();
 	IServiceManager* getServices();
-	void setupBase( ArrayRange<std::string const> requiredModules );
+	void setupBase( Range<std::string const> requiredModules );
 	void setupPresentation();
 	void tearDown();
 

@@ -14,10 +14,10 @@ namespace co {
 
 // Forward Decls:
 class TypeImpl;
-class IAttributeInfo;
-class IInterfaceInfo;
-class IInterfaceType;
-class MethodInfo;
+class IField;
+class IPort;
+class IInterface;
+class Method;
 
 /*!
 	Implements co.ITypeBuilder.
@@ -36,12 +36,12 @@ public:
 
 	/*!
 		Internal method. Destroys and removes all references to the type created by this builder.
-		This only works if the type was not committed, and is used in ITypeCreationTransaction::rollback().
+		This only works if the type was not committed, and is used in ITypeTransaction::rollback().
 	 */
 	void destroyType();
 
 	//! Template method: tries to add a method definition (called from IMethodBuilder).
-	virtual void addMethod( MethodInfo* methodInfo );
+	virtual void addMethod( Method* methodInfo );
 
 	// ITypeBuilder methods:
 	INamespace* getNamespace();
@@ -50,7 +50,7 @@ public:
 	void defineIdentifier( const std::string& name );
 	void defineAttribute( const std::string& name, IType* type, bool isReadOnly );
 	void defineSuperType( IType* superType );
-	void defineInterface( const std::string& name, IInterfaceType* interface, bool isFacet );
+	void defineInterface( const std::string& name, IInterface* interface, bool isFacet );
 	IMethodBuilder* defineMethod( const std::string& name );
 	void defineNativeClass( const std::string& nativeHeaderFile, const std::string& nativeName );
 	IType* createType();
@@ -67,7 +67,7 @@ protected:
 	/*!
 		Template method that guarantees the type to be construction by this builder is allocated.
 		Returns true if the type was freshly allocated, or false if it was pre-allocated elsewhere
-		(currently only 'co.Interface' is pre-allocated).
+		(currently only 'co.IService' is pre-allocated).
 	 */
 	virtual bool allocateType() = 0;
 

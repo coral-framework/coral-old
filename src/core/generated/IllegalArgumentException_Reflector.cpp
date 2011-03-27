@@ -9,7 +9,7 @@
 
 namespace co {
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class IllegalArgumentException_Reflector : public co::ReflectorBase
 {
@@ -40,9 +40,9 @@ public:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createIllegalArgumentExceptionIReflector()
+co::IReflector* __createIllegalArgumentExceptionReflector()
 {
     return new IllegalArgumentException_Reflector;
 }

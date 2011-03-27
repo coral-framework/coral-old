@@ -32,13 +32,13 @@ public:
 	const std::string& getName();
 	const std::string& getFullName();
 	INamespace* getParentNamespace();
-	ArrayRange<IType* const> getTypes();
-	ArrayRange<INamespace* const> getChildNamespaces();
+	Range<IType* const> getTypes();
+	Range<INamespace* const> getChildNamespaces();
 	IModule* getModule();
 	IType* getType( const std::string& name );
 	INamespace* getChildNamespace( const std::string& name );
 	ITypeBuilder* defineType( const std::string& name, TypeKind typeKind,
-									ITypeCreationTransaction* transaction );
+									ITypeTransaction* transaction );
 	INamespace* defineChildNamespace( const std::string& name );
 
 private:

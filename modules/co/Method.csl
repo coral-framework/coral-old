@@ -1,0 +1,7 @@
+/*
+	Implements co.IMethod.
+ */
+component Method
+{
+	provides IMethod methodInfo;
+};

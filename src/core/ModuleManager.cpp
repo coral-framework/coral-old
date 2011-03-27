@@ -69,12 +69,12 @@ void ModuleManager::updateModules( ModuleState state )
 	}
 }
 
-ArrayRange<IModule* const> ModuleManager::getModules()
+Range<IModule* const> ModuleManager::getModules()
 {
 	return _modules;
 }
 
-ArrayRange<IModulePartLoader* const> ModuleManager::getLoaders()
+Range<IModulePartLoader* const> ModuleManager::getLoaders()
 {
 	return _loaders;
 }
@@ -234,7 +234,7 @@ void ModuleManager::updateModule( IModule* module, ModuleState toState )
 void ModuleManager::verifyModuleIntegrity( IModule* module )
 {
 	// all module types must have their reflectors installed
-	ArrayRange<IType* const> types = module->getNamespace()->getTypes();
+	Range<IType* const> types = module->getNamespace()->getTypes();
 	try
 	{
 		for( ; types; types.popFirst() )

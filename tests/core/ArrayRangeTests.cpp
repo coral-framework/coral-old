@@ -3,7 +3,7 @@
  * See Copyright Notice in Coral.h
  */
 
-#include <co/ArrayRange.h>
+#include <co/Range.h>
 #include <gtest/gtest.h>
 
 TEST( ArrayRangeTests, staticIntArray )
@@ -11,7 +11,7 @@ TEST( ArrayRangeTests, staticIntArray )
 	int array[] = { 3, 5, 8, 13, 20 };
 
 	int i = 0;
-	for( co::ArrayRange<int> r( array, CORAL_ARRAY_LENGTH( array ) ); r; r.popFirst() )
+	for( co::Range<int> r( array, CORAL_ARRAY_LENGTH( array ) ); r; r.popFirst() )
 	{
 		EXPECT_EQ( array[i++], r.getFirst() );
 	}
@@ -21,7 +21,7 @@ TEST( ArrayRangeTests, staticConstIntArray )
 {
 	const int array[] = { 3, 5, 8, 13, 20 };
 	
-	co::ArrayRange<const int> r( array, CORAL_ARRAY_LENGTH( array ) );
+	co::Range<const int> r( array, CORAL_ARRAY_LENGTH( array ) );
 	EXPECT_EQ( r.getSize(), 5 );
 	
 	int i = 0;
@@ -40,7 +40,7 @@ TEST( ArrayRangeTests, intStdVector )
 	v.push_back( 40 );
 
 	int i = 0;
-	for( co::ArrayRange<int> r( v ); r; r.popFirst() )
+	for( co::Range<int> r( v ); r; r.popFirst() )
 	{
 		EXPECT_EQ( v[i++], r.getFirst() );
 	}
@@ -57,7 +57,7 @@ TEST( ArrayRangeTests, constIntStdVector )
 	const std::vector<int> cv( v );
 	
 	int i = 0;
-	for( co::ArrayRange<const int> r( cv ); r; r.popFirst() )
+	for( co::Range<const int> r( cv ); r; r.popFirst() )
 	{
 		EXPECT_EQ( v[i++], r.getFirst() );
 	}
@@ -70,7 +70,7 @@ TEST( ArrayRangeTests, stringStdVector )
 	strList.push_back( "Dois" );
 	strList.push_back( "Tres" );
 
-	co::ArrayRange<std::string> r( strList );
+	co::Range<std::string> r( strList );
 
 	EXPECT_EQ( r.getLast(), "Tres" );
 	r.popLast();

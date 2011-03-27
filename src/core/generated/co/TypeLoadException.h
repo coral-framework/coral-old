@@ -28,7 +28,7 @@ public:
 namespace co {
 template<> struct kindOf<co::TypeLoadException> : public kindOfBase<TK_EXCEPTION> {};
 template<> struct nameOf<co::TypeLoadException> { static const char* get() { return "co.TypeLoadException"; } };
-template<> struct typeOf<co::TypeLoadException> : public typeOfBase<co::TypeLoadException, IExceptionType> {};
+template<> struct typeOf<co::TypeLoadException> : public typeOfBase<co::TypeLoadException, IException> {};
 } // namespace co
 
 #endif // _CO_TYPELOADEXCEPTION_H_

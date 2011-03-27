@@ -24,9 +24,9 @@ class ]], t.name, [[_Adapter
 public:
 ]] )
 
-	if #t.memberAttributes > 0 then
+	if #t.fields > 0 then
 		writer( "\t// ------ Attributes ------\n" )
-		for i, a in ipairs( t.memberAttributes ) do
+		for i, a in ipairs( t.fields ) do
 			writer( "\n\tstatic ", t.formatInput( a.type ), " ", t.formatAccessor( "get", a.name ), "( ", t.cppName, "& instance );\n" )
 			if not a.isReadOnly then
 				writer( "\tstatic void ", t.formatAccessor( "set", a.name ), "( ", t.cppName,
@@ -35,9 +35,9 @@ public:
 		end
 	end
 
-	if #t.memberMethods > 0 then
+	if #t.methods > 0 then
 		writer( "\n\t// ------ Methods ------\n" )
-		for i, m in ipairs( t.memberMethods ) do
+		for i, m in ipairs( t.methods ) do
 			writer( "\n\tstatic ", t.formatInput( m.returnType ), " ", m.name, "( ", t.cppName, "& instance" )
 			for i, p in ipairs( m.parameters ) do
 				writer( ", ", ( p.isOut and t.formatOutput or t.formatInput)( p.type ), " ", p.name )

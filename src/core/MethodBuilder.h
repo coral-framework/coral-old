@@ -13,10 +13,10 @@
 namespace co {
 
 class IType;
-class IMethodInfo;
+class IMethod;
 class ITypeBuilder;
-class IExceptionType;
-class IParameterInfo;
+class IException;
+class IParameter;
 
 /*!
 	Implements co.IMethodBuilder.
@@ -35,17 +35,17 @@ public:
 	const std::string& getMethodName();
 	void defineReturnType( IType* type );
 	void defineParameter( const std::string& name, IType* type, bool input, bool output );
-	void defineException( IExceptionType* exception );
+	void defineException( IException* exception );
 	void createMethod();
 
 private:
 	std::string _name;
 	RefPtr<ITypeBuilder> _typeBuilder;
-	RefPtr<IMethodInfo> _createdMethodInfo;
+	RefPtr<IMethod> _createdMethodInfo;
 
 	IType* _returnType;
-	RefVector<IParameterInfo> _parameters;
-	std::vector<IExceptionType*> _expectedExceptions;
+	RefVector<IParameter> _parameters;
+	std::vector<IException*> _expectedExceptions;
 };
 
 } // namespace co

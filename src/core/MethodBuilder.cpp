@@ -4,12 +4,12 @@
  */
 
 #include "MethodBuilder.h"
-#include "MethodInfo.h"
+#include "Method.h"
 #include "TypeBuilder.h"
-#include "ParameterInfo.h"
+#include "Parameter.h"
 #include <co/Coral.h>
 #include <co/ISystem.h>
-#include <co/ArrayRange.h>
+#include <co/Range.h>
 #include <co/ITypeManager.h>
 #include <co/IllegalNameException.h>
 #include <co/MissingInputException.h>
@@ -64,7 +64,7 @@ void MethodBuilder::defineParameter( const std::string& name, IType* type, bool 
 	if( !LexicalUtils::isValidIdentifier( name ) )
 		CORAL_THROW( IllegalNameException, "parameter name '" << name << "' is not a valid identifier" );
 
-	for( ArrayRange<IParameterInfo* const> r( _parameters ); r; r.popFirst() )
+	for( Range<IParameter* const> r( _parameters ); r; r.popFirst() )
 		if( r.getFirst()->getName() == name )
 			CORAL_THROW( IllegalNameException, "parameter '" << name << "' defined twice in method '" << _name << "()'" );
 
@@ -79,13 +79,13 @@ void MethodBuilder::defineParameter( const std::string& name, IType* type, bool 
 	if( !input && !output )
 		CORAL_THROW( IllegalArgumentException, "parameter is neither input nor output" );
 
-	ParameterInfo* paramInfo = new ParameterInfo();
+	Parameter* paramInfo = new Parameter();
 	paramInfo->init( name, type, input, output );
 
 	_parameters.push_back( paramInfo );
 }
 
-void MethodBuilder::defineException( IExceptionType* exception )
+void MethodBuilder::defineException( IException* exception )
 {
 	if( !exception )
 		CORAL_THROW( IllegalArgumentException, "the passed exception is invalid" );
@@ -97,7 +97,7 @@ void MethodBuilder::createMethod()
 {
 	assert( _typeBuilder.isValid() );
 
-	MethodInfo* mic = new MethodInfo;
+	Method* mic = new Method;
 	_createdMethodInfo = mic;
 
 	mic->setName( _name );

@@ -9,7 +9,7 @@
 #include "Namespace.h"
 #include "ArrayType.h"
 #include "TypeLoader.h"
-#include "InterfaceType.h"
+#include "Interface.h"
 #include "tools/StringTokenizer.h"
 #include <co/CSLError.h>
 #include <co/TypeLoadException.h>
@@ -141,7 +141,7 @@ IType* TypeManager::getType( const std::string& typeName )
 	return loadTypeOrThrow( typeName );
 }
 
-IArrayType* TypeManager::getArrayOf( IType* elementType )
+IArray* TypeManager::getArrayOf( IType* elementType )
 {
 	if( !elementType )
 		CORAL_THROW( IllegalArgumentException, "null element type" );
@@ -160,8 +160,8 @@ IArrayType* TypeManager::getArrayOf( IType* elementType )
 	IType* existingArrayType = ns->getType( arrayName );
 	if( existingArrayType )
 	{
-		assert( dynamic_cast<IArrayType*>( existingArrayType ) );
-		return static_cast<IArrayType*>( existingArrayType );
+		assert( dynamic_cast<IArray*>( existingArrayType ) );
+		return static_cast<IArray*>( existingArrayType );
 	}
 
 	// otherwise, try to create it
@@ -236,17 +236,17 @@ void TypeManager::defineBuiltInTypes()
 	for( unsigned int i = TK_ANY; i <= TK_STRING; ++i )
 		definePrimitiveType( rootNS, TK_STRINGS[i], static_cast<TypeKind>( i ) );
 
-	// pre-load the 'co.Interface' type and all its dependencies
+	// pre-load the 'co.IService' type and all its dependencies
 	INamespace* coNS = rootNS->defineChildNamespace( "co" );
 	assert( dynamic_cast<Namespace*>( coNS ) );
 	Namespace* castNS = static_cast<Namespace*>( coNS );
 
-	RefPtr<InterfaceType> coInterfaceType = new InterfaceType;
-	coInterfaceType->setType( coNS, "Interface", TK_INTERFACE );
+	RefPtr<Interface> serviceType = new Interface;
+	serviceType->setType( coNS, "IService", TK_INTERFACE );
 
-	castNS->addType( coInterfaceType.get() );
+	castNS->addType( serviceType.get() );
 
-	loadTypeOrThrow( "co.Interface" );
+	loadTypeOrThrow( "co.IService" );
 }
 
 const std::string& TypeManager::getDocumentation( const std::string& typeOrMemberName )

@@ -4,10 +4,10 @@
  */
 
 #include <co/RefVector.h>
-#include <co/Interface.h>
+#include <co/IService.h>
 #include <gtest/gtest.h>
 
-class PseudoInterface : public co::Interface
+class PseudoInterface : public co::IService
 {
 public:
 	PseudoInterface( const char* name = "",  bool* setToTrueWhenDestroyed = 0 ) :
@@ -22,8 +22,8 @@ public:
 	
 	inline co::int32 getRefCount() const { return _refCount; }
 
-	virtual co::IInterfaceType* getInterfaceType() { return 0; }
-	virtual co::IComponent* getInterfaceOwner() { return 0; }
+	virtual co::IInterface* getInterfaceType() { return 0; }
+	virtual co::IObject* getInterfaceOwner() { return 0; }
 	virtual const std::string& getInterfaceName() { return _name; }
 	virtual void componentRetain() { ++_refCount; }
 	virtual void componentRelease() { if( --_refCount <= 0 ) delete this; }

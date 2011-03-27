@@ -9,7 +9,7 @@
 
 namespace co {
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class NoSuchInterfaceException_Reflector : public co::ReflectorBase
 {
@@ -40,9 +40,9 @@ public:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createNoSuchInterfaceExceptionIReflector()
+co::IReflector* __createNoSuchInterfaceExceptionReflector()
 {
     return new NoSuchInterfaceException_Reflector;
 }

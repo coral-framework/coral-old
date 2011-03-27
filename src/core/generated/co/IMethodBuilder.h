@@ -7,11 +7,11 @@
 #define _CO_IMETHODBUILDER_H_
 
 #include <co/TypeTraits.h>
-#include <co/Interface.h>
+#include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
-	class IExceptionType;
+	class IException;
 	class IType;
 	class ITypeBuilder;
 } // namespace co
@@ -20,7 +20,7 @@ namespace co {
 // co.IMethodBuilder Mapping:
 namespace co {
 
-class IMethodBuilder : public co::Interface
+class IMethodBuilder : public co::IService
 {
 public:
 	virtual ~IMethodBuilder() {;}
@@ -31,7 +31,7 @@ public:
 
 	virtual void createMethod() = 0;
 
-	virtual void defineException( co::IExceptionType* exceptionType ) = 0;
+	virtual void defineException( co::IException* exceptionType ) = 0;
 
 	virtual void defineParameter( const std::string& name, co::IType* type, bool input, bool output ) = 0;
 
@@ -43,7 +43,7 @@ public:
 namespace co {
 template<> struct kindOf<co::IMethodBuilder> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IMethodBuilder> { static const char* get() { return "co.IMethodBuilder"; } };
-template<> struct typeOf<co::IMethodBuilder> : public typeOfBase<co::IMethodBuilder, IInterfaceType> {};
+template<> struct typeOf<co::IMethodBuilder> : public typeOfBase<co::IMethodBuilder, IInterface> {};
 } // namespace co
 
 #endif // _CO_IMETHODBUILDER_H_

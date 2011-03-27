@@ -1,0 +1,7 @@
+/*
+	Implements co.IPort.
+ */
+component Port
+{
+	provides IPort port;
+};

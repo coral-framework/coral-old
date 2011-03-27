@@ -22,6 +22,6 @@ enum TypeKind
 	TK_EXCEPTION,		//< Named exception that can be thrown by methods.
 	TK_STRUCT,			//< A set of named fields of various types.
 	TK_NATIVECLASS,		//< Native class type.
-	TK_INTERFACE,		//< Interface type/pointer.
-	TK_COMPONENT		//< Concrete component type.
+	TK_INTERFACE,		//< Interface type.
+	TK_COMPONENT		//< A concrete component type.
 };

@@ -1,0 +1,20 @@
+/*
+	Type representing a Coral interface.
+ */
+interface IInterface : IClassType
+{
+	// List of all ancestors of this interface, including co.IService.
+	readonly attribute IInterface[] interfaceAncestors;
+
+	// List of the interfaces directly inherited by this interface.
+	readonly attribute IInterface[] superInterfaces;
+
+	// List of the interfaces that inherit directly from this interface.
+	readonly attribute IInterface[] subInterfaces;
+
+	// Block of C++ code that was parsed from this interface's CSL file. May be empty.
+	readonly attribute string cppBlock;
+
+	// Returns whether this IInterface descends from (or is equal to) a given IInterface.
+	bool isSubTypeOf( in IInterface itf );
+};

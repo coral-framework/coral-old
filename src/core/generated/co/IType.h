@@ -7,7 +7,7 @@
 #define _CO_ITYPE_H_
 
 #include <co/TypeTraits.h>
-#include <co/Interface.h>
+#include <co/IService.h>
 #include <co/Uuid.h>
 #include <co/TypeKind.h>
 
@@ -21,7 +21,7 @@ namespace co {
 // co.IType Mapping:
 namespace co {
 
-class IType : public co::Interface
+class IType : public co::IService
 {
 public:
 	virtual ~IType() {;}
@@ -48,7 +48,7 @@ public:
 namespace co {
 template<> struct kindOf<co::IType> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IType> { static const char* get() { return "co.IType"; } };
-template<> struct typeOf<co::IType> : public typeOfBase<co::IType, IInterfaceType> {};
+template<> struct typeOf<co::IType> : public typeOfBase<co::IType, IInterface> {};
 } // namespace co
 
 #endif // _CO_ITYPE_H_

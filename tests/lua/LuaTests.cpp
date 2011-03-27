@@ -103,7 +103,7 @@ TEST( LuaTests, array )
 	ASSERT_SUCCESS( "lua.array" );
 }
 
-// --- IComponent Binding Tests --- //
+// --- Component Binding Tests --- //
 
 TEST( LuaTests, componentManipulation )
 {
@@ -136,7 +136,7 @@ TEST( LuaTests, struct )
 	ASSERT_SUCCESS( "lua.struct" );
 }
 
-// --- Lua IComponent Tests --- //
+// --- Lua Component Tests --- //
 
 TEST( LuaTests, component )
 {
@@ -182,7 +182,7 @@ TEST( LuaTests, callFunction )
 	co::int32 numRes;
 	co::Any args[4];
 	co::Any results[6];
-	co::ArrayRange<const co::Any> resRange( results, 6 );
+	co::Range<const co::Any> resRange( results, 6 );
 
 	/*
 		Test calling a function returned by a module.
@@ -198,8 +198,8 @@ TEST( LuaTests, callFunction )
 	results[3].set<co::int32&>( intVec[3] );
 
 	ASSERT_NO_THROW( numRes = luaState->callFunction( "lua.scripts.sum", "",
-									co::ArrayRange<const co::Any>( args, 4 ), resRange ) );
-	
+									co::Range<const co::Any>( args, 4 ), resRange ) );
+
 	ASSERT_EQ( 1, numRes );
 	ASSERT_EQ( 11, intVec[0] );
 
@@ -209,7 +209,7 @@ TEST( LuaTests, callFunction )
 
 	// passthrough() simply returns all of its args.
 	ASSERT_NO_THROW( numRes = luaState->callFunction( "lua.scripts.manyFunctions", "passthrough",
-									co::ArrayRange<const co::Any>( args, 4 ), resRange ) );
+									co::Range<const co::Any>( args, 4 ), resRange ) );
 
 	ASSERT_EQ( 4, numRes );
 	ASSERT_EQ( 1, intVec[0] );
@@ -231,7 +231,7 @@ TEST( LuaTests, callFunction )
 	results[5].set<co::Any&>( any2 );
 
 	ASSERT_NO_THROW( numRes = luaState->callFunction( "lua.scripts.manyFunctions", "constants",
-									co::ArrayRange<const co::Any>(), resRange ) );
+									co::Range<const co::Any>(), resRange ) );
 
 	ASSERT_EQ( 6, numRes );
 	ASSERT_TRUE( !any1.isValid() );
@@ -239,14 +239,14 @@ TEST( LuaTests, callFunction )
 	ASSERT_EQ( false, b2 );
 	ASSERT_EQ( 3.14, d1 );
 	ASSERT_EQ( "hello", str1 );
-	ASSERT_EQ( co::getSystem(), any2.get<co::Interface*>() );
+	ASSERT_EQ( co::getSystem(), any2.get<co::IService*>() );
 
 	// test prunning the results
 	results[0].set<std::string&>( str1 );
 	results[1].set<std::string&>( str2 );
 
 	ASSERT_NO_THROW( numRes = luaState->callFunction( "lua.scripts.manyFunctions", "constants2",
-						 co::ArrayRange<const co::Any>(), co::ArrayRange<const co::Any>( results, 2 ) ) );
+						 co::Range<const co::Any>(), co::Range<const co::Any>( results, 2 ) ) );
 
 	ASSERT_EQ( 5, numRes );
 	ASSERT_EQ( "one", str1 );
@@ -256,7 +256,7 @@ TEST( LuaTests, callFunction )
 TEST( LuaTests, callFunctionErrors )
 {
 	co::RefPtr<lua::IState> luaState = co::getService<lua::IState>();
-	co::ArrayRange<const co::Any> empty;
+	co::Range<const co::Any> empty;
 
 	ASSERT_LUA_EXCEPTION( luaState->callFunction( "lua.scripts.doesNotExist", "nope", empty, empty ),
 							"module 'lua.scripts.doesNotExist' not found" );
@@ -284,8 +284,8 @@ TEST( LuaTests, exceptionTypes )
 	args[0].set<const std::string&>( exceptionType );
 	args[1].set<const std::string&>( message );
 
-	co::ArrayRange<const co::Any> empty;
-	co::ArrayRange<const co::Any> argRange( args, 2 );
+	co::Range<const co::Any> empty;
+	co::Range<const co::Any> argRange( args, 2 );
 
 	exceptionType = "no type given";
 	message = "ignored";

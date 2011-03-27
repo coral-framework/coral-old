@@ -63,7 +63,7 @@ bool IModulePartLoader::locateModuleLibrary( const std::string& moduleName, std:
 	filePath.append( moduleBaseName );
 	filePath.append( ".lua" );
 
-	return co::OS::searchFile2( co::getPaths(), co::ArrayRange<const std::string>( &filePath, 1 ),
+	return co::OS::searchFile2( co::getPaths(), co::Range<const std::string>( &filePath, 1 ),
 									filename ? *filename : filePath );
 }
 

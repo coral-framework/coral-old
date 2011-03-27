@@ -66,7 +66,7 @@ private:
 ]] )
 
 	for i, t in ipairs( c.types ) do
-		writer( "co::IReflector* __create", t.name, "IReflector();\n" )
+		writer( "co::IReflector* __create", t.name, "Reflector();\n" )
 	end
 
 	writer( "\n" )

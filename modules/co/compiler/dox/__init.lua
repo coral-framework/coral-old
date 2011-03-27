@@ -4,6 +4,7 @@ local wordSubstitutions = {
 	["Type"] = "%Type",
 	["Interface"] = "%Interface",
 	["Component"] = "%Component",
+	["Service"] = "%Service",
 }
 
 local function addDoc( writer, compoundName, memberName )
@@ -11,8 +12,7 @@ local function addDoc( writer, compoundName, memberName )
 	if text == "" then
 		writer( "//! Not documented.\n" )
 	else
-		-- filter the text, escaping the words "Interface" and "IComponent" so
-		-- they are not turned into links.
+		-- filter the text, escaping common words that could be turned into links
 		text = text:gsub( "(%p?[%w]+)", wordSubstitutions )
 
 		-- generate a \brief with the following criteria: if the first line contains a dot,
@@ -49,7 +49,7 @@ end
 
 function write.TK_STRUCT( writer, t )
 	writer( "struct ", t.name, "\n{\n//! \\name Fields\n//@{\n" )
-	for i, a in ipairs( t.memberAttributes ) do
+	for i, a in ipairs( t.fields ) do
 		addDoc( writer, t.fullName, a.name )
 		writer( "\t", a.type.docName, " ", a.name, ";\n" )
 	end
@@ -58,12 +58,12 @@ end
 
 local function writeAttribAndMethods( writer, t )
 	writer( "//! \\name Attributes\n//@{\n" )
-	for i, a in ipairs( t.memberAttributes ) do
+	for i, a in ipairs( t.fields ) do
 		addDoc( writer, t.fullName, a.name )
 		writer( "\t", a.isReadOnly and "readonly " or "", "attribute ", a.type.docName, " ", a.name, ";\n" )
 	end
 	writer( "//@}\n//! \\name Methods\n//@{\n" )
-	for i, m in ipairs( t.memberMethods ) do
+	for i, m in ipairs( t.methods ) do
 		addDoc( writer, t.fullName, m.name )
 		local ret = m.returnType
 		writer( "\t", ret and ret.docName or "void", " ", m.name, "(" )
@@ -113,7 +113,7 @@ function write.TK_INTERFACE( writer, t )
 end
 
 function write.TK_COMPONENT( writer, t )
-	writer( "ref class ", t.name, " : co::IComponent\n{\n" )
+	writer( "ref class ", t.name, " : co::IObject\n{\n" )
 	writer( "\t//! \\name Facets\n\t//@{\n\n" )
 	for i, itf in ipairs( t.facets ) do
 		addDoc( writer, t.fullName, itf.name )

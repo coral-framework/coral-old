@@ -7,12 +7,12 @@
 #define _CO_ITYPEBUILDER_H_
 
 #include <co/TypeTraits.h>
-#include <co/Interface.h>
+#include <co/IService.h>
 #include <co/TypeKind.h>
 
 // Forward Declarations:
 namespace co {
-	class IInterfaceType;
+	class IInterface;
 	class IMethodBuilder;
 	class INamespace;
 	class IType;
@@ -22,7 +22,7 @@ namespace co {
 // co.ITypeBuilder Mapping:
 namespace co {
 
-class ITypeBuilder : public co::Interface
+class ITypeBuilder : public co::IService
 {
 public:
 	virtual ~ITypeBuilder() {;}
@@ -39,7 +39,7 @@ public:
 
 	virtual void defineIdentifier( const std::string& name ) = 0;
 
-	virtual void defineInterface( const std::string& name, co::IInterfaceType* interfaceType, bool isFacet ) = 0;
+	virtual void defineInterface( const std::string& name, co::IInterface* interfaceType, bool isFacet ) = 0;
 
 	virtual co::IMethodBuilder* defineMethod( const std::string& name ) = 0;
 
@@ -53,7 +53,7 @@ public:
 namespace co {
 template<> struct kindOf<co::ITypeBuilder> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::ITypeBuilder> { static const char* get() { return "co.ITypeBuilder"; } };
-template<> struct typeOf<co::ITypeBuilder> : public typeOfBase<co::ITypeBuilder, IInterfaceType> {};
+template<> struct typeOf<co::ITypeBuilder> : public typeOfBase<co::ITypeBuilder, IInterface> {};
 } // namespace co
 
 #endif // _CO_ITYPEBUILDER_H_

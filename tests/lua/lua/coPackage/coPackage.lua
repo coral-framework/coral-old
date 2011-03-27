@@ -9,12 +9,12 @@ function M:initialize( module )
 
 	-- test the co.getType() function
 	ASSERT_EQ( co.getType( "bool" ).fullName, "bool" )
-	ASSERT_EQ( co.getType( "co.IArrayType" ).name, "IArrayType" )
+	ASSERT_EQ( co.getType( "co.IArray" ).name, "IArray" )
 	ASSERT_ERROR( function() co.getType( "nonExistingType" ) end, "could not load type 'nonExistingType'" )
 
 	-- test the co.Type table
 	ASSERT_EQ( co.Type "bool", co.getType( "bool" ) )
-	ASSERT_EQ( co.Type["co.IArrayType"], co.getType( "co.IArrayType" ) )
+	ASSERT_EQ( co.Type["co.IArray"], co.getType( "co.IArray" ) )
 	ASSERT_ERROR( function() return co.Type.nonExistingType end, "could not load type 'nonExistingType'" )
 
 	-- test the co.new() function

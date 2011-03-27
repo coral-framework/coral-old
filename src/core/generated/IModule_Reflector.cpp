@@ -4,11 +4,11 @@
  */
 
 #include <co/IModule.h>
-#include <co/IDynamicProxyHandler.h>
+#include <co/IDynamicServiceProvider.h>
 #include <co/INamespace.h>
 #include <co/IModulePart.h>
-#include <co/IMethodInfo.h>
-#include <co/IAttributeInfo.h>
+#include <co/IMethod.h>
+#include <co/IField.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -18,14 +18,14 @@
 
 namespace co {
 
-// ------ Proxy Interface ------ //
+// ------ Dynamic Service Proxy ------ //
 
 class IModule_Proxy : public co::IModule
 {
 public:
-	IModule_Proxy( co::IDynamicProxyHandler* handler ) : _handler( handler )
+	IModule_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _handler->registerProxyInterface( co::disambiguate<co::Interface, co::IModule>( this ) );
+		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, co::IModule>( this ) );
 	}
 
 	virtual ~IModule_Proxy()
@@ -33,31 +33,31 @@ public:
 		// empty
 	}
 
-	// co::Interface Methods:
+	// co::IService Methods:
 
-	co::IInterfaceType* getInterfaceType() { return co::typeOf<co::IModule>::get(); }
-	co::IComponent* getInterfaceOwner() { return _handler->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _handler->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _handler->componentRetain(); }
-	void componentRelease() { _handler->componentRelease(); }
+	co::IInterface* getInterfaceType() { return co::typeOf<co::IModule>::get(); }
+	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
+	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
+	void componentRetain() { _provider->componentRetain(); }
+	void componentRelease() { _provider->componentRelease(); }
 
 	// co.IModule Methods:
 
 	co::INamespace* getNamespace()
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::IModule>( 0 ) );
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IModule>( 0 ) );
         return res.get< co::INamespace* >();
 	}
 
-	co::ArrayRange<co::IModulePart* const> getParts()
+	co::Range<co::IModulePart* const> getParts()
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::IModule>( 1 ) );
-        return res.get< co::ArrayRange<co::IModulePart* const> >();
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IModule>( 1 ) );
+        return res.get< co::Range<co::IModulePart* const> >();
 	}
 
 	co::int32 getRank()
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::IModule>( 2 ) );
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IModule>( 2 ) );
         return res.get< co::int32 >();
 	}
 
@@ -65,70 +65,70 @@ public:
 	{
 		co::Any arg;
 		arg.set< co::int32 >( rank_ );
-		_handler->handleSetAttribute( _cookie, getAttribInfo<co::IModule>( 2 ), arg );
+		_provider->handleSetAttribute( _cookie, getAttribInfo<co::IModule>( 2 ), arg );
 	}
 
 	co::ModuleState getState()
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::IModule>( 3 ) );
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IModule>( 3 ) );
         return res.get< co::ModuleState >();
 	}
 
 	void abort()
 	{
-		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IModule>( 0 ), range );
+		co::Range<co::Any const> range;
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IModule>( 0 ), range );
 	}
 
 	void disintegrate()
 	{
-		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IModule>( 1 ), range );
+		co::Range<co::Any const> range;
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IModule>( 1 ), range );
 	}
 
 	void dispose()
 	{
-		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IModule>( 2 ), range );
+		co::Range<co::Any const> range;
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IModule>( 2 ), range );
 	}
 
 	void initialize()
 	{
-		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IModule>( 3 ), range );
+		co::Range<co::Any const> range;
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IModule>( 3 ), range );
 	}
 
 	void integrate()
 	{
-		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IModule>( 4 ), range );
+		co::Range<co::Any const> range;
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IModule>( 4 ), range );
 	}
 
 	void integratePresentation()
 	{
-		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IModule>( 5 ), range );
+		co::Range<co::Any const> range;
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IModule>( 5 ), range );
 	}
 
 protected:
 	template<typename T>
-	co::IAttributeInfo* getAttribInfo( co::uint32 index )
+	co::IField* getAttribInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberAttributes()[index];
+		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethodInfo* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethodInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberMethods()[index];
+		return co::typeOf<T>::get()->getMethods()[index];
 	}
 
 private:
-	co::IDynamicProxyHandler* _handler;
+	co::IDynamicServiceProvider* _provider;
 	co::uint32 _cookie;
 };
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class IModule_Reflector : public co::ReflectorBase
 {
@@ -153,26 +153,26 @@ public:
 		return sizeof(co::IModule);
 	}
 
-	co::Interface* newProxy( co::IDynamicProxyHandler* handler )
+	co::IService* newProxy( co::IDynamicServiceProvider* provider )
 	{
-		checValidProxyHandler( handler );
-		return co::disambiguate<co::Interface, co::IModule>( new co::IModule_Proxy( handler ) );
+		checkValidDynamicProvider( provider );
+		return co::disambiguate<co::IService, co::IModule>( new co::IModule_Proxy( provider ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value )
+	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
 	{
 		co::IModule* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
 		case 0:		value.set< co::INamespace* >( p->getNamespace() ); break;
-		case 1:		value.set< co::ArrayRange<co::IModulePart* const> >( p->getParts() ); break;
+		case 1:		value.set< co::Range<co::IModulePart* const> >( p->getParts() ); break;
 		case 2:		value.set< co::int32 >( p->getRank() ); break;
 		case 3:		value.set< co::ModuleState >( p->getState() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value )
+	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
 	{
 		co::IModule* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
@@ -187,7 +187,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
+	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
 	{
 		co::IModule* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -244,20 +244,20 @@ public:
 	}
 
 private:
-	co::IModule* checkInstance( const co::Any& any, co::IMemberInfo* member )
+	co::IModule* checkInstance( const co::Any& any, co::IMember* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
 
 		// make sure that 'any' is an instance of this type
-		co::IInterfaceType* myType = co::typeOf<co::IModule>::get();
+		co::IInterface* myType = co::typeOf<co::IModule>::get();
 
 		co::IModule* res;
 		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::IModule*>( any.getState().data.itf ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::IModule*, but got " << any );
 
 		// make sure that 'member' belongs to this type
-		co::ICompoundType* owner = member->getOwner();
+		co::ICompositeType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to co.IModule" );
@@ -266,9 +266,9 @@ private:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createIModuleIReflector()
+co::IReflector* __createIModuleReflector()
 {
     return new IModule_Reflector;
 }

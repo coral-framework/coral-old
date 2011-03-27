@@ -9,7 +9,7 @@
 
 namespace co {
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class TypeLoadException_Reflector : public co::ReflectorBase
 {
@@ -40,9 +40,9 @@ public:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createTypeLoadExceptionIReflector()
+co::IReflector* __createTypeLoadExceptionReflector()
 {
     return new TypeLoadException_Reflector;
 }

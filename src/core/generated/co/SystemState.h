@@ -28,7 +28,7 @@ enum SystemState
 namespace co {
 template<> struct kindOf<co::SystemState> : public kindOfBase<TK_ENUM> {};
 template<> struct nameOf<co::SystemState> { static const char* get() { return "co.SystemState"; } };
-template<> struct typeOf<co::SystemState> : public typeOfBase<co::SystemState, IEnumType> {};
+template<> struct typeOf<co::SystemState> : public typeOfBase<co::SystemState, IEnum> {};
 } // namespace co
 
 #endif // _CO_SYSTEMSTATE_H_

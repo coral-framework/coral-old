@@ -69,7 +69,7 @@ INamespace* Module::getNamespace()
 	return _namespace;
 }
 
-ArrayRange<IModulePart* const> Module::getParts()
+Range<IModulePart* const> Module::getParts()
 {
 	return _parts;
 }
@@ -89,7 +89,7 @@ void Module::initialize()
 	if( _state != ModuleState_None )
 		throw LifeCycleException( "the module's state is not ModuleState_None" );
 
-	for( ArrayRange<IModulePart*> ar( _parts ); ar; ar.popFirst() )
+	for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->initialize( this );
 
 	_state = ModuleState_Initialized;
@@ -100,7 +100,7 @@ void Module::integrate()
 	if( _state != ModuleState_Initialized )
 		throw LifeCycleException( "the module's state is not ModuleState_Initialized" );
 
-	for( ArrayRange<IModulePart*> ar( _parts ); ar; ar.popFirst() )
+	for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->integrate( this );
 
 	_state = ModuleState_Integrated;
@@ -111,7 +111,7 @@ void Module::integratePresentation()
 	if( _state != ModuleState_Integrated )
 		throw LifeCycleException( "the module's state is not ModuleState_Integrated" );
 
-	for( ArrayRange<IModulePart*> ar( _parts ); ar; ar.popFirst() )
+	for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->integratePresentation( this );
 
 	_state = ModuleState_PresentationIntegrated;
@@ -122,7 +122,7 @@ void Module::disintegrate()
 	if( _state != ModuleState_PresentationIntegrated )
 		throw LifeCycleException( "the module's state is not ModuleState_PresentationIntegrated" );
 
-	for( ArrayRange<IModulePart*> ar( _parts ); ar; ar.popFirst() )
+	for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->disintegrate( this );
 
 	_state = ModuleState_Disintegrated;
@@ -133,7 +133,7 @@ void Module::dispose()
 	if( _state != ModuleState_Disintegrated )
 		throw LifeCycleException( "the module's state is not ModuleState_Disintegrated" );
 
-	for( ArrayRange<IModulePart*> ar( _parts ); ar; ar.popFirst() )
+	for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->dispose( this );
 
 	_parts.clear();
@@ -150,7 +150,7 @@ void Module::abort()
 	// just ignore exceptions raised by ModuleParts from this point on
 	for( int i = 0; i < 2; ++i ) // this loop is just to avoid duplicating the 'catch' code
 	{
-		for( ArrayRange<IModulePart*> ar( _parts ); ar; ar.popFirst() )
+		for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
 		{
 			try
 			{

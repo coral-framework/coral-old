@@ -54,7 +54,7 @@ co::int32 BasicReflector::getSize()
 	return s_typeSizes[kind];
 }
 
-co::IComponent* BasicReflector::newInstance()
+co::IObject* BasicReflector::newInstance()
 {
 	if( _type->getKind() == co::TK_COMPONENT )
 		throw co::NotSupportedException( "cannot instantiate an internal component" );

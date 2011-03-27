@@ -10,11 +10,11 @@
 #include <co/RefPtr.h>
 #include <co/ISystem.h>
 #include <co/INamespace.h>
-#include <co/IMethodInfo.h>
+#include <co/IMethod.h>
 #include <co/ITypeBuilder.h>
-#include <co/IInterfaceType.h>
+#include <co/IInterface.h>
 #include <co/IMethodBuilder.h>
-#include <co/IParameterInfo.h>
+#include <co/IParameter.h>
 #include <co/IllegalNameException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -24,13 +24,13 @@
 
 TEST( MethodBuilderTests, theTest )
 {
-	co::RefPtr<co::ITypeCreationTransaction> tct = createTypeCreationTransaction();
+	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
 	co::RefPtr<co::ITypeBuilder> typeBuilder = TestHelper::createBuilder( co::TK_INTERFACE, "MethodBuilderbuilderTest.NewInterface", tct.get() );
 
 	co::IType* stringType = 	TestHelper::type( "string" );
 
 	co::RefPtr<co::ITypeBuilder> exbuilder = TestHelper::createBuilder( co::TK_EXCEPTION, "MethodBuilderbuilderTest.NewException", tct.get() );
-	co::IExceptionType* testException = dynamic_cast<co::IExceptionType*>( exbuilder->createType() );
+	co::IException* testException = dynamic_cast<co::IException*>( exbuilder->createType() );
 
 	co::RefPtr<co::IMethodBuilder> mb = typeBuilder->defineMethod( "testMethod" );
 
@@ -51,16 +51,16 @@ TEST( MethodBuilderTests, theTest )
 
 	EXPECT_NO_THROW( mb->createMethod() );
 
-	co::IInterfaceType* interface = dynamic_cast<co::IInterfaceType*>( typeBuilder->createType() );
+	co::IInterface* interface = dynamic_cast<co::IInterface*>( typeBuilder->createType() );
 	ASSERT_TRUE( interface != NULL );
 
-	co::IMethodInfo* mInfo = dynamic_cast<co::IMethodInfo*>( interface->getMember( "testMethod" ) );
+	co::IMethod* mInfo = dynamic_cast<co::IMethod*>( interface->getMember( "testMethod" ) );
 	ASSERT_TRUE( mInfo != NULL );
 
 	ASSERT_EQ( 3, mInfo->getParameters().getSize() );
 
-	co::ArrayRange<co::IParameterInfo* const> params = mInfo->getParameters();
-	co::IParameterInfo* p = params.getFirst();
+	co::Range<co::IParameter* const> params = mInfo->getParameters();
+	co::IParameter* p = params.getFirst();
 	ASSERT_EQ( "p1", p->getName() );
 	ASSERT_EQ( stringType, p->getType() );
 	ASSERT_FALSE( p->getIsIn() );

@@ -5,15 +5,15 @@
 
 #include "Namespace_Base.h"
 #include <co/Coral.h>
-#include <co/IComponentType.h>
-#include <co/IInterfaceInfo.h>
-#include <co/IInterfaceType.h>
+#include <co/IComponent.h>
+#include <co/IPort.h>
+#include <co/IInterface.h>
 
 namespace co {
 
 // ------ co.Namespace provides an interface named 'namespace', of type co.INamespace ------ //
 
-co::IInterfaceType* Namespace_co_INamespace::getInterfaceType()
+co::IInterface* Namespace_co_INamespace::getInterfaceType()
 {
 	return co::typeOf<co::INamespace>::get();
 }
@@ -36,7 +36,7 @@ Namespace_Base::~Namespace_Base()
 	// empty
 }
 
-co::IComponent* Namespace_Base::getInterfaceOwner()
+co::IObject* Namespace_Base::getInterfaceOwner()
 {
 	return this;
 }
@@ -51,26 +51,26 @@ void Namespace_Base::componentRelease()
 	decrementRefCount();
 }
 
-co::IComponentType* Namespace_Base::getComponentType()
+co::IComponent* Namespace_Base::getComponentType()
 {
 	co::IType* type = co::getType( "co.Namespace" );
-	assert( dynamic_cast<co::IComponentType*>( type ) );
-	return static_cast<co::IComponentType*>( type );
+	assert( dynamic_cast<co::IComponent*>( type ) );
+	return static_cast<co::IComponent*>( type );
 }
 
-co::Interface* Namespace_Base::getInterface( co::IInterfaceInfo* interfaceInfo )
+co::IService* Namespace_Base::getInterface( co::IPort* port )
 {
-	checkValidInterface( interfaceInfo );
-	co::Interface* res = NULL;
-	switch( interfaceInfo->getIndex() )
+	checkValidPort( port );
+	co::IService* res = NULL;
+	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::Interface, co::INamespace>( this ); break;
+	case 0:		res = co::disambiguate<co::IService, co::INamespace>( this ); break;
 	default:	raiseUnexpectedInterfaceIndex();
 	}
 	return res;
 }
 
-void Namespace_Base::setReceptacle( co::IInterfaceInfo* receptacle, co::Interface* facet )
+void Namespace_Base::setReceptacle( co::IPort* receptacle, co::IService* facet )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();

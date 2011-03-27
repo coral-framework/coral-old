@@ -11,7 +11,7 @@
 #include <core/tools/StringTokenizer.h>
 #include <gtest/gtest.h>
 
-co::ITypeBuilder* TestHelper::createBuilder( co::TypeKind kind, const std::string& fullTypeName, co::ITypeCreationTransaction* tct )
+co::ITypeBuilder* TestHelper::createBuilder( co::TypeKind kind, const std::string& fullTypeName, co::ITypeTransaction* tct )
 {
 	co::INamespace* ns = co::getSystem()->getTypes()->getRootNS();
 

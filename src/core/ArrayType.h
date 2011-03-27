@@ -12,7 +12,7 @@
 namespace co {
 
 /*!
-	Implements co.IArrayType.
+	Implements co.IArray.
  */
 class ArrayType : public ArrayType_Base, public TypeImpl
 {
@@ -22,10 +22,10 @@ public:
 	// internal methods:
 	void setElementType( IType* type );
 
-	// co::IArrayType methods:
+	// co::IArray methods:
 	IType* getElementType();
 
-	DELEGATE_CO_TYPE_METHODS( TypeImpl:: );
+	DELEGATE_co_IType( TypeImpl:: );
 
 private:
 	RefPtr<IType> _elementType;

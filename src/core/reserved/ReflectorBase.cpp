@@ -4,9 +4,9 @@
  */
 
 #include "ReflectorBase.h"
-#include <co/IMethodInfo.h>
-#include <co/IAttributeInfo.h>
-#include <co/IInterfaceInfo.h>
+#include <co/IMethod.h>
+#include <co/IField.h>
+#include <co/IPort.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -17,7 +17,7 @@ namespace co {
 
 // ------ ReflectorBase provides an interface named 'reflector', of type co::IReflector ------ //
 
-IInterfaceType* ReflectorBase_co_Reflector::getInterfaceType()
+IInterface* ReflectorBase_co_Reflector::getInterfaceType()
 {
 	return co::typeOf<IReflector>::get();
 }
@@ -40,7 +40,7 @@ ReflectorBase::~ReflectorBase()
 	// empty
 }
 
-IComponent* ReflectorBase::getInterfaceOwner()
+IObject* ReflectorBase::getInterfaceOwner()
 {
 	return this;
 }
@@ -55,17 +55,17 @@ void ReflectorBase::componentRelease()
 	decrementRefCount();
 }
 
-IComponentType* ReflectorBase::getComponentType()
+IComponent* ReflectorBase::getComponentType()
 {
 	return getOrCreateSimpleInternalComponentType( "co.ReflectorBase", "co.IReflector", "reflector" );
 }
 
-Interface* ReflectorBase::getInterface( IInterfaceInfo* interfaceInfo )
+IService* ReflectorBase::getInterface( IPort* port )
 {
-	checkValidInterface( interfaceInfo );
+	checkValidPort( port );
 
-	Interface* res = NULL;
-	switch( interfaceInfo->getIndex() )
+	IService* res = NULL;
+	switch( port->getIndex() )
 	{
 	case 0: res = static_cast<IReflector*>( this ); break;
 	default:
@@ -75,7 +75,7 @@ Interface* ReflectorBase::getInterface( IInterfaceInfo* interfaceInfo )
 	return res;
 }
 
-void ReflectorBase::setReceptacle( IInterfaceInfo* receptacle, Interface* )
+void ReflectorBase::setReceptacle( IPort* receptacle, IService* )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();
@@ -96,29 +96,29 @@ void ReflectorBase::destroyValue( void* )
 	raiseNotSupportedException();
 }
 
-IComponent* ReflectorBase::newInstance()
+IObject* ReflectorBase::newInstance()
 {
 	raiseNotSupportedException();
 	return NULL;
 }
 
-Interface* ReflectorBase::newProxy( IDynamicProxyHandler* )
+IService* ReflectorBase::newProxy( IDynamicServiceProvider* )
 {
 	raiseNotSupportedException();
 	return NULL;
 }
 
-void ReflectorBase::getAttribute( const Any&, IAttributeInfo*, Any& )
+void ReflectorBase::getAttribute( const Any&, IField*, Any& )
 {
 	raiseNotSupportedException();
 }
 
-void ReflectorBase::setAttribute( const Any&, IAttributeInfo*, const Any& )
+void ReflectorBase::setAttribute( const Any&, IField*, const Any& )
 {
 	raiseNotSupportedException();
 }
 
-void ReflectorBase::invokeMethod( const Any&, IMethodInfo*, ArrayRange<Any const>, Any& )
+void ReflectorBase::invokeMethod( const Any&, IMethod*, Range<Any const>, Any& )
 {
 	raiseNotSupportedException();
 }
@@ -134,13 +134,13 @@ void ReflectorBase::checkValidSize( size_t expectedSize, size_t actualSize )
 		throw co::IllegalArgumentException( "instance size mismatch" );
 }
 
-void ReflectorBase::checValidProxyHandler( co::IDynamicProxyHandler* handler )
+void ReflectorBase::checkValidDynamicProvider( co::IDynamicServiceProvider* provider )
 {
-	if( handler == NULL )
-		throw co::IllegalArgumentException( "illegal null co::IDynamicProxyHandler" );
+	if( provider == NULL )
+		throw co::IllegalArgumentException( "illegal null co::IDynamicServiceProvider" );
 }
 
-void ReflectorBase::checkNumArguments( co::IMethodInfo* mi, size_t numArgs )
+void ReflectorBase::checkNumArguments( co::IMethod* mi, size_t numArgs )
 {
 	assert( mi );
 	size_t expectedNumArgs = mi->getParameters().getSize();
@@ -150,14 +150,14 @@ void ReflectorBase::checkNumArguments( co::IMethodInfo* mi, size_t numArgs )
 					<< ", but only " << numArgs << ( numArgs > 1 ? " were" : " was" ) << " passed" );
 }
 
-void ReflectorBase::raiseAttributeIsReadOnly( co::IAttributeInfo* ai )
+void ReflectorBase::raiseAttributeIsReadOnly( co::IField* ai )
 {
 	assert( ai && ai->getIsReadOnly() );
 	CORAL_THROW( co::IllegalArgumentException, "attribute '" << ai->getName()
 					<< "' is read-only and cannot be changed" );
 }
 
-void ReflectorBase::raiseArgumentTypeException( co::IMethodInfo* mi, int argIndex, const co::IllegalCastException& e )
+void ReflectorBase::raiseArgumentTypeException( co::IMethod* mi, int argIndex, const co::IllegalCastException& e )
 {
 	CORAL_THROW( co::IllegalCastException, "invalid argument #" << argIndex + 1 << " to method "
 					<< mi->getName() << "(): " << e.getMessage() );

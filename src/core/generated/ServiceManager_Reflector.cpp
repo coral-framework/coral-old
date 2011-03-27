@@ -10,9 +10,9 @@ namespace co {
 
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
 co::int32 __ServiceManager_getSize();
-co::IComponent* __ServiceManager_newInstance();
+co::IObject* __ServiceManager_newInstance();
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class ServiceManager_Reflector : public co::ReflectorBase
 {
@@ -37,17 +37,17 @@ public:
 		return __ServiceManager_getSize();
 	}
 
-	co::IComponent* newInstance()
+	co::IObject* newInstance()
 	{
-		co::IComponent* component = __ServiceManager_newInstance();
+		co::IObject* component = __ServiceManager_newInstance();
 		assert( component->getComponentType()->getFullName() == "co.ServiceManager" );
 		return component;
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createServiceManagerIReflector()
+co::IReflector* __createServiceManagerReflector()
 {
     return new ServiceManager_Reflector;
 }

@@ -7,16 +7,16 @@
 #define _CO_CORAL_H_
 
 #include <co/Platform.h>
-#include <co/ArrayRange.h>
+#include <co/Range.h>
 
 namespace co {
 
 // Forward Decls:
 class IType;
+class IObject;
 class ISystem;
-class IComponent;
-class Interface;
-class IInterfaceType;
+class IService;
+class IInterface;
 
 // ------ Coral Path -----------------------------------------------------------
 
@@ -25,11 +25,11 @@ class IInterfaceType;
 	All paths are guaranteed to be absolute pathnames.
 	\ingroup setup
  */
-CORAL_EXPORT ArrayRange<const std::string> getPaths();
+CORAL_EXPORT Range<const std::string> getPaths();
 
 /*!
 	\brief Adds one or more type repositories for use by the system.
- 
+
 	The passed string may contain a single directory or a list of directories,
 	separated by comma or semicolon (or colon, on UNIX systems).
 
@@ -125,14 +125,14 @@ CORAL_EXPORT IType* getType( const std::string& fullName );
 	Please note that this function may raise all exceptions raised by the aforementioned methods.
 	\ingroup convenience
  */
-CORAL_EXPORT IComponent* newInstance( const std::string& fullName );
+CORAL_EXPORT IObject* newInstance( const std::string& fullName );
 
 /*!
 	Binds a \a facet to the component receptacle identified by \a receptacleName.
-	You should generally use co::IComponent::setReceptacle() instead of this function.
-	Please refer to co::IComponent::setReceptacle() for the full list of exceptions this function may throw.
+	You should generally use co::IObject::setReceptacle() instead of this function.
+	Please refer to co::IObject::setReceptacle() for the full list of exceptions this function may throw.
  */
-CORAL_EXPORT void setReceptacleByName( IComponent* instance, const std::string& receptacleName, Interface* facet );
+CORAL_EXPORT void setReceptacleByName( IObject* instance, const std::string& receptacleName, IService* facet );
 
 /*!
 	\brief Utility function to get the best provider of \a serviceType for clients of type \a clientType.
@@ -140,7 +140,7 @@ CORAL_EXPORT void setReceptacleByName( IComponent* instance, const std::string& 
 	Please refer to co::IServiceManager::getServiceForType() for the list of exceptions this function may throw.
 	\ingroup convenience
  */
-CORAL_EXPORT Interface* getServiceForType( IInterfaceType* serviceType, IInterfaceType* clientType );
+CORAL_EXPORT IService* getServiceForType( IInterface* serviceType, IInterface* clientType );
 
 /*!
 	\brief Utility function to get the best provider of \a serviceType for the given \a clientInstance.
@@ -148,7 +148,7 @@ CORAL_EXPORT Interface* getServiceForType( IInterfaceType* serviceType, IInterfa
 	Please refer to co::IServiceManager::getServiceForInstance() for the list of exceptions this function may throw.
 	\ingroup convenience
  */
-CORAL_EXPORT Interface* getServiceForInstance( IInterfaceType* serviceType, Interface* clientInstance );
+CORAL_EXPORT IService* getServiceForInstance( IInterface* serviceType, IService* clientInstance );
 
 /*!
 	\brief Template function to get a global service by its interface type.
@@ -168,7 +168,7 @@ inline T* getService()
 	\ingroup convenience
  */
 template<typename T>
-inline T* getService( co::IInterfaceType* clientType )
+inline T* getService( co::IInterface* clientType )
 {
 	return static_cast<T*>( getServiceForType( co::typeOf<T>::get(), clientType ) );
 }
@@ -180,7 +180,7 @@ inline T* getService( co::IInterfaceType* clientType )
 	\ingroup convenience
  */
 template<typename T>
-inline T* getService( co::Interface* clientInstance )
+inline T* getService( co::IService* clientInstance )
 {
 	return static_cast<T*>( getServiceForInstance( co::typeOf<T>::get(), clientInstance ) );
 }
@@ -198,19 +198,19 @@ CORAL_EXPORT bool findModuleFile( const std::string& moduleName, const std::stri
 } // namespace co
 
 /******************************************************************************
- 
- Copyright (c) 2009-2010 Tecgraf, PUC-Rio.
- 
+
+ Copyright (c) 2009-2011 Tecgraf, PUC-Rio.
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included in
  all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE

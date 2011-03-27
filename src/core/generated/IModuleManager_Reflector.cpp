@@ -4,11 +4,11 @@
  */
 
 #include <co/IModuleManager.h>
-#include <co/IDynamicProxyHandler.h>
+#include <co/IDynamicServiceProvider.h>
 #include <co/IModule.h>
 #include <co/IModulePartLoader.h>
-#include <co/IMethodInfo.h>
-#include <co/IAttributeInfo.h>
+#include <co/IMethod.h>
+#include <co/IField.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -18,14 +18,14 @@
 
 namespace co {
 
-// ------ Proxy Interface ------ //
+// ------ Dynamic Service Proxy ------ //
 
 class IModuleManager_Proxy : public co::IModuleManager
 {
 public:
-	IModuleManager_Proxy( co::IDynamicProxyHandler* handler ) : _handler( handler )
+	IModuleManager_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _handler->registerProxyInterface( co::disambiguate<co::Interface, co::IModuleManager>( this ) );
+		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, co::IModuleManager>( this ) );
 	}
 
 	virtual ~IModuleManager_Proxy()
@@ -33,19 +33,19 @@ public:
 		// empty
 	}
 
-	// co::Interface Methods:
+	// co::IService Methods:
 
-	co::IInterfaceType* getInterfaceType() { return co::typeOf<co::IModuleManager>::get(); }
-	co::IComponent* getInterfaceOwner() { return _handler->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _handler->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _handler->componentRetain(); }
-	void componentRelease() { _handler->componentRelease(); }
+	co::IInterface* getInterfaceType() { return co::typeOf<co::IModuleManager>::get(); }
+	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
+	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
+	void componentRetain() { _provider->componentRetain(); }
+	void componentRelease() { _provider->componentRelease(); }
 
 	// co.IModuleManager Methods:
 
 	bool getBinaryCompatibilityChecking()
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::IModuleManager>( 0 ) );
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IModuleManager>( 0 ) );
         return res.get< bool >();
 	}
 
@@ -53,27 +53,27 @@ public:
 	{
 		co::Any arg;
 		arg.set< bool >( binaryCompatibilityChecking_ );
-		_handler->handleSetAttribute( _cookie, getAttribInfo<co::IModuleManager>( 0 ), arg );
+		_provider->handleSetAttribute( _cookie, getAttribInfo<co::IModuleManager>( 0 ), arg );
 	}
 
-	co::ArrayRange<co::IModulePartLoader* const> getLoaders()
+	co::Range<co::IModulePartLoader* const> getLoaders()
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::IModuleManager>( 1 ) );
-        return res.get< co::ArrayRange<co::IModulePartLoader* const> >();
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IModuleManager>( 1 ) );
+        return res.get< co::Range<co::IModulePartLoader* const> >();
 	}
 
-	co::ArrayRange<co::IModule* const> getModules()
+	co::Range<co::IModule* const> getModules()
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::IModuleManager>( 2 ) );
-        return res.get< co::ArrayRange<co::IModule* const> >();
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IModuleManager>( 2 ) );
+        return res.get< co::Range<co::IModule* const> >();
 	}
 
 	co::IModule* findModule( const std::string& moduleName_ )
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::IModuleManager>( 0 ), range );
+		co::Range<co::Any const> range( args, 1 );
+		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::IModuleManager>( 0 ), range );
 		return res.get< co::IModule* >();
 	}
 
@@ -81,16 +81,16 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IModulePartLoader* >( loader_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IModuleManager>( 1 ), range );
+		co::Range<co::Any const> range( args, 1 );
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IModuleManager>( 1 ), range );
 	}
 
 	bool isLoadable( const std::string& moduleName_ )
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::IModuleManager>( 2 ), range );
+		co::Range<co::Any const> range( args, 1 );
+		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::IModuleManager>( 2 ), range );
 		return res.get< bool >();
 	}
 
@@ -98,8 +98,8 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::IModuleManager>( 3 ), range );
+		co::Range<co::Any const> range( args, 1 );
+		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::IModuleManager>( 3 ), range );
 		return res.get< co::IModule* >();
 	}
 
@@ -107,29 +107,29 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IModulePartLoader* >( loader_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IModuleManager>( 4 ), range );
+		co::Range<co::Any const> range( args, 1 );
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IModuleManager>( 4 ), range );
 	}
 
 protected:
 	template<typename T>
-	co::IAttributeInfo* getAttribInfo( co::uint32 index )
+	co::IField* getAttribInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberAttributes()[index];
+		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethodInfo* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethodInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberMethods()[index];
+		return co::typeOf<T>::get()->getMethods()[index];
 	}
 
 private:
-	co::IDynamicProxyHandler* _handler;
+	co::IDynamicServiceProvider* _provider;
 	co::uint32 _cookie;
 };
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class IModuleManager_Reflector : public co::ReflectorBase
 {
@@ -154,25 +154,25 @@ public:
 		return sizeof(co::IModuleManager);
 	}
 
-	co::Interface* newProxy( co::IDynamicProxyHandler* handler )
+	co::IService* newProxy( co::IDynamicServiceProvider* provider )
 	{
-		checValidProxyHandler( handler );
-		return co::disambiguate<co::Interface, co::IModuleManager>( new co::IModuleManager_Proxy( handler ) );
+		checkValidDynamicProvider( provider );
+		return co::disambiguate<co::IService, co::IModuleManager>( new co::IModuleManager_Proxy( provider ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value )
+	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
 	{
 		co::IModuleManager* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
 		case 0:		value.set< bool >( p->getBinaryCompatibilityChecking() ); break;
-		case 1:		value.set< co::ArrayRange<co::IModulePartLoader* const> >( p->getLoaders() ); break;
-		case 2:		value.set< co::ArrayRange<co::IModule* const> >( p->getModules() ); break;
+		case 1:		value.set< co::Range<co::IModulePartLoader* const> >( p->getLoaders() ); break;
+		case 2:		value.set< co::Range<co::IModule* const> >( p->getModules() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value )
+	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
 	{
 		co::IModuleManager* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
@@ -186,7 +186,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
+	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
 	{
 		co::IModuleManager* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -248,20 +248,20 @@ public:
 	}
 
 private:
-	co::IModuleManager* checkInstance( const co::Any& any, co::IMemberInfo* member )
+	co::IModuleManager* checkInstance( const co::Any& any, co::IMember* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
 
 		// make sure that 'any' is an instance of this type
-		co::IInterfaceType* myType = co::typeOf<co::IModuleManager>::get();
+		co::IInterface* myType = co::typeOf<co::IModuleManager>::get();
 
 		co::IModuleManager* res;
 		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::IModuleManager*>( any.getState().data.itf ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::IModuleManager*, but got " << any );
 
 		// make sure that 'member' belongs to this type
-		co::ICompoundType* owner = member->getOwner();
+		co::ICompositeType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to co.IModuleManager" );
@@ -270,9 +270,9 @@ private:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createIModuleManagerIReflector()
+co::IReflector* __createIModuleManagerReflector()
 {
     return new IModuleManager_Reflector;
 }

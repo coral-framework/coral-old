@@ -5,20 +5,20 @@
 
 #include "ArrayType_Base.h"
 #include <co/Coral.h>
-#include <co/IComponentType.h>
-#include <co/IInterfaceInfo.h>
-#include <co/IInterfaceType.h>
+#include <co/IComponent.h>
+#include <co/IPort.h>
+#include <co/IInterface.h>
 
 namespace co {
 
-// ------ co.ArrayType provides an interface named 'type', of type co.IArrayType ------ //
+// ------ co.ArrayType provides an interface named 'type', of type co.IArray ------ //
 
-co::IInterfaceType* ArrayType_co_IArrayType::getInterfaceType()
+co::IInterface* ArrayType_co_IArray::getInterfaceType()
 {
-	return co::typeOf<co::IArrayType>::get();
+	return co::typeOf<co::IArray>::get();
 }
 
-const std::string& ArrayType_co_IArrayType::getInterfaceName()
+const std::string& ArrayType_co_IArray::getInterfaceName()
 {
 	static const std::string s_interfaceName( "type" );
 	return s_interfaceName;
@@ -36,7 +36,7 @@ ArrayType_Base::~ArrayType_Base()
 	// empty
 }
 
-co::IComponent* ArrayType_Base::getInterfaceOwner()
+co::IObject* ArrayType_Base::getInterfaceOwner()
 {
 	return this;
 }
@@ -51,26 +51,26 @@ void ArrayType_Base::componentRelease()
 	decrementRefCount();
 }
 
-co::IComponentType* ArrayType_Base::getComponentType()
+co::IComponent* ArrayType_Base::getComponentType()
 {
 	co::IType* type = co::getType( "co.ArrayType" );
-	assert( dynamic_cast<co::IComponentType*>( type ) );
-	return static_cast<co::IComponentType*>( type );
+	assert( dynamic_cast<co::IComponent*>( type ) );
+	return static_cast<co::IComponent*>( type );
 }
 
-co::Interface* ArrayType_Base::getInterface( co::IInterfaceInfo* interfaceInfo )
+co::IService* ArrayType_Base::getInterface( co::IPort* port )
 {
-	checkValidInterface( interfaceInfo );
-	co::Interface* res = NULL;
-	switch( interfaceInfo->getIndex() )
+	checkValidPort( port );
+	co::IService* res = NULL;
+	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::Interface, co::IArrayType>( this ); break;
+	case 0:		res = co::disambiguate<co::IService, co::IArray>( this ); break;
 	default:	raiseUnexpectedInterfaceIndex();
 	}
 	return res;
 }
 
-void ArrayType_Base::setReceptacle( co::IInterfaceInfo* receptacle, co::Interface* facet )
+void ArrayType_Base::setReceptacle( co::IPort* receptacle, co::IService* facet )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();

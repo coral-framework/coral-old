@@ -4,11 +4,11 @@
  */
 
 #include <co/RefVector.h>
-#include <co/Interface.h>
+#include <co/IService.h>
 #include <co/INamespace.h>
 #include <gtest/gtest.h>
 
-class PseudoInterface : public co::Interface
+class PseudoInterface : public co::IService
 {
 public:
 	PseudoInterface( const char* name = "",  bool* setToTrueWhenDestroyed = 0 ) :
@@ -21,8 +21,8 @@ public:
 			*_setToTrueWhenDestroyed = true;
 	}
 
-	virtual co::IInterfaceType* getInterfaceType() { return 0; }
-	virtual co::IComponent* getInterfaceOwner() { return 0; }
+	virtual co::IInterface* getInterfaceType() { return 0; }
+	virtual co::IObject* getInterfaceOwner() { return 0; }
 	virtual const std::string& getInterfaceName() { return _name; }
 	virtual void componentRetain() { ++_refCount; }
 	virtual void componentRelease() { if( --_refCount <= 0 ) delete this; }
@@ -50,7 +50,7 @@ TEST( RefVectorTests, rawPtrVectorEquivalence )
 	refVec.push_back( &o2 );
 	refVec.push_back( &o3 );
 
-	co::ArrayRange<PseudoInterface* const> range( refVec );
+	co::Range<PseudoInterface* const> range( refVec );
 	for( int i = 0; i < 3; ++i )
 	{
 		EXPECT_EQ( range.getFirst(), rawVec[i] );
@@ -64,7 +64,7 @@ TEST( RefVectorTests, rawPtrVectorWithEmptyRefVector )
 
 	EXPECT_EQ( emptyRefVec.size(), 0 );
 
-	co::ArrayRange<PseudoInterface* const> range( emptyRefVec );
+	co::Range<PseudoInterface* const> range( emptyRefVec );
 	EXPECT_TRUE( range.isEmpty() );
 }
 
@@ -80,11 +80,11 @@ TEST( RefVectorTests, castedPtrRange )
 	refVec.push_back( &o2 );
 	refVec.push_back( &o3 );
 
-	co::ArrayRange<co::Interface* const> range( refVec );
+	co::Range<co::IService* const> range( refVec );
 	EXPECT_EQ( range.getSize(), 3 );
 	
 	// invalid usage sample (causes compile-time error):
-	//co::ArrayRange<co::INamespace*> invalidRange( refVec );
+	//co::Range<co::INamespace*> invalidRange( refVec );
 }
 
 inline int pseudoInterfaceComparator( PseudoInterface* element, const std::string& name )

@@ -5,9 +5,9 @@
 
 #include "Universe_Base.h"
 #include <co/Coral.h>
-#include <co/IComponentType.h>
-#include <co/IInterfaceInfo.h>
-#include <co/IInterfaceType.h>
+#include <co/IComponent.h>
+#include <co/IPort.h>
+#include <co/IInterface.h>
 
 namespace lua {
 
@@ -16,7 +16,7 @@ void moduleRelease();
 
 // ------ lua.Universe provides an interface named 'state', of type lua.IState ------ //
 
-co::IInterfaceType* Universe_lua_IState::getInterfaceType()
+co::IInterface* Universe_lua_IState::getInterfaceType()
 {
 	return co::typeOf<lua::IState>::get();
 }
@@ -39,7 +39,7 @@ Universe_Base::~Universe_Base()
 	moduleRelease();
 }
 
-co::IComponent* Universe_Base::getInterfaceOwner()
+co::IObject* Universe_Base::getInterfaceOwner()
 {
 	return this;
 }
@@ -54,26 +54,26 @@ void Universe_Base::componentRelease()
 	decrementRefCount();
 }
 
-co::IComponentType* Universe_Base::getComponentType()
+co::IComponent* Universe_Base::getComponentType()
 {
 	co::IType* type = co::getType( "lua.Universe" );
-	assert( dynamic_cast<co::IComponentType*>( type ) );
-	return static_cast<co::IComponentType*>( type );
+	assert( dynamic_cast<co::IComponent*>( type ) );
+	return static_cast<co::IComponent*>( type );
 }
 
-co::Interface* Universe_Base::getInterface( co::IInterfaceInfo* interfaceInfo )
+co::IService* Universe_Base::getInterface( co::IPort* port )
 {
-	checkValidInterface( interfaceInfo );
-	co::Interface* res = NULL;
-	switch( interfaceInfo->getIndex() )
+	checkValidPort( port );
+	co::IService* res = NULL;
+	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::Interface, lua::IState>( this ); break;
+	case 0:		res = co::disambiguate<co::IService, lua::IState>( this ); break;
 	default:	raiseUnexpectedInterfaceIndex();
 	}
 	return res;
 }
 
-void Universe_Base::setReceptacle( co::IInterfaceInfo* receptacle, co::Interface* facet )
+void Universe_Base::setReceptacle( co::IPort* receptacle, co::IService* facet )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();

@@ -140,13 +140,13 @@ function autoFields.fullNameUpperUnderline( t )
 end
 
 local typeKindToInterfaceName = {
-	TK_ARRAY		= "IArrayType",
-	TK_ENUM			= "IEnumType",
-	TK_EXCEPTION	= "IExceptionType",
-	TK_STRUCT		= "IStructType",
-	TK_NATIVECLASS	= "INativeClassType",
-	TK_INTERFACE	= "IInterfaceType",
-	TK_COMPONENT	= "IComponentType",
+	TK_ARRAY		= "IArray",
+	TK_ENUM			= "IEnum",
+	TK_EXCEPTION	= "IException",
+	TK_STRUCT		= "IStruct",
+	TK_NATIVECLASS	= "INativeClass",
+	TK_INTERFACE	= "IInterface",
+	TK_COMPONENT	= "IComponent",
 }
 
 function autoFields.typeInterfaceName( t )
@@ -195,12 +195,12 @@ function autoFields.typesNeededInReflector( t )
 
 	-- add forward-decl types from all ancestors
 	for i, ancestor in ipairs( t.interfaceAncestors ) do
-		if ancestor.fullName ~= 'co.Interface' then
-			for i, a in ipairs( ancestor.memberAttributes ) do
+		if ancestor.fullName ~= 'co.IService' then
+			for i, a in ipairs( ancestor.fields ) do
 				addType( a.type )
 			end
 
-			for i, m in ipairs( ancestor.memberMethods ) do
+			for i, m in ipairs( ancestor.methods ) do
 				local returnType = m.returnType
 				if returnType then
 					addType( returnType )
@@ -268,7 +268,7 @@ function traverse.TK_EXCEPTION( t )
 end
 
 function traverse.TK_STRUCT( t )
-	for i, field in ipairs( t.memberAttributes ) do
+	for i, field in ipairs( t.fields ) do
 		t:includeType( field.type )
 		if field.type.kind == 'TK_INTERFACE' then
 			t:includeHeader( "co/RefPtr.h" )
@@ -283,11 +283,11 @@ function traverse.TK_STRUCT( t )
 end
 
 local function traverseAttribMethodContainer( t )
-	for i, a in ipairs( t.memberAttributes ) do
+	for i, a in ipairs( t.fields ) do
 		t:includeType( a.type )
 	end
 
-	for i, m in ipairs( t.memberMethods ) do
+	for i, m in ipairs( t.methods ) do
 		local returnType = m.returnType
 		if returnType then
 			t:includeType( returnType )
@@ -319,7 +319,7 @@ function traverse.TK_INTERFACE( t )
 end
 
 function traverse.TK_COMPONENT( t )
-	for i, itf in ipairs( t.interfaces ) do
+	for i, itf in ipairs( t.ports ) do
 		t:includeHeader( itf.type )
 	end
 end

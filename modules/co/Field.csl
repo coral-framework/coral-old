@@ -1,0 +1,7 @@
+/*
+	Implements co.IField.
+ */
+component Field
+{
+	provides IField attributeInfo;
+};

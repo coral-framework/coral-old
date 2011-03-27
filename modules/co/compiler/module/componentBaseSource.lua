@@ -5,9 +5,9 @@ local function template( writer, c, t )
 
 #include "]], t.name, [[_Base.h"
 #include <co/Coral.h>
-#include <co/IComponentType.h>
-#include <co/IInterfaceInfo.h>
-#include <co/IInterfaceType.h>
+#include <co/IComponent.h>
+#include <co/IPort.h>
+#include <co/IInterface.h>
 
 ]] )
 
@@ -31,7 +31,7 @@ void moduleRelease();
 
 // ------ ]], t.fullName, [[ provides an interface named ']], itf.name, [[', of type ]], itf.type.fullName, [[ ------ //
 
-co::IInterfaceType* ]], t.name, [[_]], itf.type.fullNameUnderline, [[::getInterfaceType()
+co::IInterface* ]], t.name, [[_]], itf.type.fullNameUnderline, [[::getInterfaceType()
 {
 	return co::typeOf<]], itf.type.cppName, [[>::get();
 }
@@ -74,7 +74,7 @@ const std::string& ]], t.name, [[_]], itf.type.fullNameUnderline, [[::getInterfa
 	writer( [[
 }
 
-co::IComponent* ]], t.name, [[_Base::getInterfaceOwner()
+co::IObject* ]], t.name, [[_Base::getInterfaceOwner()
 {
 	return this;
 }
@@ -89,27 +89,27 @@ void ]], t.name, [[_Base::componentRelease()
 	decrementRefCount();
 }
 
-co::IComponentType* ]], t.name, [[_Base::getComponentType()
+co::IComponent* ]], t.name, [[_Base::getComponentType()
 {
 	co::IType* type = co::getType( "]], t.fullName, [[" );
-	assert( dynamic_cast<co::IComponentType*>( type ) );
-	return static_cast<co::IComponentType*>( type );
+	assert( dynamic_cast<co::IComponent*>( type ) );
+	return static_cast<co::IComponent*>( type );
 }
 
-co::Interface* ]], t.name, [[_Base::getInterface( co::IInterfaceInfo* interfaceInfo )
+co::IService* ]], t.name, [[_Base::getInterface( co::IPort* port )
 {
-	checkValidInterface( interfaceInfo );
-	co::Interface* res = NULL;
-	switch( interfaceInfo->getIndex() )
+	checkValidPort( port );
+	co::IService* res = NULL;
+	switch( port->getIndex() )
 	{
 ]] )
 
 	for i, itf in ipairs( facets ) do
-		writer( "\tcase ", itf.index, ":\t\tres = co::disambiguate<co::Interface, ", itf.type.cppName, ">( this ); break;\n" )
+		writer( "\tcase ", itf.index, ":\t\tres = co::disambiguate<co::IService, ", itf.type.cppName, ">( this ); break;\n" )
 	end
 
 	for i, itf in ipairs( receptacles ) do
-		writer( "\tcase ", itf.index, ":\t\tres = co::disambiguate<co::Interface, ",
+		writer( "\tcase ", itf.index, ":\t\tres = co::disambiguate<co::IService, ",
 			itf.type.cppName, ">( ", t.formatAccessor( "getReceptacle", itf.name ), "() ); break;\n" )
 	end
 
@@ -119,7 +119,7 @@ co::Interface* ]], t.name, [[_Base::getInterface( co::IInterfaceInfo* interfaceI
 	return res;
 }
 
-void ]], t.name, [[_Base::setReceptacle( co::IInterfaceInfo* receptacle, co::Interface* facet )
+void ]], t.name, [[_Base::setReceptacle( co::IPort* receptacle, co::IService* facet )
 {
 	checkValidReceptacle( receptacle );
 ]] )

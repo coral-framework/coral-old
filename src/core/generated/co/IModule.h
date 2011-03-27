@@ -7,9 +7,9 @@
 #define _CO_IMODULE_H_
 
 #include <co/TypeTraits.h>
-#include <co/ArrayRange.h>
-#include <co/Interface.h>
+#include <co/IService.h>
 #include <co/ModuleState.h>
+#include <co/Range.h>
 
 // Forward Declarations:
 namespace co {
@@ -21,14 +21,14 @@ namespace co {
 // co.IModule Mapping:
 namespace co {
 
-class IModule : public co::Interface
+class IModule : public co::IService
 {
 public:
 	virtual ~IModule() {;}
 
 	virtual co::INamespace* getNamespace() = 0;
 
-	virtual co::ArrayRange<co::IModulePart* const> getParts() = 0;
+	virtual co::Range<co::IModulePart* const> getParts() = 0;
 
 	virtual co::int32 getRank() = 0;
 
@@ -54,7 +54,7 @@ public:
 namespace co {
 template<> struct kindOf<co::IModule> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IModule> { static const char* get() { return "co.IModule"; } };
-template<> struct typeOf<co::IModule> : public typeOfBase<co::IModule, IInterfaceType> {};
+template<> struct typeOf<co::IModule> : public typeOfBase<co::IModule, IInterface> {};
 } // namespace co
 
 #endif // _CO_IMODULE_H_

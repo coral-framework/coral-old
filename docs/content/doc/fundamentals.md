@@ -81,7 +81,7 @@ A segunda abordagem é mais simples, mas só é possível se o tipo for conhecido em
 <code lang="cpp">
 #include <drink/IJuice.h>
 
-co::IInterfaceType* t = co::typeOf<drink::IJuice>();
+co::IInterface* t = co::typeOf<drink::IJuice>();
 </code>
 
 Internamente o operador `co::typeOf<T>()` faz uma busca pelo nome do tipo:

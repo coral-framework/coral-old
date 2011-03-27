@@ -1,0 +1,21 @@
+/*
+	Interface for components that provide a dynamic set of services
+	through <em>dynamic service proxies</em>.
+ */
+interface IDynamicServiceProvider
+{
+	// Registers a new proxy interface and returns a 'cookie' for it.
+	int32 registerProxyInterface( in IService proxy );
+
+	// Retrieves a proxy interface's name given its cookie.
+	string getProxyInterfaceName( in int32 cookie );
+
+	// Handles a request for retrieving an attribute value.
+	any handleGetAttribute( in int32 cookie, in IField ai );
+
+	// Handles a request for setting an attribute value.
+	void handleSetAttribute( in int32 cookie, in IField ai, in any value );
+
+	// Handles a call to one of the proxy interface's methods.
+	any handleMethodInvocation( in int32 cookie, in IMethod mi, in any[] args );
+};

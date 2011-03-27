@@ -28,7 +28,7 @@ public:
 namespace co {
 template<> struct kindOf<co::MissingServiceException> : public kindOfBase<TK_EXCEPTION> {};
 template<> struct nameOf<co::MissingServiceException> { static const char* get() { return "co.MissingServiceException"; } };
-template<> struct typeOf<co::MissingServiceException> : public typeOfBase<co::MissingServiceException, IExceptionType> {};
+template<> struct typeOf<co::MissingServiceException> : public typeOfBase<co::MissingServiceException, IException> {};
 } // namespace co
 
 #endif // _CO_MISSINGSERVICEEXCEPTION_H_

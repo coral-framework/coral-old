@@ -1,7 +1,7 @@
 /*
-	Implements co.IArrayType.
+	Implements co.IArray.
  */
 component ArrayType
 {
-	provides IArrayType type;
+	provides IArray type;
 };

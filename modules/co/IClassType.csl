@@ -1,0 +1,8 @@
+/*
+	Interface for types that contain fields and methods.
+ */
+interface IClassType : IRecordType
+{
+	// List of member methods.
+	readonly attribute IMethod[] methods;
+};

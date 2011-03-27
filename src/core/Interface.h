@@ -3,49 +3,51 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _CO_INTERFACE_H_
-#define _CO_INTERFACE_H_
+#ifndef _INTERFACETYPE_H_
+#define _INTERFACETYPE_H_
 
-#include <co/TypeTraits.h>
+#include "CompositeType.h"
+#include "Interface_Base.h"
 
 namespace co {
 
-USING_CORAL_INTEGER_TYPES;
-
-// Forward declarations:
-class IComponent;
-class IInterfaceType;
-
 /*!
-	The co::Interface pseudo-interface, implicitly inherited by all Coral interfaces.
+	Implements co.IInterface.
  */
-class Interface
+class Interface : public Interface_Base, public CompositeTypeImpl
 {
 public:
-	virtual ~Interface() {;}
+	virtual ~Interface();
 
-	virtual IInterfaceType* getInterfaceType() = 0;
+	// internal methods:
+	void addSuperInterface( IInterface* superItf );
+	void addSubInterface( IInterface* subItf );
 
-	virtual IComponent* getInterfaceOwner() = 0;
+	// IInterface methods:
+	Range<IInterface* const> getInterfaceAncestors();
+	Range<IInterface* const> getSuperInterfaces();
+	Range<IInterface* const> getSubInterfaces();
+	const std::string& getCppBlock();
+	bool isSubTypeOf( IInterface* itf );
 
-	virtual const std::string& getInterfaceName() = 0;
+	DELEGATE_co_IType( CompositeTypeImpl:: );
+	DELEGATE_co_ICompositeType( CompositeTypeImpl:: );
+	DELEGATE_co_IRecordType( CompositeTypeImpl:: );
+	DELEGATE_co_IClassType( CompositeTypeImpl:: );
 
-	virtual void componentRetain() = 0;
+private:
+	Range<ICompositeType* const> getCompositeTypeAncestors();
 
-	virtual void componentRelease() = 0;
+	// ancestors are computed lazily
+	void updateAncestors();
+
+private:
+	typedef std::vector<IInterface*> InterfaceVector;
+	InterfaceVector _ancestors;
+	InterfaceVector _superInterfaces;
+	InterfaceVector _subInterfaces;
 };
 
-template<> struct kindOf<Interface> : public kindOfBase<TK_INTERFACE> {};
-template<> struct nameOf<Interface> { static const char* get() { return "co.Interface"; } };
-template<> struct typeOf<Interface> : public typeOfBase<Interface, IInterfaceType> {};
-
-#define CORAL_DISAMBIGUATE_CO_INTERFACE( Super ) \
-	co::IInterfaceType* getInterfaceType() = 0; \
-	co::IComponent* getInterfaceOwner() = 0; \
-	const std::string& getInterfaceName() = 0; \
-	void componentRetain() = 0; \
-	void componentRelease() = 0;
-
 } // namespace co
-	
+
 #endif

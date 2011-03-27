@@ -7,17 +7,17 @@
 #define _CO_ANY_H_
 
 #include <co/Coral.h>
-#include <co/Interface.h>
+#include <co/IService.h>
 #include <co/RefVector.h>
 #include <co/TypeTraits.h>
 
-#include <co/IEnumType.h>
-#include <co/IArrayType.h>
-#include <co/IStructType.h>
-#include <co/IExceptionType.h>
-#include <co/IInterfaceType.h>
-#include <co/IComponentType.h>
-#include <co/INativeClassType.h>
+#include <co/IEnum.h>
+#include <co/IArray.h>
+#include <co/IStruct.h>
+#include <co/IException.h>
+#include <co/IInterface.h>
+#include <co/IComponent.h>
+#include <co/INativeClass.h>
 
 namespace co {
 
@@ -46,7 +46,7 @@ struct State
 		// Multipurpose pointers:
 		void* ptr;
 		const void* cptr;
-		Interface* itf;
+		IService* itf;
 	}
 	data;
 
@@ -54,7 +54,7 @@ struct State
 	union
 	{
 		IType* type;						// used for arrays, enums, structs and native classes
-		IInterfaceType* interfaceType;	// used for interfaces
+		IInterface* interfaceType;	// used for interfaces
 	};
 
 	// only used if arrayKind is AK_ArrayRange
@@ -164,7 +164,7 @@ struct PrepareStateForArray<RefVector<T>, ATT>
 };
 
 template<typename T, typename ATT>
-struct PrepareStateForArray<ArrayRange<T>, ATT>
+struct PrepareStateForArray<Range<T>, ATT>
 {
 	typedef traits::get<T> ETT; // traits for the array element type
 	inline static void prepare( State& s )
@@ -236,10 +236,10 @@ struct ValueHelper<TK_ARRAY, T>
 };
 
 template<typename T>
-struct ValueHelper<TK_ARRAY, ArrayRange<T> >
+struct ValueHelper<TK_ARRAY, Range<T> >
 {
 	// co::ArrayRanges are handled by this case
-	inline static void store( State& s, ArrayRange<T>& v )
+	inline static void store( State& s, Range<T>& v )
 	{
 		s.data.cptr = &( v.getFirst() );
 		size_t size = v.getSize();
@@ -247,12 +247,12 @@ struct ValueHelper<TK_ARRAY, ArrayRange<T> >
 		s.arraySize = static_cast<uint32>( size );
 	}
 
-	inline static ArrayRange<T> retrieve( State& s )
+	inline static Range<T> retrieve( State& s )
 	{
 		if( s.arrayKind == State::AK_ArrayRange )
-			return ArrayRange<T>( reinterpret_cast<T*>( s.data.ptr ), s.arraySize );
+			return Range<T>( reinterpret_cast<T*>( s.data.ptr ), s.arraySize );
 		else
-			return ArrayRange<T>( *reinterpret_cast<std::vector<typename
+			return Range<T>( *reinterpret_cast<std::vector<typename
 										traits::removeConst<T>::Type>*>( s.data.ptr ) );
 	}
 };
@@ -321,7 +321,7 @@ template<typename T>
 struct InterfaceHelper<true, T>
 {
 	// this case handles non-ambiguous interface pointers
-	inline static void store( State& s, T* ptr ) { s.data.itf = disambiguate<co::Interface, T>( ptr ); }
+	inline static void store( State& s, T* ptr ) { s.data.itf = disambiguate<co::IService, T>( ptr ); }
 	inline static T* retrieve( State& s ) { return dynamic_cast<T*>( s.data.itf ); }
 };
 
@@ -337,7 +337,7 @@ template<typename T>
 struct PointerHelper<TK_INTERFACE, T>
 {
 	// all interface pointers are forwarded to InterfaceHelper
-	typedef traits::hasAmbiguousBase<T, Interface> AB;
+	typedef traits::hasAmbiguousBase<T, IService> AB;
 	inline static void store( State& s, T* ptr ) { InterfaceHelper<AB::value, T>::store( s, ptr ); }
 	inline static T* retrieve( State& s ) { return InterfaceHelper<AB::value, T>::retrieve( s ); }
 };
@@ -475,30 +475,30 @@ struct VariableHelper<double>
 
 	\par Arrays
 		An array can be passed using three possible representations:
-		  -# A \c co::ArrayRange, which is the most generic representation but cannot be used to add/remove elements;
+		  -# A \c co::Range, which is the most generic representation but cannot be used to add/remove elements;
 		  -# A \c std::vector, which is useful when the receiver needs to add/remove elements to/from the array;
 		  -# Or a \c co::RefVector, which is similar to a \c std::vector, but keeps active references to interfaces.
 		\par
 		These types are \e always considered to be \b mutable. In other words, all arrays passed as \c std::vectors
 		or \c co::RefVectors can have their contents changed. To prevent the addition/removal of elements, one should
-		pass the array as a \c co::ArrayRange instead. Moreover, to prevent existing elements from being modified,
-		one should pass a \c co::ArrayRange of \c <b>const</b> elements.
+		pass the array as a \c co::Range instead. Moreover, to prevent existing elements from being modified,
+		one should pass a \c co::Range of \c <b>const</b> elements.
 		\par
-		For instance, an array passed as a <tt>co::ArrayRange<const std::string></tt> is completely immutable &mdash;
+		For instance, an array passed as a <tt>co::Range<const std::string></tt> is completely immutable &mdash;
 		as opposed to a <tt>std::vector<std::string></tt>, which is fully mutable. Somewhere in between, a
-		<tt>co::ArrayRange<std::string></tt> allows existing strings to be modified, but not the array length.
+		<tt>co::Range<std::string></tt> allows existing strings to be modified, but not the array length.
 		\par
 		Arrays represented by \c std::vectors or \c co::RefVectors must always be passed and retrieved
 		<b>by reference</b>, while \c co::ArrayRanges must always be passed and retrieved <b>by value</b>.
 		\par
 		Arrays must generally be retrieved by the exact same type they were passed. However, when
 		retrieving \c co::ArrayRanges the following coercion rules apply:
-		  - It is possible to retrieve a <tt>co::ArrayRange<\e ValueType></tt> from an array passed as a
+		  - It is possible to retrieve a <tt>co::Range<\e ValueType></tt> from an array passed as a
 				<tt>std::vector<\e ValueType></tt>.
-		  - It is possible to retrieve a <tt>co::ArrayRange<const \e ValueType></tt> from an array passed as
-				either a <tt>co::ArrayRange<\e ValueType></tt> or a <tt>std::vector<\e ValueType></tt>.
-		  - It is possible to retrieve a <tt>co::ArrayRange<\e SuperInterface* const></tt> from an array
-				passed as either a <tt>co::ArrayRange<\e SubInterface* [const]></tt>, a
+		  - It is possible to retrieve a <tt>co::Range<const \e ValueType></tt> from an array passed as
+				either a <tt>co::Range<\e ValueType></tt> or a <tt>std::vector<\e ValueType></tt>.
+		  - It is possible to retrieve a <tt>co::Range<\e SuperInterface* const></tt> from an array
+				passed as either a <tt>co::Range<\e SubInterface* [const]></tt>, a
 				<tt>std::vector<\e SubInterface*></tt> or a <tt>co::RefVector<\e SubInterface></tt>.
 		\par
 		Non-listed cases must be retrieved by exact type.
@@ -546,7 +546,7 @@ public:
 	{
 		AK_StdVector,	//!< Indicates the variable is a \c std::vector.
 		AK_RefVector,	//!< Indicates the variable is a \c co::RefVector (implies VarIsPointerConst).
-		AK_ArrayRange	//!< Indicates the variable is a \c co::ArrayRange.
+		AK_ArrayRange	//!< Indicates the variable is a \c co::Range.
 	};
 
 	/*!
@@ -596,7 +596,7 @@ public:
 		Constructor corresponding to a setInterface() call.
 		Please, see setInterface()'s documentation for more info.
 	 */
-	inline Any( Interface* instance, IInterfaceType* type ) : _state()
+	inline Any( IService* instance, IInterface* type ) : _state()
 	{
 		setInterface( instance, type );
 	}
@@ -674,8 +674,8 @@ public:
 	 */
 	inline IType* getType() const { return _state.type; }
 
-	//! Returns the co::IInterfaceType of the stored interface instance.
-	inline IInterfaceType* getInterfaceType() const
+	//! Returns the co::IInterface of the stored interface instance.
+	inline IInterface* getInterfaceType() const
 	{
 		assert( _state.kind == TK_INTERFACE );
 		return _state.interfaceType;
@@ -766,7 +766,7 @@ public:
 		This method does not take variable flags, variables are always pointers. If you
 		want to create a reference to an interface pointer, use setVariable() instead.
 	 */
-	void setInterface( Interface* instance, IInterfaceType* type = 0 );
+	void setInterface( IService* instance, IInterface* type = 0 );
 
 	/*!
 		Stores a single-value (non-array) variable.

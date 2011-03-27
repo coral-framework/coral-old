@@ -6,13 +6,13 @@
 #include <gtest/gtest.h>
 
 #include <co/Coral.h>
-#include <co/IComponent.h>
+#include <co/IObject.h>
 #include <co/IReflector.h>
-#include <co/IMethodInfo.h>
-#include <co/ICompoundType.h>
-#include <co/IAttributeInfo.h>
-#include <co/IInterfaceInfo.h>
-#include <co/IComponentType.h>
+#include <co/IMethod.h>
+#include <co/ICompositeType.h>
+#include <co/IField.h>
+#include <co/IPort.h>
+#include <co/IComponent.h>
 #include <co/IllegalCastException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/NoSuchInterfaceException.h>
@@ -22,7 +22,7 @@
 template<typename T>
 T* getMember( co::IType* type, const char* memberName )
 {
-	co::ICompoundType* ct = dynamic_cast<co::ICompoundType*>( type );
+	co::ICompositeType* ct = dynamic_cast<co::ICompositeType*>( type );
 	assert( ct );
 
 	T* mi = dynamic_cast<T*>( ct->getMember( memberName ) );
@@ -31,14 +31,14 @@ T* getMember( co::IType* type, const char* memberName )
 	return mi;
 }
 
-co::IAttributeInfo* getAttributeInfo( co::IType* type, const char* memberName )
+co::IField* getAttributeInfo( co::IType* type, const char* memberName )
 {
-	return getMember<co::IAttributeInfo>( type, memberName );
+	return getMember<co::IField>( type, memberName );
 }
 
-co::IMethodInfo* getMethodInfo( co::IType* type, const char* memberName )
+co::IMethod* getMethodInfo( co::IType* type, const char* memberName )
 {
-	return getMember<co::IMethodInfo>( type, memberName );
+	return getMember<co::IMethod>( type, memberName );
 }
 
 TEST( ReflectionTests, structGetSetInterfacesAndArrays )
@@ -61,24 +61,24 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 	EXPECT_EQ( 0, ts->typeArray.size() );
 
 	// --- obtain the necessary attribute infos:
-	co::IAttributeInfo* aTypeAttrib = getAttributeInfo( type, "aType" );
+	co::IField* aTypeAttrib = getAttributeInfo( type, "aType" );
 	ASSERT_TRUE( aTypeAttrib != NULL );
 
-	co::IAttributeInfo* floatArrayAttrib = getAttributeInfo( type, "floatArray" );
+	co::IField* floatArrayAttrib = getAttributeInfo( type, "floatArray" );
 	ASSERT_TRUE( floatArrayAttrib != NULL );
 
-	co::IAttributeInfo* typeArrayAttrib = getAttributeInfo( type, "typeArray" );
+	co::IField* typeArrayAttrib = getAttributeInfo( type, "typeArray" );
 	ASSERT_TRUE( typeArrayAttrib != NULL );
 
 	// --- attribute setting:
-	reflector->setAttribute( ts, aTypeAttrib, co::getType( "co.IArrayType" ) );
+	reflector->setAttribute( ts, aTypeAttrib, co::getType( "co.IArray" ) );
 	ASSERT_TRUE( ts->aType.isValid() );
-	EXPECT_EQ( "co.IArrayType", ts->aType->getFullName() );
+	EXPECT_EQ( "co.IArray", ts->aType->getFullName() );
 
 	std::vector<co::IType*> typeVec;
-	typeVec.push_back( co::getType( "co.IMemberInfo" ) );
-	typeVec.push_back( co::getType( "co.IAttributeInfo" ) );
-	typeVec.push_back( co::getType( "co.IMethodInfo" ) );
+	typeVec.push_back( co::getType( "co.IMember" ) );
+	typeVec.push_back( co::getType( "co.IField" ) );
+	typeVec.push_back( co::getType( "co.IMethod" ) );
 	
 	co::Any typeVecAny;
 	typeVecAny.set<std::vector<co::IType*>&>( typeVec );
@@ -87,28 +87,28 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 	EXPECT_NO_THROW( reflector->setAttribute( ts, typeArrayAttrib, typeVecAny ) );
 
 	ASSERT_EQ( 3, ts->typeArray.size() );
-	EXPECT_EQ( "co.IMemberInfo", ts->typeArray[0]->getFullName() );
-	EXPECT_EQ( "co.IAttributeInfo", ts->typeArray[1]->getFullName() );
-	EXPECT_EQ( "co.IMethodInfo", ts->typeArray[2]->getFullName() );
+	EXPECT_EQ( "co.IMember", ts->typeArray[0]->getFullName() );
+	EXPECT_EQ( "co.IField", ts->typeArray[1]->getFullName() );
+	EXPECT_EQ( "co.IMethod", ts->typeArray[2]->getFullName() );
 
 	// --- attribute getting:
 	co::Any res;
 
 	reflector->getAttribute( ts, aTypeAttrib, res );
-	EXPECT_EQ( "co.IInterfaceType", res.get<co::Interface*>()->getInterfaceType()->getFullName() );
+	EXPECT_EQ( "co.IInterface", res.get<co::IService*>()->getInterfaceType()->getFullName() );
 
 	reflector->getAttribute( ts, floatArrayAttrib, res );
-	EXPECT_EQ( 0, res.get< co::ArrayRange<const float> >().getSize() );
+	EXPECT_EQ( 0, res.get< co::Range<const float> >().getSize() );
 
 	ts->floatArray.push_back( 1.1f );
 	ts->floatArray.push_back( 2.2f );
 	ts->floatArray.push_back( 3.3f );
 
 	reflector->getAttribute( ts, floatArrayAttrib, res );
-	ASSERT_EQ( 3, res.get< co::ArrayRange<const float> >().getSize() );
-	EXPECT_EQ( 1.1f, res.get< co::ArrayRange<const float> >()[0] );
-	EXPECT_EQ( 2.2f, res.get< co::ArrayRange<const float> >()[1] );
-	EXPECT_EQ( 3.3f, res.get< co::ArrayRange<const float> >()[2] );
+	ASSERT_EQ( 3, res.get< co::Range<const float> >().getSize() );
+	EXPECT_EQ( 1.1f, res.get< co::Range<const float> >()[0] );
+	EXPECT_EQ( 2.2f, res.get< co::Range<const float> >()[1] );
+	EXPECT_EQ( 3.3f, res.get< co::Range<const float> >()[2] );
 
 	// --- in-place destruction:
 	reflector->destroyValue( ts );
@@ -116,37 +116,37 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 
 TEST( ReflectionTests, getAndBindComponentInterfaces )
 {
-	co::RefPtr<co::IComponent> testComponent = co::newInstance( "moduleA.TestComponent" );
+	co::RefPtr<co::IObject> testComponent = co::newInstance( "moduleA.TestComponent" );
 	ASSERT_TRUE( testComponent.isValid() );
 
 	EXPECT_THROW( testComponent->getInterface( NULL ), co::NoSuchInterfaceException );
 
-	co::IComponentType* type = testComponent->getComponentType();
+	co::IComponent* type = testComponent->getComponentType();
 
 	// get a facet info
-	co::IInterfaceInfo* testInterfaceInfo = dynamic_cast<co::IInterfaceInfo*>( type->getMember( "testInterface" ) );
+	co::IPort* testInterfaceInfo = dynamic_cast<co::IPort*>( type->getMember( "testInterface" ) );
 	ASSERT_TRUE( testInterfaceInfo != NULL );
 
 	// get the 'testInterface' instance
-	co::Interface* itf = testComponent->getInterface( testInterfaceInfo );
+	co::IService* itf = testComponent->getInterface( testInterfaceInfo );
 	EXPECT_EQ( testComponent->getFacet<moduleA::TestInterface>(), itf );
 
 	// cannot 'bind' to a facet
 	EXPECT_THROW( testComponent->setReceptacle( testInterfaceInfo, itf ), co::NoSuchInterfaceException );
 
-	// get IInterfaceInfo's for the receptacles
-	co::IInterfaceInfo* typeItfInfo = dynamic_cast<co::IInterfaceInfo*>( type->getMember( "type" ) );
-	co::IInterfaceInfo* itfTypeItfInfo = dynamic_cast<co::IInterfaceInfo*>( type->getMember( "itfType" ) );
+	// get IPort's for the receptacles
+	co::IPort* typeItfInfo = dynamic_cast<co::IPort*>( type->getMember( "type" ) );
+	co::IPort* itfTypeItfInfo = dynamic_cast<co::IPort*>( type->getMember( "itfType" ) );
 	ASSERT_TRUE( typeItfInfo && itfTypeItfInfo );
 
 	// get the interface currently bound to the 'type' receptacle (should be null)
 	EXPECT_EQ( NULL, testComponent->getInterface( typeItfInfo ) );
 
-	// attempting to bind a IStructType to 'itfType' should produce an exception (it expects an IInterfaceType)
+	// attempting to bind a IStruct to 'itfType' should produce an exception (it expects an IInterface)
 	co::IType* structType = co::getType( "moduleA.TestStruct" );
 	EXPECT_THROW( testComponent->setReceptacle( itfTypeItfInfo, structType ), co::IllegalArgumentException );
 
-	// bind an IInterfaceType to both receptacles
+	// bind an IInterface to both receptacles
 	co::IType* itfType = co::getType( "moduleA.TestInterface" );
 
 	testComponent->setReceptacle( typeItfInfo, itfType );

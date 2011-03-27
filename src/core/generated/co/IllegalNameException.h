@@ -28,7 +28,7 @@ public:
 namespace co {
 template<> struct kindOf<co::IllegalNameException> : public kindOfBase<TK_EXCEPTION> {};
 template<> struct nameOf<co::IllegalNameException> { static const char* get() { return "co.IllegalNameException"; } };
-template<> struct typeOf<co::IllegalNameException> : public typeOfBase<co::IllegalNameException, IExceptionType> {};
+template<> struct typeOf<co::IllegalNameException> : public typeOfBase<co::IllegalNameException, IException> {};
 } // namespace co
 
 #endif // _CO_ILLEGALNAMEEXCEPTION_H_

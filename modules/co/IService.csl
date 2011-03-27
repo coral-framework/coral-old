@@ -1,0 +1,20 @@
+/*
+	The co.IService interface, implicitly inherited by all interfaces.
+ */
+interface IService
+{
+	// Object providing type introspection for this interface.
+	readonly attribute IInterface interfaceType;
+
+	// The component providing this interface.
+	readonly attribute IObject interfaceOwner;
+
+	// This interface's name within the interfaceOwner.
+	readonly attribute string interfaceName;
+
+	// Increment the interface owner's reference count.
+	void componentRetain();
+
+	// Decrement the interface owner's reference count.
+	void componentRelease();
+};

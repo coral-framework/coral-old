@@ -1,0 +1,7 @@
+/*
+	Implements co.ITypeTransaction.
+ */
+component TypeTransaction
+{
+	provides ITypeTransaction transaction;
+};

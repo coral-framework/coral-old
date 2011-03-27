@@ -5,10 +5,10 @@
 
 #include "TypeLoader.h"
 #include "TypeManager.h"
-#include "TypeCreationTransaction.h"
+#include "TypeTransaction.h"
 #include "tools/StringTokenizer.h"
 #include <co/IType.h>
-#include <co/IArrayType.h>
+#include <co/IArray.h>
 #include <co/Exception.h>
 #include <co/INamespace.h>
 #include <co/ITypeBuilder.h>
@@ -20,7 +20,7 @@ namespace co {
 
 // Root Loader Contructor:
 TypeLoader::TypeLoader( const std::string& fullTypeName,
-						ArrayRange<const std::string> path,
+						Range<const std::string> path,
 						ITypeManager* tm )
 	: _fullTypeName( fullTypeName ), _path( path )
 {
@@ -29,7 +29,7 @@ TypeLoader::TypeLoader( const std::string& fullTypeName,
 
 	_parentLoader = NULL;
 	_namespace = NULL;
-	_transaction = new TypeCreationTransaction();
+	_transaction = new TypeTransaction();
 }
 
 // Non-Root Loader Constructor:
@@ -230,7 +230,7 @@ bool TypeLoader::findCSL( const std::string& typeName, std::string& fullPath, st
 	names[n].append( ".csl" );
 	++n;
 
-	bool succeeded = OS::searchFile2( _path, ArrayRange<const std::string>( names, n ),
+	bool succeeded = OS::searchFile2( _path, Range<const std::string>( names, n ),
 											fullPath, NULL, &relativePath );
 	if( !succeeded )
 	{

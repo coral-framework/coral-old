@@ -10,9 +10,9 @@ namespace co {
 
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
 co::int32 __ExceptionType_getSize();
-co::IComponent* __ExceptionType_newInstance();
+co::IObject* __ExceptionType_newInstance();
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class ExceptionType_Reflector : public co::ReflectorBase
 {
@@ -37,17 +37,17 @@ public:
 		return __ExceptionType_getSize();
 	}
 
-	co::IComponent* newInstance()
+	co::IObject* newInstance()
 	{
-		co::IComponent* component = __ExceptionType_newInstance();
+		co::IObject* component = __ExceptionType_newInstance();
 		assert( component->getComponentType()->getFullName() == "co.ExceptionType" );
 		return component;
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createExceptionTypeIReflector()
+co::IReflector* __createExceptionTypeReflector()
 {
     return new ExceptionType_Reflector;
 }

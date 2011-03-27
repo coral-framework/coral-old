@@ -10,15 +10,15 @@
 #include <co/Exception.h>
 #include <co/INamespace.h>
 #include <co/ITypeBuilder.h>
-#include <co/IInterfaceInfo.h>
-#include <co/IInterfaceType.h>
-#include <co/ITypeCreationTransaction.h>
+#include <co/IPort.h>
+#include <co/IInterface.h>
+#include <co/ITypeTransaction.h>
 
 namespace co {
 
 // ------ ModulePartBase provides an interface named 'part', of type co::IModulePart ------ //
 
-IInterfaceType* ModulePartBase_co_ModulePart::getInterfaceType()
+IInterface* ModulePartBase_co_ModulePart::getInterfaceType()
 {
 	return co::typeOf<IModulePart>::get();
 }
@@ -41,7 +41,7 @@ ModulePartBase::~ModulePartBase()
 	// empty
 }
 
-IComponent* ModulePartBase::getInterfaceOwner()
+IObject* ModulePartBase::getInterfaceOwner()
 {
 	return this;
 }
@@ -56,17 +56,17 @@ void ModulePartBase::componentRelease()
 	decrementRefCount();
 }
 
-IComponentType* ModulePartBase::getComponentType()
+IComponent* ModulePartBase::getComponentType()
 {
 	return getOrCreateSimpleInternalComponentType( "co.ModulePartBase", "co.IModulePart", "part" );
 }
 
-Interface* ModulePartBase::getInterface( IInterfaceInfo* interfaceInfo )
+IService* ModulePartBase::getInterface( IPort* port )
 {
-	checkValidInterface( interfaceInfo );
+	checkValidPort( port );
 
-	Interface* res = NULL;
-	switch( interfaceInfo->getIndex() )
+	IService* res = NULL;
+	switch( port->getIndex() )
 	{
 	case 0: res = static_cast<IModulePart*>( this ); break;
 	default:
@@ -76,7 +76,7 @@ Interface* ModulePartBase::getInterface( IInterfaceInfo* interfaceInfo )
 	return res;
 }
 
-void ModulePartBase::setReceptacle( IInterfaceInfo* receptacle, Interface* )
+void ModulePartBase::setReceptacle( IPort* receptacle, IService* )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();

@@ -13,7 +13,7 @@ interface ITypeBuilder
 	readonly attribute string typeName;
 
 	/*
-		Adds an identifier to an IEnumType.
+		Adds an identifier to an IEnum.
 		\note Values are assigned implicitly: the first defined identifier is zero, and so forth.
 		\throw NotSupportedException if the builder's kind is not TK_ENUM or if the type was already created.
 		\throw IllegalNameException if the passed \a name is not a valid identifier or clashes with other members.
@@ -22,7 +22,7 @@ interface ITypeBuilder
 		raises NotSupportedException, IllegalNameException;
 
 	/*
-		Adds an attribute to a IStructType, INativeClassType or IInterfaceType.
+		Adds an attribute to a IStruct, INativeClass or IInterface.
 		\throw NotSupportedException if the builder's kind is neither TK_STRUCT, TK_NATIVECLASS nor TK_INTERFACE or if the type was already created.
 		\throw IllegalNameException if the passed \a name is not a valid identifier.
 		\throw IllegalArgumentException if the passed \a type is invalid (e.g. null or the type is a component or exception) or
@@ -33,24 +33,24 @@ interface ITypeBuilder
 		raises NotSupportedException, IllegalNameException, IllegalArgumentException;
 
 	/*
-		Adds a parent interface to an IInterfaceType.
+		Adds a parent interface to an IInterface.
 		\throw NotSupportedException if the builder's kind is not TK_INTERFACE or if the type was already created.
-		\throw IllegalArgumentException if the passed \a superType is invalid (e.g. not an IInterfaceType) or already a super interface.
+		\throw IllegalArgumentException if the passed \a superType is invalid (e.g. not an IInterface) or already a super interface.
 	 */
 	void defineSuperType( in IType superType )
 		raises NotSupportedException, IllegalArgumentException;
 
 	/*
-		Adds an interface to a IComponentType.
+		Adds an interface to a IComponent.
 		\throw NotSupportedException if the builder's kind is not TK_COMPONENT or if the type was already created.
 		\throw IllegalNameException if the passed \a name is not a valid identifier or clashes with other members.
 		\throw IllegalArgumentException if the passed \a interfaceType is invalid (e.g. null).
 	 */
-	void defineInterface( in string name, in IInterfaceType interfaceType, in bool isFacet )
+	void defineInterface( in string name, in IInterface interfaceType, in bool isFacet )
 		raises NotSupportedException, IllegalNameException, IllegalArgumentException;
 
 	/*
-		Adds a method to a INativeClassType or IInterfaceType.
+		Adds a method to a INativeClass or IInterface.
 		\note The method is only really added when IMethodBuilder::createMethod() is called.
 		\throw NotSupportedException if the builder's kind is neither TK_NATIVECLASS nor TK_INTERFACE or if the type was already created.
 		\throw IllegalNameException if the passed \a name is not a valid identifier.
@@ -60,7 +60,7 @@ interface ITypeBuilder
 		raises NotSupportedException, IllegalNameException;
 
 	/*
-		Defines the parameters to create a INativeClassType.
+		Defines the parameters to create a INativeClass.
 		\throw NotSupportedException if the builder's kind is not TK_NATIVECLASS or if the type was already created.
 		\throw IllegalArgumentException if the passed \a nativeHeaderFile or \a nativeName parameters are empty.
 	 */

@@ -11,7 +11,7 @@
 
 namespace co {
 	class IType;
-	class IMethodInfo;
+	class IMethod;
 } // namespace co
 
 /*!

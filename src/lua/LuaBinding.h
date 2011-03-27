@@ -8,7 +8,7 @@
 
 #include <lua.hpp>
 #include <co/Any.h>
-#include <co/IComponent.h>
+#include <co/IObject.h>
 
 namespace lua {
 
@@ -33,22 +33,22 @@ private:
 	static int newComponentInstance( lua_State* L );
 
 private:
-	typedef std::vector<co::IComponentType*> ComponentTypeList;
+	typedef std::vector<co::IComponent*> ComponentTypeList;
 	static ComponentTypeList sm_luaComponentTypes;
 };
 
 /*!
 	Auxiliary static class containing re-usable functions for
-	binding co::CompoundTypes to Lua.
+	binding co::CompositeTypes to Lua.
  */
-class CompoundTypeBinding
+class CompositeTypeBinding
 {
 public:
 	/*!
-		Attempts to get the co::ICompoundType* for the Coral object at \a index.
+		Attempts to get the co::ICompositeType* for the Coral object at \a index.
 		Returns NULL if the value at \a index is not a valid Coral object.
 	 */
-	static co::ICompoundType* getType( lua_State* L, int index );
+	static co::ICompositeType* getType( lua_State* L, int index );
 
 	/*!
 		Given a userdata's index, attempts to set a co::Any with a reference to
@@ -64,34 +64,34 @@ public:
 	static bool tryGetInstance( lua_State* L, int index, co::Any& instance );
 
 	/*!
-		Removes all references to ICompoundType metatables from the Lua registry.
+		Removes all references to ICompositeType metatables from the Lua registry.
 	 */
 	static void releaseBindings( lua_State* L );
 
 protected:
 	/*!
-		Pushes a metatable for a userdata of the specified co::ICompoundType.
-		The metatable is cached in the registry, indexed by the co::ICompoundType pointer.
+		Pushes a metatable for a userdata of the specified co::ICompositeType.
+		The metatable is cached in the registry, indexed by the co::ICompositeType pointer.
 	 */
-	static void pushMetatable( lua_State* L, co::ICompoundType* ct, co::IReflector* reflector = 0 );
+	static void pushMetatable( lua_State* L, co::ICompositeType* ct, co::IReflector* reflector = 0 );
 
 	/*!
-		Assumes the ICompoundType's udata is at index 1 and the member name is at index 2.
+		Assumes the ICompositeType's udata is at index 1 and the member name is at index 2.
 		Pushes a function and returns true, if the member is a method; or a light
-		userdata pointing to a co::IMemberInfo, if the member is not a method.
+		userdata pointing to a co::IMember, if the member is not a method.
 		If the member cannot be found and \a mustExist is false (default), pushes nil and
 		returns false; otherwise, if \a mustExist is true, an exception is thrown.
 	 */
-	static bool pushMember( lua_State* L, co::ICompoundType* ct, bool mustExist = false );
+	static bool pushMember( lua_State* L, co::ICompositeType* ct, bool mustExist = false );
 
 	/*!
-		Pops a light userdata (co::IAttributeInfo*) from the stack.
+		Pops a light userdata (co::IField*) from the stack.
 		Pushes the corresponding attribute value of the given 'instance'.
 	 */
 	static void getAttribute( lua_State* L, const co::Any& instance );
 
 	/*!
-		Pops a value and a light userdata (co::IAttributeInfo*) from the stack.
+		Pops a value and a light userdata (co::IField*) from the stack.
 		Assigns the value to the corresponding attribute of the given 'instance'.
 	 */
 	static void setAttribute( lua_State* L, const co::Any& instance );
@@ -102,18 +102,18 @@ protected:
 	static int callMethod( lua_State* L );
 
 private:
-	typedef std::vector<co::ICompoundType*> CompoundTypeList;
-	static CompoundTypeList sm_boundTypes;
+	typedef std::vector<co::ICompositeType*> CompositeTypeList;
+	static CompositeTypeList sm_boundTypes;
 };
 
 /*!
 	Static class for binding co::Components to Lua.
  */
-class ComponentBinding : public CompoundTypeBinding
+class ComponentBinding : public CompositeTypeBinding
 {
 public:
-	//! Pushes a new instance of a co::IComponent* userdata onto the stack.
-	static void create( lua_State* L, co::IComponent* component );
+	//! Pushes a new instance of a co::IObject* userdata onto the stack.
+	static void create( lua_State* L, co::IObject* component );
 
 	// --- Metamethods ---
 	static int index( lua_State* L );
@@ -125,16 +125,16 @@ public:
 /*!
 	Static class for binding co::Interfaces to Lua.
  */
-class InterfaceBinding : public CompoundTypeBinding
+class InterfaceBinding : public CompositeTypeBinding
 {
 public:
-	//! Pushes a new instance of a co::Interface* userdata onto the stack.
-	static void create( lua_State* L, co::Interface* itf );
+	//! Pushes a new instance of a co::IService* userdata onto the stack.
+	static void create( lua_State* L, co::IService* itf );
 
 	//! Gets the interface pointer of a verified Coral interface userdata.
-	inline static co::Interface* getInstance( lua_State* L, int index )
+	inline static co::IService* getInstance( lua_State* L, int index )
 	{
-		return *reinterpret_cast<co::Interface**>( lua_touserdata( L, index ) );
+		return *reinterpret_cast<co::IService**>( lua_touserdata( L, index ) );
 	}
 
 	// --- Metamethods ---
@@ -147,7 +147,7 @@ public:
 /*!
 	Re-usable class for binding complex values to Lua.
  */
-class ComplexValueBinding : public CompoundTypeBinding
+class ComplexValueBinding : public CompositeTypeBinding
 {
 public:
 	/*!

@@ -50,7 +50,7 @@ end )
 -- co.Type is a smart table that fetches and caches Coral types. It can be
 -- indexed or called, always with a fully-qualified type name. For example:
 --		local type = co.Type[fullTypeName]
---		local type = co.Type "co.Interface"
+--		local type = co.Type "my.InterfaceName"
 
 local coTypeMT = {}
 
@@ -117,7 +117,7 @@ function co.getService( serviceName, client )
 end
 
 -------------------------------------------------------------------------------
--- componentPrototype = co.IComponent( desc )
+-- componentPrototype = co.Component( desc )
 --
 -- Defines a Coral component type implemented in Lua.
 --
@@ -136,7 +136,7 @@ end
 -- A method will only affect a specific facet if it is added to the facet's prototype
 -- table; conversely, it will affect all facets if added to the component's prototype
 -- table. For example:
---		local MyComponent = co.IComponent{ ... }
+--		local MyComponent = co.Component{ ... }
 --		function MyComponent:doSomething() print "all interfaces" end
 --		function MyComponent.someItf:doSomething() print "just someItf" end
 --
@@ -196,7 +196,7 @@ end
 
 local ComponentMT = {}
 
-function co.IComponent( t )
+function co.Component( t )
 	local fullName = t.name
 	if not fullName then
 		error( "you must specify a component name", 2 )
@@ -224,7 +224,7 @@ function co.IComponent( t )
 		error( "component name '" .. fullName .. "' clashes with an existing type", 2 )
 	end
 
-	local tct = coNew( "co.TypeCreationTransaction" ).transaction
+	local tct = coNew( "co.TypeTransaction" ).transaction
 	local ok, ct = pcall( defineComponentType, ns, typeName, tct, provides, receives )
 	if ok then
 		tct:commit()

@@ -1,0 +1,18 @@
+/*
+	Type representing an enumeration of constant identifiers, in the range [0, n].
+ */
+interface IEnum : IType
+{
+	/*
+		An ordered range of strings containing all identifiers in this enum.
+		The first identifier is considered to have value 0; the second identifier, 1, etc.
+	 */
+	readonly attribute string[] identifiers;
+
+	/*
+		Returns the value of an identifier in this enum.
+		Valid values are in the range [0, n]. If the string is not a valid identifier, -1 is returned.
+		\warning This method is case sensitive.
+	 */
+	int32 getValueOf( in string identifier );
+};

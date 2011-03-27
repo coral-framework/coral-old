@@ -11,11 +11,11 @@
 #include <co/INamespace.h>
 #include <co/ITypeBuilder.h>
 #include <co/ITypeManager.h>
-#include <co/ICompoundType.h>
-#include <co/IComponentType.h>
-#include <co/IInterfaceInfo.h>
-#include <co/IInterfaceType.h>
-#include <co/ITypeCreationTransaction.h>
+#include <co/ICompositeType.h>
+#include <co/IComponent.h>
+#include <co/IPort.h>
+#include <co/IInterface.h>
+#include <co/ITypeTransaction.h>
 #include <co/NoSuchInterfaceException.h>
 #include <sstream>
 #include <iostream>
@@ -28,9 +28,9 @@ ComponentBase::~ComponentBase()
 		debug( Dbg_Fatal, "Deleting component %p with a reference count of %i.", this, _refCount );
 }
 
-IInterfaceType* ComponentBase::getInterfaceType()
+IInterface* ComponentBase::getInterfaceType()
 {
-	return typeOf<IComponent>::get();
+	return typeOf<IObject>::get();
 }
 
 const std::string& ComponentBase::getInterfaceName()
@@ -39,23 +39,23 @@ const std::string& ComponentBase::getInterfaceName()
 	return s_interfaceName;
 }
 
-void ComponentBase::checkValidInterface( IInterfaceInfo* itfInfo )
+void ComponentBase::checkValidPort( IPort* port )
 {
-	if( !itfInfo )
-		throw NoSuchInterfaceException( "illegal null interface info" );
+	if( !port )
+		throw NoSuchInterfaceException( "illegal null port" );
 
-	IComponentType* myType = getComponentType();
-	ICompoundType* owner = itfInfo->getOwner();
-	if( owner != static_cast<ICompoundType*>( myType ) )
-		CORAL_THROW( NoSuchInterfaceException, "interface '" << itfInfo->getName() << "' belongs to "
+	IComponent* myType = getComponentType();
+	ICompositeType* owner = port->getOwner();
+	if( owner != static_cast<ICompositeType*>( myType ) )
+		CORAL_THROW( NoSuchInterfaceException, "port '" << port->getName() << "' belongs to "
 			<< owner->getFullName() << ", not to " << myType->getFullName() );
 
-	assert( itfInfo->getIndex() < myType->getInterfaces().getSize() );
+	assert( port->getIndex() < myType->getPorts().getSize() );
 }
 
-void ComponentBase::checkValidReceptacle( IInterfaceInfo* receptacle )
+void ComponentBase::checkValidReceptacle( IPort* receptacle )
 {
-	checkValidInterface( receptacle );
+	checkValidPort( receptacle );
 	if( receptacle->getIsFacet() )
 		throw NoSuchInterfaceException( "receptacle expected, got facet" );
 }
@@ -66,33 +66,33 @@ void ComponentBase::raiseUnexpectedInterfaceIndex()
 	throw NoSuchInterfaceException( "unexpected invalid interface index" );
 }
 
-void ComponentBase::raiseIncompatibleInterface( IInterfaceType* expectedType, Interface* ptr )
+void ComponentBase::raiseIncompatibleInterface( IInterface* expectedType, IService* ptr )
 {
 	CORAL_THROW( IllegalArgumentException, "incompatible interface types (" << expectedType->getFullName()
 					<< " expected, got " << ptr->getInterfaceType()->getFullName() << ")" );
 }
 
-IComponentType* ComponentBase::getOrCreateSimpleInternalComponentType( const char* componentTypeName,
+IComponent* ComponentBase::getOrCreateSimpleInternalComponentType( const char* componentTypeName,
 																	  const char* interfaceTypeName,
 																	  const char* interfaceName )
 {
 	std::string fullTypeName( componentTypeName );
 
-	// get the IComponentType if it already exists
+	// get the IComponent if it already exists
 	ITypeManager* tm = getSystem()->getTypes();
 	IType* type = tm->findType( fullTypeName );
 	if( type )
 	{
-		assert( dynamic_cast<IComponentType*>( type ) );
-		return dynamic_cast<IComponentType*>( type );
+		assert( dynamic_cast<IComponent*>( type ) );
+		return dynamic_cast<IComponent*>( type );
 	}
 
-	// create the IComponentType if it's not defined
-	IInterfaceType* interfaceType = dynamic_cast<IInterfaceType*>( getType( interfaceTypeName ) );
+	// create the IComponent if it's not defined
+	IInterface* interfaceType = dynamic_cast<IInterface*>( getType( interfaceTypeName ) );
 	assert( interfaceType );
 
-	RefPtr<ITypeCreationTransaction> tct =
-			newInstance( "co.TypeCreationTransaction" )->getFacet<ITypeCreationTransaction>();
+	RefPtr<ITypeTransaction> tct =
+			newInstance( "co.TypeTransaction" )->getFacet<ITypeTransaction>();
 
 	size_t lastDotPos = fullTypeName.rfind( '.' );
 	assert( lastDotPos != std::string::npos ); // componentTypeName must be specified with a namespace
@@ -116,10 +116,10 @@ IComponentType* ComponentBase::getOrCreateSimpleInternalComponentType( const cha
 		throw;
 	}
 
-	IComponentType* componentType = dynamic_cast<IComponentType*>( tb->createType() );
+	IComponent* componentType = dynamic_cast<IComponent*>( tb->createType() );
 	assert( componentType );
 
-	// set the IComponentType with a dummy reflector
+	// set the IComponent with a dummy reflector
 	componentType->setReflector( new BasicReflector( componentType ) );
 
 	return componentType;

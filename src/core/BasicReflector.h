@@ -23,7 +23,7 @@ public:
 	// co::IReflector methods:
 	co::IType* getType();
 	co::int32 getSize();
-	IComponent* newInstance();
+	IObject* newInstance();
 
 private:
 	co::IType* _type;

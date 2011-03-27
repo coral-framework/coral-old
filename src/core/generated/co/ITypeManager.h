@@ -7,14 +7,14 @@
 #define _CO_ITYPEMANAGER_H_
 
 #include <co/TypeTraits.h>
-#include <co/ArrayRange.h>
+#include <co/IService.h>
 #include <vector>
-#include <co/Interface.h>
+#include <co/Range.h>
 
 // Forward Declarations:
 namespace co {
 	struct CSLError;
-	class IArrayType;
+	class IArray;
 	class INamespace;
 	class IType;
 } // namespace co
@@ -23,7 +23,7 @@ namespace co {
 // co.ITypeManager Mapping:
 namespace co {
 
-class ITypeManager : public co::Interface
+class ITypeManager : public co::IService
 {
 public:
 	virtual ~ITypeManager() {;}
@@ -38,7 +38,7 @@ public:
 
 	virtual co::IType* findType( const std::string& fullName ) = 0;
 
-	virtual co::IArrayType* getArrayOf( co::IType* elementType ) = 0;
+	virtual co::IArray* getArrayOf( co::IType* elementType ) = 0;
 
 	virtual const std::string& getDocumentation( const std::string& typeOrMemberName ) = 0;
 
@@ -52,7 +52,7 @@ public:
 namespace co {
 template<> struct kindOf<co::ITypeManager> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::ITypeManager> { static const char* get() { return "co.ITypeManager"; } };
-template<> struct typeOf<co::ITypeManager> : public typeOfBase<co::ITypeManager, IInterfaceType> {};
+template<> struct typeOf<co::ITypeManager> : public typeOfBase<co::ITypeManager, IInterface> {};
 } // namespace co
 
 #endif // _CO_ITYPEMANAGER_H_

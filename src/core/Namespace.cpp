@@ -6,7 +6,7 @@
 #include "Namespace.h"
 #include "Module.h"
 #include "TypeBuilder.h"
-#include "TypeCreationTransaction.h"
+#include "TypeTransaction.h"
 #include <co/IType.h>
 #include <co/IllegalNameException.h>
 #include <co/IllegalArgumentException.h>
@@ -105,12 +105,12 @@ INamespace* Namespace::getParentNamespace()
 	return _parent;
 }
 
-ArrayRange<IType* const> Namespace::getTypes()
+Range<IType* const> Namespace::getTypes()
 {
 	return _types;
 }
 
-ArrayRange<INamespace* const> Namespace::getChildNamespaces()
+Range<INamespace* const> Namespace::getChildNamespaces()
 {
 	return _childNamespaces;
 }
@@ -136,7 +136,7 @@ INamespace* Namespace::getChildNamespace( const std::string& name )
 	return NULL;
 }
 
-ITypeBuilder* Namespace::defineType( const std::string& name, TypeKind typeKind, ITypeCreationTransaction* transaction )
+ITypeBuilder* Namespace::defineType( const std::string& name, TypeKind typeKind, ITypeTransaction* transaction )
 {
 	if( typeKind <= TK_ARRAY || typeKind > TK_COMPONENT )
 	{
@@ -149,7 +149,7 @@ ITypeBuilder* Namespace::defineType( const std::string& name, TypeKind typeKind,
 	}
 
 	size_t pos;
-	if( _types.sortedFind( name, typeComparator, pos ) && _types[pos]->getFullName() != "co.Interface" )
+	if( _types.sortedFind( name, typeComparator, pos ) && _types[pos]->getFullName() != "co.IService" )
 		throwClashingType( name );
 
 	if( _childNamespaces.sortedFind( name, namespaceComparator, pos ) )
@@ -157,7 +157,7 @@ ITypeBuilder* Namespace::defineType( const std::string& name, TypeKind typeKind,
 
 	ITypeBuilder* tb = TypeBuilder::create( typeKind, this, name );
 
-	static_cast<TypeCreationTransaction*>( transaction )->addTypeBuilder( tb );
+	static_cast<TypeTransaction*>( transaction )->addTypeBuilder( tb );
 
 	return tb;
 }

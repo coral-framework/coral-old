@@ -14,7 +14,7 @@ interface ITypeManager
 
 	/*
 		Searches the database of loaded types for a type with the given fully-qualified name.
-		A suffix "[]" may be added to the name of a type to search for its corresponding IArrayType.
+		A suffix "[]" may be added to the name of a type to search for its corresponding IArray.
 		Returns null if a type with the given \a fullName is not currently loaded.
 	 */
  	IType findType( in string fullName );
@@ -39,10 +39,10 @@ interface ITypeManager
 	IType getType( in string typeName ) raises IllegalArgumentException, TypeLoadException;
 
 	/*
-		Creates or retrieves an existing IArrayType whose elements are of type \a elementType.
+		Creates or retrieves an existing IArray whose elements are of type \a elementType.
 		\throw IllegalArgumentException if \a elementType is null, an array, an exception or a component.
 	 */
-	IArrayType getArrayOf( in IType elementType ) raises IllegalArgumentException;
+	IArray getArrayOf( in IType elementType ) raises IllegalArgumentException;
 
 	/*
 		A lower-level counterpart of getType() that either retrieves or tries to load a type

@@ -1,0 +1,7 @@
+/*
+	Implements co.INativeClass.
+ */
+component NativeClass
+{
+	provides INativeClass type;
+};

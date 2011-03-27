@@ -12,9 +12,9 @@
 namespace co {
 
 class IType;
-class ICompoundType;
-class IAttributeInfo;
-class IInterfaceType;
+class ICompositeType;
+class IField;
+class IInterface;
 
 /*!
 	Performs several checks to assure a type is semantically consistent.
@@ -69,7 +69,7 @@ private:
 	friend std::ostream& operator<<( std::ostream&, const co::TypeSemanticChecker::MemberDeclaration& );
 
 	// validates inheritance: checks for cyclic inheritance and multiple inheritance.
-	void checkInheritance( co::IInterfaceType* interfaceType );
+	void checkInheritance( co::IInterface* interfaceType );
 
 	// validates inherited members: checks for clashing names between the checked type and its super-types
 	void checkInheritedMemberClashing();
@@ -78,7 +78,7 @@ private:
 	void insertMemberDeclaration( const MemberDeclaration& memberDeclaration );
 
 	// inserts de attribute declarations - member name and accessors.
-	void insertAttributeDeclaration( co::IAttributeInfo* attribute, co::IType* declaringType );
+	void insertAttributeDeclaration( co::IField* attribute, co::IType* declaringType );
 
 	// checks the type members declarations.
 	// If avilable checks for the attributes and methods possible clashes, and checks superTypes if they exist.

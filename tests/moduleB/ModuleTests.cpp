@@ -8,15 +8,15 @@
 #include <co/Coral.h>
 #include <co/IModule.h>
 #include <co/ISystem.h>
-#include <co/IComponent.h>
+#include <co/IObject.h>
 #include <co/IReflector.h>
 #include <co/ModuleState.h>
-#include <co/ICompoundType.h>
-#include <co/IAttributeInfo.h>
+#include <co/ICompositeType.h>
+#include <co/IField.h>
 #include <co/IModuleManager.h>
 #include <co/IServiceManager.h>
 #include <co/LifeCycleException.h>
-#include <co/ITypeCreationTransaction.h>
+#include <co/ITypeTransaction.h>
 #include <co/IllegalArgumentException.h>
 #include <moduleA/TestInterface.h>
 
@@ -54,7 +54,7 @@ TEST( ModuleTests, setupSystemRequiringModuleB )
 
 	// setup the system requiring moduleB
 	std::string requiredModule( "moduleB" );
-	system->setup( co::ArrayRange<std::string const>( &requiredModule, 1 ) );
+	system->setup( co::Range<std::string const>( &requiredModule, 1 ) );
 
 	// now moduleA should have been loaded, as a dependency of moduleB
 	ASSERT_TRUE( system->getModules()->findModule( "moduleA" ) != NULL );
@@ -78,7 +78,7 @@ TEST( ModuleTests, systemAndModuleLifeCycles )
 
 	// setupBase() requiring moduleA
 	std::string requiredModule( "moduleA" );
-	system->setupBase( co::ArrayRange<std::string const>( &requiredModule, 1 ) );
+	system->setupBase( co::Range<std::string const>( &requiredModule, 1 ) );
 
 	// moduleA should have been loaded, but not moduleB
 	co::IModule* moduleA = system->getModules()->findModule( "moduleA" );
@@ -130,13 +130,13 @@ TEST( ModuleTests, systemAndModuleLifeCycles )
 TEST( ModuleTests, crossModuleInheritance )
 {
 	// instantiate a component from 'moduleA' that implements an interface from 'co'
-	co::RefPtr<co::IComponent> component = co::newInstance( "moduleA.TestComponent" );
+	co::RefPtr<co::IObject> component = co::newInstance( "moduleA.TestComponent" );
 
 	// exercise dynamic_casts
 	moduleA::TestInterface* ti = component->getFacet<moduleA::TestInterface>();
 	EXPECT_EQ( component.get(), ti->getInterfaceOwner() );
 
-	co::ITypeCreationTransaction* tct = component->getFacet<co::ITypeCreationTransaction>();
+	co::ITypeTransaction* tct = component->getFacet<co::ITypeTransaction>();
 	EXPECT_EQ( component.get(), tct->getInterfaceOwner() );
 }
 
@@ -155,11 +155,11 @@ TEST( ModuleTests, crossModuleReflection )
 	EXPECT_THROW( reflector->createValue( instancePtr, 1337 ), co::IllegalArgumentException );
 	EXPECT_NO_THROW( reflector->createValue( instancePtr, size ) );
 
-	// get an IAttributeInfo
-	co::ICompoundType* ct = dynamic_cast<co::ICompoundType*>( type );
+	// get an IField
+	co::ICompositeType* ct = dynamic_cast<co::ICompositeType*>( type );
 	assert( ct );
 
-	co::IAttributeInfo* anInt8Attrib = dynamic_cast<co::IAttributeInfo*>( ct->getMember( "anInt8" ) );
+	co::IField* anInt8Attrib = dynamic_cast<co::IField*>( ct->getMember( "anInt8" ) );
 	assert( anInt8Attrib );
 
 	// exercise the reflection API
@@ -198,7 +198,7 @@ TEST( ModuleTests, serviceDependencies )
 	system->setup();
 
 	co::IServiceManager* sm = system->getServices();
-	co::IInterfaceType* serviceType = co::typeOf<moduleA::TestInterface>::get();
+	co::IInterface* serviceType = co::typeOf<moduleA::TestInterface>::get();
 
 	// register a service provided by moduleA
 	ASSERT_TRUE( sm->getIsLazy() );

@@ -31,7 +31,7 @@ interface IMethodBuilder
 		\throw NotSupportedException if the parent type was already created.
 		\throw IllegalArgumentException if the passed \a exceptionType is invalid (e.g. null).
 	 */
-	void defineException( in IExceptionType exceptionType )
+	void defineException( in IException exceptionType )
 		raises IllegalArgumentException;
 
 	/*

@@ -6,14 +6,14 @@
 #include "Utils.h"
 #include <co/Coral.h>
 #include <co/ISystem.h>
-#include <co/IComponent.h>
+#include <co/IObject.h>
 #include <co/Exception.h>
 #include <co/IReflector.h>
-#include <co/IMethodInfo.h>
-#include <co/IComponentType.h>
-#include <co/IInterfaceInfo.h>
-#include <co/IInterfaceType.h>
-#include <co/IParameterInfo.h>
+#include <co/IMethod.h>
+#include <co/IComponent.h>
+#include <co/IPort.h>
+#include <co/IInterface.h>
+#include <co/IParameter.h>
 #include <co/IModuleManager.h>
 
 /*
@@ -61,7 +61,7 @@ static void addDefaultPaths()
 #endif
 }
 
-static void resolveCallee( const std::string& calleeName, co::IComponentType*& ct, co::IInterfaceInfo*& facet, co::IMethodInfo*& method )
+static void resolveCallee( const std::string& calleeName, co::IComponent*& ct, co::IPort*& facet, co::IMethod*& method )
 {
 	// was a method name specified?
 	size_t colonPos = calleeName.rfind( ':' );
@@ -69,17 +69,17 @@ static void resolveCallee( const std::string& calleeName, co::IComponentType*& c
 	{
 		// resolve component type
 		co::IType* type = co::getType( calleeName );
-		ct = dynamic_cast<co::IComponentType*>( type );
+		ct = dynamic_cast<co::IComponent*>( type );
 		if( !ct )
 			CORAL_THROW( co::Exception, "'" << calleeName << "' is not a component." );
 
 		// search the component's list of facets
-		co::ArrayRange<co::IInterfaceInfo* const> facets = ct->getFacets();
+		co::Range<co::IPort* const> facets = ct->getFacets();
 		for( ; facets; facets.popFirst() )
 		{
 			facet = facets.getFirst();
-			co::IMemberInfo* member = facet->getType()->getMember( "main" );
-			if( member && ( method = dynamic_cast<co::IMethodInfo*>( member ) ) )
+			co::IMember* member = facet->getType()->getMember( "main" );
+			if( member && ( method = dynamic_cast<co::IMethod*>( member ) ) )
 				return;
 		}
 
@@ -99,16 +99,16 @@ static void resolveCallee( const std::string& calleeName, co::IComponentType*& c
 
 	// resolve component type
 	co::IType* type = co::getType( componentName );
-	ct = dynamic_cast<co::IComponentType*>( type );
+	ct = dynamic_cast<co::IComponent*>( type );
 	if( !ct )
 		CORAL_THROW( co::Exception, "'" << componentName << "' is not a component." );
 
 	// resolve interface type
-	co::IMemberInfo* member = ct->getMember( interfaceName );
+	co::IMember* member = ct->getMember( interfaceName );
 	if( !member )
 		CORAL_THROW( co::Exception, "'" << componentName << "' has no interface named '" << interfaceName << "'." );
 
-	facet = dynamic_cast<co::IInterfaceInfo*>( member );
+	facet = dynamic_cast<co::IPort*>( member );
 	assert( facet );
 
 	if( !facet || !facet->getIsFacet() )
@@ -120,7 +120,7 @@ static void resolveCallee( const std::string& calleeName, co::IComponentType*& c
 		CORAL_THROW( co::Exception, "interface '" << facet->getType()->getFullName()
 						<< "' has no method named '" << methodName << "'." );
 
-	method = dynamic_cast<co::IMethodInfo*>( member );
+	method = dynamic_cast<co::IMethod*>( member );
 	if( !method )
 		CORAL_THROW( co::Exception, "interface '" << facet->getType()->getFullName()
 						<< "' has a member named '" << methodName << "', but it is not a method." );
@@ -199,9 +199,9 @@ int main( int argc, char* argv[] )
 		}
 
 		// resolve the callee
-		co::IComponentType* ct = NULL;
-		co::IInterfaceInfo* facet = NULL;
-		co::IMethodInfo* method = NULL;
+		co::IComponent* ct = NULL;
+		co::IPort* facet = NULL;
+		co::IMethod* method = NULL;
 		try
 		{
 			resolveCallee( argv[index], ct, facet, method );
@@ -216,7 +216,7 @@ int main( int argc, char* argv[] )
 		// check the method signature
 		try
 		{
-			co::ArrayRange<co::IParameterInfo* const> params = method->getParameters();
+			co::Range<co::IParameter* const> params = method->getParameters();
 			if( !params.isEmpty() && ( params.getSize() > 1 || params[0]->getType()->getFullName() != "string[]" ) )
 				throw co::Exception( "method can only have a single parameter, of type 'string[]'" );
 		}
@@ -228,8 +228,8 @@ int main( int argc, char* argv[] )
 		}
 
 		// instantiate the component & obtain the interface instance
-		co::RefPtr<co::IComponent> component;
-		co::Interface* itf;
+		co::RefPtr<co::IObject> component;
+		co::IService* itf;
 		try
 		{
 			component = ct->getReflector()->newInstance();
@@ -266,7 +266,7 @@ int main( int argc, char* argv[] )
 			co::Any res;
 			co::Any arg;
 			arg.set<std::vector<std::string>&>( args );
-			reflector->invokeMethod( itf, method, co::ArrayRange<co::Any const>( &arg, 1 ), res );
+			reflector->invokeMethod( itf, method, co::Range<co::Any const>( &arg, 1 ), res );
 
 			// if the result is a number, use it as the return status; otherwise, print it
 			if( res.isValid() )

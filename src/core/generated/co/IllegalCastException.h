@@ -28,7 +28,7 @@ public:
 namespace co {
 template<> struct kindOf<co::IllegalCastException> : public kindOfBase<TK_EXCEPTION> {};
 template<> struct nameOf<co::IllegalCastException> { static const char* get() { return "co.IllegalCastException"; } };
-template<> struct typeOf<co::IllegalCastException> : public typeOfBase<co::IllegalCastException, IExceptionType> {};
+template<> struct typeOf<co::IllegalCastException> : public typeOfBase<co::IllegalCastException, IException> {};
 } // namespace co
 
 #endif // _CO_ILLEGALCASTEXCEPTION_H_

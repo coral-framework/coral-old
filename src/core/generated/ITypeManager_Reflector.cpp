@@ -4,13 +4,13 @@
  */
 
 #include <co/ITypeManager.h>
-#include <co/IDynamicProxyHandler.h>
+#include <co/IDynamicServiceProvider.h>
 #include <co/CSLError.h>
 #include <co/INamespace.h>
-#include <co/IArrayType.h>
 #include <co/IType.h>
-#include <co/IMethodInfo.h>
-#include <co/IAttributeInfo.h>
+#include <co/IArray.h>
+#include <co/IMethod.h>
+#include <co/IField.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -20,14 +20,14 @@
 
 namespace co {
 
-// ------ Proxy Interface ------ //
+// ------ Dynamic Service Proxy ------ //
 
 class ITypeManager_Proxy : public co::ITypeManager
 {
 public:
-	ITypeManager_Proxy( co::IDynamicProxyHandler* handler ) : _handler( handler )
+	ITypeManager_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _handler->registerProxyInterface( co::disambiguate<co::Interface, co::ITypeManager>( this ) );
+		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, co::ITypeManager>( this ) );
 	}
 
 	virtual ~ITypeManager_Proxy()
@@ -35,19 +35,19 @@ public:
 		// empty
 	}
 
-	// co::Interface Methods:
+	// co::IService Methods:
 
-	co::IInterfaceType* getInterfaceType() { return co::typeOf<co::ITypeManager>::get(); }
-	co::IComponent* getInterfaceOwner() { return _handler->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _handler->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _handler->componentRetain(); }
-	void componentRelease() { _handler->componentRelease(); }
+	co::IInterface* getInterfaceType() { return co::typeOf<co::ITypeManager>::get(); }
+	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
+	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
+	void componentRetain() { _provider->componentRetain(); }
+	void componentRelease() { _provider->componentRelease(); }
 
 	// co.ITypeManager Methods:
 
 	bool getDocumentationParsing()
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::ITypeManager>( 0 ) );
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::ITypeManager>( 0 ) );
         return res.get< bool >();
 	}
 
@@ -55,12 +55,12 @@ public:
 	{
 		co::Any arg;
 		arg.set< bool >( documentationParsing_ );
-		_handler->handleSetAttribute( _cookie, getAttribInfo<co::ITypeManager>( 0 ), arg );
+		_provider->handleSetAttribute( _cookie, getAttribInfo<co::ITypeManager>( 0 ), arg );
 	}
 
 	co::INamespace* getRootNS()
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::ITypeManager>( 1 ) );
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::ITypeManager>( 1 ) );
         return res.get< co::INamespace* >();
 	}
 
@@ -68,8 +68,8 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( fullName_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeManager>( 0 ), range );
+		co::Range<co::Any const> range( args, 1 );
+		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeManager>( 0 ), range );
 		return res.get< co::INamespace* >();
 	}
 
@@ -77,26 +77,26 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( fullName_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeManager>( 1 ), range );
+		co::Range<co::Any const> range( args, 1 );
+		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeManager>( 1 ), range );
 		return res.get< co::IType* >();
 	}
 
-	co::IArrayType* getArrayOf( co::IType* elementType_ )
+	co::IArray* getArrayOf( co::IType* elementType_ )
 	{
 		co::Any args[1];
 		args[0].set< co::IType* >( elementType_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeManager>( 2 ), range );
-		return res.get< co::IArrayType* >();
+		co::Range<co::Any const> range( args, 1 );
+		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeManager>( 2 ), range );
+		return res.get< co::IArray* >();
 	}
 
 	const std::string& getDocumentation( const std::string& typeOrMemberName_ )
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( typeOrMemberName_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeManager>( 3 ), range );
+		co::Range<co::Any const> range( args, 1 );
+		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeManager>( 3 ), range );
 		return res.get< const std::string& >();
 	}
 
@@ -104,8 +104,8 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( typeName_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeManager>( 4 ), range );
+		co::Range<co::Any const> range( args, 1 );
+		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeManager>( 4 ), range );
 		return res.get< co::IType* >();
 	}
 
@@ -114,30 +114,30 @@ public:
 		co::Any args[2];
 		args[0].set< const std::string& >( typeName_ );
 		args[1].set< std::vector<co::CSLError>& >( errorStack_ );
-		co::ArrayRange<co::Any const> range( args, 2 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeManager>( 5 ), range );
+		co::Range<co::Any const> range( args, 2 );
+		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeManager>( 5 ), range );
 		return res.get< co::IType* >();
 	}
 
 protected:
 	template<typename T>
-	co::IAttributeInfo* getAttribInfo( co::uint32 index )
+	co::IField* getAttribInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberAttributes()[index];
+		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethodInfo* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethodInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberMethods()[index];
+		return co::typeOf<T>::get()->getMethods()[index];
 	}
 
 private:
-	co::IDynamicProxyHandler* _handler;
+	co::IDynamicServiceProvider* _provider;
 	co::uint32 _cookie;
 };
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class ITypeManager_Reflector : public co::ReflectorBase
 {
@@ -162,13 +162,13 @@ public:
 		return sizeof(co::ITypeManager);
 	}
 
-	co::Interface* newProxy( co::IDynamicProxyHandler* handler )
+	co::IService* newProxy( co::IDynamicServiceProvider* provider )
 	{
-		checValidProxyHandler( handler );
-		return co::disambiguate<co::Interface, co::ITypeManager>( new co::ITypeManager_Proxy( handler ) );
+		checkValidDynamicProvider( provider );
+		return co::disambiguate<co::IService, co::ITypeManager>( new co::ITypeManager_Proxy( provider ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value )
+	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
 	{
 		co::ITypeManager* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
@@ -179,7 +179,7 @@ public:
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value )
+	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
 	{
 		co::ITypeManager* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
@@ -192,7 +192,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
+	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
 	{
 		co::ITypeManager* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -219,7 +219,7 @@ public:
 				{
 					co::IType* elementType_ = args[++argIndex].get< co::IType* >();
 					argIndex = -1;
-					res.set< co::IArrayType* >( p->getArrayOf( elementType_ ) );
+					res.set< co::IArray* >( p->getArrayOf( elementType_ ) );
 				}
 				break;
 			case 5:
@@ -262,20 +262,20 @@ public:
 	}
 
 private:
-	co::ITypeManager* checkInstance( const co::Any& any, co::IMemberInfo* member )
+	co::ITypeManager* checkInstance( const co::Any& any, co::IMember* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
 
 		// make sure that 'any' is an instance of this type
-		co::IInterfaceType* myType = co::typeOf<co::ITypeManager>::get();
+		co::IInterface* myType = co::typeOf<co::ITypeManager>::get();
 
 		co::ITypeManager* res;
 		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::ITypeManager*>( any.getState().data.itf ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::ITypeManager*, but got " << any );
 
 		// make sure that 'member' belongs to this type
-		co::ICompoundType* owner = member->getOwner();
+		co::ICompositeType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to co.ITypeManager" );
@@ -284,9 +284,9 @@ private:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createITypeManagerIReflector()
+co::IReflector* __createITypeManagerReflector()
 {
     return new ITypeManager_Reflector;
 }

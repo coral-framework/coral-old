@@ -1,0 +1,7 @@
+/*
+	Implements co.IStruct.
+ */
+component Struct
+{
+	provides IStruct type;
+};

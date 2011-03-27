@@ -25,7 +25,7 @@ interface IServiceManager
 		\throw IllegalArgumentException if any of the arguments are null, or if the interface
 					type of \a serviceInstance is not a subtype of \a serviceType.
 	 */
-	void addService( in IInterfaceType serviceType, in Interface serviceInstance )
+	void addService( in IInterface serviceType, in IService serviceInstance )
 			raises IllegalArgumentException;
 
 	/*
@@ -33,9 +33,9 @@ interface IServiceManager
 
 		\throw IllegalArgumentException if a) any of the arguments are null; or b) the interface type
 				of \a serviceInstance is not a subtype of \a serviceType; or c) \a clientType is the
-				co.Interface interface (in this case you should call addService() instead).
+				co.IService interface (in this case you should call addService() instead).
 	 */
-	void addServiceForType( in IInterfaceType serviceType, in IInterfaceType clientType, in Interface serviceInstance )
+	void addServiceForType( in IInterface serviceType, in IInterface clientType, in IService serviceInstance )
 			raises IllegalArgumentException;
 
 	/*
@@ -54,7 +54,7 @@ interface IServiceManager
 					type \a serviceType.
 		\throw MissingServiceException if \a isLazy is \a false and the service cannot be instantiated.
 	 */
-	void addServiceImplementation( in IInterfaceType serviceType, in string componentName )
+	void addServiceImplementation( in IInterface serviceType, in string componentName )
 			raises IllegalArgumentException, NoSuchInterfaceException, MissingServiceException;
 
 	/*
@@ -69,12 +69,12 @@ interface IServiceManager
 
 		\throw IllegalArgumentException if a) \a serviceType or \a clientType are null;
 				or b) \a componentName does not identify a valid component type; or c) \a clientType is
-				the co.Interface interface (in this case you should call addService() instead).
+				the co.IService interface (in this case you should call addService() instead).
 		\throw NoSuchInterfaceException if the named component type does not provide an interface of
 					type \a serviceType.
 		\throw MissingServiceException if \a isLazy is \a false and the service cannot be instantiated.
 	 */
-	void addServiceImplementationForType( in IInterfaceType serviceType, in IInterfaceType clientType, in string componentName )
+	void addServiceImplementationForType( in IInterface serviceType, in IInterface clientType, in string componentName )
 			raises IllegalArgumentException, NoSuchInterfaceException, MissingServiceException;
 
 	/*
@@ -83,7 +83,7 @@ interface IServiceManager
 		\throw IllegalArgumentException if serviceType is null.
 		\throw MissingServiceException if no global instance of \a serviceType is available.
 	 */
-	Interface getService( in IInterfaceType serviceType )
+	IService getService( in IInterface serviceType )
 			raises IllegalArgumentException, MissingServiceException;
 
 	/*
@@ -97,7 +97,7 @@ interface IServiceManager
 		\throw IllegalArgumentException if any of the arguments are null.
 		\throw MissingServiceException if no suitable instance of \a serviceType is available for \a clientType.
 	 */
-	Interface getServiceForType( in IInterfaceType serviceType, in IInterfaceType clientType )
+	IService getServiceForType( in IInterface serviceType, in IInterface clientType )
 			raises IllegalArgumentException, MissingServiceException;
 
 	/*
@@ -110,19 +110,19 @@ interface IServiceManager
 		\throw IllegalArgumentException if any of the arguments are null.
 		\throw MissingServiceException if no suitable instance of \a serviceType is available for \a clientInstance.
 	 */
-	Interface getServiceForInstance( in IInterfaceType serviceType, in Interface clientInstance )
+	IService getServiceForInstance( in IInterface serviceType, in IService clientInstance )
 			raises IllegalArgumentException, MissingServiceException;
 
 	/*
 		Removes the global instance of the specified \a serviceType.
 		\throw MissingServiceException if no global instance of \a serviceType was found.
 	 */
-	void removeService( in IInterfaceType serviceType ) raises MissingServiceException;
+	void removeService( in IInterface serviceType ) raises MissingServiceException;
 
 	/*
 		Removes the instance of \a serviceType that was published for \a clientType.
 		\throw MissingServiceException if no matching service instance was found.
 	 */
-	void removeServiceForType( in IInterfaceType serviceType, in IInterfaceType clientType )
+	void removeServiceForType( in IInterface serviceType, in IInterface clientType )
 			raises MissingServiceException;
 };

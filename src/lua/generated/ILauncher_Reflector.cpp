@@ -4,9 +4,9 @@
  */
 
 #include <lua/ILauncher.h>
-#include <co/IDynamicProxyHandler.h>
-#include <co/IMethodInfo.h>
-#include <co/IAttributeInfo.h>
+#include <co/IDynamicServiceProvider.h>
+#include <co/IMethod.h>
+#include <co/IField.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -19,15 +19,15 @@ namespace lua {
 void moduleRetain();
 void moduleRelease();
 
-// ------ Proxy Interface ------ //
+// ------ Dynamic Service Proxy ------ //
 
 class ILauncher_Proxy : public lua::ILauncher
 {
 public:
-	ILauncher_Proxy( co::IDynamicProxyHandler* handler ) : _handler( handler )
+	ILauncher_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
 		moduleRetain();
-		_cookie = _handler->registerProxyInterface( co::disambiguate<co::Interface, lua::ILauncher>( this ) );
+		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, lua::ILauncher>( this ) );
 	}
 
 	virtual ~ILauncher_Proxy()
@@ -35,44 +35,44 @@ public:
 		moduleRelease();
 	}
 
-	// co::Interface Methods:
+	// co::IService Methods:
 
-	co::IInterfaceType* getInterfaceType() { return co::typeOf<lua::ILauncher>::get(); }
-	co::IComponent* getInterfaceOwner() { return _handler->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _handler->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _handler->componentRetain(); }
-	void componentRelease() { _handler->componentRelease(); }
+	co::IInterface* getInterfaceType() { return co::typeOf<lua::ILauncher>::get(); }
+	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
+	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
+	void componentRetain() { _provider->componentRetain(); }
+	void componentRelease() { _provider->componentRelease(); }
 
 	// lua.ILauncher Methods:
 
-	co::int32 main( co::ArrayRange<std::string const> args_ )
+	co::int32 main( co::Range<std::string const> args_ )
 	{
 		co::Any args[1];
-		args[0].set< co::ArrayRange<std::string const> >( args_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<lua::ILauncher>( 0 ), range );
+		args[0].set< co::Range<std::string const> >( args_ );
+		co::Range<co::Any const> range( args, 1 );
+		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<lua::ILauncher>( 0 ), range );
 		return res.get< co::int32 >();
 	}
 
 protected:
 	template<typename T>
-	co::IAttributeInfo* getAttribInfo( co::uint32 index )
+	co::IField* getAttribInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberAttributes()[index];
+		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethodInfo* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethodInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberMethods()[index];
+		return co::typeOf<T>::get()->getMethods()[index];
 	}
 
 private:
-	co::IDynamicProxyHandler* _handler;
+	co::IDynamicServiceProvider* _provider;
 	co::uint32 _cookie;
 };
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class ILauncher_Reflector : public co::ReflectorBase
 {
@@ -97,27 +97,27 @@ public:
 		return sizeof(lua::ILauncher);
 	}
 
-	co::Interface* newProxy( co::IDynamicProxyHandler* handler )
+	co::IService* newProxy( co::IDynamicServiceProvider* provider )
 	{
-		checValidProxyHandler( handler );
-		return co::disambiguate<co::Interface, lua::ILauncher>( new lua::ILauncher_Proxy( handler ) );
+		checkValidDynamicProvider( provider );
+		return co::disambiguate<co::IService, lua::ILauncher>( new lua::ILauncher_Proxy( provider ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value )
-	{
-		checkInstance( instance, ai );
-		raiseUnexpectedMemberIndex();
-		CORAL_UNUSED( value );
-	}
-
-	void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value )
+	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
 	{
 		checkInstance( instance, ai );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
+	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
+	{
+		checkInstance( instance, ai );
+		raiseUnexpectedMemberIndex();
+		CORAL_UNUSED( value );
+	}
+
+	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
 	{
 		lua::ILauncher* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -128,7 +128,7 @@ public:
 			{
 			case 0:
 				{
-					co::ArrayRange<std::string const> args_ = args[++argIndex].get< co::ArrayRange<std::string const> >();
+					co::Range<std::string const> args_ = args[++argIndex].get< co::Range<std::string const> >();
 					argIndex = -1;
 					res.set< co::int32 >( p->main( args_ ) );
 				}
@@ -151,20 +151,20 @@ public:
 	}
 
 private:
-	lua::ILauncher* checkInstance( const co::Any& any, co::IMemberInfo* member )
+	lua::ILauncher* checkInstance( const co::Any& any, co::IMember* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
 
 		// make sure that 'any' is an instance of this type
-		co::IInterfaceType* myType = co::typeOf<lua::ILauncher>::get();
+		co::IInterface* myType = co::typeOf<lua::ILauncher>::get();
 
 		lua::ILauncher* res;
 		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<lua::ILauncher*>( any.getState().data.itf ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid lua::ILauncher*, but got " << any );
 
 		// make sure that 'member' belongs to this type
-		co::ICompoundType* owner = member->getOwner();
+		co::ICompositeType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to lua.ILauncher" );
@@ -173,9 +173,9 @@ private:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createILauncherIReflector()
+co::IReflector* __createILauncherReflector()
 {
     return new ILauncher_Reflector;
 }

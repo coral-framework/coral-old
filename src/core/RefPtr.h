@@ -11,9 +11,8 @@
 namespace co {
 
 /*!
-	\brief A smart-pointer that implements reference counting for Coral interfaces.
- 
-	\tparam T an interface type (co::Interface).
+	\brief A smart-pointer that implements reference counting for Coral services.
+	\tparam T a service type (co::IService).
  */
 template<class T>
 class RefPtr
@@ -77,7 +76,7 @@ public:
 
 		return *this;
 	}
-	
+
 	//! Comparison operator for RefPtr's.
 	//@{
 	inline bool operator == ( const RefPtr& other ) const { return _ptr == other._ptr; }
@@ -93,7 +92,7 @@ public:
 	inline bool operator < ( const T* p ) const { return _ptr < p; }
 	inline bool operator > ( const T* p ) const { return _ptr > p; }
 	//@}
-	
+
 	//! Dereference operator.
 	//@{
 	inline T& operator * ()  { return *_ptr; }

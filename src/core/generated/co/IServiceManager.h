@@ -7,18 +7,18 @@
 #define _CO_ISERVICEMANAGER_H_
 
 #include <co/TypeTraits.h>
-#include <co/Interface.h>
+#include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
-	class IInterfaceType;
+	class IInterface;
 } // namespace co
 // End Of Forward Declarations
 
 // co.IServiceManager Mapping:
 namespace co {
 
-class IServiceManager : public co::Interface
+class IServiceManager : public co::IService
 {
 public:
 	virtual ~IServiceManager() {;}
@@ -27,23 +27,23 @@ public:
 
 	virtual void setIsLazy( bool isLazy ) = 0;
 
-	virtual void addService( co::IInterfaceType* serviceType, co::Interface* serviceInstance ) = 0;
+	virtual void addService( co::IInterface* serviceType, co::IService* serviceInstance ) = 0;
 
-	virtual void addServiceForType( co::IInterfaceType* serviceType, co::IInterfaceType* clientType, co::Interface* serviceInstance ) = 0;
+	virtual void addServiceForType( co::IInterface* serviceType, co::IInterface* clientType, co::IService* serviceInstance ) = 0;
 
-	virtual void addServiceImplementation( co::IInterfaceType* serviceType, const std::string& componentName ) = 0;
+	virtual void addServiceImplementation( co::IInterface* serviceType, const std::string& componentName ) = 0;
 
-	virtual void addServiceImplementationForType( co::IInterfaceType* serviceType, co::IInterfaceType* clientType, const std::string& componentName ) = 0;
+	virtual void addServiceImplementationForType( co::IInterface* serviceType, co::IInterface* clientType, const std::string& componentName ) = 0;
 
-	virtual co::Interface* getService( co::IInterfaceType* serviceType ) = 0;
+	virtual co::IService* getService( co::IInterface* serviceType ) = 0;
 
-	virtual co::Interface* getServiceForInstance( co::IInterfaceType* serviceType, co::Interface* clientInstance ) = 0;
+	virtual co::IService* getServiceForInstance( co::IInterface* serviceType, co::IService* clientInstance ) = 0;
 
-	virtual co::Interface* getServiceForType( co::IInterfaceType* serviceType, co::IInterfaceType* clientType ) = 0;
+	virtual co::IService* getServiceForType( co::IInterface* serviceType, co::IInterface* clientType ) = 0;
 
-	virtual void removeService( co::IInterfaceType* serviceType ) = 0;
+	virtual void removeService( co::IInterface* serviceType ) = 0;
 
-	virtual void removeServiceForType( co::IInterfaceType* serviceType, co::IInterfaceType* clientType ) = 0;
+	virtual void removeServiceForType( co::IInterface* serviceType, co::IInterface* clientType ) = 0;
 };
 
 } // namespace co
@@ -51,7 +51,7 @@ public:
 namespace co {
 template<> struct kindOf<co::IServiceManager> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IServiceManager> { static const char* get() { return "co.IServiceManager"; } };
-template<> struct typeOf<co::IServiceManager> : public typeOfBase<co::IServiceManager, IInterfaceType> {};
+template<> struct typeOf<co::IServiceManager> : public typeOfBase<co::IServiceManager, IInterface> {};
 } // namespace co
 
 #endif // _CO_ISERVICEMANAGER_H_

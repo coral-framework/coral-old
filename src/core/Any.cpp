@@ -5,10 +5,10 @@
 
 #include "Any.h"
 #include <co/IType.h>
-#include <co/IEnumType.h>
+#include <co/IEnum.h>
 #include <co/INamespace.h>
 #include <co/IReflector.h>
-#include <co/IInterfaceType.h>
+#include <co/IInterface.h>
 #include <co/IllegalCastException.h>
 #include <cstdlib>
 #include <iomanip>
@@ -28,7 +28,7 @@ std::ostream& operator<<( std::ostream& out, const co::__any::State& s )
 		{
 		case co::__any::State::AK_StdVector:	arrayKindString = "std::vector"; break;
 		case co::__any::State::AK_RefVector:	arrayKindString = "co::RefVector"; break;
-		case co::__any::State::AK_ArrayRange:	arrayKindString = "co::ArrayRange"; break;
+		case co::__any::State::AK_ArrayRange:	arrayKindString = "co::Range"; break;
 		default:
 			arrayKindString = NULL;
 			assert( false );
@@ -432,7 +432,7 @@ void castValue( const __any::State& from, __any::State& to )
 		}
 
 		// check if the resulting value is well defined for the enum
-		if( to.data.u32 >= static_cast<IEnumType*>( to.type )->getIdentifiers().getSize() )
+		if( to.data.u32 >= static_cast<IEnum*>( to.type )->getIdentifiers().getSize() )
 			THROW_ILLEGAL_CAST( from, to, << ": value '" << to.data.u32 << "' is out of range for the enum" );
 		break;
 	}
@@ -460,7 +460,7 @@ bool testAndCopyCompatibleReferences( const __any::State& from, __any::State& to
 		// special treatment for arrays
 		assert( !to.isReference && !from.isReference ); // arrays can never contain references
 
-		// all array kinds are implicitly convertable to co::ArrayRange
+		// all array kinds are implicitly convertable to co::Range
 		if( to.arrayKind == __any::State::AK_ArrayRange )
 		{
 			if( from.arrayKind == __any::State::AK_ArrayRange )
@@ -488,7 +488,7 @@ bool testAndCopyCompatibleReferences( const __any::State& from, __any::State& to
 		}
 		else
 		{
-			// array kinds other than co::ArrayRange must be retrieved by exact type, and cannot be null
+			// array kinds other than co::Range must be retrieved by exact type, and cannot be null
 			assert( from.data.ptr != NULL );
 			return	to.arrayKind == from.arrayKind &&
 					to.type == from.type &&
@@ -509,7 +509,7 @@ bool testAndCopyCompatibleReferences( const __any::State& from, __any::State& to
 	}
 }
 
-void Any::setInterface( Interface* instance, IInterfaceType* type )
+void Any::setInterface( IService* instance, IInterface* type )
 {
 	// type cannot be NULL when the instance is NULL
 	assert( type || instance );
@@ -762,7 +762,7 @@ void Any::makeOut( IType* paramType )
 			assert( getKind() == TK_ARRAY && isConst() == false );
 		else
 		{
-			IArrayType* arrayType = dynamic_cast<IArrayType*>( paramType );
+			IArray* arrayType = dynamic_cast<IArray*>( paramType );
 			assert( arrayType );
 
 			IType* elementType = arrayType->getElementType();
@@ -851,7 +851,7 @@ void Any::makeIn()
 		break;
 
 	case TK_INTERFACE:
-		setInterface( reinterpret_cast<Interface*>( _object.data.ptr ), getInterfaceType() );
+		setInterface( reinterpret_cast<IService*>( _object.data.ptr ), getInterfaceType() );
 		break;
 
 	default:
@@ -961,7 +961,7 @@ Any::PseudoVector& Any::createArray( IType* elementType, size_t n )
 		break;
 
 	case TK_INTERFACE:
-		new( _object.array.vectorArea ) RefVector<Interface>( n );
+		new( _object.array.vectorArea ) RefVector<IService>( n );
 		break;
 
 	default:
@@ -1074,7 +1074,7 @@ void Any::destroyObject()
 				break;
 
 			case TK_INTERFACE:
-				reinterpret_cast<RefVector<Interface>*>( pv )->~RefVector();
+				reinterpret_cast<RefVector<IService>*>( pv )->~RefVector();
 				break;
 
 			default:
@@ -1276,8 +1276,8 @@ void Any::copy( const Any& other )
 					break;
 
 				case TK_INTERFACE:
-					new( _object.array.vectorArea ) RefVector<Interface>(
-							*reinterpretPtr<const RefVector<Interface> >( other._object.array.vectorArea ) );
+					new( _object.array.vectorArea ) RefVector<IService>(
+							*reinterpretPtr<const RefVector<IService> >( other._object.array.vectorArea ) );
 					break;
 
 				default:

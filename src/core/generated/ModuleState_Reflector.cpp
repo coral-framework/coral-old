@@ -9,7 +9,7 @@
 
 namespace co {
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class ModuleState_Reflector : public co::ReflectorBase
 {
@@ -35,9 +35,9 @@ public:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createModuleStateIReflector()
+co::IReflector* __createModuleStateReflector()
 {
     return new ModuleState_Reflector;
 }

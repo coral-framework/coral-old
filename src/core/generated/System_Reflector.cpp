@@ -10,9 +10,9 @@ namespace co {
 
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
 co::int32 __System_getSize();
-co::IComponent* __System_newInstance();
+co::IObject* __System_newInstance();
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class System_Reflector : public co::ReflectorBase
 {
@@ -37,17 +37,17 @@ public:
 		return __System_getSize();
 	}
 
-	co::IComponent* newInstance()
+	co::IObject* newInstance()
 	{
-		co::IComponent* component = __System_newInstance();
+		co::IObject* component = __System_newInstance();
 		assert( component->getComponentType()->getFullName() == "co.System" );
 		return component;
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createSystemIReflector()
+co::IReflector* __createSystemReflector()
 {
     return new System_Reflector;
 }

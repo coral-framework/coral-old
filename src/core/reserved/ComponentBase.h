@@ -6,12 +6,12 @@
 #ifndef _CO_RESERVED_COMPONENTBASE_H_
 #define _CO_RESERVED_COMPONENTBASE_H_
 
-#include <co/IComponent.h>
+#include <co/IObject.h>
 #include <co/IllegalArgumentException.h>
 
 namespace co {
 
-class CORAL_EXPORT ComponentBase : public IComponent
+class CORAL_EXPORT ComponentBase : public IObject
 {
 public:
 	ComponentBase() : _refCount( 0 )
@@ -19,8 +19,8 @@ public:
 
 	virtual ~ComponentBase();
 
-	// co::Interface methods for the 'component' (co::IComponent) interface:
-	IInterfaceType* getInterfaceType();
+	// co::IService methods for the 'object' (co::IObject) interface:
+	IInterface* getInterfaceType();
 	const std::string& getInterfaceName();
 
 protected:
@@ -36,10 +36,10 @@ protected:
 	}
 
 	//! Raises co::NoSuchInterfaceException if \a itfInfo isn't one of the component's interfaces.
-	void checkValidInterface( IInterfaceInfo* itfInfo );
+	void checkValidPort( IPort* port );
 
-	//! Similar to checkValidInterface(), but also raises an exception if \a receptacle is a facet.
-	void checkValidReceptacle( IInterfaceInfo* receptacle );
+	//! Similar to checkValidPort(), but also raises an exception if \a receptacle is a facet.
+	void checkValidReceptacle( IPort* receptacle );
 
 	/*!
 		Raises a co::NoSuchInterfaceException for cases that simply "should never happen"
@@ -49,7 +49,7 @@ protected:
 
 	//! Downcasts an interface pointer, throwing co::IllegalArgumentException if the cast fails.
 	template<typename T>
-	T* checkedInterfaceCast( Interface* ptr )
+	T* checkedInterfaceCast( IService* ptr )
 	{
 		if( !ptr ) return NULL; // null pointers are always compatible
 		T* castedPtr = dynamic_cast<T*>( ptr );
@@ -59,18 +59,18 @@ protected:
 	}
 
 	//! Raises an IllegalArgumentException stating the passed 'ptr' was not of the 'expectedType'.
-	void raiseIncompatibleInterface( IInterfaceType* expectedType, Interface* ptr );
+	void raiseIncompatibleInterface( IInterface* expectedType, IService* ptr );
 
 	/*!
 		Utility method to dynamically define simple, internal component types (i.e.
 		components that provide a single interface and don't have reflectors). Used
 		internally by the core for all Reflectors and default IModulePart components.
 
-		\param componentTypeName fully-qualified name of the IComponentType.
+		\param componentTypeName fully-qualified name of the IComponent.
 		\param interfaceTypeName type name of the component's sole facet.
 		\param interfaceName interface name of the component's sole facet.
 	 */
-	IComponentType* getOrCreateSimpleInternalComponentType( const char* componentTypeName,
+	IComponent* getOrCreateSimpleInternalComponentType( const char* componentTypeName,
 														   const char* interfaceTypeName,
 														   const char* interfaceName );
 
@@ -86,7 +86,7 @@ private:
  */
 #define CORAL_EXPORT_COMPONENT( ClassName, ComponentName ) \
 	co::int32 __##ComponentName##_getSize() { return sizeof(ClassName); } \
-	co::IComponent* __##ComponentName##_newInstance() { return new ClassName; }
+	co::IObject* __##ComponentName##_newInstance() { return new ClassName; }
 
 /*!
 	Macro that should be called once for each module's main co::IModulePart class.

@@ -55,15 +55,15 @@ co::IReflector* lua::ModuleInstaller::createReflector( TypeId typeId )
 	co::IReflector* res = NULL;
 	switch( typeId )
 	{
-	case TypeId_Component: res = lua::__createComponentIReflector(); break;
-	case TypeId_Exception: res = lua::__createExceptionIReflector(); break;
-	case TypeId_ILauncher: res = lua::__createILauncherIReflector(); break;
-	case TypeId_IState: res = lua::__createIStateIReflector(); break;
-	case TypeId_Launcher: res = lua::__createLauncherIReflector(); break;
-	case TypeId_lua: res = lua::__createluaIReflector(); break;
-	case TypeId_ModulePart: res = lua::__createModulePartIReflector(); break;
-	case TypeId_ModulePartLoader: res = lua::__createModulePartLoaderIReflector(); break;
-	case TypeId_Universe: res = lua::__createUniverseIReflector(); break;
+	case TypeId_Component: res = lua::__createComponentReflector(); break;
+	case TypeId_Exception: res = lua::__createExceptionReflector(); break;
+	case TypeId_ILauncher: res = lua::__createILauncherReflector(); break;
+	case TypeId_IState: res = lua::__createIStateReflector(); break;
+	case TypeId_Launcher: res = lua::__createLauncherReflector(); break;
+	case TypeId_lua: res = lua::__createluaReflector(); break;
+	case TypeId_ModulePart: res = lua::__createModulePartReflector(); break;
+	case TypeId_ModulePartLoader: res = lua::__createModulePartLoaderReflector(); break;
+	case TypeId_Universe: res = lua::__createUniverseReflector(); break;
 	default: assert( false );
 	};
 	assert( res != NULL );

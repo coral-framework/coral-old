@@ -4,12 +4,12 @@
  */
 
 #include <co/IMethodBuilder.h>
-#include <co/IDynamicProxyHandler.h>
+#include <co/IDynamicServiceProvider.h>
 #include <co/ITypeBuilder.h>
-#include <co/IExceptionType.h>
+#include <co/IException.h>
 #include <co/IType.h>
-#include <co/IMethodInfo.h>
-#include <co/IAttributeInfo.h>
+#include <co/IMethod.h>
+#include <co/IField.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -19,14 +19,14 @@
 
 namespace co {
 
-// ------ Proxy Interface ------ //
+// ------ Dynamic Service Proxy ------ //
 
 class IMethodBuilder_Proxy : public co::IMethodBuilder
 {
 public:
-	IMethodBuilder_Proxy( co::IDynamicProxyHandler* handler ) : _handler( handler )
+	IMethodBuilder_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _handler->registerProxyInterface( co::disambiguate<co::Interface, co::IMethodBuilder>( this ) );
+		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, co::IMethodBuilder>( this ) );
 	}
 
 	virtual ~IMethodBuilder_Proxy()
@@ -34,40 +34,40 @@ public:
 		// empty
 	}
 
-	// co::Interface Methods:
+	// co::IService Methods:
 
-	co::IInterfaceType* getInterfaceType() { return co::typeOf<co::IMethodBuilder>::get(); }
-	co::IComponent* getInterfaceOwner() { return _handler->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _handler->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _handler->componentRetain(); }
-	void componentRelease() { _handler->componentRelease(); }
+	co::IInterface* getInterfaceType() { return co::typeOf<co::IMethodBuilder>::get(); }
+	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
+	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
+	void componentRetain() { _provider->componentRetain(); }
+	void componentRelease() { _provider->componentRelease(); }
 
 	// co.IMethodBuilder Methods:
 
 	const std::string& getMethodName()
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::IMethodBuilder>( 0 ) );
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IMethodBuilder>( 0 ) );
         return res.get< const std::string& >();
 	}
 
 	co::ITypeBuilder* getTypeBuilder()
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::IMethodBuilder>( 1 ) );
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IMethodBuilder>( 1 ) );
         return res.get< co::ITypeBuilder* >();
 	}
 
 	void createMethod()
 	{
-		co::ArrayRange<co::Any const> range;
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IMethodBuilder>( 0 ), range );
+		co::Range<co::Any const> range;
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IMethodBuilder>( 0 ), range );
 	}
 
-	void defineException( co::IExceptionType* exceptionType_ )
+	void defineException( co::IException* exceptionType_ )
 	{
 		co::Any args[1];
-		args[0].set< co::IExceptionType* >( exceptionType_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IMethodBuilder>( 1 ), range );
+		args[0].set< co::IException* >( exceptionType_ );
+		co::Range<co::Any const> range( args, 1 );
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IMethodBuilder>( 1 ), range );
 	}
 
 	void defineParameter( const std::string& name_, co::IType* type_, bool input_, bool output_ )
@@ -77,37 +77,37 @@ public:
 		args[1].set< co::IType* >( type_ );
 		args[2].set< bool >( input_ );
 		args[3].set< bool >( output_ );
-		co::ArrayRange<co::Any const> range( args, 4 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IMethodBuilder>( 2 ), range );
+		co::Range<co::Any const> range( args, 4 );
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IMethodBuilder>( 2 ), range );
 	}
 
 	void defineReturnType( co::IType* type_ )
 	{
 		co::Any args[1];
 		args[0].set< co::IType* >( type_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IMethodBuilder>( 3 ), range );
+		co::Range<co::Any const> range( args, 1 );
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IMethodBuilder>( 3 ), range );
 	}
 
 protected:
 	template<typename T>
-	co::IAttributeInfo* getAttribInfo( co::uint32 index )
+	co::IField* getAttribInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberAttributes()[index];
+		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethodInfo* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethodInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberMethods()[index];
+		return co::typeOf<T>::get()->getMethods()[index];
 	}
 
 private:
-	co::IDynamicProxyHandler* _handler;
+	co::IDynamicServiceProvider* _provider;
 	co::uint32 _cookie;
 };
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class IMethodBuilder_Reflector : public co::ReflectorBase
 {
@@ -132,13 +132,13 @@ public:
 		return sizeof(co::IMethodBuilder);
 	}
 
-	co::Interface* newProxy( co::IDynamicProxyHandler* handler )
+	co::IService* newProxy( co::IDynamicServiceProvider* provider )
 	{
-		checValidProxyHandler( handler );
-		return co::disambiguate<co::Interface, co::IMethodBuilder>( new co::IMethodBuilder_Proxy( handler ) );
+		checkValidDynamicProvider( provider );
+		return co::disambiguate<co::IService, co::IMethodBuilder>( new co::IMethodBuilder_Proxy( provider ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value )
+	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
 	{
 		co::IMethodBuilder* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
@@ -149,7 +149,7 @@ public:
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value )
+	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
 	{
 		co::IMethodBuilder* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
@@ -162,7 +162,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
+	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
 	{
 		co::IMethodBuilder* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -178,7 +178,7 @@ public:
 				break;
 			case 3:
 				{
-					co::IExceptionType* exceptionType_ = args[++argIndex].get< co::IExceptionType* >();
+					co::IException* exceptionType_ = args[++argIndex].get< co::IException* >();
 					argIndex = -1;
 					p->defineException( exceptionType_ );
 				}
@@ -218,20 +218,20 @@ public:
 	}
 
 private:
-	co::IMethodBuilder* checkInstance( const co::Any& any, co::IMemberInfo* member )
+	co::IMethodBuilder* checkInstance( const co::Any& any, co::IMember* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
 
 		// make sure that 'any' is an instance of this type
-		co::IInterfaceType* myType = co::typeOf<co::IMethodBuilder>::get();
+		co::IInterface* myType = co::typeOf<co::IMethodBuilder>::get();
 
 		co::IMethodBuilder* res;
 		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::IMethodBuilder*>( any.getState().data.itf ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::IMethodBuilder*, but got " << any );
 
 		// make sure that 'member' belongs to this type
-		co::ICompoundType* owner = member->getOwner();
+		co::ICompositeType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to co.IMethodBuilder" );
@@ -240,9 +240,9 @@ private:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createIMethodBuilderIReflector()
+co::IReflector* __createIMethodBuilderReflector()
 {
     return new IMethodBuilder_Reflector;
 }

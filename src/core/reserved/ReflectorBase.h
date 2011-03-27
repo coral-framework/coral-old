@@ -18,7 +18,7 @@ class IllegalCastException;
 class CORAL_EXPORT ReflectorBase_co_Reflector : public IReflector
 {
 public:
-	virtual IInterfaceType* getInterfaceType();
+	virtual IInterface* getInterfaceType();
 	virtual const std::string& getInterfaceName();
 };
 
@@ -31,25 +31,25 @@ public:
 	ReflectorBase();
 	virtual ~ReflectorBase();
 
-	// co::Interface methods:
-    IComponent* getInterfaceOwner();
+	// co::IService methods:
+    IObject* getInterfaceOwner();
     void componentRetain();
     void componentRelease();
 
-    // co::IComponent methods:
-    IComponentType* getComponentType();
-    Interface* getInterface( IInterfaceInfo* );
-    void setReceptacle( IInterfaceInfo*, Interface* );
+    // co::IObject methods:
+    IComponent* getComponentType();
+    IService* getInterface( IPort* );
+    void setReceptacle( IPort*, IService* );
 
 	// co::IReflector methods:
 	void createValue( void* address, size_t length );
     void copyValue( const void* fromAddress, void* toAddress );
     void destroyValue( void* address );
-    IComponent* newInstance();
-    Interface* newProxy( IDynamicProxyHandler* handler );
-    void getAttribute( const Any& instance, IAttributeInfo* ai, Any& value );
-    void setAttribute( const Any& instance, IAttributeInfo* ai, const Any& value );
-    void invokeMethod( const Any& instance, IMethodInfo* mi, ArrayRange<Any const> args, Any& returnValue );
+    IObject* newInstance();
+    IService* newProxy( IDynamicServiceProvider* handler );
+    void getAttribute( const Any& instance, IField* ai, Any& value );
+    void setAttribute( const Any& instance, IField* ai, const Any& value );
+    void invokeMethod( const Any& instance, IMethod* mi, Range<Any const> args, Any& returnValue );
 	void raise( const std::string& message );
 
 protected:
@@ -63,16 +63,16 @@ protected:
 	void checkValidSize( size_t expectedSize, size_t actualSize );
 
 	//! Raises co::IllegalArgumentException if handler is NULL.
-	void checValidProxyHandler( co::IDynamicProxyHandler* handler );
+	void checkValidDynamicProvider( co::IDynamicServiceProvider* provider );
 
 	//! Raises co::MissingInputException if \a numArgs is lesser than \a mi's expected number of args.
-	void checkNumArguments( co::IMethodInfo* mi, size_t numArgs );
+	void checkNumArguments( co::IMethod* mi, size_t numArgs );
 
 	//! Raises an exception because setAttribute() was called on a read-only attribute.
-	void raiseAttributeIsReadOnly( co::IAttributeInfo* ai );
+	void raiseAttributeIsReadOnly( co::IField* ai );
 
 	//! Re-raises a co::IllegalCastException with info about which method parameter raised the exception.
-	void raiseArgumentTypeException( co::IMethodInfo* mi, int argIndex, const co::IllegalCastException& e );
+	void raiseArgumentTypeException( co::IMethod* mi, int argIndex, const co::IllegalCastException& e );
 
 	/*!
 		Raises a co::IllegalArgumentException for cases (that "should never happen")

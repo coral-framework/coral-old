@@ -5,9 +5,9 @@
 
 #include "lua_Base.h"
 #include <co/Coral.h>
-#include <co/IComponentType.h>
-#include <co/IInterfaceInfo.h>
-#include <co/IInterfaceType.h>
+#include <co/IComponent.h>
+#include <co/IPort.h>
+#include <co/IInterface.h>
 
 namespace lua {
 
@@ -16,7 +16,7 @@ void moduleRelease();
 
 // ------ lua.lua provides an interface named 'part', of type co.IModulePart ------ //
 
-co::IInterfaceType* lua_co_IModulePart::getInterfaceType()
+co::IInterface* lua_co_IModulePart::getInterfaceType()
 {
 	return co::typeOf<co::IModulePart>::get();
 }
@@ -39,7 +39,7 @@ lua_Base::~lua_Base()
 	moduleRelease();
 }
 
-co::IComponent* lua_Base::getInterfaceOwner()
+co::IObject* lua_Base::getInterfaceOwner()
 {
 	return this;
 }
@@ -54,26 +54,26 @@ void lua_Base::componentRelease()
 	decrementRefCount();
 }
 
-co::IComponentType* lua_Base::getComponentType()
+co::IComponent* lua_Base::getComponentType()
 {
 	co::IType* type = co::getType( "lua.lua" );
-	assert( dynamic_cast<co::IComponentType*>( type ) );
-	return static_cast<co::IComponentType*>( type );
+	assert( dynamic_cast<co::IComponent*>( type ) );
+	return static_cast<co::IComponent*>( type );
 }
 
-co::Interface* lua_Base::getInterface( co::IInterfaceInfo* interfaceInfo )
+co::IService* lua_Base::getInterface( co::IPort* port )
 {
-	checkValidInterface( interfaceInfo );
-	co::Interface* res = NULL;
-	switch( interfaceInfo->getIndex() )
+	checkValidPort( port );
+	co::IService* res = NULL;
+	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::Interface, co::IModulePart>( this ); break;
+	case 0:		res = co::disambiguate<co::IService, co::IModulePart>( this ); break;
 	default:	raiseUnexpectedInterfaceIndex();
 	}
 	return res;
 }
 
-void lua_Base::setReceptacle( co::IInterfaceInfo* receptacle, co::Interface* facet )
+void lua_Base::setReceptacle( co::IPort* receptacle, co::IService* facet )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();

@@ -1,7 +1,0 @@
-/*
-	Implements co.INativeClassType.
- */
-component NativeClassType
-{
-	provides INativeClassType type;
-};

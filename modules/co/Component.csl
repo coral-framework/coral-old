@@ -1,0 +1,7 @@
+/*
+	Implements co.IComponent.
+ */
+component Component
+{
+	provides IComponent type;
+};

@@ -56,7 +56,7 @@ function M.formatInput( t )
 	local kind = t.kind
 	if kind == 'TK_ARRAY' then
 		local elem = t.elementType
-		return "co::ArrayRange<" .. elem.cppName .. ( elem.kind == 'TK_INTERFACE' and '*' or '' ) .. " const>"
+		return "co::Range<" .. elem.cppName .. ( elem.kind == 'TK_INTERFACE' and '*' or '' ) .. " const>"
 	elseif kind == 'TK_INTERFACE' then
 		return t.cppName .. "*"
 	elseif kind == 'TK_STRING' or kind == 'TK_ANY' or kind == 'TK_STRUCT' or kind == 'TK_NATIVECLASS' then
@@ -131,7 +131,7 @@ function include.TK_ARRAY( t, type )
 			t:includeHeader( type )
 		end
 	else
-		t:includeHeader( "co/ArrayRange.h" )
+		t:includeHeader( "co/Range.h" )
 		t:includeType( type )
 	end
 end

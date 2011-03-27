@@ -7,8 +7,8 @@ function M:initialize( module )
 	ASSERT_ERROR( function() co.getService "moduleA.IBat" end, "unknown service" )
 	ASSERT_ERROR( function() co.getService "moduleA.IHuman" end, "unknown service" )
 
-	-- we reuse "lua.bat.IComponent" from the lua.component test
-	local bc = co.new "lua.bat.IComponent"
+	-- we reuse "lua.bat.Component" from the lua.component test
+	local bc = co.new "lua.bat.Component"
 
 	-- register a global moduleA.IBat service:
 	co.system.services:addService( co.Type "moduleA.IBat", bc.fruitBat )

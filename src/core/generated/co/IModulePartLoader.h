@@ -7,7 +7,7 @@
 #define _CO_IMODULEPARTLOADER_H_
 
 #include <co/TypeTraits.h>
-#include <co/Interface.h>
+#include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
@@ -18,7 +18,7 @@ namespace co {
 // co.IModulePartLoader Mapping:
 namespace co {
 
-class IModulePartLoader : public co::Interface
+class IModulePartLoader : public co::IService
 {
 public:
 	virtual ~IModulePartLoader() {;}
@@ -33,7 +33,7 @@ public:
 namespace co {
 template<> struct kindOf<co::IModulePartLoader> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IModulePartLoader> { static const char* get() { return "co.IModulePartLoader"; } };
-template<> struct typeOf<co::IModulePartLoader> : public typeOfBase<co::IModulePartLoader, IInterfaceType> {};
+template<> struct typeOf<co::IModulePartLoader> : public typeOfBase<co::IModulePartLoader, IInterface> {};
 } // namespace co
 
 #endif // _CO_IMODULEPARTLOADER_H_

@@ -6,16 +6,16 @@
 #ifndef _CO_EXCEPTIONTYPE_BASE_H_
 #define _CO_EXCEPTIONTYPE_BASE_H_
 
-#include <co/IExceptionType.h>
+#include <co/IException.h>
 #include <co/reserved/ComponentBase.h>
 
 namespace co {
 
-//! co.ExceptionType has a facet named 'type', of type co.IExceptionType.
-class ExceptionType_co_IExceptionType : public co::IExceptionType
+//! co.ExceptionType has a facet named 'type', of type co.IException.
+class ExceptionType_co_IException : public co::IException
 {
 public:
-	virtual co::IInterfaceType* getInterfaceType();
+	virtual co::IInterface* getInterfaceType();
 	virtual const std::string& getInterfaceName();
 };
 
@@ -23,21 +23,21 @@ public:
 	Inherit from this class to implement the component 'co.ExceptionType'.
  */
 class ExceptionType_Base : public co::ComponentBase,
-	public ExceptionType_co_IExceptionType
+	public ExceptionType_co_IException
 {
 public:
 	ExceptionType_Base();
 	virtual ~ExceptionType_Base();
 
-	// co::Interface Methods:
-	co::IComponent* getInterfaceOwner();
+	// co::IService Methods:
+	co::IObject* getInterfaceOwner();
 	void componentRetain();
 	void componentRelease();
 
-	// co::IComponent Methods:
-	co::IComponentType* getComponentType();
-	co::Interface* getInterface( co::IInterfaceInfo* );
-	void setReceptacle( co::IInterfaceInfo*, co::Interface* );
+	// co::IObject Methods:
+	co::IComponent* getComponentType();
+	co::IService* getInterface( co::IPort* );
+	void setReceptacle( co::IPort*, co::IService* );
 };
 
 } // namespace co

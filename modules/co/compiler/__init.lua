@@ -88,7 +88,7 @@ end
 
 local function isBuiltInType( t )
 	local name = t.fullName
-	return name == 'co.Interface' or name == 'co.TypeKind'
+	return name == 'co.IService' or name == 'co.TypeKind'
 end
 
 local function reportChanges( action, subject, changed, total )
@@ -109,13 +109,13 @@ function Compiler:generateMappings()
 	assert( not self.updatedTypes, "this compiler instance has already been used" )
 
 	-- add implicit dependencies of the Coral API (e.g. Any.h)
-	self:addType( "co.IEnumType" )
-	self:addType( "co.IArrayType" )
-	self:addType( "co.IStructType" )
-	self:addType( "co.IExceptionType" )
-	self:addType( "co.IInterfaceType" )
-	self:addType( "co.IComponentType" )
-	self:addType( "co.INativeClassType" )
+	self:addType( "co.IEnum" )
+	self:addType( "co.IArray" )
+	self:addType( "co.IStruct" )
+	self:addType( "co.IException" )
+	self:addType( "co.IInterface" )
+	self:addType( "co.IComponent" )
+	self:addType( "co.INativeClass" )
 
 	if not self.mappingsDir then
 		self.mappingsDir = self.outDir

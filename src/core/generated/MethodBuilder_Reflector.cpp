@@ -10,9 +10,9 @@ namespace co {
 
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
 co::int32 __MethodBuilder_getSize();
-co::IComponent* __MethodBuilder_newInstance();
+co::IObject* __MethodBuilder_newInstance();
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class MethodBuilder_Reflector : public co::ReflectorBase
 {
@@ -37,17 +37,17 @@ public:
 		return __MethodBuilder_getSize();
 	}
 
-	co::IComponent* newInstance()
+	co::IObject* newInstance()
 	{
-		co::IComponent* component = __MethodBuilder_newInstance();
+		co::IObject* component = __MethodBuilder_newInstance();
 		assert( component->getComponentType()->getFullName() == "co.MethodBuilder" );
 		return component;
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createMethodBuilderIReflector()
+co::IReflector* __createMethodBuilderReflector()
 {
     return new MethodBuilder_Reflector;
 }

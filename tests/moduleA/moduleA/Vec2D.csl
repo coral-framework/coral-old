@@ -31,5 +31,5 @@ native class Vec2D ( <utility> std::pair<double, double> )
 	Vec2D testInOut( in Vec2D a, inout Vec2D b, out Vec2D c );
 
 	// Dummy method to test code gen
-	co.Interface dummyMethod( in any one, out any two );
+	co.IService dummyMethod( in any one, out any two );
 };

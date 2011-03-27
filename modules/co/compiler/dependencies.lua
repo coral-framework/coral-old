@@ -36,13 +36,13 @@ function enqueueDependencies.TK_ENUM( enqueue, type, nextDistance ) end
 function enqueueDependencies.TK_EXCEPTION( enqueue, type, nextDistance ) end
 
 local function enqueueAttribContainer( enqueue, type, nextDistance )
-	for i, attrib in ipairs( type.memberAttributes ) do
+	for i, attrib in ipairs( type.fields ) do
 		enqueue( attrib.type, nextDistance )
 	end
 end
 
 local function enqueueMethodContainer( enqueue, type, nextDistance )
-	for i, method in ipairs( type.memberMethods ) do
+	for i, method in ipairs( type.methods ) do
 		local returnType = method.returnType
 		if returnType then enqueue( returnType, nextDistance ) end
 		for i, param in ipairs( method.parameters ) do
@@ -72,7 +72,7 @@ function enqueueDependencies.TK_INTERFACE( enqueue, type, nextDistance )
 end
 
 function enqueueDependencies.TK_COMPONENT( enqueue, type, nextDistance )
-	for i, itf in ipairs( type.interfaces ) do
+	for i, itf in ipairs( type.ports ) do
 		enqueue( itf.type, nextDistance )
 	end
 end
@@ -88,7 +88,7 @@ local function walkDependencies( types, maxDistance )
 	-- Flag a type as visited, and queue it for iteration.
 	local function enqueue( type, distance )
 		local kind = type.kind
-		-- If the passed type is a co.IArrayType, the enqueued type is the array's elementType.
+		-- If the passed type is a co.IArray, the enqueued type is the array's elementType.
 		if kind == 'TK_ARRAY' then
 			type = type.elementType
 			kind = type.kind

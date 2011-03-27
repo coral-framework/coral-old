@@ -23,7 +23,7 @@ namespace co {
 
 class IType;
 class INamespace;
-class ITypeCreationTransaction;
+class ITypeTransaction;
 
 namespace csl {
 

@@ -4,11 +4,14 @@
  */
 
 #include <co/IComponent.h>
-#include <co/IDynamicProxyHandler.h>
-#include <co/IInterfaceInfo.h>
-#include <co/IComponentType.h>
-#include <co/IMethodInfo.h>
-#include <co/IAttributeInfo.h>
+#include <co/IDynamicServiceProvider.h>
+#include <co/IReflector.h>
+#include <co/IPort.h>
+#include <co/IMember.h>
+#include <co/INamespace.h>
+#include <co/Uuid.h>
+#include <co/IMethod.h>
+#include <co/IField.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -18,14 +21,14 @@
 
 namespace co {
 
-// ------ Proxy Interface ------ //
+// ------ Dynamic Service Proxy ------ //
 
 class IComponent_Proxy : public co::IComponent
 {
 public:
-	IComponent_Proxy( co::IDynamicProxyHandler* handler ) : _handler( handler )
+	IComponent_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _handler->registerProxyInterface( co::disambiguate<co::Interface, co::IComponent>( this ) );
+		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, co::IComponent>( this ) );
 	}
 
 	virtual ~IComponent_Proxy()
@@ -33,59 +36,121 @@ public:
 		// empty
 	}
 
-	// co::Interface Methods:
+	// co::IService Methods:
 
-	co::IInterfaceType* getInterfaceType() { return co::typeOf<co::IComponent>::get(); }
-	co::IComponent* getInterfaceOwner() { return _handler->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _handler->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _handler->componentRetain(); }
-	void componentRelease() { _handler->componentRelease(); }
+	co::IInterface* getInterfaceType() { return co::typeOf<co::IComponent>::get(); }
+	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
+	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
+	void componentRetain() { _provider->componentRetain(); }
+	void componentRelease() { _provider->componentRelease(); }
+
+	// co.ICompositeType Methods:
+
+	co::Range<co::IMember* const> getMembers()
+	{
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::ICompositeType>( 0 ) );
+        return res.get< co::Range<co::IMember* const> >();
+	}
+
+	co::IMember* getMember( const std::string& name_ )
+	{
+		co::Any args[1];
+		args[0].set< const std::string& >( name_ );
+		co::Range<co::Any const> range( args, 1 );
+		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::ICompositeType>( 0 ), range );
+		return res.get< co::IMember* >();
+	}
+
+	// co.IType Methods:
+
+	const co::Uuid& getBinarySignature()
+	{
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IType>( 0 ) );
+        return res.get< const co::Uuid& >();
+	}
+
+	const std::string& getFullName()
+	{
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IType>( 1 ) );
+        return res.get< const std::string& >();
+	}
+
+	const co::Uuid& getFullSignature()
+	{
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IType>( 2 ) );
+        return res.get< const co::Uuid& >();
+	}
+
+	co::TypeKind getKind()
+	{
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IType>( 3 ) );
+        return res.get< co::TypeKind >();
+	}
+
+	const std::string& getName()
+	{
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IType>( 4 ) );
+        return res.get< const std::string& >();
+	}
+
+	co::INamespace* getNamespace()
+	{
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IType>( 5 ) );
+        return res.get< co::INamespace* >();
+	}
+
+	co::IReflector* getReflector()
+	{
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IType>( 6 ) );
+        return res.get< co::IReflector* >();
+	}
+
+	void setReflector( co::IReflector* reflector_ )
+	{
+		co::Any arg;
+		arg.set< co::IReflector* >( reflector_ );
+		_provider->handleSetAttribute( _cookie, getAttribInfo<co::IType>( 6 ), arg );
+	}
 
 	// co.IComponent Methods:
 
-	co::IComponentType* getComponentType()
+	co::Range<co::IPort* const> getFacets()
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::IComponent>( 0 ) );
-        return res.get< co::IComponentType* >();
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IComponent>( 0 ) );
+        return res.get< co::Range<co::IPort* const> >();
 	}
 
-	co::Interface* getInterface( co::IInterfaceInfo* itfInfo_ )
+	co::Range<co::IPort* const> getPorts()
 	{
-		co::Any args[1];
-		args[0].set< co::IInterfaceInfo* >( itfInfo_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::IComponent>( 0 ), range );
-		return res.get< co::Interface* >();
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IComponent>( 1 ) );
+        return res.get< co::Range<co::IPort* const> >();
 	}
 
-	void setReceptacle( co::IInterfaceInfo* receptacle_, co::Interface* facet_ )
+	co::Range<co::IPort* const> getReceptacles()
 	{
-		co::Any args[2];
-		args[0].set< co::IInterfaceInfo* >( receptacle_ );
-		args[1].set< co::Interface* >( facet_ );
-		co::ArrayRange<co::Any const> range( args, 2 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IComponent>( 1 ), range );
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IComponent>( 2 ) );
+        return res.get< co::Range<co::IPort* const> >();
 	}
 
 protected:
 	template<typename T>
-	co::IAttributeInfo* getAttribInfo( co::uint32 index )
+	co::IField* getAttribInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberAttributes()[index];
+		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethodInfo* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethodInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberMethods()[index];
+		return co::typeOf<T>::get()->getMethods()[index];
 	}
 
 private:
-	co::IDynamicProxyHandler* _handler;
+	co::IDynamicServiceProvider* _provider;
 	co::uint32 _cookie;
 };
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class IComponent_Reflector : public co::ReflectorBase
 {
@@ -110,90 +175,61 @@ public:
 		return sizeof(co::IComponent);
 	}
 
-	co::Interface* newProxy( co::IDynamicProxyHandler* handler )
+	co::IService* newProxy( co::IDynamicServiceProvider* provider )
 	{
-		checValidProxyHandler( handler );
-		return co::disambiguate<co::Interface, co::IComponent>( new co::IComponent_Proxy( handler ) );
+		checkValidDynamicProvider( provider );
+		return co::disambiguate<co::IService, co::IComponent>( new co::IComponent_Proxy( provider ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value )
+	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
 	{
 		co::IComponent* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
-		case 0:		value.set< co::IComponentType* >( p->getComponentType() ); break;
+		case 0:		value.set< co::Range<co::IPort* const> >( p->getFacets() ); break;
+		case 1:		value.set< co::Range<co::IPort* const> >( p->getPorts() ); break;
+		case 2:		value.set< co::Range<co::IPort* const> >( p->getReceptacles() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value )
+	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
 	{
 		co::IComponent* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
 		case 0:		raiseAttributeIsReadOnly( ai ); break;
+		case 1:		raiseAttributeIsReadOnly( ai ); break;
+		case 2:		raiseAttributeIsReadOnly( ai ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 		CORAL_UNUSED( p );
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
+	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
 	{
-		co::IComponent* p = checkInstance( instance, mi );
-		checkNumArguments( mi, args.getSize() );
-		int argIndex = -1;
-		try
-		{
-			switch( mi->getIndex() )
-			{
-			case 1:
-				{
-					co::IInterfaceInfo* itfInfo_ = args[++argIndex].get< co::IInterfaceInfo* >();
-					argIndex = -1;
-					res.set< co::Interface* >( p->getInterface( itfInfo_ ) );
-				}
-				break;
-			case 2:
-				{
-					co::IInterfaceInfo* receptacle_ = args[++argIndex].get< co::IInterfaceInfo* >();
-					co::Interface* facet_ = args[++argIndex].get< co::Interface* >();
-					argIndex = -1;
-					p->setReceptacle( receptacle_, facet_ );
-				}
-				break;
-			default:
-				raiseUnexpectedMemberIndex();
-			}
-		}
-		catch( co::IllegalCastException& e )
-		{
-			if( argIndex == -1 )
-				throw; // just re-throw if the exception is not related to 'args'
-			raiseArgumentTypeException( mi, argIndex, e );
-		}
-		catch( ... )
-		{
-			throw;
-		}
+		checkInstance( instance, mi );
+		raiseUnexpectedMemberIndex();
+		CORAL_UNUSED( args );
 		CORAL_UNUSED( res );
 	}
 
 private:
-	co::IComponent* checkInstance( const co::Any& any, co::IMemberInfo* member )
+	co::IComponent* checkInstance( const co::Any& any, co::IMember* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
 
 		// make sure that 'any' is an instance of this type
-		co::IInterfaceType* myType = co::typeOf<co::IComponent>::get();
+		co::IInterface* myType = co::typeOf<co::IComponent>::get();
 
 		co::IComponent* res;
 		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::IComponent*>( any.getState().data.itf ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::IComponent*, but got " << any );
 
 		// make sure that 'member' belongs to this type
-		co::ICompoundType* owner = member->getOwner();
+		co::ICompositeType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to co.IComponent" );
@@ -202,9 +238,9 @@ private:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createIComponentIReflector()
+co::IReflector* __createIComponentReflector()
 {
     return new IComponent_Reflector;
 }

@@ -4,11 +4,11 @@
  */
 
 #include <co/IReflector.h>
+#include <co/IField.h>
+#include <co/IDynamicServiceProvider.h>
 #include <co/IType.h>
-#include <co/IDynamicProxyHandler.h>
-#include <co/IAttributeInfo.h>
-#include <co/IMethodInfo.h>
-#include <co/IComponent.h>
+#include <co/IObject.h>
+#include <co/IMethod.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -19,14 +19,14 @@
 
 namespace co {
 
-// ------ Proxy Interface ------ //
+// ------ Dynamic Service Proxy ------ //
 
 class IReflector_Proxy : public co::IReflector
 {
 public:
-	IReflector_Proxy( co::IDynamicProxyHandler* handler ) : _handler( handler )
+	IReflector_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _handler->registerProxyInterface( co::disambiguate<co::Interface, co::IReflector>( this ) );
+		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, co::IReflector>( this ) );
 	}
 
 	virtual ~IReflector_Proxy()
@@ -34,81 +34,81 @@ public:
 		// empty
 	}
 
-	// co::Interface Methods:
+	// co::IService Methods:
 
-	co::IInterfaceType* getInterfaceType() { return co::typeOf<co::IReflector>::get(); }
-	co::IComponent* getInterfaceOwner() { return _handler->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _handler->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _handler->componentRetain(); }
-	void componentRelease() { _handler->componentRelease(); }
+	co::IInterface* getInterfaceType() { return co::typeOf<co::IReflector>::get(); }
+	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
+	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
+	void componentRetain() { _provider->componentRetain(); }
+	void componentRelease() { _provider->componentRelease(); }
 
 	// co.IReflector Methods:
 
 	co::int32 getSize()
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::IReflector>( 0 ) );
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IReflector>( 0 ) );
         return res.get< co::int32 >();
 	}
 
 	co::IType* getType()
 	{
-		const co::Any& res = _handler->handleGetAttribute( _cookie, getAttribInfo<co::IReflector>( 1 ) );
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IReflector>( 1 ) );
         return res.get< co::IType* >();
 	}
 
-	void getAttribute( const co::Any& instance_, co::IAttributeInfo* ai_, co::Any& value_ )
+	void getAttribute( const co::Any& instance_, co::IField* ai_, co::Any& value_ )
 	{
 		co::Any args[3];
 		args[0].set< const co::Any& >( instance_ );
-		args[1].set< co::IAttributeInfo* >( ai_ );
+		args[1].set< co::IField* >( ai_ );
 		args[2].set< co::Any& >( value_ );
-		co::ArrayRange<co::Any const> range( args, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IReflector>( 0 ), range );
+		co::Range<co::Any const> range( args, 3 );
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IReflector>( 0 ), range );
 	}
 
-	void invokeMethod( const co::Any& instance_, co::IMethodInfo* mi_, co::ArrayRange<co::Any const> args_, co::Any& returnValue_ )
+	void invokeMethod( const co::Any& instance_, co::IMethod* mi_, co::Range<co::Any const> args_, co::Any& returnValue_ )
 	{
 		co::Any args[4];
 		args[0].set< const co::Any& >( instance_ );
-		args[1].set< co::IMethodInfo* >( mi_ );
-		args[2].set< co::ArrayRange<co::Any const> >( args_ );
+		args[1].set< co::IMethod* >( mi_ );
+		args[2].set< co::Range<co::Any const> >( args_ );
 		args[3].set< co::Any& >( returnValue_ );
-		co::ArrayRange<co::Any const> range( args, 4 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IReflector>( 1 ), range );
+		co::Range<co::Any const> range( args, 4 );
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IReflector>( 1 ), range );
 	}
 
-	co::IComponent* newInstance()
+	co::IObject* newInstance()
 	{
-		co::ArrayRange<co::Any const> range;
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::IReflector>( 2 ), range );
-		return res.get< co::IComponent* >();
+		co::Range<co::Any const> range;
+		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::IReflector>( 2 ), range );
+		return res.get< co::IObject* >();
 	}
 
-	co::Interface* newProxy( co::IDynamicProxyHandler* handler_ )
+	co::IService* newProxy( co::IDynamicServiceProvider* handler_ )
 	{
 		co::Any args[1];
-		args[0].set< co::IDynamicProxyHandler* >( handler_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<co::IReflector>( 3 ), range );
-		return res.get< co::Interface* >();
+		args[0].set< co::IDynamicServiceProvider* >( handler_ );
+		co::Range<co::Any const> range( args, 1 );
+		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::IReflector>( 3 ), range );
+		return res.get< co::IService* >();
 	}
 
 	void raise( const std::string& message_ )
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( message_ );
-		co::ArrayRange<co::Any const> range( args, 1 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IReflector>( 4 ), range );
+		co::Range<co::Any const> range( args, 1 );
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IReflector>( 4 ), range );
 	}
 
-	void setAttribute( const co::Any& instance_, co::IAttributeInfo* ai_, const co::Any& value_ )
+	void setAttribute( const co::Any& instance_, co::IField* ai_, const co::Any& value_ )
 	{
 		co::Any args[3];
 		args[0].set< const co::Any& >( instance_ );
-		args[1].set< co::IAttributeInfo* >( ai_ );
+		args[1].set< co::IField* >( ai_ );
 		args[2].set< const co::Any& >( value_ );
-		co::ArrayRange<co::Any const> range( args, 3 );
-		_handler->handleMethodInvocation( _cookie, getMethodInfo<co::IReflector>( 5 ), range );
+		co::Range<co::Any const> range( args, 3 );
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IReflector>( 5 ), range );
 	}
 
 	// These co::IReflector methods are not part of the reflection system:
@@ -130,23 +130,23 @@ public:
 
 protected:
 	template<typename T>
-	co::IAttributeInfo* getAttribInfo( co::uint32 index )
+	co::IField* getAttribInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberAttributes()[index];
+		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethodInfo* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethodInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberMethods()[index];
+		return co::typeOf<T>::get()->getMethods()[index];
 	}
 
 private:
-	co::IDynamicProxyHandler* _handler;
+	co::IDynamicServiceProvider* _provider;
 	co::uint32 _cookie;
 };
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class IReflector_Reflector : public co::ReflectorBase
 {
@@ -171,13 +171,13 @@ public:
 		return sizeof(co::IReflector);
 	}
 
-	co::Interface* newProxy( co::IDynamicProxyHandler* handler )
+	co::IService* newProxy( co::IDynamicServiceProvider* provider )
 	{
-		checValidProxyHandler( handler );
-		return co::disambiguate<co::Interface, co::IReflector>( new co::IReflector_Proxy( handler ) );
+		checkValidDynamicProvider( provider );
+		return co::disambiguate<co::IService, co::IReflector>( new co::IReflector_Proxy( provider ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value )
+	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
 	{
 		co::IReflector* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
@@ -188,7 +188,7 @@ public:
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value )
+	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
 	{
 		co::IReflector* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
@@ -201,7 +201,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
+	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
 	{
 		co::IReflector* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -213,7 +213,7 @@ public:
 			case 2:
 				{
 					const co::Any& instance_ = args[++argIndex].get< const co::Any& >();
-					co::IAttributeInfo* ai_ = args[++argIndex].get< co::IAttributeInfo* >();
+					co::IField* ai_ = args[++argIndex].get< co::IField* >();
 					co::Any& value_ = args[++argIndex].get< co::Any& >();
 					argIndex = -1;
 					p->getAttribute( instance_, ai_, value_ );
@@ -222,8 +222,8 @@ public:
 			case 3:
 				{
 					const co::Any& instance_ = args[++argIndex].get< const co::Any& >();
-					co::IMethodInfo* mi_ = args[++argIndex].get< co::IMethodInfo* >();
-					co::ArrayRange<co::Any const> args_ = args[++argIndex].get< co::ArrayRange<co::Any const> >();
+					co::IMethod* mi_ = args[++argIndex].get< co::IMethod* >();
+					co::Range<co::Any const> args_ = args[++argIndex].get< co::Range<co::Any const> >();
 					co::Any& returnValue_ = args[++argIndex].get< co::Any& >();
 					argIndex = -1;
 					p->invokeMethod( instance_, mi_, args_, returnValue_ );
@@ -231,14 +231,14 @@ public:
 				break;
 			case 4:
 				{
-					res.set< co::IComponent* >( p->newInstance() );
+					res.set< co::IObject* >( p->newInstance() );
 				}
 				break;
 			case 5:
 				{
-					co::IDynamicProxyHandler* handler_ = args[++argIndex].get< co::IDynamicProxyHandler* >();
+					co::IDynamicServiceProvider* handler_ = args[++argIndex].get< co::IDynamicServiceProvider* >();
 					argIndex = -1;
-					res.set< co::Interface* >( p->newProxy( handler_ ) );
+					res.set< co::IService* >( p->newProxy( handler_ ) );
 				}
 				break;
 			case 6:
@@ -251,7 +251,7 @@ public:
 			case 7:
 				{
 					const co::Any& instance_ = args[++argIndex].get< const co::Any& >();
-					co::IAttributeInfo* ai_ = args[++argIndex].get< co::IAttributeInfo* >();
+					co::IField* ai_ = args[++argIndex].get< co::IField* >();
 					const co::Any& value_ = args[++argIndex].get< const co::Any& >();
 					argIndex = -1;
 					p->setAttribute( instance_, ai_, value_ );
@@ -275,20 +275,20 @@ public:
 	}
 
 private:
-	co::IReflector* checkInstance( const co::Any& any, co::IMemberInfo* member )
+	co::IReflector* checkInstance( const co::Any& any, co::IMember* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
 
 		// make sure that 'any' is an instance of this type
-		co::IInterfaceType* myType = co::typeOf<co::IReflector>::get();
+		co::IInterface* myType = co::typeOf<co::IReflector>::get();
 
 		co::IReflector* res;
 		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::IReflector*>( any.getState().data.itf ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::IReflector*, but got " << any );
 
 		// make sure that 'member' belongs to this type
-		co::ICompoundType* owner = member->getOwner();
+		co::ICompositeType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to co.IReflector" );
@@ -297,9 +297,9 @@ private:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createIReflectorIReflector()
+co::IReflector* __createIReflectorReflector()
 {
     return new IReflector_Reflector;
 }

@@ -35,12 +35,12 @@ public:
 		_dummyInterface = dummyInterfaceAttribute;
 	}
 
-	co::ArrayRange<DummyInterface* const> getDummyInterfaces()
+	co::Range<DummyInterface* const> getDummyInterfaces()
 	{
 		return _dummyInterfaces;
 	}
 
-	void setDummyInterfaces( co::ArrayRange<DummyInterface* const> dummyInterfaces )
+	void setDummyInterfaces( co::Range<DummyInterface* const> dummyInterfaces )
 	{
 		_dummyInterfaces.clear();
 		for( ; dummyInterfaces; dummyInterfaces.popFirst() )
@@ -62,12 +62,12 @@ public:
 		return _readOnlyString;
 	}
 
-	co::ArrayRange<std::string const> getNames()
+	co::Range<std::string const> getNames()
 	{
-		return co::ArrayRange<std::string const>( _names );
+		return co::Range<std::string const>( _names );
 	}
 
-	void setNames( co::ArrayRange<std::string const> names )
+	void setNames( co::Range<std::string const> names )
 	{
 		_names.clear();
 		for( ; names; names.popFirst() )
@@ -99,12 +99,12 @@ public:
 		_testStruct = value;
 	}
 
-	co::ArrayRange<TestStruct const> getTestStructArray()
+	co::Range<TestStruct const> getTestStructArray()
 	{
 		return _testStructArray;
 	}
 
-	void setTestStructArray( co::ArrayRange<TestStruct const> range )
+	void setTestStructArray( co::Range<TestStruct const> range )
 	{
 		_testStructArray.clear();
 		_testStructArray.reserve( range.getSize() );
@@ -114,8 +114,8 @@ public:
 
 	void testInParameters( float size, TestEnum enumValue,
 		const std::string& text, const TestStruct& testStruct,
-		DummyInterface* dummyInterface, co::ArrayRange<co::int32 const> intList,
-		co::ArrayRange<DummyInterface* const> interfaces )
+		DummyInterface* dummyInterface, co::Range<co::int32 const> intList,
+		co::Range<DummyInterface* const> interfaces )
 	{
 		size = -1;
 		enumValue = First;
@@ -171,11 +171,11 @@ public:
 		return param;
 	}
 
-	// co::ITypeCreationTransaction methods:
+	// co::ITypeTransaction methods:
 
-	co::ArrayRange<co::ITypeBuilder* const> getTypeBuilders()
+	co::Range<co::ITypeBuilder* const> getTypeBuilders()
 	{
-		return co::ArrayRange<co::ITypeBuilder* const>();
+		return co::Range<co::ITypeBuilder* const>();
 	}
 
 	void commit()
@@ -189,12 +189,12 @@ public:
 	}	
 	
 protected:
-	co::IInterfaceType* getReceptacleItfType()
+	co::IInterface* getReceptacleItfType()
 	{
 		return _itfType.get();
 	}
 
-	void setReceptacleItfType( co::IInterfaceType* itfType )
+	void setReceptacleItfType( co::IInterface* itfType )
 	{
 		_itfType = itfType;
 	}
@@ -210,7 +210,7 @@ protected:
 	}
 
 private:
-	co::RefPtr<co::IInterfaceType> _itfType;
+	co::RefPtr<co::IInterface> _itfType;
 	co::RefPtr<co::IType> _type;
 
 	co::RefPtr<DummyInterface> _dummyInterface;

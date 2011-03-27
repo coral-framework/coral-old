@@ -7,8 +7,8 @@
 #define _CO_IMODULEMANAGER_H_
 
 #include <co/TypeTraits.h>
-#include <co/ArrayRange.h>
-#include <co/Interface.h>
+#include <co/IService.h>
+#include <co/Range.h>
 
 // Forward Declarations:
 namespace co {
@@ -20,7 +20,7 @@ namespace co {
 // co.IModuleManager Mapping:
 namespace co {
 
-class IModuleManager : public co::Interface
+class IModuleManager : public co::IService
 {
 public:
 	virtual ~IModuleManager() {;}
@@ -29,9 +29,9 @@ public:
 
 	virtual void setBinaryCompatibilityChecking( bool binaryCompatibilityChecking ) = 0;
 
-	virtual co::ArrayRange<co::IModulePartLoader* const> getLoaders() = 0;
+	virtual co::Range<co::IModulePartLoader* const> getLoaders() = 0;
 
-	virtual co::ArrayRange<co::IModule* const> getModules() = 0;
+	virtual co::Range<co::IModule* const> getModules() = 0;
 
 	virtual co::IModule* findModule( const std::string& moduleName ) = 0;
 
@@ -49,7 +49,7 @@ public:
 namespace co {
 template<> struct kindOf<co::IModuleManager> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IModuleManager> { static const char* get() { return "co.IModuleManager"; } };
-template<> struct typeOf<co::IModuleManager> : public typeOfBase<co::IModuleManager, IInterfaceType> {};
+template<> struct typeOf<co::IModuleManager> : public typeOfBase<co::IModuleManager, IInterface> {};
 } // namespace co
 
 #endif // _CO_IMODULEMANAGER_H_

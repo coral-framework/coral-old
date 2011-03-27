@@ -36,7 +36,7 @@ public:
 	// IModule methods:
 	ModuleState getState();
 	INamespace* getNamespace();
-	ArrayRange<IModulePart* const> getParts();
+	Range<IModulePart* const> getParts();
 	int32 getRank();
 	void setRank( int32 rank );
 	void initialize();

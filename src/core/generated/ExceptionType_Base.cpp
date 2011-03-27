@@ -5,20 +5,20 @@
 
 #include "ExceptionType_Base.h"
 #include <co/Coral.h>
-#include <co/IComponentType.h>
-#include <co/IInterfaceInfo.h>
-#include <co/IInterfaceType.h>
+#include <co/IComponent.h>
+#include <co/IPort.h>
+#include <co/IInterface.h>
 
 namespace co {
 
-// ------ co.ExceptionType provides an interface named 'type', of type co.IExceptionType ------ //
+// ------ co.ExceptionType provides an interface named 'type', of type co.IException ------ //
 
-co::IInterfaceType* ExceptionType_co_IExceptionType::getInterfaceType()
+co::IInterface* ExceptionType_co_IException::getInterfaceType()
 {
-	return co::typeOf<co::IExceptionType>::get();
+	return co::typeOf<co::IException>::get();
 }
 
-const std::string& ExceptionType_co_IExceptionType::getInterfaceName()
+const std::string& ExceptionType_co_IException::getInterfaceName()
 {
 	static const std::string s_interfaceName( "type" );
 	return s_interfaceName;
@@ -36,7 +36,7 @@ ExceptionType_Base::~ExceptionType_Base()
 	// empty
 }
 
-co::IComponent* ExceptionType_Base::getInterfaceOwner()
+co::IObject* ExceptionType_Base::getInterfaceOwner()
 {
 	return this;
 }
@@ -51,26 +51,26 @@ void ExceptionType_Base::componentRelease()
 	decrementRefCount();
 }
 
-co::IComponentType* ExceptionType_Base::getComponentType()
+co::IComponent* ExceptionType_Base::getComponentType()
 {
 	co::IType* type = co::getType( "co.ExceptionType" );
-	assert( dynamic_cast<co::IComponentType*>( type ) );
-	return static_cast<co::IComponentType*>( type );
+	assert( dynamic_cast<co::IComponent*>( type ) );
+	return static_cast<co::IComponent*>( type );
 }
 
-co::Interface* ExceptionType_Base::getInterface( co::IInterfaceInfo* interfaceInfo )
+co::IService* ExceptionType_Base::getInterface( co::IPort* port )
 {
-	checkValidInterface( interfaceInfo );
-	co::Interface* res = NULL;
-	switch( interfaceInfo->getIndex() )
+	checkValidPort( port );
+	co::IService* res = NULL;
+	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::Interface, co::IExceptionType>( this ); break;
+	case 0:		res = co::disambiguate<co::IService, co::IException>( this ); break;
 	default:	raiseUnexpectedInterfaceIndex();
 	}
 	return res;
 }
 
-void ExceptionType_Base::setReceptacle( co::IInterfaceInfo* receptacle, co::Interface* facet )
+void ExceptionType_Base::setReceptacle( co::IPort* receptacle, co::IService* facet )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedInterfaceIndex();

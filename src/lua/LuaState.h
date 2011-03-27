@@ -64,8 +64,8 @@ public:
 	static void push( lua_State* L, const co::Any& var );
 	static void push( lua_State* L, const co::Any& var, int depth );
 	static void push( lua_State* L, const std::string& str );
-	static void push( lua_State* L, co::Interface* itf );
-	static void push( lua_State* L, co::IComponent* component );
+	static void push( lua_State* L, co::IService* itf );
+	static void push( lua_State* L, co::IObject* component );
 	//@}
 
 	/*!
@@ -91,7 +91,7 @@ public:
 	bool findScript( const std::string& name, std::string& filename );
 
 	co::int32 callFunction( const std::string& moduleName, const std::string& functionName,
-								co::ArrayRange<const co::Any> args, co::ArrayRange<const co::Any> results );
+								co::Range<const co::Any> args, co::Range<const co::Any> results );
 
 private:
 	template<typename BindingClass, typename InstanceType>
@@ -102,7 +102,7 @@ private:
 	static void pushArray( lua_State* L, const co::Any& var );
 	static void toArray( lua_State* L, int index, co::IType* elementType, co::Any& var );
 	
-	static co::int32 getEnumIdentifier( lua_State* L, int index, co::IEnumType* enumType );
+	static co::int32 getEnumIdentifier( lua_State* L, int index, co::IEnum* enumType );
 
 	static void checkType( lua_State* L, int index, int expectedType );
 	static void raiseException( lua_State* L, int errorCode );

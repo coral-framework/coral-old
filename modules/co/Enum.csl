@@ -1,0 +1,7 @@
+/*
+	Implements co.IEnum.
+ */
+component Enum
+{
+	provides IEnum type;
+};

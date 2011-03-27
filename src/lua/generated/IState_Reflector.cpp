@@ -4,9 +4,9 @@
  */
 
 #include <lua/IState.h>
-#include <co/IDynamicProxyHandler.h>
-#include <co/IMethodInfo.h>
-#include <co/IAttributeInfo.h>
+#include <co/IDynamicServiceProvider.h>
+#include <co/IMethod.h>
+#include <co/IField.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -19,15 +19,15 @@ namespace lua {
 void moduleRetain();
 void moduleRelease();
 
-// ------ Proxy Interface ------ //
+// ------ Dynamic Service Proxy ------ //
 
 class IState_Proxy : public lua::IState
 {
 public:
-	IState_Proxy( co::IDynamicProxyHandler* handler ) : _handler( handler )
+	IState_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
 		moduleRetain();
-		_cookie = _handler->registerProxyInterface( co::disambiguate<co::Interface, lua::IState>( this ) );
+		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, lua::IState>( this ) );
 	}
 
 	virtual ~IState_Proxy()
@@ -35,25 +35,25 @@ public:
 		moduleRelease();
 	}
 
-	// co::Interface Methods:
+	// co::IService Methods:
 
-	co::IInterfaceType* getInterfaceType() { return co::typeOf<lua::IState>::get(); }
-	co::IComponent* getInterfaceOwner() { return _handler->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _handler->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _handler->componentRetain(); }
-	void componentRelease() { _handler->componentRelease(); }
+	co::IInterface* getInterfaceType() { return co::typeOf<lua::IState>::get(); }
+	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
+	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
+	void componentRetain() { _provider->componentRetain(); }
+	void componentRelease() { _provider->componentRelease(); }
 
 	// lua.IState Methods:
 
-	co::int32 callFunction( const std::string& moduleName_, const std::string& functionName_, co::ArrayRange<co::Any const> args_, co::ArrayRange<co::Any const> results_ )
+	co::int32 callFunction( const std::string& moduleName_, const std::string& functionName_, co::Range<co::Any const> args_, co::Range<co::Any const> results_ )
 	{
 		co::Any args[4];
 		args[0].set< const std::string& >( moduleName_ );
 		args[1].set< const std::string& >( functionName_ );
-		args[2].set< co::ArrayRange<co::Any const> >( args_ );
-		args[3].set< co::ArrayRange<co::Any const> >( results_ );
-		co::ArrayRange<co::Any const> range( args, 4 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 0 ), range );
+		args[2].set< co::Range<co::Any const> >( args_ );
+		args[3].set< co::Range<co::Any const> >( results_ );
+		co::Range<co::Any const> range( args, 4 );
+		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 0 ), range );
 		return res.get< co::int32 >();
 	}
 
@@ -62,30 +62,30 @@ public:
 		co::Any args[2];
 		args[0].set< const std::string& >( name_ );
 		args[1].set< std::string& >( filename_ );
-		co::ArrayRange<co::Any const> range( args, 2 );
-		const co::Any& res = _handler->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 1 ), range );
+		co::Range<co::Any const> range( args, 2 );
+		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 1 ), range );
 		return res.get< bool >();
 	}
 
 protected:
 	template<typename T>
-	co::IAttributeInfo* getAttribInfo( co::uint32 index )
+	co::IField* getAttribInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberAttributes()[index];
+		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethodInfo* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethodInfo( co::uint32 index )
 	{
-		return co::typeOf<T>::get()->getMemberMethods()[index];
+		return co::typeOf<T>::get()->getMethods()[index];
 	}
 
 private:
-	co::IDynamicProxyHandler* _handler;
+	co::IDynamicServiceProvider* _provider;
 	co::uint32 _cookie;
 };
 
-// ------ IReflector ------ //
+// ------ Reflector Component ------ //
 
 class IState_Reflector : public co::ReflectorBase
 {
@@ -110,27 +110,27 @@ public:
 		return sizeof(lua::IState);
 	}
 
-	co::Interface* newProxy( co::IDynamicProxyHandler* handler )
+	co::IService* newProxy( co::IDynamicServiceProvider* provider )
 	{
-		checValidProxyHandler( handler );
-		return co::disambiguate<co::Interface, lua::IState>( new lua::IState_Proxy( handler ) );
+		checkValidDynamicProvider( provider );
+		return co::disambiguate<co::IService, lua::IState>( new lua::IState_Proxy( provider ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IAttributeInfo* ai, co::Any& value )
-	{
-		checkInstance( instance, ai );
-		raiseUnexpectedMemberIndex();
-		CORAL_UNUSED( value );
-	}
-
-	void setAttribute( const co::Any& instance, co::IAttributeInfo* ai, const co::Any& value )
+	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
 	{
 		checkInstance( instance, ai );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethodInfo* mi, co::ArrayRange<co::Any const> args, co::Any& res )
+	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
+	{
+		checkInstance( instance, ai );
+		raiseUnexpectedMemberIndex();
+		CORAL_UNUSED( value );
+	}
+
+	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
 	{
 		lua::IState* p = checkInstance( instance, mi );
 		checkNumArguments( mi, args.getSize() );
@@ -143,8 +143,8 @@ public:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					const std::string& functionName_ = args[++argIndex].get< const std::string& >();
-					co::ArrayRange<co::Any const> args_ = args[++argIndex].get< co::ArrayRange<co::Any const> >();
-					co::ArrayRange<co::Any const> results_ = args[++argIndex].get< co::ArrayRange<co::Any const> >();
+					co::Range<co::Any const> args_ = args[++argIndex].get< co::Range<co::Any const> >();
+					co::Range<co::Any const> results_ = args[++argIndex].get< co::Range<co::Any const> >();
 					argIndex = -1;
 					res.set< co::int32 >( p->callFunction( moduleName_, functionName_, args_, results_ ) );
 				}
@@ -175,20 +175,20 @@ public:
 	}
 
 private:
-	lua::IState* checkInstance( const co::Any& any, co::IMemberInfo* member )
+	lua::IState* checkInstance( const co::Any& any, co::IMember* member )
 	{
 		if( !member )
 			throw co::IllegalArgumentException( "illegal null member info" );
 
 		// make sure that 'any' is an instance of this type
-		co::IInterfaceType* myType = co::typeOf<lua::IState>::get();
+		co::IInterface* myType = co::typeOf<lua::IState>::get();
 
 		lua::IState* res;
 		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<lua::IState*>( any.getState().data.itf ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid lua::IState*, but got " << any );
 
 		// make sure that 'member' belongs to this type
-		co::ICompoundType* owner = member->getOwner();
+		co::ICompositeType* owner = member->getOwner();
 		if( owner != myType )
 			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
 				<< owner->getFullName() << ", not to lua.IState" );
@@ -197,9 +197,9 @@ private:
 	}
 };
 
-// ------ IReflector Creation Function ------ //
+// ------ Reflector Creation Function ------ //
 
-co::IReflector* __createIStateIReflector()
+co::IReflector* __createIStateReflector()
 {
     return new IState_Reflector;
 }

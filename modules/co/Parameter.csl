@@ -1,0 +1,7 @@
+/*
+	Implements co.IParameter.
+ */
+component Parameter
+{
+	provides IParameter parameter;
+};

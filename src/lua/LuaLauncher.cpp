@@ -20,7 +20,7 @@ Launcher::~Launcher()
 	// empty
 }
 
-co::int32 Launcher::main( co::ArrayRange<std::string const> args )
+co::int32 Launcher::main( co::Range<std::string const> args )
 {
 	if( args.isEmpty() )
 		throw lua::Exception( "lua.Launcher must receive a Lua script name as argument" );

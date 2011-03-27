@@ -1,0 +1,14 @@
+/*
+	Offers type introspection for an attribute, as a member of an IRecordType.
+ */
+interface IField : IMember
+{
+	// The attribute's type.
+	readonly attribute IType type;
+
+	/*
+		Whether the attribute is read-only.
+		\note For structs, this is always false (i.e. structs are always read/write).
+	 */
+	readonly attribute bool isReadOnly;
+};

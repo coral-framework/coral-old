@@ -6,8 +6,8 @@
 #include "CSLTester.h"
 #include <co/ISystem.h>
 #include <co/ITypeManager.h>
-#include <co/IInterfaceType.h>
-#include <co/IAttributeInfo.h>
+#include <co/IInterface.h>
+#include <co/IField.h>
 #include <gtest/gtest.h>
 
 TEST( TypeLoaderTests, windowsLineBreaks )
@@ -30,11 +30,11 @@ TEST( TypeLoaderTests, clashingImports )
 TEST( TypeLoaderTests, validImport )
 {
 	CSL_TEST( "TypeLoaderTests.ImportClauseTests.ValidImports" );
-	co::IInterfaceType* designer = dynamic_cast<co::IInterfaceType*>( TestHelper::type( "TypeLoaderTests.ImportClauseTests.Roles.Designer") );
+	co::IInterface* designer = dynamic_cast<co::IInterface*>( TestHelper::type( "TypeLoaderTests.ImportClauseTests.Roles.Designer") );
 
 	ASSERT_TRUE( designer != NULL );
 
-	co::IAttributeInfo* attribute = dynamic_cast<co::IAttributeInfo*>( designer->getMember( "mainOffice" ) );
+	co::IField* attribute = dynamic_cast<co::IField*>( designer->getMember( "mainOffice" ) );
 
 	ASSERT_TRUE( attribute != NULL );
 
@@ -212,7 +212,7 @@ TEST( TypeLoaderTests, singleCppBlock )
 {
 	CSL_TEST( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" );
 	
-	co::IInterfaceType* it = dynamic_cast<co::IInterfaceType*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" ) );
+	co::IInterface* it = dynamic_cast<co::IInterface*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" ) );
 	ASSERT_TRUE( it != NULL );
 
 	const std::string& str = it->getCppBlock();
@@ -224,7 +224,7 @@ TEST( TypeLoaderTests, multipleCppBlocks )
 {
 	CSL_TEST( "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" );
 
-	co::IInterfaceType* it = dynamic_cast<co::IInterfaceType*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" ) );
+	co::IInterface* it = dynamic_cast<co::IInterface*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" ) );
 	ASSERT_TRUE( it != NULL );
 
 	const std::string& str = it->getCppBlock();

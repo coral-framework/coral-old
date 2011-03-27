@@ -8,19 +8,19 @@
 
 #include <co/TypeTraits.h>
 #include <co/Any.h>
-#include <co/ArrayRange.h>
+#include <co/IService.h>
 #include <vector>
-#include <co/Interface.h>
+#include <co/Range.h>
 
 // lua.IState Mapping:
 namespace lua {
 
-class IState : public co::Interface
+class IState : public co::IService
 {
 public:
 	virtual ~IState() {;}
 
-	virtual co::int32 callFunction( const std::string& moduleName, const std::string& functionName, co::ArrayRange<co::Any const> args, co::ArrayRange<co::Any const> results ) = 0;
+	virtual co::int32 callFunction( const std::string& moduleName, const std::string& functionName, co::Range<co::Any const> args, co::Range<co::Any const> results ) = 0;
 
 	virtual bool findScript( const std::string& name, std::string& filename ) = 0;
 };
@@ -30,7 +30,7 @@ public:
 namespace co {
 template<> struct kindOf<lua::IState> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<lua::IState> { static const char* get() { return "lua.IState"; } };
-template<> struct typeOf<lua::IState> : public typeOfBase<lua::IState, IInterfaceType> {};
+template<> struct typeOf<lua::IState> : public typeOfBase<lua::IState, IInterface> {};
 } // namespace co
 
 #endif // _LUA_ISTATE_H_

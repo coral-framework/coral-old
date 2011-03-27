@@ -40,7 +40,7 @@ interface INamespace
 		\throw IllegalArgumentException if the passed \a typeKind is not a user-definable type kind
 					(TK_ARRAY, TK_ENUM, TK_EXCEPTION, TK_STRUCT, TK_NATIVECLASS, TK_INTERFACE or TK_COMPONENT).
 	 */
-	ITypeBuilder defineType( in string name, in TypeKind typeKind, in ITypeCreationTransaction transaction )
+	ITypeBuilder defineType( in string name, in TypeKind typeKind, in ITypeTransaction transaction )
 		raises IllegalNameException, IllegalArgumentException;
 
 	/*
