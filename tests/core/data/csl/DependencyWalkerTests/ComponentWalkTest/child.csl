@@ -1,4 +1,0 @@
-interface child
-{
-	attribute child myRecursiveChild;
-};

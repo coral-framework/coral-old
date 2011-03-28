@@ -1,4 +1,4 @@
 interface Analyst
 {
-	attribute string name;
+	string name;
 };

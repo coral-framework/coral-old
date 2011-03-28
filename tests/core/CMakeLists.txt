@@ -8,20 +8,9 @@ PROJECT( TESTS_CORE )
 # Build the tests_core executable
 ################################################################################
 
-# Process subdirectories
-ADD_SUBDIRECTORY( tools )
-
-# Extract properties gathered from all subdirs
-GET_PROPERTY( HEADER_FILES DIRECTORY PROPERTY HEADER_FILES )
-GET_PROPERTY( SOURCE_FILES DIRECTORY PROPERTY SOURCE_FILES )
-
 # Gather files in the current directory
-FILE( GLOB _HEADER_FILES *.h )
-FILE( GLOB _SOURCE_FILES *.cpp )
-
-# Add source files in the current directory
-SET( HEADER_FILES ${_HEADER_FILES} ${HEADER_FILES} )
-SET( SOURCE_FILES ${_SOURCE_FILES} ${SOURCE_FILES} )
+FILE( GLOB HEADER_FILES *.h )
+FILE( GLOB SOURCE_FILES *.cpp )
 
 # Pass the CORAL_PATH as a precompiler definition
 SET_PROPERTY( DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
@@ -73,13 +62,8 @@ ENDIF()
 # Source Groups
 ################################################################################
 
-FILE( GLOB testsFiles ${CMAKE_CURRENT_SOURCE_DIR}/*Tests.cpp )
-SOURCE_GROUP( "Core Tests" FILES ${testsFiles} )
+# Default Source Group
+SOURCE_GROUP( "Helpers" REGULAR_EXPRESSION ".*" )
+SOURCE_GROUP( "" FILES "CMakeLists.txt" )
 
-FILE( GLOB toolsFiles ${CMAKE_CURRENT_SOURCE_DIR}/tools/*.cpp )
-SOURCE_GROUP( "Tools Tests" FILES ${toolsFiles} )
-
-FILE( GLOB miscFiles ${CMAKE_CURRENT_SOURCE_DIR}/*.h ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp )
-LIST( REMOVE_ITEM miscFiles ${testsFiles} )
-
-SOURCE_GROUP( "@Misc" FILES ${miscFiles} )
+SOURCE_GROUP( "Tests" REGULAR_EXPRESSION ".*Tests\\.cpp$" )

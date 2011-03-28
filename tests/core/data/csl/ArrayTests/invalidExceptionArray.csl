@@ -1,0 +1,7 @@
+/*
+	Invalid interface to verifiy that exceptions cannot be in arrays
+ */
+interface invalidExceptionArray
+{
+	TestExceptions.AnotherException[] comp;
+};

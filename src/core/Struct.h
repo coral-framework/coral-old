@@ -6,22 +6,22 @@
 #ifndef _CO_STRUCT_H_
 #define _CO_STRUCT_H_
 
+#include "ClassType.h"
 #include "Struct_Base.h"
-#include "CompositeType.h"
 
 namespace co {
 
 /*!
 	Implements co.IStruct.
  */
-class Struct : public Struct_Base, public CompositeTypeImpl
+class Struct : public Struct_Base, public ClassTypeImpl
 {
 public:
 	virtual ~Struct();
 
-	DELEGATE_co_IType( CompositeTypeImpl:: );
-	DELEGATE_co_ICompositeType( CompositeTypeImpl:: );
-	DELEGATE_co_IRecordType( CompositeTypeImpl:: );
+	DELEGATE_co_IType( ClassTypeImpl:: );
+	DELEGATE_co_ICompositeType( ClassTypeImpl:: );
+	DELEGATE_co_IRecordType( ClassTypeImpl:: );
 };
 
 } // namespace co

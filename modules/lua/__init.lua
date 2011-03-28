@@ -126,7 +126,7 @@ end
 --		desc.provides = a map of interface names to interface type names.
 --		desc.receives = a map of interface names to interface type names.
 -- Either 'provides' or 'receives' can be omitted, but at least one interface
--- must be defined. When providing both tables, beware of interface name clashes.
+-- must be defined. When providing both tables, beware of port name clashes.
 --
 -- The 'desc' table is converted into a component prototype table and returned
 -- as the function result. A brand new component prototype table contains only
@@ -181,13 +181,13 @@ local function defineComponentType( ns, typeName, tct, provides, receives )
 
 	if provides then
 		for itfName, itfType in pairs( provides ) do
-			typeBuilder:defineInterface( itfName, itfType, true )
+			typeBuilder:definePort( itfName, itfType, true )
 		end
 	end
 
 	if receives then
 		for itfName, itfType in pairs( receives ) do
-			typeBuilder:defineInterface( itfName, itfType, false )
+			typeBuilder:definePort( itfName, itfType, false )
 		end
 	end
 

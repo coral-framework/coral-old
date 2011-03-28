@@ -1,19 +1,19 @@
 interface TestInterface
 {
-	readonly attribute string nameReadonly;
+	readonly string nameReadonly;
 
-	attribute string name;
+	string name;
 
-	attribute string[] names;
+	string[] names;
 
-	attribute DummyInterface dummyInterfaceAttribute;
+	DummyInterface dummyInterfaceAttribute;
 
-	readonly attribute TestInterface selfReferenceAttrib;
+	readonly TestInterface selfReferenceAttrib;
 
-	attribute TestEnum testEnum;
+	TestEnum testEnum;
 
-	attribute TestStruct testStruct;
-	attribute TestStruct[] testStructArray;
+	TestStruct testStruct;
+	TestStruct[] testStructArray;
 
 	<c++
 	inline int testCppBlock1()
@@ -22,7 +22,7 @@ interface TestInterface
 	}
 	c++>
 
-	attribute DummyInterface[] dummyInterfaces;
+	DummyInterface[] dummyInterfaces;
 
 	void testInParameters( in float size, in TestEnum enumValue, in string text, in TestStruct testStruct, in DummyInterface dummyInterface, in int32[] intList, in DummyInterface[] interfaces );
 

@@ -15,7 +15,6 @@
 #include <moduleA/DummyInterface.h>
 #include <moduleA/TestNamespaces.h>
 #include <moduleA/BadlySortedStruct.h>
-#include <moduleA/IBatman.h>
 
 TEST( MappingTests, enumValues )
 {
@@ -151,21 +150,6 @@ TEST( MappingTests, interface )
 	ASSERT_NE( moduleA::Second, enumValue );
 	ASSERT_NE( 42, testStruct.anInt16 );
 	ASSERT_TRUE( dummyPtr == NULL );
-}
-
-TEST( MappingTests, interfaceDisambiguation )
-{
-	EXPECT_FALSE( ( co::traits::hasAmbiguousBase<moduleA::IBat, co::IService>::value ) );
-
-	EXPECT_TRUE( ( co::traits::hasAmbiguousBase<moduleA::IBatman, co::IService>::value ) );
-	EXPECT_TRUE( ( co::traits::hasAmbiguousBase<moduleA::IBatman, moduleA::IMammal>::value ) );
-
-	moduleA::IBatman* batman = NULL;
-	co::IService* itf = co::disambiguate<co::IService>( batman );
-	moduleA::IMammal* mammalItf = co::disambiguate<moduleA::IMammal>( batman );
-
-	CORAL_UNUSED( itf );
-	CORAL_UNUSED( mammalItf );
 }
 
 TEST( MappingTests, nativeClass )

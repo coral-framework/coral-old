@@ -5,19 +5,19 @@
 interface IModule
 {
 	// The module's namespace in the type repository.
-	readonly attribute INamespace namespace;
+	readonly INamespace namespace;
 
 	// Current module state. See the module life cycle control methods below.
-	readonly attribute ModuleState state;
+	readonly ModuleState state;
 
 	// List of ModuleParts that make up this module.
-	readonly attribute IModulePart[] parts;
+	readonly IModulePart[] parts;
 
 	/*
 		Affects the order in which a module is notified of state changes.
 		Modules are sorted by increasing rank value. The default rank is zero.
 	 */
-	attribute int32 rank;
+	int32 rank;
 
 	//---------- Life Cycle Control Methods ----------//
 

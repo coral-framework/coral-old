@@ -3,15 +3,15 @@ import TypeLoaderTests.ImportClauseTests.Roles.Designer;
 
 interface Office
 {
-	attribute Analyst mainAnalyst;
-	attribute Roles.Analyst[] maleAnalysts;
-	attribute TypeLoaderTests.ImportClauseTests.Roles.Analyst[] femaleAnalysts;
+	Analyst mainAnalyst;
+	Roles.Analyst[] maleAnalysts;
+	TypeLoaderTests.ImportClauseTests.Roles.Analyst[] femaleAnalysts;
 
-	attribute Designer mainDesigner;
-	attribute Roles.Designer[] maleDesigners;
-	attribute TypeLoaderTests.ImportClauseTests.Roles.Designer[] femaleDesigners;
+	Designer mainDesigner;
+	Roles.Designer[] maleDesigners;
+	TypeLoaderTests.ImportClauseTests.Roles.Designer[] femaleDesigners;
 
 
-	attribute Roles.Tester[] maleTesters;
-	attribute TypeLoaderTests.ImportClauseTests.Roles.Tester[] femaleTesters;
+	Roles.Tester[] maleTesters;
+	TypeLoaderTests.ImportClauseTests.Roles.Tester[] femaleTesters;
 };

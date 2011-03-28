@@ -58,7 +58,7 @@ void ModulePartBase::componentRelease()
 
 IComponent* ModulePartBase::getComponentType()
 {
-	return getOrCreateSimpleInternalComponentType( "co.ModulePartBase", "co.IModulePart", "part" );
+	return getOrCreateInternalComponent( "co.ModulePartBase", "co.IModulePart", "part" );
 }
 
 IService* ModulePartBase::getInterface( IPort* port )
@@ -70,7 +70,7 @@ IService* ModulePartBase::getInterface( IPort* port )
 	{
 	case 0: res = static_cast<IModulePart*>( this ); break;
 	default:
-		raiseUnexpectedInterfaceIndex();
+		raiseUnexpectedPortIndex();
 	}
 
 	return res;
@@ -79,7 +79,7 @@ IService* ModulePartBase::getInterface( IPort* port )
 void ModulePartBase::setReceptacle( IPort* receptacle, IService* )
 {
 	checkValidReceptacle( receptacle );
-	raiseUnexpectedInterfaceIndex();
+	raiseUnexpectedPortIndex();
 }
 
 void ModulePartBase::initialize( co::IModule* )

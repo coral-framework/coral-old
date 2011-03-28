@@ -51,9 +51,8 @@ public:
 	void onNativeClass( const std::string& cppType, const std::string& cppHeader );
 	void onIdentifierListItem( const std::string& name );
 	void onSuperType( const std::string& typeName );
-	void onStructMember( const std::string& memberIdentifier );
 	void onComponentInterface( bool isFacet, const std::string& name );
-	void onAttribute( bool isReadOnly, const std::string& name );
+	void onField( const std::string& name, bool isReadOnly );
 	void onMethod( const std::string& name );
 	void onParameter( bool isIn, bool isOut, const std::string& name );
 	void onExeptionRaised( const std::string& name );

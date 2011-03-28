@@ -70,7 +70,7 @@ public:
 
 	virtual co::IObject* newInstance() = 0;
 
-	virtual co::IService* newProxy( co::IDynamicServiceProvider* provider ) = 0;
+	virtual co::IService* newProxy( co::IDynamicServiceProvider* handler ) = 0;
 
 	virtual void raise( const std::string& message ) = 0;
 

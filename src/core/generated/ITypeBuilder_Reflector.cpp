@@ -6,8 +6,8 @@
 #include <co/ITypeBuilder.h>
 #include <co/IDynamicServiceProvider.h>
 #include <co/INamespace.h>
-#include <co/IMethodBuilder.h>
 #include <co/IInterface.h>
+#include <co/IMethodBuilder.h>
 #include <co/IType.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
@@ -70,7 +70,7 @@ public:
 		return res.get< co::IType* >();
 	}
 
-	void defineAttribute( const std::string& name_, co::IType* type_, bool isReadOnly_ )
+	void defineField( const std::string& name_, co::IType* type_, bool isReadOnly_ )
 	{
 		co::Any args[3];
 		args[0].set< const std::string& >( name_ );
@@ -88,31 +88,31 @@ public:
 		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeBuilder>( 2 ), range );
 	}
 
-	void defineInterface( const std::string& name_, co::IInterface* interfaceType_, bool isFacet_ )
+	co::IMethodBuilder* defineMethod( const std::string& name_ )
+	{
+		co::Any args[1];
+		args[0].set< const std::string& >( name_ );
+		co::Range<co::Any const> range( args, 1 );
+		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeBuilder>( 3 ), range );
+		return res.get< co::IMethodBuilder* >();
+	}
+
+	void defineNativeClass( const std::string& nativeHeader_, const std::string& nativeName_ )
+	{
+		co::Any args[2];
+		args[0].set< const std::string& >( nativeHeader_ );
+		args[1].set< const std::string& >( nativeName_ );
+		co::Range<co::Any const> range( args, 2 );
+		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeBuilder>( 4 ), range );
+	}
+
+	void definePort( const std::string& name_, co::IInterface* interfaceType_, bool isFacet_ )
 	{
 		co::Any args[3];
 		args[0].set< const std::string& >( name_ );
 		args[1].set< co::IInterface* >( interfaceType_ );
 		args[2].set< bool >( isFacet_ );
 		co::Range<co::Any const> range( args, 3 );
-		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeBuilder>( 3 ), range );
-	}
-
-	co::IMethodBuilder* defineMethod( const std::string& name_ )
-	{
-		co::Any args[1];
-		args[0].set< const std::string& >( name_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeBuilder>( 4 ), range );
-		return res.get< co::IMethodBuilder* >();
-	}
-
-	void defineNativeClass( const std::string& nativeHeaderFile_, const std::string& nativeName_ )
-	{
-		co::Any args[2];
-		args[0].set< const std::string& >( nativeHeaderFile_ );
-		args[1].set< const std::string& >( nativeName_ );
-		co::Range<co::Any const> range( args, 2 );
 		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeBuilder>( 5 ), range );
 	}
 
@@ -219,7 +219,7 @@ public:
 					co::IType* type_ = args[++argIndex].get< co::IType* >();
 					bool isReadOnly_ = args[++argIndex].get< bool >();
 					argIndex = -1;
-					p->defineAttribute( name_, type_, isReadOnly_ );
+					p->defineField( name_, type_, isReadOnly_ );
 				}
 				break;
 			case 5:
@@ -232,25 +232,25 @@ public:
 			case 6:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
-					co::IInterface* interfaceType_ = args[++argIndex].get< co::IInterface* >();
-					bool isFacet_ = args[++argIndex].get< bool >();
-					argIndex = -1;
-					p->defineInterface( name_, interfaceType_, isFacet_ );
-				}
-				break;
-			case 7:
-				{
-					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
 					res.set< co::IMethodBuilder* >( p->defineMethod( name_ ) );
 				}
 				break;
-			case 8:
+			case 7:
 				{
-					const std::string& nativeHeaderFile_ = args[++argIndex].get< const std::string& >();
+					const std::string& nativeHeader_ = args[++argIndex].get< const std::string& >();
 					const std::string& nativeName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					p->defineNativeClass( nativeHeaderFile_, nativeName_ );
+					p->defineNativeClass( nativeHeader_, nativeName_ );
+				}
+				break;
+			case 8:
+				{
+					const std::string& name_ = args[++argIndex].get< const std::string& >();
+					co::IInterface* interfaceType_ = args[++argIndex].get< co::IInterface* >();
+					bool isFacet_ = args[++argIndex].get< bool >();
+					argIndex = -1;
+					p->definePort( name_, interfaceType_, isFacet_ );
 				}
 				break;
 			case 9:

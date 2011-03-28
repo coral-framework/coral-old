@@ -27,13 +27,13 @@ public:
 
 	virtual void setIsLazy( bool isLazy ) = 0;
 
-	virtual void addService( co::IInterface* serviceType, co::IService* serviceInstance ) = 0;
+	virtual void addService( co::IInterface* serviceType, co::IService* service ) = 0;
 
-	virtual void addServiceForType( co::IInterface* serviceType, co::IInterface* clientType, co::IService* serviceInstance ) = 0;
+	virtual void addServiceForType( co::IInterface* serviceType, co::IInterface* clientType, co::IService* service ) = 0;
 
-	virtual void addServiceImplementation( co::IInterface* serviceType, const std::string& componentName ) = 0;
+	virtual void addServiceProvider( co::IInterface* serviceType, const std::string& componentName ) = 0;
 
-	virtual void addServiceImplementationForType( co::IInterface* serviceType, co::IInterface* clientType, const std::string& componentName ) = 0;
+	virtual void addServiceProviderForType( co::IInterface* serviceType, co::IInterface* clientType, const std::string& componentName ) = 0;
 
 	virtual co::IService* getService( co::IInterface* serviceType ) = 0;
 

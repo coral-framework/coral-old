@@ -1,13 +1,13 @@
 /*
 	Type representing an enumeration of constant identifiers, in the range [0, n].
  */
-interface IEnum : IType
+interface IEnum extends IType
 {
 	/*
 		An ordered range of strings containing all identifiers in this enum.
 		The first identifier is considered to have value 0; the second identifier, 1, etc.
 	 */
-	readonly attribute string[] identifiers;
+	readonly string[] identifiers;
 
 	/*
 		Returns the value of an identifier in this enum.

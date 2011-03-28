@@ -1,7 +1,7 @@
 /*
 	Type representing a named exception that can be raised by methods.
  */
-interface IException : IType
+interface IException extends IType
 {
 	// no members
 };

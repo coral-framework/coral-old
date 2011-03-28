@@ -1,8 +1,8 @@
 /*
 	Type representing a unidimensional array of elements.
  */
-interface IArray : IType
+interface IArray extends IType
 {
 	// The type of the array elements.
-	readonly attribute IType elementType;
+	readonly IType elementType;
 };

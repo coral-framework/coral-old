@@ -1,5 +1,0 @@
-interface SportPlayer : Person
-{
-	readonly attribute Sport sport;
-	attribute float rate;
-};

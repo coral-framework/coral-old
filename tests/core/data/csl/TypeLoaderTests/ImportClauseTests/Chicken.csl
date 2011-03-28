@@ -2,5 +2,5 @@ import TypeLoaderTests.ImportClauseTests.Parent.Egg;
 
 interface Chicken
 {
-	attribute string chickenName;
+	string chickenName;
 };

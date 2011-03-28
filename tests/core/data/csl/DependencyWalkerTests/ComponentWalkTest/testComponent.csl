@@ -1,6 +1,0 @@
-component testComponent
-{
-	provides providedInterface providedInterface;
-
-	receives requiredInterface requiredInterface;
-};

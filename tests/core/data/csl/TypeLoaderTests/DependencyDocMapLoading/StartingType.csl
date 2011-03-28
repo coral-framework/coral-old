@@ -4,7 +4,7 @@
 interface StartingType 
 {
 	// this will cause load on the denpendency, and will fill its doc info.
-	attribute DependencyType dep;
+	DependencyType dep;
 
 	
 };

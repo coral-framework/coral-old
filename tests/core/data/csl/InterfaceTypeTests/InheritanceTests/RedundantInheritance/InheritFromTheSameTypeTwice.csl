@@ -1,7 +1,0 @@
-// invalid duplicate inheritance
-interface InheritFromTheSameTypeTwice : Car, Car
-{
-	readonly attribute string fordName;
-};
-
-

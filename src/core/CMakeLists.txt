@@ -106,8 +106,8 @@ ENDIF()
 ################################################################################
 
 # Default Source Group
-SOURCE_GROUP( "Core" REGULAR_EXPRESSION .* )
-SOURCE_GROUP( "" FILES CMakeLists.txt )
+SOURCE_GROUP( "Core" REGULAR_EXPRESSION ".*" )
+SOURCE_GROUP( "" FILES "CMakeLists.txt" )
 
 # Generated Files
 SOURCE_GROUP( "@Mappings" FILES ${MAPPING_HEADER_FILES} )

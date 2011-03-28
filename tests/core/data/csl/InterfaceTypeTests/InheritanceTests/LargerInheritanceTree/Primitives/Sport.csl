@@ -1,4 +1,0 @@
-interface Sport
-{
-	readonly attribute uint32 numberOfPlayers;
-};

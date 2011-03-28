@@ -1,6 +1,0 @@
-enum testEnum
-{
-	one,
-	two,
-	three
-};

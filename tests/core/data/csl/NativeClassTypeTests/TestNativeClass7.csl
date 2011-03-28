@@ -1,8 +1,0 @@
-native class TestNativeClass7 ( <x> a::_ )
-{
-
-
-attribute string[] a;
-
-
-};

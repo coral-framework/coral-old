@@ -1,7 +1,0 @@
-interface ClashingParent
-{
-	attribute string name;
-};
-
-
-

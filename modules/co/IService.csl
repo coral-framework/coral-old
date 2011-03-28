@@ -4,13 +4,13 @@
 interface IService
 {
 	// Object providing type introspection for this interface.
-	readonly attribute IInterface interfaceType;
+	readonly IInterface interfaceType;
 
 	// The component providing this interface.
-	readonly attribute IObject interfaceOwner;
+	readonly IObject interfaceOwner;
 
 	// This interface's name within the interfaceOwner.
-	readonly attribute string interfaceName;
+	readonly string interfaceName;
 
 	// Increment the interface owner's reference count.
 	void componentRetain();

@@ -1,4 +1,5 @@
-interface IBatman : IHuman, IBat
+// used in the Lua component tests
+interface IBatman extends IHuman
 {
 	void fightCrime();
 };

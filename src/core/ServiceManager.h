@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _SERVICEMANAGER_H_
-#define _SERVICEMANAGER_H_
+#ifndef _CO_SERVICEMANAGER_H_
+#define _CO_SERVICEMANAGER_H_
 
 #include "ServiceManager_Base.h"
 #include <co/IComponent.h>
@@ -28,10 +28,10 @@ public:
 	// IServiceManager methods:
 	bool getIsLazy();
 	void setIsLazy( bool isLazy );
-	void addService( IInterface* serviceType, IService* serviceInstance );
-	void addServiceForType( IInterface* serviceType, IInterface* clientType, IService* serviceInstance );
-	void addServiceImplementation( IInterface* serviceType, const std::string& componentName );
-	void addServiceImplementationForType( IInterface* serviceType, IInterface* clientType, const std::string& componentName );
+	void addService( IInterface* serviceType, IService* service );
+	void addServiceForType( IInterface* serviceType, IInterface* clientType, IService* service );
+	void addServiceProvider( IInterface* serviceType, const std::string& componentName );
+	void addServiceProviderForType( IInterface* serviceType, IInterface* clientType, const std::string& componentName );
 	IService* getService( IInterface* serviceType );
 	IService* getServiceForType( IInterface* serviceType, IInterface* clientType );
 	IService* getServiceForInstance( IInterface* serviceType, IService* clientInstance );
@@ -39,72 +39,71 @@ public:
 	void removeServiceForType( IInterface* serviceType, IInterface* clientType );
 
 private:
-	class LazyInstance
+	class LazyService
 	{
 	public:
-		inline LazyInstance() : _hasInstance( false ), _instance( NULL ) {;}
-		inline ~LazyInstance() { clear(); }
+		inline LazyService() : _service( NULL ), _hasService( false ) {;}
+		inline ~LazyService() { clear(); }
 
-		inline bool isValid() const { return _instance != NULL; }
+		inline bool isValid() const { return _service != NULL; }
 
 		inline void clear()
 		{
-			if( _hasInstance )
-				_instance->componentRelease();
-			_instance = NULL;
-			_hasInstance = false;
+			if( _hasService )
+				_service->componentRelease();
+			_service = NULL;
+			_hasService = false;
 		}
 
-		inline bool hasInstance() const { return _hasInstance; }
+		inline bool hasService() const { return _hasService; }
 
-		inline IService* getInstance() { return _instance; }
+		inline IService* getService() { return _service; }
 
-		inline void setInstance( IService* instance )
+		inline void setService( IService* instance )
 		{
 			clear();
-			_instance = instance;
-			_instance->componentRetain();
-			_hasInstance = true;
+			_service = instance;
+			_service->componentRetain();
+			_hasService = true;
 		}
 
-		inline IComponent* getComponentType() { return _implementation; }
+		inline IComponent* getComponent() { return _component; }
 
-		inline void setComponentType( IComponent* type )
+		inline void setComponent( IComponent* type )
 		{
 			clear();
-			_implementation = type;
+			_component = type;
 		}
 
 	private:
-		bool _hasInstance; // true if we got an '_instance'; false if we got an '_implementation'.
 		union
 		{
-			IService* _instance;
-			IComponent* _implementation;
+			IService* _service;
+			IComponent* _component;
 		};
+		bool _hasService; // true if we got a '_service'; false if we got a '_component'.
 	};
 
-	typedef std::map<IInterface*, LazyInstance> CustomServicesMap;
+	typedef std::map<IInterface*, LazyService> CustomServicesMap;
 
 	struct ServiceRecord
 	{
-		LazyInstance global;
+		LazyService global;
 		CustomServicesMap custom; // specialized by clientType
 	};
 
 	typedef std::map<IInterface*, ServiceRecord> ServiceMap;
 
 	inline ServiceRecord& fetchServiceRecord( IInterface* serviceType );
-	inline IPort* getFacetInfo( IComponent* ct, IInterface* itfType );
+	inline IPort* findServiceFacet( IComponent* component, IInterface* serviceType );
 
-	void validateClientType( IInterface* clientType );
-	void validateServiceInstance( IInterface* serviceType, IService* serviceInstance );
-	IComponent* validateComponentType( IInterface* serviceType, const std::string& componentName );
-	
-	void createServiceInstance( IInterface* serviceType, LazyInstance& instance, IInterface* clientType = 0 );
+	void validateService( IInterface* serviceType, IService* service );
+	IComponent* validateComponent( IInterface* serviceType, const std::string& componentName );
 
-	IService* getServiceForType( ServiceRecord& rec, IInterface* serviceType, IInterface* clientType );
-	LazyInstance* findSuitableInstance( ServiceRecord& rec, IInterface* serviceType, IInterface* clientType );
+	void createService( IInterface* serviceType, LazyService& lazy, IInterface* clientType = 0 );
+
+	IService* getCustomService( ServiceRecord& rec, IInterface* serviceType, IInterface* clientType );
+	LazyService* findCustomService( ServiceRecord& rec, IInterface* serviceType, IInterface* clientType );
 
 private:
 	bool _isLazy;

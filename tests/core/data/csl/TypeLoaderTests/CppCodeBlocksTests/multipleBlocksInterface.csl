@@ -1,13 +1,13 @@
 // tests if a multiple blocks are beeing processed
 interface multipleBlocksInterface
 {
-	attribute string foo;
+	string foo;
 	
 	<c++
 	void myInjectedFoo() {;}
 	c++>
 
-	attribute string moreFoo;
+	string moreFoo;
 
 	<c++
 	void myLastInjectedFoo() {;}

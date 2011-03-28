@@ -4,8 +4,8 @@
  */
 interface DocumentedInterface
 {
-	// and this is the attribute doc.
-	attribute string name;
+	// and this is the field doc.
+	string name;
 
 	// foo method declaration.
 

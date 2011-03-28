@@ -58,6 +58,7 @@ public:
 		TypeId_ITypeManager,
 		TypeId_ITypeTransaction,
 		TypeId_LifeCycleException,
+		TypeId_MemberKind,
 		TypeId_Method,
 		TypeId_MethodBuilder,
 		TypeId_MissingInputException,
@@ -69,7 +70,7 @@ public:
 		TypeId_ModuleState,
 		TypeId_Namespace,
 		TypeId_NativeClass,
-		TypeId_NoSuchInterfaceException,
+		TypeId_NoSuchPortException,
 		TypeId_NotSupportedException,
 		TypeId_Parameter,
 		TypeId_Port,
@@ -163,6 +164,7 @@ co::IReflector* __createITypeBuilderReflector();
 co::IReflector* __createITypeManagerReflector();
 co::IReflector* __createITypeTransactionReflector();
 co::IReflector* __createLifeCycleExceptionReflector();
+co::IReflector* __createMemberKindReflector();
 co::IReflector* __createMethodReflector();
 co::IReflector* __createMethodBuilderReflector();
 co::IReflector* __createMissingInputExceptionReflector();
@@ -174,7 +176,7 @@ co::IReflector* __createModulePartLoaderReflector();
 co::IReflector* __createModuleStateReflector();
 co::IReflector* __createNamespaceReflector();
 co::IReflector* __createNativeClassReflector();
-co::IReflector* __createNoSuchInterfaceExceptionReflector();
+co::IReflector* __createNoSuchPortExceptionReflector();
 co::IReflector* __createNotSupportedExceptionReflector();
 co::IReflector* __createParameterReflector();
 co::IReflector* __createPortReflector();

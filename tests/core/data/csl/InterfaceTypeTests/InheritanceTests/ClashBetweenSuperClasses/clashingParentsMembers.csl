@@ -1,8 +1,0 @@
-// This test interface should raise an exeption because the parents
-// contain clashing members.
-interface clashingParentsMembers : parentWithAttributeName, parentWithMethodGetName
-{
-	readonly attribute string foo;
-};
-
-

@@ -7,38 +7,38 @@ interface IType
 		The type's local name (not considering its namespace).
 		For instance, for the type <tt>liquid.drinkable.Water</tt>, the local name would be <tt>Water</tt>.
 	 */
- 	readonly attribute string name;
+ 	readonly string name;
 
 	/*
 		The type's fully qualified name.
 		If the type is in the global namespace, the full name is equivalent to the type's local name.
 		Otherwise, the full name is equivalent to (type.namespace.fullName + "." + type.name).
 	 */
-	readonly attribute string fullName;
+	readonly string fullName;
 
 	// The namespace where the type is defined.
-	readonly attribute INamespace namespace;
+	readonly INamespace namespace;
 
 	// The kind of type that this object represents.
-	readonly attribute TypeKind kind;
+	readonly TypeKind kind;
 
 	/*
 		The type's full signature: a version hash for checking if a type has changed over time.
 		This considers changes to the type's binary interface, as well as other aspects that could affect
 		source-code compatibility (e.g. struct field names, raised exceptions, etc.).
 	 */
-	readonly attribute Uuid fullSignature;
+	readonly Uuid fullSignature;
 
 	/*
 		The type's binary signature: a version hash for checking if a type's binary interface has changed.
 		This can be used to check if two interfaces are binary compatible at the C++ ABI level.
 	 */
-	readonly attribute Uuid binarySignature;
+	readonly Uuid binarySignature;
 
 	/*
-		The type's reflector. Getting this attribute may cause the type's module to be loaded,
-		in order to instantiate its reflector. Therefore, getting this attribute may raise a
-		ModuleLoadException, which also indicates that the reflector cannot be obtained.
+		The type's reflector. Getting this field may cause the type's module to be loaded,
+		in order to instantiate a reflector. Therefore, getting this field may raise a
+		ModuleLoadException indicating that the reflector could not be obtained.
 	 */
-	attribute IReflector reflector;
+	IReflector reflector;
 };

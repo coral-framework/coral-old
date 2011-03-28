@@ -1,4 +1,0 @@
-interface requiredInterface
-{
-	attribute child myChild;
-};

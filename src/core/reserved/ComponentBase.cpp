@@ -16,9 +16,9 @@
 #include <co/IPort.h>
 #include <co/IInterface.h>
 #include <co/ITypeTransaction.h>
-#include <co/NoSuchInterfaceException.h>
+#include <co/NoSuchPortException.h>
+#include <co/IllegalCastException.h>
 #include <sstream>
-#include <iostream>
 
 namespace co {
 
@@ -35,19 +35,19 @@ IInterface* ComponentBase::getInterfaceType()
 
 const std::string& ComponentBase::getInterfaceName()
 {
-	static const std::string s_interfaceName( "component" );
+	static const std::string s_interfaceName( "object" );
 	return s_interfaceName;
 }
 
 void ComponentBase::checkValidPort( IPort* port )
 {
 	if( !port )
-		throw NoSuchInterfaceException( "illegal null port" );
+		throw NoSuchPortException( "illegal null port" );
 
 	IComponent* myType = getComponentType();
 	ICompositeType* owner = port->getOwner();
 	if( owner != static_cast<ICompositeType*>( myType ) )
-		CORAL_THROW( NoSuchInterfaceException, "port '" << port->getName() << "' belongs to "
+		CORAL_THROW( NoSuchPortException, "port '" << port->getName() << "' belongs to "
 			<< owner->getFullName() << ", not to " << myType->getFullName() );
 
 	assert( port->getIndex() < myType->getPorts().getSize() );
@@ -57,26 +57,25 @@ void ComponentBase::checkValidReceptacle( IPort* receptacle )
 {
 	checkValidPort( receptacle );
 	if( receptacle->getIsFacet() )
-		throw NoSuchInterfaceException( "receptacle expected, got facet" );
+		throw NoSuchPortException( "receptacle expected, got facet" );
 }
 
-void ComponentBase::raiseUnexpectedInterfaceIndex()
+void ComponentBase::raiseUnexpectedPortIndex()
 {
 	assert( false );
-	throw NoSuchInterfaceException( "unexpected invalid interface index" );
+	throw NoSuchPortException( "unexpected invalid port index" );
 }
 
-void ComponentBase::raiseIncompatibleInterface( IInterface* expectedType, IService* ptr )
+void ComponentBase::raiseIncompatibleService( IInterface* expectedType, IService* service )
 {
-	CORAL_THROW( IllegalArgumentException, "incompatible interface types (" << expectedType->getFullName()
-					<< " expected, got " << ptr->getInterfaceType()->getFullName() << ")" );
+	CORAL_THROW( IllegalCastException, "incompatible service (" << expectedType->getFullName()
+					<< " expected, got " << service->getInterfaceType()->getFullName() << ")" );
 }
 
-IComponent* ComponentBase::getOrCreateSimpleInternalComponentType( const char* componentTypeName,
-																	  const char* interfaceTypeName,
-																	  const char* interfaceName )
+IComponent* ComponentBase::getOrCreateInternalComponent(
+	const char* componentName, const char* interfaceName, const char* facetName )
 {
-	std::string fullTypeName( componentTypeName );
+	std::string fullTypeName( componentName );
 
 	// get the IComponent if it already exists
 	ITypeManager* tm = getSystem()->getTypes();
@@ -88,14 +87,14 @@ IComponent* ComponentBase::getOrCreateSimpleInternalComponentType( const char* c
 	}
 
 	// create the IComponent if it's not defined
-	IInterface* interfaceType = dynamic_cast<IInterface*>( getType( interfaceTypeName ) );
+	IInterface* interfaceType = dynamic_cast<IInterface*>( getType( interfaceName ) );
 	assert( interfaceType );
 
-	RefPtr<ITypeTransaction> tct =
+	RefPtr<ITypeTransaction> transaction =
 			newInstance( "co.TypeTransaction" )->getFacet<ITypeTransaction>();
 
 	size_t lastDotPos = fullTypeName.rfind( '.' );
-	assert( lastDotPos != std::string::npos ); // componentTypeName must be specified with a namespace
+	assert( lastDotPos != std::string::npos ); // componentName must be specified with a namespace
 
 	std::string namespaceName( fullTypeName.substr( 0, lastDotPos ) );
 	std::string localTypeName( fullTypeName.substr( lastDotPos + 1 ) );
@@ -103,26 +102,26 @@ IComponent* ComponentBase::getOrCreateSimpleInternalComponentType( const char* c
 	INamespace* ns = tm->findNamespace( namespaceName );
 	assert( ns ); // the namespace should have been created before
 
-	RefPtr<ITypeBuilder> tb = ns->defineType( localTypeName, TK_COMPONENT, tct.get() );
-	tb->defineInterface( interfaceName, interfaceType, true );
+	RefPtr<ITypeBuilder> tb = ns->defineType( localTypeName, TK_COMPONENT, transaction.get() );
+	tb->definePort( facetName, interfaceType, true );
 
 	try
 	{
-		tct->commit();
+		transaction->commit();
 	}
 	catch( std::exception& )
 	{
-		tct->rollback();
+		transaction->rollback();
 		throw;
 	}
 
-	IComponent* componentType = dynamic_cast<IComponent*>( tb->createType() );
-	assert( componentType );
+	IComponent* component = dynamic_cast<IComponent*>( tb->createType() );
+	assert( component );
 
 	// set the IComponent with a dummy reflector
-	componentType->setReflector( new BasicReflector( componentType ) );
+	component->setReflector( new BasicReflector( component ) );
 
-	return componentType;
+	return component;
 }
 
 } // namespace 'co'

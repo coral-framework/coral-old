@@ -33,6 +33,11 @@ void Method::setExceptions( Range<IException* const> exceptions )
 		_exceptions.push_back( exceptions.getFirst() );
 }
 
+MemberKind Method::getKind()
+{
+	return MK_METHOD;
+}
+
 IType* Method::getReturnType()
 {
 	return _returnType;

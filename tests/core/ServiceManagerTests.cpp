@@ -14,9 +14,10 @@
 #include <co/IServiceManager.h>
 #include <co/IRecordType.h>
 #include <co/ITypeTransaction.h>
+#include <co/IllegalCastException.h>
 #include <co/MissingServiceException.h>
 #include <co/IllegalArgumentException.h>
-#include <co/NoSuchInterfaceException.h>
+#include <co/NoSuchPortException.h>
 #include <gtest/gtest.h>
 
 TEST( ServiceManagerTests, globalService )
@@ -30,7 +31,7 @@ TEST( ServiceManagerTests, globalService )
 
 	// add the ITypeManager service
 	EXPECT_THROW( sm->addService( typeManagerType, NULL ), co::IllegalArgumentException );
-	EXPECT_THROW( sm->addService( typeManagerType, co::getSystem() ), co::IllegalArgumentException );
+	EXPECT_THROW( sm->addService( typeManagerType, co::getSystem() ), co::IllegalCastException );
 	sm->addService( typeManagerType, co::getSystem()->getTypes() );
 
 	// now we should be able to get it
@@ -56,12 +57,12 @@ TEST( ServiceManagerTests, lazyGlobalService )
 
 	// add the service with lazy instantiation
 	EXPECT_TRUE( sm->getIsLazy() );
-	EXPECT_THROW( sm->addServiceImplementation( NULL, "co.TypeTransaction" ),
+	EXPECT_THROW( sm->addServiceProvider( NULL, "co.TypeTransaction" ),
 					co::IllegalArgumentException );
-	EXPECT_THROW( sm->addServiceImplementation( tctType, "invalid" ), co::IllegalArgumentException );
-	EXPECT_THROW( sm->addServiceImplementation( co::typeOf<co::IType>::get(),
-					"co.TypeTransaction" ), co::NoSuchInterfaceException );
-	sm->addServiceImplementation( tctType, "co.TypeTransaction" );
+	EXPECT_THROW( sm->addServiceProvider( tctType, "invalid" ), co::IllegalArgumentException );
+	EXPECT_THROW( sm->addServiceProvider( co::typeOf<co::IType>::get(),
+					"co.TypeTransaction" ), co::NoSuchPortException );
+	sm->addServiceProvider( tctType, "co.TypeTransaction" );
 
 	// now we should be able to get the service instance
 	co::IService* service = sm->getService( tctType );
@@ -86,14 +87,14 @@ TEST( ServiceManagerTests, customServicesPerType )
 	co::IInterface* memberInfoType = co::typeOf<co::IMember>::get();
 	EXPECT_THROW( sm->getService( memberInfoType ), co::MissingServiceException );
 
-	// add a custom instance for AttributeContainers
-	co::IInterface* attribContType = co::typeOf<co::IRecordType>::get();
+	// add a custom instance for IRecordTypes
+	co::IInterface* recordType = co::typeOf<co::IRecordType>::get();
 	co::IObject* component = co::newInstance( "co.Field" );
-	sm->addServiceForType( memberInfoType, attribContType, component->getFacet<co::IMember>() );
+	sm->addServiceForType( memberInfoType, recordType, component->getFacet<co::IMember>() );
 
 	// add a different custom instance for InterfaceTypes
 	co::IInterface* interfaceTypeType = co::typeOf<co::IInterface>::get();
-	sm->addServiceImplementationForType( memberInfoType, interfaceTypeType, "co.Port" );
+	sm->addServiceProviderForType( memberInfoType, interfaceTypeType, "co.Port" );
 
 	// getting the service for an IArray should hit an unavailable global instance
 	EXPECT_THROW( sm->getServiceForType( memberInfoType, co::typeOf<co::IArray>::get() ),
@@ -112,7 +113,7 @@ TEST( ServiceManagerTests, customServicesPerType )
 	EXPECT_EQ( itf, co::getService<co::IMember>( interfaceTypeType ) );
 
 	// add a global instance for the service
-	sm->addServiceImplementation( memberInfoType, "co.Method" );
+	sm->addServiceProvider( memberInfoType, "co.Method" );
 
 	// now, getting the service for an IArray should return a IMethod
 	co::IInterface* arrayTypeType = co::typeOf<co::IArray>::get();

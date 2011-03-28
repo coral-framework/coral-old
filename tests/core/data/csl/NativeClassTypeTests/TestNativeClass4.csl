@@ -1,6 +1,0 @@
-native
-class TestNativeClass4 ( <ba> a::a )
-{
-attribute string[] a;
-
-};

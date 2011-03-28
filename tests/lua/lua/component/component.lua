@@ -49,7 +49,7 @@ local function testBatInstance( batInstance )
 	ASSERT_EQ( batInstance.componentType.fullName, "lua.bat.Component" )
 	ASSERT_EQ( batInstance.vampireBat.bloodsucker, true )
 	ASSERT_EQ( batInstance.fruitBat.bloodsucker, false )
-	ASSERT_EQ( batInstance.batman.bloodsucker, false )
+	ASSERT_EQ( batInstance.batman.bloodsucker, nil )
 
 	ASSERT_EQ( batInstance.fruitBat.name, nil )		-- bats don't have a name
 	ASSERT_EQ( batInstance.batman.name, "Batman" )	-- only Batman has a name

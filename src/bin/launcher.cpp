@@ -83,36 +83,37 @@ static void resolveCallee( const std::string& calleeName, co::IComponent*& ct, c
 				return;
 		}
 
-		CORAL_THROW( co::Exception, "none of " << calleeName << "'s interfaces has a main() method." );
+		CORAL_THROW( co::Exception, "none of " << calleeName << "'s facets has a main() method." );
 	}
 
-	// parse the component.interface:method names
+	// parse the component.facet:method names
 
 	std::string methodName( calleeName, colonPos + 1 );
 
-	size_t interfaceDotPos = calleeName.rfind( '.', colonPos );
-	if( interfaceDotPos == std::string::npos )
-		CORAL_THROW( co::Exception, "both a component and interface name must be specified before the method name." );
+	size_t facetDotPos = calleeName.rfind( '.', colonPos );
+	if( facetDotPos == std::string::npos )
+		CORAL_THROW( co::Exception, "methods must be specified within a component's facet "
+						"(syntax: module.component.facet:method)." );
 
-	std::string interfaceName( calleeName, interfaceDotPos + 1, colonPos - interfaceDotPos - 1 );
-	std::string componentName( calleeName, 0, interfaceDotPos );
+	std::string facetName( calleeName, facetDotPos + 1, colonPos - facetDotPos - 1 );
+	std::string componentName( calleeName, 0, facetDotPos );
 
 	// resolve component type
 	co::IType* type = co::getType( componentName );
-	ct = dynamic_cast<co::IComponent*>( type );
-	if( !ct )
+	if( type->getKind() != co::TK_COMPONENT )
 		CORAL_THROW( co::Exception, "'" << componentName << "' is not a component." );
 
-	// resolve interface type
-	co::IMember* member = ct->getMember( interfaceName );
+	ct = static_cast<co::IComponent*>( type );
+
+	// resolve facet type
+	co::IMember* member = ct->getMember( facetName );
 	if( !member )
-		CORAL_THROW( co::Exception, "'" << componentName << "' has no interface named '" << interfaceName << "'." );
+		CORAL_THROW( co::Exception, "'" << componentName << "' has no facet named '" << facetName << "'." );
 
-	facet = dynamic_cast<co::IPort*>( member );
-	assert( facet );
-
-	if( !facet || !facet->getIsFacet() )
-		CORAL_THROW( co::Exception, "'" << interfaceName << "' is not a facet of component '" << componentName << "'." );
+	facet = static_cast<co::IPort*>( member );
+	if( !member->getKind() != co::MK_PORT || !facet->getIsFacet() )
+		CORAL_THROW( co::Exception, "component port '" << componentName << "." << facetName
+						<< "' is a receptacle, not a facet." );
 
 	// resolve method
 	member = facet->getType()->getMember( methodName );
@@ -122,8 +123,8 @@ static void resolveCallee( const std::string& calleeName, co::IComponent*& ct, c
 
 	method = dynamic_cast<co::IMethod*>( member );
 	if( !method )
-		CORAL_THROW( co::Exception, "interface '" << facet->getType()->getFullName()
-						<< "' has a member named '" << methodName << "', but it is not a method." );
+		CORAL_THROW( co::Exception, "interface member '" << facet->getType()->getFullName()
+						<< ":" << methodName << "' is a field, not a method." );
 }
 
 /*
@@ -164,14 +165,14 @@ int main( int argc, char* argv[] )
 			"Coral Application Launcher v" CORAL_VERSION_STR " (" CORAL_BUILD_KEY " " CORAL_BUILD_MODE ")\n"
 			"Usage: coral [options] callee [ARG] ...\n"
 			"Description:\n"
-			"  A 'callee' must be specified as either a component or a method name within\n"
-			"  a component interface. If a method is not specified, one named 'main' will be\n"
-			"  searched for in all facets of the component. The called method must receive\n"
-			"  either no argument or an array of strings. If the method returns a number, it\n"
-			"  will be used as the application's return status.\n"
+			"  A 'callee' is either a component or a method name within a component's facet.\n"
+			"  If a method is not specified, one named 'main' will be searched for in all\n"
+			"  facets of the specified component. The called method must receive either no\n"
+			"  argument or an array of strings. If the method returns a number, it will be\n"
+			"  used as the application's return status.\n"
 			"Examples:\n"
 			"  coral myModule.MyComponent arg1 arg2 arg3\n"
-			"  coral someModule.SomeComponent.someInterface:someMethod arg1 arg2\n"
+			"  coral someModule.SomeComponent.someFacet:someMethod arg1 arg2\n"
 			"Available Options:\n"
 			"  -p EXTRA,DIRS    Add a list of repositories to the Coral path.\n"
 			"  --no-abi-checks  Disable ABI compatibility checks when loading modules.\n"
@@ -227,16 +228,16 @@ int main( int argc, char* argv[] )
 			throw;
 		}
 
-		// instantiate the component & obtain the interface instance
+		// instantiate the component & obtain the service
 		co::RefPtr<co::IObject> component;
-		co::IService* itf;
+		co::IService* service;
 		try
 		{
 			component = ct->getReflector()->newInstance();
 			assert( component.isValid() );
 
-			itf = component->getInterface( facet );
-			assert( itf );
+			service = component->getInterface( facet );
+			assert( service );
 		}
 		catch( std::exception& e )
 		{
@@ -266,7 +267,7 @@ int main( int argc, char* argv[] )
 			co::Any res;
 			co::Any arg;
 			arg.set<std::vector<std::string>&>( args );
-			reflector->invokeMethod( itf, method, co::Range<co::Any const>( &arg, 1 ), res );
+			reflector->invokeMethod( service, method, co::Range<co::Any const>( &arg, 1 ), res );
 
 			// if the result is a number, use it as the return status; otherwise, print it
 			if( res.isValid() )

@@ -1,6 +1,6 @@
 interface Office 
 {
-	attribute string foo;
+	string foo;
 
 };
 

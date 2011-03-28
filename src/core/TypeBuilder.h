@@ -48,11 +48,11 @@ public:
 	TypeKind getKind();
 	const std::string& getTypeName();
 	void defineIdentifier( const std::string& name );
-	void defineAttribute( const std::string& name, IType* type, bool isReadOnly );
+	void defineField( const std::string& name, IType* type, bool isReadOnly );
 	void defineSuperType( IType* superType );
-	void defineInterface( const std::string& name, IInterface* interface, bool isFacet );
+	void definePort( const std::string& name, IInterface* interface, bool isFacet );
 	IMethodBuilder* defineMethod( const std::string& name );
-	void defineNativeClass( const std::string& nativeHeaderFile, const std::string& nativeName );
+	void defineNativeClass( const std::string& nativeHeader, const std::string& nativeName );
 	IType* createType();
 
 protected:

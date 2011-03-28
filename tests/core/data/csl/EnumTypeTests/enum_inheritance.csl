@@ -1,6 +1,0 @@
-enum enum_inheritance : enum_valid
-{
-	fox,
-	dog,
-	test
-};

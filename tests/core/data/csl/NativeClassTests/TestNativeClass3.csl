@@ -1,0 +1,5 @@
+native	class TestNativeClass3 ( <ba> a::a )
+{
+string[] a;
+
+};

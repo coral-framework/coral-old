@@ -129,7 +129,7 @@ public:
 
 	// co.INativeClass Methods:
 
-	const std::string& getNativeHeaderFile()
+	const std::string& getNativeHeader()
 	{
 		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::INativeClass>( 0 ) );
         return res.get< const std::string& >();
@@ -195,7 +195,7 @@ public:
 		co::INativeClass* p = checkInstance( instance, ai );
 		switch( ai->getIndex() )
 		{
-		case 0:		value.set< const std::string& >( p->getNativeHeaderFile() ); break;
+		case 0:		value.set< const std::string& >( p->getNativeHeader() ); break;
 		case 1:		value.set< const std::string& >( p->getNativeName() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}

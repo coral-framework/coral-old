@@ -97,6 +97,7 @@ co::IReflector* co::ModuleInstaller::createReflector( TypeId typeId )
 	case TypeId_ITypeManager: res = co::__createITypeManagerReflector(); break;
 	case TypeId_ITypeTransaction: res = co::__createITypeTransactionReflector(); break;
 	case TypeId_LifeCycleException: res = co::__createLifeCycleExceptionReflector(); break;
+	case TypeId_MemberKind: res = co::__createMemberKindReflector(); break;
 	case TypeId_Method: res = co::__createMethodReflector(); break;
 	case TypeId_MethodBuilder: res = co::__createMethodBuilderReflector(); break;
 	case TypeId_MissingInputException: res = co::__createMissingInputExceptionReflector(); break;
@@ -108,7 +109,7 @@ co::IReflector* co::ModuleInstaller::createReflector( TypeId typeId )
 	case TypeId_ModuleState: res = co::__createModuleStateReflector(); break;
 	case TypeId_Namespace: res = co::__createNamespaceReflector(); break;
 	case TypeId_NativeClass: res = co::__createNativeClassReflector(); break;
-	case TypeId_NoSuchInterfaceException: res = co::__createNoSuchInterfaceExceptionReflector(); break;
+	case TypeId_NoSuchPortException: res = co::__createNoSuchPortExceptionReflector(); break;
 	case TypeId_NotSupportedException: res = co::__createNotSupportedExceptionReflector(); break;
 	case TypeId_Parameter: res = co::__createParameterReflector(); break;
 	case TypeId_Port: res = co::__createPortReflector(); break;

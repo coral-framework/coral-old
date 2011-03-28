@@ -4,16 +4,16 @@
 native class Vec2D ( <utility> std::pair<double, double> )
 {
 	// X coordinate.
-	attribute double x;
+	double x;
 
 	// Y coordinate.
-	attribute double y;
+	double y;
 
 	// Vector length.
-	readonly attribute double length;
+	readonly double length;
 
 	// Squared vector length.
-	readonly attribute double length2;
+	readonly double length2;
 
 	// Sets all coordinates.
 	void set( in double x, in double y );

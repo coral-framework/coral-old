@@ -28,6 +28,11 @@ void Field::setIsReadOnly( bool isReadOnly )
 	_isReadOnly = isReadOnly;
 }
 
+MemberKind Field::getKind()
+{
+	return MK_FIELD;
+}
+
 IType* Field::getType()
 {
 	return _type;

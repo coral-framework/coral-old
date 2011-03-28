@@ -35,13 +35,14 @@ local enqueueDependencies = {}
 function enqueueDependencies.TK_ENUM( enqueue, type, nextDistance ) end
 function enqueueDependencies.TK_EXCEPTION( enqueue, type, nextDistance ) end
 
-local function enqueueAttribContainer( enqueue, type, nextDistance )
+local function enqueueRecordType( enqueue, type, nextDistance )
 	for i, attrib in ipairs( type.fields ) do
 		enqueue( attrib.type, nextDistance )
 	end
 end
 
-local function enqueueMethodContainer( enqueue, type, nextDistance )
+local function enqueueClassType( enqueue, type, nextDistance )
+	enqueueRecordType( enqueue, type, nextDistance )
 	for i, method in ipairs( type.methods ) do
 		local returnType = method.returnType
 		if returnType then enqueue( returnType, nextDistance ) end
@@ -55,20 +56,18 @@ local function enqueueMethodContainer( enqueue, type, nextDistance )
 end
 
 function enqueueDependencies.TK_STRUCT( enqueue, type, nextDistance )
-	enqueueAttribContainer( enqueue, type, nextDistance )
+	enqueueRecordType( enqueue, type, nextDistance )
 end
 
 function enqueueDependencies.TK_NATIVECLASS( enqueue, type, nextDistance )
-	enqueueAttribContainer( enqueue, type, nextDistance )
-	enqueueMethodContainer( enqueue, type, nextDistance )
+	enqueueClassType( enqueue, type, nextDistance )
 end
 
 function enqueueDependencies.TK_INTERFACE( enqueue, type, nextDistance )
 	for i, super in ipairs( type.superInterfaces ) do
 		enqueue( super, nextDistance )
 	end
-	enqueueAttribContainer( enqueue, type, nextDistance )
-	enqueueMethodContainer( enqueue, type, nextDistance )
+	enqueueClassType( enqueue, type, nextDistance )
 end
 
 function enqueueDependencies.TK_COMPONENT( enqueue, type, nextDistance )

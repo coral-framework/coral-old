@@ -1,14 +1,17 @@
 /*
-	Interface for the \e members (i.e. fields, methods and ports) of a composite type.
+	Interface for the \e members of a composite type.
  */
 interface IMember
 {
-	// Member name, which must be unique within a ICompositeType.
-	readonly attribute string name;
+	// Member name, which must be unique within its owner type.
+	readonly string name;
 
-	// ICompositeType that contains the member.
-	readonly attribute ICompositeType owner;
+	// Member kind (field, method or port).
+	readonly MemberKind kind;
+
+	// ICompositeType that contains this member.
+	readonly ICompositeType owner;
 
 	// Index of the member within its owner's \a members array.
-	readonly attribute uint16 index;
+	readonly uint16 index;
 };

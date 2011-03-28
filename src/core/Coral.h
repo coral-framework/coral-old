@@ -128,11 +128,11 @@ CORAL_EXPORT IType* getType( const std::string& fullName );
 CORAL_EXPORT IObject* newInstance( const std::string& fullName );
 
 /*!
-	Binds a \a facet to the component receptacle identified by \a receptacleName.
+	Binds a \a service to the component receptacle identified by \a receptacleName.
 	You should generally use co::IObject::setReceptacle() instead of this function.
 	Please refer to co::IObject::setReceptacle() for the full list of exceptions this function may throw.
  */
-CORAL_EXPORT void setReceptacleByName( IObject* instance, const std::string& receptacleName, IService* facet );
+CORAL_EXPORT void setReceptacleByName( IObject* object, const std::string& receptacleName, IService* service );
 
 /*!
 	\brief Utility function to get the best provider of \a serviceType for clients of type \a clientType.

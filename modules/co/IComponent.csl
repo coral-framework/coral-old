@@ -1,14 +1,14 @@
 /*
 	The blueprint of a component.
  */
-interface IComponent : ICompositeType
+interface IComponent extends ICompositeType
 {
 	// List of all ports (i.e. facets and receptacles) of this component.
-	readonly attribute IPort[] ports;
+	readonly IPort[] ports;
 
 	// List of all facets (provided interfaces) of this component.
-	readonly attribute IPort[] facets;
+	readonly IPort[] facets;
 
 	// List of all receptacles (required interfaces) of this component.
-	readonly attribute IPort[] receptacles;
+	readonly IPort[] receptacles;
 };

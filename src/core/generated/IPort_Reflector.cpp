@@ -49,15 +49,21 @@ public:
         return res.get< co::uint16 >();
 	}
 
-	const std::string& getName()
+	co::MemberKind getKind()
 	{
 		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IMember>( 1 ) );
+        return res.get< co::MemberKind >();
+	}
+
+	const std::string& getName()
+	{
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IMember>( 2 ) );
         return res.get< const std::string& >();
 	}
 
 	co::ICompositeType* getOwner()
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IMember>( 2 ) );
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IMember>( 3 ) );
         return res.get< co::ICompositeType* >();
 	}
 

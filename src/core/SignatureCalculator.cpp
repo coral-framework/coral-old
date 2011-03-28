@@ -17,17 +17,21 @@
 #include <co/IPort.h>
 #include <co/INativeClass.h>
 
-/*
-	Changing this constant will automatically change ALL signatures.
-	Use this to signal type incompatibilities in new Coral versions.
- */
-const co::uint8 SIGNATURE_ALGORITHM_VERSION = 1;
+namespace co {
 
-// A byte to clearly delimiter an element and avoid ambiguities
-const co::uint8 DELIMITER = ';';
+namespace {
+	/*
+		Changing this constant will automatically change ALL signatures.
+		Use this to signal type incompatibilities in new Coral versions.
+	 */
+	const uint8 SIGNATURE_ALGORITHM_VERSION = 1;
 
-SignatureCalculator::SignatureCalculator( co::IType* type ) : _type( type ),
-	_fullSignatureHash( co::CryptoHash::Sha1 ), _binarySignatureHash( co::CryptoHash::Sha1 )
+	// A byte to clearly delimiter an element and avoid ambiguities
+	const uint8 DELIMITER = ';';
+}
+
+SignatureCalculator::SignatureCalculator( IType* type ) : _type( type ),
+	_fullSignatureHash( CryptoHash::Sha1 ), _binarySignatureHash( CryptoHash::Sha1 )
 {
 	assert( _type );
 }
@@ -42,9 +46,9 @@ void SignatureCalculator::calculate()
 	calculateSignatures();
 }
 
-inline void getUuidFromHash( co::CryptoHash& hash, co::Uuid& uuid )
+inline void getUuidFromHash( CryptoHash& hash, Uuid& uuid )
 {
-	co::CryptoHash::Result result;
+	CryptoHash::Result result;
 	hash.getResult( result );
 	result.toUuid( uuid );
 }
@@ -53,47 +57,47 @@ void SignatureCalculator::calculateSignatures()
 {
 	addDataToSignatures( SIGNATURE_ALGORITHM_VERSION );
 
-	const co::uint8 kind = _type->getKind();
+	const uint8 kind = _type->getKind();
 	addDataToSignatures( kind );
 
 	_fullSignatureHash.addData( _type->getFullName() );
 
 	switch( _type->getKind() )
 	{
-	case co::TK_ANY:
-	case co::TK_BOOLEAN:
-	case co::TK_INT8:
-	case co::TK_UINT8:
-	case co::TK_INT16:
-	case co::TK_UINT16:
-	case co::TK_INT32:
-	case co::TK_UINT32:
-	case co::TK_INT64:
-	case co::TK_UINT64:
-	case co::TK_FLOAT:
-	case co::TK_DOUBLE:
-	case co::TK_STRING:
+	case TK_ANY:
+	case TK_BOOLEAN:
+	case TK_INT8:
+	case TK_UINT8:
+	case TK_INT16:
+	case TK_UINT16:
+	case TK_INT32:
+	case TK_UINT32:
+	case TK_INT64:
+	case TK_UINT64:
+	case TK_FLOAT:
+	case TK_DOUBLE:
+	case TK_STRING:
 		// empty
 		break;
-	case co::TK_ARRAY:
+	case TK_ARRAY:
 		fillArraySignatureData();
 		break;
-	case co::TK_ENUM:
+	case TK_ENUM:
 		fillEnumSignatureData();
 		break;
-	case co::TK_EXCEPTION:
+	case TK_EXCEPTION:
 		// empty
 		break;
-	case co::TK_STRUCT:
+	case TK_STRUCT:
 		fillStructSignatureData();
 		break;
-	case co::TK_NATIVECLASS:
+	case TK_NATIVECLASS:
 		fillNativeClassSignatureData();
 		break;
-	case co::TK_INTERFACE:
+	case TK_INTERFACE:
 		fillInterfaceSignatureData();
 		break;
-	case co::TK_COMPONENT:
+	case TK_COMPONENT:
 		fillComponentSignatureData();
 		break;
 	default:
@@ -106,16 +110,16 @@ void SignatureCalculator::calculateSignatures()
 
 void SignatureCalculator::fillArraySignatureData()
 {
-	co::IArray* array = static_cast<co::IArray*>( _type );
-	co::IType* elementType = array->getElementType();
+	IArray* array = static_cast<IArray*>( _type );
+	IType* elementType = array->getElementType();
 	_fullSignatureHash.addData( elementType->getFullSignature() );
 	_binarySignatureHash.addData( elementType->getBinarySignature() );
 }
 
 void SignatureCalculator::fillEnumSignatureData()
 {
-	co::IEnum* enumType = static_cast<co::IEnum*>( _type );
-	co::Range<std::string const> range = enumType->getIdentifiers();
+	IEnum* enumType = static_cast<IEnum*>( _type );
+	Range<std::string const> range = enumType->getIdentifiers();
 	for( ; range; range.popFirst() )
 	{
 		addDataToSignatures( range.getFirst() );
@@ -127,14 +131,14 @@ void SignatureCalculator::fillEnumSignatureData()
 
 void SignatureCalculator::fillStructSignatureData()
 {
-	co::IStruct* structType = static_cast<co::IStruct*>( _type );
-	co::Range<co::IField* const> fields = structType->getFields();
+	IStruct* structType = static_cast<IStruct*>( _type );
+	Range<IField* const> fields = structType->getFields();
 	for( ; fields; fields.popFirst() )
 	{
-		co::IField* ai = fields.getFirst();
+		IField* ai = fields.getFirst();
 		assert( !ai->getIsReadOnly() );
 
-		co::IType* type = ai->getType();
+		IType* type = ai->getType();
 		_fullSignatureHash.addData( type->getFullSignature() );
 		_binarySignatureHash.addData( type->getBinarySignature() );
 
@@ -144,43 +148,43 @@ void SignatureCalculator::fillStructSignatureData()
 
 void SignatureCalculator::fillNativeClassSignatureData()
 {
-	co::INativeClass* nativeType = static_cast<co::INativeClass*>( _type );
+	INativeClass* nativeType = static_cast<INativeClass*>( _type );
 	_fullSignatureHash.addData( nativeType->getNativeName() );
-	_fullSignatureHash.addData( nativeType->getNativeHeaderFile() );
-	fillAttributeAndMethodContainerData();
+	_fullSignatureHash.addData( nativeType->getNativeHeader() );
+	fillClassTypeData();
 }
 
 void SignatureCalculator::fillInterfaceSignatureData()
 {
-	co::IInterface* interfaceType = static_cast<co::IInterface*>( _type );
+	IInterface* interfaceType = static_cast<IInterface*>( _type );
 
 	_binarySignatureHash.addData( _type->getFullName() );
 
 	// add all inherited signatures
-	co::Range<co::IInterface* const> superTypes = interfaceType->getSuperInterfaces();
+	Range<IInterface* const> superTypes = interfaceType->getSuperInterfaces();
 	for( ; superTypes; superTypes.popFirst() )
 	{
-		co::IInterface* super = superTypes.getFirst();
+		IInterface* super = superTypes.getFirst();
 		_fullSignatureHash.addData( super->getFullSignature() );
 		_binarySignatureHash.addData( super->getBinarySignature() );
 	}
 
-	fillAttributeAndMethodContainerData();
+	fillClassTypeData();
 }
 
 void SignatureCalculator::fillComponentSignatureData()
 {
-	co::IComponent* componentType = static_cast<co::IComponent*>( _type );
+	IComponent* componentType = static_cast<IComponent*>( _type );
 
-	co::Range<co::IPort* const> interfaces = componentType->getPorts();
+	Range<IPort* const> interfaces = componentType->getPorts();
 	for( ; interfaces; interfaces.popFirst() )
 	{
-		co::IPort* itf = interfaces.getFirst();
+		IPort* itf = interfaces.getFirst();
 
-		const co::uint8 isFacet = itf->getIsFacet() ? 1 : 0;
+		const uint8 isFacet = itf->getIsFacet() ? 1 : 0;
 		addDataToSignatures( isFacet );
 
-		co::IType* type = itf->getType();
+		IType* type = itf->getType();
 		_fullSignatureHash.addData( type->getFullSignature() );
 		_binarySignatureHash.addData( type->getBinarySignature() );
 
@@ -188,48 +192,44 @@ void SignatureCalculator::fillComponentSignatureData()
 	}
 }
 
-void SignatureCalculator::fillAttributeAndMethodContainerData()
+void SignatureCalculator::fillClassTypeData()
 {
-	co::IRecordType* attributeContainer = dynamic_cast<co::IRecordType*>( _type );
-	assert( attributeContainer );
+	IClassType* classType = static_cast<IClassType*>( _type );
 
-	co::Range<co::IField* const> attributes = attributeContainer->getFields();
+	Range<IField* const> attributes = classType->getFields();
 	for( ; attributes; attributes.popFirst() )
 	{
-		co::IField* ai = attributes.getFirst();
+		IField* ai = attributes.getFirst();
 
-		const co::uint8 isReadOnly = ai->getIsReadOnly() ? 1 : 0;
+		const uint8 isReadOnly = ai->getIsReadOnly() ? 1 : 0;
 		addDataToSignatures( isReadOnly );
 
 		addTypeWithNoSignature( ai->getType() );
 		addDataToSignatures( ai->getName() );
 	}
 
-	co::IClassType* methodContainer = dynamic_cast<co::IClassType*>( _type );
-	assert( methodContainer );
-
-	co::Range<co::IMethod* const> methods = methodContainer->getMethods();
+	Range<IMethod* const> methods = classType->getMethods();
 	for( ; methods; methods.popFirst() )
 	{
-		co::IMethod* mi = methods.getFirst();
+		IMethod* mi = methods.getFirst();
 
-		co::IType* returnType = mi->getReturnType();
+		IType* returnType = mi->getReturnType();
 		if( returnType )
 			addTypeWithNoSignature( returnType );
 		else
-			addDataToSignatures( co::Uuid::null() );
+			addDataToSignatures( Uuid::null() );
 
 		addDataToSignatures( mi->getName() );
 
-		co::Range<co::IParameter* const> parameters = mi->getParameters();
+		Range<IParameter* const> parameters = mi->getParameters();
 		for( ; parameters; parameters.popFirst() )
 		{
-			co::IParameter* pi = parameters.getFirst();
+			IParameter* pi = parameters.getFirst();
 
-			const co::uint8 isIn = pi->getIsIn() ? 1 : 0;
+			const uint8 isIn = pi->getIsIn() ? 1 : 0;
 			addDataToSignatures( isIn );
 
-			const co::uint8 isOut = pi->getIsOut() ? 1 : 0;
+			const uint8 isOut = pi->getIsOut() ? 1 : 0;
 			addDataToSignatures( isOut );
 
 			addTypeWithNoSignature( pi->getType() );
@@ -239,9 +239,11 @@ void SignatureCalculator::fillAttributeAndMethodContainerData()
 	}
 }
 
-void SignatureCalculator::addTypeWithNoSignature( co::IType* type )
+void SignatureCalculator::addTypeWithNoSignature( IType* type )
 {
-	const co::uint8 kind = type->getKind();
+	const uint8 kind = type->getKind();
 	addDataToSignatures( kind );
 	addDataToSignatures( type->getFullName() );
 }
+
+} // namespace co

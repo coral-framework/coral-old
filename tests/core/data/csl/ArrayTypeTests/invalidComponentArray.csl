@@ -1,7 +1,0 @@
-/*
-	Invalid interface to verifiy that componets cannot be in arrays
- */
-interface invalidComponentArray 
-{
-	attribute testComponent[] comp;
-};

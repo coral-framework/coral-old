@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _ATTRIBUTEINFO_H_
-#define _ATTRIBUTEINFO_H_
+#ifndef _CO_FIELD_H_
+#define _CO_FIELD_H_
 
 #include "Member.h"
 #include "Field_Base.h"
@@ -24,7 +24,10 @@ public:
 	void setType( IType* type );
 	void setIsReadOnly( bool isReadOnly );
 
-	// co::IField methods:
+	// IMember methods:
+	MemberKind getKind();
+
+	// IField methods:
 	IType* getType();
 	bool getIsReadOnly();
 

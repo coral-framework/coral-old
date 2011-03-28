@@ -29,99 +29,99 @@ TEST( LexicalUtilsTests, isValidIdentifier )
 
 TEST( LexicalUtilsTests, isValidAttribute )
 {
-	ASSERT_TRUE( co::LexicalUtils::isValidAttributeName( "a" ) );
-	ASSERT_TRUE( co::LexicalUtils::isValidAttributeName( "ala" ) );
-	ASSERT_TRUE( co::LexicalUtils::isValidAttributeName( "ab_cd" ) );
-	ASSERT_TRUE( co::LexicalUtils::isValidAttributeName( "d123" ) );
-	ASSERT_TRUE( co::LexicalUtils::isValidAttributeName( "lalalalalala" ) );
+	ASSERT_TRUE( co::LexicalUtils::isValidFieldName( "a" ) );
+	ASSERT_TRUE( co::LexicalUtils::isValidFieldName( "ala" ) );
+	ASSERT_TRUE( co::LexicalUtils::isValidFieldName( "ab_cd" ) );
+	ASSERT_TRUE( co::LexicalUtils::isValidFieldName( "d123" ) );
+	ASSERT_TRUE( co::LexicalUtils::isValidFieldName( "lalalalalala" ) );
 
-	ASSERT_FALSE( co::LexicalUtils::isValidAttributeName( "" ) );
-	ASSERT_FALSE( co::LexicalUtils::isValidAttributeName( "Ae" ) );
-	ASSERT_FALSE( co::LexicalUtils::isValidAttributeName( "Baaaa" ) );
+	ASSERT_FALSE( co::LexicalUtils::isValidFieldName( "" ) );
+	ASSERT_FALSE( co::LexicalUtils::isValidFieldName( "Ae" ) );
+	ASSERT_FALSE( co::LexicalUtils::isValidFieldName( "Baaaa" ) );
 }
 
 TEST( LexicalUtilsTests, formatAccessor )
 {
-	std::string attributeName;
+	std::string fieldName;
 
-	co::LexicalUtils::formatAccessor( "name", co::LexicalUtils::Getter, attributeName );
-	ASSERT_EQ( attributeName, "getName" );
+	co::LexicalUtils::formatAccessor( "name", co::LexicalUtils::Getter, fieldName );
+	ASSERT_EQ( fieldName, "getName" );
 
-	co::LexicalUtils::formatAccessor( "name", co::LexicalUtils::Setter, attributeName );
-	ASSERT_EQ( attributeName, "setName" );
+	co::LexicalUtils::formatAccessor( "name", co::LexicalUtils::Setter, fieldName );
+	ASSERT_EQ( fieldName, "setName" );
 
-	co::LexicalUtils::formatAccessor( "Name", co::LexicalUtils::Getter, attributeName );
-	ASSERT_EQ( attributeName, "getName" );
+	co::LexicalUtils::formatAccessor( "Name", co::LexicalUtils::Getter, fieldName );
+	ASSERT_EQ( fieldName, "getName" );
 
-	co::LexicalUtils::formatAccessor( "Name", co::LexicalUtils::Setter, attributeName );
-	ASSERT_EQ( attributeName, "setName" );
+	co::LexicalUtils::formatAccessor( "Name", co::LexicalUtils::Setter, fieldName );
+	ASSERT_EQ( fieldName, "setName" );
 
-	co::LexicalUtils::formatAccessor( "a", co::LexicalUtils::Getter, attributeName );
-	ASSERT_EQ( attributeName, "getA" );
+	co::LexicalUtils::formatAccessor( "a", co::LexicalUtils::Getter, fieldName );
+	ASSERT_EQ( fieldName, "getA" );
 
-	co::LexicalUtils::formatAccessor( "a", co::LexicalUtils::Setter, attributeName );
-	ASSERT_EQ( attributeName, "setA" );
+	co::LexicalUtils::formatAccessor( "a", co::LexicalUtils::Setter, fieldName );
+	ASSERT_EQ( fieldName, "setA" );
 }
 
 TEST( LexicalUtilsTests, parseAccessor )
 {
 	int res;
-	std::string attributeName;
+	std::string fieldName;
 
-	res = co::LexicalUtils::parseAccessor( "getName", co::LexicalUtils::Getter, attributeName );
-	ASSERT_EQ( "name", attributeName );
+	res = co::LexicalUtils::parseAccessor( "getName", co::LexicalUtils::Getter, fieldName );
+	ASSERT_EQ( "name", fieldName );
 	ASSERT_EQ( co::LexicalUtils::Getter, res );
 
-	res = co::LexicalUtils::parseAccessor( "getName", co::LexicalUtils::Getter | co::LexicalUtils::Setter, attributeName );
-	ASSERT_EQ( "name", attributeName );
+	res = co::LexicalUtils::parseAccessor( "getName", co::LexicalUtils::Getter | co::LexicalUtils::Setter, fieldName );
+	ASSERT_EQ( "name", fieldName );
 	ASSERT_EQ( co::LexicalUtils::Getter, res );
 
-	res = co::LexicalUtils::parseAccessor( "setName", co::LexicalUtils::Setter, attributeName );
-	ASSERT_EQ( "name" , attributeName );
+	res = co::LexicalUtils::parseAccessor( "setName", co::LexicalUtils::Setter, fieldName );
+	ASSERT_EQ( "name" , fieldName );
 	ASSERT_EQ( co::LexicalUtils::Setter, res );
 
-	res = co::LexicalUtils::parseAccessor( "setName", co::LexicalUtils::Getter | co::LexicalUtils::Setter, attributeName );
-	ASSERT_EQ( "name", attributeName );
+	res = co::LexicalUtils::parseAccessor( "setName", co::LexicalUtils::Getter | co::LexicalUtils::Setter, fieldName );
+	ASSERT_EQ( "name", fieldName );
 	ASSERT_EQ( co::LexicalUtils::Setter, res );
 
-	res = co::LexicalUtils::parseAccessor( "getname", co::LexicalUtils::Getter, attributeName );
+	res = co::LexicalUtils::parseAccessor( "getname", co::LexicalUtils::Getter, fieldName );
 	ASSERT_EQ( -1, res );
 
-	res = co::LexicalUtils::parseAccessor( "GetName", co::LexicalUtils::Getter, attributeName );
+	res = co::LexicalUtils::parseAccessor( "GetName", co::LexicalUtils::Getter, fieldName );
 	ASSERT_EQ( -1, res );
 
-	res = co::LexicalUtils::parseAccessor( "getName", co::LexicalUtils::Setter, attributeName );
+	res = co::LexicalUtils::parseAccessor( "getName", co::LexicalUtils::Setter, fieldName );
 	ASSERT_EQ( -1, res );
 
-	res = co::LexicalUtils::parseAccessor( "get", co::LexicalUtils::Getter, attributeName );
+	res = co::LexicalUtils::parseAccessor( "get", co::LexicalUtils::Getter, fieldName );
 	ASSERT_EQ( -1, res );
 
-	res = co::LexicalUtils::parseAccessor( "is", co::LexicalUtils::Getter, attributeName );
+	res = co::LexicalUtils::parseAccessor( "is", co::LexicalUtils::Getter, fieldName );
 	ASSERT_EQ( -1, res );
 
-	res = co::LexicalUtils::parseAccessor( "set", co::LexicalUtils::Getter, attributeName );
+	res = co::LexicalUtils::parseAccessor( "set", co::LexicalUtils::Getter, fieldName );
 	ASSERT_EQ( -1, res );
 
-	res = co::LexicalUtils::parseAccessor( "a", co::LexicalUtils::Getter, attributeName );
+	res = co::LexicalUtils::parseAccessor( "a", co::LexicalUtils::Getter, fieldName );
 	ASSERT_EQ( -1, res );
 
-	res = co::LexicalUtils::parseAccessor( "setName", co::LexicalUtils::Getter, attributeName );
+	res = co::LexicalUtils::parseAccessor( "setName", co::LexicalUtils::Getter, fieldName );
 	ASSERT_EQ( -1, res );
 
-	res = co::LexicalUtils::parseAccessor( "isName", co::LexicalUtils::Getter, attributeName );
+	res = co::LexicalUtils::parseAccessor( "isName", co::LexicalUtils::Getter, fieldName );
 	ASSERT_EQ( -1, res );
 
-	res = co::LexicalUtils::parseAccessor( "isName", co::LexicalUtils::Getter | co::LexicalUtils::Setter, attributeName );
+	res = co::LexicalUtils::parseAccessor( "isName", co::LexicalUtils::Getter | co::LexicalUtils::Setter, fieldName );
 	ASSERT_EQ( -1, res );
 
-	res = co::LexicalUtils::parseAccessor( "setName", co::LexicalUtils::Setter, attributeName );
-	ASSERT_EQ( "name" , attributeName );
+	res = co::LexicalUtils::parseAccessor( "setName", co::LexicalUtils::Setter, fieldName );
+	ASSERT_EQ( "name" , fieldName );
 	ASSERT_EQ( co::LexicalUtils::Setter, res );
 
-	res = co::LexicalUtils::parseAccessor( "setName", co::LexicalUtils::Getter | co::LexicalUtils::Setter, attributeName );
-	ASSERT_EQ( "name", attributeName );
+	res = co::LexicalUtils::parseAccessor( "setName", co::LexicalUtils::Getter | co::LexicalUtils::Setter, fieldName );
+	ASSERT_EQ( "name", fieldName );
 	ASSERT_EQ( co::LexicalUtils::Setter, res );
 
-	res = co::LexicalUtils::parseAccessor( "isName", co::LexicalUtils::Setter, attributeName );
+	res = co::LexicalUtils::parseAccessor( "isName", co::LexicalUtils::Setter, fieldName );
 	ASSERT_EQ( -1, res );
 }

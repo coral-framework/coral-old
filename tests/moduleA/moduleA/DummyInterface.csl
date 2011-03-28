@@ -1,4 +1,4 @@
 interface DummyInterface
 {
-	attribute string foo;
+	string foo;
 };

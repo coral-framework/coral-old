@@ -49,20 +49,20 @@ public:
         return res.get< co::IComponent* >();
 	}
 
-	co::IService* getInterface( co::IPort* itfInfo_ )
+	co::IService* getInterface( co::IPort* port_ )
 	{
 		co::Any args[1];
-		args[0].set< co::IPort* >( itfInfo_ );
+		args[0].set< co::IPort* >( port_ );
 		co::Range<co::Any const> range( args, 1 );
 		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::IObject>( 0 ), range );
 		return res.get< co::IService* >();
 	}
 
-	void setReceptacle( co::IPort* receptacle_, co::IService* facet_ )
+	void setReceptacle( co::IPort* receptacle_, co::IService* service_ )
 	{
 		co::Any args[2];
 		args[0].set< co::IPort* >( receptacle_ );
-		args[1].set< co::IService* >( facet_ );
+		args[1].set< co::IService* >( service_ );
 		co::Range<co::Any const> range( args, 2 );
 		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IObject>( 1 ), range );
 	}
@@ -149,17 +149,17 @@ public:
 			{
 			case 1:
 				{
-					co::IPort* itfInfo_ = args[++argIndex].get< co::IPort* >();
+					co::IPort* port_ = args[++argIndex].get< co::IPort* >();
 					argIndex = -1;
-					res.set< co::IService* >( p->getInterface( itfInfo_ ) );
+					res.set< co::IService* >( p->getInterface( port_ ) );
 				}
 				break;
 			case 2:
 				{
 					co::IPort* receptacle_ = args[++argIndex].get< co::IPort* >();
-					co::IService* facet_ = args[++argIndex].get< co::IService* >();
+					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					argIndex = -1;
-					p->setReceptacle( receptacle_, facet_ );
+					p->setReceptacle( receptacle_, service_ );
 				}
 				break;
 			default:

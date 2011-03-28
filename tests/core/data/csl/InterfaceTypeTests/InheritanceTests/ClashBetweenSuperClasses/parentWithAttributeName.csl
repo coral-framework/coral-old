@@ -1,7 +1,0 @@
-// interface used to check clash between supertypes
-interface parentWithAttributeName 
-{
-	attribute string name;
-};
-
-

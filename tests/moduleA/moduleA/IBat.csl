@@ -1,4 +1,5 @@
-interface IBat : IMammal
+// used in the Lua component tests
+interface IBat extends IMammal
 {
-	readonly attribute bool bloodsucker;
+	readonly bool bloodsucker;
 };

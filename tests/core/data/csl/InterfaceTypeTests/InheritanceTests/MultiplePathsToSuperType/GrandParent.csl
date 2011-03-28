@@ -1,7 +1,0 @@
-interface GrandParent : GreatGrandParent
-{
-	attribute string age;
-};
-
-
-

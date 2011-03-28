@@ -82,16 +82,16 @@ co::IService* Component_Base::getInterface( co::IPort* port )
 	{
 	case 0:		res = co::disambiguate<co::IService, co::IDynamicServiceProvider>( this ); break;
 	case 1:		res = co::disambiguate<co::IService, co::IReflector>( this ); break;
-	default:	raiseUnexpectedInterfaceIndex();
+	default:	raiseUnexpectedPortIndex();
 	}
 	return res;
 }
 
-void Component_Base::setReceptacle( co::IPort* receptacle, co::IService* facet )
+void Component_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
-	raiseUnexpectedInterfaceIndex();
-	CORAL_UNUSED( facet );
+	raiseUnexpectedPortIndex();
+	CORAL_UNUSED( service );
 }
 
 } // namespace lua

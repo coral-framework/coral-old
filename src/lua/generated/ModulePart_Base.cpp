@@ -68,16 +68,16 @@ co::IService* ModulePart_Base::getInterface( co::IPort* port )
 	switch( port->getIndex() )
 	{
 	case 0:		res = co::disambiguate<co::IService, co::IModulePart>( this ); break;
-	default:	raiseUnexpectedInterfaceIndex();
+	default:	raiseUnexpectedPortIndex();
 	}
 	return res;
 }
 
-void ModulePart_Base::setReceptacle( co::IPort* receptacle, co::IService* facet )
+void ModulePart_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
-	raiseUnexpectedInterfaceIndex();
-	CORAL_UNUSED( facet );
+	raiseUnexpectedPortIndex();
+	CORAL_UNUSED( service );
 }
 
 } // namespace lua

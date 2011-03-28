@@ -10,7 +10,7 @@ local function template( writer, c, t )
 ]] )
 
 	if t.kind == 'TK_NATIVECLASS' then
-		writer( "#include <", t.nativeHeaderFile, ">\n" )
+		writer( "#include <", t.nativeHeader, ">\n" )
 	else
 		t:writeIncludesAndFwdDecls( writer )
 	end

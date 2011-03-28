@@ -6,7 +6,7 @@
 #ifndef _INTERFACETYPE_H_
 #define _INTERFACETYPE_H_
 
-#include "CompositeType.h"
+#include "ClassType.h"
 #include "Interface_Base.h"
 
 namespace co {
@@ -14,7 +14,7 @@ namespace co {
 /*!
 	Implements co.IInterface.
  */
-class Interface : public Interface_Base, public CompositeTypeImpl
+class Interface : public Interface_Base, public ClassTypeImpl
 {
 public:
 	virtual ~Interface();
@@ -30,10 +30,10 @@ public:
 	const std::string& getCppBlock();
 	bool isSubTypeOf( IInterface* itf );
 
-	DELEGATE_co_IType( CompositeTypeImpl:: );
-	DELEGATE_co_ICompositeType( CompositeTypeImpl:: );
-	DELEGATE_co_IRecordType( CompositeTypeImpl:: );
-	DELEGATE_co_IClassType( CompositeTypeImpl:: );
+	DELEGATE_co_IType( ClassTypeImpl:: );
+	DELEGATE_co_ICompositeType( ClassTypeImpl:: );
+	DELEGATE_co_IRecordType( ClassTypeImpl:: );
+	DELEGATE_co_IClassType( ClassTypeImpl:: );
 
 private:
 	Range<ICompositeType* const> getCompositeTypeAncestors();

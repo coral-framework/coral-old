@@ -23,7 +23,7 @@
 static co::IInterface* createDummyInterface( const std::string& name, co::ITypeTransaction* tct )
 {
 	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_INTERFACE, name, tct );
-	builder->defineAttribute( "dummyAtr", TestHelper::type( "string" ), false );
+	builder->defineField( "dummyAtr", TestHelper::type( "string" ), false );
 
 	return dynamic_cast<co::IInterface*>( builder->createType() );
 }
@@ -35,19 +35,19 @@ TEST( SignatureCalculatorTests, binarySignatureIndependsOnAttributeDefineOrder )
 	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
 	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_INTERFACE, "createBinarySignatureTests.First", tct.get() );
 
-	builder->defineAttribute( "a", stringType, false );
-	builder->defineAttribute( "b", stringType, true );
-	builder->defineAttribute( "c", stringType, true );
-	builder->defineAttribute( "d", stringType, false );
+	builder->defineField( "a", stringType, false );
+	builder->defineField( "b", stringType, true );
+	builder->defineField( "c", stringType, true );
+	builder->defineField( "d", stringType, false );
 
 	co::IType* first = builder->createType();
 
 	co::RefPtr<co::ITypeBuilder> builder2 = TestHelper::createBuilder( co::TK_INTERFACE, "createBinarySignatureTests.Second", tct.get() );
 
-	builder2->defineAttribute( "c", stringType, true );
-	builder2->defineAttribute( "b", stringType, true );
-	builder2->defineAttribute( "d", stringType, false );
-	builder2->defineAttribute( "a", stringType, false );
+	builder2->defineField( "c", stringType, true );
+	builder2->defineField( "b", stringType, true );
+	builder2->defineField( "d", stringType, false );
+	builder2->defineField( "a", stringType, false );
 
 	co::IType* second = builder2->createType();
 
@@ -207,25 +207,25 @@ TEST( SignatureCalculatorTests, attributeSignature )
 	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
 
 	co::RefPtr<co::ITypeBuilder> builder1 = TestHelper::createBuilder( co::TK_INTERFACE, "AttributeSignatureTest.First", tct.get() );
-	builder1->defineAttribute( "name", TestHelper::type( "string" ), true );
+	builder1->defineField( "name", TestHelper::type( "string" ), true );
 	co::IInterface* first = dynamic_cast<co::IInterface*>( builder1->createType() );
 
 	//variations with the same binary signature
 	co::RefPtr<co::ITypeBuilder> builder2 = TestHelper::createBuilder( co::TK_INTERFACE, "AttributeSignatureTest.SameBinary1", tct.get() );
-	builder2->defineAttribute( "name", TestHelper::type( "string" ), true );
+	builder2->defineField( "name", TestHelper::type( "string" ), true );
 	co::IInterface* sameBinary1 = dynamic_cast<co::IInterface*>( builder2->createType() );
 
 	co::RefPtr<co::ITypeBuilder> builder3 = TestHelper::createBuilder( co::TK_INTERFACE, "AttributeSignatureTest.SameBinary2", tct.get() );
-	builder3->defineAttribute( "fullName", TestHelper::type( "string" ), true );
+	builder3->defineField( "fullName", TestHelper::type( "string" ), true );
 	co::IInterface* sameBinary2 = dynamic_cast<co::IInterface*>( builder3->createType() );
 
 	// variations with diferent signature
 	co::RefPtr<co::ITypeBuilder> builder4 = TestHelper::createBuilder( co::TK_INTERFACE, "AttributeSignatureTest.Variation1", tct.get() );
-	builder4->defineAttribute( "fullName", TestHelper::type( "string" ), false );
+	builder4->defineField( "fullName", TestHelper::type( "string" ), false );
 	co::IInterface* variation1 = dynamic_cast<co::IInterface*>( builder4->createType() );
 
 	co::RefPtr<co::ITypeBuilder> builder5 = TestHelper::createBuilder( co::TK_INTERFACE, "AttributeSignatureTest.Variation2", tct.get() );
-	builder5->defineAttribute( "name", TestHelper::type( "int32" ), false );
+	builder5->defineField( "name", TestHelper::type( "int32" ), false );
 	co::IInterface* variation2 = dynamic_cast<co::IInterface*>( builder5->createType() );
 
 	ASSERT_NO_THROW( tct->commit() );

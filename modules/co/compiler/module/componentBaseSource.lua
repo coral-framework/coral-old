@@ -114,12 +114,12 @@ co::IService* ]], t.name, [[_Base::getInterface( co::IPort* port )
 	end
 
 	writer( [[
-	default:	raiseUnexpectedInterfaceIndex();
+	default:	raiseUnexpectedPortIndex();
 	}
 	return res;
 }
 
-void ]], t.name, [[_Base::setReceptacle( co::IPort* receptacle, co::IService* facet )
+void ]], t.name, [[_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 ]] )
@@ -132,17 +132,17 @@ void ]], t.name, [[_Base::setReceptacle( co::IPort* receptacle, co::IService* fa
 
 		for i, itf in ipairs( receptacles ) do
 			writer( "\tcase ", itf.index, ":\t\t", t.formatAccessor( "setReceptacle", itf.name ),
-				"( checkedInterfaceCast<", itf.type.cppName, ">( facet ) ); break;\n" )
+				"( checkedCast<", itf.type.cppName, ">( service ) ); break;\n" )
 		end
 
 		writer( [[
-	default:	raiseUnexpectedInterfaceIndex();
+	default:	raiseUnexpectedPortIndex();
 	}
 ]] )
 	else
 		writer( [[
-	raiseUnexpectedInterfaceIndex();
-	CORAL_UNUSED( facet );
+	raiseUnexpectedPortIndex();
+	CORAL_UNUSED( service );
 ]] )
 	end
 

@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _MEMBERINFO_H_
-#define _MEMBERINFO_H_
+#ifndef _CO_MEMBER_H_
+#define _CO_MEMBER_H_
 
 #include <co/IMember.h>
 
@@ -32,8 +32,8 @@ private:
 };
 
 #define DELEGATE_co_IMember( DELEGATE ) \
-	virtual const std::string& getName() { return DELEGATE getName(); } \
-	virtual co::ICompositeType* getOwner() { return DELEGATE getOwner(); } \
-	virtual co::uint16 getIndex() { return DELEGATE getIndex(); }
+	const std::string& getName() { return DELEGATE getName(); } \
+	co::ICompositeType* getOwner() { return DELEGATE getOwner(); } \
+	co::uint16 getIndex() { return DELEGATE getIndex(); }
 
 #endif

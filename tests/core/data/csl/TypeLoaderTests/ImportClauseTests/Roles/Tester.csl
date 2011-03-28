@@ -1,4 +1,4 @@
 interface Tester
 {
-	attribute string name;
+	string name;
 };

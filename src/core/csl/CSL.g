@@ -74,7 +74,7 @@ struct_specification
 		{
 			ctx->parser->onTypeSpecification( (const char*)$ID.text->chars, co::TK_STRUCT );
 		}
-		OPEN_BLOCK struct_member* CLOSE_BLOCK SEMICOLON
+		OPEN_BLOCK record_member* CLOSE_BLOCK SEMICOLON
 	;
 
 native_class_specification
@@ -86,21 +86,7 @@ native_class_specification
 		{
 			ctx->parser->onNativeClass( (const char*)$CPP_TAG.text->chars, (const char*)$cpp_type.text->chars );
 		}
-		OPEN_BLOCK native_class_member* CLOSE_BLOCK SEMICOLON
-	;
-
-identifier_list
-	: comment* firstId = ID
-		{
-			ctx->parser->setCurrentLine( $firstId.line );
-			ctx->parser->onIdentifierListItem( (const char*)$firstId.text->chars );
-		}
-		( COMMA comment* loopId = ID
-			{
-				ctx->parser->setCurrentLine( $loopId.line );
-				ctx->parser->onIdentifierListItem( (const char*)$loopId.text->chars );
-			}
-		)* comment*
+		OPEN_BLOCK class_member* CLOSE_BLOCK SEMICOLON
 	;
 
 interface_specification
@@ -127,43 +113,39 @@ cpp_type
 	: ID ( CPP_SCOPE ID )* CPP_TAG?
 	;
 
-native_class_member
-	: comment
-	| attribute_declaration
-	| method_declaration
-	;
-
-struct_member
-	: comment
-	| { ctx->parser->setCurrentLine( $start->line ); } type_declaration ID SEMICOLON
+identifier_list
+	: comment* firstId = ID
 		{
-			ctx->parser->onStructMember( (const char*)$ID.text->chars );
+			ctx->parser->setCurrentLine( $firstId.line );
+			ctx->parser->onIdentifierListItem( (const char*)$firstId.text->chars );
 		}
+		( COMMA comment* loopId = ID
+			{
+				ctx->parser->setCurrentLine( $loopId.line );
+				ctx->parser->onIdentifierListItem( (const char*)$loopId.text->chars );
+			}
+		)* comment*
 	;
 
-interface_member
+record_member
 	: comment
-	| attribute_declaration
-	| method_declaration
-	| CPP_BLOCK { ctx->parser->onCppBlock( (const char*)$CPP_BLOCK.text->chars ); }
+	| field_declaration
 	;
 
-inheritance_declaration
-	: COLON firstInheritance = qualified_identifier
-		{
-			ctx->parser->onSuperType( (const char*)$firstInheritance.text->chars );
-		}
-		( COMMA loopInheritance = qualified_identifier { ctx->parser->onSuperType( (const char*)$loopInheritance.text->chars ); } )*
-	;
-
-attribute_declaration
-	: READONLY? ATTRIBUTE { ctx->parser->setCurrentLine( $start->line ); } type_declaration ID SEMICOLON
+field_declaration
+	: READONLY? { ctx->parser->setCurrentLine( $start->line ); } type_declaration ID SEMICOLON
 		{
 			bool isReadOnly = false;
 			if( $READONLY )
 				isReadOnly = true;
-			ctx->parser->onAttribute( isReadOnly, (const char*)$ID.text->chars );
+			ctx->parser->onField( (const char*)$ID.text->chars, isReadOnly );
 		}
+	;
+
+class_member
+	// we use a syntatic predicate to resolve whether a member is a method or a field
+	: ( method_type_spec ID OPEN_PAREN )=> method_declaration
+	| record_member
 	;
 
 method_declaration
@@ -192,6 +174,18 @@ exception_list
 			ctx->parser->onExeptionRaised( (const char*)$firstExcep.text->chars );
 		}
 		( COMMA loopExcep=qualified_identifier { ctx->parser->onExeptionRaised( (const char*)$loopExcep.text->chars ); } )*
+	;
+
+interface_member
+	: CPP_BLOCK { ctx->parser->onCppBlock( (const char*)$CPP_BLOCK.text->chars ); }
+	| class_member
+	;
+
+inheritance_declaration
+	: EXTENDS superType = qualified_identifier
+		{
+			ctx->parser->onSuperType( (const char*)$superType.text->chars );
+		}
 	;
 
 component_member
@@ -252,10 +246,6 @@ comment
  * Lexer Rules
  *****************************************************************************/
 
-ATTRIBUTE
-	: 'attribute'
-	;
-
 BASIC_TYPE
 	: 'any'
 	| 'bool'
@@ -280,10 +270,6 @@ CPP_SCOPE
 	: '::'
 	;
 
-COLON
-	: ':'
-	;
-
 COMMA
 	: ','
 	;
@@ -298,6 +284,10 @@ ENUM
 
 EXCEPTION_TOKEN
 	: 'exception'
+	;
+
+EXTENDS
+	: 'extends'
 	;
 
 IMPORT

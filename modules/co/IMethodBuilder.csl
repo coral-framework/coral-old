@@ -4,10 +4,10 @@
 interface IMethodBuilder
 {
 	// The ITypeBuilder to which this IMethodBuilder belongs to.
-	readonly attribute ITypeBuilder typeBuilder;
+	readonly ITypeBuilder typeBuilder;
 
 	// The future name of the method when it's created.
-	readonly attribute string methodName;
+	readonly string methodName;
 
 	/*
 		Defines the return type of the method.

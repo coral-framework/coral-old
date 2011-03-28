@@ -1,4 +1,4 @@
 structt struct1
 {
-	attribute string name;
+	string name;
 };

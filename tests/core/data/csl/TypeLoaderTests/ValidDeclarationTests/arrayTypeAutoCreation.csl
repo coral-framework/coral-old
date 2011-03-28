@@ -1,7 +1,7 @@
 // tests if the array type is auto generated on the expected namespace
 interface arrayTypeAutoCreation
 {
-	attribute BaseClasses.ArrayElement[] fooArray;
+	BaseClasses.ArrayElement[] fooArray;
 };
 
 

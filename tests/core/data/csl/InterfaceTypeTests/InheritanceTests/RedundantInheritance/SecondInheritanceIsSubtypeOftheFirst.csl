@@ -1,7 +1,0 @@
-// invalid subtype inheritance, since Fiat is also a subype of Car
-interface SecondInheritanceIsSubtypeOftheFirst : Car, Fiat
-{
-	readonly attribute string fordName;
-};
-
-

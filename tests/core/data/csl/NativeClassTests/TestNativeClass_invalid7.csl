@@ -1,0 +1,5 @@
+native class TestNativeClass_invalid7 ( <a> a:: )
+{
+string[] a;
+
+};

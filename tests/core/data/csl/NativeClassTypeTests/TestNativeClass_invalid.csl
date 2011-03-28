@@ -1,5 +1,0 @@
-native TestNativeClass_invalid a ( <a> a::_ )
-{
-attribute string[] a;
-
-};

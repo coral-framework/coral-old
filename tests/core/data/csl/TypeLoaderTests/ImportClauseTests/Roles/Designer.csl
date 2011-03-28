@@ -2,8 +2,8 @@ import TypeLoaderTests.ImportClauseTests.Office;
 
 interface Designer
 {
-	attribute string name;
+	string name;
 
 	// should be the  TypeLoaderTests.ImportClauseTests.Office type;
-	attribute Office mainOffice;
+	Office mainOffice;
 };

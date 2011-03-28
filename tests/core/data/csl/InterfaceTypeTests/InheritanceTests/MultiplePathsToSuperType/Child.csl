@@ -1,8 +1,0 @@
-// child of the parent and an parent brother
-interface Child : Parent, Uncle 
-{
-	attribute string childName;
-};
-
-
-

@@ -337,12 +337,6 @@ void Parser::onSuperType( const std::string& name )
 	_typeBuilder->defineSuperType( type );
 }
 
-void Parser::onStructMember( const std::string& memberIdentifier )
-{
-	_typeBuilder->defineAttribute( memberIdentifier, getLastDeclaredType(), false );
-	handleDocumentation( memberIdentifier );
-}
-
 void Parser::onIdentifierListItem( const std::string& name )
 {
 	_typeBuilder->defineIdentifier( name );
@@ -355,13 +349,13 @@ void Parser::onComponentInterface( bool isFacet, const std::string& name )
 	if( !interface )
 		CORAL_THROW( TypeLoadException, "an interface type was expected" );
 
-	_typeBuilder->defineInterface( name, interface, isFacet );
+	_typeBuilder->definePort( name, interface, isFacet );
 	handleDocumentation( name );
 }
 
-void Parser::onAttribute( bool isReadOnly, const std::string& name )
+void Parser::onField( const std::string& name, bool isReadOnly )
 {
-	_typeBuilder->defineAttribute( name, getLastDeclaredType(), isReadOnly );
+	_typeBuilder->defineField( name, getLastDeclaredType(), isReadOnly );
 	handleDocumentation( name );
 }
 

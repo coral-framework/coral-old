@@ -1,4 +1,0 @@
-interface SuperInterfaceClash4
-{
-	attribute string fullName;
-};

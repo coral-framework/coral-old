@@ -1,5 +1,0 @@
-nativeclass TestNativeClass_invalid2 ( <ba> a::_a )
-{
-attribute string[] a;
-
-};

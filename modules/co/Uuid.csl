@@ -4,7 +4,7 @@
 native class Uuid ( <co/reserved/Uuid.h> Uuid )
 {
 	// True if this is the null UUID (that is, "00000000-0000-0000-0000000000000000").
-	readonly attribute bool isNull;
+	readonly bool isNull;
 
 	//! Creates an Uuid based on the SHA-1 hash of the specified data string.
 	void createSha1( in string data );

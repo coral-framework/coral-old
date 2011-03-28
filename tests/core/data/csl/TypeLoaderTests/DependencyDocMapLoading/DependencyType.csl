@@ -3,5 +3,5 @@
 interface DependencyType 
 {
 	//name attribute;
-	attribute string name;
+	string name;
 };

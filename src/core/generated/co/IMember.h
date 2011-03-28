@@ -8,6 +8,7 @@
 
 #include <co/TypeTraits.h>
 #include <co/IService.h>
+#include <co/MemberKind.h>
 
 // Forward Declarations:
 namespace co {
@@ -24,6 +25,8 @@ public:
 	virtual ~IMember() {;}
 
 	virtual co::uint16 getIndex() = 0;
+
+	virtual co::MemberKind getKind() = 0;
 
 	virtual const std::string& getName() = 0;
 

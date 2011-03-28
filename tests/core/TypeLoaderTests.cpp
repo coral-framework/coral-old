@@ -64,11 +64,11 @@ TEST( TypeLoaderTests, syntaxError )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "TypeLoaderTests.SyntaxError.struct3" )
-	CSL_EXPECT_SYNTAX_ERROR( "struct3.csl", 3 )
+	CSL_EXPECT_SYNTAX_ERROR( "struct3.csl", 4 )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "TypeLoaderTests.SyntaxError.struct4" )
-	CSL_EXPECT_SYNTAX_ERROR( "struct4.csl", 4 )
+	CSL_EXPECT_SYNTAX_ERROR( "struct4.csl", 7 )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "TypeLoaderTests.SyntaxError.struct5" )
@@ -94,7 +94,7 @@ TEST( TypeLoaderTests, interfaceDocs )
 	const std::string& fooDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedInterface:foo" );
 
 	EXPECT_EQ( "This is the interface Declaration\nThis could be a multi-line comment", interfaceDoc );
-	EXPECT_EQ( "and this is the attribute doc.", nameDoc );
+	EXPECT_EQ( "and this is the field doc.", nameDoc );
 	EXPECT_EQ( "foo method declaration.\nusing separated.\ndocumentation lines.", fooDoc );
 }
 

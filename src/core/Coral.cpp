@@ -10,7 +10,7 @@
 #include <co/RefPtr.h>
 #include <co/IReflector.h>
 #include <co/IPort.h>
-#include <co/NoSuchInterfaceException.h>
+#include <co/NoSuchPortException.h>
 #include <co/reserved/OS.h>
 #include <co/reserved/LibraryManager.h>
 #include <cstdio>
@@ -152,15 +152,15 @@ IObject* newInstance( const std::string& fullName )
 	return reflector->newInstance();
 }
 
-void setReceptacleByName( IObject* instance, const std::string& receptacleName, IService* facet )
+void setReceptacleByName( IObject* object, const std::string& receptacleName, IService* service )
 {
-	assert( instance );
-	IComponent* ct = instance->getComponentType();
-	IPort* ii = dynamic_cast<IPort*>( ct->getMember( receptacleName ) );
-	if( !ii )
-		CORAL_THROW( NoSuchInterfaceException, "no such interface '" << receptacleName
-						<< "' in component " << ct->getFullName() );
-	instance->setReceptacle( ii, facet );
+	assert( object );
+	IComponent* component = object->getComponentType();
+	IPort* port = dynamic_cast<IPort*>( component->getMember( receptacleName ) );
+	if( !port )
+		CORAL_THROW( NoSuchPortException, "no such receptacle '" << receptacleName
+						<< "' in component " << component->getFullName() );
+	object->setReceptacle( port, service );
 }
 
 inline IServiceManager* getServices()

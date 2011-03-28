@@ -3,16 +3,16 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _SIGNATURECALCULATOR_H_
-#define _SIGNATURECALCULATOR_H_
+#ifndef _CO_SIGNATURECALCULATOR_H_
+#define _CO_SIGNATURECALCULATOR_H_
 
 #include <co/Platform.h>
 #include "tools/CryptoHash.h"
 
 namespace co {
-	class IType;
-	class IMethod;
-} // namespace co
+
+class IType;
+class IMethod;
 
 /*!
 	Calculates version hashes for binary or full type compatibility checking.
@@ -26,18 +26,18 @@ namespace co {
 		- http://techbase.kde.org/Policies/Binary_Compatibility_Examples
 		- http://labs.trolltech.com/blogs/2009/08/12/some-thoughts-on-binary-compatibility/
 
-	Implementation Details:
+	\par Implementation Details:
 		- Cannot raise exceptions.
 		- Signatures are computed on demand within the type components.
 		- Based on SHA-1 hashing of the data available through the public type API.
-		- A type's signature cannot depend on another type's signature, except in places
-			where mutual dependencies would never occur.
+		- A type's signature cannot depend on another type's signature, except
+			in places where mutual dependencies are guaranteed to never occur.
  */
 class SignatureCalculator
 {
 public:
 	//! Type for whom we should calculate, and on which we should set, the signatures.
-	SignatureCalculator( co::IType* type );
+	SignatureCalculator( IType* type );
 
 	//! Destructor.
 	~SignatureCalculator();
@@ -46,10 +46,10 @@ public:
 	void calculate();
 
 	//! Returns the calculated full signature.
-	inline const co::Uuid& getFullSignature() const { return _fullSignature; }
+	inline const Uuid& getFullSignature() const { return _fullSignature; }
 
 	//! Returns the calculated binary signature.
-	inline const co::Uuid& getBinarySignature() const { return _binarySignature; }
+	inline const Uuid& getBinarySignature() const { return _binarySignature; }
 
 private:
 	template<typename T>
@@ -67,23 +67,25 @@ private:
 	void fillNativeClassSignatureData();
 	void fillInterfaceSignatureData();
 	void fillComponentSignatureData();
-	void fillAttributeAndMethodContainerData();
+	void fillClassTypeData();
 
 	/*!
 		Adds just enough data about a type. For places where using the
 		type's signature would imply in mutual dependencies (i.e. method
 		parameters and return types).
 	 */
-	void addTypeWithNoSignature( co::IType* type );
+	void addTypeWithNoSignature( IType* type );
 
 private:
-	co::IType* _type;
+	IType* _type;
 
-	co::Uuid _fullSignature;
-	co::Uuid _binarySignature;
+	Uuid _fullSignature;
+	Uuid _binarySignature;
 
-	co::CryptoHash _fullSignatureHash;
-	co::CryptoHash _binarySignatureHash;
+	CryptoHash _fullSignatureHash;
+	CryptoHash _binarySignatureHash;
 };
 
-#endif // _SIGNATURECALCULATOR_H_
+} // namespace co
+
+#endif

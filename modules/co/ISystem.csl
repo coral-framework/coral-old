@@ -5,16 +5,16 @@
 interface ISystem
 {
 	// Current system state. See the life cycle control methods: setup(), tearDown(), etc.
-	readonly attribute SystemState state;
+	readonly SystemState state;
 
 	// Service responsible for maintaining the types database, as well as loading new types.
-	readonly attribute ITypeManager types;
+	readonly ITypeManager types;
 
 	// Service responsible for loading and maintaining the life cycle of all modules.
-	readonly attribute IModuleManager modules;
+	readonly IModuleManager modules;
 
 	// Service that manages the service database and provides contextualized service lookups.
-	readonly attribute IServiceManager services;
+	readonly IServiceManager services;
 
 	//--------- ISystem Life Cycle Control Methods ---------//
 

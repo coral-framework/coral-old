@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _METHODINFO_H_
-#define _METHODINFO_H_
+#ifndef _CO_METHOD_H_
+#define _CO_METHOD_H_
 
 #include "Member.h"
 #include "Method_Base.h"
@@ -26,6 +26,9 @@ public:
 	void setReturnType( IType* returnType );
 	void setParameters( Range<IParameter* const> parameters );
 	void setExceptions( Range<IException* const> exceptions );
+
+	// IMember methods:
+	MemberKind getKind();
 
 	// IMethod methods:
 	IType* getReturnType();

@@ -27,26 +27,25 @@ public:
 	static bool isValidIdentifier( const std::string& str );
 
 	/*!
-		Returns whether the passed \a identifier is a valid attribute name (i.e. starts with lower case).
+		Returns whether the passed \a identifier is a valid field name.
+		Field names must start with lower case.
 		\warning this method assumes the passed parameter is already a valid identifier.
 		\sa isValidIdentifier
 	 */
-	static bool isValidAttributeName( const std::string& identifier );
+	static bool isValidFieldName( const std::string& identifier );
 
-	//! Enumerates the kind of attribute acessors.
-	enum AttributeAccessor
+	//! Enumerates the kind of field accessors.
+	enum Accessor
 	{
 		Getter  = 1,
 		Setter  = 2
 	};
 
 	/*!
-		Generates an accessor name given an attribute name.
+		Generates an accessor name given a field name.
 		\warning This method assumes \a methodName is a valid identifier.
 	 */
-	static void formatAccessor( const std::string& attributeName,
-								AttributeAccessor accessorKind,
-								std::string& methodName );
+	static void formatAccessor( const std::string& fieldName, Accessor accessor, std::string& methodName );
 
 	/*!
 		Parses a method name looking for a specific acessor name pattern.
@@ -61,7 +60,7 @@ public:
 		\param[in] accessorKinds a bitfield with one or more of the following values:
 			- co::LexicalUtils::Getter meaning that the method should search for a \e getter.
 			- co::LexicalUtils::Setter meaning that the method should search for a \e setter.
-		\param[out] attributeName the parsed attribute name, starting with a lower case letter.
+		\param[out] fieldName the parsed field name, starting with a lower case letter.
 
 		\return One of the following values:
 			- co::LexicalUtils::Getter if a \e getter name was parsed;
@@ -70,7 +69,7 @@ public:
 
 		\warning This method assumes \a methodName is a valid identifier.
 	 */
-	static int parseAccessor( const std::string& methodName, int accessorKinds, std::string& attributeName );
+	static int parseAccessor( const std::string& methodName, int accessorKinds, std::string& fieldName );
 };
 
 } // namespace co

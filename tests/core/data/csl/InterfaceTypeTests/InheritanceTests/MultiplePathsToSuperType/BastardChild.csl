@@ -1,8 +1,0 @@
-// child of the parent and an parent brother
-interface BastardChild : Child, DistantUncle 
-{
-	attribute string bastardName;
-};
-
-
-

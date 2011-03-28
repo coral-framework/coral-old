@@ -57,7 +57,7 @@ void ReflectorBase::componentRelease()
 
 IComponent* ReflectorBase::getComponentType()
 {
-	return getOrCreateSimpleInternalComponentType( "co.ReflectorBase", "co.IReflector", "reflector" );
+	return getOrCreateInternalComponent( "co.ReflectorBase", "co.IReflector", "reflector" );
 }
 
 IService* ReflectorBase::getInterface( IPort* port )
@@ -69,7 +69,7 @@ IService* ReflectorBase::getInterface( IPort* port )
 	{
 	case 0: res = static_cast<IReflector*>( this ); break;
 	default:
-		raiseUnexpectedInterfaceIndex();
+		raiseUnexpectedPortIndex();
 	}
 
 	return res;
@@ -78,7 +78,7 @@ IService* ReflectorBase::getInterface( IPort* port )
 void ReflectorBase::setReceptacle( IPort* receptacle, IService* )
 {
 	checkValidReceptacle( receptacle );
-	raiseUnexpectedInterfaceIndex();
+	raiseUnexpectedPortIndex();
 }
 
 void ReflectorBase::createValue( void*, size_t )

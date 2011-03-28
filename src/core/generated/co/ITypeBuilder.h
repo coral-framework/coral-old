@@ -35,15 +35,15 @@ public:
 
 	virtual co::IType* createType() = 0;
 
-	virtual void defineAttribute( const std::string& name, co::IType* type, bool isReadOnly ) = 0;
+	virtual void defineField( const std::string& name, co::IType* type, bool isReadOnly ) = 0;
 
 	virtual void defineIdentifier( const std::string& name ) = 0;
 
-	virtual void defineInterface( const std::string& name, co::IInterface* interfaceType, bool isFacet ) = 0;
-
 	virtual co::IMethodBuilder* defineMethod( const std::string& name ) = 0;
 
-	virtual void defineNativeClass( const std::string& nativeHeaderFile, const std::string& nativeName ) = 0;
+	virtual void defineNativeClass( const std::string& nativeHeader, const std::string& nativeName ) = 0;
+
+	virtual void definePort( const std::string& name, co::IInterface* interfaceType, bool isFacet ) = 0;
 
 	virtual void defineSuperType( co::IType* superType ) = 0;
 };

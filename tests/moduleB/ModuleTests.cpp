@@ -202,7 +202,7 @@ TEST( ModuleTests, serviceDependencies )
 
 	// register a service provided by moduleA
 	ASSERT_TRUE( sm->getIsLazy() );
-	sm->addServiceImplementation( serviceType, "moduleA.TestComponent" );
+	sm->addServiceProvider( serviceType, "moduleA.TestComponent" );
 
 	// moduleA should not have been loaded yet
 	EXPECT_TRUE( system->getModules()->findModule( "moduleA" ) == NULL );
@@ -227,7 +227,7 @@ TEST( ModuleTests, serviceDependencies )
 	// re-register the service provided by moduleA, forcing its immediate instantiation
 	sm->setIsLazy( false );
 	ASSERT_FALSE( sm->getIsLazy() );
-	sm->addServiceImplementation( serviceType, "moduleA.TestComponent" );
+	sm->addServiceProvider( serviceType, "moduleA.TestComponent" );
 
 	// moduleA should already have been loaded now
 	EXPECT_TRUE( system->getModules()->findModule( "moduleA" ) != NULL );

@@ -15,7 +15,7 @@
 #include <co/IComponent.h>
 #include <co/IllegalCastException.h>
 #include <co/IllegalArgumentException.h>
-#include <co/NoSuchInterfaceException.h>
+#include <co/NoSuchPortException.h>
 #include <moduleA/TestStruct.h>
 #include <moduleA/TestInterface.h>
 
@@ -119,7 +119,7 @@ TEST( ReflectionTests, getAndBindComponentInterfaces )
 	co::RefPtr<co::IObject> testComponent = co::newInstance( "moduleA.TestComponent" );
 	ASSERT_TRUE( testComponent.isValid() );
 
-	EXPECT_THROW( testComponent->getInterface( NULL ), co::NoSuchInterfaceException );
+	EXPECT_THROW( testComponent->getInterface( NULL ), co::NoSuchPortException );
 
 	co::IComponent* type = testComponent->getComponentType();
 
@@ -132,35 +132,35 @@ TEST( ReflectionTests, getAndBindComponentInterfaces )
 	EXPECT_EQ( testComponent->getFacet<moduleA::TestInterface>(), itf );
 
 	// cannot 'bind' to a facet
-	EXPECT_THROW( testComponent->setReceptacle( testInterfaceInfo, itf ), co::NoSuchInterfaceException );
+	EXPECT_THROW( testComponent->setReceptacle( testInterfaceInfo, itf ), co::NoSuchPortException );
 
 	// get IPort's for the receptacles
-	co::IPort* typeItfInfo = dynamic_cast<co::IPort*>( type->getMember( "type" ) );
-	co::IPort* itfTypeItfInfo = dynamic_cast<co::IPort*>( type->getMember( "itfType" ) );
-	ASSERT_TRUE( typeItfInfo && itfTypeItfInfo );
+	co::IPort* typePort = dynamic_cast<co::IPort*>( type->getMember( "type" ) );
+	co::IPort* itfTypePort = dynamic_cast<co::IPort*>( type->getMember( "itfType" ) );
+	ASSERT_TRUE( typePort && itfTypePort );
 
 	// get the interface currently bound to the 'type' receptacle (should be null)
-	EXPECT_EQ( NULL, testComponent->getInterface( typeItfInfo ) );
+	EXPECT_EQ( NULL, testComponent->getInterface( typePort ) );
 
 	// attempting to bind a IStruct to 'itfType' should produce an exception (it expects an IInterface)
 	co::IType* structType = co::getType( "moduleA.TestStruct" );
-	EXPECT_THROW( testComponent->setReceptacle( itfTypeItfInfo, structType ), co::IllegalArgumentException );
+	EXPECT_THROW( testComponent->setReceptacle( itfTypePort, structType ), co::IllegalCastException );
 
 	// bind an IInterface to both receptacles
 	co::IType* itfType = co::getType( "moduleA.TestInterface" );
 
-	testComponent->setReceptacle( typeItfInfo, itfType );
-	itf = testComponent->getInterface( typeItfInfo );
+	testComponent->setReceptacle( typePort, itfType );
+	itf = testComponent->getInterface( typePort );
 	EXPECT_EQ( itfType->getInterfaceOwner(), itf->getInterfaceOwner() );
 	EXPECT_EQ( itfType->getInterfaceName(), itf->getInterfaceName() );
 
-	testComponent->setReceptacle( itfTypeItfInfo, itfType );
-	itf = testComponent->getInterface( itfTypeItfInfo );
+	testComponent->setReceptacle( itfTypePort, itfType );
+	itf = testComponent->getInterface( itfTypePort );
 	EXPECT_EQ( itfType->getInterfaceOwner(), itf->getInterfaceOwner() );
 	EXPECT_EQ( itfType->getInterfaceName(), itf->getInterfaceName() );
 
 	// try setting a receptacle by name
 	co::setReceptacleByName( testComponent.get(), "type", NULL );
-	EXPECT_EQ( NULL, testComponent->getInterface( typeItfInfo ) );
-	EXPECT_THROW( co::setReceptacleByName( testComponent.get(), "noReceptacle", NULL ), co::NoSuchInterfaceException );
+	EXPECT_EQ( NULL, testComponent->getInterface( typePort ) );
+	EXPECT_THROW( co::setReceptacleByName( testComponent.get(), "noReceptacle", NULL ), co::NoSuchPortException );
 }

@@ -59,7 +59,7 @@ public:
 		LuaState::call( L, 1, 0 );
 
 		// create and register the global lua.IState service
-		co::getSystem()->getServices()->addServiceImplementation( co::typeOf<lua::IState>::get(), "lua.Universe" );
+		co::getSystem()->getServices()->addServiceProvider( co::typeOf<lua::IState>::get(), "lua.Universe" );
 	}
 
 	void integrate( co::IModule* )

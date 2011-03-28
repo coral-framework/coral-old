@@ -3,5 +3,5 @@ import Roles.Office;
 
 interface ClashingImports
 {
-	attribute string foo;
+	string foo;
 };

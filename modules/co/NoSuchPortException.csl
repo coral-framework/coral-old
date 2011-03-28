@@ -1,0 +1,2 @@
+// Raised to indicate that the requested port is not available.
+exception NoSuchPortException;

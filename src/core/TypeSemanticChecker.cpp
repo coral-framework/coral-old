@@ -4,7 +4,7 @@
  */
 
 #include "TypeSemanticChecker.h"
-#include "CompositeType.h"
+#include "ClassType.h"
 #include <co/Range.h>
 #include <co/IMethod.h>
 #include <co/ICompositeType.h>
@@ -128,7 +128,7 @@ void TypeSemanticChecker::checkMemberDeclarations( co::IType* type )
 
 	_visitedTypes.insert( type );
 
-	CompositeTypeImpl* container = dynamic_cast<CompositeTypeImpl*>( type );
+	ClassTypeImpl* container = dynamic_cast<ClassTypeImpl*>( type );
 	if( container )
 	{
 		co::Range<co::IMethod* const> methods = container->getMethods();

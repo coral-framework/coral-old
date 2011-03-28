@@ -1,6 +1,6 @@
 /*
 	An ordered set of named fields of various types.
  */
-interface IStruct : IRecordType
+interface IStruct extends IRecordType
 {
 };

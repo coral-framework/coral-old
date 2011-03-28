@@ -38,19 +38,19 @@ bool LexicalUtils::isValidIdentifier( const std::string& str )
 	return true;
 }
 
-bool LexicalUtils::isValidAttributeName( const std::string& identifier )
+bool LexicalUtils::isValidFieldName( const std::string& identifier )
 {
 	return !identifier.empty() && islower( identifier[0] ) != 0;
 }
 
-void LexicalUtils::formatAccessor( const std::string& attributeName, AttributeAccessor kind, std::string& methodName )
+void LexicalUtils::formatAccessor( const std::string& fieldName, Accessor accessor, std::string& methodName )
 {
-	assert( !attributeName.empty() );
+	assert( !fieldName.empty() );
 
 	const int PREFIX_LENGTH = 3;
-	methodName.reserve( attributeName.length() + PREFIX_LENGTH );
+	methodName.reserve( fieldName.length() + PREFIX_LENGTH );
 
-	switch( kind )
+	switch( accessor )
 	{
 	case Getter:
 		methodName = GETTER_PREFIX;
@@ -61,8 +61,8 @@ void LexicalUtils::formatAccessor( const std::string& attributeName, AttributeAc
 		break;
 	}
 
-	// append attributeName
-	methodName.append( attributeName );
+	// append fieldName
+	methodName.append( fieldName );
 	methodName[PREFIX_LENGTH] = toupper( methodName[PREFIX_LENGTH] );
 }
 
@@ -71,7 +71,7 @@ inline bool startsWith( const std::string& str, const std::string& start )
 	return str.find( start ) == 0;
 }
 
-int LexicalUtils::parseAccessor( const std::string& methodName, int accessorKinds, std::string& attributeName )
+int LexicalUtils::parseAccessor( const std::string& methodName, int accessorKinds, std::string& fieldName )
 {
 	assert( accessorKinds > 0 && accessorKinds < 4 );
 
@@ -97,10 +97,10 @@ int LexicalUtils::parseAccessor( const std::string& methodName, int accessorKind
 	if( firstChar == attributeNamePos[0] )
 		return -1;
 
-	attributeName.clear();
-	attributeName.reserve( attributeNamePos - methodName.c_str() );
-	attributeName += firstChar;
-	attributeName += attributeNamePos + 1;
+	fieldName.clear();
+	fieldName.reserve( attributeNamePos - methodName.c_str() );
+	fieldName += firstChar;
+	fieldName += attributeNamePos + 1;
 
 	return foundKind;
 }

@@ -4,10 +4,10 @@
 interface IReflector
 {
 	// The type we are providing reflection for.
-	readonly attribute IType type;
+	readonly IType type;
 
 	// Number of bytes occupied by instances of this type.
-	readonly attribute int32 size;
+	readonly int32 size;
 
 	<c++
 		// Memory manipulation of complex Coral values is only available from C++.
@@ -56,23 +56,23 @@ interface IReflector
 		raises NotSupportedException, IllegalArgumentException;
 
 	/*
-		Gets the current value of an attribute from a struct, interface or native class instance.
+		Gets the value of a field from a struct, interface or native class instance.
 		\throw NotSupportedException if \a type is not an IRecordType.
 		\throw IllegalArgumentException if \a instance is not an instance of \a type, or if the
-			attribute \a ai does not belong to this type.
+			\a field does not belong to this type.
 	 */
-	void getAttribute( in any instance, in IField ai, out any value )
+	void getAttribute( in any instance, in IField field, out any value )
 		raises NotSupportedException, IllegalArgumentException;
 
 	/*
-		Sets the current value of an attribute in a struct, interface or native class instance.
+		Sets the value of a field in a struct, interface or native class instance.
 		\throw NotSupportedException if \a type is not an IRecordType.
 		\throw IllegalArgumentException if \a instance is not an instance of \a type; if the
-			attribute \a ai does not belong to this type, or if it is read-only.
-		\throw IllegalCastException if \a value has no valid conversion to the actual attribute type.
+			\a field does not belong to this type, or if it is read-only.
+		\throw IllegalCastException if \a value has no valid conversion to the actual type.
 			Please refer to Any's documentation for more information about type conversion rules.
 	 */
-	void setAttribute( in any instance, in IField ai, in any value )
+	void setAttribute( in any instance, in IField field, in any value )
 		raises NotSupportedException, IllegalArgumentException, IllegalCastException;
 
 	/*

@@ -1,6 +1,0 @@
-enum parentEnum
-{
-	one,
-	two,
-	three
-};

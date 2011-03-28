@@ -53,7 +53,7 @@ TEST( TypeTransactionTests, rollbackWithoutCommit )
 	co::RefPtr<co::ITypeBuilder> structBuilder = TestHelper::createBuilder( co::TK_STRUCT, "TypeTransactionTests.transactionRollbackTest.IStruct", transaction.get() );
 
 	ASSERT_NO_THROW( enumBuilder->defineIdentifier( "foo" ) );
-	ASSERT_NO_THROW( structBuilder->defineAttribute( "name", enumBuilder->createType(), false ) );
+	ASSERT_NO_THROW( structBuilder->defineField( "name", enumBuilder->createType(), false ) );
 
 	// force the creation of an array for the struct
 	ASSERT_NO_THROW( co::getSystem()->getTypes()->getArrayOf( structBuilder->createType() ) );

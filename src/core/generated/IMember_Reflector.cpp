@@ -48,15 +48,21 @@ public:
         return res.get< co::uint16 >();
 	}
 
-	const std::string& getName()
+	co::MemberKind getKind()
 	{
 		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IMember>( 1 ) );
+        return res.get< co::MemberKind >();
+	}
+
+	const std::string& getName()
+	{
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IMember>( 2 ) );
         return res.get< const std::string& >();
 	}
 
 	co::ICompositeType* getOwner()
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IMember>( 2 ) );
+		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IMember>( 3 ) );
         return res.get< co::ICompositeType* >();
 	}
 
@@ -115,8 +121,9 @@ public:
 		switch( ai->getIndex() )
 		{
 		case 0:		value.set< co::uint16 >( p->getIndex() ); break;
-		case 1:		value.set< const std::string& >( p->getName() ); break;
-		case 2:		value.set< co::ICompositeType* >( p->getOwner() ); break;
+		case 1:		value.set< co::MemberKind >( p->getKind() ); break;
+		case 2:		value.set< const std::string& >( p->getName() ); break;
+		case 3:		value.set< co::ICompositeType* >( p->getOwner() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -129,6 +136,7 @@ public:
 		case 0:		raiseAttributeIsReadOnly( ai ); break;
 		case 1:		raiseAttributeIsReadOnly( ai ); break;
 		case 2:		raiseAttributeIsReadOnly( ai ); break;
+		case 3:		raiseAttributeIsReadOnly( ai ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 		CORAL_UNUSED( p );

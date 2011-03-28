@@ -1,4 +1,0 @@
-interface SuperInterfaceClash3
-{
-	attribute string address;
-};

@@ -1,4 +1,0 @@
-interface child : parent
-{
-	attribute string name;
-};

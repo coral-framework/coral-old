@@ -1,4 +1,5 @@
+// used in the Lua component tests
 interface IMammal
 {
-	readonly attribute bool ableToFly;
+	readonly bool ableToFly;
 };

@@ -4,5 +4,5 @@ import Supplies.Table;
 
 interface ValidImports
 {
-	attribute string name;
+	string name;
 };

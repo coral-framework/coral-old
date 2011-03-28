@@ -1,4 +1,0 @@
-struct testStruct
-{
-	string name;
-};

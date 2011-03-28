@@ -37,9 +37,9 @@ public:
 
 	virtual co::IComponent* getComponentType() = 0;
 
-	virtual co::IService* getInterface( co::IPort* itfInfo ) = 0;
+	virtual co::IService* getInterface( co::IPort* port ) = 0;
 
-	virtual void setReceptacle( co::IPort* receptacle, co::IService* facet ) = 0;
+	virtual void setReceptacle( co::IPort* receptacle, co::IService* service ) = 0;
 };
 
 } // namespace co

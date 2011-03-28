@@ -1,5 +1,5 @@
 // local office
 interface Office
 {
-	attribute string name;
+	string name;
 };

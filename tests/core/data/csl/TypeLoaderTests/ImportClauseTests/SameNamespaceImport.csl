@@ -2,7 +2,7 @@ import Office;
 
 interface SameNamespaceImport 
 {
-	attribute string foo;
+	string foo;
 };
 
 

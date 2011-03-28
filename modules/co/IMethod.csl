@@ -1,14 +1,14 @@
 /*
 	Offers type introspection for a method, as a member of a IClassType.
  */
-interface IMethod : IMember
+interface IMethod extends IMember
 {
 	// The method's return type.
-	readonly attribute IType returnType;
+	readonly IType returnType;
 
 	// The list of parameters that this method takes.
-	readonly attribute IParameter[] parameters;
+	readonly IParameter[] parameters;
 
 	// The list of exceptions that might be thrown by this method.
-	readonly attribute IException[] exceptions;
+	readonly IException[] exceptions;
 };

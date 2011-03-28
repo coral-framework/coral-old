@@ -1,4 +1,0 @@
-struct banana
-{
-	attribute string banana;
-};

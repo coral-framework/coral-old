@@ -1,7 +1,7 @@
 // tests if a single block is beeing processed
 interface singleBlockInterface
 {
-	attribute string foo;
+	string foo;
 	
 	<c++
 	//This code block was injected by the compiler using the '<c++' tag

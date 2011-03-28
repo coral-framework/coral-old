@@ -5,22 +5,22 @@
 interface INamespace
 {
 	// The namespace's local name (or "", if this is the global namespace).
-	readonly attribute string name;
+	readonly string name;
 
 	// The namespace's fully qualified name (or "", if this is the global namespace).
-	readonly attribute string fullName;
+	readonly string fullName;
 
 	// The namespace's parent namespace (or null, if this is the global namespace).
-	readonly attribute INamespace parentNamespace;
+	readonly INamespace parentNamespace;
 
 	// List of child namespaces.
-	readonly attribute INamespace[] childNamespaces;
+	readonly INamespace[] childNamespaces;
 
 	// List of types defined in this namespace.
-	readonly attribute IType[] types;
+	readonly IType[] types;
 
 	// The namespace's IModule, if one was loaded (otherwise, null).
-	readonly attribute IModule module;
+	readonly IModule module;
 
 	/*
 		Retrieves a type by name (case sensitive).

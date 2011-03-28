@@ -4,7 +4,7 @@
 interface ITypeTransaction
 {
 	// List of TypeBuilders participating in the transaction.
-	readonly attribute ITypeBuilder[] typeBuilders;
+	readonly ITypeBuilder[] typeBuilders;
 
 	/*
 		Creates all types associated with this transaction, registering them with the system's ITypeManager.

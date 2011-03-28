@@ -17,7 +17,7 @@ void NativeClass::setNativeName( const std::string& nativeName )
 	_nativeName = nativeName;
 }
 
-void NativeClass::setNativeHeaderFile( const std::string& headerName )
+void NativeClass::setNativeHeader( const std::string& headerName )
 {
 	_nativeHeaderFile = headerName;
 }
@@ -27,7 +27,7 @@ const std::string& NativeClass::getNativeName()
 	return _nativeName;
 }
 
-const std::string& NativeClass::getNativeHeaderFile()
+const std::string& NativeClass::getNativeHeader()
 {
 	return _nativeHeaderFile;
 }

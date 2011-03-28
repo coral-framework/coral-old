@@ -65,16 +65,16 @@ co::IService* ModuleManager_Base::getInterface( co::IPort* port )
 	switch( port->getIndex() )
 	{
 	case 0:		res = co::disambiguate<co::IService, co::IModuleManager>( this ); break;
-	default:	raiseUnexpectedInterfaceIndex();
+	default:	raiseUnexpectedPortIndex();
 	}
 	return res;
 }
 
-void ModuleManager_Base::setReceptacle( co::IPort* receptacle, co::IService* facet )
+void ModuleManager_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
-	raiseUnexpectedInterfaceIndex();
-	CORAL_UNUSED( facet );
+	raiseUnexpectedPortIndex();
+	CORAL_UNUSED( service );
 }
 
 } // namespace co

@@ -1,5 +1,0 @@
-enum ComputerType
-{
-	PC,
-	MAC
-};

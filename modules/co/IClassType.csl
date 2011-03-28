@@ -1,8 +1,8 @@
 /*
 	Interface for types that contain fields and methods.
  */
-interface IClassType : IRecordType
+interface IClassType extends IRecordType
 {
 	// List of member methods.
-	readonly attribute IMethod[] methods;
+	readonly IMethod[] methods;
 };

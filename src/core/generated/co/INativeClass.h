@@ -17,7 +17,7 @@ class INativeClass : public co::IClassType
 public:
 	virtual ~INativeClass() {;}
 
-	virtual const std::string& getNativeHeaderFile() = 0;
+	virtual const std::string& getNativeHeader() = 0;
 
 	virtual const std::string& getNativeName() = 0;
 };

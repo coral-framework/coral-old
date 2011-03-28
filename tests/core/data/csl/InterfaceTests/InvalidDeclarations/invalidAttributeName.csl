@@ -1,0 +1,10 @@
+/*
+	Invalid Attribute name that starts with Uppercase
+ */
+interface invalidAttributeName
+{
+	readonly 
+			string Name;
+};
+
+

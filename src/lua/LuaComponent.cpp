@@ -358,7 +358,7 @@ co::IService* LuaComponent::getDynamicInterface( co::IPort* itfInfo )
 
 	// check interface compatibility
 	if( res && !res->getInterfaceType()->isSubTypeOf( itfInfo->getType() ) )
-		raiseIncompatibleInterface( itfInfo->getType(), res );
+		raiseIncompatibleService( itfInfo->getType(), res );
 
 	return res;
 }
@@ -367,7 +367,7 @@ void LuaComponent::bindToDynamicReceptacle( co::IPort* receptacle, co::IService*
 {
 	// check interface compatibility
 	if( instance && !instance->getInterfaceType()->isSubTypeOf( receptacle->getType() ) )
-		raiseIncompatibleInterface( receptacle->getType(), instance );
+		raiseIncompatibleService( receptacle->getType(), instance );
 
 	__BEGIN_LUA_API_CODE__
 

@@ -1,12 +1,12 @@
 /*
 	Interface for types that contain <em>named members</em>.
  */
-interface ICompositeType : IType
+interface ICompositeType extends IType
 {
 	/*
 		List of all members of this type. A member can be an attribute, a method, etc.
 	 */
-	readonly attribute IMember[] members;
+	readonly IMember[] members;
 
 	/*
 		Retrieves the member with the given name, if one exists; otherwise, returns null.

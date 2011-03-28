@@ -55,7 +55,7 @@ void TypeBuilder::destroyType()
 
 void TypeBuilder::addMethod( Method* )
 {
-	CORAL_THROW( NotSupportedException, "the typeBuilder's kind is neither TK_NATIVECLASS nor TK_INTERFACE" );
+	CORAL_THROW( NotSupportedException, "the builder's type is not a class type" );
 }
 
 INamespace* TypeBuilder::getNamespace()
@@ -75,32 +75,32 @@ const std::string& TypeBuilder::getTypeName()
 
 void TypeBuilder::defineIdentifier(  const std::string& )
 {
-	CORAL_THROW( NotSupportedException, "the typeBuilder's kind is not TK_ENUM" );
+	CORAL_THROW( NotSupportedException, "the builder's type is not an enum" );
 }
 
-void TypeBuilder::defineAttribute( const std::string&, IType*, bool )
+void TypeBuilder::defineField( const std::string&, IType*, bool )
 {
-	CORAL_THROW( NotSupportedException, "the typeBuilder's kind is neither TK_STRUCT, TK_NATIVECLASS nor TK_INTERFACE" );
+	CORAL_THROW( NotSupportedException, "the builder's type is not a record type" );
 }
 
 void TypeBuilder::defineSuperType( IType* )
 {
-	CORAL_THROW( NotSupportedException, "the typeBuilder's kind is not TK_INTERFACE" );
+	CORAL_THROW( NotSupportedException, "the builder's type does not support inheritance" );
 }
 
-void TypeBuilder::defineInterface( const std::string&, IInterface*, bool )
+void TypeBuilder::definePort( const std::string&, IInterface*, bool )
 {
-	CORAL_THROW( NotSupportedException, "the typeBuilder's kind is not TK_COMPONENT" );
+	CORAL_THROW( NotSupportedException, "the builder's type is not a component" );
 }
 
 IMethodBuilder* TypeBuilder::defineMethod( const std::string& )
 {
-	CORAL_THROW( NotSupportedException, "the typeBuilder's kind is neither TK_NATIVECLASS nor TK_INTERFACE" );
+	CORAL_THROW( NotSupportedException, "the builder's type is not a class type" );
 }
 
 void TypeBuilder::defineNativeClass( const std::string&, const std::string& )
 {
-	CORAL_THROW( NotSupportedException, "the typeBuilder's kind is not TK_NATIVECLASS" );
+	CORAL_THROW( NotSupportedException, "the builder's type is not a native class" );
 }
 
 IType* TypeBuilder::createType()
@@ -140,7 +140,7 @@ void TypeBuilder::initialize( INamespace* ns, const std::string& name )
 void TypeBuilder::assertNotCreated()
 {
 	if( _typeWasCreated )
-		CORAL_THROW( NotSupportedException, "type was already created" );
+		CORAL_THROW( NotSupportedException, "the builder's type was already created" );
 }
 
 // ------ EnumTypeBuilder ------------------------------------------------------
@@ -225,15 +225,15 @@ private:
 	ExceptionType* _myType;
 };
 
-// ------ AttributeContainerTypeBuilder ----------------------------------------
+// ------ RecordTypeBuilder ----------------------------------------------------
 
-class AttributeContainerTypeBuilder : public TypeBuilder
+class RecordTypeBuilder : public TypeBuilder
 {
 public:
-	AttributeContainerTypeBuilder( TypeKind kind ) : TypeBuilder( kind )
+	RecordTypeBuilder( TypeKind kind ) : TypeBuilder( kind )
 	{;}
 
-	void defineAttribute( const std::string& name, IType* type, bool isReadOnly )
+	void defineField( const std::string& name, IType* type, bool isReadOnly )
 	{
 		assertNotCreated();
 
@@ -242,29 +242,29 @@ public:
 
 		if( type->getKind() == TK_EXCEPTION || type->getKind() == TK_COMPONENT )
 			CORAL_THROW( IllegalArgumentException, ( type->getKind() == TK_EXCEPTION ?
-					"exception" : "component" ) << "s are illegal as attribute types" );
+					"exception" : "component" ) << "s are illegal as field types" );
 
 		// struct-specific checks
 		if( _kind == TK_STRUCT )
 		{
 			if( isReadOnly )
-				CORAL_THROW( IllegalArgumentException, "structs cannot have read-only attributes" );
+				CORAL_THROW( IllegalArgumentException, "structs cannot have read-only field" );
 
 			if( _type == type )
 				CORAL_THROW( IllegalArgumentException, "a struct cannot contain itself recursively" );
 		}
 
 		if( !LexicalUtils::isValidIdentifier( name ) )
-			CORAL_THROW( IllegalNameException, "attribute name '" << name << "' is not a valid identifier" );
+			CORAL_THROW( IllegalNameException, "field name '" << name << "' is not a valid identifier" );
 
-		if( !LexicalUtils::isValidAttributeName( name ) )
-			CORAL_THROW( IllegalNameException, "attribute names must start with a lowercase letter" );
+		if( !LexicalUtils::isValidFieldName( name ) )
+			CORAL_THROW( IllegalNameException, "field names must start with a lowercase letter" );
 
-		size_t count = _attributes.size();
+		size_t count = _fields.size();
 		for( size_t i = 0; i < count; ++i )
 		{
-			if( _attributes[i]->getName() == name )
-				CORAL_THROW( IllegalNameException, "attribute name '" << name << "' clashes with a previous definition" );
+			if( _fields[i]->getName() == name )
+				CORAL_THROW( IllegalNameException, "field name '" << name << "' clashes with a previous definition" );
 		}
 
 		Field* attr = new Field;
@@ -272,19 +272,19 @@ public:
 		attr->setName( name );
 		attr->setIsReadOnly( isReadOnly );
 
-		_attributes.push_back( attr );
+		_fields.push_back( attr );
 	}
 
 protected:
-	RefVector<IField> _attributes;
+	RefVector<IField> _fields;
 };
 
 // ------ StructTypeBuilder ----------------------------------------------------
 
-class StructTypeBuilder : public AttributeContainerTypeBuilder
+class StructTypeBuilder : public RecordTypeBuilder
 {
 public:
-	StructTypeBuilder() : AttributeContainerTypeBuilder( TK_STRUCT )
+	StructTypeBuilder() : RecordTypeBuilder( TK_STRUCT )
 	{
 		_myType = NULL;
 	}
@@ -299,13 +299,13 @@ public:
 
 	void validate()
 	{
-		if( _attributes.empty() )
+		if( _fields.empty() )
 			CORAL_THROW( MissingInputException, "missing struct contents" );
 	}
 
 	void fillType()
 	{
-		_myType->addMembers( _attributes );
+		_myType->addMembers( _fields );
 		_myType->sortMembers( _myType );
 	}
 
@@ -313,12 +313,12 @@ private:
 	Struct* _myType;
 };
 
-// ------ MethodContainerTypeBuilder -------------------------------------------
+// ------ ClassTypeBuilder -----------------------------------------------------
 
-class MethodContainerTypeBuilder : public AttributeContainerTypeBuilder
+class ClassTypeBuilder : public RecordTypeBuilder
 {
 public:
-	MethodContainerTypeBuilder( TypeKind kind ) : AttributeContainerTypeBuilder( kind )
+	ClassTypeBuilder( TypeKind kind ) : RecordTypeBuilder( kind )
 	{;}
 
 	void addMethod( Method* methodInfo )
@@ -347,10 +347,10 @@ protected:
 
 // ------ NativeClassTypeBuilder -----------------------------------------------
 
-class NativeClassTypeBuilder : public MethodContainerTypeBuilder
+class NativeClassTypeBuilder : public ClassTypeBuilder
 {
 public:
-	NativeClassTypeBuilder() : MethodContainerTypeBuilder( TK_NATIVECLASS )
+	NativeClassTypeBuilder() : ClassTypeBuilder( TK_NATIVECLASS )
 	{
 		_myType = NULL;
 	}
@@ -365,52 +365,49 @@ public:
 
 	void validate()
 	{
-		if( _attributes.empty() && _methods.empty() )
-			CORAL_THROW( MissingInputException, "missing native class contents" );
-
-		if( _nativeHeaderFile.empty() )
-			CORAL_THROW( MissingInputException, "missing native class header name" );
+		if( _nativeHeader.empty() )
+			CORAL_THROW( MissingInputException, "missing native header" );
 
 		if( _nativeName.empty() )
-			CORAL_THROW( MissingInputException, "missing native class name" );
+			CORAL_THROW( MissingInputException, "missing native name" );
 	}
 
 	void fillType()
 	{
-		_myType->setNativeHeaderFile( _nativeHeaderFile );
+		_myType->setNativeHeader( _nativeHeader );
 		_myType->setNativeName( _nativeName );
 
-		_myType->addMembers( _attributes );
+		_myType->addMembers( _fields );
 		_myType->addMembers( _methods );
 		_myType->sortMembers( _myType );
 	}
 
-	void defineNativeClass( const std::string& nativeHeaderFile, const std::string& nativeName )
+	void defineNativeClass( const std::string& nativeHeader, const std::string& nativeName )
 	{
 		assertNotCreated();
 
-		if( nativeHeaderFile.empty() )
+		if( nativeHeader.empty() )
 			CORAL_THROW( IllegalArgumentException, "illegal empty header name" );
 
 		if( nativeName.empty() )
 			CORAL_THROW( IllegalArgumentException, "illegal empty native type name" );
 
-		_nativeHeaderFile = nativeHeaderFile;
+		_nativeHeader = nativeHeader;
 		_nativeName = nativeName;
 	}
 
 private:
 	NativeClass* _myType;
-	std::string _nativeHeaderFile;
+	std::string _nativeHeader;
 	std::string _nativeName;
 };
 
 // ------ InterfaceTypeBuilder -------------------------------------------------
 
-class InterfaceTypeBuilder : public MethodContainerTypeBuilder
+class InterfaceTypeBuilder : public ClassTypeBuilder
 {
 public:
-	InterfaceTypeBuilder() : MethodContainerTypeBuilder( TK_INTERFACE )
+	InterfaceTypeBuilder() : ClassTypeBuilder( TK_INTERFACE )
 	{
 		_myType = NULL;
 	}
@@ -436,13 +433,13 @@ public:
 
 	void validate()
 	{
-		if( _attributes.empty() && _methods.empty() && _superTypes.empty() )
+		if( _fields.empty() && _methods.empty() && _superTypes.empty() )
 			CORAL_THROW( MissingInputException, "missing interface contents" );
 	}
 
 	void fillType()
 	{
-		// if this interface has no explicit super-types, add the implicit 'co.IService' super-type to the list
+		// when an interface has no explicit supertype, add the implicit 'co.IService' supertype
 		if( _superTypes.empty() )
 		{
 			Interface* coInterfaceType =
@@ -461,7 +458,7 @@ public:
 			superType->addSubInterface( _myType );
 		}
 
-		_myType->addMembers( _attributes );
+		_myType->addMembers( _fields );
 		_myType->addMembers( _methods );
 		_myType->sortMembers( _myType );
 	}
@@ -516,7 +513,7 @@ public:
 	void validate()
 	{
 		if( _interfaces.empty() )
-			CORAL_THROW( MissingInputException, "missing component interfaces" );
+			CORAL_THROW( MissingInputException, "missing component ports" );
 	}
 
 	void fillType()
@@ -525,7 +522,7 @@ public:
 		_myType->sortInterfaces();
 	}
 
-	void defineInterface( const std::string& name, IInterface* interface, bool isFacet )
+	void definePort( const std::string& name, IInterface* interface, bool isFacet )
 	{
 		assertNotCreated();
 
@@ -533,12 +530,12 @@ public:
 			CORAL_THROW( IllegalArgumentException, "illegal null interface" );
 
 		if( !LexicalUtils::isValidIdentifier( name ) )
-			CORAL_THROW( IllegalNameException, "interface name '" << name << "' is not a valid indentifier");
+			CORAL_THROW( IllegalNameException, "port name '" << name << "' is not a valid indentifier");
 
 		for( Range<IPort* const> r( _interfaces ); r; r.popFirst() )
 		{
 			if( r.getFirst()->getName() == name )
-				CORAL_THROW( IllegalNameException, "interface name '" << name << "' clashes with a previous definition" );
+				CORAL_THROW( IllegalNameException, "port name '" << name << "' clashes with a previous definition" );
 		}
 
 		Port* port = new Port;

@@ -1,0 +1,8 @@
+native class TestNativeClass10 ( <my long include path/letsgetitlonger/theincludefolderofmyown/mylibs/agoodone/vr/Vec3f.hpp> tests::tools::vr::Vec3f )
+{
+
+string[] vec3;
+string[] vec2;
+void theMethod();
+
+};

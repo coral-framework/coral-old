@@ -1,8 +1,8 @@
 /*
 	Interface for types that contain fields.
  */
-interface IRecordType : ICompositeType
+interface IRecordType extends ICompositeType
 {
 	// List of member fields.
-	readonly attribute IField[] fields;
+	readonly IField[] fields;
 };
