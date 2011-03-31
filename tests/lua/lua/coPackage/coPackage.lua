@@ -5,7 +5,7 @@ local M = {}
 function M:initialize( module )
 	-- test the co.system interface
 	ASSERT_TRUE( co.system )
-	ASSERT_EQ( co.system.interfaceType.fullName, "co.ISystem" )
+	ASSERT_EQ( co.system.interface.fullName, "co.ISystem" )
 
 	-- test the co.getType() function
 	ASSERT_EQ( co.getType( "bool" ).fullName, "bool" )
@@ -18,10 +18,10 @@ function M:initialize( module )
 	ASSERT_ERROR( function() return co.Type.nonExistingType end, "could not load type 'nonExistingType'" )
 
 	-- test the co.new() function
-	local testComponent = co.new( "moduleA.TestComponent" )
-	ASSERT_EQ( testComponent.componentType.fullName, "moduleA.TestComponent" )
+	local testObject = co.new "moduleA.TestComponent"
+	ASSERT_EQ( testObject.component.fullName, "moduleA.TestComponent" )
 
-	local testStruct = co.new( "moduleA.TestStruct" )
+	local testStruct = co.new "moduleA.TestStruct"
 	ASSERT_EQ( testStruct.anInt8, 0 )
 
 	local testNativeClass = co.new "moduleA.Vec2D"

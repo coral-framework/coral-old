@@ -16,7 +16,7 @@ namespace co {
 class Uuid_Adapter
 {
 public:
-	// ------ Attributes ------
+	// ------ Fields ------
 
 	static bool getIsNull( co::Uuid& instance );
 

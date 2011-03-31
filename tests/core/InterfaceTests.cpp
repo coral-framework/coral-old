@@ -8,29 +8,29 @@
 
 TEST( InterfaceTests, fieldAndMethodClashes )
 {
-	CSL_TEST_BEGIN( "InterfaceTests.FieldAndMethodClashes.methodAndAttributeMemberName" )
+	CSL_TEST_BEGIN( "InterfaceTests.FieldAndMethodClashes.methodAndFieldMemberName" )
 	CSL_EXPECT_SEMANTIC_ERROR( "name clash" )
 	CSL_TEST_END()
 
-	CSL_TEST_BEGIN( "InterfaceTests.FieldAndMethodClashes.attributeGetterAndMethod" )
+	CSL_TEST_BEGIN( "InterfaceTests.FieldAndMethodClashes.fieldGetterAndMethod" )
 	CSL_EXPECT_SEMANTIC_ERROR( "name clash" )
 	CSL_TEST_END()
 
-	CSL_TEST_BEGIN( "InterfaceTests.FieldAndMethodClashes.attributeSetterAndMethod" )
+	CSL_TEST_BEGIN( "InterfaceTests.FieldAndMethodClashes.fieldSetterAndMethod" )
 	CSL_EXPECT_SEMANTIC_ERROR( "name clash" )
 	CSL_TEST_END()
 
-	CSL_TEST( "InterfaceTests.FieldAndMethodClashes.attributeSetterAndMethod_valid" )
+	CSL_TEST( "InterfaceTests.FieldAndMethodClashes.fieldSetterAndMethod_valid" )
 
-	CSL_TEST_BEGIN( "InterfaceTests.FieldAndMethodClashes.methodAndAttributeGetter" )
+	CSL_TEST_BEGIN( "InterfaceTests.FieldAndMethodClashes.methodAndFieldGetter" )
 	CSL_EXPECT_SEMANTIC_ERROR( "name clash" )
 	CSL_TEST_END()
 
-	CSL_TEST_BEGIN( "InterfaceTests.FieldAndMethodClashes.methodAndAttributeSetter" )
+	CSL_TEST_BEGIN( "InterfaceTests.FieldAndMethodClashes.methodAndFieldSetter" )
 	CSL_EXPECT_SEMANTIC_ERROR( "name clash" )
 	CSL_TEST_END()
 
-	CSL_TEST( "InterfaceTests.FieldAndMethodClashes.methodAndAttributeSetter_valid" )
+	CSL_TEST( "InterfaceTests.FieldAndMethodClashes.methodAndFieldSetter_valid" )
 }
 
 TEST( InterfaceTests, clashesWithSuperType )
@@ -85,8 +85,8 @@ TEST( InterfaceTests, invalidDeclarations )
 	CSL_EXPECT_SEMANTIC_ERROR( "missing interface contents" )
 	CSL_TEST_END()
 
-	CSL_TEST_BEGIN( "InterfaceTests.InvalidDeclarations.invalidAttributeName" )
-	CSL_EXPECT_ERROR( "must start with a lowercase letter", "invalidAttributeName.csl", 6 )
+	CSL_TEST_BEGIN( "InterfaceTests.InvalidDeclarations.invalidFieldName" )
+	CSL_EXPECT_ERROR( "must start with a lowercase letter", "invalidFieldName.csl", 6 )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "InterfaceTests.InvalidDeclarations.missingParameterIO" )

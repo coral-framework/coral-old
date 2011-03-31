@@ -65,7 +65,7 @@ public:
 	static void push( lua_State* L, const co::Any& var, int depth );
 	static void push( lua_State* L, const std::string& str );
 	static void push( lua_State* L, co::IService* itf );
-	static void push( lua_State* L, co::IObject* component );
+	static void push( lua_State* L, co::IObject* object );
 	//@}
 
 	/*!

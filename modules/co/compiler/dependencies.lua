@@ -36,8 +36,8 @@ function enqueueDependencies.TK_ENUM( enqueue, type, nextDistance ) end
 function enqueueDependencies.TK_EXCEPTION( enqueue, type, nextDistance ) end
 
 local function enqueueRecordType( enqueue, type, nextDistance )
-	for i, attrib in ipairs( type.fields ) do
-		enqueue( attrib.type, nextDistance )
+	for i, field in ipairs( type.fields ) do
+		enqueue( field.type, nextDistance )
 	end
 end
 

@@ -1,6 +1,6 @@
-// this test interface should not raise an exeption because the 
+// this test interface should not raise an exeption because the
 // method name is available as the is readonly
-interface attributeSetterAndMethod_valid 
+interface fieldSetterAndMethod_valid
 {
 	readonly string age;
 	void setAge();

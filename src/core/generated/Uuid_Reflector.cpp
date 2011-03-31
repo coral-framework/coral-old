@@ -56,36 +56,36 @@ public:
 		callDestructor( reinterpret_cast<co::Uuid*>( address ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		co::Uuid& r = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		co::Uuid& r = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
 		case 0:		value.set< bool >( co::Uuid_Adapter::getIsNull( r ) ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		co::Uuid& r = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		co::Uuid& r = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
-		case 0:		raiseAttributeIsReadOnly( ai ); break;
+		case 0:		raiseFieldIsReadOnly( field ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 		CORAL_UNUSED( r );
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
 	{
-		co::Uuid& r = checkInstance( instance, mi );
-		checkNumArguments( mi, args.getSize() );
+		co::Uuid& r = checkInstance( instance, method );
+		checkNumArguments( method, args.getSize() );
 		int argIndex = -1;
 		try
 		{
-			switch( mi->getIndex() )
+			switch( method->getIndex() )
 			{
 			case 1:
 				{
@@ -126,7 +126,7 @@ public:
 		{
 			if( argIndex == -1 )
 				throw; // just re-throw if the exception is not related to 'args'
-			raiseArgumentTypeException( mi, argIndex, e );
+			raiseArgumentTypeException( method, argIndex, e );
 		}
 		catch( ... )
 		{

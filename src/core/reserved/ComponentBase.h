@@ -24,8 +24,8 @@ public:
 	virtual ~ComponentBase();
 
 	// co::IService methods for the 'object' (co::IObject) facet
-	IInterface* getInterfaceType();
-	const std::string& getInterfaceName();
+	IInterface* getInterface();
+	IPort* getFacet();
 
 protected:
 	inline void incrementRefCount()
@@ -39,7 +39,7 @@ protected:
 			delete this;
 	}
 
-	//! Raises co::NoSuchPortException if \a itfInfo isn't one of the component's interfaces.
+	//! Raises co::NoSuchPortException if \a port isn't one of the component's interfaces.
 	void checkValidPort( IPort* port );
 
 	//! Similar to checkValidPort(), but also raises an exception if \a receptacle is a facet.

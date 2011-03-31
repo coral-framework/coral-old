@@ -3,11 +3,11 @@
  */
 interface ITypeManager
 {
-	// The 'global' (root) namespace, which gives hierarchical access to all types, namespaces and modules.
+	// The root namespace. Provides hierarchical access to all types, namespaces and modules.
 	readonly INamespace rootNS;
 
 	/*
-		If true, newly parsed CSL files will generate entries in the documentation database.
+		If true, newly parsed CSL files will populate the documentation database.
 		See getDocumentation(). Default is true. Can be set to false in order to save memory.
 	 */
 	bool documentationParsing;

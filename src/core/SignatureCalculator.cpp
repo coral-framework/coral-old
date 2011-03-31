@@ -156,12 +156,12 @@ void SignatureCalculator::fillNativeClassSignatureData()
 
 void SignatureCalculator::fillInterfaceSignatureData()
 {
-	IInterface* interfaceType = static_cast<IInterface*>( _type );
+	IInterface* interface = static_cast<IInterface*>( _type );
 
 	_binarySignatureHash.addData( _type->getFullName() );
 
 	// add all inherited signatures
-	Range<IInterface* const> superTypes = interfaceType->getSuperInterfaces();
+	Range<IInterface* const> superTypes = interface->getSuperInterfaces();
 	for( ; superTypes; superTypes.popFirst() )
 	{
 		IInterface* super = superTypes.getFirst();
@@ -174,9 +174,9 @@ void SignatureCalculator::fillInterfaceSignatureData()
 
 void SignatureCalculator::fillComponentSignatureData()
 {
-	IComponent* componentType = static_cast<IComponent*>( _type );
+	IComponent* component = static_cast<IComponent*>( _type );
 
-	Range<IPort* const> interfaces = componentType->getPorts();
+	Range<IPort* const> interfaces = component->getPorts();
 	for( ; interfaces; interfaces.popFirst() )
 	{
 		IPort* itf = interfaces.getFirst();
@@ -196,10 +196,10 @@ void SignatureCalculator::fillClassTypeData()
 {
 	IClassType* classType = static_cast<IClassType*>( _type );
 
-	Range<IField* const> attributes = classType->getFields();
-	for( ; attributes; attributes.popFirst() )
+	Range<IField* const> fields = classType->getFields();
+	for( ; fields; fields.popFirst() )
 	{
-		IField* ai = attributes.getFirst();
+		IField* ai = fields.getFirst();
 
 		const uint8 isReadOnly = ai->getIsReadOnly() ? 1 : 0;
 		addDataToSignatures( isReadOnly );

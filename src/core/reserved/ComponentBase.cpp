@@ -28,15 +28,16 @@ ComponentBase::~ComponentBase()
 		debug( Dbg_Fatal, "Deleting component %p with a reference count of %i.", this, _refCount );
 }
 
-IInterface* ComponentBase::getInterfaceType()
+IInterface* ComponentBase::getInterface()
 {
 	return typeOf<IObject>::get();
 }
 
-const std::string& ComponentBase::getInterfaceName()
+IPort* ComponentBase::getFacet()
 {
-	static const std::string s_interfaceName( "object" );
-	return s_interfaceName;
+	IPort* facet = static_cast<IPort*>( typeOf<IObject>::get()->getMember( "object" ) );
+	assert( facet );
+	return facet;
 }
 
 void ComponentBase::checkValidPort( IPort* port )
@@ -44,7 +45,7 @@ void ComponentBase::checkValidPort( IPort* port )
 	if( !port )
 		throw NoSuchPortException( "illegal null port" );
 
-	IComponent* myType = getComponentType();
+	IComponent* myType = getComponent();
 	ICompositeType* owner = port->getOwner();
 	if( owner != static_cast<ICompositeType*>( myType ) )
 		CORAL_THROW( NoSuchPortException, "port '" << port->getName() << "' belongs to "
@@ -69,7 +70,7 @@ void ComponentBase::raiseUnexpectedPortIndex()
 void ComponentBase::raiseIncompatibleService( IInterface* expectedType, IService* service )
 {
 	CORAL_THROW( IllegalCastException, "incompatible service (" << expectedType->getFullName()
-					<< " expected, got " << service->getInterfaceType()->getFullName() << ")" );
+					<< " expected, got " << service->getInterface()->getFullName() << ")" );
 }
 
 IComponent* ComponentBase::getOrCreateInternalComponent(
@@ -87,11 +88,11 @@ IComponent* ComponentBase::getOrCreateInternalComponent(
 	}
 
 	// create the IComponent if it's not defined
-	IInterface* interfaceType = dynamic_cast<IInterface*>( getType( interfaceName ) );
-	assert( interfaceType );
+	IInterface* interface = dynamic_cast<IInterface*>( getType( interfaceName ) );
+	assert( interface );
 
 	RefPtr<ITypeTransaction> transaction =
-			newInstance( "co.TypeTransaction" )->getFacet<ITypeTransaction>();
+			newInstance( "co.TypeTransaction" )->getService<ITypeTransaction>();
 
 	size_t lastDotPos = fullTypeName.rfind( '.' );
 	assert( lastDotPos != std::string::npos ); // componentName must be specified with a namespace
@@ -103,7 +104,7 @@ IComponent* ComponentBase::getOrCreateInternalComponent(
 	assert( ns ); // the namespace should have been created before
 
 	RefPtr<ITypeBuilder> tb = ns->defineType( localTypeName, TK_COMPONENT, transaction.get() );
-	tb->definePort( facetName, interfaceType, true );
+	tb->definePort( facetName, interface, true );
 
 	try
 	{

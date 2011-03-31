@@ -13,15 +13,18 @@ namespace co {
 
 // ------ co.MethodBuilder provides an interface named 'methodBuilder', of type co.IMethodBuilder ------ //
 
-co::IInterface* MethodBuilder_co_IMethodBuilder::getInterfaceType()
+co::IInterface* MethodBuilder_co_IMethodBuilder::getInterface()
 {
 	return co::typeOf<co::IMethodBuilder>::get();
 }
 
-const std::string& MethodBuilder_co_IMethodBuilder::getInterfaceName()
+co::IPort* MethodBuilder_co_IMethodBuilder::getFacet()
 {
-	static const std::string s_interfaceName( "methodBuilder" );
-	return s_interfaceName;
+	co::IComponent* component = static_cast<co::IComponent*>( co::getType( "co.MethodBuilder" ) );
+	assert( component );
+	co::IPort* facet = static_cast<co::IPort*>( component->getMember( "methodBuilder" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ MethodBuilder_Base ------ //
@@ -36,29 +39,29 @@ MethodBuilder_Base::~MethodBuilder_Base()
 	// empty
 }
 
-co::IObject* MethodBuilder_Base::getInterfaceOwner()
+co::IObject* MethodBuilder_Base::getProvider()
 {
 	return this;
 }
 
-void MethodBuilder_Base::componentRetain()
+void MethodBuilder_Base::serviceRetain()
 {
 	incrementRefCount();
 }
 
-void MethodBuilder_Base::componentRelease()
+void MethodBuilder_Base::serviceRelease()
 {
 	decrementRefCount();
 }
 
-co::IComponent* MethodBuilder_Base::getComponentType()
+co::IComponent* MethodBuilder_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.MethodBuilder" );
 	assert( dynamic_cast<co::IComponent*>( type ) );
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* MethodBuilder_Base::getInterface( co::IPort* port )
+co::IService* MethodBuilder_Base::getService( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -70,7 +73,7 @@ co::IService* MethodBuilder_Base::getInterface( co::IPort* port )
 	return res;
 }
 
-void MethodBuilder_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
+void MethodBuilder_Base::setService( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

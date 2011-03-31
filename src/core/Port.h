@@ -21,7 +21,7 @@ public:
 	virtual ~Port();
 
 	// internal methods:
-	void setType( IInterface* interfaceType );
+	void setType( IInterface* interface );
 	void setIsFacet( bool isFacet );
 
 	// IMember methods:
@@ -34,7 +34,7 @@ public:
 	DELEGATE_co_IMember( MemberImpl:: );
 
 private:
-	IInterface* _interfaceType;
+	IInterface* _type;
 	bool _isFacet;
 };
 

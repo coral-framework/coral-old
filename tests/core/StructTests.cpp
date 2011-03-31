@@ -53,18 +53,18 @@ TEST( StructTests, methodDefinition )
 	CSL_TEST_END()
 }
 
-TEST( StructTests, badAttributeName )
+TEST( StructTests, badFieldName )
 {
-	CSL_TEST_BEGIN( "StructTests.struct_badAttributeName" )
-	CSL_EXPECT_SYNTAX_ERROR( "struct_badAttributeName.csl", 3 )
+	CSL_TEST_BEGIN( "StructTests.struct_badFieldName" )
+	CSL_EXPECT_SYNTAX_ERROR( "struct_badFieldName.csl", 3 )
 	CSL_TEST_END()
 
-	CSL_TEST_BEGIN( "StructTests.struct_badAttributeName2" )
-	CSL_EXPECT_SYNTAX_ERROR( "struct_badAttributeName2.csl", 3 )
+	CSL_TEST_BEGIN( "StructTests.struct_badFieldName2" )
+	CSL_EXPECT_SYNTAX_ERROR( "struct_badFieldName2.csl", 3 )
 	CSL_TEST_END()
 
-	CSL_TEST_BEGIN( "StructTests.struct_badAttributeName3" )
-	CSL_EXPECT_SYNTAX_ERROR( "struct_badAttributeName3.csl", 3 )
+	CSL_TEST_BEGIN( "StructTests.struct_badFieldName3" )
+	CSL_EXPECT_SYNTAX_ERROR( "struct_badFieldName3.csl", 3 )
 	CSL_TEST_END()
 }
 
@@ -72,6 +72,13 @@ TEST( StructTests, cyclicDependencies )
 {
 	// cyclic dependencies are naturally handled by the compiler
 	CSL_TEST( "StructTests.struct_valid2" )
+}
+
+TEST( StructTests, readonlyField )
+{
+	CSL_TEST_BEGIN( "StructTests.readonlyField" )
+	CSL_EXPECT_ERROR( "structs cannot have read-only fields", "readonlyField.csl", 4 )
+	CSL_TEST_END()
 }
 
 TEST( StructTests, selfReference )

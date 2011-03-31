@@ -27,19 +27,19 @@ public:
 	// Code From <c++ Block:
 	
 		/*!
-			<tt>getFacet<T>()</tt>: convenience method that returns the instance of a facet 'T' provided
-			by this component. Please notice that this method only works for statically-defined components.
-			It will not retrieve proxy interfaces from dynamic components (such as those implemented in Lua).
+			<tt>getService<T>()</tt>: convenience method that returns a built-in service of type 'T'
+			provided by the component. Please notice that this method only works for static facets.
+			It will not retrieve services from dynamic facets, such as those implemented in Lua.
 		 */
-		template<typename T> inline T* getFacet() { return dynamic_cast<T*>( this ); }
+		template<typename T> inline T* getService() { return dynamic_cast<T*>( this ); }
 	
 	// End Of c++> Block
 
-	virtual co::IComponent* getComponentType() = 0;
+	virtual co::IComponent* getComponent() = 0;
 
-	virtual co::IService* getInterface( co::IPort* port ) = 0;
+	virtual co::IService* getService( co::IPort* port ) = 0;
 
-	virtual void setReceptacle( co::IPort* receptacle, co::IService* service ) = 0;
+	virtual void setService( co::IPort* receptacle, co::IService* service ) = 0;
 };
 
 } // namespace co

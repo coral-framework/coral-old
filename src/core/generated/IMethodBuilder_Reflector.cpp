@@ -26,7 +26,7 @@ class IMethodBuilder_Proxy : public co::IMethodBuilder
 public:
 	IMethodBuilder_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, co::IMethodBuilder>( this ) );
+		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, co::IMethodBuilder>( this ) );
 	}
 
 	virtual ~IMethodBuilder_Proxy()
@@ -36,30 +36,30 @@ public:
 
 	// co::IService Methods:
 
-	co::IInterface* getInterfaceType() { return co::typeOf<co::IMethodBuilder>::get(); }
-	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _provider->componentRetain(); }
-	void componentRelease() { _provider->componentRelease(); }
+	co::IInterface* getInterface() { return co::typeOf<co::IMethodBuilder>::get(); }
+	co::IObject* getProvider() { return _provider->getProvider(); }
+	co::IPort* getFacet() { return _provider->dynamicGetFacet( _cookie ); }
+	void serviceRetain() { _provider->serviceRetain(); }
+	void serviceRelease() { _provider->serviceRelease(); }
 
 	// co.IMethodBuilder Methods:
 
 	const std::string& getMethodName()
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IMethodBuilder>( 0 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IMethodBuilder>( 0 ) );
         return res.get< const std::string& >();
 	}
 
 	co::ITypeBuilder* getTypeBuilder()
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IMethodBuilder>( 1 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IMethodBuilder>( 1 ) );
         return res.get< co::ITypeBuilder* >();
 	}
 
 	void createMethod()
 	{
 		co::Range<co::Any const> range;
-		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IMethodBuilder>( 0 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 0 ), range );
 	}
 
 	void defineException( co::IException* exceptionType_ )
@@ -67,7 +67,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::IException* >( exceptionType_ );
 		co::Range<co::Any const> range( args, 1 );
-		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IMethodBuilder>( 1 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 1 ), range );
 	}
 
 	void defineParameter( const std::string& name_, co::IType* type_, bool input_, bool output_ )
@@ -78,7 +78,7 @@ public:
 		args[2].set< bool >( input_ );
 		args[3].set< bool >( output_ );
 		co::Range<co::Any const> range( args, 4 );
-		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IMethodBuilder>( 2 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 2 ), range );
 	}
 
 	void defineReturnType( co::IType* type_ )
@@ -86,18 +86,18 @@ public:
 		co::Any args[1];
 		args[0].set< co::IType* >( type_ );
 		co::Range<co::Any const> range( args, 1 );
-		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IMethodBuilder>( 3 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 3 ), range );
 	}
 
 protected:
 	template<typename T>
-	co::IField* getAttribInfo( co::uint32 index )
+	co::IField* getField( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethod* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethod( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getMethods()[index];
 	}
@@ -132,16 +132,16 @@ public:
 		return sizeof(co::IMethodBuilder);
 	}
 
-	co::IService* newProxy( co::IDynamicServiceProvider* provider )
+	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
 		return co::disambiguate<co::IService, co::IMethodBuilder>( new co::IMethodBuilder_Proxy( provider ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		co::IMethodBuilder* p = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		co::IMethodBuilder* p = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
 		case 0:		value.set< const std::string& >( p->getMethodName() ); break;
 		case 1:		value.set< co::ITypeBuilder* >( p->getTypeBuilder() ); break;
@@ -149,27 +149,27 @@ public:
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		co::IMethodBuilder* p = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		co::IMethodBuilder* p = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
-		case 0:		raiseAttributeIsReadOnly( ai ); break;
-		case 1:		raiseAttributeIsReadOnly( ai ); break;
+		case 0:		raiseFieldIsReadOnly( field ); break;
+		case 1:		raiseFieldIsReadOnly( field ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 		CORAL_UNUSED( p );
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
 	{
-		co::IMethodBuilder* p = checkInstance( instance, mi );
-		checkNumArguments( mi, args.getSize() );
+		co::IMethodBuilder* p = checkInstance( instance, method );
+		checkNumArguments( method, args.getSize() );
 		int argIndex = -1;
 		try
 		{
-			switch( mi->getIndex() )
+			switch( method->getIndex() )
 			{
 			case 2:
 				{
@@ -208,7 +208,7 @@ public:
 		{
 			if( argIndex == -1 )
 				throw; // just re-throw if the exception is not related to 'args'
-			raiseArgumentTypeException( mi, argIndex, e );
+			raiseArgumentTypeException( method, argIndex, e );
 		}
 		catch( ... )
 		{

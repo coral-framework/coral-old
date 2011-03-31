@@ -16,15 +16,18 @@ void moduleRelease();
 
 // ------ lua.Launcher provides an interface named 'launcher', of type lua.ILauncher ------ //
 
-co::IInterface* Launcher_lua_ILauncher::getInterfaceType()
+co::IInterface* Launcher_lua_ILauncher::getInterface()
 {
 	return co::typeOf<lua::ILauncher>::get();
 }
 
-const std::string& Launcher_lua_ILauncher::getInterfaceName()
+co::IPort* Launcher_lua_ILauncher::getFacet()
 {
-	static const std::string s_interfaceName( "launcher" );
-	return s_interfaceName;
+	co::IComponent* component = static_cast<co::IComponent*>( co::getType( "lua.Launcher" ) );
+	assert( component );
+	co::IPort* facet = static_cast<co::IPort*>( component->getMember( "launcher" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ Launcher_Base ------ //
@@ -39,29 +42,29 @@ Launcher_Base::~Launcher_Base()
 	moduleRelease();
 }
 
-co::IObject* Launcher_Base::getInterfaceOwner()
+co::IObject* Launcher_Base::getProvider()
 {
 	return this;
 }
 
-void Launcher_Base::componentRetain()
+void Launcher_Base::serviceRetain()
 {
 	incrementRefCount();
 }
 
-void Launcher_Base::componentRelease()
+void Launcher_Base::serviceRelease()
 {
 	decrementRefCount();
 }
 
-co::IComponent* Launcher_Base::getComponentType()
+co::IComponent* Launcher_Base::getComponent()
 {
 	co::IType* type = co::getType( "lua.Launcher" );
 	assert( dynamic_cast<co::IComponent*>( type ) );
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* Launcher_Base::getInterface( co::IPort* port )
+co::IService* Launcher_Base::getService( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -73,7 +76,7 @@ co::IService* Launcher_Base::getInterface( co::IPort* port )
 	return res;
 }
 
-void Launcher_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
+void Launcher_Base::setService( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

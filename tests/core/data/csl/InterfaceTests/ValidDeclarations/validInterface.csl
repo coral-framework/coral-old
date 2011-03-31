@@ -3,7 +3,7 @@
  */
 interface validInterface
 {
-	// The attribute's type.
+	// The field's type.
 	// AAAA
 	readonly Graphics.Color carColor;
 

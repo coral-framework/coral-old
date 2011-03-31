@@ -24,7 +24,7 @@ class ITypeTransaction_Proxy : public co::ITypeTransaction
 public:
 	ITypeTransaction_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, co::ITypeTransaction>( this ) );
+		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, co::ITypeTransaction>( this ) );
 	}
 
 	virtual ~ITypeTransaction_Proxy()
@@ -34,41 +34,41 @@ public:
 
 	// co::IService Methods:
 
-	co::IInterface* getInterfaceType() { return co::typeOf<co::ITypeTransaction>::get(); }
-	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _provider->componentRetain(); }
-	void componentRelease() { _provider->componentRelease(); }
+	co::IInterface* getInterface() { return co::typeOf<co::ITypeTransaction>::get(); }
+	co::IObject* getProvider() { return _provider->getProvider(); }
+	co::IPort* getFacet() { return _provider->dynamicGetFacet( _cookie ); }
+	void serviceRetain() { _provider->serviceRetain(); }
+	void serviceRelease() { _provider->serviceRelease(); }
 
 	// co.ITypeTransaction Methods:
 
 	co::Range<co::ITypeBuilder* const> getTypeBuilders()
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::ITypeTransaction>( 0 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeTransaction>( 0 ) );
         return res.get< co::Range<co::ITypeBuilder* const> >();
 	}
 
 	void commit()
 	{
 		co::Range<co::Any const> range;
-		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeTransaction>( 0 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeTransaction>( 0 ), range );
 	}
 
 	void rollback()
 	{
 		co::Range<co::Any const> range;
-		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeTransaction>( 1 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeTransaction>( 1 ), range );
 	}
 
 protected:
 	template<typename T>
-	co::IField* getAttribInfo( co::uint32 index )
+	co::IField* getField( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethod* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethod( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getMethods()[index];
 	}
@@ -103,42 +103,42 @@ public:
 		return sizeof(co::ITypeTransaction);
 	}
 
-	co::IService* newProxy( co::IDynamicServiceProvider* provider )
+	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
 		return co::disambiguate<co::IService, co::ITypeTransaction>( new co::ITypeTransaction_Proxy( provider ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		co::ITypeTransaction* p = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		co::ITypeTransaction* p = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
 		case 0:		value.set< co::Range<co::ITypeBuilder* const> >( p->getTypeBuilders() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		co::ITypeTransaction* p = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		co::ITypeTransaction* p = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
-		case 0:		raiseAttributeIsReadOnly( ai ); break;
+		case 0:		raiseFieldIsReadOnly( field ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 		CORAL_UNUSED( p );
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
 	{
-		co::ITypeTransaction* p = checkInstance( instance, mi );
-		checkNumArguments( mi, args.getSize() );
+		co::ITypeTransaction* p = checkInstance( instance, method );
+		checkNumArguments( method, args.getSize() );
 		int argIndex = -1;
 		try
 		{
-			switch( mi->getIndex() )
+			switch( method->getIndex() )
 			{
 			case 1:
 				{
@@ -158,7 +158,7 @@ public:
 		{
 			if( argIndex == -1 )
 				throw; // just re-throw if the exception is not related to 'args'
-			raiseArgumentTypeException( mi, argIndex, e );
+			raiseArgumentTypeException( method, argIndex, e );
 		}
 		catch( ... )
 		{

@@ -39,9 +39,9 @@ public:
 
 	co::IObject* newInstance()
 	{
-		co::IObject* component = __ExceptionType_newInstance();
-		assert( component->getComponentType()->getFullName() == "co.ExceptionType" );
-		return component;
+		co::IObject* instance = __ExceptionType_newInstance();
+		assert( instance->getComponent()->getFullName() == "co.ExceptionType" );
+		return instance;
 	}
 };
 

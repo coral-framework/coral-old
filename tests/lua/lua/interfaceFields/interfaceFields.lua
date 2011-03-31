@@ -44,10 +44,10 @@ function M:initialize( module )
 	-- test getting/setting a struct array
 	-- test getting/setting an interface array
 
-	-- try setting a read-only attribute
+	-- try setting a read-only field
 	ASSERT_EQ( co.system.state, "SystemState_Running" )
 	ASSERT_ERROR( function() co.system.state = "SystemState_Integrating" end,
-		"attribute 'state' is read-only and cannot be changed" )
+		"field 'state' is read-only and cannot be changed" )
 end
 
 return M

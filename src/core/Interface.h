@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _INTERFACETYPE_H_
-#define _INTERFACETYPE_H_
+#ifndef _CO_INTERFACE_H_
+#define _CO_INTERFACE_H_
 
 #include "ClassType.h"
 #include "Interface_Base.h"

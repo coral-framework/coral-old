@@ -39,9 +39,9 @@ public:
 
 	co::IObject* newInstance()
 	{
-		co::IObject* component = __Namespace_newInstance();
-		assert( component->getComponentType()->getFullName() == "co.Namespace" );
-		return component;
+		co::IObject* instance = __Namespace_newInstance();
+		assert( instance->getComponent()->getFullName() == "co.Namespace" );
+		return instance;
 	}
 };
 

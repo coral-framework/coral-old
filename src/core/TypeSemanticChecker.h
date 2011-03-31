@@ -32,19 +32,19 @@ public:
 private:
 	enum MemberType
 	{
-		Attribute,
-		GetterMethod,
-		SetterMethod,
+		Field,
+		FieldGetter,
+		FieldSetter,
 		Method
 	};
-	
+
 	class MemberDeclaration
 	{
 	public:
 		inline co::IType* getDeclaringType() const { return _declaringType; }
 		inline MemberType getMemberType() const { return _memberType; }
 		inline const std::string& getMemberName() const { return _memberName; }
-		
+
 		MemberDeclaration( MemberType memberType, const std::string& memberName, co::IType* declaringType )
 			: _memberType( memberType ), _memberName( memberName ), _declaringType( declaringType )
 		{;}
@@ -53,7 +53,7 @@ private:
 		{
 			return member._memberName < _memberName;
 		}
-		
+
 		bool operator==( const MemberDeclaration& member ) const
 		{
 			return member._memberName == _memberName;
@@ -69,7 +69,7 @@ private:
 	friend std::ostream& operator<<( std::ostream&, const co::TypeSemanticChecker::MemberDeclaration& );
 
 	// validates inheritance: checks for cyclic inheritance and multiple inheritance.
-	void checkInheritance( co::IInterface* interfaceType );
+	void checkInheritance( co::IInterface* interface );
 
 	// validates inherited members: checks for clashing names between the checked type and its super-types
 	void checkInheritedMemberClashing();
@@ -77,11 +77,11 @@ private:
 	// checks if the member declaration clashes with the previously declared and inserts it if not.
 	void insertMemberDeclaration( const MemberDeclaration& memberDeclaration );
 
-	// inserts de attribute declarations - member name and accessors.
-	void insertAttributeDeclaration( co::IField* attribute, co::IType* declaringType );
+	// inserts the field declarations - member name and accessors.
+	void insertFieldDeclaration( co::IField* field, co::IType* declaringType );
 
 	// checks the type members declarations.
-	// If avilable checks for the attributes and methods possible clashes, and checks superTypes if they exist.
+	// If available checks for the fields and methods possible clashes, and checks superTypes if they exist.
 	void checkMemberDeclarations( co::IType* type );
 
 private:

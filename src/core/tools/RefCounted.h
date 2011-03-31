@@ -31,12 +31,12 @@ public:
 		return *this;
 	}
 
-	inline void componentRetain() const
+	inline void serviceRetain() const
 	{
 		++_refCount;
 	}
 
-	inline void componentRelease() const
+	inline void serviceRelease() const
 	{
 		if( --_refCount <= 0 )
 			delete this;

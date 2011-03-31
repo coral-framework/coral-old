@@ -7,11 +7,13 @@
 #include <co/IService.h>
 #include <gtest/gtest.h>
 
+namespace {
+
 class PseudoInterface : public co::IService
 {
 public:
-	PseudoInterface( const char* name = "",  bool* setToTrueWhenDestroyed = 0 ) :
-			_name( name ), _setToTrueWhenDestroyed( setToTrueWhenDestroyed ), _refCount( 0 )
+	PseudoInterface( bool* setToTrueWhenDestroyed = 0 ) :
+		_setToTrueWhenDestroyed( setToTrueWhenDestroyed ), _refCount( 0 )
 	{;}
 
 	virtual ~PseudoInterface()
@@ -19,20 +21,21 @@ public:
 		if( _setToTrueWhenDestroyed )
 			*_setToTrueWhenDestroyed = true;
 	}
-	
+
 	inline co::int32 getRefCount() const { return _refCount; }
 
-	virtual co::IInterface* getInterfaceType() { return 0; }
-	virtual co::IObject* getInterfaceOwner() { return 0; }
-	virtual const std::string& getInterfaceName() { return _name; }
-	virtual void componentRetain() { ++_refCount; }
-	virtual void componentRelease() { if( --_refCount <= 0 ) delete this; }
+	co::IInterface* getInterface() { return 0; }
+	co::IObject* getProvider() { return 0; }
+	co::IPort* getFacet() { return 0; }
+	void serviceRetain() { ++_refCount; }
+	void serviceRelease() { if( --_refCount <= 0 ) delete this; }
 
 private:
-	std::string _name;
 	bool* _setToTrueWhenDestroyed;
 	co::int32 _refCount;
 };
+
+} // anonymous namespace
 
 TEST( RefPtrTests, refPtrValidity )
 {
@@ -52,19 +55,19 @@ TEST( RefPtrTests, refPtrValidity )
 TEST( RefPtrTests, refPtrRelease )
 {
 	bool objDestroyed = false;
-	PseudoInterface *obj = new PseudoInterface( "", &objDestroyed );
+	PseudoInterface *obj = new PseudoInterface( &objDestroyed );
 	{
-		obj->componentRetain();
+		obj->serviceRetain();
 		co::RefPtr<PseudoInterface> ptr = obj;
 	}
 
 	ASSERT_FALSE( objDestroyed );
-	obj->componentRelease();
+	obj->serviceRelease();
 	EXPECT_TRUE( objDestroyed );
 
 	bool anonymousInstanceDestroyed = false;
 	{
-		co::RefPtr<PseudoInterface>( new PseudoInterface( "", &anonymousInstanceDestroyed ) );
+		co::RefPtr<PseudoInterface>( new PseudoInterface( &anonymousInstanceDestroyed ) );
 	}
 	EXPECT_TRUE( anonymousInstanceDestroyed );
 
@@ -73,7 +76,7 @@ TEST( RefPtrTests, refPtrRelease )
 TEST( RefPtrTests, refPtrSwap )
 {
 	bool objDestroyed = false;
-	PseudoInterface *obj = new PseudoInterface( "", &objDestroyed );
+	PseudoInterface *obj = new PseudoInterface( &objDestroyed );
 
 	co::RefPtr<PseudoInterface> ptr1;
 	{
@@ -98,10 +101,10 @@ struct TripleRefs
 TEST( RefPtrTests, refPtrsInStruct )
 {
 	bool destroyedA = false;
-	PseudoInterface *objA = new PseudoInterface( "A", &destroyedA );
+	PseudoInterface *objA = new PseudoInterface( &destroyedA );
 
 	bool destroyedB = false;
-	PseudoInterface *objB = new PseudoInterface( "B", &destroyedB );
+	PseudoInterface *objB = new PseudoInterface( &destroyedB );
 
 	TripleRefs structOne;
 

@@ -1,4 +1,0 @@
-struct struct_badAttributeName 
-{
-	string #name;	
-};

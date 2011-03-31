@@ -229,14 +229,14 @@ int main( int argc, char* argv[] )
 		}
 
 		// instantiate the component & obtain the service
-		co::RefPtr<co::IObject> component;
+		co::RefPtr<co::IObject> object;
 		co::IService* service;
 		try
 		{
-			component = ct->getReflector()->newInstance();
-			assert( component.isValid() );
+			object = ct->getReflector()->newInstance();
+			assert( object.isValid() );
 
-			service = component->getInterface( facet );
+			service = object->getService( facet );
 			assert( service );
 		}
 		catch( std::exception& e )
@@ -267,7 +267,7 @@ int main( int argc, char* argv[] )
 			co::Any res;
 			co::Any arg;
 			arg.set<std::vector<std::string>&>( args );
-			reflector->invokeMethod( service, method, co::Range<co::Any const>( &arg, 1 ), res );
+			reflector->invoke( service, method, co::Range<co::Any const>( &arg, 1 ), res );
 
 			// if the result is a number, use it as the return status; otherwise, print it
 			if( res.isValid() )

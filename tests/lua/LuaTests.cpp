@@ -112,9 +112,9 @@ TEST( LuaTests, componentManipulation )
 
 // --- Interface Binding Tests --- //
 
-TEST( LuaTests, interfaceAttributes )
+TEST( LuaTests, interfaceFields )
 {
-	ASSERT_SUCCESS( "lua.interfaceAttributes" );
+	ASSERT_SUCCESS( "lua.interfaceFields" );
 }
 
 TEST( LuaTests, interfaceMethods )

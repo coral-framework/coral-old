@@ -13,15 +13,18 @@ namespace co {
 
 // ------ co.Interface provides an interface named 'type', of type co.IInterface ------ //
 
-co::IInterface* Interface_co_IInterface::getInterfaceType()
+co::IInterface* Interface_co_IInterface::getInterface()
 {
 	return co::typeOf<co::IInterface>::get();
 }
 
-const std::string& Interface_co_IInterface::getInterfaceName()
+co::IPort* Interface_co_IInterface::getFacet()
 {
-	static const std::string s_interfaceName( "type" );
-	return s_interfaceName;
+	co::IComponent* component = static_cast<co::IComponent*>( co::getType( "co.Interface" ) );
+	assert( component );
+	co::IPort* facet = static_cast<co::IPort*>( component->getMember( "type" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ Interface_Base ------ //
@@ -36,29 +39,29 @@ Interface_Base::~Interface_Base()
 	// empty
 }
 
-co::IObject* Interface_Base::getInterfaceOwner()
+co::IObject* Interface_Base::getProvider()
 {
 	return this;
 }
 
-void Interface_Base::componentRetain()
+void Interface_Base::serviceRetain()
 {
 	incrementRefCount();
 }
 
-void Interface_Base::componentRelease()
+void Interface_Base::serviceRelease()
 {
 	decrementRefCount();
 }
 
-co::IComponent* Interface_Base::getComponentType()
+co::IComponent* Interface_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.Interface" );
 	assert( dynamic_cast<co::IComponent*>( type ) );
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* Interface_Base::getInterface( co::IPort* port )
+co::IService* Interface_Base::getService( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -70,7 +73,7 @@ co::IService* Interface_Base::getInterface( co::IPort* port )
 	return res;
 }
 
-void Interface_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
+void Interface_Base::setService( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

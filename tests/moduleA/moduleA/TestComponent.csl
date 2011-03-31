@@ -7,5 +7,5 @@ component TestComponent
 
 	// test 'receives'
 	receives co.IType type;
-	receives co.IInterface itfType;
+	receives co.IInterface itf;
 };

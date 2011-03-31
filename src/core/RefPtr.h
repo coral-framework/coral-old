@@ -55,7 +55,7 @@ public:
 
 		// always release last
 		if( old )
-			old->componentRelease();
+			old->serviceRelease();
 
 		return *this;
 	}
@@ -72,7 +72,7 @@ public:
 
 		// always release last
 		if( old )
-			old->componentRelease();
+			old->serviceRelease();
 
 		return *this;
 	}
@@ -119,7 +119,7 @@ public:
 
 	/*!
 		Efficiently swaps the internal pointers of two co::RefPtr's.
-		This saves two componentRetain() and two componentRelease() calls.
+		This saves two serviceRetain() and two serviceRelease() calls.
 	 */
 	inline void swap( RefPtr& other )
 	{
@@ -132,13 +132,13 @@ private:
 	inline void tryRetain()
 	{
 		if( _ptr )
-			_ptr->componentRetain();
+			_ptr->serviceRetain();
 	}
 
 	inline void tryRelease()
 	{
 		if( _ptr )
-			_ptr->componentRelease();
+			_ptr->serviceRelease();
 	}
 
 private:

@@ -27,7 +27,7 @@ class ITypeBuilder_Proxy : public co::ITypeBuilder
 public:
 	ITypeBuilder_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, co::ITypeBuilder>( this ) );
+		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, co::ITypeBuilder>( this ) );
 	}
 
 	virtual ~ITypeBuilder_Proxy()
@@ -37,36 +37,36 @@ public:
 
 	// co::IService Methods:
 
-	co::IInterface* getInterfaceType() { return co::typeOf<co::ITypeBuilder>::get(); }
-	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _provider->componentRetain(); }
-	void componentRelease() { _provider->componentRelease(); }
+	co::IInterface* getInterface() { return co::typeOf<co::ITypeBuilder>::get(); }
+	co::IObject* getProvider() { return _provider->getProvider(); }
+	co::IPort* getFacet() { return _provider->dynamicGetFacet( _cookie ); }
+	void serviceRetain() { _provider->serviceRetain(); }
+	void serviceRelease() { _provider->serviceRelease(); }
 
 	// co.ITypeBuilder Methods:
 
 	co::TypeKind getKind()
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::ITypeBuilder>( 0 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 0 ) );
         return res.get< co::TypeKind >();
 	}
 
 	co::INamespace* getNamespace()
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::ITypeBuilder>( 1 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 1 ) );
         return res.get< co::INamespace* >();
 	}
 
 	const std::string& getTypeName()
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::ITypeBuilder>( 2 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 2 ) );
         return res.get< const std::string& >();
 	}
 
 	co::IType* createType()
 	{
 		co::Range<co::Any const> range;
-		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeBuilder>( 0 ), range );
+		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 0 ), range );
 		return res.get< co::IType* >();
 	}
 
@@ -77,7 +77,7 @@ public:
 		args[1].set< co::IType* >( type_ );
 		args[2].set< bool >( isReadOnly_ );
 		co::Range<co::Any const> range( args, 3 );
-		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeBuilder>( 1 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 1 ), range );
 	}
 
 	void defineIdentifier( const std::string& name_ )
@@ -85,7 +85,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::Range<co::Any const> range( args, 1 );
-		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeBuilder>( 2 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 2 ), range );
 	}
 
 	co::IMethodBuilder* defineMethod( const std::string& name_ )
@@ -93,7 +93,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeBuilder>( 3 ), range );
+		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 3 ), range );
 		return res.get< co::IMethodBuilder* >();
 	}
 
@@ -103,17 +103,17 @@ public:
 		args[0].set< const std::string& >( nativeHeader_ );
 		args[1].set< const std::string& >( nativeName_ );
 		co::Range<co::Any const> range( args, 2 );
-		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeBuilder>( 4 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 4 ), range );
 	}
 
-	void definePort( const std::string& name_, co::IInterface* interfaceType_, bool isFacet_ )
+	void definePort( const std::string& name_, co::IInterface* type_, bool isFacet_ )
 	{
 		co::Any args[3];
 		args[0].set< const std::string& >( name_ );
-		args[1].set< co::IInterface* >( interfaceType_ );
+		args[1].set< co::IInterface* >( type_ );
 		args[2].set< bool >( isFacet_ );
 		co::Range<co::Any const> range( args, 3 );
-		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeBuilder>( 5 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 5 ), range );
 	}
 
 	void defineSuperType( co::IType* superType_ )
@@ -121,18 +121,18 @@ public:
 		co::Any args[1];
 		args[0].set< co::IType* >( superType_ );
 		co::Range<co::Any const> range( args, 1 );
-		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::ITypeBuilder>( 6 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 6 ), range );
 	}
 
 protected:
 	template<typename T>
-	co::IField* getAttribInfo( co::uint32 index )
+	co::IField* getField( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethod* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethod( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getMethods()[index];
 	}
@@ -167,16 +167,16 @@ public:
 		return sizeof(co::ITypeBuilder);
 	}
 
-	co::IService* newProxy( co::IDynamicServiceProvider* provider )
+	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
 		return co::disambiguate<co::IService, co::ITypeBuilder>( new co::ITypeBuilder_Proxy( provider ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		co::ITypeBuilder* p = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		co::ITypeBuilder* p = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
 		case 0:		value.set< co::TypeKind >( p->getKind() ); break;
 		case 1:		value.set< co::INamespace* >( p->getNamespace() ); break;
@@ -185,28 +185,28 @@ public:
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		co::ITypeBuilder* p = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		co::ITypeBuilder* p = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
-		case 0:		raiseAttributeIsReadOnly( ai ); break;
-		case 1:		raiseAttributeIsReadOnly( ai ); break;
-		case 2:		raiseAttributeIsReadOnly( ai ); break;
+		case 0:		raiseFieldIsReadOnly( field ); break;
+		case 1:		raiseFieldIsReadOnly( field ); break;
+		case 2:		raiseFieldIsReadOnly( field ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 		CORAL_UNUSED( p );
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
 	{
-		co::ITypeBuilder* p = checkInstance( instance, mi );
-		checkNumArguments( mi, args.getSize() );
+		co::ITypeBuilder* p = checkInstance( instance, method );
+		checkNumArguments( method, args.getSize() );
 		int argIndex = -1;
 		try
 		{
-			switch( mi->getIndex() )
+			switch( method->getIndex() )
 			{
 			case 3:
 				{
@@ -247,10 +247,10 @@ public:
 			case 8:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
-					co::IInterface* interfaceType_ = args[++argIndex].get< co::IInterface* >();
+					co::IInterface* type_ = args[++argIndex].get< co::IInterface* >();
 					bool isFacet_ = args[++argIndex].get< bool >();
 					argIndex = -1;
-					p->definePort( name_, interfaceType_, isFacet_ );
+					p->definePort( name_, type_, isFacet_ );
 				}
 				break;
 			case 9:
@@ -268,7 +268,7 @@ public:
 		{
 			if( argIndex == -1 )
 				throw; // just re-throw if the exception is not related to 'args'
-			raiseArgumentTypeException( mi, argIndex, e );
+			raiseArgumentTypeException( method, argIndex, e );
 		}
 		catch( ... )
 		{

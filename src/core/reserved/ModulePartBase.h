@@ -18,8 +18,8 @@ namespace co {
 class CORAL_EXPORT ModulePartBase_co_ModulePart : public IModulePart
 {
 public:
-	virtual IInterface* getInterfaceType();
-	virtual const std::string& getInterfaceName();
+	virtual IInterface* getInterface();
+	virtual IPort* getFacet();
 };
 
 /*!
@@ -32,14 +32,14 @@ public:
 	virtual ~ModulePartBase();
 
 	// co::IService methods:
-    IObject* getInterfaceOwner();
-    void componentRetain();
-    void componentRelease();
+    IObject* getProvider();
+    void serviceRetain();
+    void serviceRelease();
 
     // co::IObject methods:
-    IComponent* getComponentType();
-    IService* getInterface( IPort* );
-    void setReceptacle( IPort*, IService* );
+    IComponent* getComponent();
+    IService* getService( IPort* );
+    void setService( IPort*, IService* );
 
 	// co::IModulePart methods:
 	void initialize( co::IModule* module );

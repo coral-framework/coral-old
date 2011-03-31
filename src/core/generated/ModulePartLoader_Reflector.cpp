@@ -39,9 +39,9 @@ public:
 
 	co::IObject* newInstance()
 	{
-		co::IObject* component = __ModulePartLoader_newInstance();
-		assert( component->getComponentType()->getFullName() == "co.ModulePartLoader" );
-		return component;
+		co::IObject* instance = __ModulePartLoader_newInstance();
+		assert( instance->getComponent()->getFullName() == "co.ModulePartLoader" );
+		return instance;
 	}
 };
 

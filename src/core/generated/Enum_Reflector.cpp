@@ -39,9 +39,9 @@ public:
 
 	co::IObject* newInstance()
 	{
-		co::IObject* component = __Enum_newInstance();
-		assert( component->getComponentType()->getFullName() == "co.Enum" );
-		return component;
+		co::IObject* instance = __Enum_newInstance();
+		assert( instance->getComponent()->getFullName() == "co.Enum" );
+		return instance;
 	}
 };
 

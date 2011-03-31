@@ -39,9 +39,9 @@ public:
 
 	co::IObject* newInstance()
 	{
-		co::IObject* component = __TypeManager_newInstance();
-		assert( component->getComponentType()->getFullName() == "co.TypeManager" );
-		return component;
+		co::IObject* instance = __TypeManager_newInstance();
+		assert( instance->getComponent()->getFullName() == "co.TypeManager" );
+		return instance;
 	}
 };
 

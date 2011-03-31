@@ -3,5 +3,5 @@
  */
 component Field
 {
-	provides IField attributeInfo;
+	provides IField field;
 };

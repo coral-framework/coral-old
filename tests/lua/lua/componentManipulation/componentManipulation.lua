@@ -4,35 +4,35 @@ local M = {}
 
 function M:initialize( module )
 	-- create a test component
-	local testComponent = co.new( "moduleA.TestComponent" )
+	local object = co.new( "moduleA.TestComponent" )
 
-	-- test getting the 'componentType' attribute
-	ASSERT_EQ( testComponent.componentType.fullName, "moduleA.TestComponent" )
+	-- test getting the 'component' port
+	ASSERT_EQ( object.component.fullName, "moduleA.TestComponent" )
 
-	-- test setting the 'componentType' attribute
-	ASSERT_ERROR( function() testComponent.componentType = nil end,
-		"attribute 'componentType' is read-only and cannot be changed" )
+	-- test setting the 'component' port
+	ASSERT_ERROR( function() object.component = nil end,
+		"'component' is a facet and cannot be set" )
 
 	-- test getting a non-existing component interface
-	ASSERT_EQ( testComponent.nonExistingItf, nil )
-	-- Previously: ASSERT_ERROR( function() return testComponent.nonExistingItf end, "non-existing member 'nonExistingItf'" )
+	ASSERT_EQ( object.nonExistingItf, nil )
+	-- Previously: ASSERT_ERROR( function() return object.nonExistingItf end, "non-existing member 'nonExistingItf'" )
 
 	-- test getting existing interfaces
-	ASSERT_EQ( testComponent.testInterface.interfaceName, "testInterface" )
-	ASSERT_EQ( testComponent.testInterface.interfaceOwner, testComponent )
+	ASSERT_EQ( object.testInterface.facet.name, "testInterface" )
+	ASSERT_EQ( object.testInterface.provider, object )
 
-	ASSERT_EQ( testComponent.transaction.interfaceName, "transaction" )
-	ASSERT_EQ( testComponent.transaction.interfaceOwner, testComponent )
+	ASSERT_EQ( object.transaction.facet.name, "transaction" )
+	ASSERT_EQ( object.transaction.provider, object )
 
 	-- test getting/setting a receptacle
-	ASSERT_EQ( testComponent.itfType, nil )
-	testComponent.itfType = testComponent.testInterface.interfaceType
-	ASSERT_EQ( testComponent.itfType, testComponent.testInterface.interfaceType )
-	testComponent.itfType = nil
-	ASSERT_EQ( testComponent.itfType, nil )
+	ASSERT_EQ( object.itf, nil )
+	object.itf = object.testInterface.interface
+	ASSERT_EQ( object.itf, object.testInterface.interface )
+	object.itf = nil
+	ASSERT_EQ( object.itf, nil )
 
 	-- test setting a facet
-	ASSERT_ERROR( function() testComponent.testInterface = nil end, "'testInterface' is a facet and cannot be set" )
+	ASSERT_ERROR( function() object.testInterface = nil end, "'testInterface' is a facet and cannot be set" )
 end
 
 return M

@@ -6,9 +6,9 @@ interface TestInterface
 
 	string[] names;
 
-	DummyInterface dummyInterfaceAttribute;
+	DummyInterface dummyInterfaceField;
 
-	readonly TestInterface selfReferenceAttrib;
+	readonly TestInterface selfReferenceField;
 
 	TestEnum testEnum;
 

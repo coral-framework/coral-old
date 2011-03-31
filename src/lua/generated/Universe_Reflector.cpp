@@ -42,9 +42,9 @@ public:
 
 	co::IObject* newInstance()
 	{
-		co::IObject* component = __Universe_newInstance();
-		assert( component->getComponentType()->getFullName() == "lua.Universe" );
-		return component;
+		co::IObject* instance = __Universe_newInstance();
+		assert( instance->getComponent()->getFullName() == "lua.Universe" );
+		return instance;
 	}
 };
 

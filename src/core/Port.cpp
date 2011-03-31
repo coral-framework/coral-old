@@ -7,7 +7,7 @@
 
 namespace co {
 
-Port::Port() : _interfaceType( 0 ), _isFacet( true )
+Port::Port() : _type( 0 ), _isFacet( true )
 {
 	// empty
 }
@@ -18,9 +18,9 @@ Port::~Port()
 	// empty
 }
 
-void Port::setType( IInterface* interfaceType )
+void Port::setType( IInterface* interface )
 {
-	_interfaceType = interfaceType;
+	_type = interface;
 }
 
 void Port::setIsFacet( bool isFacet )
@@ -35,7 +35,7 @@ MemberKind Port::getKind()
 
 IInterface* Port::getType()
 {
-	return _interfaceType;
+	return _type;
 }
 
 bool Port::getIsFacet()

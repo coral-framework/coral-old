@@ -248,7 +248,7 @@ public:
 		if( _kind == TK_STRUCT )
 		{
 			if( isReadOnly )
-				CORAL_THROW( IllegalArgumentException, "structs cannot have read-only field" );
+				CORAL_THROW( IllegalArgumentException, "structs cannot have read-only fields" );
 
 			if( _type == type )
 				CORAL_THROW( IllegalArgumentException, "a struct cannot contain itself recursively" );
@@ -410,6 +410,7 @@ public:
 	InterfaceTypeBuilder() : ClassTypeBuilder( TK_INTERFACE )
 	{
 		_myType = NULL;
+		_superType = NULL;
 	}
 
 	bool allocateType()
@@ -433,29 +434,25 @@ public:
 
 	void validate()
 	{
-		if( _fields.empty() && _methods.empty() && _superTypes.empty() )
+		if( _fields.empty() && _methods.empty() && !_superType )
 			CORAL_THROW( MissingInputException, "missing interface contents" );
 	}
 
 	void fillType()
 	{
-		// when an interface has no explicit supertype, add the implicit 'co.IService' supertype
-		if( _superTypes.empty() )
+		// when an interface has no explicit supertype, default to 'co.IService'		
+		if( !_superType )
 		{
-			Interface* coInterfaceType =
-				static_cast<Interface*>( typeOf<IService>::get() );
-			// ... unless we're defining the co.IService itself
-			if( _myType != coInterfaceType )
-				_superTypes.push_back( coInterfaceType );
+			// ... unless we're defining the 'co.IService' interface itself
+			Interface* coIService = static_cast<Interface*>( typeOf<IService>::get() );
+			if( _myType != coIService )
+				_superType = coIService;
 		}
 
-		// add all super-types in the list
-		size_t count = _superTypes.size();
-		for( size_t i = 0; i < count; ++i )
+		if( _superType )
 		{
-			Interface* superType = _superTypes[i].get();
-			_myType->addSuperInterface( superType );
-			superType->addSubInterface( _myType );
+			_myType->addSuperInterface( _superType );
+			_superType->addSubInterface( _myType );
 		}
 
 		_myType->addMembers( _fields );
@@ -470,26 +467,21 @@ public:
 		if( !superType )
 			CORAL_THROW( IllegalArgumentException, "illegal null supertype" );
 
-		Interface* interfaceType = dynamic_cast<Interface*>( superType );
-		if( !interfaceType )
-			CORAL_THROW( IllegalArgumentException, "illegal supertype - an interface was expected" );
+		if( _superType )
+			CORAL_THROW( NotSupportedException, "multiple interface inheritance is not supported" );
+
+		co::TypeKind kind = superType->getKind();
+		if( kind != co::TK_INTERFACE )
+			CORAL_THROW( IllegalArgumentException, "illegal supertype (interface expected, got "
+							<< co::TK_STRINGS[kind] << ")" );
 
 		// check if the super-type is already contained in the _superTypes list
-		size_t count = _superTypes.size();
-		for( size_t i = 0; i < count; ++i )
-		{
-			Interface* anotherSuper = _superTypes[i].get();
-			if( superType == anotherSuper )
-				CORAL_THROW( NotSupportedException, "cannot inherit twice from '"
-								<< superType->getFullName() << "'" );
-		}
-
-		_superTypes.push_back( interfaceType );
+		_superType = static_cast<Interface*>( superType );
 	}
 
 private:
 	Interface* _myType;
-	RefVector<Interface> _superTypes;
+	Interface* _superType;
 };
 
 // ------ ComponentTypeBuilder -------------------------------------------------

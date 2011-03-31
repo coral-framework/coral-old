@@ -27,26 +27,26 @@ void TypeSemanticChecker::check()
 	if( dynamic_cast<ICompositeType*>( _type ) == NULL )
 		return;
 
-	co::IInterface* interfaceType = dynamic_cast<IInterface*>( _type );
-	if( interfaceType )
-		checkInheritance( interfaceType );
+	co::IInterface* interface = dynamic_cast<IInterface*>( _type );
+	if( interface )
+		checkInheritance( interface );
 
 	checkMemberDeclarations( _type );
 }
 
-void TypeSemanticChecker::checkInheritance( co::IInterface* interfaceType )
+void TypeSemanticChecker::checkInheritance( co::IInterface* interface )
 {
 	// assert no multiple inheritance from the same type
-	co::Range<co::IInterface* const> superTypes = interfaceType->getSuperInterfaces();
+	co::Range<co::IInterface* const> superTypes = interface->getSuperInterfaces();
 	for( ; superTypes; superTypes.popFirst() )
 	{
 		co::IInterface* currentSuper = superTypes.getFirst();
 
 		// check for cyclic inheritance
-		if( currentSuper->isSubTypeOf( interfaceType ) )
+		if( currentSuper->isSubTypeOf( interface ) )
 		{
 			CORAL_THROW( SemanticException, "cyclic inheritance detected in type '"
-				<< interfaceType->getFullName() << "' through supertype '"
+				<< interface->getFullName() << "' through supertype '"
 				<< currentSuper->getFullName() << "'" );
 		}
 
@@ -69,7 +69,7 @@ void TypeSemanticChecker::checkInheritance( co::IInterface* interfaceType )
 
 			if( toBlame )
 			{
-				CORAL_THROW( SemanticException, "type '" << interfaceType->getFullName()
+				CORAL_THROW( SemanticException, "type '" << interface->getFullName()
 					<< "' inherits more than once from supertype '" << toBlame->getFullName() << "'" );
 			}
 		}
@@ -81,9 +81,9 @@ std::ostream& operator<<( std::ostream& out, const co::TypeSemanticChecker::Memb
 	const char* memberType = NULL;
 	switch( md.getMemberType() )
 	{
-	case co::TypeSemanticChecker::Attribute:	memberType = "attribute "; break;
-	case co::TypeSemanticChecker::GetterMethod:	memberType = "getter method "; break;
-	case co::TypeSemanticChecker::SetterMethod:	memberType = "setter method "; break;
+	case co::TypeSemanticChecker::Field:		memberType = "field "; break;
+	case co::TypeSemanticChecker::FieldGetter:	memberType = "field getter "; break;
+	case co::TypeSemanticChecker::FieldSetter:	memberType = "field setter "; break;
 	case co::TypeSemanticChecker::Method:		memberType = "method "; break;
 	default:
 		assert( false );
@@ -105,19 +105,19 @@ void TypeSemanticChecker::insertMemberDeclaration( const MemberDeclaration& memb
 	_memberDeclarations.insert( memberDeclaration );
 }
 
-void TypeSemanticChecker::insertAttributeDeclaration( co::IField* attribute, co::IType* declaringType )
+void TypeSemanticChecker::insertFieldDeclaration( co::IField* field, co::IType* declaringType )
 {
-	insertMemberDeclaration( MemberDeclaration( Attribute,  attribute->getName(), declaringType ) );
+	insertMemberDeclaration( MemberDeclaration( Field,  field->getName(), declaringType ) );
 
 	std::string name;
-	co::LexicalUtils::formatAccessor( attribute->getName(), co::LexicalUtils::Getter, name );
-	insertMemberDeclaration( MemberDeclaration( GetterMethod, name, declaringType ) );
+	co::LexicalUtils::formatAccessor( field->getName(), co::LexicalUtils::Getter, name );
+	insertMemberDeclaration( MemberDeclaration( FieldGetter, name, declaringType ) );
 
-	if( attribute->getIsReadOnly() )
+	if( field->getIsReadOnly() )
 		return;
 
-	co::LexicalUtils::formatAccessor( attribute->getName(), co::LexicalUtils::Setter, name );
-	insertMemberDeclaration( MemberDeclaration( SetterMethod, name, declaringType ) );
+	co::LexicalUtils::formatAccessor( field->getName(), co::LexicalUtils::Setter, name );
+	insertMemberDeclaration( MemberDeclaration( FieldSetter, name, declaringType ) );
 }
 
 void TypeSemanticChecker::checkMemberDeclarations( co::IType* type )
@@ -128,16 +128,16 @@ void TypeSemanticChecker::checkMemberDeclarations( co::IType* type )
 
 	_visitedTypes.insert( type );
 
-	ClassTypeImpl* container = dynamic_cast<ClassTypeImpl*>( type );
-	if( container )
+	IClassType* classType = dynamic_cast<IClassType*>( type );
+	if( classType )
 	{
-		co::Range<co::IMethod* const> methods = container->getMethods();
+		co::Range<co::IMethod* const> methods = classType->getMethods();
 		for( ; methods; methods.popFirst() )
 			insertMemberDeclaration( MemberDeclaration( Method, methods.getFirst()->getName(), type ) );
 
-		co::Range<co::IField* const> attributes = container->getFields();
-		for( ; attributes; attributes.popFirst() )
-			insertAttributeDeclaration( attributes.getFirst(), type );
+		co::Range<co::IField* const> fields = classType->getFields();
+		for( ; fields; fields.popFirst() )
+			insertFieldDeclaration( fields.getFirst(), type );
 	}
 
 	co::IInterface* interface = dynamic_cast<co::IInterface*>( type );

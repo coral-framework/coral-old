@@ -15,8 +15,8 @@ namespace lua {
 class Universe_lua_IState : public lua::IState
 {
 public:
-	virtual co::IInterface* getInterfaceType();
-	virtual const std::string& getInterfaceName();
+	virtual co::IInterface* getInterface();
+	virtual co::IPort* getFacet();
 };
 
 /*!
@@ -30,14 +30,14 @@ public:
 	virtual ~Universe_Base();
 
 	// co::IService Methods:
-	co::IObject* getInterfaceOwner();
-	void componentRetain();
-	void componentRelease();
+	co::IObject* getProvider();
+	void serviceRetain();
+	void serviceRelease();
 
 	// co::IObject Methods:
-	co::IComponent* getComponentType();
-	co::IService* getInterface( co::IPort* );
-	void setReceptacle( co::IPort*, co::IService* );
+	co::IComponent* getComponent();
+	co::IService* getService( co::IPort* );
+	void setService( co::IPort*, co::IService* );
 };
 
 } // namespace lua

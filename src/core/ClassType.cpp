@@ -83,11 +83,11 @@ IMember* ClassTypeImpl::getMember( const std::string& name )
 {
 	size_t pos;
 
-	// first, look for an attribute
+	// first, look for a field
 	if( _firstMethodPos > 0 && _members.sortedFind( name, memberComparator, 0, _firstMethodPos - 1, pos ) )
 		return _members[pos].get();
 
-	// if it's not an attribute, look for a method
+	// if it's not a field, look for a method
 	size_t membersSize = _members.size();
 	if( _firstMethodPos < membersSize && _members.sortedFind( name, memberComparator, _firstMethodPos, membersSize - 1, pos ) )
 		return _members[pos].get();

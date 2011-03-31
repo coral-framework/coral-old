@@ -235,11 +235,11 @@ bool co::OS::searchFile3( co::Range<const std::string> listA,
 	std::string filePath;
 	filePath.reserve( 256 );
 
-	for( co::Range<const std::string> itA( listA ); itA; itA.popFirst() )
+	for( co::Range<const std::string> itC( listC ); itC; itC.popFirst() )
 	{
 		for( co::Range<const std::string> itB( listB ); itB; itB.popFirst() )
 		{
-			for( co::Range<const std::string> itC( listC ); itC; itC.popFirst() )
+			for( co::Range<const std::string> itA( listA ); itA; itA.popFirst() )
 			{
 				filePath.assign( itA.getFirst() );
 				if( *filePath.rbegin() != CORAL_OS_DIR_SEP )

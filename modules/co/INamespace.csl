@@ -1,16 +1,22 @@
 /*
-	Namespaces are nodes in the type hierarchy. They contain types and child namespaces.
-	A namespace will generally correspond to a directory in the Coral path, although this is not enforced.
+	Namespaces contain types and child namespaces and are the inner nodes of the
+	type repository tree. A namespace will generally correspond to a directory
+	(or several, see below) in the Coral path, although this is not enforced.
+
+	Whenever the Coral path specifies multiple root directories, a namespace may
+	span several directories&mdash;with the same relative path, but different roots.
+
+	The root (aka \e global) namespace is in the \ref ISystem::types "system's type manager".
  */
 interface INamespace
 {
-	// The namespace's local name (or "", if this is the global namespace).
+	// The namespace's local name (or "", if this is the root namespace).
 	readonly string name;
 
-	// The namespace's fully qualified name (or "", if this is the global namespace).
+	// The namespace's fully qualified name (or "", if this is the root namespace).
 	readonly string fullName;
 
-	// The namespace's parent namespace (or null, if this is the global namespace).
+	// The namespace's parent namespace (or null, if this is the root namespace).
 	readonly INamespace parentNamespace;
 
 	// List of child namespaces.
@@ -19,12 +25,12 @@ interface INamespace
 	// List of types defined in this namespace.
 	readonly IType[] types;
 
-	// The namespace's IModule, if one was loaded (otherwise, null).
+	// The namespace's module, if one was loaded (otherwise, null).
 	readonly IModule module;
 
 	/*
 		Retrieves a type by name (case sensitive).
-		Returns null if there is no type in this namespace with the given name.
+		Returns null if there is no type in this namespace with the given \a name.
 	 */
 	IType getType( in string name );
 
@@ -35,17 +41,21 @@ interface INamespace
 	INamespace getChildNamespace( in string name );
 
 	/*
-		Creates a ITypeBuilder to instantiate a type in this namespace.
-		\throw IllegalNameException if the passed \a name is not a valid identifier or clashes with an existing type or child namespace.
-		\throw IllegalArgumentException if the passed \a typeKind is not a user-definable type kind
-					(TK_ARRAY, TK_ENUM, TK_EXCEPTION, TK_STRUCT, TK_NATIVECLASS, TK_INTERFACE or TK_COMPONENT).
+		Creates an ITypeBuilder to define a type in this namespace.
+
+		\throw IllegalNameException if \a name is not a valid identifier.
+		\throw IllegalNameException if \a name clashes with an existing type or child namespace.
+		\throw IllegalArgumentException if \a typeKind does not indicate a user-definable type.
+		\throw IllegalArgumentException if \a transaction is invalid (e.g. null).
 	 */
 	ITypeBuilder defineType( in string name, in TypeKind typeKind, in ITypeTransaction transaction )
 		raises IllegalNameException, IllegalArgumentException;
 
 	/*
-		Creates a child namespace with the specified name.
-		\throw IllegalNameException if the passed \a name is not a valid identifier or clashes with an existing type or child namespace.
+		Creates a child namespace with the specified \a name.
+
+		\throw IllegalNameException if \a name is not a valid identifier.
+		\throw IllegalNameException if \a name clashes with an existing type or child namespace.
 	 */
 	INamespace defineChildNamespace( in string name ) raises IllegalNameException;
 };

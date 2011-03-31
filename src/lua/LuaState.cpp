@@ -108,7 +108,7 @@ void LuaState::dumpStack( lua_State* L )
 bool LuaState::findScript( lua_State*, const std::string& name, std::string& filename )
 {
 	static const std::string s_extension( "lua" );
-	
+
 	// look for "?.lua" first, then "?/__init.lua"
 	std::string filePaths[2];
 	filePaths[0] = name;
@@ -307,15 +307,15 @@ inline void LuaState::pushInstance( lua_State* L, InstanceType* ptr )
 
 void LuaState::push( lua_State* L, co::IService* itf )
 {
-	if( itf && itf->getInterfaceType()->getFullName() == "co.IObject" )
+	if( itf && itf->getInterface()->getFullName() == "co.IObject" )
 		push( L, static_cast<co::IObject*>( itf ) );
 	else
 		pushInstance<InterfaceBinding, co::IService>( L, itf );
 }
 
-void LuaState::push( lua_State* L, co::IObject* component )
+void LuaState::push( lua_State* L, co::IObject* object )
 {
-	pushInstance<ComponentBinding, co::IObject>( L, component );
+	pushInstance<ComponentBinding, co::IObject>( L, object );
 }
 
 void LuaState::getAny( lua_State* L, int index, co::IType* expectedType, co::Any& any )
@@ -345,7 +345,7 @@ void LuaState::getAny( lua_State* L, int index, co::IType* expectedType, co::Any
 	case LUA_TNIL:
 		if( expectedKind == co::TK_INTERFACE )
 		{
-			var->setInterface( NULL, static_cast<co::IInterface*>( expectedType ) );
+			var->setService( NULL, static_cast<co::IInterface*>( expectedType ) );
 			break;
 		}
 		else if( expectedKind == co::TK_ANY )
@@ -539,8 +539,8 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 
 			lua_settop( L, stackTop );
 
-			if( !itf || !itf->getInterfaceType()->isSubTypeOf( var.getInterfaceType() ) )
-				CORAL_THROW( lua::Exception, var.getInterfaceType()->getFullName() << " expected, got "
+			if( !itf || !itf->getInterface()->isSubTypeOf( var.getInterface() ) )
+				CORAL_THROW( lua::Exception, var.getInterface()->getFullName() << " expected, got "
 								<< ( ct ? ct->getFullName().c_str() : lua_typename( L, tp ) ) );
 
 			*reinterpret_cast<co::IService**>( var.getState().data.ptr ) = itf;
@@ -595,7 +595,7 @@ co::int32 LuaState::callFunction( const std::string& moduleName, const std::stri
 			getValue( L, top + i + 1, results[i] );
 
 		lua_settop( L, top );
-		
+
 		return numResults;
 	}
 	catch( lua::Exception& e )
@@ -732,9 +732,9 @@ void LuaState::toArray( lua_State* L, int index, co::IType* elementType, co::Any
 				getValue( L, -1, elementVar );
 				co::IService* newItf = elementVar.get<co::IService*&>();
 				if( newItf )
-					newItf->componentRetain();
+					newItf->serviceRetain();
 				if( oldItf )
-					oldItf->componentRelease();
+					oldItf->serviceRelease();
 			}
 			else
 			{
@@ -806,7 +806,7 @@ void LuaState::raiseException( lua_State* L, int errorCode )
 	size_t size;
 	const char* msg = lua_tolstring( L, -1, &size );
 	lua_pop( L, 1 );
-	
+
 	/*
 		Exception messages in the form "{some.IException}some message" are raised
 		as instances of some.IException, using Coral's reflection API.

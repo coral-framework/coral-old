@@ -47,8 +47,8 @@ function M.closeNamespaces( writer, ns )
 	closeBlocks( writer, "namespace", ns )
 end
 
-function M.formatAccessor( prefix, attribName )
-	return prefix .. attribName:sub( 1, 1 ):upper() .. attribName:sub( 2 )
+function M.formatAccessor( prefix, fieldName, suffix )
+	return prefix .. fieldName:sub( 1, 1 ):upper() .. fieldName:sub( 2 ) .. ( suffix or "" )
 end
 
 function M.formatInput( t )

@@ -39,9 +39,9 @@ public:
 
 	co::IObject* newInstance()
 	{
-		co::IObject* component = __MethodBuilder_newInstance();
-		assert( component->getComponentType()->getFullName() == "co.MethodBuilder" );
-		return component;
+		co::IObject* instance = __MethodBuilder_newInstance();
+		assert( instance->getComponent()->getFullName() == "co.MethodBuilder" );
+		return instance;
 	}
 };
 

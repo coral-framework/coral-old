@@ -17,15 +17,16 @@ namespace co {
 
 // ------ ReflectorBase provides an interface named 'reflector', of type co::IReflector ------ //
 
-IInterface* ReflectorBase_co_Reflector::getInterfaceType()
+IInterface* ReflectorBase_co_Reflector::getInterface()
 {
 	return co::typeOf<IReflector>::get();
 }
 
-const std::string& ReflectorBase_co_Reflector::getInterfaceName()
+IPort* ReflectorBase_co_Reflector::getFacet()
 {
-	static const std::string s_interfaceName( "reflector" );
-	return s_interfaceName;
+	IPort* facet = static_cast<IPort*>( typeOf<IReflector>::get()->getMember( "reflector" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ ReflectorBase ------ //
@@ -40,27 +41,27 @@ ReflectorBase::~ReflectorBase()
 	// empty
 }
 
-IObject* ReflectorBase::getInterfaceOwner()
+IObject* ReflectorBase::getProvider()
 {
 	return this;
 }
 
-void ReflectorBase::componentRetain()
+void ReflectorBase::serviceRetain()
 {
 	incrementRefCount();
 }
 
-void ReflectorBase::componentRelease()
+void ReflectorBase::serviceRelease()
 {
 	decrementRefCount();
 }
 
-IComponent* ReflectorBase::getComponentType()
+IComponent* ReflectorBase::getComponent()
 {
 	return getOrCreateInternalComponent( "co.ReflectorBase", "co.IReflector", "reflector" );
 }
 
-IService* ReflectorBase::getInterface( IPort* port )
+IService* ReflectorBase::getService( IPort* port )
 {
 	checkValidPort( port );
 
@@ -75,7 +76,7 @@ IService* ReflectorBase::getInterface( IPort* port )
 	return res;
 }
 
-void ReflectorBase::setReceptacle( IPort* receptacle, IService* )
+void ReflectorBase::setService( IPort* receptacle, IService* )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();
@@ -102,23 +103,23 @@ IObject* ReflectorBase::newInstance()
 	return NULL;
 }
 
-IService* ReflectorBase::newProxy( IDynamicServiceProvider* )
+IService* ReflectorBase::newDynamicProxy( IDynamicServiceProvider* )
 {
 	raiseNotSupportedException();
 	return NULL;
 }
 
-void ReflectorBase::getAttribute( const Any&, IField*, Any& )
+void ReflectorBase::getField( const Any&, IField*, Any& )
 {
 	raiseNotSupportedException();
 }
 
-void ReflectorBase::setAttribute( const Any&, IField*, const Any& )
+void ReflectorBase::setField( const Any&, IField*, const Any& )
 {
 	raiseNotSupportedException();
 }
 
-void ReflectorBase::invokeMethod( const Any&, IMethod*, Range<Any const>, Any& )
+void ReflectorBase::invoke( const Any&, IMethod*, Range<Any const>, Any& )
 {
 	raiseNotSupportedException();
 }
@@ -150,11 +151,10 @@ void ReflectorBase::checkNumArguments( co::IMethod* mi, size_t numArgs )
 					<< ", but only " << numArgs << ( numArgs > 1 ? " were" : " was" ) << " passed" );
 }
 
-void ReflectorBase::raiseAttributeIsReadOnly( co::IField* ai )
+void ReflectorBase::raiseFieldIsReadOnly( co::IField* ai )
 {
 	assert( ai && ai->getIsReadOnly() );
-	CORAL_THROW( co::IllegalArgumentException, "attribute '" << ai->getName()
-					<< "' is read-only and cannot be changed" );
+	CORAL_THROW( co::IllegalArgumentException, "field '" << ai->getName() << "' is read-only and cannot be changed" );
 }
 
 void ReflectorBase::raiseArgumentTypeException( co::IMethod* mi, int argIndex, const co::IllegalCastException& e )

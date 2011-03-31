@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _CO_INTERFACE_H_
-#define _CO_INTERFACE_H_
+#ifndef _CO_ISERVICE_H_
+#define _CO_ISERVICE_H_
 
 #include <co/TypeTraits.h>
 
@@ -12,27 +12,28 @@ namespace co {
 
 USING_CORAL_INTEGER_TYPES;
 
-// Forward declarations:
+// Forward Decls:
+class IPort;
 class IObject;
 class IInterface;
 
 /*!
-	The co::IService interface, implicitly inherited by all Coral interfaces.
+	The co.IService interface, implicitly inherited by all interfaces.
  */
 class IService
 {
 public:
 	virtual ~IService() {;}
 
-	virtual IInterface* getInterfaceType() = 0;
+	virtual IInterface* getInterface() = 0;
 
-	virtual IObject* getInterfaceOwner() = 0;
+	virtual IObject* getProvider() = 0;
 
-	virtual const std::string& getInterfaceName() = 0;
+	virtual IPort* getFacet() = 0;
 
-	virtual void componentRetain() = 0;
+	virtual void serviceRetain() = 0;
 
-	virtual void componentRelease() = 0;
+	virtual void serviceRelease() = 0;
 };
 
 template<> struct kindOf<IService> : public kindOfBase<TK_INTERFACE> {};
@@ -40,11 +41,11 @@ template<> struct nameOf<IService> { static const char* get() { return "co.IServ
 template<> struct typeOf<IService> : public typeOfBase<IService, IInterface> {};
 
 #define CORAL_DISAMBIGUATE_CO_INTERFACE( Super ) \
-	co::IInterface* getInterfaceType() = 0; \
-	co::IObject* getInterfaceOwner() = 0; \
-	const std::string& getInterfaceName() = 0; \
-	void componentRetain() = 0; \
-	void componentRelease() = 0;
+	co::IInterface* getInterface() = 0; \
+	co::IObject* getProvider() = 0; \
+	co::IPort* getFacet() = 0; \
+	void serviceRetain() = 0; \
+	void serviceRelease() = 0;
 
 } // namespace co
 

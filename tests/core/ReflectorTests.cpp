@@ -58,10 +58,10 @@ TEST( ReflectorTests, basicTypes )
 		EXPECT_THROW( reflector->createValue( NULL, 0 ), co::NotSupportedException );
 		EXPECT_THROW( reflector->destroyValue( NULL ), co::NotSupportedException );
 		EXPECT_THROW( reflector->newInstance(), co::NotSupportedException );
-		EXPECT_THROW( reflector->newProxy( NULL ), co::NotSupportedException );
-		EXPECT_THROW( reflector->getAttribute( any, NULL, any ), co::NotSupportedException );
-		EXPECT_THROW( reflector->setAttribute( any, NULL, any ), co::NotSupportedException );
-		EXPECT_THROW( reflector->invokeMethod( any, NULL, anyRange, any ), co::NotSupportedException );
+		EXPECT_THROW( reflector->newDynamicProxy( NULL ), co::NotSupportedException );
+		EXPECT_THROW( reflector->getField( any, NULL, any ), co::NotSupportedException );
+		EXPECT_THROW( reflector->setField( any, NULL, any ), co::NotSupportedException );
+		EXPECT_THROW( reflector->invoke( any, NULL, anyRange, any ), co::NotSupportedException );
 	}
 }
 
@@ -69,15 +69,15 @@ TEST( ReflectorTests, reflectorComponent )
 {
 	co::IType* type = co::getType( "co.INamespace" );
 	co::IReflector* reflector = type->getReflector();
-	co::IObject* reflectorComponent = reflector->getInterfaceOwner();
+	co::IObject* reflectorObject = reflector->getProvider();
 
 	// test the reflector component's IComponent
-	co::IComponent* componentType = reflectorComponent->getComponentType();
-	EXPECT_EQ( 1, componentType->getPorts().getSize() );
-	EXPECT_EQ( "reflector", componentType->getPorts().getFirst()->getName() );
+	co::IComponent* component = reflectorObject->getComponent();
+	EXPECT_EQ( 1, component->getPorts().getSize() );
+	EXPECT_EQ( "reflector", component->getPorts().getFirst()->getName() );
 
 	// tests the reflector component's interface
-	EXPECT_EQ( reflector, reflectorComponent->getInterface( componentType->getPorts().getFirst() ) );
+	EXPECT_EQ( reflector, reflectorObject->getService( component->getPorts().getFirst() ) );
 }
 
 TEST( ReflectorTests, exceptions )
@@ -115,12 +115,12 @@ T* getMember( co::IType* type, const char* memberName )
 	return mi;
 }
 
-co::IField* getAttributeInfo( co::IType* type, const char* memberName )
+co::IField* getField( co::IType* type, const char* memberName )
 {
 	return getMember<co::IField>( type, memberName );
 }
 
-co::IMethod* getMethodInfo( co::IType* type, const char* memberName )
+co::IMethod* getMethod( co::IType* type, const char* memberName )
 {
 	return getMember<co::IMethod>( type, memberName );
 }
@@ -152,24 +152,24 @@ TEST( ReflectorTests, structSimple )
 	EXPECT_EQ( 0, s2->message.length() );
 	EXPECT_EQ( 0, s2->filename.length() );
 
-	// --- obtain the necessary attribute infos:
-	co::IField* lineAttrib = getAttributeInfo( type, "line" );
-	ASSERT_TRUE( lineAttrib != NULL );
+	// --- obtain the necessary fields:
+	co::IField* lineField = getField( type, "line" );
+	ASSERT_TRUE( lineField != NULL );
 
-	co::IField* messageAttrib = getAttributeInfo( type, "message" );
-	ASSERT_TRUE( messageAttrib != NULL );
+	co::IField* messageField = getField( type, "message" );
+	ASSERT_TRUE( messageField != NULL );
 
-	co::IField* filenameAttrib = getAttributeInfo( type, "filename" );
-	ASSERT_TRUE( filenameAttrib != NULL );
+	co::IField* filenameField = getField( type, "filename" );
+	ASSERT_TRUE( filenameField != NULL );
 
-	// --- attribute setting:
-	reflector->setAttribute( s1, lineAttrib, 7 );
+	// --- field setting:
+	reflector->setField( s1, lineField, 7 );
 	EXPECT_EQ( 7, s1->line );
 
 	try
 	{
-		// try to set a string attribute with an int value (there's no coercion)
-		reflector->setAttribute( s1, messageAttrib, 3 );
+		// try to set a string field with an int value (there's no coercion)
+		reflector->setField( s1, messageField, 3 );
 		EXPECT_FALSE( true );
 	}
 	catch( co::IllegalCastException& e )
@@ -181,23 +181,23 @@ TEST( ReflectorTests, structSimple )
 	std::string str( "my message" );
 	a1.set<const std::string&>( str );
 
-	reflector->setAttribute( s1, messageAttrib, a1 );
+	reflector->setField( s1, messageField, a1 );
 	EXPECT_EQ( "my message", s1->message );
 
 	str = "my filename";
-	reflector->setAttribute( s1, filenameAttrib, a1 );
+	reflector->setField( s1, filenameField, a1 );
 	EXPECT_EQ( "my filename", s1->filename );
 
-	// --- attribute getting:
+	// --- field getting:
 	co::Any res;
 
-	reflector->getAttribute( s1, lineAttrib, a1 );
-	reflector->getAttribute( s2, lineAttrib, res );
+	reflector->getField( s1, lineField, a1 );
+	reflector->getField( s2, lineField, res );
 	EXPECT_EQ( 7, a1.get<co::int32>() );
 	EXPECT_EQ( 0, res.get<co::int32>() );
 
-	reflector->getAttribute( s1, messageAttrib, a1 );
-	reflector->getAttribute( s2, messageAttrib, res );
+	reflector->getField( s1, messageField, a1 );
+	reflector->getField( s2, messageField, res );
 	EXPECT_EQ( "my message", a1.get<const std::string&>() );
 	EXPECT_EQ( "", res.get<const std::string&>() );
 
@@ -218,10 +218,10 @@ TEST( ReflectorTests, structExceptions )
 	EXPECT_THROW( reflector->createValue( s1, 1337 ), co::IllegalArgumentException );
 
 	co::Any a1;
-	co::IField* lineAttrib = getAttributeInfo( type, "line" );
+	co::IField* lineField = getField( type, "line" );
 
-	EXPECT_THROW( reflector->getAttribute( type, lineAttrib, a1 ), co::IllegalArgumentException );
-	EXPECT_THROW( reflector->getAttribute( s1, NULL, a1 ), co::IllegalArgumentException );
+	EXPECT_THROW( reflector->getField( type, lineField, a1 ), co::IllegalArgumentException );
+	EXPECT_THROW( reflector->getField( s1, NULL, a1 ), co::IllegalArgumentException );
 }
 
 TEST( ReflectorTests, interfaceNamespace )
@@ -236,35 +236,35 @@ TEST( ReflectorTests, interfaceNamespace )
 
 	// --- obtain the necessary member infos:
 
-	// readonly attribute string name;
-	co::IField* nameAttrib = getAttributeInfo( type, "name" );
-	ASSERT_TRUE( nameAttrib != NULL );
+	// readonly string name;
+	co::IField* nameField = getField( type, "name" );
+	ASSERT_TRUE( nameField != NULL );
 
-	// readonly attribute IType[] types;
-	co::IField* typesAttrib = getAttributeInfo( type, "types" );
-	ASSERT_TRUE( typesAttrib != NULL );
+	// readonly IType[] types;
+	co::IField* typesField = getField( type, "types" );
+	ASSERT_TRUE( typesField != NULL );
 
 	// IType getType( in string name );
-	co::IMethod* getTypeMethod = getMethodInfo( type, "getType" );
+	co::IMethod* getTypeMethod = getMethod( type, "getType" );
 	ASSERT_TRUE( getTypeMethod != NULL );
 
 	// ITypeBuilder defineType( in string name, in TypeKind typeKind, in ITypeTransaction transaction )
-	co::IMethod* defineTypeMethod = getMethodInfo( type, "defineType" );
+	co::IMethod* defineTypeMethod = getMethod( type, "defineType" );
 	ASSERT_TRUE( defineTypeMethod != NULL );
 
 	// --- obtain a 'co.INamespace' instance:
 	co::INamespace* coNS = co::getSystem()->getTypes()->findNamespace( "co" );
 
-	// --- attribute getting:
+	// --- field getting:
 	co::Any a1;
 
-	reflector->getAttribute( coNS, nameAttrib, a1 );
+	reflector->getField( coNS, nameField, a1 );
 	EXPECT_EQ( "co", a1.get<const std::string&>() );
 
-	// cannot 'set' a read-only attribute
-	EXPECT_THROW( reflector->setAttribute( coNS, nameAttrib, a1 ), co::IllegalArgumentException );
+	// cannot 'set' a read-only field
+	EXPECT_THROW( reflector->setField( coNS, nameField, a1 ), co::IllegalArgumentException );
 
-	reflector->getAttribute( coNS, typesAttrib, a1 );
+	reflector->getField( coNS, typesField, a1 );
 	EXPECT_TRUE( a1.get< co::Range<co::IType* const> >().getSize() > 10 );
 	EXPECT_EQ( "co.ArrayType", a1.get< co::Range<co::IType* const> >().getFirst()->getFullName() );
 
@@ -274,18 +274,18 @@ TEST( ReflectorTests, interfaceNamespace )
 	std::string str( "INamespace" );
 	a1.set<std::string&>( str );
 
-	reflector->invokeMethod( coNS, getTypeMethod, co::Range<co::Any const>( &a1, 1 ), res );
+	reflector->invoke( coNS, getTypeMethod, co::Range<co::Any const>( &a1, 1 ), res );
 	EXPECT_EQ( type, res.get<co::IType*>() );
 
 	// calling getType() with no argument should generate an exception
-	EXPECT_THROW( reflector->invokeMethod( coNS, getTypeMethod, co::Range<co::Any const>(), res ),
+	EXPECT_THROW( reflector->invoke( coNS, getTypeMethod, co::Range<co::Any const>(), res ),
 					co::MissingInputException );
 
 	try
 	{
 		// try to call getType() passing a bool instead of a string
 		a1.set<bool>( false );
-		reflector->invokeMethod( coNS, getTypeMethod, co::Range<co::Any const>( &a1, 1 ), res );
+		reflector->invoke( coNS, getTypeMethod, co::Range<co::Any const>( &a1, 1 ), res );
 		EXPECT_FALSE( true );
 	}
 	catch( co::IllegalCastException& e )
@@ -301,13 +301,13 @@ TEST( ReflectorTests, interfaceNamespace )
 	args[1].set( co::TK_STRUCT );
 
 	// passing only 2 args, when the method requires 3
-	EXPECT_THROW( reflector->invokeMethod( coNS, defineTypeMethod, co::Range<co::Any const>( args, 2 ), res ),
+	EXPECT_THROW( reflector->invoke( coNS, defineTypeMethod, co::Range<co::Any const>( args, 2 ), res ),
 				 co::MissingInputException );
 
 	// passing 3 args, but the third one is a null co::Any
 	try
 	{
-		reflector->invokeMethod( coNS, defineTypeMethod, co::Range<co::Any const>( args, 3 ), res );
+		reflector->invoke( coNS, defineTypeMethod, co::Range<co::Any const>( args, 3 ), res );
 	}
 	catch( co::IllegalCastException& e )
 	{
@@ -319,7 +319,7 @@ TEST( ReflectorTests, interfaceNamespace )
 	args[2].set( tct.get() );
 	args[3].set( "dummy arg" );
 
-	reflector->invokeMethod( coNS, defineTypeMethod, co::Range<co::Any const>( args, 4 ), res );
+	reflector->invoke( coNS, defineTypeMethod, co::Range<co::Any const>( args, 4 ), res );
 
 	// alright, we should be able to retrieve a ITypeBuilder from res
 	co::RefPtr<co::ITypeBuilder> builder = res.get<co::ITypeBuilder*>();
@@ -350,55 +350,55 @@ TEST( ReflectorTests, nativeClass )
 	EXPECT_EQ( u1, *u2 );
 
 	// --- obtain the necessary member infos:
-	co::IField* isNullAttrib = getAttributeInfo( type, "isNull" );
-	ASSERT_TRUE( isNullAttrib != NULL );
+	co::IField* isNullField = getField( type, "isNull" );
+	ASSERT_TRUE( isNullField != NULL );
 
-	co::IMethod* createRandomMethod = getMethodInfo( type, "createRandom" );
+	co::IMethod* createRandomMethod = getMethod( type, "createRandom" );
 	ASSERT_TRUE( createRandomMethod != NULL );
 
-	co::IMethod* clearMethod = getMethodInfo( type, "clear" );
+	co::IMethod* clearMethod = getMethod( type, "clear" );
 	ASSERT_TRUE( clearMethod != NULL );
 
-	co::IMethod* getStringMethod = getMethodInfo( type, "getString" );
+	co::IMethod* getStringMethod = getMethod( type, "getString" );
 	ASSERT_TRUE( getStringMethod != NULL );
 
-	co::IMethod* setStringMethod = getMethodInfo( type, "setString" );
+	co::IMethod* setStringMethod = getMethod( type, "setString" );
 	ASSERT_TRUE( setStringMethod != NULL );
 
 	// --- both freshly constructed Uuids should be null; check this using 'isNull' and 'getString'
 	co::Any a1, res;
 
-	reflector->getAttribute( &u1, isNullAttrib, a1 );
+	reflector->getField( &u1, isNullField, a1 );
 	EXPECT_TRUE( a1.get<bool>() );
 
 	std::string str;
 	a1.set<std::string&>( str );
-	reflector->invokeMethod( u2, getStringMethod, co::Range<co::Any const>( &a1, 1 ), res );
+	reflector->invoke( u2, getStringMethod, co::Range<co::Any const>( &a1, 1 ), res );
 	EXPECT_EQ( "00000000-0000-0000-0000000000000000", str );
 
 	// --- randomize u1, then copy its value to u2 via get/setString
-	reflector->invokeMethod( &u1, createRandomMethod, co::Range<co::Any const>(), res );
-	reflector->getAttribute( &u1, isNullAttrib, a1 );
+	reflector->invoke( &u1, createRandomMethod, co::Range<co::Any const>(), res );
+	reflector->getField( &u1, isNullField, a1 );
 	EXPECT_FALSE( a1.get<bool>() );
 
 	EXPECT_NE( u1, *u2 );
 
 	a1.set<std::string&>( str );
-	reflector->invokeMethod( &u1, getStringMethod, co::Range<co::Any const>( &a1, 1 ), res );
-	reflector->invokeMethod( u2, setStringMethod, co::Range<co::Any const>( &a1, 1 ), res );
+	reflector->invoke( &u1, getStringMethod, co::Range<co::Any const>( &a1, 1 ), res );
+	reflector->invoke( u2, setStringMethod, co::Range<co::Any const>( &a1, 1 ), res );
 
 	EXPECT_EQ( u1, *u2 );
 
 	// --- clear u1 and it should be null again
-	reflector->invokeMethod( &u1, clearMethod, co::Range<co::Any const>(), res );
-	reflector->getAttribute( &u1, isNullAttrib, a1 );
+	reflector->invoke( &u1, clearMethod, co::Range<co::Any const>(), res );
+	reflector->getField( &u1, isNullField, a1 );
 	EXPECT_TRUE( a1.get<bool>() );
 	EXPECT_NE( u1, *u2 );
 
 	// --- set u2 with an invalid string and it should become null as well
 	str = "{invalid}";
 	a1.set<std::string&>( str );
-	reflector->invokeMethod( u2, setStringMethod, co::Range<co::Any const>( &a1, 1 ), res );
+	reflector->invoke( u2, setStringMethod, co::Range<co::Any const>( &a1, 1 ), res );
 	EXPECT_EQ( u1, *u2 );
 
 	// --- in-place destruction:

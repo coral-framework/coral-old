@@ -43,7 +43,7 @@ public:
 
 	virtual void defineNativeClass( const std::string& nativeHeader, const std::string& nativeName ) = 0;
 
-	virtual void definePort( const std::string& name, co::IInterface* interfaceType, bool isFacet ) = 0;
+	virtual void definePort( const std::string& name, co::IInterface* type, bool isFacet ) = 0;
 
 	virtual void defineSuperType( co::IType* superType ) = 0;
 };

@@ -147,14 +147,14 @@ IService* ServiceManager::getServiceForInstance( IInterface* serviceType, IServi
 	CHECK_NOT_NULL( clientInstance );
 
 	// give preference to the clientInstance's built-in service, when available
-	IObject* object = clientInstance->getInterfaceOwner();
-	IComponent* component = object->getComponentType();
+	IObject* object = clientInstance->getProvider();
+	IComponent* component = object->getComponent();
 	IPort* facet = findServiceFacet( component, serviceType );
 	if( facet )
-		return object->getInterface( facet );
+		return object->getService( facet );
 
 	// otherwise, fall back to getCustomService()
-	return getCustomService( fetchServiceRecord( serviceType ), serviceType, clientInstance->getInterfaceType() );
+	return getCustomService( fetchServiceRecord( serviceType ), serviceType, clientInstance->getInterface() );
 }
 
 void ServiceManager::removeService( IInterface* serviceType )
@@ -203,7 +203,7 @@ void ServiceManager::validateService( IInterface* serviceType, IService* service
 {
 	CHECK_NOT_NULL( serviceType );
 	CHECK_NOT_NULL( service );
-	if( !service->getInterfaceType()->isSubTypeOf( serviceType ) )
+	if( !service->getInterface()->isSubTypeOf( serviceType ) )
 		raiseIncompatibleService( serviceType, service );
 }
 
@@ -242,7 +242,7 @@ void ServiceManager::createService( IInterface* serviceType, LazyService& lazy, 
 		IObject* component = reflector->newInstance();
 		IPort* serviceFacet = findServiceFacet( ct, serviceType );
 		assert( serviceFacet );
-		lazy.setService( component->getInterface( serviceFacet ) );
+		lazy.setService( component->getService( serviceFacet ) );
 	}
 	catch( std::exception& e )
 	{

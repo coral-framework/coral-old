@@ -37,7 +37,7 @@ public:
 
 	virtual co::IService* getService( co::IInterface* serviceType ) = 0;
 
-	virtual co::IService* getServiceForInstance( co::IInterface* serviceType, co::IService* clientInstance ) = 0;
+	virtual co::IService* getServiceForInstance( co::IInterface* serviceType, co::IService* client ) = 0;
 
 	virtual co::IService* getServiceForType( co::IInterface* serviceType, co::IInterface* clientType ) = 0;
 

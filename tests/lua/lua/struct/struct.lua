@@ -6,15 +6,15 @@ function M:initialize( module )
 	-- create a co.CSLError struct instance
 	local cslError = co.new( "co.CSLError" )
 
-	-- test getting some attributes
+	-- test getting some fields
 	ASSERT_EQ( cslError.message, "" )
 	ASSERT_EQ( cslError.filename, "" )
 	ASSERT_EQ( cslError.line, 0 )
 
-	-- test getting a non-existing attribute
+	-- test getting a non-existing field
 	ASSERT_EQ( cslError.dummy, nil )
 
-	-- test setting some attributes
+	-- test setting some fields
 	cslError.message = "My Message"
 	ASSERT_EQ( cslError.message, "My Message" )
 	cslError.filename = "My Filename"
@@ -22,17 +22,17 @@ function M:initialize( module )
 	cslError.line = 1337
 	ASSERT_EQ( cslError.line, 1337 )
 
-	-- test setting a non-existing attribute
+	-- test setting a non-existing field
 	ASSERT_ERROR( function() cslError.dummy = 2 end, "non-existing member 'dummy'" )
 
 	-- create a moduleA.TestStruct struct instance
 	local testStruct = co.new( "moduleA.TestStruct" )
 
-	-- test getting some attributes
+	-- test getting some fields
 	ASSERT_EQ( testStruct.testEnum, "First" )
 	ASSERT_EQ( testStruct.aType, nil )
 
-	-- test setting some attributes
+	-- test setting some fields
 	testStruct.testEnum = "Third"
 	ASSERT_EQ( testStruct.testEnum, "Third" )
 	testStruct.aType = co.Type.uint16
@@ -42,16 +42,16 @@ function M:initialize( module )
 	ASSERT_ERROR( function() testStruct.testEnum = "Fourth" end,
 		"invalid identifier 'Fourth' for enum moduleA.TestEnum" )
 
-	-- test getting attributes of the innerStruct
+	-- test getting fields of the innerStruct
 	ASSERT_EQ( testStruct.innerStruct.message, "" )
 	ASSERT_EQ( testStruct.innerStruct.filename, "" )
 	ASSERT_EQ( testStruct.innerStruct.line, 0 )
 
-	-- test setting attributes of the innerStruct
+	-- test setting fields of the innerStruct
 	testStruct.innerStruct.message = "Something"
 	ASSERT_EQ( testStruct.innerStruct.message, "" ) -- FIX THIS
 
-	-- test setting the innerStruct attribute itself
+	-- test setting the innerStruct field itself
 	testStruct.innerStruct = cslError
 	ASSERT_EQ( testStruct.innerStruct.message, "My Message" )
 	ASSERT_EQ( testStruct.innerStruct.filename, "My Filename" )

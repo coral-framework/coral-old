@@ -13,15 +13,18 @@ namespace co {
 
 // ------ co.TypeTransaction provides an interface named 'transaction', of type co.ITypeTransaction ------ //
 
-co::IInterface* TypeTransaction_co_ITypeTransaction::getInterfaceType()
+co::IInterface* TypeTransaction_co_ITypeTransaction::getInterface()
 {
 	return co::typeOf<co::ITypeTransaction>::get();
 }
 
-const std::string& TypeTransaction_co_ITypeTransaction::getInterfaceName()
+co::IPort* TypeTransaction_co_ITypeTransaction::getFacet()
 {
-	static const std::string s_interfaceName( "transaction" );
-	return s_interfaceName;
+	co::IComponent* component = static_cast<co::IComponent*>( co::getType( "co.TypeTransaction" ) );
+	assert( component );
+	co::IPort* facet = static_cast<co::IPort*>( component->getMember( "transaction" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ TypeTransaction_Base ------ //
@@ -36,29 +39,29 @@ TypeTransaction_Base::~TypeTransaction_Base()
 	// empty
 }
 
-co::IObject* TypeTransaction_Base::getInterfaceOwner()
+co::IObject* TypeTransaction_Base::getProvider()
 {
 	return this;
 }
 
-void TypeTransaction_Base::componentRetain()
+void TypeTransaction_Base::serviceRetain()
 {
 	incrementRefCount();
 }
 
-void TypeTransaction_Base::componentRelease()
+void TypeTransaction_Base::serviceRelease()
 {
 	decrementRefCount();
 }
 
-co::IComponent* TypeTransaction_Base::getComponentType()
+co::IComponent* TypeTransaction_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.TypeTransaction" );
 	assert( dynamic_cast<co::IComponent*>( type ) );
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* TypeTransaction_Base::getInterface( co::IPort* port )
+co::IService* TypeTransaction_Base::getService( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -70,7 +73,7 @@ co::IService* TypeTransaction_Base::getInterface( co::IPort* port )
 	return res;
 }
 
-void TypeTransaction_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
+void TypeTransaction_Base::setService( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

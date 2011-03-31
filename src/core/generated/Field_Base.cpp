@@ -11,17 +11,20 @@
 
 namespace co {
 
-// ------ co.Field provides an interface named 'attributeInfo', of type co.IField ------ //
+// ------ co.Field provides an interface named 'field', of type co.IField ------ //
 
-co::IInterface* Field_co_IField::getInterfaceType()
+co::IInterface* Field_co_IField::getInterface()
 {
 	return co::typeOf<co::IField>::get();
 }
 
-const std::string& Field_co_IField::getInterfaceName()
+co::IPort* Field_co_IField::getFacet()
 {
-	static const std::string s_interfaceName( "attributeInfo" );
-	return s_interfaceName;
+	co::IComponent* component = static_cast<co::IComponent*>( co::getType( "co.Field" ) );
+	assert( component );
+	co::IPort* facet = static_cast<co::IPort*>( component->getMember( "field" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ Field_Base ------ //
@@ -36,29 +39,29 @@ Field_Base::~Field_Base()
 	// empty
 }
 
-co::IObject* Field_Base::getInterfaceOwner()
+co::IObject* Field_Base::getProvider()
 {
 	return this;
 }
 
-void Field_Base::componentRetain()
+void Field_Base::serviceRetain()
 {
 	incrementRefCount();
 }
 
-void Field_Base::componentRelease()
+void Field_Base::serviceRelease()
 {
 	decrementRefCount();
 }
 
-co::IComponent* Field_Base::getComponentType()
+co::IComponent* Field_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.Field" );
 	assert( dynamic_cast<co::IComponent*>( type ) );
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* Field_Base::getInterface( co::IPort* port )
+co::IService* Field_Base::getService( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -70,7 +73,7 @@ co::IService* Field_Base::getInterface( co::IPort* port )
 	return res;
 }
 
-void Field_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
+void Field_Base::setService( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

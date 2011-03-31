@@ -34,11 +34,11 @@ TEST( TypeLoaderTests, validImport )
 
 	ASSERT_TRUE( designer != NULL );
 
-	co::IField* attribute = dynamic_cast<co::IField*>( designer->getMember( "mainOffice" ) );
+	co::IField* field = dynamic_cast<co::IField*>( designer->getMember( "mainOffice" ) );
 
-	ASSERT_TRUE( attribute != NULL );
+	ASSERT_TRUE( field != NULL );
 
-	EXPECT_EQ( "TypeLoaderTests.ImportClauseTests.Office", attribute->getType()->getFullName() );
+	EXPECT_EQ( "TypeLoaderTests.ImportClauseTests.Office", field->getType()->getFullName() );
 }
 
 TEST( TypeLoaderTests, sameNamespaceImport )
@@ -211,7 +211,7 @@ TEST( TypeLoaderTests, importAfterTypeSpecification )
 TEST( TypeLoaderTests, singleCppBlock )
 {
 	CSL_TEST( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" );
-	
+
 	co::IInterface* it = dynamic_cast<co::IInterface*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" ) );
 	ASSERT_TRUE( it != NULL );
 

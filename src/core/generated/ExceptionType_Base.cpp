@@ -13,15 +13,18 @@ namespace co {
 
 // ------ co.ExceptionType provides an interface named 'type', of type co.IException ------ //
 
-co::IInterface* ExceptionType_co_IException::getInterfaceType()
+co::IInterface* ExceptionType_co_IException::getInterface()
 {
 	return co::typeOf<co::IException>::get();
 }
 
-const std::string& ExceptionType_co_IException::getInterfaceName()
+co::IPort* ExceptionType_co_IException::getFacet()
 {
-	static const std::string s_interfaceName( "type" );
-	return s_interfaceName;
+	co::IComponent* component = static_cast<co::IComponent*>( co::getType( "co.ExceptionType" ) );
+	assert( component );
+	co::IPort* facet = static_cast<co::IPort*>( component->getMember( "type" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ ExceptionType_Base ------ //
@@ -36,29 +39,29 @@ ExceptionType_Base::~ExceptionType_Base()
 	// empty
 }
 
-co::IObject* ExceptionType_Base::getInterfaceOwner()
+co::IObject* ExceptionType_Base::getProvider()
 {
 	return this;
 }
 
-void ExceptionType_Base::componentRetain()
+void ExceptionType_Base::serviceRetain()
 {
 	incrementRefCount();
 }
 
-void ExceptionType_Base::componentRelease()
+void ExceptionType_Base::serviceRelease()
 {
 	decrementRefCount();
 }
 
-co::IComponent* ExceptionType_Base::getComponentType()
+co::IComponent* ExceptionType_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.ExceptionType" );
 	assert( dynamic_cast<co::IComponent*>( type ) );
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* ExceptionType_Base::getInterface( co::IPort* port )
+co::IService* ExceptionType_Base::getService( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -70,7 +73,7 @@ co::IService* ExceptionType_Base::getInterface( co::IPort* port )
 	return res;
 }
 
-void ExceptionType_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
+void ExceptionType_Base::setService( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

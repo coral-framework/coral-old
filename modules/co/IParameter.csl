@@ -9,7 +9,7 @@ interface IParameter
 	// The parameter's type.
 	readonly IType type;
 
-	// Whether the paremeter is used for input.
+	// Whether the parameter is used for input.
 	readonly bool isIn;
 
 	// Whether the parameter is used for output.

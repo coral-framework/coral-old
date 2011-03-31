@@ -1,9 +1,9 @@
 /*
-	Works in conjunction with a ITypeBuilder to define methods for new types.
+	Works in conjunction with an ITypeBuilder to define methods for new types.
  */
 interface IMethodBuilder
 {
-	// The ITypeBuilder to which this IMethodBuilder belongs to.
+	// The ITypeBuilder to which this method builder belongs to.
 	readonly ITypeBuilder typeBuilder;
 
 	// The future name of the method when it's created.
@@ -11,34 +11,38 @@ interface IMethodBuilder
 
 	/*
 		Defines the return type of the method.
-		\throw NotSupportedException if the method's return type was already defined or if the parent type was already created.
+
 		\throw IllegalArgumentException if the passed \a type is invalid (e.g. null).
+		\throw NotSupportedException if the method's return type was already defined.
+		\throw NotSupportedException if the class type was already created.
 	 */
 	void defineReturnType( in IType type )
-		raises NotSupportedException, IllegalArgumentException;
+		raises IllegalArgumentException, NotSupportedException;
 
 	/*
-		Adds a parameter to the method.
-		\throw NotSupportedException if the parent type was already created.
-		\throw IllegalNameException if the passed \a name is not a valid identifier or clashes with other parameters.
-		\throw IllegalArgumentException if the passed \a type is invalid (e.g. null) or if both input and output are false.
+		Adds a method parameter.
+
+		\throw IllegalNameException if \a name is not a valid identifier or clashes with other parameters.
+		\throw IllegalArgumentException if \a type is invalid (e.g. null) or both input and output are false.
+		\throw NotSupportedException if the class type was already created.
 	 */
 	void defineParameter( in string name, in IType type, in bool input, in bool output )
-		raises IllegalNameException, IllegalArgumentException;
+		raises IllegalNameException, IllegalArgumentException, NotSupportedException;
 
 	/*
-		Adds an exception type that can be raised by the method.
-		\throw NotSupportedException if the parent type was already created.
+		Adds an exception that can be raised by the method.
+
 		\throw IllegalArgumentException if the passed \a exceptionType is invalid (e.g. null).
+		\throw NotSupportedException if the class type was already created.
 	 */
 	void defineException( in IException exceptionType )
-		raises IllegalArgumentException;
+		raises IllegalArgumentException, NotSupportedException;
 
 	/*
-		Uses the data provided thus far to add a method to the ITypeBuilder that owns this IMethodBuilder.
-		\throw NotSupportedException if the parent type was already created.
-		\throw MemberClashException if another member with a clashing name was added to the type since this builder's creation.
-		\throw MissingInputException if the reference to the ITypeBuilder that owns this IMethodBuilder is null.
+		Finishes adding a method to the ITypeBuilder that owns this IMethodBuilder.
+
+		\throw IllegalNameException if a member with a clashing name was meanwhile added to the type.
+		\throw NotSupportedException if the class type was already created.
 	 */
-	void createMethod() raises IllegalNameException, MissingInputException;
+	void createMethod() raises IllegalNameException, NotSupportedException;
 };

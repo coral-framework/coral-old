@@ -80,68 +80,71 @@ void LuaComponent::setComponentInstance( LuaComponent* prototype, int instanceTa
 			should check all interface reflectors before instantiating the component.
 		 */
 		assert( _numFacets == i );
-		facets[i]->getType()->getReflector()->newProxy( this );
+		facets[i]->getType()->getReflector()->newDynamicProxy( this );
 		assert( _numFacets == i + 1 );
 	}
 }
 
-co::IComponent* LuaComponent::getComponentType()
+co::IComponent* LuaComponent::getComponent()
 {
-	return _componentType ? _componentType : lua::Component_Base::getComponentType();
+	return _componentType ? _componentType : lua::Component_Base::getComponent();
 }
 
-co::IService* LuaComponent::getInterface( co::IPort* itfInfo )
+co::IService* LuaComponent::getService( co::IPort* port )
 {
-	co::ICompositeType* owner = itfInfo->getOwner();
+	co::ICompositeType* owner = port->getOwner();
 	if( owner == _componentType )
-		return getDynamicInterface( itfInfo );
-	return lua::Component_Base::getInterface( itfInfo );
+		return getDynamicReceptacle( port );
+	return lua::Component_Base::getService( port );
 }
 
-void LuaComponent::setReceptacle( co::IPort* receptacle, co::IService* instance )
+void LuaComponent::setService( co::IPort* receptacle, co::IService* instance )
 {
 	co::ICompositeType* owner = receptacle->getOwner();
 	if( owner == _componentType )
-		bindToDynamicReceptacle( receptacle, instance );
+		setDynamicReceptacle( receptacle, instance );
 	else
-		lua::Component_Base::setReceptacle( receptacle, instance );
+		lua::Component_Base::setService( receptacle, instance );
 }
 
-co::int32 LuaComponent::registerProxyInterface( co::IService* proxy )
+co::int32 LuaComponent::dynamicRegisterService( co::IService* proxy )
 {
 	_facets[_numFacets] = proxy;
 	return _numFacets++;
 }
 
-const std::string& LuaComponent::getInterfaceName( co::int32 cookie )
+co::IPort* LuaComponent::getFacet( co::int32 cookie )
 {
-	return _componentType->getFacets()[cookie]->getName();
+	return _componentType->getFacets()[cookie];
 }
 
-const std::string& LuaComponent::getProxyInterfaceName( co::int32 cookie )
+co::IPort* LuaComponent::dynamicGetFacet( co::int32 cookie )
 {
-	return getInterfaceName( cookie );
+	return getFacet( cookie );
 }
 
 void LuaComponent::pushInterfaceInstanceTable( lua_State* L, co::int32 cookie )
 {
 	lua_rawgeti( L, LUA_REGISTRYINDEX, _tableRef );
-	lua_pushstring( L, getInterfaceName( cookie ).c_str() );
+	lua_pushstring( L, getFacet( cookie )->getName().c_str() );
 	lua_rawget( L, -2 );
 	lua_remove( L, -2 );
 }
 
-void LuaComponent::pushAccessorName( lua_State* L, const char* prefix, const std::string& attribName )
+void LuaComponent::pushAccessorName( lua_State* L, const char* prefix, const std::string& fieldName, const char* suffix )
 {
 	char buffer[256];
 	char* p = buffer;
 	while( *prefix )
 		*p++ = *prefix++;
-	assert( !attribName.empty() && attribName.length() < sizeof(buffer) - ( p - buffer ) );
-	const char* str = attribName.c_str();
+	assert( !fieldName.empty() && fieldName.length() < sizeof(buffer) - ( p - buffer ) );
+	const char* str = fieldName.c_str();
 	*p++ = toupper( *str++ );
 	while( *str )
 		*p++ = *str++;
+	if( suffix )
+		while( *suffix )
+			*p++ = *suffix++;
 	lua_pushlstring( L, buffer, p - buffer );
 }
 
@@ -154,12 +157,12 @@ void LuaComponent::getMethod( lua_State* L, int t, co::int32 cookie )
 		std::stringstream ss;
 		ss << "missing method '" << methodName << "' in LuaComponent '" << _componentType->getFullName() << "'";
 		if( cookie != -1 )
-			ss << ", interface '" << getInterfaceName( cookie ) << "'";
+			ss << ", interface '" << getFacet( cookie )->getName() << "'";
 		throw lua::Exception( ss.str() );
 	}
 }
 
-const co::Any& LuaComponent::handleGetAttribute( co::int32 cookie, co::IField* ai )
+const co::Any& LuaComponent::dynamicGetField( co::int32 cookie, co::IField* ai )
 {
 	__BEGIN_LUA_API_CODE__
 
@@ -175,7 +178,7 @@ const co::Any& LuaComponent::handleGetAttribute( co::int32 cookie, co::IField* a
 	return _res;
 }
 
-void LuaComponent::handleSetAttribute( co::int32 cookie, co::IField* ai, const co::Any& value )
+void LuaComponent::dynamicSetField( co::int32 cookie, co::IField* ai, const co::Any& value )
 {
 	__BEGIN_LUA_API_CODE__
 
@@ -189,7 +192,7 @@ void LuaComponent::handleSetAttribute( co::int32 cookie, co::IField* ai, const c
 	__END_LUA_API_CODE__
 }
 
-const co::Any& LuaComponent::handleMethodInvocation( co::int32 cookie, co::IMethod* mi, co::Range<co::Any const> args )
+const co::Any& LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<co::Any const> args )
 {
 	__BEGIN_LUA_API_CODE__
 
@@ -309,23 +312,23 @@ co::IObject* LuaComponent::newInstance()
 	return any.get<co::IObject*>();
 }
 
-co::IService* LuaComponent::newProxy( co::IDynamicServiceProvider* )
+co::IService* LuaComponent::newDynamicProxy( co::IDynamicServiceProvider* )
 {
 	raiseNotSupportedException();
 	return NULL;
 }
 
-void LuaComponent::getAttribute( const co::Any&, co::IField*, co::Any& )
+void LuaComponent::getField( const co::Any&, co::IField*, co::Any& )
 {
 	raiseNotSupportedException();
 }
 
-void LuaComponent::setAttribute( const co::Any&, co::IField*, const co::Any& )
+void LuaComponent::setField( const co::Any&, co::IField*, const co::Any& )
 {
 	raiseNotSupportedException();
 }
 
-void LuaComponent::invokeMethod( const co::Any&, co::IMethod*, co::Range<co::Any const>, co::Any& )
+void LuaComponent::invoke( const co::Any&, co::IMethod*, co::Range<co::Any const>, co::Any& )
 {
 	raiseNotSupportedException();
 }
@@ -335,17 +338,17 @@ void LuaComponent::raise( const std::string& )
 	raiseNotSupportedException();
 }
 
-co::IService* LuaComponent::getDynamicInterface( co::IPort* itfInfo )
+co::IService* LuaComponent::getDynamicReceptacle( co::IPort* port )
 {
-	if( itfInfo->getIsFacet() )
-		return _facets[itfInfo->getIndex()];
+	if( port->getIsFacet() )
+		return _facets[port->getIndex()];
 
 	// call the Lua component to get a client interface
 	co::IService* res;
 	__BEGIN_LUA_API_CODE__
 
 	lua_rawgeti( L, LUA_REGISTRYINDEX, _tableRef );
-	pushAccessorName( L, "getReceptacle", itfInfo->getName() );
+	pushAccessorName( L, "get", port->getName(), "Service" );
 	getMethod( L, -2 );
 	lua_pushvalue( L, -2 ); // push the 'self' argument
 	LuaState::call( L, 1, 1 );
@@ -357,22 +360,22 @@ co::IService* LuaComponent::getDynamicInterface( co::IPort* itfInfo )
 	__END_LUA_API_CODE__
 
 	// check interface compatibility
-	if( res && !res->getInterfaceType()->isSubTypeOf( itfInfo->getType() ) )
-		raiseIncompatibleService( itfInfo->getType(), res );
+	if( res && !res->getInterface()->isSubTypeOf( port->getType() ) )
+		raiseIncompatibleService( port->getType(), res );
 
 	return res;
 }
 
-void LuaComponent::bindToDynamicReceptacle( co::IPort* receptacle, co::IService* instance )
+void LuaComponent::setDynamicReceptacle( co::IPort* receptacle, co::IService* instance )
 {
 	// check interface compatibility
-	if( instance && !instance->getInterfaceType()->isSubTypeOf( receptacle->getType() ) )
+	if( instance && !instance->getInterface()->isSubTypeOf( receptacle->getType() ) )
 		raiseIncompatibleService( receptacle->getType(), instance );
 
 	__BEGIN_LUA_API_CODE__
 
 	lua_rawgeti( L, LUA_REGISTRYINDEX, _tableRef );
-	pushAccessorName( L, "setReceptacle", receptacle->getName() );
+	pushAccessorName( L, "set", receptacle->getName(), "Service" );
 	getMethod( L, -2 );
 	lua_pushvalue( L, -2 ); // push the 'self' argument
 	LuaState::push( L, instance );

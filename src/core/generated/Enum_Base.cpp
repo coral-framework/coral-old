@@ -13,15 +13,18 @@ namespace co {
 
 // ------ co.Enum provides an interface named 'type', of type co.IEnum ------ //
 
-co::IInterface* Enum_co_IEnum::getInterfaceType()
+co::IInterface* Enum_co_IEnum::getInterface()
 {
 	return co::typeOf<co::IEnum>::get();
 }
 
-const std::string& Enum_co_IEnum::getInterfaceName()
+co::IPort* Enum_co_IEnum::getFacet()
 {
-	static const std::string s_interfaceName( "type" );
-	return s_interfaceName;
+	co::IComponent* component = static_cast<co::IComponent*>( co::getType( "co.Enum" ) );
+	assert( component );
+	co::IPort* facet = static_cast<co::IPort*>( component->getMember( "type" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ Enum_Base ------ //
@@ -36,29 +39,29 @@ Enum_Base::~Enum_Base()
 	// empty
 }
 
-co::IObject* Enum_Base::getInterfaceOwner()
+co::IObject* Enum_Base::getProvider()
 {
 	return this;
 }
 
-void Enum_Base::componentRetain()
+void Enum_Base::serviceRetain()
 {
 	incrementRefCount();
 }
 
-void Enum_Base::componentRelease()
+void Enum_Base::serviceRelease()
 {
 	decrementRefCount();
 }
 
-co::IComponent* Enum_Base::getComponentType()
+co::IComponent* Enum_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.Enum" );
 	assert( dynamic_cast<co::IComponent*>( type ) );
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* Enum_Base::getInterface( co::IPort* port )
+co::IService* Enum_Base::getService( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -70,7 +73,7 @@ co::IService* Enum_Base::getInterface( co::IPort* port )
 	return res;
 }
 
-void Enum_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
+void Enum_Base::setService( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

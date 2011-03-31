@@ -35,18 +35,18 @@ end
 
 function BatComponent:fightCrime()
 	-- test passing our own interfaces to another component
-	local component = self.target1.interfaceOwner
+	local component = self.target1.provider
 	component.bat = self.vampireBat
 	component.target1 = self.batman
 end
 
-function BatComponent:getReceptacleBat() return self.bat end
-function BatComponent:setReceptacleBat( bat ) self.bat = bat end
-function BatComponent:getReceptacleTarget1() return self.target1 end
-function BatComponent:setReceptacleTarget1( human ) self.target1 = human end
+function BatComponent:getBatService() return self.bat end
+function BatComponent:setBatService( bat ) self.bat = bat end
+function BatComponent:getTarget1Service() return self.target1 end
+function BatComponent:setTarget1Service( human ) self.target1 = human end
 
 local function testBatInstance( batInstance )
-	ASSERT_EQ( batInstance.componentType.fullName, "lua.bat.Component" )
+	ASSERT_EQ( batInstance.component.fullName, "lua.bat.Component" )
 	ASSERT_EQ( batInstance.vampireBat.bloodsucker, true )
 	ASSERT_EQ( batInstance.fruitBat.bloodsucker, false )
 	ASSERT_EQ( batInstance.batman.bloodsucker, nil )
@@ -94,7 +94,7 @@ function M:initialize( module )
 	bc.target1 = bc.batman
 	ASSERT_EQ( bc.batman, bc.target1 )
 	ASSERT_ERROR( function() bc.target1 = bc.fruitBat end, "moduleA.IHuman expected, got moduleA.IBat" )
-	ASSERT_ERROR( function() return bc.target2 end, "missing method 'getReceptacleTarget2'" )
+	ASSERT_ERROR( function() return bc.target2 end, "missing method 'getTarget2Service'" )
 
 	-- test passing interfaces from within the component
 	local bc2 = BatComponent()

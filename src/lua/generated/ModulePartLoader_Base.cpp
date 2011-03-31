@@ -16,15 +16,18 @@ void moduleRelease();
 
 // ------ lua.ModulePartLoader provides an interface named 'loader', of type co.IModulePartLoader ------ //
 
-co::IInterface* ModulePartLoader_co_IModulePartLoader::getInterfaceType()
+co::IInterface* ModulePartLoader_co_IModulePartLoader::getInterface()
 {
 	return co::typeOf<co::IModulePartLoader>::get();
 }
 
-const std::string& ModulePartLoader_co_IModulePartLoader::getInterfaceName()
+co::IPort* ModulePartLoader_co_IModulePartLoader::getFacet()
 {
-	static const std::string s_interfaceName( "loader" );
-	return s_interfaceName;
+	co::IComponent* component = static_cast<co::IComponent*>( co::getType( "lua.ModulePartLoader" ) );
+	assert( component );
+	co::IPort* facet = static_cast<co::IPort*>( component->getMember( "loader" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ ModulePartLoader_Base ------ //
@@ -39,29 +42,29 @@ ModulePartLoader_Base::~ModulePartLoader_Base()
 	moduleRelease();
 }
 
-co::IObject* ModulePartLoader_Base::getInterfaceOwner()
+co::IObject* ModulePartLoader_Base::getProvider()
 {
 	return this;
 }
 
-void ModulePartLoader_Base::componentRetain()
+void ModulePartLoader_Base::serviceRetain()
 {
 	incrementRefCount();
 }
 
-void ModulePartLoader_Base::componentRelease()
+void ModulePartLoader_Base::serviceRelease()
 {
 	decrementRefCount();
 }
 
-co::IComponent* ModulePartLoader_Base::getComponentType()
+co::IComponent* ModulePartLoader_Base::getComponent()
 {
 	co::IType* type = co::getType( "lua.ModulePartLoader" );
 	assert( dynamic_cast<co::IComponent*>( type ) );
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* ModulePartLoader_Base::getInterface( co::IPort* port )
+co::IService* ModulePartLoader_Base::getService( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -73,7 +76,7 @@ co::IService* ModulePartLoader_Base::getInterface( co::IPort* port )
 	return res;
 }
 
-void ModulePartLoader_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
+void ModulePartLoader_Base::setService( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

@@ -52,11 +52,11 @@ TEST( TypeBuilderTests, cyclicDependencies )
 
 	EXPECT_TRUE( typeA != NULL );
 
-	EXPECT_NO_THROW( structBBuilder->defineField( "attributeOfTypeA", typeA, false ) );
+	EXPECT_NO_THROW( structBBuilder->defineField( "fieldOfTypeA", typeA, false ) );
 
 	// createType the B type
 	co::IType* typeB = structBBuilder->createType();
-	EXPECT_NO_THROW( structABuilder->defineField( "attributeOfTypeB", typeB, false ) );
+	EXPECT_NO_THROW( structABuilder->defineField( "fieldOfTypeB", typeB, false ) );
 
 	// create type A
 	co::IType* createdTypeA = structABuilder->createType();
@@ -104,12 +104,12 @@ TEST( TypeBuilderTests, componentInvalidDefinitions )
 	co::RefPtr<co::ITypeBuilder> auxbuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_componentInterface", tct.get() );
 	auxbuilder->defineField( "test", anyType, true );
 
-	co::IInterface* testInterfaceType = dynamic_cast<co::IInterface*>( auxbuilder->createType() );
+	co::IInterface* testInterface = dynamic_cast<co::IInterface*>( auxbuilder->createType() );
 
 	// invalid component class definition
 	EXPECT_THROW( cbuilder->defineIdentifier( "identifier" ), co::NotSupportedException );
 	EXPECT_THROW( cbuilder->defineField( "fieldName", anyType, false ), co::NotSupportedException );
-	EXPECT_THROW( cbuilder->defineSuperType( testInterfaceType ), co::NotSupportedException );
+	EXPECT_THROW( cbuilder->defineSuperType( testInterface ), co::NotSupportedException );
 	EXPECT_THROW( cbuilder->definePort( "testIntMember", NULL, false ), co::IllegalArgumentException );
 	EXPECT_THROW( cbuilder->defineMethod( "testMethod" ), co::NotSupportedException );
 	EXPECT_THROW( cbuilder->defineNativeClass( "testHeader", "testName" ), co::NotSupportedException );
@@ -135,17 +135,17 @@ TEST( TypeBuilderTests, componentDefinition )
 
 	EXPECT_NO_THROW( tct->commit() );
 
-	co::IComponent* componentType = dynamic_cast<co::IComponent*>( componentBuilder->createType() );
-	ASSERT_TRUE( componentType != NULL );
+	co::IComponent* component = dynamic_cast<co::IComponent*>( componentBuilder->createType() );
+	ASSERT_TRUE( component != NULL );
 
-	ASSERT_TRUE( componentType->getPorts().getSize() == 2 );
+	ASSERT_TRUE( component->getPorts().getSize() == 2 );
 
-	co::IMember* memberInfo = componentType->getMember( "Receptacle" );
+	co::IMember* memberInfo = component->getMember( "Receptacle" );
 	ASSERT_TRUE( memberInfo != NULL );
 	co::IPort* receptacle = dynamic_cast<co::IPort*>( memberInfo );
 	ASSERT_TRUE( receptacle != NULL );
 
-	memberInfo = componentType->getMember( "Facet" );
+	memberInfo = component->getMember( "Facet" );
 	ASSERT_TRUE( memberInfo != NULL );
 	co::IPort* facet = dynamic_cast<co::IPort*>( memberInfo );
 	ASSERT_TRUE( facet != NULL );
@@ -190,17 +190,17 @@ TEST( TypeBuilderTests, componentGetInterfaces )
 
 	EXPECT_NO_THROW( tct->commit() );
 
-	co::IComponent* componentType = dynamic_cast<co::IComponent*>( componentBuilder->createType() );
-	ASSERT_TRUE( componentType != NULL );
+	co::IComponent* component = dynamic_cast<co::IComponent*>( componentBuilder->createType() );
+	ASSERT_TRUE( component != NULL );
 
-	ASSERT_TRUE( componentType->getPorts().getSize() == 6 );
+	ASSERT_TRUE( component->getPorts().getSize() == 6 );
 
-	co::Range<co::IPort* const> facets = componentType->getFacets();
+	co::Range<co::IPort* const> facets = component->getFacets();
 	ASSERT_TRUE( facets.getSize() == 3 );
 	for( ; facets; facets.popFirst() )
 		ASSERT_TRUE( facets.getFirst()->getIsFacet() );
 
-	co::Range<co::IPort* const> receptacles = componentType->getReceptacles();
+	co::Range<co::IPort* const> receptacles = component->getReceptacles();
 	ASSERT_TRUE( receptacles.getSize() == 3 );
 	for( ; receptacles; receptacles.popFirst() )
 		ASSERT_FALSE( receptacles.getFirst()->getIsFacet() );
@@ -220,11 +220,11 @@ TEST( TypeBuilderTests, enumInvalidDefinition )
 	co::RefPtr<co::ITypeBuilder> auxbuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_enumSuperInterface", tct.get() );
 	auxbuilder->defineField( "test", anyType, true );
 
-	co::IInterface* testInterfaceType = dynamic_cast<co::IInterface*>( auxbuilder->createType() );
+	co::IInterface* testInterface = dynamic_cast<co::IInterface*>( auxbuilder->createType() );
 
 	EXPECT_THROW( ebuilder->defineIdentifier( "3identifier" ), co::IllegalNameException );
 	EXPECT_THROW( ebuilder->defineField( "fieldName", anyType, false ), co::NotSupportedException );
-	EXPECT_THROW( ebuilder->defineSuperType( testInterfaceType ), co::NotSupportedException );
+	EXPECT_THROW( ebuilder->defineSuperType( testInterface ), co::NotSupportedException );
 
 	EXPECT_NO_THROW( tct->rollback() );
 }
@@ -360,13 +360,13 @@ TEST( TypeBuilderTests, interfaceInvalidDefinition )
 	co::RefPtr<co::ITypeBuilder> auxbuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_superInterface", tct.get() );
 	auxbuilder->defineField( "test", anyType, true );
 
-	co::IInterface* testInterfaceType = dynamic_cast<co::IInterface*>( auxbuilder->createType() );
+	co::IInterface* testInterface = dynamic_cast<co::IInterface*>( auxbuilder->createType() );
 
 	// invalid interface definitions
 	EXPECT_THROW( ibuilder->defineIdentifier( "identifier" ), co::NotSupportedException );
-	EXPECT_THROW( ibuilder->defineField( "2attributeName", anyType, false ), co::IllegalNameException );
+	EXPECT_THROW( ibuilder->defineField( "2fieldName", anyType, false ), co::IllegalNameException );
 	EXPECT_THROW( ibuilder->defineSuperType( NULL ), co::IllegalArgumentException );
-	EXPECT_THROW( ibuilder->definePort( "testIntMember", testInterfaceType, false ), co::NotSupportedException );
+	EXPECT_THROW( ibuilder->definePort( "testIntMember", testInterface, false ), co::NotSupportedException );
 	EXPECT_THROW( ibuilder->defineMethod( "$testMethod" ), co::IllegalNameException );
 	EXPECT_THROW( ibuilder->defineMethod( "" ), co::IllegalNameException );
 	EXPECT_THROW( ibuilder->defineNativeClass( "testHeader", "testName" ), co::NotSupportedException );
@@ -400,32 +400,36 @@ TEST( TypeBuilderTests, interfaceDefinition )
 	co::IInterface* superInterface = dynamic_cast<co::IInterface*>( TestHelper::type( "builderTest.ASuperInterfaceType" ) );
 	EXPECT_TRUE( superInterface != NULL );
 
+	// try inheriting from an incompatible type
+	EXPECT_THROW( builder->defineSuperType( stringType ), co::IllegalArgumentException );
+
 	// add the super-type to the interface type
 	builder->defineSuperType( superInterface );
 
-	EXPECT_THROW( builder->defineSuperType( stringType ), co::IllegalArgumentException );
+	// try multiple inheritance
+	EXPECT_THROW( builder->defineSuperType( builder->getInterface() ), co::NotSupportedException );
 
 	EXPECT_NO_THROW( superBuilder->createType() );
 
-	co::IInterface* interfaceType = dynamic_cast<co::IInterface*>( builder->createType() );
-	EXPECT_TRUE( interfaceType != NULL );
+	co::IInterface* interface = dynamic_cast<co::IInterface*>( builder->createType() );
+	EXPECT_TRUE( interface != NULL );
 
-	ASSERT_TRUE( interfaceType->getMember( "name" ) != NULL );
-	ASSERT_TRUE( interfaceType->getMember( "parentMethod" ) != NULL );
-	ASSERT_TRUE( interfaceType->getMember( "childMethod" ) != NULL );
-	ASSERT_TRUE( interfaceType->getMember( "testName" ) != NULL );
-	ASSERT_TRUE( interfaceType->getMember( "testSecondName" ) != NULL );
+	ASSERT_TRUE( interface->getMember( "name" ) != NULL );
+	ASSERT_TRUE( interface->getMember( "parentMethod" ) != NULL );
+	ASSERT_TRUE( interface->getMember( "childMethod" ) != NULL );
+	ASSERT_TRUE( interface->getMember( "testName" ) != NULL );
+	ASSERT_TRUE( interface->getMember( "testSecondName" ) != NULL );
 
-	ASSERT_EQ( 1, interfaceType->getMethods().getSize() );
-	ASSERT_EQ( 2, interfaceType->getFields().getSize() );
+	ASSERT_EQ( 1, interface->getMethods().getSize() );
+	ASSERT_EQ( 2, interface->getFields().getSize() );
 
-	ASSERT_TRUE( interfaceType->getSuperInterfaces().getSize() == 1 );
-	ASSERT_TRUE( interfaceType->getSuperInterfaces().getFirst() == superInterface );
-	ASSERT_TRUE( interfaceType->getSubInterfaces().getSize() == 0 );
+	ASSERT_TRUE( interface->getSuperInterfaces().getSize() == 1 );
+	ASSERT_TRUE( interface->getSuperInterfaces().getFirst() == superInterface );
+	ASSERT_TRUE( interface->getSubInterfaces().getSize() == 0 );
 
 	ASSERT_TRUE( superInterface->getSuperInterfaces().getSize() == 1 );
 	ASSERT_TRUE( superInterface->getSubInterfaces().getSize() == 1 );
-	ASSERT_TRUE( superInterface->getSubInterfaces().getFirst() == interfaceType );
+	ASSERT_TRUE( superInterface->getSubInterfaces().getFirst() == interface );
 
 	EXPECT_NO_THROW( tct->commit() );
 }
@@ -436,11 +440,11 @@ TEST( TypeBuilderTests, interfaceGetMethods )
 	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_INTERFACE, "interfaceGetMethodsTest.Foo", tct.get() );
 
 	builder->defineField( "test", TestHelper::type( "string" ), true );
-	co::IInterface* interfaceType = dynamic_cast<co::IInterface*>( builder->createType() );
+	co::IInterface* interface = dynamic_cast<co::IInterface*>( builder->createType() );
 
-	ASSERT_NO_THROW( interfaceType->getMethods() );
+	ASSERT_NO_THROW( interface->getMethods() );
 
-	ASSERT_EQ( 0, interfaceType->getMethods().getSize() );
+	ASSERT_EQ( 0, interface->getMethods().getSize() );
 
 	EXPECT_NO_THROW( tct->commit() );
 }
@@ -461,13 +465,13 @@ TEST( TypeBuilderTests, nativeClassInvalidDefinitions )
 	co::RefPtr<co::ITypeBuilder> auxbuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_anInterface", tct.get() );
 	auxbuilder->defineField( "test", anyType, true );
 
-	co::IInterface* testInterfaceType = dynamic_cast<co::IInterface*>( auxbuilder->createType() );
+	co::IInterface* testInterface = dynamic_cast<co::IInterface*>( auxbuilder->createType() );
 
 	// invalid native class definition
 	EXPECT_THROW( nbuilder->defineIdentifier( "identifier" ), co::NotSupportedException );
-	EXPECT_THROW( nbuilder->defineField( "0_attributeName", anyType, false ), co::IllegalNameException );
-	EXPECT_THROW( nbuilder->defineSuperType( testInterfaceType ), co::NotSupportedException );
-	EXPECT_THROW( nbuilder->definePort( "testIntMember", testInterfaceType, false ), co::NotSupportedException );
+	EXPECT_THROW( nbuilder->defineField( "0_fieldName", anyType, false ), co::IllegalNameException );
+	EXPECT_THROW( nbuilder->defineSuperType( testInterface ), co::NotSupportedException );
+	EXPECT_THROW( nbuilder->definePort( "testIntMember", testInterface, false ), co::NotSupportedException );
 	EXPECT_THROW( nbuilder->defineMethod( "" ), co::IllegalNameException );
 	EXPECT_THROW( nbuilder->defineNativeClass( "header", "" ), co::IllegalArgumentException );
 
@@ -552,13 +556,13 @@ TEST( TypeBuilderTests, structInvalidDefinition )
 	co::RefPtr<co::ITypeBuilder> auxbuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_anInterface", tct.get() );
 	auxbuilder->defineField( "test", anyType, true );
 
-	co::IInterface* testInterfaceType = dynamic_cast<co::IInterface*>( auxbuilder->createType() );
+	co::IInterface* testInterface = dynamic_cast<co::IInterface*>( auxbuilder->createType() );
 
 	// invalid struct definitions
 	EXPECT_THROW( sbuilder->defineIdentifier( "identifier" ), co::NotSupportedException );
-	EXPECT_THROW( sbuilder->defineField( "1attributeName", anyType, false ), co::IllegalNameException );
-	EXPECT_THROW( sbuilder->defineSuperType( testInterfaceType ), co::NotSupportedException );
-	EXPECT_THROW( sbuilder->definePort( "testIntMember", testInterfaceType, false ), co::NotSupportedException );
+	EXPECT_THROW( sbuilder->defineField( "1fieldName", anyType, false ), co::IllegalNameException );
+	EXPECT_THROW( sbuilder->defineSuperType( testInterface ), co::NotSupportedException );
+	EXPECT_THROW( sbuilder->definePort( "testIntMember", testInterface, false ), co::NotSupportedException );
 	EXPECT_THROW( sbuilder->defineMethod( "testMethod" ), co::NotSupportedException );
 	EXPECT_THROW( sbuilder->defineNativeClass( "testHeader", "testName" ), co::NotSupportedException );
 

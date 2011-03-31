@@ -1,15 +1,15 @@
 /*
 	Manages the system's services database, providing contextualized service lookups.
 
-	A module may publish its services with the IServiceManager in order to make
+	A module may publish services with the IServiceManager in order to make
 	them available for consumption by other modules.
 
-	Services are always identified by interface type. An interface instance may be published as
-	either the global provider of a certain service (e.g. using addService()), or as a specialized
+	Services are always identified by their IInterface type. A service may be published as either
+	the global provider of a certain type of service (e.g. using addService()), or as a specialized
 	service provider for clients of a certain interface type (e.g. using addServiceForType()).
-	Whenever a service is published twice, the latest provided instance replaces the pre-existing instance.
+	Whenever a service is published twice, the latest provided instance replaces the pre-existing one.
 
-	The IServiceManager supports three kinds of lookups:
+	The service manager supports three kinds of lookups:
 		- Lookup by <tt>service type</tt>: getService().
 		- Lookup by <tt>service type + client <b>type</b></tt>: getServiceForType().
 		- Lookup by <tt>service type + client <b>instance</b></tt>: getServiceForInstance().
@@ -99,12 +99,12 @@ interface IServiceManager
 
 		This method first checks if the \a clientInstance's component provides an interface of
 		type \a serviceType. If so, such interface is returned. Otherwise, this method behaves
-		like a call to <tt>getServiceForType( service, clientInstance->getInterfaceType() )</tt>.
+		like a call to <tt>getServiceForType( service, client->getInterface() )</tt>.
 
 		\throw IllegalArgumentException if any of the arguments are null.
 		\throw MissingServiceException if no suitable instance of \a serviceType could be found.
 	 */
-	IService getServiceForInstance( in IInterface serviceType, in IService clientInstance )
+	IService getServiceForInstance( in IInterface serviceType, in IService client )
 			raises IllegalArgumentException, MissingServiceException;
 
 	/*

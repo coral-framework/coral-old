@@ -39,9 +39,9 @@ public:
 
 	co::IObject* newInstance()
 	{
-		co::IObject* component = __Port_newInstance();
-		assert( component->getComponentType()->getFullName() == "co.Port" );
-		return component;
+		co::IObject* instance = __Port_newInstance();
+		assert( instance->getComponent()->getFullName() == "co.Port" );
+		return instance;
 	}
 };
 

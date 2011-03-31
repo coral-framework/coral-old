@@ -13,15 +13,18 @@ namespace co {
 
 // ------ co.ArrayType provides an interface named 'type', of type co.IArray ------ //
 
-co::IInterface* ArrayType_co_IArray::getInterfaceType()
+co::IInterface* ArrayType_co_IArray::getInterface()
 {
 	return co::typeOf<co::IArray>::get();
 }
 
-const std::string& ArrayType_co_IArray::getInterfaceName()
+co::IPort* ArrayType_co_IArray::getFacet()
 {
-	static const std::string s_interfaceName( "type" );
-	return s_interfaceName;
+	co::IComponent* component = static_cast<co::IComponent*>( co::getType( "co.ArrayType" ) );
+	assert( component );
+	co::IPort* facet = static_cast<co::IPort*>( component->getMember( "type" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ ArrayType_Base ------ //
@@ -36,29 +39,29 @@ ArrayType_Base::~ArrayType_Base()
 	// empty
 }
 
-co::IObject* ArrayType_Base::getInterfaceOwner()
+co::IObject* ArrayType_Base::getProvider()
 {
 	return this;
 }
 
-void ArrayType_Base::componentRetain()
+void ArrayType_Base::serviceRetain()
 {
 	incrementRefCount();
 }
 
-void ArrayType_Base::componentRelease()
+void ArrayType_Base::serviceRelease()
 {
 	decrementRefCount();
 }
 
-co::IComponent* ArrayType_Base::getComponentType()
+co::IComponent* ArrayType_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.ArrayType" );
 	assert( dynamic_cast<co::IComponent*>( type ) );
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* ArrayType_Base::getInterface( co::IPort* port )
+co::IService* ArrayType_Base::getService( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -70,7 +73,7 @@ co::IService* ArrayType_Base::getInterface( co::IPort* port )
 	return res;
 }
 
-void ArrayType_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
+void ArrayType_Base::setService( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

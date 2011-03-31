@@ -53,7 +53,7 @@ protected:
 
 private:
 	typedef RefVector<IMember> MembersVector;
-	MembersVector _members;	// mixed container: attributes first, then methods.
+	MembersVector _members;	// mixed container: fields first, then methods.
 	size_t _firstMethodPos;	// dividing point: position of the first method in _members.
 };
 

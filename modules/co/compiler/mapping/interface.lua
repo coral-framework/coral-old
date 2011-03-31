@@ -15,7 +15,7 @@ local function template( writer, c, t )
 		writer( "\t// End Of c++> Block" )
 	end
 
-	-- Attribute Accessors
+	-- Field Accessors
 	for i, a in ipairs( t.fields ) do
 		writer( "\n\n\tvirtual ", t.formatInput( a.type ), " ", t.formatAccessor( "get", a.name ), "() = 0;" )
 		if not a.isReadOnly then

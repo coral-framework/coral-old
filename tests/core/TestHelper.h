@@ -22,11 +22,11 @@ namespace co {
 //! Helper function to instantiate a co::ITypeTransaction.
 inline co::ITypeTransaction* createTypeTransaction()
 {
-	co::IObject* component = co::newInstance( "co.TypeTransaction" );
-	assert( component );
-	co::ITypeTransaction* tct = component->getFacet<co::ITypeTransaction>();
-	assert( tct );
-	return tct;
+	co::IObject* instance = co::newInstance( "co.TypeTransaction" );
+	assert( instance );
+	co::ITypeTransaction* transaction = instance->getService<co::ITypeTransaction>();
+	assert( transaction );
+	return transaction;
 }
 
 class TestHelper

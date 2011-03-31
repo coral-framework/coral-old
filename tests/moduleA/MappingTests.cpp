@@ -103,9 +103,8 @@ TEST( MappingTests, exception )
 
 TEST( MappingTests, interface )
 {
-	co::RefPtr<co::IObject> testComponent = co::newInstance( "moduleA.TestComponent" );
-
-	moduleA::TestInterface* ti = testComponent->getFacet<moduleA::TestInterface>();
+	co::RefPtr<co::IObject> instance = co::newInstance( "moduleA.TestComponent" );
+	moduleA::TestInterface* ti = instance->getService<moduleA::TestInterface>();
 
 	ASSERT_EQ( 1, ti->testCppBlock1() );
 	ASSERT_EQ( 2, ti->testCppBlock2() );
@@ -114,7 +113,7 @@ TEST( MappingTests, interface )
 	ti->setName( "VALUE" );
 	ASSERT_EQ( "VALUE", ti->getName() );
 
-	ASSERT_EQ( NULL, ti->getDummyInterfaceAttribute() );
+	ASSERT_EQ( NULL, ti->getDummyInterfaceField() );
 
 	float size = 1;
 	std::string text = "VALUE";

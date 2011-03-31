@@ -67,7 +67,7 @@ TEST( ServiceManagerTests, lazyGlobalService )
 	// now we should be able to get the service instance
 	co::IService* service = sm->getService( tctType );
 	EXPECT_TRUE( service != NULL );
-	EXPECT_EQ( tctType, service->getInterfaceType() );
+	EXPECT_EQ( tctType, service->getInterface() );
 
 	// remove the service
 	co::ITypeTransaction* tct = dynamic_cast<co::ITypeTransaction*>( service );
@@ -89,12 +89,12 @@ TEST( ServiceManagerTests, customServicesPerType )
 
 	// add a custom instance for IRecordTypes
 	co::IInterface* recordType = co::typeOf<co::IRecordType>::get();
-	co::IObject* component = co::newInstance( "co.Field" );
-	sm->addServiceForType( memberInfoType, recordType, component->getFacet<co::IMember>() );
+	co::IObject* instance = co::newInstance( "co.Field" );
+	sm->addServiceForType( memberInfoType, recordType, instance->getService<co::IMember>() );
 
-	// add a different custom instance for InterfaceTypes
-	co::IInterface* interfaceTypeType = co::typeOf<co::IInterface>::get();
-	sm->addServiceProviderForType( memberInfoType, interfaceTypeType, "co.Port" );
+	// add a different custom instance for IInterfaces
+	co::IInterface* interfaceType = co::typeOf<co::IInterface>::get();
+	sm->addServiceProviderForType( memberInfoType, interfaceType, "co.Port" );
 
 	// getting the service for an IArray should hit an unavailable global instance
 	EXPECT_THROW( sm->getServiceForType( memberInfoType, co::typeOf<co::IArray>::get() ),
@@ -102,15 +102,15 @@ TEST( ServiceManagerTests, customServicesPerType )
 
 	// getting the service for a IStruct should return an IField
 	co::IService* itf = sm->getServiceForType( memberInfoType, co::typeOf<co::IStruct>::get() );
-	EXPECT_EQ( "co.IField", itf->getInterfaceType()->getFullName() );
+	EXPECT_EQ( "co.IField", itf->getInterface()->getFullName() );
 
 	// getting the service for an IInterface should return an IPort
-	itf = sm->getServiceForType( memberInfoType, interfaceTypeType );
-	EXPECT_EQ( "co.IPort", itf->getInterfaceType()->getFullName() );
+	itf = sm->getServiceForType( memberInfoType, interfaceType );
+	EXPECT_EQ( "co.IPort", itf->getInterface()->getFullName() );
 
 	// test the utility functions
-	EXPECT_EQ( itf, co::getServiceForType( memberInfoType, interfaceTypeType ) );
-	EXPECT_EQ( itf, co::getService<co::IMember>( interfaceTypeType ) );
+	EXPECT_EQ( itf, co::getServiceForType( memberInfoType, interfaceType ) );
+	EXPECT_EQ( itf, co::getService<co::IMember>( interfaceType ) );
 
 	// add a global instance for the service
 	sm->addServiceProvider( memberInfoType, "co.Method" );
@@ -118,7 +118,7 @@ TEST( ServiceManagerTests, customServicesPerType )
 	// now, getting the service for an IArray should return a IMethod
 	co::IInterface* arrayTypeType = co::typeOf<co::IArray>::get();
 	itf = sm->getServiceForType( memberInfoType, arrayTypeType );
-	EXPECT_EQ( "co.IMethod", itf->getInterfaceType()->getFullName() );
+	EXPECT_EQ( "co.IMethod", itf->getInterface()->getFullName() );
 
 	// test the utility functions
 	EXPECT_EQ( itf, co::getServiceForType( memberInfoType, arrayTypeType ) );
@@ -126,11 +126,11 @@ TEST( ServiceManagerTests, customServicesPerType )
 
 	// getting the service for a IStruct should still return an IField
 	itf = sm->getServiceForType( memberInfoType, co::typeOf<co::IStruct>::get() );
-	EXPECT_EQ( "co.IField", itf->getInterfaceType()->getFullName() );
+	EXPECT_EQ( "co.IField", itf->getInterface()->getFullName() );
 
 	// getting the service for an IInterface should still return an IPort
-	itf = sm->getServiceForType( memberInfoType, interfaceTypeType );
-	EXPECT_EQ( "co.IPort", itf->getInterfaceType()->getFullName() );
+	itf = sm->getServiceForType( memberInfoType, interfaceType );
+	EXPECT_EQ( "co.IPort", itf->getInterface()->getFullName() );
 }
 
 TEST( ServiceManagerTests, customServicesPerInstance )
@@ -140,31 +140,31 @@ TEST( ServiceManagerTests, customServicesPerInstance )
 	co::IInterface* memberInfoType = co::typeOf<co::IMember>::get();
 
 	// getting a IMember service for a IMethod instance should return the intance's interface
-	co::IMember* aMethod = co::typeOf<co::IService>::get()->getMember( "componentRetain" );
+	co::IMember* aMethod = co::typeOf<co::IService>::get()->getMember( "serviceRetain" );
 	ASSERT_TRUE( aMethod != NULL );
 
 	co::IService* itf = sm->getServiceForInstance( memberInfoType, aMethod );
 	co::IMember* mi = dynamic_cast<co::IMember*>( itf );
 	ASSERT_TRUE( mi != NULL );
-	EXPECT_EQ( "componentRetain", mi->getName() );
+	EXPECT_EQ( "serviceRetain", mi->getName() );
 
 	EXPECT_EQ( itf, co::getServiceForInstance( memberInfoType, aMethod ) );
 	EXPECT_EQ( itf, co::getService<co::IMember>( aMethod ) );
 
 	// getting a IMember service for the system should return the global service instance
 	itf = sm->getServiceForInstance( memberInfoType, co::getSystem() );
-	EXPECT_EQ( "co.IMethod", itf->getInterfaceType()->getFullName() );
+	EXPECT_EQ( "co.IMethod", itf->getInterface()->getFullName() );
 
 	EXPECT_EQ( itf, co::getServiceForInstance( memberInfoType, co::getSystem() ) );
 	EXPECT_EQ( itf, co::getService<co::IMember>( co::getSystem() ) );
 
 	/*
-		Getting a IMember service for an IInterface instance should return
-			the IInterface-specialized service instance.
+		Getting a IMember service for an IInterface instance should
+		return the IInterface-specialized service.
 	 */
 	co::IService* clientInstance = co::disambiguate<co::IService>( co::typeOf<co::IType>::get() );
 	itf = sm->getServiceForInstance( memberInfoType, clientInstance );
-	EXPECT_EQ( "co.IPort", itf->getInterfaceType()->getFullName() );
+	EXPECT_EQ( "co.IPort", itf->getInterface()->getFullName() );
 
 	EXPECT_EQ( itf, co::getServiceForInstance( memberInfoType, clientInstance ) );
 	EXPECT_EQ( itf, co::getService<co::IMember>( clientInstance ) );
@@ -185,7 +185,7 @@ TEST( ServiceManagerTests, serviceRemovals )
 
 	// getting the service for a IStruct should still return an IField
 	co::IService* itf = sm->getServiceForType( memberInfoType, co::typeOf<co::IStruct>::get() );
-	EXPECT_EQ( "co.IField", itf->getInterfaceType()->getFullName() );
+	EXPECT_EQ( "co.IField", itf->getInterface()->getFullName() );
 
 	// remove all custom service instances
 	sm->removeServiceForType( memberInfoType, co::typeOf<co::IRecordType>::get() );

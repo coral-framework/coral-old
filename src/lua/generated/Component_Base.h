@@ -12,20 +12,20 @@
 
 namespace lua {
 
-//! lua.Component has a facet named 'dynamicProxyHandler', of type co.IDynamicServiceProvider.
+//! lua.Component has a facet named 'dynamicServiceProvider', of type co.IDynamicServiceProvider.
 class Component_co_IDynamicServiceProvider : public co::IDynamicServiceProvider
 {
 public:
-	virtual co::IInterface* getInterfaceType();
-	virtual const std::string& getInterfaceName();
+	virtual co::IInterface* getInterface();
+	virtual co::IPort* getFacet();
 };
 
 //! lua.Component has a facet named 'reflector', of type co.IReflector.
 class Component_co_IReflector : public co::IReflector
 {
 public:
-	virtual co::IInterface* getInterfaceType();
-	virtual const std::string& getInterfaceName();
+	virtual co::IInterface* getInterface();
+	virtual co::IPort* getFacet();
 };
 
 /*!
@@ -40,14 +40,14 @@ public:
 	virtual ~Component_Base();
 
 	// co::IService Methods:
-	co::IObject* getInterfaceOwner();
-	void componentRetain();
-	void componentRelease();
+	co::IObject* getProvider();
+	void serviceRetain();
+	void serviceRelease();
 
 	// co::IObject Methods:
-	co::IComponent* getComponentType();
-	co::IService* getInterface( co::IPort* );
-	void setReceptacle( co::IPort*, co::IService* );
+	co::IComponent* getComponent();
+	co::IService* getService( co::IPort* );
+	void setService( co::IPort*, co::IService* );
 };
 
 } // namespace lua

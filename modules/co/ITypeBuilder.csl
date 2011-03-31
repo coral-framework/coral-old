@@ -3,10 +3,10 @@
  */
 interface ITypeBuilder
 {
-	// INamespace where the new type should be placed when it's created.
+	// Namespace where the new type should be placed when it's created.
 	readonly INamespace namespace;
 
-	// TypeKind of the type under construction by this builder.
+	// Kind of type under construction by this builder.
 	readonly TypeKind kind;
 
 	// The future name of the type when it's created.
@@ -51,15 +51,16 @@ interface ITypeBuilder
 
 		\throw NotSupportedException if the builder's type was already created, or is not a component.
 		\throw IllegalNameException if \a name is not a valid identifier or clashes with other members.
-		\throw IllegalArgumentException if \a interfaceType is invalid (e.g. NULL).
+		\throw IllegalArgumentException if \a type is invalid (e.g. NULL).
 	 */
-	void definePort( in string name, in IInterface interfaceType, in bool isFacet )
+	void definePort( in string name, in IInterface type, in bool isFacet )
 		raises NotSupportedException, IllegalNameException, IllegalArgumentException;
 
 	/*
 		Makes a type inherit from a \a superType.
 
 		\throw NotSupportedException if the builder's type was already created, or does not support inheritance.
+		\throw NotSupportedException if a supertype was already defined and multiple inheritance is not supported.
 		\throw IllegalArgumentException if the \a superType is invalid or was already defined.
 	 */
 	void defineSuperType( in IType superType )

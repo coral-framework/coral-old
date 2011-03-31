@@ -6,7 +6,7 @@ function M:initialize( module )
 	-- create a native class instance
 	local vec2d = co.new( "moduleA.Vec2D" )
 
-	-- test getting/setting some attributes
+	-- test getting/setting some fields
 	ASSERT_EQ( vec2d.x, 0 )
 	ASSERT_EQ( vec2d.y, 0 )
 	ASSERT_EQ( vec2d.length, 0 )
@@ -20,10 +20,10 @@ function M:initialize( module )
 	ASSERT_EQ( vec2d.length, math.sqrt( 5 ) )
 	ASSERT_EQ( vec2d.length2, 5 )
 
-	-- test setting the read-only 'length' attribute
-	ASSERT_ERROR( function() vec2d.length = 2 end, "attribute 'length' is read-only and cannot be changed" )
+	-- test setting the read-only 'length' field
+	ASSERT_ERROR( function() vec2d.length = 2 end, "field 'length' is read-only and cannot be changed" )
 
-	-- test getting a non-existing attribute
+	-- test getting a non-existing field
 	ASSERT_EQ( vec2d.dummy, nil )
 
 	-- test the get/set methods

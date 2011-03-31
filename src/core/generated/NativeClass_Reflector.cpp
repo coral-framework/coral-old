@@ -39,9 +39,9 @@ public:
 
 	co::IObject* newInstance()
 	{
-		co::IObject* component = __NativeClass_newInstance();
-		assert( component->getComponentType()->getFullName() == "co.NativeClass" );
-		return component;
+		co::IObject* instance = __NativeClass_newInstance();
+		assert( instance->getComponent()->getFullName() == "co.NativeClass" );
+		return instance;
 	}
 };
 

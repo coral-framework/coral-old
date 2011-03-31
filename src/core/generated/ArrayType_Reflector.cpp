@@ -39,9 +39,9 @@ public:
 
 	co::IObject* newInstance()
 	{
-		co::IObject* component = __ArrayType_newInstance();
-		assert( component->getComponentType()->getFullName() == "co.ArrayType" );
-		return component;
+		co::IObject* instance = __ArrayType_newInstance();
+		assert( instance->getComponent()->getFullName() == "co.ArrayType" );
+		return instance;
 	}
 };
 

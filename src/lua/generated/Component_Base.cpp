@@ -14,30 +14,36 @@ namespace lua {
 void moduleRetain();
 void moduleRelease();
 
-// ------ lua.Component provides an interface named 'dynamicProxyHandler', of type co.IDynamicServiceProvider ------ //
+// ------ lua.Component provides an interface named 'dynamicServiceProvider', of type co.IDynamicServiceProvider ------ //
 
-co::IInterface* Component_co_IDynamicServiceProvider::getInterfaceType()
+co::IInterface* Component_co_IDynamicServiceProvider::getInterface()
 {
 	return co::typeOf<co::IDynamicServiceProvider>::get();
 }
 
-const std::string& Component_co_IDynamicServiceProvider::getInterfaceName()
+co::IPort* Component_co_IDynamicServiceProvider::getFacet()
 {
-	static const std::string s_interfaceName( "dynamicProxyHandler" );
-	return s_interfaceName;
+	co::IComponent* component = static_cast<co::IComponent*>( co::getType( "lua.Component" ) );
+	assert( component );
+	co::IPort* facet = static_cast<co::IPort*>( component->getMember( "dynamicServiceProvider" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ lua.Component provides an interface named 'reflector', of type co.IReflector ------ //
 
-co::IInterface* Component_co_IReflector::getInterfaceType()
+co::IInterface* Component_co_IReflector::getInterface()
 {
 	return co::typeOf<co::IReflector>::get();
 }
 
-const std::string& Component_co_IReflector::getInterfaceName()
+co::IPort* Component_co_IReflector::getFacet()
 {
-	static const std::string s_interfaceName( "reflector" );
-	return s_interfaceName;
+	co::IComponent* component = static_cast<co::IComponent*>( co::getType( "lua.Component" ) );
+	assert( component );
+	co::IPort* facet = static_cast<co::IPort*>( component->getMember( "reflector" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ Component_Base ------ //
@@ -52,29 +58,29 @@ Component_Base::~Component_Base()
 	moduleRelease();
 }
 
-co::IObject* Component_Base::getInterfaceOwner()
+co::IObject* Component_Base::getProvider()
 {
 	return this;
 }
 
-void Component_Base::componentRetain()
+void Component_Base::serviceRetain()
 {
 	incrementRefCount();
 }
 
-void Component_Base::componentRelease()
+void Component_Base::serviceRelease()
 {
 	decrementRefCount();
 }
 
-co::IComponent* Component_Base::getComponentType()
+co::IComponent* Component_Base::getComponent()
 {
 	co::IType* type = co::getType( "lua.Component" );
 	assert( dynamic_cast<co::IComponent*>( type ) );
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* Component_Base::getInterface( co::IPort* port )
+co::IService* Component_Base::getService( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -87,7 +93,7 @@ co::IService* Component_Base::getInterface( co::IPort* port )
 	return res;
 }
 
-void Component_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
+void Component_Base::setService( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

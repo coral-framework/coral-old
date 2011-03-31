@@ -1,5 +1,6 @@
 /*
-	Controls the life-cycle of an <em>abstract artifact</em> (such as a dynamic library or a script bundle) loaded as part of a module.
+	Controls the life-cycle of an <em>abstract artifact</em> (such as a dynamic library
+	or a script bundle) loaded as part of a module.
  */
 interface IModulePart
 {

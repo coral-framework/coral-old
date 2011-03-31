@@ -16,15 +16,18 @@ void moduleRelease();
 
 // ------ lua.ModulePart provides an interface named 'part', of type co.IModulePart ------ //
 
-co::IInterface* ModulePart_co_IModulePart::getInterfaceType()
+co::IInterface* ModulePart_co_IModulePart::getInterface()
 {
 	return co::typeOf<co::IModulePart>::get();
 }
 
-const std::string& ModulePart_co_IModulePart::getInterfaceName()
+co::IPort* ModulePart_co_IModulePart::getFacet()
 {
-	static const std::string s_interfaceName( "part" );
-	return s_interfaceName;
+	co::IComponent* component = static_cast<co::IComponent*>( co::getType( "lua.ModulePart" ) );
+	assert( component );
+	co::IPort* facet = static_cast<co::IPort*>( component->getMember( "part" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ ModulePart_Base ------ //
@@ -39,29 +42,29 @@ ModulePart_Base::~ModulePart_Base()
 	moduleRelease();
 }
 
-co::IObject* ModulePart_Base::getInterfaceOwner()
+co::IObject* ModulePart_Base::getProvider()
 {
 	return this;
 }
 
-void ModulePart_Base::componentRetain()
+void ModulePart_Base::serviceRetain()
 {
 	incrementRefCount();
 }
 
-void ModulePart_Base::componentRelease()
+void ModulePart_Base::serviceRelease()
 {
 	decrementRefCount();
 }
 
-co::IComponent* ModulePart_Base::getComponentType()
+co::IComponent* ModulePart_Base::getComponent()
 {
 	co::IType* type = co::getType( "lua.ModulePart" );
 	assert( dynamic_cast<co::IComponent*>( type ) );
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* ModulePart_Base::getInterface( co::IPort* port )
+co::IService* ModulePart_Base::getService( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -73,7 +76,7 @@ co::IService* ModulePart_Base::getInterface( co::IPort* port )
 	return res;
 }
 
-void ModulePart_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
+void ModulePart_Base::setService( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

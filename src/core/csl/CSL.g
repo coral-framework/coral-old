@@ -105,6 +105,12 @@ component_specification
 		OPEN_BLOCK component_member* CLOSE_BLOCK SEMICOLON
 	;
 
+identifier
+	: ID
+	| COMPONENT
+	| INTERFACE
+	;
+
 qualified_identifier
 	: ID ( DOT ID )*
 	;
@@ -133,12 +139,12 @@ record_member
 	;
 
 field_declaration
-	: READONLY? { ctx->parser->setCurrentLine( $start->line ); } type_declaration ID SEMICOLON
+	: READONLY? { ctx->parser->setCurrentLine( $start->line ); } type_declaration identifier SEMICOLON
 		{
 			bool isReadOnly = false;
 			if( $READONLY )
 				isReadOnly = true;
-			ctx->parser->onField( (const char*)$ID.text->chars, isReadOnly );
+			ctx->parser->onField( (const char*)$identifier.text->chars, isReadOnly );
 		}
 	;
 

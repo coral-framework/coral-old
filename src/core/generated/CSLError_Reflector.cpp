@@ -54,10 +54,10 @@ public:
 		callDestructor( reinterpret_cast<co::CSLError*>( address ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		co::CSLError* p = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		co::CSLError* p = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
 		case 0:		value.set< const std::string& >( p->filename ); break;
 		case 1:		value.set< co::int32 >( p->line ); break;
@@ -66,10 +66,10 @@ public:
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		co::CSLError* p = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		co::CSLError* p = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
 		case 0:		p->filename = value.get< const std::string& >(); break;
 		case 1:		p->line = value.get< co::int32 >(); break;

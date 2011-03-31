@@ -10,13 +10,13 @@ local TypeWrapper = {}	-- the TypeWrapper class
 local autoFields = {}	-- table of auto-field handlers
 local wrappedTypes = {}	-- cache of TypeWrapper instances, indexed by type
 
--- Auxiliary function to wrap attribute values, so a chain of nested attribute
+-- Auxiliary function to wrap field values, so a chain of nested field
 -- accesses will still return properly wrapped co.Types.
 local GenericWrapper = {}
 local wrappedObjects = {}
 local function wrapValue( v )
 	local typeOfV = type( v )
-	if typeOfV == 'userdata' and v.interfaceType then
+	if typeOfV == 'userdata' and v.facet then
 		if v.namespace then
 			v = TypeWrapper:wrap( v )
 		else
@@ -282,7 +282,7 @@ function traverse.TK_STRUCT( t )
 	end
 end
 
-local function traverseAttribMethodContainer( t )
+local function traverseClassType( t )
 	for i, a in ipairs( t.fields ) do
 		t:includeType( a.type )
 	end
@@ -307,11 +307,11 @@ end
 
 function traverse.TK_NATIVECLASS( t )
 	t:includeHeader( t.headerName )
-	traverseAttribMethodContainer( t )
+	traverseClassType( t )
 end
 
 function traverse.TK_INTERFACE( t )
-	traverseAttribMethodContainer( t )
+	traverseClassType( t )
 
 	for i, super in ipairs( t.superInterfaces ) do
 		t:includeHeader( super )

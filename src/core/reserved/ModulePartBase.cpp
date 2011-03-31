@@ -18,15 +18,16 @@ namespace co {
 
 // ------ ModulePartBase provides an interface named 'part', of type co::IModulePart ------ //
 
-IInterface* ModulePartBase_co_ModulePart::getInterfaceType()
+IInterface* ModulePartBase_co_ModulePart::getInterface()
 {
 	return co::typeOf<IModulePart>::get();
 }
 
-const std::string& ModulePartBase_co_ModulePart::getInterfaceName()
+IPort* ModulePartBase_co_ModulePart::getFacet()
 {
-	static const std::string s_interfaceName( "part" );
-	return s_interfaceName;
+	IPort* facet = static_cast<IPort*>( typeOf<IModulePart>::get()->getMember( "part" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ ModulePartBase ------ //
@@ -41,27 +42,27 @@ ModulePartBase::~ModulePartBase()
 	// empty
 }
 
-IObject* ModulePartBase::getInterfaceOwner()
+IObject* ModulePartBase::getProvider()
 {
 	return this;
 }
 
-void ModulePartBase::componentRetain()
+void ModulePartBase::serviceRetain()
 {
 	incrementRefCount();
 }
 
-void ModulePartBase::componentRelease()
+void ModulePartBase::serviceRelease()
 {
 	decrementRefCount();
 }
 
-IComponent* ModulePartBase::getComponentType()
+IComponent* ModulePartBase::getComponent()
 {
 	return getOrCreateInternalComponent( "co.ModulePartBase", "co.IModulePart", "part" );
 }
 
-IService* ModulePartBase::getInterface( IPort* port )
+IService* ModulePartBase::getService( IPort* port )
 {
 	checkValidPort( port );
 
@@ -76,7 +77,7 @@ IService* ModulePartBase::getInterface( IPort* port )
 	return res;
 }
 
-void ModulePartBase::setReceptacle( IPort* receptacle, IService* )
+void ModulePartBase::setService( IPort* receptacle, IService* )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

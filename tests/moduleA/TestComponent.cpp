@@ -25,14 +25,14 @@ public:
 
 	// TestInterface: methods:
 
-	DummyInterface* getDummyInterfaceAttribute()
+	DummyInterface* getDummyInterfaceField()
 	{
 		return _dummyInterface.get();
 	}
 
-	void setDummyInterfaceAttribute( DummyInterface* dummyInterfaceAttribute )
+	void setDummyInterfaceField( DummyInterface* dummyInterfaceField )
 	{
-		_dummyInterface = dummyInterfaceAttribute;
+		_dummyInterface = dummyInterfaceField;
 	}
 
 	co::Range<DummyInterface* const> getDummyInterfaces()
@@ -74,7 +74,7 @@ public:
 			_names.push_back( names.getFirst() );
 	}
 
-	TestInterface* getSelfReferenceAttrib()
+	TestInterface* getSelfReferenceField()
 	{
 		return this;
 	}
@@ -165,7 +165,7 @@ public:
 		assert( !interfaces.empty() );
 		CORAL_UNUSED( interfaces );
 	}
-	
+
 	const co::Any& testAnyReturn( const co::Any& param )
 	{
 		return param;
@@ -182,36 +182,36 @@ public:
 	{
 		// empty
 	}
-	
+
 	void rollback()
 	{
 		// empty
-	}	
-	
+	}
+
 protected:
-	co::IInterface* getReceptacleItfType()
+	co::IInterface* getItfService()
 	{
-		return _itfType.get();
+		return _itf.get();
 	}
 
-	void setReceptacleItfType( co::IInterface* itfType )
+	void setItfService( co::IInterface* itf )
 	{
-		_itfType = itfType;
+		_itf = itf;
 	}
 
-	co::IType* getReceptacleType()
+	co::IType* getTypeService()
 	{
 		return _type.get();
 	}
 
-	void setReceptacleType( co::IType* type )
+	void setTypeService( co::IType* type )
 	{
 		_type = type;
 	}
 
 private:
-	co::RefPtr<co::IInterface> _itfType;
 	co::RefPtr<co::IType> _type;
+	co::RefPtr<co::IInterface> _itf;
 
 	co::RefPtr<DummyInterface> _dummyInterface;
 	std::string _name;

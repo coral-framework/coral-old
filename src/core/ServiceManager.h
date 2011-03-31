@@ -50,7 +50,7 @@ private:
 		inline void clear()
 		{
 			if( _hasService )
-				_service->componentRelease();
+				_service->serviceRelease();
 			_service = NULL;
 			_hasService = false;
 		}
@@ -63,7 +63,7 @@ private:
 		{
 			clear();
 			_service = instance;
-			_service->componentRetain();
+			_service->serviceRetain();
 			_hasService = true;
 		}
 

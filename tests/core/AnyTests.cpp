@@ -63,16 +63,16 @@ TEST( AnyTests, stdVectorMemoryLayout )
 	/*
 		In co::Any we assume some truths about the memory layout of std::vectors.
 		This test verifies whether the assumptions are true for the local STL distro.
-	
+
 		Basically, the assumption is that the std::vector computes its size() by subtracting
 		two pointers (one to the start, another past the end of the array). This is a fairly
 		standard implementation choice for std::vectors, and allows Coral to find out how much
 		memory is allocated by a std::vector in run-time without knowing its template type.
-	 
+
 		A derived assumption is that all std::vectors have the same size.
 	 */
 
-	size_t s1 = sizeof(std::vector<co::uint8>); 
+	size_t s1 = sizeof(std::vector<co::uint8>);
 	size_t s2 = sizeof(co::RefVector<co::IService>);
 	ASSERT_EQ( s1, s2 );
 
@@ -143,7 +143,7 @@ void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::IType* exp
 	EXPECT_EQ( sizeof(void*), a3.getSize() );
 	EXPECT_EQ( expectedType, a3.getType() );
 	EXPECT_EQ( p, a3.get<T*>() );
-	
+
 	const T* cp = sampleValue;
 	co::Any a4( cp );
 	EXPECT_TRUE( a4.getKind() == kind );
@@ -154,7 +154,7 @@ void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::IType* exp
 	EXPECT_EQ( sizeof(void*), a4.getSize() );
 	EXPECT_EQ( expectedType, a4.getType() );
 	EXPECT_EQ( cp, a4.get<const T*>() );
-	
+
 	T* const pc = sampleValue;
 	co::Any a5;
 	a5.set<T* const>( pc );
@@ -166,7 +166,7 @@ void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::IType* exp
 	EXPECT_EQ( sizeof(void*), a5.getSize() );
 	EXPECT_EQ( expectedType, a5.getType() );
 	EXPECT_EQ( pc, a5.get<T* const>() );
-	
+
 	const T* const cpc = sampleValue;
 	co::Any a6;
 	a6.set<const T* const>( cpc );
@@ -178,7 +178,7 @@ void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::IType* exp
 	EXPECT_EQ( sizeof(void*), a6.getSize() );
 	EXPECT_EQ( expectedType, a6.getType() );
 	EXPECT_EQ( cpc, a6.get<const T* const>() );
-	
+
 	T*& pr = p;
 	co::Any a9;
 	a9.set<T*&>( pr );
@@ -190,7 +190,7 @@ void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::IType* exp
 	EXPECT_EQ( sizeof(void*), a9.getSize() );
 	EXPECT_EQ( expectedType, a9.getType() );
 	EXPECT_EQ( pr, a9.get<T*&>() );
-	
+
 	const T*& cpr = cp;
 	co::Any a10;
 	a10.set<const T*&>( cpr );
@@ -208,7 +208,7 @@ template<typename T>
 void constructorRefTest( const co::TypeKind kind, const T& sampleValue, co::IType* expectedType )
 {
 	T v = sampleValue;
-	
+
 	constructorPtrTest<T>( kind, &v, expectedType );
 
 	T& r = v;
@@ -234,7 +234,7 @@ void constructorRefTest( const co::TypeKind kind, const T& sampleValue, co::ITyp
 	EXPECT_EQ( sizeof(T), a8.getSize() );
 	EXPECT_EQ( expectedType, a8.getType() );
 	EXPECT_EQ( cr, a8.get<const T&>() );
-	
+
 	// try retrieving the reference by pointer
 	EXPECT_EQ( &cr, a8.get<const T*>() );
 
@@ -523,7 +523,7 @@ TEST( AnyTests, setGetArrays )
 	co::Range<co::IType* const> range = co::getSystem()->getTypes()->getRootNS()->getTypes();
 	co::Any a1( range );
 	EXPECT_ANY_TYPE_STREQ( a1, "co::Range<co::IType* const>" );
-	
+
 	// cannot drop 'const' from the array element type
 	EXPECT_THROW( a1.get<co::Range<co::IType*> >(), co::IllegalCastException );
 
@@ -610,7 +610,7 @@ TEST( AnyTests, setGetInterface )
 {
 	co::Any any;
 
-	// set 'any' with a co::IInterface instance
+	// set 'any' with an instance of co::IInterface
 	co::IInterface* input = co::typeOf<co::INamespace>::get();
 	any.set( input );
 	EXPECT_ANY_TYPE_STREQ( any, "co::IInterface*" );
@@ -619,7 +619,7 @@ TEST( AnyTests, setGetInterface )
 	{
 		co::IInterface* output = any.get<co::IInterface*>();
 		EXPECT_TRUE( areSamePtr( input, output ) );
-		EXPECT_EQ( input->getInterfaceOwner(), output->getInterfaceOwner() );
+		EXPECT_EQ( input->getProvider(), output->getProvider() );
 		EXPECT_TRUE( output->isSubTypeOf( co::typeOf<co::IService>::get() ) );
 	}
 
@@ -627,14 +627,14 @@ TEST( AnyTests, setGetInterface )
 	{
 		co::IService* output = any.get<co::IService*>();
 		EXPECT_TRUE( areSamePtr( input, output ) );
-		EXPECT_EQ( input->getInterfaceOwner(), output->getInterfaceOwner() );
+		EXPECT_EQ( input->getProvider(), output->getProvider() );
 	}
-	
+
 	// try to get a co::ICompositeType back (implicit upcasting)
 	{
 		co::ICompositeType* output = any.get<co::ICompositeType*>();
 		EXPECT_TRUE( areSamePtr( input, output ) );
-		EXPECT_EQ( input->getInterfaceOwner(), output->getInterfaceOwner() );
+		EXPECT_EQ( input->getProvider(), output->getProvider() );
 		co::IMember* res = output->getMember( "name" );
 		EXPECT_EQ( res->getName(), "name" );
 	}
@@ -654,7 +654,7 @@ TEST( AnyTests, setGetInterface )
 	{
 		co::IService* output = any.get<co::IService*>();
 		EXPECT_TRUE( areSamePtr( input2, output ) );
-		EXPECT_EQ( input2->getInterfaceOwner(), output->getInterfaceOwner() );
+		EXPECT_EQ( input2->getProvider(), output->getProvider() );
 	}
 
 	// try to retrieve a co::IInterface (implicit downcasting)
@@ -699,7 +699,7 @@ TEST( AnyTests, coercionsFromUInt64 )
 	co::Any a0; a0.set<co::uint64>( 0 );
 	co::Any a1; a1.set<co::uint64>( co::MAX_INT16 );
 	co::Any a2; a2.set<co::uint64>( co::MAX_UINT64 );
-	
+
 	EXPECT_ANY_STREQ( a0, "(co::uint64)0" );
 	EXPECT_ANY_STREQ( a1, "(co::uint64)32767" );
 	EXPECT_ANY_STREQ( a2, "(co::uint64)18446744073709551615" );
@@ -718,7 +718,7 @@ TEST( AnyTests, coercionsFromUInt64 )
 	EXPECT_EQ( 0.0, a0.get<double>() );
 	EXPECT_EQ( static_cast<double>( co::MAX_INT16 ), a1.get<double>() );
 	EXPECT_EQ( static_cast<double>( co::MAX_UINT64 ), a2.get<double>() );
-	
+
 	// to enum (co::TypeKind)
 	EXPECT_EQ( co::TK_NONE, a0.get<co::TypeKind>() );
 	EXPECT_EQ( co::TK_COMPONENT, co::Any( 20 ).get<co::TypeKind>() );
@@ -744,7 +744,7 @@ TEST( AnyTests, coercionsFromDouble )
 	EXPECT_FALSE( a0.get<bool>() );
 	EXPECT_TRUE( a1.get<bool>() );
 	EXPECT_TRUE( a2.get<bool>() );
-	
+
 	// to int16
 	EXPECT_EQ( 0, a0.get<co::int16>() );
 	EXPECT_EQ( 3, a1.get<co::int16>() );
@@ -779,7 +779,7 @@ TEST( AnyTests, coercionsFromEnum )
 	// to bool
 	EXPECT_FALSE( a0.get<bool>() );
 	EXPECT_TRUE( a1.get<bool>() );
-	EXPECT_TRUE( a2.get<bool>() );	
+	EXPECT_TRUE( a2.get<bool>() );
 
 	// to int16
 	EXPECT_EQ( 0, a0.get<co::int16>() );
@@ -800,7 +800,7 @@ TEST( AnyTests, coercionsFromEnum )
 }
 
 TEST( MappingTests, coercionBetweenEnums )
-{	
+{
 	co::Any a0( co::TK_NONE );
 	co::Any a1( static_cast<short>( 1 ) );
 	co::Any a2( co::TK_BOOLEAN );
@@ -870,7 +870,7 @@ TEST( AnyTests, coercionsFromArrayRange )
 	co::Range<const float> constValueRange;
 	co::Any constValueRangeAny( constValueRange );
 	EXPECT_ANY_TYPE_STREQ( constValueRangeAny, "co::Range<const float>" );
-	
+
 	// const ValueType* const
 	co::Range<const float* const> constValuePtrConst;
 	co::Any constValuePtrConstRangeAny( constValuePtrConst );
@@ -885,7 +885,7 @@ TEST( AnyTests, coercionsFromArrayRange )
 	co::Range<co::IInterface* const> constInterfaceRange;
 	co::Any constInterfaceRangeAny( constInterfaceRange );
 	EXPECT_ANY_TYPE_STREQ( constInterfaceRangeAny, "co::Range<co::IInterface* const>" );
-	
+
 	// SuperInterface*
 	co::Range<co::IType*> superInterfaceRange;
 	co::Any superInterfaceRangeAny( superInterfaceRange );
@@ -896,7 +896,7 @@ TEST( AnyTests, coercionsFromArrayRange )
 
 	// ILLEGAL: const ValueType -> ValueType
 	EXPECT_THROW( constValueRangeAny.get<co::Range<float> >(), co::IllegalCastException );
-	
+
 	// ILLEGAL: ValueType -> DifferentValueType
 	EXPECT_THROW( valueRangeAny.get<co::Range<double> >(), co::IllegalCastException );
 
@@ -990,7 +990,7 @@ TEST( AnyTests, coercionsFromStdVector )
 	EXPECT_ANY_TYPE_STREQ( subVecAny, "std::vector<co::IInterface*>" );
 
 	// SuperInterface*
-	std::vector<co::IType*> superVec;	
+	std::vector<co::IType*> superVec;
 	co::Any superVecAny;
 	superVecAny.set<std::vector<co::IType*>&>( superVec );
 	EXPECT_ANY_TYPE_STREQ( superVecAny, "std::vector<co::IType*>" );
@@ -1016,7 +1016,7 @@ TEST( AnyTests, coercionsFromStdVector )
 	// ILLEGAL: std::vector<const ValueType*> -> std::vector<ValueType*>
 	EXPECT_NO_THROW( constIntPtrVecAny.get<std::vector<const int*>&>() );
 	EXPECT_THROW( constIntPtrVecAny.get<std::vector<int*>&>(), co::IllegalCastException );
-	
+
 	// std::vector<SubInterface*> -> co::Range<SubInterface* const>
 	EXPECT_EQ( 2, subVecAny.get<co::Range<co::IInterface* const> >().getSize() );
 
@@ -1024,7 +1024,7 @@ TEST( AnyTests, coercionsFromStdVector )
 	EXPECT_EQ( 2, subVecAny.get<co::Range<co::IInterface*> >().getSize() );
 
 	// ILLEGAL: std::vector<SubInterface*> -> std::vector<SuperInterface*>
-	EXPECT_EQ( 2, subVecAny.get<std::vector<co::IInterface*>&>().size() );	
+	EXPECT_EQ( 2, subVecAny.get<std::vector<co::IInterface*>&>().size() );
 	EXPECT_THROW( subVecAny.get<std::vector<co::IType*>&>(), co::IllegalCastException );
 
 	// std::vector<SubInterface*> -> co::Range<SuperInterface* const>
@@ -1041,7 +1041,7 @@ TEST( AnyTests, coercionsFromStdVector )
  *	Tests for the custom variable setters and constructors
  ****************************************************************************/
 
-TEST( AnyTests, setInterface )
+TEST( AnyTests, setService )
 {
 	co::IInterface* nsType = co::typeOf<co::INamespace>::get();
 	co::IService* nsTypeAsItf = co::disambiguate<co::IService>( nsType );
@@ -1052,7 +1052,7 @@ TEST( AnyTests, setInterface )
 
 	// try passing a null pointer
 	automatic.set<co::INamespace*>( NULL );
-	manual.setInterface( NULL, nsType );
+	manual.setService( NULL, nsType );
 	EXPECT_EQ( automatic, manual );
 }
 
@@ -1148,7 +1148,7 @@ void testTemporaryComplexValue( const T& sample )
 	co::Any a2( a1 );
 	EXPECT_EQ( a2.get<T&>(), sample );
 	EXPECT_EQ( a1.get<T&>(), a2.get<T&>() );
-	
+
 	EXPECT_EQ( a1.containsObject(), true );
 	EXPECT_EQ( a2.containsObject(), true );
 	a1.destroyObject();
@@ -1160,7 +1160,7 @@ void testTemporaryComplexValue( const T& sample )
 TEST( AnyTests, temporaryComplexValues )
 {
 	testTemporaryComplexValue<co::Uuid>( co::Uuid::createRandom() );
-	
+
 	co::CSLError cslError;
 	cslError.filename = "filename";
 	cslError.message = "msg";

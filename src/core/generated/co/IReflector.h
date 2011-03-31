@@ -32,29 +32,29 @@ public:
 
 	// Code From <c++ Block:
 	
-		// Memory manipulation of complex Coral values is only available from C++.
+		//------ Manipulation of complex value instances (only available from C++) ------//
 
 		/*!
 			Constructs an instance of a struct or native class in the specified memory area.
 			\param[in] address memory address where the instance is to be constructed.
 			\param[in] length number of bytes (starting at \a address) reserved for the instance.
-			\throw NotSupportedException if \a type is neither a IStruct nor a INativeClass.
 			\throw IllegalArgumentException if the passed \a length is not equal to the type's \a size.
+			\throw NotSupportedException if the \a type is neither a struct nor a native class.
 		 */
 		virtual void createValue( void* address, size_t length ) = 0;
 
 		/*!
-			Sets the complex value at 'toAddress' with a copy of the complex value at 'fromAddress'.
+			Sets the complex value at \a toAddress with a copy of the complex value at \a fromAddress.
 			The copy is done using the type's assignment operator.
-			\warning Both pointers must point to instances of this exact 'type'.
+			\warning Both pointers must point to instances of this exact type.
 		 */
 		virtual void copyValue( const void* fromAddress, void* toAddress ) = 0;
 
 		/*!
 			Destroys the struct or native class instance located at \a address.
 			The instance should have been constructed using createValue().
-			\warning Expect the worst if \a address does not point to an instance of this exact type.
-			\throw NotSupportedException if \a type is neither a IStruct nor a INativeClass.
+			\warning Expect the worst if \a address does not point to an instance of this type.
+			\throw NotSupportedException if the \a type is neither a struct nor a native class.
 		 */
 		virtual void destroyValue( void* address ) = 0;
 	
@@ -64,17 +64,17 @@ public:
 
 	virtual co::IType* getType() = 0;
 
-	virtual void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value ) = 0;
+	virtual void getField( const co::Any& instance, co::IField* field, co::Any& value ) = 0;
 
-	virtual void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& returnValue ) = 0;
+	virtual void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& returnValue ) = 0;
+
+	virtual co::IService* newDynamicProxy( co::IDynamicServiceProvider* dynamicProvider ) = 0;
 
 	virtual co::IObject* newInstance() = 0;
 
-	virtual co::IService* newProxy( co::IDynamicServiceProvider* handler ) = 0;
-
 	virtual void raise( const std::string& message ) = 0;
 
-	virtual void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value ) = 0;
+	virtual void setField( const co::Any& instance, co::IField* field, const co::Any& value ) = 0;
 };
 
 } // namespace co

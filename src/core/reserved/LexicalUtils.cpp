@@ -76,31 +76,31 @@ int LexicalUtils::parseAccessor( const std::string& methodName, int accessorKind
 	assert( accessorKinds > 0 && accessorKinds < 4 );
 
 	int foundKind;
-	const char* attributeNamePos = 0;
+	const char* fieldNamePos = 0;
 
 	if( accessorKinds & Getter && startsWith( methodName, GETTER_PREFIX ) )
 	{
 		foundKind = Getter;
-		attributeNamePos = methodName.c_str() + GETTER_PREFIX.length();
+		fieldNamePos = methodName.c_str() + GETTER_PREFIX.length();
 	}
 
 	if( accessorKinds & Setter && startsWith( methodName, SETTER_PREFIX )  )
 	{
 		foundKind = Setter;
-		attributeNamePos = methodName.c_str() + SETTER_PREFIX.length();
+		fieldNamePos = methodName.c_str() + SETTER_PREFIX.length();
 	}
 
-	if( attributeNamePos == 0 )
+	if( fieldNamePos == 0 )
 		return -1;
 
-	int firstChar = tolower( attributeNamePos[0] );
-	if( firstChar == attributeNamePos[0] )
+	int firstChar = tolower( fieldNamePos[0] );
+	if( firstChar == fieldNamePos[0] )
 		return -1;
 
 	fieldName.clear();
-	fieldName.reserve( attributeNamePos - methodName.c_str() );
+	fieldName.reserve( fieldNamePos - methodName.c_str() );
 	fieldName += firstChar;
-	fieldName += attributeNamePos + 1;
+	fieldName += fieldNamePos + 1;
 
 	return foundKind;
 }

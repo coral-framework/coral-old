@@ -13,15 +13,18 @@ namespace co {
 
 // ------ co.Method provides an interface named 'methodInfo', of type co.IMethod ------ //
 
-co::IInterface* Method_co_IMethod::getInterfaceType()
+co::IInterface* Method_co_IMethod::getInterface()
 {
 	return co::typeOf<co::IMethod>::get();
 }
 
-const std::string& Method_co_IMethod::getInterfaceName()
+co::IPort* Method_co_IMethod::getFacet()
 {
-	static const std::string s_interfaceName( "methodInfo" );
-	return s_interfaceName;
+	co::IComponent* component = static_cast<co::IComponent*>( co::getType( "co.Method" ) );
+	assert( component );
+	co::IPort* facet = static_cast<co::IPort*>( component->getMember( "methodInfo" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ Method_Base ------ //
@@ -36,29 +39,29 @@ Method_Base::~Method_Base()
 	// empty
 }
 
-co::IObject* Method_Base::getInterfaceOwner()
+co::IObject* Method_Base::getProvider()
 {
 	return this;
 }
 
-void Method_Base::componentRetain()
+void Method_Base::serviceRetain()
 {
 	incrementRefCount();
 }
 
-void Method_Base::componentRelease()
+void Method_Base::serviceRelease()
 {
 	decrementRefCount();
 }
 
-co::IComponent* Method_Base::getComponentType()
+co::IComponent* Method_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.Method" );
 	assert( dynamic_cast<co::IComponent*>( type ) );
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* Method_Base::getInterface( co::IPort* port )
+co::IService* Method_Base::getService( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -70,7 +73,7 @@ co::IService* Method_Base::getInterface( co::IPort* port )
 	return res;
 }
 
-void Method_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
+void Method_Base::setService( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

@@ -1,16 +1,17 @@
 /*
-	A set of custom extensions loaded from a INamespace in the Coral path. Modules are composed of
-	one or more ModuleParts, which are individual extension artifacts found in the module's dir.
+	A set of custom extensions loaded from a namespace in the Coral path.
+	Modules are composed of one or more IModulePart's, which are individual
+	extensions loaded from artifacts in the module directory.
  */
 interface IModule
 {
-	// The module's namespace in the type repository.
+	// Namespace from which the module was loaded. Indicates the module's location in the Coral path.
 	readonly INamespace namespace;
 
 	// Current module state. See the module life cycle control methods below.
 	readonly ModuleState state;
 
-	// List of ModuleParts that make up this module.
+	// List of ModuleParts that comprise this module.
 	readonly IModulePart[] parts;
 
 	/*

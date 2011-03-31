@@ -86,15 +86,15 @@ protected:
 
 	/*!
 		Pops a light userdata (co::IField*) from the stack.
-		Pushes the corresponding attribute value of the given 'instance'.
+		Pushes the corresponding field value of the given 'instance'.
 	 */
-	static void getAttribute( lua_State* L, const co::Any& instance );
+	static void getField( lua_State* L, const co::Any& instance );
 
 	/*!
 		Pops a value and a light userdata (co::IField*) from the stack.
-		Assigns the value to the corresponding attribute of the given 'instance'.
+		Assigns the value to the corresponding field of the given 'instance'.
 	 */
-	static void setAttribute( lua_State* L, const co::Any& instance );
+	static void setField( lua_State* L, const co::Any& instance );
 
 	/*!
 		The lua_CFunction that dispatches method calls.
@@ -113,7 +113,7 @@ class ComponentBinding : public CompositeTypeBinding
 {
 public:
 	//! Pushes a new instance of a co::IObject* userdata onto the stack.
-	static void create( lua_State* L, co::IObject* component );
+	static void create( lua_State* L, co::IObject* object );
 
 	// --- Metamethods ---
 	static int index( lua_State* L );

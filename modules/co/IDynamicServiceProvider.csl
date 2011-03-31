@@ -4,18 +4,21 @@
  */
 interface IDynamicServiceProvider
 {
-	// Registers a new proxy interface and returns a 'cookie' for it.
-	int32 registerProxyInterface( in IService proxy );
+	/*
+		Registers a \a dynamicServiceProxy and returns its <em>dynamic facet ID</em>.
+		This method is called whenever a dynamic service proxy is instantiated for this provider.
+	 */
+	int32 dynamicRegisterService( in IService dynamicServiceProxy );
 
-	// Retrieves a proxy interface's name given its cookie.
-	string getProxyInterfaceName( in int32 cookie );
+	// Returns the facet associated with a dynamic service.
+	IPort dynamicGetFacet( in int32 dynFacetId );
 
-	// Handles a request for retrieving a field value.
-	any handleGetAttribute( in int32 cookie, in IField ai );
+	// Retrieves a field value from a dynamic service.
+	any dynamicGetField( in int32 dynFacetId, in IField field );
 
-	// Handles a request for setting a field value.
-	void handleSetAttribute( in int32 cookie, in IField ai, in any value );
+	// Sets the value of a field in a dynamic service.
+	void dynamicSetField( in int32 dynFacetId, in IField field, in any value );
 
-	// Handles a call to one of the proxy interface's methods.
-	any handleMethodInvocation( in int32 cookie, in IMethod mi, in any[] args );
+	// Calls a method from a dynamic service.
+	any dynamicInvoke( in int32 dynFacetId, in IMethod method, in any[] args );
 };

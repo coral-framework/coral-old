@@ -13,15 +13,18 @@ namespace co {
 
 // ------ co.TypeBuilder provides an interface named 'typeBuilder', of type co.ITypeBuilder ------ //
 
-co::IInterface* TypeBuilder_co_ITypeBuilder::getInterfaceType()
+co::IInterface* TypeBuilder_co_ITypeBuilder::getInterface()
 {
 	return co::typeOf<co::ITypeBuilder>::get();
 }
 
-const std::string& TypeBuilder_co_ITypeBuilder::getInterfaceName()
+co::IPort* TypeBuilder_co_ITypeBuilder::getFacet()
 {
-	static const std::string s_interfaceName( "typeBuilder" );
-	return s_interfaceName;
+	co::IComponent* component = static_cast<co::IComponent*>( co::getType( "co.TypeBuilder" ) );
+	assert( component );
+	co::IPort* facet = static_cast<co::IPort*>( component->getMember( "typeBuilder" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ TypeBuilder_Base ------ //
@@ -36,29 +39,29 @@ TypeBuilder_Base::~TypeBuilder_Base()
 	// empty
 }
 
-co::IObject* TypeBuilder_Base::getInterfaceOwner()
+co::IObject* TypeBuilder_Base::getProvider()
 {
 	return this;
 }
 
-void TypeBuilder_Base::componentRetain()
+void TypeBuilder_Base::serviceRetain()
 {
 	incrementRefCount();
 }
 
-void TypeBuilder_Base::componentRelease()
+void TypeBuilder_Base::serviceRelease()
 {
 	decrementRefCount();
 }
 
-co::IComponent* TypeBuilder_Base::getComponentType()
+co::IComponent* TypeBuilder_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.TypeBuilder" );
 	assert( dynamic_cast<co::IComponent*>( type ) );
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* TypeBuilder_Base::getInterface( co::IPort* port )
+co::IService* TypeBuilder_Base::getService( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -70,7 +73,7 @@ co::IService* TypeBuilder_Base::getInterface( co::IPort* port )
 	return res;
 }
 
-void TypeBuilder_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
+void TypeBuilder_Base::setService( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

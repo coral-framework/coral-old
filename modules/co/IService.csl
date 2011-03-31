@@ -4,17 +4,17 @@
 interface IService
 {
 	// Object providing type introspection for this interface.
-	readonly IInterface interfaceType;
+	readonly IInterface interface;
 
 	// The component providing this interface.
-	readonly IObject interfaceOwner;
+	readonly IObject provider;
 
-	// This interface's name within the interfaceOwner.
-	readonly string interfaceName;
+	// This interface's name within the provider.
+	readonly IPort facet;
 
-	// Increment the interface owner's reference count.
-	void componentRetain();
+	// Increment the service provider's reference count.
+	void serviceRetain();
 
-	// Decrement the interface owner's reference count.
-	void componentRelease();
+	// Decrement the service provider's reference count.
+	void serviceRelease();
 };

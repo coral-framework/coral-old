@@ -1,6 +1,6 @@
 // This test interface should not raise an exeption as the setter 
 // does not exists and it doesn't clashes with the name of the method.
-interface methodAndAttributeSetter_valid 
+interface methodAndFieldSetter_valid 
 {
 	void setBirthDate();
 	void isBirthDate();

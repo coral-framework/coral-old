@@ -26,16 +26,16 @@ public:
 	void setComponentInstance( LuaComponent* prototype, int instanceTableRef );
 
 	// co::IObject methods:
-	co::IComponent* getComponentType();
-	co::IService* getInterface( co::IPort* itfInfo );
-	void setReceptacle( co::IPort* receptacle, co::IService* instance );
+	co::IComponent* getComponent();
+	co::IService* getService( co::IPort* port );
+	void setService( co::IPort* receptacle, co::IService* instance );
 
 	// co::IDynamicServiceProvider methods:
-	co::int32 registerProxyInterface( co::IService* proxy );
-	const std::string& getProxyInterfaceName( co::int32 cookie );
-	const co::Any& handleGetAttribute( co::int32 cookie, co::IField* ai );
-	void handleSetAttribute( co::int32 cookie, co::IField* ai, const co::Any& value );
-	const co::Any& handleMethodInvocation( co::int32 cookie, co::IMethod* mi, co::Range<co::Any const> args );
+	co::int32 dynamicRegisterService( co::IService* proxy );
+	co::IPort* dynamicGetFacet( co::int32 cookie );
+	const co::Any& dynamicGetField( co::int32 cookie, co::IField* ai );
+	void dynamicSetField( co::int32 cookie, co::IField* ai, const co::Any& value );
+	const co::Any& dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<co::Any const> args );
 
 	// co::IReflector methods:
 	co::int32 getSize();
@@ -44,20 +44,20 @@ public:
     void copyValue( const void* fromAddress, void* toAddress );
     void destroyValue( void* address );
 	co::IObject* newInstance();
-	co::IService* newProxy( co::IDynamicServiceProvider* provider );
-    void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value );
-    void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value );
-    void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& returnValue );
+	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider );
+    void getField( const co::Any& instance, co::IField* ai, co::Any& value );
+    void setField( const co::Any& instance, co::IField* ai, const co::Any& value );
+    void invoke( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& returnValue );
 	void raise( const std::string& message );
 
 private:
-	inline const std::string& getInterfaceName( co::int32 cookie );
+	inline co::IPort* getFacet( co::int32 cookie );
 	void pushInterfaceInstanceTable( lua_State* L, co::int32 cookie );
-	void pushAccessorName( lua_State* L, const char* prefix, const std::string& attribName );
+	void pushAccessorName( lua_State* L, const char* prefix, const std::string& fieldName, const char* suffix = NULL );
 	void getMethod( lua_State* L, int t, co::int32 cookie = -1 );
 
-	co::IService* getDynamicInterface( co::IPort* itfInfo );
-	void bindToDynamicReceptacle( co::IPort* receptacle, co::IService* instance );
+	co::IService* getDynamicReceptacle( co::IPort* port );
+	void setDynamicReceptacle( co::IPort* receptacle, co::IService* instance );
 
 	void raiseNotSupportedException();
 

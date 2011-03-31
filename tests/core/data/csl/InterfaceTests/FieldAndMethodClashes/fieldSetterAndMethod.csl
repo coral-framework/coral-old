@@ -3,7 +3,7 @@
 
 
 // do not remove those empty lines from above (its part of the test)
-interface attributeSetterAndMethod
+interface fieldSetterAndMethod
 {
 	string age;
 	void setAge();

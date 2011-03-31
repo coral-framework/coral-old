@@ -3,4 +3,5 @@
  */
 interface IStruct extends IRecordType
 {
+	// empty
 };

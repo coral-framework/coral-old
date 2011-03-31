@@ -39,9 +39,9 @@ public:
 
 	co::IObject* newInstance()
 	{
-		co::IObject* component = __Interface_newInstance();
-		assert( component->getComponentType()->getFullName() == "co.Interface" );
-		return component;
+		co::IObject* instance = __Interface_newInstance();
+		assert( instance->getComponent()->getFullName() == "co.Interface" );
+		return instance;
 	}
 };
 

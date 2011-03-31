@@ -31,8 +31,8 @@ local function template( writer, c, t )
 class ]], t.name , [[_]], itf.type.fullNameUnderline, [[ : public ]], itf.type.cppName, "\n", [[
 {
 public:
-	virtual co::IInterface* getInterfaceType();
-	virtual const std::string& getInterfaceName();
+	virtual co::IInterface* getInterface();
+	virtual co::IPort* getFacet();
 };
 
 ]] )
@@ -58,14 +58,14 @@ public:
 	virtual ~]], t.name, [[_Base();
 
 	// co::IService Methods:
-	co::IObject* getInterfaceOwner();
-	void componentRetain();
-	void componentRelease();
+	co::IObject* getProvider();
+	void serviceRetain();
+	void serviceRelease();
 
 	// co::IObject Methods:
-	co::IComponent* getComponentType();
-	co::IService* getInterface( co::IPort* );
-	void setReceptacle( co::IPort*, co::IService* );
+	co::IComponent* getComponent();
+	co::IService* getService( co::IPort* );
+	void setService( co::IPort*, co::IService* );
 ]] )
 
 	if #receptacles > 0 then
@@ -74,11 +74,11 @@ public:
 		for i, itf in ipairs( receptacles ) do
 			writer( [[
 
-	//! Get receptacle ']], itf.name, [[', of type ]], itf.type.fullName, ".\n", [[
-	virtual ]], itf.type.cppName, [[* ]], t.formatAccessor( "getReceptacle", itf.name ), [[() = 0;
+	//! Get the service at receptacle ']], itf.name, [[', of type ]], itf.type.fullName, ".\n", [[
+	virtual ]], itf.type.cppName, [[* ]], t.formatAccessor( "get", itf.name ), [[Service() = 0;
 
-	//! Set receptacle ']], itf.name, [[', of type ]], itf.type.fullName, ".\n", [[
-	virtual void ]], t.formatAccessor( "setReceptacle", itf.name ), [[( ]], itf.type.cppName, [[* ]], itf.name, [[ ) = 0;
+	//! Set the service at receptacle ']], itf.name, [[', of type ]], itf.type.fullName, ".\n", [[
+	virtual void ]], t.formatAccessor( "set", itf.name ), [[Service( ]], itf.type.cppName, [[* ]], itf.name, [[ ) = 0;
 ]] )
 		end
 	end

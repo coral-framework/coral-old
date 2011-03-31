@@ -130,14 +130,14 @@ TEST( ModuleTests, systemAndModuleLifeCycles )
 TEST( ModuleTests, crossModuleInheritance )
 {
 	// instantiate a component from 'moduleA' that implements an interface from 'co'
-	co::RefPtr<co::IObject> component = co::newInstance( "moduleA.TestComponent" );
+	co::RefPtr<co::IObject> instance = co::newInstance( "moduleA.TestComponent" );
 
 	// exercise dynamic_casts
-	moduleA::TestInterface* ti = component->getFacet<moduleA::TestInterface>();
-	EXPECT_EQ( component.get(), ti->getInterfaceOwner() );
+	moduleA::TestInterface* ti = instance->getService<moduleA::TestInterface>();
+	EXPECT_EQ( instance.get(), ti->getProvider() );
 
-	co::ITypeTransaction* tct = component->getFacet<co::ITypeTransaction>();
-	EXPECT_EQ( component.get(), tct->getInterfaceOwner() );
+	co::ITypeTransaction* tct = instance->getService<co::ITypeTransaction>();
+	EXPECT_EQ( instance.get(), tct->getProvider() );
 }
 
 TEST( ModuleTests, crossModuleReflection )
@@ -159,19 +159,19 @@ TEST( ModuleTests, crossModuleReflection )
 	co::ICompositeType* ct = dynamic_cast<co::ICompositeType*>( type );
 	assert( ct );
 
-	co::IField* anInt8Attrib = dynamic_cast<co::IField*>( ct->getMember( "anInt8" ) );
-	assert( anInt8Attrib );
+	co::IField* anInt8Field = dynamic_cast<co::IField*>( ct->getMember( "anInt8" ) );
+	assert( anInt8Field );
 
 	// exercise the reflection API
 	co::Any a1, a2;
 
-	reflector->getAttribute( instanceAny, anInt8Attrib, a1 );
+	reflector->getField( instanceAny, anInt8Field, a1 );
 	EXPECT_EQ( 0, a1.get<int>() );
 
 	a2.set( 7 );
-	reflector->setAttribute( instanceAny, anInt8Attrib, a2 );
+	reflector->setField( instanceAny, anInt8Field, a2 );
 
-	reflector->getAttribute( instanceAny, anInt8Attrib, a1 );
+	reflector->getField( instanceAny, anInt8Field, a1 );
 	EXPECT_EQ( 7, a1.get<int>() );
 
 	// test exception catching
@@ -179,7 +179,7 @@ TEST( ModuleTests, crossModuleReflection )
 	instanceAny.set( garbage );
 	try
 	{
-		reflector->getAttribute( instanceAny, anInt8Attrib, a1 );
+		reflector->getField( instanceAny, anInt8Field, a1 );
 		FAIL();
 	}
 	catch( co::IllegalArgumentException& e )

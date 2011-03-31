@@ -16,6 +16,7 @@
 namespace co {
 	class IField;
 	class IMethod;
+	class IPort;
 } // namespace co
 // End Of Forward Declarations
 
@@ -27,15 +28,15 @@ class IDynamicServiceProvider : public co::IService
 public:
 	virtual ~IDynamicServiceProvider() {;}
 
-	virtual const std::string& getProxyInterfaceName( co::int32 cookie ) = 0;
+	virtual co::IPort* dynamicGetFacet( co::int32 dynFacetId ) = 0;
 
-	virtual const co::Any& handleGetAttribute( co::int32 cookie, co::IField* ai ) = 0;
+	virtual const co::Any& dynamicGetField( co::int32 dynFacetId, co::IField* field ) = 0;
 
-	virtual const co::Any& handleMethodInvocation( co::int32 cookie, co::IMethod* mi, co::Range<co::Any const> args ) = 0;
+	virtual const co::Any& dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, co::Range<co::Any const> args ) = 0;
 
-	virtual void handleSetAttribute( co::int32 cookie, co::IField* ai, const co::Any& value ) = 0;
+	virtual co::int32 dynamicRegisterService( co::IService* dynamicServiceProxy ) = 0;
 
-	virtual co::int32 registerProxyInterface( co::IService* proxy ) = 0;
+	virtual void dynamicSetField( co::int32 dynFacetId, co::IField* field, const co::Any& value ) = 0;
 };
 
 } // namespace co

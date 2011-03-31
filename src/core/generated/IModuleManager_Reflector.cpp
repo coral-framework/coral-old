@@ -25,7 +25,7 @@ class IModuleManager_Proxy : public co::IModuleManager
 public:
 	IModuleManager_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, co::IModuleManager>( this ) );
+		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, co::IModuleManager>( this ) );
 	}
 
 	virtual ~IModuleManager_Proxy()
@@ -35,17 +35,17 @@ public:
 
 	// co::IService Methods:
 
-	co::IInterface* getInterfaceType() { return co::typeOf<co::IModuleManager>::get(); }
-	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _provider->componentRetain(); }
-	void componentRelease() { _provider->componentRelease(); }
+	co::IInterface* getInterface() { return co::typeOf<co::IModuleManager>::get(); }
+	co::IObject* getProvider() { return _provider->getProvider(); }
+	co::IPort* getFacet() { return _provider->dynamicGetFacet( _cookie ); }
+	void serviceRetain() { _provider->serviceRetain(); }
+	void serviceRelease() { _provider->serviceRelease(); }
 
 	// co.IModuleManager Methods:
 
 	bool getBinaryCompatibilityChecking()
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IModuleManager>( 0 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 0 ) );
         return res.get< bool >();
 	}
 
@@ -53,18 +53,18 @@ public:
 	{
 		co::Any arg;
 		arg.set< bool >( binaryCompatibilityChecking_ );
-		_provider->handleSetAttribute( _cookie, getAttribInfo<co::IModuleManager>( 0 ), arg );
+		_provider->dynamicSetField( _cookie, getField<co::IModuleManager>( 0 ), arg );
 	}
 
 	co::Range<co::IModulePartLoader* const> getLoaders()
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IModuleManager>( 1 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 1 ) );
         return res.get< co::Range<co::IModulePartLoader* const> >();
 	}
 
 	co::Range<co::IModule* const> getModules()
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IModuleManager>( 2 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 2 ) );
         return res.get< co::Range<co::IModule* const> >();
 	}
 
@@ -73,7 +73,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::IModuleManager>( 0 ), range );
+		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 0 ), range );
 		return res.get< co::IModule* >();
 	}
 
@@ -82,7 +82,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::IModulePartLoader* >( loader_ );
 		co::Range<co::Any const> range( args, 1 );
-		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IModuleManager>( 1 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 1 ), range );
 	}
 
 	bool isLoadable( const std::string& moduleName_ )
@@ -90,7 +90,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::IModuleManager>( 2 ), range );
+		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 2 ), range );
 		return res.get< bool >();
 	}
 
@@ -99,7 +99,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::IModuleManager>( 3 ), range );
+		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 3 ), range );
 		return res.get< co::IModule* >();
 	}
 
@@ -108,18 +108,18 @@ public:
 		co::Any args[1];
 		args[0].set< co::IModulePartLoader* >( loader_ );
 		co::Range<co::Any const> range( args, 1 );
-		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IModuleManager>( 4 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 4 ), range );
 	}
 
 protected:
 	template<typename T>
-	co::IField* getAttribInfo( co::uint32 index )
+	co::IField* getField( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethod* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethod( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getMethods()[index];
 	}
@@ -154,16 +154,16 @@ public:
 		return sizeof(co::IModuleManager);
 	}
 
-	co::IService* newProxy( co::IDynamicServiceProvider* provider )
+	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
 		return co::disambiguate<co::IService, co::IModuleManager>( new co::IModuleManager_Proxy( provider ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		co::IModuleManager* p = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		co::IModuleManager* p = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
 		case 0:		value.set< bool >( p->getBinaryCompatibilityChecking() ); break;
 		case 1:		value.set< co::Range<co::IModulePartLoader* const> >( p->getLoaders() ); break;
@@ -172,28 +172,28 @@ public:
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		co::IModuleManager* p = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		co::IModuleManager* p = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
 		case 0:		p->setBinaryCompatibilityChecking( value.get< bool >() ); break;
-		case 1:		raiseAttributeIsReadOnly( ai ); break;
-		case 2:		raiseAttributeIsReadOnly( ai ); break;
+		case 1:		raiseFieldIsReadOnly( field ); break;
+		case 2:		raiseFieldIsReadOnly( field ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 		CORAL_UNUSED( p );
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
 	{
-		co::IModuleManager* p = checkInstance( instance, mi );
-		checkNumArguments( mi, args.getSize() );
+		co::IModuleManager* p = checkInstance( instance, method );
+		checkNumArguments( method, args.getSize() );
 		int argIndex = -1;
 		try
 		{
-			switch( mi->getIndex() )
+			switch( method->getIndex() )
 			{
 			case 3:
 				{
@@ -238,7 +238,7 @@ public:
 		{
 			if( argIndex == -1 )
 				throw; // just re-throw if the exception is not related to 'args'
-			raiseArgumentTypeException( mi, argIndex, e );
+			raiseArgumentTypeException( method, argIndex, e );
 		}
 		catch( ... )
 		{

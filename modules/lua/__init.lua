@@ -75,7 +75,7 @@ co.raise = function( exceptionType, message )
 end
 
 -------------------------------------------------------------------------------
--- interfaceInstance = co.getService( serviceName[, client] )
+-- service = co.getService( serviceName[, client] )
 --
 -- Performs all kinds of service lookups: global, specialized by client type,
 -- or specialized by client instance.
@@ -84,14 +84,13 @@ end
 -- indicating the kind of service you are trying to obtain.
 --
 -- If parameter 'client' is omitted, this function will attempt to get the
--- global provider of the specified service. Otherwise, 'client' must be
--- either an interface type name (string) or an interface instance.
+-- global provider of the specified type of service. Otherwise, \a client must
+-- be either the name (string) or an instance of another service.
 --
--- If 'client' is an interface type name, co.getService() will pick the most
--- specialized service instance available for clients of this type. Otherwise,
--- if 'client' is an interface instance, co.getService() will pick the most
--- specialized service instance available for the given client instance,
--- considering its component and interface types.
+-- If \a client is an interface name (string), co.getService() will pick the most
+-- specialized service available for clients of this type. Otherwise, if \a client
+-- is a service, co.getService() will pick the most specialized service available
+-- for the component instance providing the service, considering all its facets.
 --
 -- Examples:
 --     local itf = co.getService( "gfx.IDrawer" )
@@ -180,14 +179,14 @@ local function defineComponentType( ns, typeName, tct, provides, receives )
 	local typeBuilder = ns:defineType( typeName, 'TK_COMPONENT', tct )
 
 	if provides then
-		for itfName, itfType in pairs( provides ) do
-			typeBuilder:definePort( itfName, itfType, true )
+		for facetName, facetType in pairs( provides ) do
+			typeBuilder:definePort( facetName, facetType, true )
 		end
 	end
 
 	if receives then
-		for itfName, itfType in pairs( receives ) do
-			typeBuilder:definePort( itfName, itfType, false )
+		for receptacleName, receptacleType in pairs( receives ) do
+			typeBuilder:definePort( receptacleName, receptacleType, false )
 		end
 	end
 

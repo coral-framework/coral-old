@@ -31,12 +31,12 @@ T* getMember( co::IType* type, const char* memberName )
 	return mi;
 }
 
-co::IField* getAttributeInfo( co::IType* type, const char* memberName )
+co::IField* getField( co::IType* type, const char* memberName )
 {
 	return getMember<co::IField>( type, memberName );
 }
 
-co::IMethod* getMethodInfo( co::IType* type, const char* memberName )
+co::IMethod* getMethod( co::IType* type, const char* memberName )
 {
 	return getMember<co::IMethod>( type, memberName );
 }
@@ -60,18 +60,18 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 	EXPECT_EQ( 0, ts->floatArray.size() );
 	EXPECT_EQ( 0, ts->typeArray.size() );
 
-	// --- obtain the necessary attribute infos:
-	co::IField* aTypeAttrib = getAttributeInfo( type, "aType" );
-	ASSERT_TRUE( aTypeAttrib != NULL );
+	// --- obtain the necessary fields:
+	co::IField* aTypeField = getField( type, "aType" );
+	ASSERT_TRUE( aTypeField != NULL );
 
-	co::IField* floatArrayAttrib = getAttributeInfo( type, "floatArray" );
-	ASSERT_TRUE( floatArrayAttrib != NULL );
+	co::IField* floatArrayField = getField( type, "floatArray" );
+	ASSERT_TRUE( floatArrayField != NULL );
 
-	co::IField* typeArrayAttrib = getAttributeInfo( type, "typeArray" );
-	ASSERT_TRUE( typeArrayAttrib != NULL );
+	co::IField* typeArrayField = getField( type, "typeArray" );
+	ASSERT_TRUE( typeArrayField != NULL );
 
-	// --- attribute setting:
-	reflector->setAttribute( ts, aTypeAttrib, co::getType( "co.IArray" ) );
+	// --- field setting:
+	reflector->setField( ts, aTypeField, co::getType( "co.IArray" ) );
 	ASSERT_TRUE( ts->aType.isValid() );
 	EXPECT_EQ( "co.IArray", ts->aType->getFullName() );
 
@@ -79,32 +79,32 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 	typeVec.push_back( co::getType( "co.IMember" ) );
 	typeVec.push_back( co::getType( "co.IField" ) );
 	typeVec.push_back( co::getType( "co.IMethod" ) );
-	
+
 	co::Any typeVecAny;
 	typeVecAny.set<std::vector<co::IType*>&>( typeVec );
 
-	EXPECT_THROW( reflector->setAttribute( ts, floatArrayAttrib, typeVecAny ), co::IllegalCastException );
-	EXPECT_NO_THROW( reflector->setAttribute( ts, typeArrayAttrib, typeVecAny ) );
+	EXPECT_THROW( reflector->setField( ts, floatArrayField, typeVecAny ), co::IllegalCastException );
+	EXPECT_NO_THROW( reflector->setField( ts, typeArrayField, typeVecAny ) );
 
 	ASSERT_EQ( 3, ts->typeArray.size() );
 	EXPECT_EQ( "co.IMember", ts->typeArray[0]->getFullName() );
 	EXPECT_EQ( "co.IField", ts->typeArray[1]->getFullName() );
 	EXPECT_EQ( "co.IMethod", ts->typeArray[2]->getFullName() );
 
-	// --- attribute getting:
+	// --- field getting:
 	co::Any res;
 
-	reflector->getAttribute( ts, aTypeAttrib, res );
-	EXPECT_EQ( "co.IInterface", res.get<co::IService*>()->getInterfaceType()->getFullName() );
+	reflector->getField( ts, aTypeField, res );
+	EXPECT_EQ( "co.IInterface", res.get<co::IService*>()->getInterface()->getFullName() );
 
-	reflector->getAttribute( ts, floatArrayAttrib, res );
+	reflector->getField( ts, floatArrayField, res );
 	EXPECT_EQ( 0, res.get< co::Range<const float> >().getSize() );
 
 	ts->floatArray.push_back( 1.1f );
 	ts->floatArray.push_back( 2.2f );
 	ts->floatArray.push_back( 3.3f );
 
-	reflector->getAttribute( ts, floatArrayAttrib, res );
+	reflector->getField( ts, floatArrayField, res );
 	ASSERT_EQ( 3, res.get< co::Range<const float> >().getSize() );
 	EXPECT_EQ( 1.1f, res.get< co::Range<const float> >()[0] );
 	EXPECT_EQ( 2.2f, res.get< co::Range<const float> >()[1] );
@@ -116,51 +116,51 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 
 TEST( ReflectionTests, getAndBindComponentInterfaces )
 {
-	co::RefPtr<co::IObject> testComponent = co::newInstance( "moduleA.TestComponent" );
-	ASSERT_TRUE( testComponent.isValid() );
+	co::RefPtr<co::IObject> instance = co::newInstance( "moduleA.TestComponent" );
+	ASSERT_TRUE( instance.isValid() );
 
-	EXPECT_THROW( testComponent->getInterface( NULL ), co::NoSuchPortException );
+	EXPECT_THROW( instance->getService( NULL ), co::NoSuchPortException );
 
-	co::IComponent* type = testComponent->getComponentType();
+	co::IComponent* type = instance->getComponent();
 
 	// get a facet info
 	co::IPort* testInterfaceInfo = dynamic_cast<co::IPort*>( type->getMember( "testInterface" ) );
 	ASSERT_TRUE( testInterfaceInfo != NULL );
 
 	// get the 'testInterface' instance
-	co::IService* itf = testComponent->getInterface( testInterfaceInfo );
-	EXPECT_EQ( testComponent->getFacet<moduleA::TestInterface>(), itf );
+	co::IService* service = instance->getService( testInterfaceInfo );
+	EXPECT_EQ( instance->getService<moduleA::TestInterface>(), service );
 
 	// cannot 'bind' to a facet
-	EXPECT_THROW( testComponent->setReceptacle( testInterfaceInfo, itf ), co::NoSuchPortException );
+	EXPECT_THROW( instance->setService( testInterfaceInfo, service ), co::NoSuchPortException );
 
 	// get IPort's for the receptacles
 	co::IPort* typePort = dynamic_cast<co::IPort*>( type->getMember( "type" ) );
-	co::IPort* itfTypePort = dynamic_cast<co::IPort*>( type->getMember( "itfType" ) );
+	co::IPort* itfTypePort = dynamic_cast<co::IPort*>( type->getMember( "itf" ) );
 	ASSERT_TRUE( typePort && itfTypePort );
 
 	// get the interface currently bound to the 'type' receptacle (should be null)
-	EXPECT_EQ( NULL, testComponent->getInterface( typePort ) );
+	EXPECT_EQ( NULL, instance->getService( typePort ) );
 
-	// attempting to bind a IStruct to 'itfType' should produce an exception (it expects an IInterface)
+	// attempting to bind a IStruct to 'itf' should produce an exception (it expects an IInterface)
 	co::IType* structType = co::getType( "moduleA.TestStruct" );
-	EXPECT_THROW( testComponent->setReceptacle( itfTypePort, structType ), co::IllegalCastException );
+	EXPECT_THROW( instance->setService( itfTypePort, structType ), co::IllegalCastException );
 
 	// bind an IInterface to both receptacles
-	co::IType* itfType = co::getType( "moduleA.TestInterface" );
+	co::IType* itf = co::getType( "moduleA.TestInterface" );
 
-	testComponent->setReceptacle( typePort, itfType );
-	itf = testComponent->getInterface( typePort );
-	EXPECT_EQ( itfType->getInterfaceOwner(), itf->getInterfaceOwner() );
-	EXPECT_EQ( itfType->getInterfaceName(), itf->getInterfaceName() );
+	instance->setService( typePort, itf );
+	service = instance->getService( typePort );
+	EXPECT_EQ( itf->getProvider(), service->getProvider() );
+	EXPECT_EQ( itf->getFacet(), service->getFacet() );
 
-	testComponent->setReceptacle( itfTypePort, itfType );
-	itf = testComponent->getInterface( itfTypePort );
-	EXPECT_EQ( itfType->getInterfaceOwner(), itf->getInterfaceOwner() );
-	EXPECT_EQ( itfType->getInterfaceName(), itf->getInterfaceName() );
+	instance->setService( itfTypePort, itf );
+	service = instance->getService( itfTypePort );
+	EXPECT_EQ( itf->getProvider(), service->getProvider() );
+	EXPECT_EQ( itf->getFacet(), service->getFacet() );
 
 	// try setting a receptacle by name
-	co::setReceptacleByName( testComponent.get(), "type", NULL );
-	EXPECT_EQ( NULL, testComponent->getInterface( typePort ) );
-	EXPECT_THROW( co::setReceptacleByName( testComponent.get(), "noReceptacle", NULL ), co::NoSuchPortException );
+	co::bindService( instance.get(), "type", NULL );
+	EXPECT_EQ( NULL, instance->getService( typePort ) );
+	EXPECT_THROW( co::bindService( instance.get(), "noReceptacle", NULL ), co::NoSuchPortException );
 }

@@ -39,9 +39,9 @@ public:
 
 	co::IObject* newInstance()
 	{
-		co::IObject* component = __TypeTransaction_newInstance();
-		assert( component->getComponentType()->getFullName() == "co.TypeTransaction" );
-		return component;
+		co::IObject* instance = __TypeTransaction_newInstance();
+		assert( instance->getComponent()->getFullName() == "co.TypeTransaction" );
+		return instance;
 	}
 };
 

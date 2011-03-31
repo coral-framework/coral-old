@@ -27,7 +27,7 @@ TEST( LexicalUtilsTests, isValidIdentifier )
 	ASSERT_FALSE( co::LexicalUtils::isValidIdentifier( "." ) );
 }
 
-TEST( LexicalUtilsTests, isValidAttribute )
+TEST( LexicalUtilsTests, isValidField )
 {
 	ASSERT_TRUE( co::LexicalUtils::isValidFieldName( "a" ) );
 	ASSERT_TRUE( co::LexicalUtils::isValidFieldName( "ala" ) );

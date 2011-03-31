@@ -82,7 +82,7 @@ public:
 	]], t.name, [[_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
 ]], c.moduleName == 'co' and '' or "\t\tmoduleRetain();\n", [[
-		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, ]], t.cppName, [[>( this ) );
+		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, ]], t.cppName, [[>( this ) );
 	}
 
 	virtual ~]], t.name, [[_Proxy()
@@ -92,23 +92,23 @@ public:
 
 	// co::IService Methods:
 
-	co::IInterface* getInterfaceType() { return co::typeOf<]], t.cppName, [[>::get(); }
-	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _provider->componentRetain(); }
-	void componentRelease() { _provider->componentRelease(); }
+	co::IInterface* getInterface() { return co::typeOf<]], t.cppName, [[>::get(); }
+	co::IObject* getProvider() { return _provider->getProvider(); }
+	co::IPort* getFacet() { return _provider->dynamicGetFacet( _cookie ); }
+	void serviceRetain() { _provider->serviceRetain(); }
+	void serviceRelease() { _provider->serviceRelease(); }
 
 ]] )
 
 		local function generateProxyMethodsFor( itf )
 			writer( "\t// ", itf.fullName, " Methods:\n\n" )
 
-			-- Attribute Accessors
+			-- Field Accessors
 			for i, a in ipairs( itf.fields ) do
 				local inputType = itf.formatInput( a.type )
 				writer( "\t", inputType, " ", itf.formatAccessor( "get", a.name ), "()\n", [[
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<]], itf.cppName, [[>( ]], i - 1, [[ ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<]], itf.cppName, [[>( ]], i - 1, [[ ) );
         return res.get< ]], inputType, [[ >();
 	}
 
@@ -118,7 +118,7 @@ public:
 	{
 		co::Any arg;
 		arg.set< ]], inputType, [[ >( ]], a.name, [[_ );
-		_provider->handleSetAttribute( _cookie, getAttribInfo<]], itf.cppName, [[>( ]], i - 1, [[ ), arg );
+		_provider->dynamicSetField( _cookie, getField<]], itf.cppName, [[>( ]], i - 1, [[ ), arg );
 	}
 
 ]] )
@@ -153,7 +153,7 @@ public:
 				if m.returnType then
 					writer( "const co::Any& res = " )
 				end
-				writer( "_provider->handleMethodInvocation( _cookie, getMethodInfo<", itf.cppName, ">( ", i - 1, " ), range );\n" )
+				writer( "_provider->dynamicInvoke( _cookie, getMethod<", itf.cppName, ">( ", i - 1, " ), range );\n" )
 				if m.returnType then
 					writer( "\t\treturn res.get< ", formattedReturnType, " >();\n" )
 				end
@@ -196,13 +196,13 @@ public:
 		writer( [[
 protected:
 	template<typename T>
-	co::IField* getAttribInfo( co::uint32 index )
+	co::IField* getField( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethod* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethod( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getMethods()[index];
 	}
@@ -255,9 +255,9 @@ public:
 
 	co::IObject* newInstance()
 	{
-		co::IObject* component = __]], t.name, [[_newInstance();
-		assert( component->getComponentType()->getFullName() == "]], t.fullName, [[" );
-		return component;
+		co::IObject* instance = __]], t.name, [[_newInstance();
+		assert( instance->getComponent()->getFullName() == "]], t.fullName, [[" );
+		return instance;
 	}
 ]] )
 	else
@@ -294,7 +294,7 @@ public:
 	elseif t.kind == 'TK_INTERFACE' then
 		writer( [[
 
-	co::IService* newProxy( co::IDynamicServiceProvider* provider )
+	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
 		return co::disambiguate<co::IService, ]], t.cppName, [[>( new ]], c.moduleNS, [[::]], t.name, [[_Proxy( provider ) );
@@ -306,10 +306,10 @@ public:
 
 		writer( [[
 
-	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		]], t.cppName, [[* p = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		]], t.cppName, [[* p = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
 ]] )
 		for i, a in ipairs( t.fields ) do
@@ -323,10 +323,10 @@ public:
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		]], t.cppName, [[* p = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		]], t.cppName, [[* p = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
 ]] )
 
@@ -348,11 +348,11 @@ public:
 
 		local callPrefix = ( t.kind == 'TK_NATIVECLASS' and t.cppName .. "_Adapter::" or "p->" )
 
-		writer( "\n\tvoid getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )\n\t{\n" )
+		writer( "\n\tvoid getField( const co::Any& instance, co::IField* field, co::Any& value )\n\t{\n" )
 
 		if #t.fields > 0 then
-			writer( "\t\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "& r" or "* p" ), [[ = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+			writer( "\t\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "& r" or "* p" ), [[ = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
 ]] )
 			for i, a in ipairs( t.fields ) do
@@ -366,7 +366,7 @@ public:
 ]]
 		else
 			writer [[
-		checkInstance( instance, ai );
+		checkInstance( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 ]]
@@ -375,17 +375,17 @@ public:
 		writer [[
 	}
 
-	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 ]]
 		if #t.fields > 0 then
-			writer( "\t\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "& r" or "* p" ), [[ = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+			writer( "\t\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "& r" or "* p" ), [[ = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
 ]] )
 			for i, a in ipairs( t.fields ) do
 				if a.isReadOnly then
-					writer( "\t\tcase ", a.index, ":\t\traiseAttributeIsReadOnly( ai ); break;\n" )
+					writer( "\t\tcase ", a.index, ":\t\traiseFieldIsReadOnly( field ); break;\n" )
 				else
 					writer( "\t\tcase ", a.index, ":\t\t", callPrefix, t.formatAccessor( "set", a.name ), "( ",
 						( t.kind == 'TK_NATIVECLASS' and "r, " or "" ), "value.get< ", t.formatInput( a.type ), " >() ); break;\n" )
@@ -400,7 +400,7 @@ public:
 ]] )
 		else
 			writer [[
-		checkInstance( instance, ai );
+		checkInstance( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 ]]
@@ -409,16 +409,16 @@ public:
 		writer [[
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
 	{
 ]]
 		if #t.methods > 0 then
-			writer( "\t\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "& r" or "* p" ), [[ = checkInstance( instance, mi );
-		checkNumArguments( mi, args.getSize() );
+			writer( "\t\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "& r" or "* p" ), [[ = checkInstance( instance, method );
+		checkNumArguments( method, args.getSize() );
 		int argIndex = -1;
 		try
 		{
-			switch( mi->getIndex() )
+			switch( method->getIndex() )
 			{
 ]] )
 			for i, m in ipairs( t.methods ) do
@@ -464,7 +464,7 @@ public:
 		{
 			if( argIndex == -1 )
 				throw; // just re-throw if the exception is not related to 'args'
-			raiseArgumentTypeException( mi, argIndex, e );
+			raiseArgumentTypeException( method, argIndex, e );
 		}
 		catch( ... )
 		{
@@ -474,7 +474,7 @@ public:
 ]]
 		else
 			writer [[
-		checkInstance( instance, mi );
+		checkInstance( instance, method );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( args );
 		CORAL_UNUSED( res );

@@ -42,9 +42,9 @@ public:
 
 	co::IObject* newInstance()
 	{
-		co::IObject* component = __Launcher_newInstance();
-		assert( component->getComponentType()->getFullName() == "lua.Launcher" );
-		return component;
+		co::IObject* instance = __Launcher_newInstance();
+		assert( instance->getComponent()->getFullName() == "lua.Launcher" );
+		return instance;
 	}
 };
 

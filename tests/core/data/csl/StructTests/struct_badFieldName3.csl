@@ -1,0 +1,4 @@
+struct struct_badFieldName3 
+{
+	string apple name;
+};

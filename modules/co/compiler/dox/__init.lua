@@ -56,11 +56,11 @@ function write.TK_STRUCT( writer, t )
 	writer( "//@}\n};\n" )
 end
 
-local function writeAttribAndMethods( writer, t )
-	writer( "//! \\name Attributes\n//@{\n" )
+local function writeFieldsAndMethods( writer, t )
+	writer( "//! \\name Fields\n//@{\n" )
 	for i, a in ipairs( t.fields ) do
 		addDoc( writer, t.fullName, a.name )
-		writer( "\t", a.isReadOnly and "readonly " or "", "attribute ", a.type.docName, " ", a.name, ";\n" )
+		writer( "\t", a.isReadOnly and "readonly " or "", a.type.docName, " ", a.name, ";\n" )
 	end
 	writer( "//@}\n//! \\name Methods\n//@{\n" )
 	for i, m in ipairs( t.methods ) do
@@ -90,7 +90,7 @@ end
 
 function write.TK_NATIVECLASS( writer, t )
 	writer( "value class ", t.name, "\n{\n" )
-	writeAttribAndMethods( writer, t )
+	writeFieldsAndMethods( writer, t )
 	writer( "};\n" )
 end
 
@@ -102,7 +102,7 @@ function write.TK_INTERFACE( writer, t )
 		writer( s.docName )
 	end
 	writer( "\n{\n" )
-	writeAttribAndMethods( writer, t )
+	writeFieldsAndMethods( writer, t )
 
 	local cppBlock = t.cppBlock
 	if cppBlock ~= "" then

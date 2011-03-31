@@ -6,6 +6,9 @@ interface IPort extends IMember
 	// The interface type.
 	readonly IInterface type;
 
-	//! True if this interface is a facet. False if it is a receptacle.
+	/*
+		True if the port is a facet (i.e. if it provides a service);
+		false if the port is a receptacle (i.e. it receives a service).
+	 */
 	readonly bool isFacet;
 };

@@ -13,15 +13,18 @@ namespace co {
 
 // ------ co.Module provides an interface named 'module', of type co.IModule ------ //
 
-co::IInterface* Module_co_IModule::getInterfaceType()
+co::IInterface* Module_co_IModule::getInterface()
 {
 	return co::typeOf<co::IModule>::get();
 }
 
-const std::string& Module_co_IModule::getInterfaceName()
+co::IPort* Module_co_IModule::getFacet()
 {
-	static const std::string s_interfaceName( "module" );
-	return s_interfaceName;
+	co::IComponent* component = static_cast<co::IComponent*>( co::getType( "co.Module" ) );
+	assert( component );
+	co::IPort* facet = static_cast<co::IPort*>( component->getMember( "module" ) );
+	assert( facet );
+	return facet;
 }
 
 // ------ Module_Base ------ //
@@ -36,29 +39,29 @@ Module_Base::~Module_Base()
 	// empty
 }
 
-co::IObject* Module_Base::getInterfaceOwner()
+co::IObject* Module_Base::getProvider()
 {
 	return this;
 }
 
-void Module_Base::componentRetain()
+void Module_Base::serviceRetain()
 {
 	incrementRefCount();
 }
 
-void Module_Base::componentRelease()
+void Module_Base::serviceRelease()
 {
 	decrementRefCount();
 }
 
-co::IComponent* Module_Base::getComponentType()
+co::IComponent* Module_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.Module" );
 	assert( dynamic_cast<co::IComponent*>( type ) );
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* Module_Base::getInterface( co::IPort* port )
+co::IService* Module_Base::getService( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -70,7 +73,7 @@ co::IService* Module_Base::getInterface( co::IPort* port )
 	return res;
 }
 
-void Module_Base::setReceptacle( co::IPort* receptacle, co::IService* service )
+void Module_Base::setService( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

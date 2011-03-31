@@ -27,7 +27,7 @@ public:
 	IState_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
 		moduleRetain();
-		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, lua::IState>( this ) );
+		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, lua::IState>( this ) );
 	}
 
 	virtual ~IState_Proxy()
@@ -37,11 +37,11 @@ public:
 
 	// co::IService Methods:
 
-	co::IInterface* getInterfaceType() { return co::typeOf<lua::IState>::get(); }
-	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _provider->componentRetain(); }
-	void componentRelease() { _provider->componentRelease(); }
+	co::IInterface* getInterface() { return co::typeOf<lua::IState>::get(); }
+	co::IObject* getProvider() { return _provider->getProvider(); }
+	co::IPort* getFacet() { return _provider->dynamicGetFacet( _cookie ); }
+	void serviceRetain() { _provider->serviceRetain(); }
+	void serviceRelease() { _provider->serviceRelease(); }
 
 	// lua.IState Methods:
 
@@ -53,7 +53,7 @@ public:
 		args[2].set< co::Range<co::Any const> >( args_ );
 		args[3].set< co::Range<co::Any const> >( results_ );
 		co::Range<co::Any const> range( args, 4 );
-		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 0 ), range );
+		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 0 ), range );
 		return res.get< co::int32 >();
 	}
 
@@ -63,19 +63,19 @@ public:
 		args[0].set< const std::string& >( name_ );
 		args[1].set< std::string& >( filename_ );
 		co::Range<co::Any const> range( args, 2 );
-		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<lua::IState>( 1 ), range );
+		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 1 ), range );
 		return res.get< bool >();
 	}
 
 protected:
 	template<typename T>
-	co::IField* getAttribInfo( co::uint32 index )
+	co::IField* getField( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethod* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethod( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getMethods()[index];
 	}
@@ -110,34 +110,34 @@ public:
 		return sizeof(lua::IState);
 	}
 
-	co::IService* newProxy( co::IDynamicServiceProvider* provider )
+	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
 		return co::disambiguate<co::IService, lua::IState>( new lua::IState_Proxy( provider ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		checkInstance( instance, ai );
+		checkInstance( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
-	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		checkInstance( instance, ai );
+		checkInstance( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
 	{
-		lua::IState* p = checkInstance( instance, mi );
-		checkNumArguments( mi, args.getSize() );
+		lua::IState* p = checkInstance( instance, method );
+		checkNumArguments( method, args.getSize() );
 		int argIndex = -1;
 		try
 		{
-			switch( mi->getIndex() )
+			switch( method->getIndex() )
 			{
 			case 0:
 				{
@@ -165,7 +165,7 @@ public:
 		{
 			if( argIndex == -1 )
 				throw; // just re-throw if the exception is not related to 'args'
-			raiseArgumentTypeException( mi, argIndex, e );
+			raiseArgumentTypeException( method, argIndex, e );
 		}
 		catch( ... )
 		{

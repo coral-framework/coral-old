@@ -53,8 +53,8 @@ struct State
 	// co::IType of the variable; or, if this is an array, the array element's co::IType.
 	union
 	{
-		IType* type;						// used for arrays, enums, structs and native classes
-		IInterface* interfaceType;	// used for interfaces
+		IType* type;				// used for arrays, enums, structs and native classes
+		IInterface* interface;	// used for interfaces
 	};
 
 	// only used if arrayKind is AK_ArrayRange
@@ -205,7 +205,7 @@ struct PrepareStateForStorageOf<TK_INTERFACE, TT, T*>
 	inline static void prepare( State& s, T* v )
 	{
 		PrepareBasic<TT>::prepare( s );
-		s.interfaceType = v ? v->getInterfaceType() : typeOf<T>::get();
+		s.interface = v ? v->getInterface() : typeOf<T>::get();
 	}
 };
 
@@ -215,7 +215,7 @@ struct PrepareStateForStorageOf<TK_INTERFACE, TT, const T*>
 	inline static void prepare( State& s, const T* v )
 	{
 		PrepareBasic<TT>::prepare( s );
-		s.interfaceType = v ? const_cast<T*>( v )->getInterfaceType() : typeOf<T>::get();
+		s.interface = v ? const_cast<T*>( v )->getInterface() : typeOf<T>::get();
 	}
 };
 
@@ -593,12 +593,12 @@ public:
 	}
 
 	/*!
-		Constructor corresponding to a setInterface() call.
-		Please, see setInterface()'s documentation for more info.
+		Constructor corresponding to a setService() call.
+		Please, see setService()'s documentation for more info.
 	 */
 	inline Any( IService* instance, IInterface* type ) : _state()
 	{
-		setInterface( instance, type );
+		setService( instance, type );
 	}
 
 	/*!
@@ -669,16 +669,16 @@ public:
 	/*!
 		For \c enums, \c structs and \c native \c classes, this returns the co::IType of the stored variable.
 		For \c arrays, this returns the array element type.
-		For \c interfaces you should call getInterfaceType() instead.
+		For \c interfaces you should call getInterface() instead.
 		For all other type kinds, this returns NULL.
 	 */
 	inline IType* getType() const { return _state.type; }
 
-	//! Returns the co::IInterface of the stored interface instance.
-	inline IInterface* getInterfaceType() const
+	//! Returns the interface of the stored service.
+	inline IInterface* getInterface() const
 	{
 		assert( _state.kind == TK_INTERFACE );
-		return _state.interfaceType;
+		return static_cast<IInterface*>( _state.type );
 	}
 
 	/*!
@@ -757,16 +757,16 @@ public:
 	//@{
 
 	/*!
-		Stores an interface pointer.
+		Stores a service.
 
-		The \a type parameter is optional. When it's not passed, the interface type is
-		extracted from the interface instance, which in this case cannot be NULL. Always
-		pass the interface \a type for cases where the interface instance could be null.
+		The \a type parameter is optional. When it's not passed, the interface is
+		extracted from the \a instance, which in this case cannot be NULL. Always
+		pass the \a type for cases where the \a instance could be null.
 
 		This method does not take variable flags, variables are always pointers. If you
 		want to create a reference to an interface pointer, use setVariable() instead.
 	 */
-	void setInterface( IService* instance, IInterface* type = 0 );
+	void setService( IService* instance, IInterface* type = 0 );
 
 	/*!
 		Stores a single-value (non-array) variable.

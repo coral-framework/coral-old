@@ -25,7 +25,7 @@ public:
 ]] )
 
 	if #t.fields > 0 then
-		writer( "\t// ------ Attributes ------\n" )
+		writer( "\t// ------ Fields ------\n" )
 		for i, a in ipairs( t.fields ) do
 			writer( "\n\tstatic ", t.formatInput( a.type ), " ", t.formatAccessor( "get", a.name ), "( ", t.cppName, "& instance );\n" )
 			if not a.isReadOnly then

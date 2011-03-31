@@ -152,15 +152,15 @@ IObject* newInstance( const std::string& fullName )
 	return reflector->newInstance();
 }
 
-void setReceptacleByName( IObject* object, const std::string& receptacleName, IService* service )
+void bindService( IObject* instance, const std::string& receptacleName, IService* service )
 {
-	assert( object );
-	IComponent* component = object->getComponentType();
+	assert( instance );
+	IComponent* component = instance->getComponent();
 	IPort* port = dynamic_cast<IPort*>( component->getMember( receptacleName ) );
 	if( !port )
 		CORAL_THROW( NoSuchPortException, "no such receptacle '" << receptacleName
 						<< "' in component " << component->getFullName() );
-	object->setReceptacle( port, service );
+	instance->setService( port, service );
 }
 
 inline IServiceManager* getServices()

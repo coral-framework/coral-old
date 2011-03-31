@@ -8,11 +8,13 @@
 #include <co/INamespace.h>
 #include <gtest/gtest.h>
 
+namespace {
+
 class PseudoInterface : public co::IService
 {
 public:
-	PseudoInterface( const char* name = "",  bool* setToTrueWhenDestroyed = 0 ) :
-			_name( name ), _setToTrueWhenDestroyed( setToTrueWhenDestroyed ), _refCount( 0 )
+	PseudoInterface( co::int32 key, bool* setToTrueWhenDestroyed = 0 ) :
+		_key( key ), _refCount( 0 ), _setToTrueWhenDestroyed( setToTrueWhenDestroyed )
 	{;}
 
 	virtual ~PseudoInterface()
@@ -21,25 +23,29 @@ public:
 			*_setToTrueWhenDestroyed = true;
 	}
 
-	virtual co::IInterface* getInterfaceType() { return 0; }
-	virtual co::IObject* getInterfaceOwner() { return 0; }
-	virtual const std::string& getInterfaceName() { return _name; }
-	virtual void componentRetain() { ++_refCount; }
-	virtual void componentRelease() { if( --_refCount <= 0 ) delete this; }
+	inline co::int32 getKey() { return _key; }
+
+	co::IInterface* getInterface() { return 0; }
+	co::IObject* getProvider() { return 0; }
+	co::IPort* getFacet() { return 0; }
+	void serviceRetain() { ++_refCount; }
+	void serviceRelease() { if( --_refCount <= 0 ) delete this; }
 
 private:
-	std::string _name;
-	bool* _setToTrueWhenDestroyed;
+	co::int32 _key;
 	co::int32 _refCount;
+	bool* _setToTrueWhenDestroyed;
 };
+
+} // anonymous namespace
 
 TEST( RefVectorTests, rawPtrVectorEquivalence )
 {
-	PseudoInterface o1, o2, o3;
-	o1.componentRetain();
-	o2.componentRetain();
-	o3.componentRetain();
-	
+	PseudoInterface o1( 1 ), o2( 2 ), o3( 3 );
+	o1.serviceRetain();
+	o2.serviceRetain();
+	o3.serviceRetain();
+
 	co::RefPtr<PseudoInterface> refPtr( &o1 );
 	EXPECT_EQ( sizeof( co::RefPtr<PseudoInterface> ), sizeof( PseudoInterface* ) );
 
@@ -70,10 +76,10 @@ TEST( RefVectorTests, rawPtrVectorWithEmptyRefVector )
 
 TEST( RefVectorTests, castedPtrRange )
 {
-	PseudoInterface o1, o2, o3;
-	o1.componentRetain();
-	o2.componentRetain();
-	o3.componentRetain();
+	PseudoInterface o1( 1 ), o2( 2 ), o3( 3 );
+	o1.serviceRetain();
+	o2.serviceRetain();
+	o3.serviceRetain();
 
 	co::RefVector<PseudoInterface> refVec;
 	refVec.push_back( &o1 );
@@ -82,28 +88,28 @@ TEST( RefVectorTests, castedPtrRange )
 
 	co::Range<co::IService* const> range( refVec );
 	EXPECT_EQ( range.getSize(), 3 );
-	
+
 	// invalid usage sample (causes compile-time error):
 	//co::Range<co::INamespace*> invalidRange( refVec );
 }
 
-inline int pseudoInterfaceComparator( PseudoInterface* element, const std::string& name )
+inline int pseudoInterfaceComparator( PseudoInterface* itf, co::int32 key )
 {
-	return element->getInterfaceName().compare( name );
+	return ( itf->getKey() == key ? 0 : ( itf->getKey() < key ? -1 : 1 ) );
 }
 
 TEST( RefVectorTests, sortedRefVector )
 {
-	co::RefPtr<PseudoInterface> o1 = new PseudoInterface( "o1" );
-	co::RefPtr<PseudoInterface> o2 = new PseudoInterface( "o2" );
-	co::RefPtr<PseudoInterface> o3 = new PseudoInterface( "o3" );
-	co::RefPtr<PseudoInterface> o4 = new PseudoInterface( "o4" );
+	co::RefPtr<PseudoInterface> o1 = new PseudoInterface( 1 );
+	co::RefPtr<PseudoInterface> o2 = new PseudoInterface( 2 );
+	co::RefPtr<PseudoInterface> o3 = new PseudoInterface( 3 );
+	co::RefPtr<PseudoInterface> o4 = new PseudoInterface( 4 );
 
 	co::RefVector<PseudoInterface> refVec;
-	refVec.sortedInsert( o2->getInterfaceName(), o2, pseudoInterfaceComparator );
-	refVec.sortedInsert( o4->getInterfaceName(), o4, pseudoInterfaceComparator );
-	refVec.sortedInsert( o3->getInterfaceName(), o3.get(), pseudoInterfaceComparator );
-	refVec.sortedInsert( o1->getInterfaceName(), o1, pseudoInterfaceComparator );
+	refVec.sortedInsert( o2->getKey(), o2, pseudoInterfaceComparator );
+	refVec.sortedInsert( o4->getKey(), o4, pseudoInterfaceComparator );
+	refVec.sortedInsert( o3->getKey(), o3.get(), pseudoInterfaceComparator );
+	refVec.sortedInsert( o1->getKey(), o1, pseudoInterfaceComparator );
 
 	EXPECT_EQ( refVec[0], o1 );
 	EXPECT_EQ( refVec[1], o2 );
@@ -114,6 +120,6 @@ TEST( RefVectorTests, sortedRefVector )
 	EXPECT_NE( refVec[0], refVec[3] );
 
 	size_t pos;
-	EXPECT_TRUE( refVec.sortedFind( std::string( "o3" ), pseudoInterfaceComparator, pos ) );
+	EXPECT_TRUE( refVec.sortedFind( o3->getKey(), pseudoInterfaceComparator, pos ) );
 	EXPECT_EQ( pos, 2 );
 }

@@ -39,9 +39,9 @@ public:
 
 	co::IObject* newInstance()
 	{
-		co::IObject* component = __Parameter_newInstance();
-		assert( component->getComponentType()->getFullName() == "co.Parameter" );
-		return component;
+		co::IObject* instance = __Parameter_newInstance();
+		assert( instance->getComponent()->getFullName() == "co.Parameter" );
+		return instance;
 	}
 };
 

@@ -25,7 +25,7 @@ class IObject_Proxy : public co::IObject
 public:
 	IObject_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, co::IObject>( this ) );
+		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, co::IObject>( this ) );
 	}
 
 	virtual ~IObject_Proxy()
@@ -35,47 +35,47 @@ public:
 
 	// co::IService Methods:
 
-	co::IInterface* getInterfaceType() { return co::typeOf<co::IObject>::get(); }
-	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _provider->componentRetain(); }
-	void componentRelease() { _provider->componentRelease(); }
+	co::IInterface* getInterface() { return co::typeOf<co::IObject>::get(); }
+	co::IObject* getProvider() { return _provider->getProvider(); }
+	co::IPort* getFacet() { return _provider->dynamicGetFacet( _cookie ); }
+	void serviceRetain() { _provider->serviceRetain(); }
+	void serviceRelease() { _provider->serviceRelease(); }
 
 	// co.IObject Methods:
 
-	co::IComponent* getComponentType()
+	co::IComponent* getComponent()
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IObject>( 0 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IObject>( 0 ) );
         return res.get< co::IComponent* >();
 	}
 
-	co::IService* getInterface( co::IPort* port_ )
+	co::IService* getService( co::IPort* port_ )
 	{
 		co::Any args[1];
 		args[0].set< co::IPort* >( port_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->handleMethodInvocation( _cookie, getMethodInfo<co::IObject>( 0 ), range );
+		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 0 ), range );
 		return res.get< co::IService* >();
 	}
 
-	void setReceptacle( co::IPort* receptacle_, co::IService* service_ )
+	void setService( co::IPort* receptacle_, co::IService* service_ )
 	{
 		co::Any args[2];
 		args[0].set< co::IPort* >( receptacle_ );
 		args[1].set< co::IService* >( service_ );
 		co::Range<co::Any const> range( args, 2 );
-		_provider->handleMethodInvocation( _cookie, getMethodInfo<co::IObject>( 1 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 1 ), range );
 	}
 
 protected:
 	template<typename T>
-	co::IField* getAttribInfo( co::uint32 index )
+	co::IField* getField( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethod* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethod( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getMethods()[index];
 	}
@@ -110,48 +110,48 @@ public:
 		return sizeof(co::IObject);
 	}
 
-	co::IService* newProxy( co::IDynamicServiceProvider* provider )
+	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
 		return co::disambiguate<co::IService, co::IObject>( new co::IObject_Proxy( provider ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		co::IObject* p = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		co::IObject* p = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::IComponent* >( p->getComponentType() ); break;
+		case 0:		value.set< co::IComponent* >( p->getComponent() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		co::IObject* p = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		co::IObject* p = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
-		case 0:		raiseAttributeIsReadOnly( ai ); break;
+		case 0:		raiseFieldIsReadOnly( field ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 		CORAL_UNUSED( p );
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
 	{
-		co::IObject* p = checkInstance( instance, mi );
-		checkNumArguments( mi, args.getSize() );
+		co::IObject* p = checkInstance( instance, method );
+		checkNumArguments( method, args.getSize() );
 		int argIndex = -1;
 		try
 		{
-			switch( mi->getIndex() )
+			switch( method->getIndex() )
 			{
 			case 1:
 				{
 					co::IPort* port_ = args[++argIndex].get< co::IPort* >();
 					argIndex = -1;
-					res.set< co::IService* >( p->getInterface( port_ ) );
+					res.set< co::IService* >( p->getService( port_ ) );
 				}
 				break;
 			case 2:
@@ -159,7 +159,7 @@ public:
 					co::IPort* receptacle_ = args[++argIndex].get< co::IPort* >();
 					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					argIndex = -1;
-					p->setReceptacle( receptacle_, service_ );
+					p->setService( receptacle_, service_ );
 				}
 				break;
 			default:
@@ -170,7 +170,7 @@ public:
 		{
 			if( argIndex == -1 )
 				throw; // just re-throw if the exception is not related to 'args'
-			raiseArgumentTypeException( mi, argIndex, e );
+			raiseArgumentTypeException( method, argIndex, e );
 		}
 		catch( ... )
 		{

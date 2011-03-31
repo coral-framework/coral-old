@@ -24,7 +24,7 @@ class IParameter_Proxy : public co::IParameter
 public:
 	IParameter_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _provider->registerProxyInterface( co::disambiguate<co::IService, co::IParameter>( this ) );
+		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, co::IParameter>( this ) );
 	}
 
 	virtual ~IParameter_Proxy()
@@ -34,47 +34,47 @@ public:
 
 	// co::IService Methods:
 
-	co::IInterface* getInterfaceType() { return co::typeOf<co::IParameter>::get(); }
-	co::IObject* getInterfaceOwner() { return _provider->getInterfaceOwner(); }
-	const std::string& getInterfaceName() { return _provider->getProxyInterfaceName( _cookie ); }
-	void componentRetain() { _provider->componentRetain(); }
-	void componentRelease() { _provider->componentRelease(); }
+	co::IInterface* getInterface() { return co::typeOf<co::IParameter>::get(); }
+	co::IObject* getProvider() { return _provider->getProvider(); }
+	co::IPort* getFacet() { return _provider->dynamicGetFacet( _cookie ); }
+	void serviceRetain() { _provider->serviceRetain(); }
+	void serviceRelease() { _provider->serviceRelease(); }
 
 	// co.IParameter Methods:
 
 	bool getIsIn()
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IParameter>( 0 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 0 ) );
         return res.get< bool >();
 	}
 
 	bool getIsOut()
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IParameter>( 1 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 1 ) );
         return res.get< bool >();
 	}
 
 	const std::string& getName()
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IParameter>( 2 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 2 ) );
         return res.get< const std::string& >();
 	}
 
 	co::IType* getType()
 	{
-		const co::Any& res = _provider->handleGetAttribute( _cookie, getAttribInfo<co::IParameter>( 3 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 3 ) );
         return res.get< co::IType* >();
 	}
 
 protected:
 	template<typename T>
-	co::IField* getAttribInfo( co::uint32 index )
+	co::IField* getField( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getFields()[index];
 	}
 
 	template<typename T>
-	co::IMethod* getMethodInfo( co::uint32 index )
+	co::IMethod* getMethod( co::uint32 index )
 	{
 		return co::typeOf<T>::get()->getMethods()[index];
 	}
@@ -109,16 +109,16 @@ public:
 		return sizeof(co::IParameter);
 	}
 
-	co::IService* newProxy( co::IDynamicServiceProvider* provider )
+	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
 		return co::disambiguate<co::IService, co::IParameter>( new co::IParameter_Proxy( provider ) );
 	}
 
-	void getAttribute( const co::Any& instance, co::IField* ai, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		co::IParameter* p = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		co::IParameter* p = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
 		case 0:		value.set< bool >( p->getIsIn() ); break;
 		case 1:		value.set< bool >( p->getIsOut() ); break;
@@ -128,24 +128,24 @@ public:
 		}
 	}
 
-	void setAttribute( const co::Any& instance, co::IField* ai, const co::Any& value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		co::IParameter* p = checkInstance( instance, ai );
-		switch( ai->getIndex() )
+		co::IParameter* p = checkInstance( instance, field );
+		switch( field->getIndex() )
 		{
-		case 0:		raiseAttributeIsReadOnly( ai ); break;
-		case 1:		raiseAttributeIsReadOnly( ai ); break;
-		case 2:		raiseAttributeIsReadOnly( ai ); break;
-		case 3:		raiseAttributeIsReadOnly( ai ); break;
+		case 0:		raiseFieldIsReadOnly( field ); break;
+		case 1:		raiseFieldIsReadOnly( field ); break;
+		case 2:		raiseFieldIsReadOnly( field ); break;
+		case 3:		raiseFieldIsReadOnly( field ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 		CORAL_UNUSED( p );
 		CORAL_UNUSED( value );
 	}
 
-	void invokeMethod( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
 	{
-		checkInstance( instance, mi );
+		checkInstance( instance, method );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( args );
 		CORAL_UNUSED( res );

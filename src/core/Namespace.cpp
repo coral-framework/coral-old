@@ -139,14 +139,13 @@ INamespace* Namespace::getChildNamespace( const std::string& name )
 ITypeBuilder* Namespace::defineType( const std::string& name, TypeKind typeKind, ITypeTransaction* transaction )
 {
 	if( typeKind <= TK_ARRAY || typeKind > TK_COMPONENT )
-	{
 		CORAL_THROW( IllegalArgumentException, "'" << typeKind <<  "' is not a user-definable type kind." );
-	}
 
 	if( !LexicalUtils::isValidIdentifier( name ) )
-	{
 		CORAL_THROW( IllegalNameException, "'" << name << "' is not a valid identifier." );
-	}
+
+	if( !transaction )
+		throw IllegalArgumentException( "illegal null transaction" );
 
 	size_t pos;
 	if( _types.sortedFind( name, typeComparator, pos ) && _types[pos]->getFullName() != "co.IService" )

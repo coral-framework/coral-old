@@ -18,8 +18,8 @@ class IllegalCastException;
 class CORAL_EXPORT ReflectorBase_co_Reflector : public IReflector
 {
 public:
-	virtual IInterface* getInterfaceType();
-	virtual const std::string& getInterfaceName();
+	virtual IInterface* getInterface();
+	virtual IPort* getFacet();
 };
 
 /*!
@@ -32,24 +32,24 @@ public:
 	virtual ~ReflectorBase();
 
 	// co::IService methods:
-    IObject* getInterfaceOwner();
-    void componentRetain();
-    void componentRelease();
+    IObject* getProvider();
+    void serviceRetain();
+    void serviceRelease();
 
     // co::IObject methods:
-    IComponent* getComponentType();
-    IService* getInterface( IPort* );
-    void setReceptacle( IPort*, IService* );
+    IComponent* getComponent();
+    IService* getService( IPort* );
+    void setService( IPort*, IService* );
 
 	// co::IReflector methods:
 	void createValue( void* address, size_t length );
     void copyValue( const void* fromAddress, void* toAddress );
     void destroyValue( void* address );
     IObject* newInstance();
-    IService* newProxy( IDynamicServiceProvider* handler );
-    void getAttribute( const Any& instance, IField* ai, Any& value );
-    void setAttribute( const Any& instance, IField* ai, const Any& value );
-    void invokeMethod( const Any& instance, IMethod* mi, Range<Any const> args, Any& returnValue );
+    IService* newDynamicProxy( IDynamicServiceProvider* handler );
+    void getField( const Any& instance, IField* ai, Any& value );
+    void setField( const Any& instance, IField* ai, const Any& value );
+    void invoke( const Any& instance, IMethod* mi, Range<Any const> args, Any& returnValue );
 	void raise( const std::string& message );
 
 protected:
@@ -68,8 +68,8 @@ protected:
 	//! Raises co::MissingInputException if \a numArgs is lesser than \a mi's expected number of args.
 	void checkNumArguments( co::IMethod* mi, size_t numArgs );
 
-	//! Raises an exception because setAttribute() was called on a read-only attribute.
-	void raiseAttributeIsReadOnly( co::IField* ai );
+	//! Raises an exception because setField() was called on a read-only field.
+	void raiseFieldIsReadOnly( co::IField* ai );
 
 	//! Re-raises a co::IllegalCastException with info about which method parameter raised the exception.
 	void raiseArgumentTypeException( co::IMethod* mi, int argIndex, const co::IllegalCastException& e );

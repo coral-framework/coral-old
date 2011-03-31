@@ -479,11 +479,11 @@ bool testAndCopyCompatibleReferences( const __any::State& from, __any::State& to
 			else
 			{
 				// for types with inheritance, upcasts are only allowed if the pointer is const
-				if( to.interfaceType == from.interfaceType )
+				if( to.interface == from.interface )
 					return ( !from.isPointerConst || to.isPointerConst );
 				else
-					return to.isPointerConst && ( from.interfaceType == to.interfaceType ||
-													from.interfaceType->isSubTypeOf( to.interfaceType ) );
+					return to.isPointerConst && ( from.interface == to.interface ||
+													from.interface->isSubTypeOf( to.interface ) );
 			}
 		}
 		else
@@ -505,17 +505,17 @@ bool testAndCopyCompatibleReferences( const __any::State& from, __any::State& to
 	{
 		// is-a type check for interfaces
 		assert( to.kind == TK_INTERFACE );
-		return from.interfaceType == to.interfaceType || from.interfaceType->isSubTypeOf( to.interfaceType );
+		return from.interface == to.interface || from.interface->isSubTypeOf( to.interface );
 	}
 }
 
-void Any::setInterface( IService* instance, IInterface* type )
+void Any::setService( IService* instance, IInterface* type )
 {
 	// type cannot be NULL when the instance is NULL
 	assert( type || instance );
 
 	_state.kind = TK_INTERFACE;
-	_state.interfaceType = ( instance ? instance->getInterfaceType() : type );
+	_state.interface = ( instance ? instance->getInterface() : type );
 	_state.isConst = false;
 	_state.isPointer = true;
 	_state.isPointerConst = false;
@@ -851,7 +851,7 @@ void Any::makeIn()
 		break;
 
 	case TK_INTERFACE:
-		setInterface( reinterpret_cast<IService*>( _object.data.ptr ), getInterfaceType() );
+		setService( reinterpret_cast<IService*>( _object.data.ptr ), getInterface() );
 		break;
 
 	default:
