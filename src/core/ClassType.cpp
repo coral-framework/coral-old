@@ -54,8 +54,11 @@ void ClassTypeImpl::sortMembers( ICompositeType* owner )
 	assert( _firstMethodPos == size_t( -1 ) );
 
 	// sort the members	vector
-	IMember** start = reinterpret_cast<IMember**>( &_members[0] );
-	std::sort( start, start + _members.size(), memberKindComparator );
+	if( !_members.empty() )
+	{
+		IMember** start = reinterpret_cast<IMember**>( &_members[0] );
+		std::sort( start, start + _members.size(), memberKindComparator );
+	}
 
 	// notify members about their owner/index
 	size_t count = _members.size();
