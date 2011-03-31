@@ -61,7 +61,7 @@ static void addDefaultPaths()
 #endif
 }
 
-static void resolveCallee( const std::string& calleeName, co::IComponent*& ct, co::IPort*& facet, co::IMethod*& method )
+static void resolveCallee( const std::string& calleeName, co::IComponent*& component, co::IPort*& facet, co::IMethod*& method )
 {
 	// was a method name specified?
 	size_t colonPos = calleeName.rfind( ':' );
@@ -69,17 +69,19 @@ static void resolveCallee( const std::string& calleeName, co::IComponent*& ct, c
 	{
 		// resolve component type
 		co::IType* type = co::getType( calleeName );
-		ct = dynamic_cast<co::IComponent*>( type );
-		if( !ct )
+		if( !type || type->getKind() != co::TK_COMPONENT )
 			CORAL_THROW( co::Exception, "'" << calleeName << "' is not a component." );
 
+		component = static_cast<co::IComponent*>( type );
+
 		// search the component's list of facets
-		co::Range<co::IPort* const> facets = ct->getFacets();
+		co::Range<co::IPort* const> facets = component->getFacets();
 		for( ; facets; facets.popFirst() )
 		{
 			facet = facets.getFirst();
 			co::IMember* member = facet->getType()->getMember( "main" );
-			if( member && ( method = dynamic_cast<co::IMethod*>( member ) ) )
+			method = static_cast<co::IMethod*>( member );
+			if( member && member->getKind() == co::MK_METHOD )
 				return;
 		}
 
@@ -100,13 +102,13 @@ static void resolveCallee( const std::string& calleeName, co::IComponent*& ct, c
 
 	// resolve component type
 	co::IType* type = co::getType( componentName );
-	if( type->getKind() != co::TK_COMPONENT )
+	if( !type || type->getKind() != co::TK_COMPONENT )
 		CORAL_THROW( co::Exception, "'" << componentName << "' is not a component." );
 
-	ct = static_cast<co::IComponent*>( type );
+	component = static_cast<co::IComponent*>( type );
 
 	// resolve facet type
-	co::IMember* member = ct->getMember( facetName );
+	co::IMember* member = component->getMember( facetName );
 	if( !member )
 		CORAL_THROW( co::Exception, "'" << componentName << "' has no facet named '" << facetName << "'." );
 
@@ -121,10 +123,11 @@ static void resolveCallee( const std::string& calleeName, co::IComponent*& ct, c
 		CORAL_THROW( co::Exception, "interface '" << facet->getType()->getFullName()
 						<< "' has no method named '" << methodName << "'." );
 
-	method = dynamic_cast<co::IMethod*>( member );
-	if( !method )
+	if( member->getKind() != co::MK_METHOD )
 		CORAL_THROW( co::Exception, "interface member '" << facet->getType()->getFullName()
 						<< ":" << methodName << "' is a field, not a method." );
+
+	method = static_cast<co::IMethod*>( member );
 }
 
 /*
