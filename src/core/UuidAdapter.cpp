@@ -5,23 +5,25 @@
 
 #include "Uuid_Adapter.h"
 #include "tools/CryptoHash.h"
-	
-bool co::Uuid_Adapter::getIsNull( co::Uuid& instance )
+
+namespace co {
+
+bool Uuid_Adapter::getIsNull( co::Uuid& instance )
 {
 	return instance.isNull();
 }
 
-void co::Uuid_Adapter::clear( co::Uuid& instance )
+void Uuid_Adapter::clear( co::Uuid& instance )
 {
 	instance.clear();
 }
 
-void co::Uuid_Adapter::createRandom( co::Uuid& instance )
+void Uuid_Adapter::createRandom( co::Uuid& instance )
 {
 	instance = co::Uuid::createRandom();
 }
 
-void co::Uuid_Adapter::createSha1( co::Uuid& instance, const std::string& data )
+void Uuid_Adapter::createSha1( co::Uuid& instance, const std::string& data )
 {
 	co::CryptoHash hash( co::CryptoHash::Sha1 );
 	hash.addData( data );
@@ -32,12 +34,14 @@ void co::Uuid_Adapter::createSha1( co::Uuid& instance, const std::string& data )
 	result.toUuid( instance );
 }
 
-void co::Uuid_Adapter::getString( co::Uuid& instance, std::string& str )
+void Uuid_Adapter::getString( co::Uuid& instance, std::string& str )
 {
 	instance.getString( str );
 }
 
-void co::Uuid_Adapter::setString( co::Uuid& instance, const std::string& str )
+void Uuid_Adapter::setString( co::Uuid& instance, const std::string& str )
 {
 	instance.setString( str );
 }
+
+} // namespace co

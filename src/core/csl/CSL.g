@@ -240,6 +240,7 @@ param_io returns [ bool isIn, bool isOut ]
 	;
 
 interface_role returns [ bool isFacet ]
+	@init { $isFacet = true; }
 	: PROVIDES { $isFacet = true; }
 	| RECEIVES { $isFacet = false; }
 	;

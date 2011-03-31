@@ -16,7 +16,9 @@ local mapping = require "co.compiler.mapping"
 
 local componentBaseHeader = require "co.compiler.module.componentBaseHeader"
 local componentBaseSource = require "co.compiler.module.componentBaseSource"
+local componentTemplate = require "co.compiler.module.componentTemplate"
 local nativeClassAdapter = require "co.compiler.module.nativeClassAdapter"
+local nativeClassTemplate = require "co.compiler.module.nativeClassTemplate"
 local reflector = require "co.compiler.module.reflector"
 
 local moduleBootstrap = require "co.compiler.module.bootstrap"
@@ -192,17 +194,22 @@ function Compiler:generateModule( moduleName )
 		expand( dir, filename, template, c, t )
 	end
 
+	local outDir = self.outDir
+	local templatesDir = outDir .. "/@templates"
+
 	-- Generate per-type files
 	for i, t in ipairs( self.types ) do
 		-- only regenerate out-of-date files
 		local expand = ( cachedTypes[t.fullName] == t.fullSignatureStr and cachedExpand or updateExpand )
 		if t.kind == 'TK_NATIVECLASS' then
-			expand( self.outDir, t.name .. "_Adapter.h", nativeClassAdapter, self, t )
+			expand( outDir, t.name .. "_Adapter.h", nativeClassAdapter, self, t )
+			expand( templatesDir, t.name .. ".cpp", nativeClassTemplate, self, t )
 		elseif t.kind == 'TK_COMPONENT' then
-			expand( self.outDir, t.name .. "_Base.h", componentBaseHeader, self, t )
-			expand( self.outDir, t.name .. "_Base.cpp", componentBaseSource, self, t )
+			expand( outDir, t.name .. "_Base.h", componentBaseHeader, self, t )
+			expand( outDir, t.name .. "_Base.cpp", componentBaseSource, self, t )
+			expand( templatesDir, t.name .. ".cpp", componentTemplate, self, t )
 		end
-		expand( self.outDir, t.name .. "_Reflector.cpp", reflector, self, t )
+		expand( outDir, t.name .. "_Reflector.cpp", reflector, self, t )
 	end
 
 	-- Generate per-module files (only if at least one file was out of date)

@@ -111,7 +111,7 @@ static void resolveCallee( const std::string& calleeName, co::IComponent*& ct, c
 		CORAL_THROW( co::Exception, "'" << componentName << "' has no facet named '" << facetName << "'." );
 
 	facet = static_cast<co::IPort*>( member );
-	if( !member->getKind() != co::MK_PORT || !facet->getIsFacet() )
+	if( member->getKind() != co::MK_PORT || !facet->getIsFacet() )
 		CORAL_THROW( co::Exception, "component port '" << componentName << "." << facetName
 						<< "' is a receptacle, not a facet." );
 
