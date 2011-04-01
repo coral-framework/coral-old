@@ -11,7 +11,7 @@
 
 namespace co {
 
-// ------ co.ExceptionType provides an interface named 'type', of type co.IException ------ //
+// ------ co.ExceptionType has a facet named 'type', of type co.IException ------ //
 
 co::IInterface* ExceptionType_co_IException::getInterface()
 {
@@ -67,7 +67,7 @@ co::IService* ExceptionType_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::IException>( this ); break;
+	case 0:		res = static_cast<co::IException*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

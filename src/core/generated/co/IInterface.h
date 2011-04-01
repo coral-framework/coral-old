@@ -27,7 +27,7 @@ public:
 
 	virtual co::Range<co::IInterface* const> getSuperInterfaces() = 0;
 
-	virtual bool isSubTypeOf( co::IInterface* itf ) = 0;
+	virtual bool isSubTypeOf( co::IInterface* type ) = 0;
 };
 
 } // namespace co

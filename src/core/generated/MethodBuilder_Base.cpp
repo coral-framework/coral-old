@@ -11,7 +11,7 @@
 
 namespace co {
 
-// ------ co.MethodBuilder provides an interface named 'methodBuilder', of type co.IMethodBuilder ------ //
+// ------ co.MethodBuilder has a facet named 'methodBuilder', of type co.IMethodBuilder ------ //
 
 co::IInterface* MethodBuilder_co_IMethodBuilder::getInterface()
 {
@@ -67,7 +67,7 @@ co::IService* MethodBuilder_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::IMethodBuilder>( this ); break;
+	case 0:		res = static_cast<co::IMethodBuilder*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

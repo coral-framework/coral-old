@@ -40,13 +40,6 @@ template<> struct kindOf<IService> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<IService> { static const char* get() { return "co.IService"; } };
 template<> struct typeOf<IService> : public typeOfBase<IService, IInterface> {};
 
-#define CORAL_DISAMBIGUATE_CO_INTERFACE( Super ) \
-	co::IInterface* getInterface() = 0; \
-	co::IObject* getProvider() = 0; \
-	co::IPort* getFacet() = 0; \
-	void serviceRetain() = 0; \
-	void serviceRelease() = 0;
-
 } // namespace co
 
 #endif

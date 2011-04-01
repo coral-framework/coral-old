@@ -14,7 +14,7 @@ namespace lua {
 void moduleRetain();
 void moduleRelease();
 
-// ------ lua.Launcher provides an interface named 'launcher', of type lua.ILauncher ------ //
+// ------ lua.Launcher has a facet named 'launcher', of type lua.ILauncher ------ //
 
 co::IInterface* Launcher_lua_ILauncher::getInterface()
 {
@@ -70,7 +70,7 @@ co::IService* Launcher_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, lua::ILauncher>( this ); break;
+	case 0:		res = static_cast<lua::ILauncher*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

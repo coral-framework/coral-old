@@ -64,8 +64,8 @@ protected:
 
 	/*!
 		Utility method to dynamically define simple, internal component types (i.e.
-		components that provide a single interface and don't have reflectors). Used
-		internally by the core for all Reflectors and default IModulePart components.
+		components with a single facet and no reflector). Used internally by the core
+		for all Reflectors and default IModulePart components.
 
 		\param componentName fully-qualified name of the IComponent.
 		\param interfaceName type of the component's sole facet.

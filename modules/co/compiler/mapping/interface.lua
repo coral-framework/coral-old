@@ -39,10 +39,6 @@ local function template( writer, c, t )
 		writer( ") = 0;" )
 	end
 
-	if next( t.ambiguousBases ) then
-		writer( "\n\n\tCORAL_DISAMBIGUATE_CO_INTERFACE( ", t.superInterfaces[1].cppName ," );" )
-	end
-
 	writer( "\n};\n" )
 end
 

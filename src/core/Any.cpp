@@ -28,7 +28,7 @@ std::ostream& operator<<( std::ostream& out, const co::__any::State& s )
 		{
 		case co::__any::State::AK_StdVector:	arrayKindString = "std::vector"; break;
 		case co::__any::State::AK_RefVector:	arrayKindString = "co::RefVector"; break;
-		case co::__any::State::AK_ArrayRange:	arrayKindString = "co::Range"; break;
+		case co::__any::State::AK_Range:		arrayKindString = "co::Range"; break;
 		default:
 			arrayKindString = NULL;
 			assert( false );
@@ -461,16 +461,16 @@ bool testAndCopyCompatibleReferences( const __any::State& from, __any::State& to
 		assert( !to.isReference && !from.isReference ); // arrays can never contain references
 
 		// all array kinds are implicitly convertable to co::Range
-		if( to.arrayKind == __any::State::AK_ArrayRange )
+		if( to.arrayKind == __any::State::AK_Range )
 		{
-			if( from.arrayKind == __any::State::AK_ArrayRange )
+			if( from.arrayKind == __any::State::AK_Range )
 				to.arraySize = from.arraySize;
 
 			TypeKind toKind = to.type->getKind();
 			if( toKind != from.type->getKind() || to.isPointer != from.isPointer )
 				return false;
 
-			// there are some relaxations/conversions we can accept for co::ArrayRanges
+			// there are some relaxations/conversions we can accept for co::Ranges
 			if( toKind != TK_INTERFACE )
 			{
 				// for types without inheritance, type must match and we can only add 'const':
@@ -479,11 +479,11 @@ bool testAndCopyCompatibleReferences( const __any::State& from, __any::State& to
 			else
 			{
 				// for types with inheritance, upcasts are only allowed if the pointer is const
-				if( to.interface == from.interface )
+				if( to.getInterface() == from.getInterface() )
 					return ( !from.isPointerConst || to.isPointerConst );
 				else
-					return to.isPointerConst && ( from.interface == to.interface ||
-													from.interface->isSubTypeOf( to.interface ) );
+					return to.isPointerConst && ( from.getInterface() == to.getInterface() ||
+													from.getInterface()->isSubTypeOf( to.getInterface() ) );
 			}
 		}
 		else
@@ -505,7 +505,7 @@ bool testAndCopyCompatibleReferences( const __any::State& from, __any::State& to
 	{
 		// is-a type check for interfaces
 		assert( to.kind == TK_INTERFACE );
-		return from.interface == to.interface || from.interface->isSubTypeOf( to.interface );
+		return from.getInterface() == to.getInterface() || from.getInterface()->isSubTypeOf( to.getInterface() );
 	}
 }
 
@@ -515,7 +515,7 @@ void Any::setService( IService* instance, IInterface* type )
 	assert( type || instance );
 
 	_state.kind = TK_INTERFACE;
-	_state.interface = ( instance ? instance->getInterface() : type );
+	_state.type = ( instance ? instance->getInterface() : type );
 	_state.isConst = false;
 	_state.isPointer = true;
 	_state.isPointerConst = false;
@@ -618,8 +618,8 @@ void Any::setArray( ArrayKind arrayKind, IType* elementType, uint32 flags, void*
 	// the element type cannot be an array
 	assert( elementKind != TK_ARRAY );
 
-	// arraySize should only be passed for co::ArrayRanges
-	assert( arrayKind == AK_ArrayRange || size == 0 );
+	// arraySize should only be passed for co::Ranges
+	assert( arrayKind == AK_Range || size == 0 );
 
 	// process the array kind
 	switch( arrayKind )
@@ -633,9 +633,9 @@ void Any::setArray( ArrayKind arrayKind, IType* elementType, uint32 flags, void*
 		flags |= ( VarIsPointer | VarIsPointerConst );
 		_state.arrayKind = __any::State::AK_RefVector;
 		break;
-	case AK_ArrayRange:
+	case AK_Range:
 		assert( ptr == NULL || size > 0 );
-		_state.arrayKind = __any::State::AK_ArrayRange;
+		_state.arrayKind = __any::State::AK_Range;
 		assert( size < MAX_UINT32 );
 		_state.arraySize = static_cast<uint32>( size );
 		break;
@@ -1114,7 +1114,7 @@ bool Any::operator==( const Any& other ) const
 		return false;
 
 	if( _state.kind == TK_ARRAY && ( _state.arrayKind != other._state.arrayKind ||
-			( _state.arrayKind == __any::State::AK_ArrayRange
+			( _state.arrayKind == __any::State::AK_Range
 				&& _state.arraySize != other._state.arraySize ) ) )
 		return false;
 

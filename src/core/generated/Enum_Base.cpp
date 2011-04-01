@@ -11,7 +11,7 @@
 
 namespace co {
 
-// ------ co.Enum provides an interface named 'type', of type co.IEnum ------ //
+// ------ co.Enum has a facet named 'type', of type co.IEnum ------ //
 
 co::IInterface* Enum_co_IEnum::getInterface()
 {
@@ -67,7 +67,7 @@ co::IService* Enum_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::IEnum>( this ); break;
+	case 0:		res = static_cast<co::IEnum*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

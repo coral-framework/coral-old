@@ -25,7 +25,7 @@ class IPort_Proxy : public co::IPort
 public:
 	IPort_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, co::IPort>( this ) );
+		_cookie = _provider->dynamicRegisterService( this );
 	}
 
 	virtual ~IPort_Proxy()
@@ -127,7 +127,7 @@ public:
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
-		return co::disambiguate<co::IService, co::IPort>( new co::IPort_Proxy( provider ) );
+		return new co::IPort_Proxy( provider );
 	}
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
@@ -172,7 +172,7 @@ private:
 		co::IInterface* myType = co::typeOf<co::IPort>::get();
 
 		co::IPort* res;
-		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::IPort*>( any.getState().data.itf ) ) )
+		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::IPort*>( any.getState().data.service ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::IPort*, but got " << any );
 
 		// make sure that 'member' belongs to this type

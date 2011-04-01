@@ -11,7 +11,7 @@
 
 namespace co {
 
-// ------ co.ArrayType provides an interface named 'type', of type co.IArray ------ //
+// ------ co.ArrayType has a facet named 'type', of type co.IArray ------ //
 
 co::IInterface* ArrayType_co_IArray::getInterface()
 {
@@ -67,7 +67,7 @@ co::IService* ArrayType_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::IArray>( this ); break;
+	case 0:		res = static_cast<co::IArray*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

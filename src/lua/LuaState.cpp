@@ -64,7 +64,7 @@ void LuaState::setup()
 
 void LuaState::tearDown()
 {
-	// release the 'co.system' interface
+	// release the 'co.system' service
 	coPackage::close( sm_L );
 
 	// force a full GC cycle to ensure all __gc finalizers are called.
@@ -652,7 +652,7 @@ void LuaState::pushArray( lua_State* L, const co::Any& var )
 	// get the array as a memory block
 	int elemCount;
 	co::uint8* blockStart;
-	if( s.arrayKind == co::__any::State::AK_ArrayRange )
+	if( s.arrayKind == co::__any::State::AK_Range )
 	{
 		elemCount = static_cast<int>( s.arraySize );
 		blockStart = reinterpret_cast<co::uint8*>( s.data.ptr );

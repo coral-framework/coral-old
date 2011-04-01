@@ -14,7 +14,7 @@
 
 namespace co {
 
-//! ModulePartBase provides an interface named 'part', of type co::IModulePart.
+//! ModulePartBase provides a facet named 'part', of type co::IModulePart.
 class CORAL_EXPORT ModulePartBase_co_ModulePart : public IModulePart
 {
 public:

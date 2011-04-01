@@ -69,7 +69,7 @@ private:
 	friend std::ostream& operator<<( std::ostream&, const co::TypeSemanticChecker::MemberDeclaration& );
 
 	// validates inheritance: checks for cyclic inheritance and multiple inheritance.
-	void checkInheritance( co::IInterface* interface );
+	void checkInheritance( co::IInterface* itf );
 
 	// validates inherited members: checks for clashing names between the checked type and its super-types
 	void checkInheritedMemberClashing();

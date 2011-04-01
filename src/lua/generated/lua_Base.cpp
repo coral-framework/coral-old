@@ -14,7 +14,7 @@ namespace lua {
 void moduleRetain();
 void moduleRelease();
 
-// ------ lua.lua provides an interface named 'part', of type co.IModulePart ------ //
+// ------ lua.lua has a facet named 'part', of type co.IModulePart ------ //
 
 co::IInterface* lua_co_IModulePart::getInterface()
 {
@@ -70,7 +70,7 @@ co::IService* lua_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::IModulePart>( this ); break;
+	case 0:		res = static_cast<co::IModulePart*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

@@ -21,7 +21,7 @@ public:
 	virtual ~Port();
 
 	// internal methods:
-	void setType( IInterface* interface );
+	void setType( IInterface* type );
 	void setIsFacet( bool isFacet );
 
 	// IMember methods:

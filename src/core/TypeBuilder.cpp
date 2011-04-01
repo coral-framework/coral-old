@@ -440,7 +440,7 @@ public:
 
 	void fillType()
 	{
-		// when an interface has no explicit supertype, default to 'co.IService'		
+		// when an interface has no explicit supertype, default to 'co.IService'
 		if( !_superType )
 		{
 			// ... unless we're defining the 'co.IService' interface itself
@@ -510,16 +510,16 @@ public:
 
 	void fillType()
 	{
-		_myType->addInterfaces( _interfaces );
-		_myType->sortInterfaces();
+		_myType->addPorts( _interfaces );
+		_myType->sortPorts();
 	}
 
-	void definePort( const std::string& name, IInterface* interface, bool isFacet )
+	void definePort( const std::string& name, IInterface* type, bool isFacet )
 	{
 		assertNotCreated();
 
-		if( !interface )
-			CORAL_THROW( IllegalArgumentException, "illegal null interface" );
+		if( !type )
+			CORAL_THROW( IllegalArgumentException, "illegal null type" );
 
 		if( !LexicalUtils::isValidIdentifier( name ) )
 			CORAL_THROW( IllegalNameException, "port name '" << name << "' is not a valid indentifier");
@@ -532,7 +532,7 @@ public:
 
 		Port* port = new Port;
 		port->setName( name );
-		port->setType( interface );
+		port->setType( type );
 		port->setIsFacet( isFacet );
 
 		_interfaces.push_back( port );

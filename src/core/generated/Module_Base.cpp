@@ -11,7 +11,7 @@
 
 namespace co {
 
-// ------ co.Module provides an interface named 'module', of type co.IModule ------ //
+// ------ co.Module has a facet named 'module', of type co.IModule ------ //
 
 co::IInterface* Module_co_IModule::getInterface()
 {
@@ -67,7 +67,7 @@ co::IService* Module_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::IModule>( this ); break;
+	case 0:		res = static_cast<co::IModule*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

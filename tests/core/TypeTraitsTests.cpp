@@ -73,6 +73,20 @@ TEST( TypeTraitsTests, removeReference )
 	EXPECT_TRUE(( isSame<removeReference<int>::Type, int>::value ));
 }
 
+TEST( TypeTraitsTests, isSubTypeOf )
+{
+	EXPECT_TRUE(( isSubTypeOf<int, int>::value ));
+	EXPECT_TRUE(( isSubTypeOf<const int, int>::value ));
+	EXPECT_TRUE(( isSubTypeOf<int, const int>::value ));
+	EXPECT_FALSE(( isSubTypeOf<short, int>::value ));
+	EXPECT_FALSE(( isSubTypeOf<int*, int>::value ));
+
+	EXPECT_TRUE(( isSubTypeOf<co::IInterface, co::IClassType>::value ));
+	EXPECT_TRUE(( isSubTypeOf<co::IInterface const, co::IClassType>::value ));
+	EXPECT_TRUE(( isSubTypeOf<co::IInterface, co::IClassType const>::value ));
+	EXPECT_FALSE(( isSubTypeOf<co::IClassType, co::IInterface>::value ));
+}
+
 TEST( TypeTraitsTests, get )
 {
 	typedef co::traits::get<const co::int32* const &> getA;

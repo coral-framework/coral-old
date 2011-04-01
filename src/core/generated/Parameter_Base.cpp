@@ -11,7 +11,7 @@
 
 namespace co {
 
-// ------ co.Parameter provides an interface named 'parameter', of type co.IParameter ------ //
+// ------ co.Parameter has a facet named 'parameter', of type co.IParameter ------ //
 
 co::IInterface* Parameter_co_IParameter::getInterface()
 {
@@ -67,7 +67,7 @@ co::IService* Parameter_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::IParameter>( this ); break;
+	case 0:		res = static_cast<co::IParameter*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

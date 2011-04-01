@@ -1,8 +1,8 @@
 /*
 	Type representing an interface.
 
-	In addition to fields (properties) and methods, interfaces support single inheritance
-	and may contain C++ code (which is copied verbatim to the interface's mapped class).
+	In addition to fields and methods, interfaces support single inheritance and
+	may contain C++ code, which is copied verbatim to the interface's mapping class.
  */
 interface IInterface extends IClassType
 {
@@ -18,6 +18,6 @@ interface IInterface extends IClassType
 	// Block of C++ code loaded from the interface's CSL file. May be empty.
 	readonly string cppBlock;
 
-	// Returns whether this interface descends from (or is equal to) a given interface.
-	bool isSubTypeOf( in IInterface itf );
+	// Returns whether this interface descends from (or is equal to) another interface.
+	bool isSubTypeOf( in IInterface type );
 };

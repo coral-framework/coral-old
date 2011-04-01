@@ -82,7 +82,7 @@ public:
 	]], t.name, [[_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
 ]], c.moduleName == 'co' and '' or "\t\tmoduleRetain();\n", [[
-		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, ]], t.cppName, [[>( this ) );
+		_cookie = _provider->dynamicRegisterService( this );
 	}
 
 	virtual ~]], t.name, [[_Proxy()
@@ -297,7 +297,7 @@ public:
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
-		return co::disambiguate<co::IService, ]], t.cppName, [[>( new ]], c.moduleNS, [[::]], t.name, [[_Proxy( provider ) );
+		return new ]], c.moduleNS, [[::]], t.name, [[_Proxy( provider );
 	}
 ]] )
 	end
@@ -500,7 +500,7 @@ public:
 
 			if t.kind == 'TK_INTERFACE' then
 				writer( t.cppName, "* res;\n\t\t" )
-				writer( "if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<", t.cppName, "*>( any.getState().data.itf ) ) )\n" )
+				writer( "if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<", t.cppName, "*>( any.getState().data.service ) ) )\n" )
 			else
 				writer( "if( any.getKind() != co::", t.kind, " || any.getType() != myType || any.getState().data.ptr == NULL )\n" )
 			end

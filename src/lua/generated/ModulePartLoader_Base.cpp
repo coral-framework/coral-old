@@ -14,7 +14,7 @@ namespace lua {
 void moduleRetain();
 void moduleRelease();
 
-// ------ lua.ModulePartLoader provides an interface named 'loader', of type co.IModulePartLoader ------ //
+// ------ lua.ModulePartLoader has a facet named 'loader', of type co.IModulePartLoader ------ //
 
 co::IInterface* ModulePartLoader_co_IModulePartLoader::getInterface()
 {
@@ -70,7 +70,7 @@ co::IService* ModulePartLoader_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::IModulePartLoader>( this ); break;
+	case 0:		res = static_cast<co::IModulePartLoader*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

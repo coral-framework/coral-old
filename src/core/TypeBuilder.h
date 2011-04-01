@@ -50,7 +50,7 @@ public:
 	void defineIdentifier( const std::string& name );
 	void defineField( const std::string& name, IType* type, bool isReadOnly );
 	void defineSuperType( IType* superType );
-	void definePort( const std::string& name, IInterface* interface, bool isFacet );
+	void definePort( const std::string& name, IInterface* type, bool isFacet );
 	IMethodBuilder* defineMethod( const std::string& name );
 	void defineNativeClass( const std::string& nativeHeader, const std::string& nativeName );
 	IType* createType();

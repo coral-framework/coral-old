@@ -71,12 +71,12 @@ TEST( ReflectorTests, reflectorComponent )
 	co::IReflector* reflector = type->getReflector();
 	co::IObject* reflectorObject = reflector->getProvider();
 
-	// test the reflector component's IComponent
+	// test the reflector's component type
 	co::IComponent* component = reflectorObject->getComponent();
 	EXPECT_EQ( 1, component->getPorts().getSize() );
 	EXPECT_EQ( "reflector", component->getPorts().getFirst()->getName() );
 
-	// tests the reflector component's interface
+	// test the reflector component's facet
 	EXPECT_EQ( reflector, reflectorObject->getService( component->getPorts().getFirst() ) );
 }
 

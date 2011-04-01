@@ -27,26 +27,26 @@ void TypeSemanticChecker::check()
 	if( dynamic_cast<ICompositeType*>( _type ) == NULL )
 		return;
 
-	co::IInterface* interface = dynamic_cast<IInterface*>( _type );
-	if( interface )
-		checkInheritance( interface );
+	co::IInterface* itf = dynamic_cast<IInterface*>( _type );
+	if( itf )
+		checkInheritance( itf );
 
 	checkMemberDeclarations( _type );
 }
 
-void TypeSemanticChecker::checkInheritance( co::IInterface* interface )
+void TypeSemanticChecker::checkInheritance( co::IInterface* itf )
 {
 	// assert no multiple inheritance from the same type
-	co::Range<co::IInterface* const> superTypes = interface->getSuperInterfaces();
+	co::Range<co::IInterface* const> superTypes = itf->getSuperInterfaces();
 	for( ; superTypes; superTypes.popFirst() )
 	{
 		co::IInterface* currentSuper = superTypes.getFirst();
 
 		// check for cyclic inheritance
-		if( currentSuper->isSubTypeOf( interface ) )
+		if( currentSuper->isSubTypeOf( itf ) )
 		{
 			CORAL_THROW( SemanticException, "cyclic inheritance detected in type '"
-				<< interface->getFullName() << "' through supertype '"
+				<< itf->getFullName() << "' through supertype '"
 				<< currentSuper->getFullName() << "'" );
 		}
 
@@ -69,7 +69,7 @@ void TypeSemanticChecker::checkInheritance( co::IInterface* interface )
 
 			if( toBlame )
 			{
-				CORAL_THROW( SemanticException, "type '" << interface->getFullName()
+				CORAL_THROW( SemanticException, "type '" << itf->getFullName()
 					<< "' inherits more than once from supertype '" << toBlame->getFullName() << "'" );
 			}
 		}
@@ -140,10 +140,10 @@ void TypeSemanticChecker::checkMemberDeclarations( co::IType* type )
 			insertFieldDeclaration( fields.getFirst(), type );
 	}
 
-	co::IInterface* interface = dynamic_cast<co::IInterface*>( type );
-	if( interface )
+	co::IInterface* itf = dynamic_cast<co::IInterface*>( type );
+	if( itf )
 	{
-		co::Range<co::IInterface* const> superTypes = interface->getSuperInterfaces();
+		co::Range<co::IInterface* const> superTypes = itf->getSuperInterfaces();
 		for( ; superTypes; superTypes.popFirst() )
 			checkMemberDeclarations( superTypes.getFirst() );
 	}

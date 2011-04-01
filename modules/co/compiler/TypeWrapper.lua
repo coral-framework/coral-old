@@ -215,39 +215,6 @@ function autoFields.typesNeededInReflector( t )
 	return neededTypes
 end
 
-function autoFields.ambiguousBases( t )
-	-- maps each ancestor to the direct superclass of 't' that descends from it
-	local ancestors = {}
-
-	-- if an ancestor can be reached via two different superclasses, it's tagged as 'ambiguous'
-	local isAmbiguous = {}
-
-	local function gatherAncestors( itf, originalSuper )
-		local current = ancestors[itf]
-		if not current then
-			ancestors[itf] = originalSuper
-		elseif current ~= originalSuper then
-			isAmbiguous[itf] = true
-		end
-		for i, super in ipairs( itf.superInterfaces ) do
-			gatherAncestors( super, originalSuper )
-		end
-	end
-
-	for i, super in ipairs( t.superInterfaces ) do
-		gatherAncestors( super, super )
-	end
-
-	-- remove non-ambiguous entries from 'ancestors'
-	for base, super in pairs( ancestors ) do
-		if not isAmbiguous[base] then
-			ancestors[base] = nil
-		end
-	end
-
-	return ancestors
-end
-
 -------------------------------------------------------------------------------
 -- Helper traversal methods to gather data about a type
 -------------------------------------------------------------------------------

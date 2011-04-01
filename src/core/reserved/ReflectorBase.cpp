@@ -15,7 +15,7 @@
 
 namespace co {
 
-// ------ ReflectorBase provides an interface named 'reflector', of type co::IReflector ------ //
+// ------ ReflectorBase provides a facet named 'reflector', of type co::IReflector ------ //
 
 IInterface* ReflectorBase_co_Reflector::getInterface()
 {

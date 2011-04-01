@@ -43,7 +43,7 @@ CORAL_EXPORT void addPath( const std::string& path );
 // ------ Bootstrap and Shutdown -----------------------------------------------
 
 /*!
-	\brief Returns the co.ISystem bootstrap interface (a singleton).
+	\brief Returns the primary co.ISystem service.
 
 	This first call to this function (ever, or since the last call to co::shutdown())
 	initializes the Coral framework.
@@ -152,7 +152,7 @@ CORAL_EXPORT IService* getServiceForType( IInterface* serviceType, IInterface* c
 CORAL_EXPORT IService* getServiceForInstance( IInterface* serviceType, IService* clientInstance );
 
 /*!
-	\brief Template function to get a global service by its interface type.
+	\brief Template function to get a global service by its type.
 	Please refer to co::IServiceManager::getService() for the list of exceptions this function may throw.
 	\ingroup convenience
  */
@@ -163,7 +163,7 @@ inline T* getService()
 }
 
 /*!
-	\brief Template function to get a <tt>clientType</tt>-specialized service by its interface type.
+	\brief Template function to get a <tt>clientType</tt>-specialized service by its type.
 	This picks the most appropriate service instance available for clients of the given \a clientType.
 	Please refer to co::IServiceManager::getServiceForType() for the list of exceptions this function may throw.
 	\ingroup convenience
@@ -175,7 +175,7 @@ inline T* getService( co::IInterface* clientType )
 }
 
 /*!
-	\brief Template function to get a <tt>clientInstance</tt>-specialized service by its interface type.
+	\brief Template function to get a <tt>clientInstance</tt>-specialized service by its type.
 	This picks the most appropriate service instance available for the given \a clientInstance.
 	Please refer to co::IServiceManager::getServiceForInstance() for the list of exceptions this function may throw.
 	\ingroup convenience

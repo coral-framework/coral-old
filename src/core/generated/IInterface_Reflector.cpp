@@ -27,7 +27,7 @@ class IInterface_Proxy : public co::IInterface
 public:
 	IInterface_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, co::IInterface>( this ) );
+		_cookie = _provider->dynamicRegisterService( this );
 	}
 
 	virtual ~IInterface_Proxy()
@@ -153,10 +153,10 @@ public:
         return res.get< co::Range<co::IInterface* const> >();
 	}
 
-	bool isSubTypeOf( co::IInterface* itf_ )
+	bool isSubTypeOf( co::IInterface* type_ )
 	{
 		co::Any args[1];
-		args[0].set< co::IInterface* >( itf_ );
+		args[0].set< co::IInterface* >( type_ );
 		co::Range<co::Any const> range( args, 1 );
 		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IInterface>( 0 ), range );
 		return res.get< bool >();
@@ -208,7 +208,7 @@ public:
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
-		return co::disambiguate<co::IService, co::IInterface>( new co::IInterface_Proxy( provider ) );
+		return new co::IInterface_Proxy( provider );
 	}
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
@@ -250,9 +250,9 @@ public:
 			{
 			case 4:
 				{
-					co::IInterface* itf_ = args[++argIndex].get< co::IInterface* >();
+					co::IInterface* type_ = args[++argIndex].get< co::IInterface* >();
 					argIndex = -1;
-					res.set< bool >( p->isSubTypeOf( itf_ ) );
+					res.set< bool >( p->isSubTypeOf( type_ ) );
 				}
 				break;
 			default:
@@ -282,7 +282,7 @@ private:
 		co::IInterface* myType = co::typeOf<co::IInterface>::get();
 
 		co::IInterface* res;
-		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::IInterface*>( any.getState().data.itf ) ) )
+		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::IInterface*>( any.getState().data.service ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::IInterface*, but got " << any );
 
 		// make sure that 'member' belongs to this type

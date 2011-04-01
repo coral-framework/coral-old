@@ -11,7 +11,7 @@
 
 namespace co {
 
-// ------ co.TypeTransaction provides an interface named 'transaction', of type co.ITypeTransaction ------ //
+// ------ co.TypeTransaction has a facet named 'transaction', of type co.ITypeTransaction ------ //
 
 co::IInterface* TypeTransaction_co_ITypeTransaction::getInterface()
 {
@@ -67,7 +67,7 @@ co::IService* TypeTransaction_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::ITypeTransaction>( this ); break;
+	case 0:		res = static_cast<co::ITypeTransaction*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

@@ -49,11 +49,8 @@ struct RangeAdaptor<T, std::vector<ET*> >
 	static const bool isValid = true;
 	static T* getData( std::vector<ET*>& v )
 	{
-		/*
-			A conversion from ET* to T must not need a type cast.
-			Generally, this works for single, but not for multiple inheritance.
-		 */
-		assert( static_cast<T>( (ET*)0xCCCC ) == (T)0xCCCC );
+		// ET must be a subtype of T.
+		CORAL_STATIC_CHECK( ( traits::isSubTypeOf<ET, typename traits::removePointer<T>::Type>::value ), incompatible_pointer_types );
 		return v.empty() ? NULL : reinterpret_cast<T*>( &v[0] );
 	}
 	static size_t getSize( std::vector<ET*>& v ) { return v.size(); }
@@ -132,7 +129,7 @@ public:
 	template<typename C>
 	Range( C& container )
 	{
-		typedef ::co::RangeAdaptor<T, C> Adaptor;
+		typedef RangeAdaptor<T, C> Adaptor;
 		CORAL_STATIC_CHECK( Adaptor::isValid, invalid_Range_container_type );
 		_start = Adaptor::getData( container );
 		_end = _start + Adaptor::getSize( container );

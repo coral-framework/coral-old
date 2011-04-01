@@ -26,7 +26,7 @@ class IMethod_Proxy : public co::IMethod
 public:
 	IMethod_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, co::IMethod>( this ) );
+		_cookie = _provider->dynamicRegisterService( this );
 	}
 
 	virtual ~IMethod_Proxy()
@@ -134,7 +134,7 @@ public:
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
-		return co::disambiguate<co::IService, co::IMethod>( new co::IMethod_Proxy( provider ) );
+		return new co::IMethod_Proxy( provider );
 	}
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
@@ -181,7 +181,7 @@ private:
 		co::IInterface* myType = co::typeOf<co::IMethod>::get();
 
 		co::IMethod* res;
-		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::IMethod*>( any.getState().data.itf ) ) )
+		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::IMethod*>( any.getState().data.service ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::IMethod*, but got " << any );
 
 		// make sure that 'member' belongs to this type

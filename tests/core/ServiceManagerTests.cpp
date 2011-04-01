@@ -139,7 +139,7 @@ TEST( ServiceManagerTests, customServicesPerInstance )
 	co::IServiceManager* sm = co::getSystem()->getServices();
 	co::IInterface* memberInfoType = co::typeOf<co::IMember>::get();
 
-	// getting a IMember service for a IMethod instance should return the intance's interface
+	// getting a IMember service for a IMethod instance should return the intance's service
 	co::IMember* aMethod = co::typeOf<co::IService>::get()->getMember( "serviceRetain" );
 	ASSERT_TRUE( aMethod != NULL );
 
@@ -159,10 +159,10 @@ TEST( ServiceManagerTests, customServicesPerInstance )
 	EXPECT_EQ( itf, co::getService<co::IMember>( co::getSystem() ) );
 
 	/*
-		Getting a IMember service for an IInterface instance should
+		Getting an IMember service for an IInterface instance should
 		return the IInterface-specialized service.
 	 */
-	co::IService* clientInstance = co::disambiguate<co::IService>( co::typeOf<co::IType>::get() );
+	co::IService* clientInstance = co::typeOf<co::IType>::get();
 	itf = sm->getServiceForInstance( memberInfoType, clientInstance );
 	EXPECT_EQ( "co.IPort", itf->getInterface()->getFullName() );
 

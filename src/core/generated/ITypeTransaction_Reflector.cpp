@@ -24,7 +24,7 @@ class ITypeTransaction_Proxy : public co::ITypeTransaction
 public:
 	ITypeTransaction_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, co::ITypeTransaction>( this ) );
+		_cookie = _provider->dynamicRegisterService( this );
 	}
 
 	virtual ~ITypeTransaction_Proxy()
@@ -106,7 +106,7 @@ public:
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
-		return co::disambiguate<co::IService, co::ITypeTransaction>( new co::ITypeTransaction_Proxy( provider ) );
+		return new co::ITypeTransaction_Proxy( provider );
 	}
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
@@ -177,7 +177,7 @@ private:
 		co::IInterface* myType = co::typeOf<co::ITypeTransaction>::get();
 
 		co::ITypeTransaction* res;
-		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::ITypeTransaction*>( any.getState().data.itf ) ) )
+		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::ITypeTransaction*>( any.getState().data.service ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::ITypeTransaction*, but got " << any );
 
 		// make sure that 'member' belongs to this type

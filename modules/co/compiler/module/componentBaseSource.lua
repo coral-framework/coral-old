@@ -29,7 +29,7 @@ void moduleRelease();
 	for i, itf in ipairs( facets ) do
 		writer( [[
 
-// ------ ]], t.fullName, [[ provides an interface named ']], itf.name, [[', of type ]], itf.type.fullName, [[ ------ //
+// ------ ]], t.fullName, [[ has a facet named ']], itf.name, [[', of type ]], itf.type.fullName, [[ ------ //
 
 co::IInterface* ]], t.name, [[_]], itf.type.fullNameUnderline, [[::getInterface()
 {
@@ -108,12 +108,11 @@ co::IService* ]], t.name, [[_Base::getService( co::IPort* port )
 ]] )
 
 	for i, itf in ipairs( facets ) do
-		writer( "\tcase ", itf.index, ":\t\tres = co::disambiguate<co::IService, ", itf.type.cppName, ">( this ); break;\n" )
+		writer( "\tcase ", itf.index, ":\t\tres = static_cast<", itf.type.cppName, "*>( this ); break;\n" )
 	end
 
 	for i, itf in ipairs( receptacles ) do
-		writer( "\tcase ", itf.index, ":\t\tres = co::disambiguate<co::IService, ",
-			itf.type.cppName, ">( ", t.formatAccessor( "get", itf.name, "Service" ), "() ); break;\n" )
+		writer( "\tcase ", itf.index, ":\t\tres = ", t.formatAccessor( "get", itf.name, "Service" ), "(); break;\n" )
 	end
 
 	writer( [[

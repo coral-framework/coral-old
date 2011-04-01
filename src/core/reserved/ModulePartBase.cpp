@@ -16,7 +16,7 @@
 
 namespace co {
 
-// ------ ModulePartBase provides an interface named 'part', of type co::IModulePart ------ //
+// ------ ModulePartBase provides a facet named 'part', of type co::IModulePart ------ //
 
 IInterface* ModulePartBase_co_ModulePart::getInterface()
 {

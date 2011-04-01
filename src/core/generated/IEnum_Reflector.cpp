@@ -26,7 +26,7 @@ class IEnum_Proxy : public co::IEnum
 public:
 	IEnum_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, co::IEnum>( this ) );
+		_cookie = _provider->dynamicRegisterService( this );
 	}
 
 	virtual ~IEnum_Proxy()
@@ -156,7 +156,7 @@ public:
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
-		return co::disambiguate<co::IService, co::IEnum>( new co::IEnum_Proxy( provider ) );
+		return new co::IEnum_Proxy( provider );
 	}
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
@@ -224,7 +224,7 @@ private:
 		co::IInterface* myType = co::typeOf<co::IEnum>::get();
 
 		co::IEnum* res;
-		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::IEnum*>( any.getState().data.itf ) ) )
+		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::IEnum*>( any.getState().data.service ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::IEnum*, but got " << any );
 
 		// make sure that 'member' belongs to this type

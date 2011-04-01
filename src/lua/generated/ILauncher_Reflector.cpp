@@ -27,7 +27,7 @@ public:
 	ILauncher_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
 		moduleRetain();
-		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, lua::ILauncher>( this ) );
+		_cookie = _provider->dynamicRegisterService( this );
 	}
 
 	virtual ~ILauncher_Proxy()
@@ -100,7 +100,7 @@ public:
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
-		return co::disambiguate<co::IService, lua::ILauncher>( new lua::ILauncher_Proxy( provider ) );
+		return new lua::ILauncher_Proxy( provider );
 	}
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
@@ -160,7 +160,7 @@ private:
 		co::IInterface* myType = co::typeOf<lua::ILauncher>::get();
 
 		lua::ILauncher* res;
-		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<lua::ILauncher*>( any.getState().data.itf ) ) )
+		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<lua::ILauncher*>( any.getState().data.service ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid lua::ILauncher*, but got " << any );
 
 		// make sure that 'member' belongs to this type

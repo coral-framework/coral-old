@@ -72,9 +72,9 @@ public:
 	/*!
 		\brief Searches for a file in a space defined by a combination of two string lists.
 
-		File path combinations are evaluated in the same order they're listed, and in case of ambiguities
-		the search always returns the first match.
-	 
+		File path combinations are evaluated in the same order they're listed, and in case of
+		ambiguities the search always returns the first match.
+
 		\param[in] listOne Outer-most list of directory paths (e.g. pass the CORAL_PATH here).
 		\param[in] listTwo Central list of directory paths (e.g. pass a list of file paths here).
 		\param[out] path Path to the first file found (only set if the method returns true).
@@ -92,9 +92,9 @@ public:
 	/*!
 		\brief Searches for a file in a space defined by a combination of three string lists.
 
-		File path combinations are evaluated in the same order they're listed, and in case of ambiguities
-		the search always returns the first match.
-	 
+		File path combinations are evaluated in the same order they're listed, and in case of
+		ambiguities the search always returns the first match.
+
 		\param[in] listOne Outer-most list of directory paths (e.g. pass the CORAL_PATH here).
 		\param[in] listTwo Central list of directory paths (e.g. pass a list of module names here).
 		\param[in] listThree Inner-most list of directory paths (e.g. pass a list of file names here).

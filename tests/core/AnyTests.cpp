@@ -639,7 +639,7 @@ TEST( AnyTests, setGetInterface )
 		EXPECT_EQ( res->getName(), "name" );
 	}
 
-	// try to retrieve an invalid interface
+	// try to retrieve an invalid service
 	EXPECT_THROW( any.get<co::INamespace*>(), co::IllegalCastException );
 
 	// try to retrieve a value
@@ -762,7 +762,7 @@ TEST( AnyTests, coercionsFromDouble )
 	// invalid retrieval: correct primitive, but it's a value, not a reference!
 	EXPECT_THROW( a1.get<double&>(), co::IllegalCastException );
 
-	// invalid retrieval: not a pointer/interface
+	// invalid retrieval: not a pointer/service
 	EXPECT_THROW( a1.get<co::IService*>(), co::IllegalCastException );
 }
 
@@ -1044,10 +1044,9 @@ TEST( AnyTests, coercionsFromStdVector )
 TEST( AnyTests, setService )
 {
 	co::IInterface* nsType = co::typeOf<co::INamespace>::get();
-	co::IService* nsTypeAsItf = co::disambiguate<co::IService>( nsType );
 
-	co::Any automatic( nsTypeAsItf );
-	co::Any manual( co::disambiguate<co::IService>( nsType ), NULL );
+	co::Any automatic( nsType );
+	co::Any manual( nsType, NULL );
 	EXPECT_EQ( automatic, manual );
 
 	// try passing a null pointer
@@ -1123,11 +1122,11 @@ TEST( AnyTests, setArray )
 	EXPECT_EQ( automatic, manual );
 
 	automatic.set( floatArrayRange );
-	manual.setArray( co::Any::AK_ArrayRange, co::getType( "float" ), co::Any::VarIsConst|co::Any::VarIsPointerConst, NULL );
+	manual.setArray( co::Any::AK_Range, co::getType( "float" ), co::Any::VarIsConst|co::Any::VarIsPointerConst, NULL );
 	EXPECT_EQ( automatic, manual );
 
 	automatic.set( int8VecRange );
-	manual.setArray( co::Any::AK_ArrayRange, co::getType( "int8" ), co::Any::VarIsValue, &int8Vec.front(), int8Vec.size() );
+	manual.setArray( co::Any::AK_Range, co::getType( "int8" ), co::Any::VarIsValue, &int8Vec.front(), int8Vec.size() );
 	EXPECT_EQ( automatic, manual );
 }
 

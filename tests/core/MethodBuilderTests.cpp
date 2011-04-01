@@ -51,10 +51,10 @@ TEST( MethodBuilderTests, theTest )
 
 	EXPECT_NO_THROW( mb->createMethod() );
 
-	co::IInterface* interface = dynamic_cast<co::IInterface*>( typeBuilder->createType() );
-	ASSERT_TRUE( interface != NULL );
+	co::IInterface* itf = dynamic_cast<co::IInterface*>( typeBuilder->createType() );
+	ASSERT_TRUE( itf != NULL );
 
-	co::IMethod* mInfo = dynamic_cast<co::IMethod*>( interface->getMember( "testMethod" ) );
+	co::IMethod* mInfo = dynamic_cast<co::IMethod*>( itf->getMember( "testMethod" ) );
 	ASSERT_TRUE( mInfo != NULL );
 
 	ASSERT_EQ( 3, mInfo->getParameters().getSize() );

@@ -14,7 +14,7 @@ namespace lua {
 void moduleRetain();
 void moduleRelease();
 
-// ------ lua.Universe provides an interface named 'state', of type lua.IState ------ //
+// ------ lua.Universe has a facet named 'state', of type lua.IState ------ //
 
 co::IInterface* Universe_lua_IState::getInterface()
 {
@@ -70,7 +70,7 @@ co::IService* Universe_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, lua::IState>( this ); break;
+	case 0:		res = static_cast<lua::IState*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

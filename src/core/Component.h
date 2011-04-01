@@ -24,12 +24,12 @@ public:
 
 	// internal methods:
 
-	//! Appends the given interfaces range to the interfaces list. After calling this
-	//! method the interfaces list must be re-sorted using the sortInterfaces() method.
-	void addInterfaces( Range<IPort* const> interfaces );
+	//! Appends the given ports to the port list. After calling this method
+	//! the port list must be re-sorted using sortPorts().
+	void addPorts( Range<IPort* const> ports );
 
-	//! Sorts the interface list by (isFacet, name) and updates _firstReceptacle.
-	void sortInterfaces();
+	//! Sorts the port list by (isFacet, name) and updates _firstReceptacle.
+	void sortPorts();
 
 	// ICompositeType methods:
 	Range<IMember* const> getMembers();
@@ -43,9 +43,8 @@ public:
 	DELEGATE_co_IType( TypeImpl:: );
 
 private:
-	typedef RefVector<IPort> InterfacesVector;
-	InterfacesVector _interfaces;	// dual sorted vector: facets first, then receptacles.
-	size_t _firstReceptacle;		// dividing point: position of the first receptacle in _interfaces.
+	RefVector<IPort> _ports; // dual sorted vector: facets first, then receptacles.
+	size_t _firstReceptacle; // dividing point: position of the first receptacle in _ports.
 };
 
 } // namespace co

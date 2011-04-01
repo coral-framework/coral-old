@@ -51,8 +51,8 @@ public:
 	static co::ICompositeType* getType( lua_State* L, int index );
 
 	/*!
-		Given a userdata's index, attempts to set a co::Any with a reference to
-		any valid Coral object (interface, native class, struct or component).
+		Given a userdata's index, attempts to set a co::Any with a reference
+		to any valid Coral instance (service, object, native class, struct).
 		If the userdata is not a valid Coral object, raises a lua::Exception.
 	 */
 	static void getInstance( lua_State* L, int index, co::Any& instance );
@@ -131,7 +131,7 @@ public:
 	//! Pushes a new instance of a co::IService* userdata onto the stack.
 	static void create( lua_State* L, co::IService* itf );
 
-	//! Gets the interface pointer of a verified Coral interface userdata.
+	//! Gets the pointer of a verified service userdata.
 	inline static co::IService* getInstance( lua_State* L, int index )
 	{
 		return *reinterpret_cast<co::IService**>( lua_touserdata( L, index ) );

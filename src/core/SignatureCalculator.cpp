@@ -156,12 +156,11 @@ void SignatureCalculator::fillNativeClassSignatureData()
 
 void SignatureCalculator::fillInterfaceSignatureData()
 {
-	IInterface* interface = static_cast<IInterface*>( _type );
-
 	_binarySignatureHash.addData( _type->getFullName() );
 
 	// add all inherited signatures
-	Range<IInterface* const> superTypes = interface->getSuperInterfaces();
+	IInterface* type = static_cast<IInterface*>( _type );
+	Range<IInterface* const> superTypes = type->getSuperInterfaces();
 	for( ; superTypes; superTypes.popFirst() )
 	{
 		IInterface* super = superTypes.getFirst();

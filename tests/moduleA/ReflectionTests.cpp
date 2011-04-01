@@ -139,7 +139,7 @@ TEST( ReflectionTests, getAndBindComponentInterfaces )
 	co::IPort* itfTypePort = dynamic_cast<co::IPort*>( type->getMember( "itf" ) );
 	ASSERT_TRUE( typePort && itfTypePort );
 
-	// get the interface currently bound to the 'type' receptacle (should be null)
+	// get the service currently bound to the 'type' receptacle (should be null)
 	EXPECT_EQ( NULL, instance->getService( typePort ) );
 
 	// attempting to bind a IStruct to 'itf' should produce an exception (it expects an IInterface)

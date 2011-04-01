@@ -11,7 +11,7 @@
 
 namespace co {
 
-// ------ co.TypeBuilder provides an interface named 'typeBuilder', of type co.ITypeBuilder ------ //
+// ------ co.TypeBuilder has a facet named 'typeBuilder', of type co.ITypeBuilder ------ //
 
 co::IInterface* TypeBuilder_co_ITypeBuilder::getInterface()
 {
@@ -67,7 +67,7 @@ co::IService* TypeBuilder_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::ITypeBuilder>( this ); break;
+	case 0:		res = static_cast<co::ITypeBuilder*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

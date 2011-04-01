@@ -14,7 +14,7 @@ namespace lua {
 void moduleRetain();
 void moduleRelease();
 
-// ------ lua.Component provides an interface named 'dynamicServiceProvider', of type co.IDynamicServiceProvider ------ //
+// ------ lua.Component has a facet named 'dynamicServiceProvider', of type co.IDynamicServiceProvider ------ //
 
 co::IInterface* Component_co_IDynamicServiceProvider::getInterface()
 {
@@ -30,7 +30,7 @@ co::IPort* Component_co_IDynamicServiceProvider::getFacet()
 	return facet;
 }
 
-// ------ lua.Component provides an interface named 'reflector', of type co.IReflector ------ //
+// ------ lua.Component has a facet named 'reflector', of type co.IReflector ------ //
 
 co::IInterface* Component_co_IReflector::getInterface()
 {
@@ -86,8 +86,8 @@ co::IService* Component_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::IDynamicServiceProvider>( this ); break;
-	case 1:		res = co::disambiguate<co::IService, co::IReflector>( this ); break;
+	case 0:		res = static_cast<co::IDynamicServiceProvider*>( this ); break;
+	case 1:		res = static_cast<co::IReflector*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

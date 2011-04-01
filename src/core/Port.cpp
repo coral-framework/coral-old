@@ -18,9 +18,9 @@ Port::~Port()
 	// empty
 }
 
-void Port::setType( IInterface* interface )
+void Port::setType( IInterface* type )
 {
-	_type = interface;
+	_type = type;
 }
 
 void Port::setIsFacet( bool isFacet )

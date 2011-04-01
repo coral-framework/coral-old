@@ -11,7 +11,7 @@
 
 namespace co {
 
-// ------ co.Method provides an interface named 'methodInfo', of type co.IMethod ------ //
+// ------ co.Method has a facet named 'methodInfo', of type co.IMethod ------ //
 
 co::IInterface* Method_co_IMethod::getInterface()
 {
@@ -67,7 +67,7 @@ co::IService* Method_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::IMethod>( this ); break;
+	case 0:		res = static_cast<co::IMethod*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

@@ -76,8 +76,8 @@ void LuaComponent::setComponentInstance( LuaComponent* prototype, int instanceTa
 	for( int i = 0; i < numFacets; ++i )
 	{
 		/*
-			To avoid having exceptions raised here by getReflector(), we
-			should check all interface reflectors before instantiating the component.
+			To avoid having exceptions raised here by getReflector(), we should
+			check all interface reflectors before instantiating the component.
 		 */
 		assert( _numFacets == i );
 		facets[i]->getType()->getReflector()->newDynamicProxy( this );
@@ -157,7 +157,7 @@ void LuaComponent::getMethod( lua_State* L, int t, co::int32 cookie )
 		std::stringstream ss;
 		ss << "missing method '" << methodName << "' in LuaComponent '" << _componentType->getFullName() << "'";
 		if( cookie != -1 )
-			ss << ", interface '" << getFacet( cookie )->getName() << "'";
+			ss << ", facet '" << getFacet( cookie )->getName() << "'";
 		throw lua::Exception( ss.str() );
 	}
 }

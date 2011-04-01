@@ -11,7 +11,7 @@
 
 namespace co {
 
-// ------ co.TypeManager provides an interface named 'typeManager', of type co.ITypeManager ------ //
+// ------ co.TypeManager has a facet named 'typeManager', of type co.ITypeManager ------ //
 
 co::IInterface* TypeManager_co_ITypeManager::getInterface()
 {
@@ -67,7 +67,7 @@ co::IService* TypeManager_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::ITypeManager>( this ); break;
+	case 0:		res = static_cast<co::ITypeManager*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

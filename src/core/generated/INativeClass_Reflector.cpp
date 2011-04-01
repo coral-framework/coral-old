@@ -27,7 +27,7 @@ class INativeClass_Proxy : public co::INativeClass
 public:
 	INativeClass_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, co::INativeClass>( this ) );
+		_cookie = _provider->dynamicRegisterService( this );
 	}
 
 	virtual ~INativeClass_Proxy()
@@ -187,7 +187,7 @@ public:
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
-		return co::disambiguate<co::IService, co::INativeClass>( new co::INativeClass_Proxy( provider ) );
+		return new co::INativeClass_Proxy( provider );
 	}
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
@@ -232,7 +232,7 @@ private:
 		co::IInterface* myType = co::typeOf<co::INativeClass>::get();
 
 		co::INativeClass* res;
-		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::INativeClass*>( any.getState().data.itf ) ) )
+		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::INativeClass*>( any.getState().data.service ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::INativeClass*, but got " << any );
 
 		// make sure that 'member' belongs to this type

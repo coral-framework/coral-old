@@ -27,7 +27,7 @@ class ITypeBuilder_Proxy : public co::ITypeBuilder
 public:
 	ITypeBuilder_Proxy( co::IDynamicServiceProvider* provider ) : _provider( provider )
 	{
-		_cookie = _provider->dynamicRegisterService( co::disambiguate<co::IService, co::ITypeBuilder>( this ) );
+		_cookie = _provider->dynamicRegisterService( this );
 	}
 
 	virtual ~ITypeBuilder_Proxy()
@@ -170,7 +170,7 @@ public:
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
 	{
 		checkValidDynamicProvider( provider );
-		return co::disambiguate<co::IService, co::ITypeBuilder>( new co::ITypeBuilder_Proxy( provider ) );
+		return new co::ITypeBuilder_Proxy( provider );
 	}
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
@@ -287,7 +287,7 @@ private:
 		co::IInterface* myType = co::typeOf<co::ITypeBuilder>::get();
 
 		co::ITypeBuilder* res;
-		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::ITypeBuilder*>( any.getState().data.itf ) ) )
+		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::ITypeBuilder*>( any.getState().data.service ) ) )
 			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::ITypeBuilder*, but got " << any );
 
 		// make sure that 'member' belongs to this type

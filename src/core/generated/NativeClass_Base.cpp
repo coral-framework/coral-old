@@ -11,7 +11,7 @@
 
 namespace co {
 
-// ------ co.NativeClass provides an interface named 'type', of type co.INativeClass ------ //
+// ------ co.NativeClass has a facet named 'type', of type co.INativeClass ------ //
 
 co::IInterface* NativeClass_co_INativeClass::getInterface()
 {
@@ -67,7 +67,7 @@ co::IService* NativeClass_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::INativeClass>( this ); break;
+	case 0:		res = static_cast<co::INativeClass*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

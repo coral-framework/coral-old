@@ -11,7 +11,7 @@
 
 namespace co {
 
-// ------ co.Field provides an interface named 'field', of type co.IField ------ //
+// ------ co.Field has a facet named 'field', of type co.IField ------ //
 
 co::IInterface* Field_co_IField::getInterface()
 {
@@ -67,7 +67,7 @@ co::IService* Field_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::IField>( this ); break;
+	case 0:		res = static_cast<co::IField*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

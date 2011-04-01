@@ -11,7 +11,7 @@
 
 namespace co {
 
-// ------ co.Namespace provides an interface named 'namespace', of type co.INamespace ------ //
+// ------ co.Namespace has a facet named 'namespace', of type co.INamespace ------ //
 
 co::IInterface* Namespace_co_INamespace::getInterface()
 {
@@ -67,7 +67,7 @@ co::IService* Namespace_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::INamespace>( this ); break;
+	case 0:		res = static_cast<co::INamespace*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

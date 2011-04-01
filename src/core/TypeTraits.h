@@ -112,80 +112,48 @@ struct typeOf : public typeOfBase<T, IType> {};
 
 namespace traits {
 
-template<typename T, T v>
-struct IntegralConstant
-{
-	static const T					value = v;
-	typedef T						ValueType;
-	typedef IntegralConstant<T, v>	Type;
-};
-
-// The special 'true' and 'false' types:
-typedef IntegralConstant<bool, true>	TrueType;
-typedef IntegralConstant<bool, false>	FalseType;
+// The special 'false' and 'true' types:
+struct FalseType { static const bool value = false; };
+struct TrueType { static const bool value = true; FalseType _[2]; };
 
 // Whether two types are the same type:
-template<typename, typename>
-struct isSame : public FalseType {};
-
-template<typename T>
-struct isSame<T, T> : public TrueType {};
+template<typename, typename> struct isSame : public FalseType {};
+template<typename T> struct isSame<T, T> : public TrueType {};
 
 // Whether a type is 'const':
-template<typename>
-struct isConst : public FalseType {};
-
-template<typename T>
-struct isConst<T const> : public TrueType {};
+template<typename> struct isConst : public FalseType {};
+template<typename T> struct isConst<T const> : public TrueType {};
 
 // Whether a type is a pointer:
-template<typename>
-struct isPointer : public FalseType {};
-
-template<typename T>
-struct isPointer<T*> : public TrueType {};
-
-template<typename T>
-struct isPointer<T* const> : public TrueType {};
+template<typename> struct isPointer : public FalseType {};
+template<typename T> struct isPointer<T*> : public TrueType {};
+template<typename T> struct isPointer<T* const> : public TrueType {};
 
 // Whether a type is a reference:
-template<typename>
-struct isReference : public FalseType {};
-
-template<typename T>
-struct isReference<T&> : public TrueType {};
+template<typename> struct isReference : public FalseType {};
+template<typename T> struct isReference<T&> : public TrueType {};
 
 // Removes 'const' from a type:
-template<typename T>
-struct removeConst { typedef T Type; };
-
-template<typename T>
-struct removeConst<T const> { typedef T Type; };
+template<typename T> struct removeConst { typedef T Type; };
+template<typename T> struct removeConst<T const> { typedef T Type; };
 
 // Removes a pointer ('*') from a type:
-template<typename T>
-struct removePointer { typedef T Type; };
-
-template<typename T>
-struct removePointer<T*> { typedef T Type; };
-
-template<typename T>
-struct removePointer<T* const> { typedef T Type; };
+template<typename T> struct removePointer { typedef T Type; };
+template<typename T> struct removePointer<T*> { typedef T Type; };
+template<typename T> struct removePointer<T* const> { typedef T Type; };
 
 // Removes a reference ('&') from a type:
-template<typename T>
-struct removeReference { typedef T Type; };
+template<typename T> struct removeReference { typedef T Type; };
+template<typename T> struct removeReference<T&> { typedef T Type; };
 
-template<typename T>
-struct removeReference<T&> { typedef T Type; };
-
-// Whether an interface 'Itf' inherits ambiguously from a certain 'Base' interface:
-template<typename, typename>
-struct hasAmbiguousBase : public FalseType {};
-
-// Indicates which 'Super'-interface should be used to disambiguate a certain 'Base' interface of 'Itf'.
-template<typename Itf, typename Base>
-struct disambiguateBase {};
+// Whether a type D is a subtype of B.
+template<typename D, typename B>
+struct isSubTypeOf
+{
+	static TrueType test( const B* const );
+	static FalseType test( ... );
+	static const bool value = ( sizeof(test((D*)0)) == sizeof(TrueType) );
+};
 
 //! Utility struct to easily access information about a Coral type.
 template<typename T>
@@ -206,30 +174,6 @@ struct get
 };
 
 } // namespace traits
-
-
-/****************************************************************************/
-/* co::disambiguate<Base>( T* ) returns a Base* for an ambiguous base of T. */
-/****************************************************************************/
-
-template<typename Itf, typename Base, bool isAmbiguous>
-struct __disambiguate {};
-
-template<typename Itf, typename Base>
-struct __disambiguate<Itf, Base, false> { typedef Itf Ancestor; };
-
-template<typename Itf, typename Base>
-struct __disambiguate<Itf, Base, true>
-{
-	typedef typename traits::disambiguateBase<Itf, Base>::Super Super;
-	typedef typename __disambiguate<Super, Base, traits::hasAmbiguousBase<Super, Base>::value>::Ancestor Ancestor;
-};
-
-template<typename Base, typename T>
-inline Base* disambiguate( T* p )
-{
-	return static_cast<typename __disambiguate<T, Base, traits::hasAmbiguousBase<T, Base>::value>::Ancestor*>( p );
-}
 
 
 /****************************************************************************/

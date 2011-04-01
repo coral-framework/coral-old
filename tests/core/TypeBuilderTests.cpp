@@ -440,11 +440,11 @@ TEST( TypeBuilderTests, interfaceGetMethods )
 	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_INTERFACE, "interfaceGetMethodsTest.Foo", tct.get() );
 
 	builder->defineField( "test", TestHelper::type( "string" ), true );
-	co::IInterface* interface = dynamic_cast<co::IInterface*>( builder->createType() );
+	co::IInterface* itf = dynamic_cast<co::IInterface*>( builder->createType() );
 
-	ASSERT_NO_THROW( interface->getMethods() );
+	ASSERT_NO_THROW( itf->getMethods() );
 
-	ASSERT_EQ( 0, interface->getMethods().getSize() );
+	ASSERT_EQ( 0, itf->getMethods().getSize() );
 
 	EXPECT_NO_THROW( tct->commit() );
 }

@@ -46,18 +46,17 @@ struct State
 		// Multipurpose pointers:
 		void* ptr;
 		const void* cptr;
-		IService* itf;
+		IService* service;
 	}
 	data;
 
-	// co::IType of the variable; or, if this is an array, the array element's co::IType.
-	union
-	{
-		IType* type;				// used for arrays, enums, structs and native classes
-		IInterface* interface;	// used for interfaces
-	};
+	// co::IType of the variable; or, if this is an array, the array's element type.
+	IType* type;
 
-	// only used if arrayKind is AK_ArrayRange
+	// convenience method to get 'type' downcasted to an IInterface
+	inline IInterface* getInterface() const { return static_cast<IInterface*>( type ); }
+
+	// only used if arrayKind is AK_Range
 	uint32 arraySize;
 
 	// the kind of variable we're holding
@@ -70,7 +69,7 @@ struct State
 	uint8 isReference : 1;
 
 	// what array representation was provided
-	enum ArrayKind { AK_StdVector, AK_RefVector, AK_ArrayRange };
+	enum ArrayKind { AK_StdVector, AK_RefVector, AK_Range };
 	uint8 arrayKind;
 
 	// reserved for use in co::Any:
@@ -176,7 +175,7 @@ struct PrepareStateForArray<Range<T>, ATT>
 		s.isPointer = ETT::isPointer;
 		s.isPointerConst = ETT::isPointerConst;
 		s.isReference = ETT::isReference;
-		s.arrayKind = State::AK_ArrayRange;
+		s.arrayKind = State::AK_Range;
 	}
 };
 
@@ -205,7 +204,7 @@ struct PrepareStateForStorageOf<TK_INTERFACE, TT, T*>
 	inline static void prepare( State& s, T* v )
 	{
 		PrepareBasic<TT>::prepare( s );
-		s.interface = v ? v->getInterface() : typeOf<T>::get();
+		s.type = v ? v->getInterface() : typeOf<T>::get();
 	}
 };
 
@@ -215,7 +214,7 @@ struct PrepareStateForStorageOf<TK_INTERFACE, TT, const T*>
 	inline static void prepare( State& s, const T* v )
 	{
 		PrepareBasic<TT>::prepare( s );
-		s.interface = v ? const_cast<T*>( v )->getInterface() : typeOf<T>::get();
+		s.type = v ? const_cast<T*>( v )->getInterface() : typeOf<T>::get();
 	}
 };
 
@@ -238,7 +237,7 @@ struct ValueHelper<TK_ARRAY, T>
 template<typename T>
 struct ValueHelper<TK_ARRAY, Range<T> >
 {
-	// co::ArrayRanges are handled by this case
+	// co::Ranges are handled by this case
 	inline static void store( State& s, Range<T>& v )
 	{
 		s.data.cptr = &( v.getFirst() );
@@ -249,7 +248,7 @@ struct ValueHelper<TK_ARRAY, Range<T> >
 
 	inline static Range<T> retrieve( State& s )
 	{
-		if( s.arrayKind == State::AK_ArrayRange )
+		if( s.arrayKind == State::AK_Range )
 			return Range<T>( reinterpret_cast<T*>( s.data.ptr ), s.arraySize );
 		else
 			return Range<T>( *reinterpret_cast<std::vector<typename
@@ -309,22 +308,6 @@ struct VariableHelper<const T&>
 	inline static const T& retrieve( State& s ) { return VariableHelper<T&>::retrieve( s ); }
 };
 
-template<bool isAmbiguous, typename T>
-struct InterfaceHelper
-{
-	// this case handles non-ambiguous interface pointers
-	inline static void store( State& s, T* ptr ) { s.data.itf = ptr; }
-	inline static T* retrieve( State& s ) { return static_cast<T*>( s.data.itf ); }
-};
-
-template<typename T>
-struct InterfaceHelper<true, T>
-{
-	// this case handles non-ambiguous interface pointers
-	inline static void store( State& s, T* ptr ) { s.data.itf = disambiguate<co::IService, T>( ptr ); }
-	inline static T* retrieve( State& s ) { return dynamic_cast<T*>( s.data.itf ); }
-};
-
 template<TypeKind kind, typename T>
 struct PointerHelper
 {
@@ -336,10 +319,9 @@ struct PointerHelper
 template<typename T>
 struct PointerHelper<TK_INTERFACE, T>
 {
-	// all interface pointers are forwarded to InterfaceHelper
-	typedef traits::hasAmbiguousBase<T, IService> AB;
-	inline static void store( State& s, T* ptr ) { InterfaceHelper<AB::value, T>::store( s, ptr ); }
-	inline static T* retrieve( State& s ) { return InterfaceHelper<AB::value, T>::retrieve( s ); }
+	// handles services
+	inline static void store( State& s, T* ptr ) { s.data.service = ptr; }
+	inline static T* retrieve( State& s ) { return static_cast<T*>( s.data.service ); }
 };
 
 template<typename T>
@@ -456,11 +438,11 @@ struct VariableHelper<double>
 		- Type checks, including compliance with type const'ness.
 		- Automatic conversion between primitive values (boolean, arithmetic types and enum).
 		- Type-safe storage and retrieval of pointers and references.
-		- Storage and retrieval of arrays as pointers to \c std::vectors, \c co::RefVectors or \c co::ArrayRanges.
+		- Storage and retrieval of arrays as pointers to \c std::vectors, \c co::RefVectors or \c co::Ranges.
 
 	\par What is NOT supported:
 		- Storing exceptions.
-		- Reference counting of interfaces. Stored interface pointers are \b not considered active references.
+		- Reference counting of services. Stored service pointers are \b not considered active references.
 
 	\par Values vs. References
 		For efficiency, this class only allows the storage of values for \c enums and <em>primitive types</em>
@@ -489,10 +471,10 @@ struct VariableHelper<double>
 		<tt>co::Range<std::string></tt> allows existing strings to be modified, but not the array length.
 		\par
 		Arrays represented by \c std::vectors or \c co::RefVectors must always be passed and retrieved
-		<b>by reference</b>, while \c co::ArrayRanges must always be passed and retrieved <b>by value</b>.
+		<b>by reference</b>, while \c co::Ranges must always be passed and retrieved <b>by value</b>.
 		\par
 		Arrays must generally be retrieved by the exact same type they were passed. However, when
-		retrieving \c co::ArrayRanges the following coercion rules apply:
+		retrieving \c co::Ranges the following coercion rules apply:
 		  - It is possible to retrieve a <tt>co::Range<\e ValueType></tt> from an array passed as a
 				<tt>std::vector<\e ValueType></tt>.
 		  - It is possible to retrieve a <tt>co::Range<const \e ValueType></tt> from an array passed as
@@ -546,7 +528,7 @@ public:
 	{
 		AK_StdVector,	//!< Indicates the variable is a \c std::vector.
 		AK_RefVector,	//!< Indicates the variable is a \c co::RefVector (implies VarIsPointerConst).
-		AK_ArrayRange	//!< Indicates the variable is a \c co::Range.
+		AK_Range	//!< Indicates the variable is a \c co::Range.
 	};
 
 	/*!
@@ -674,7 +656,7 @@ public:
 	 */
 	inline IType* getType() const { return _state.type; }
 
-	//! Returns the interface of the stored service.
+	//! Returns the type of the stored service.
 	inline IInterface* getInterface() const
 	{
 		assert( _state.kind == TK_INTERFACE );
@@ -759,14 +741,14 @@ public:
 	/*!
 		Stores a service.
 
-		The \a type parameter is optional. When it's not passed, the interface is
-		extracted from the \a instance, which in this case cannot be NULL. Always
-		pass the \a type for cases where the \a instance could be null.
+		The \a type parameter is optional. When not given, it's extracted from the
+		\a service, which in this case cannot be NULL. Always provide the \a type
+		in places where \a service could be null.
 
 		This method does not take variable flags, variables are always pointers. If you
-		want to create a reference to an interface pointer, use setVariable() instead.
+		want to create a reference to a service pointer, use setVariable() instead.
 	 */
-	void setService( IService* instance, IInterface* type = 0 );
+	void setService( IService* service, IInterface* type = 0 );
 
 	/*!
 		Stores a single-value (non-array) variable.
@@ -795,12 +777,12 @@ public:
 					value of parameter \a ptr:
 					- \c AK_StdVector: \a ptr should be a pointer to a \c std::vector instance.
 					- \c AK_RefVector: \a ptr should be a pointer to a \c co::RefVector instance.
-					- \c AK_ArrayRange: \a ptr should be a pointer to the first array element,
+					- \c AK_Range: \a ptr should be a pointer to the first array element,
 						while \a size should specify the number of elements in the range.
 		\param elementType The array element type.
 		\param flags Modifiers for the array elements.
 		\param ptr A pointer to the array instance, as described above.
-		\param size Only used if \a arrayKind is \c AK_ArrayRange.
+		\param size Only used if \a arrayKind is \c AK_Range.
 	 */
 	void setArray( ArrayKind arrayKind, IType* elementType, uint32 flags, void* ptr, size_t size = 0 );
 

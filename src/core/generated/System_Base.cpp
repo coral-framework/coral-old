@@ -11,7 +11,7 @@
 
 namespace co {
 
-// ------ co.System provides an interface named 'system', of type co.ISystem ------ //
+// ------ co.System has a facet named 'system', of type co.ISystem ------ //
 
 co::IInterface* System_co_ISystem::getInterface()
 {
@@ -67,7 +67,7 @@ co::IService* System_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::ISystem>( this ); break;
+	case 0:		res = static_cast<co::ISystem*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

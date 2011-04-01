@@ -11,7 +11,7 @@
 
 namespace co {
 
-// ------ co.ModuleManager provides an interface named 'moduleManager', of type co.IModuleManager ------ //
+// ------ co.ModuleManager has a facet named 'moduleManager', of type co.IModuleManager ------ //
 
 co::IInterface* ModuleManager_co_IModuleManager::getInterface()
 {
@@ -67,7 +67,7 @@ co::IService* ModuleManager_Base::getService( co::IPort* port )
 	co::IService* res = NULL;
 	switch( port->getIndex() )
 	{
-	case 0:		res = co::disambiguate<co::IService, co::IModuleManager>( this ); break;
+	case 0:		res = static_cast<co::IModuleManager*>( this ); break;
 	default:	raiseUnexpectedPortIndex();
 	}
 	return res;

@@ -14,7 +14,7 @@ namespace co {
 // forward declarations:
 class IllegalCastException;
 
-//! ReflectorBase provides an interface named 'reflector', of type co::IReflector.
+//! ReflectorBase provides a facet named 'reflector', of type co::IReflector.
 class CORAL_EXPORT ReflectorBase_co_Reflector : public IReflector
 {
 public:

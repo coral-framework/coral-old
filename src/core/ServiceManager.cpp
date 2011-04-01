@@ -223,7 +223,7 @@ IComponent* ServiceManager::validateComponent( IInterface* serviceType, const st
 		CORAL_THROW( IllegalArgumentException, "invalid component name '" << componentName << "'" );
 
 	if( findServiceFacet( ct, serviceType ) )
-		return ct; // ok, component implements the service interface
+		return ct; // ok, the component provides the service
 
 	CORAL_THROW( NoSuchPortException, "component '" << componentName
 			<< "' does not provide service '" << serviceType->getFullName() << "'" );

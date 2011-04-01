@@ -83,13 +83,13 @@ IComponent* ComponentBase::getOrCreateInternalComponent(
 	IType* type = tm->findType( fullTypeName );
 	if( type )
 	{
-		assert( dynamic_cast<IComponent*>( type ) );
-		return dynamic_cast<IComponent*>( type );
+		assert( type->getKind() == TK_COMPONENT );
+		return static_cast<IComponent*>( type );
 	}
 
 	// create the IComponent if it's not defined
-	IInterface* interface = dynamic_cast<IInterface*>( getType( interfaceName ) );
-	assert( interface );
+	IType* itfType = getType( interfaceName );
+	assert( itfType->getKind() == TK_INTERFACE );
 
 	RefPtr<ITypeTransaction> transaction =
 			newInstance( "co.TypeTransaction" )->getService<ITypeTransaction>();
@@ -104,7 +104,7 @@ IComponent* ComponentBase::getOrCreateInternalComponent(
 	assert( ns ); // the namespace should have been created before
 
 	RefPtr<ITypeBuilder> tb = ns->defineType( localTypeName, TK_COMPONENT, transaction.get() );
-	tb->definePort( facetName, interface, true );
+	tb->definePort( facetName, static_cast<IInterface*>( itfType ), true );
 
 	try
 	{
@@ -116,10 +116,11 @@ IComponent* ComponentBase::getOrCreateInternalComponent(
 		throw;
 	}
 
-	IComponent* component = dynamic_cast<IComponent*>( tb->createType() );
-	assert( component );
+	type = tb->createType();
+	assert( type && type->getKind() == TK_COMPONENT );
 
 	// set the IComponent with a dummy reflector
+	IComponent* component = static_cast<IComponent*>( type );
 	component->setReflector( new BasicReflector( component ) );
 
 	return component;

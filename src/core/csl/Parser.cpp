@@ -77,7 +77,7 @@ static void formatErrorMessage( pANTLR3_BASE_RECOGNIZER recognizer, std::string&
 	{
 		if( ex->charPositionInLine >= 0 )
 			sstream << " at character " << ex->charPositionInLine;
-		
+
 		pANTLR3_COMMON_TOKEN theToken = reinterpret_cast<pANTLR3_COMMON_TOKEN>( ex->token );
 		if( theToken != NULL )
 		{
@@ -134,7 +134,7 @@ static void formatErrorMessage( pANTLR3_BASE_RECOGNIZER recognizer, std::string&
 }
 
 static void handleError( pANTLR3_BASE_RECOGNIZER recognizer )
-{	
+{
 	// indicate we're recovering from an error
 	recognizer->state->errorRecovery = ANTLR3_TRUE;
 
@@ -183,18 +183,18 @@ void Parser::parse( const std::string& cslFilePath )
 {
 	// extract file's base name
 	_cslFileBaseName = cslFilePath;
-	
+
 	// get file name without dir path
 	size_t lastBarPos = _cslFileBaseName.rfind( CORAL_OS_DIR_SEP );
 	if( lastBarPos != std::string::npos )
 		_cslFileBaseName = _cslFileBaseName.substr( lastBarPos + 1 );
-	
+
 	// get file name without extension
 	size_t lastDotPos = _cslFileBaseName.rfind( '.' );
 	if( lastDotPos != std::string::npos )
 		_cslFileBaseName = _cslFileBaseName.substr( 0, lastDotPos );
-	
-	// create 	
+
+	// create
 	_inputFileStream = antlr3AsciiFileStreamNew( (pANTLR3_UINT8)cslFilePath.c_str() );
 	if( _inputFileStream == NULL )
 		CORAL_THROW( IllegalArgumentException, "Error opening file '" << cslFilePath << "'" );
@@ -241,7 +241,7 @@ void Parser::onComment( const std::string& text )
 		isRetroactive = true;
 	}
 	start = text.find_first_not_of( START_END_BLANKS, start );
-	
+
 	// ignore a comment if it starts with a dash (useful for separators)
 	if( text.length() > start && text[start] == '-' )
 		return;
@@ -345,11 +345,11 @@ void Parser::onIdentifierListItem( const std::string& name )
 
 void Parser::onComponentInterface( bool isFacet, const std::string& name )
 {
-	IInterface* interface = dynamic_cast<IInterface*>( getLastDeclaredType() );
-	if( !interface )
+	IType* type = getLastDeclaredType();
+	if( !type || type->getKind() != TK_INTERFACE )
 		CORAL_THROW( TypeLoadException, "an interface type was expected" );
 
-	_typeBuilder->definePort( name, interface, isFacet );
+	_typeBuilder->definePort( name, static_cast<IInterface*>( type ), isFacet );
 	handleDocumentation( name );
 }
 
