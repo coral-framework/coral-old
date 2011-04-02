@@ -95,15 +95,6 @@ IMember* ClassTypeImpl::getMember( const std::string& name )
 	if( _firstMethodPos < membersSize && _members.sortedFind( name, memberComparator, _firstMethodPos, membersSize - 1, pos ) )
 		return _members[pos].get();
 
-	// finally, search our ancestors (if any)
-	Range<ICompositeType* const> ancestors = getCompositeTypeAncestors();
-	for( ; ancestors; ancestors.popFirst() )
-	{
-		IMember* mi = ancestors.getFirst()->getMember( name );
-		if( mi )
-			return mi;
-	}
-
 	return NULL;
 }
 
@@ -130,11 +121,6 @@ Range<IMethod* const> ClassTypeImpl::getMethods()
 	// create an array range downcasting IMember* to IMethod*
 	return Range<IMethod* const>(
 		reinterpret_cast<IMethod**>( &_members.front() + _firstMethodPos ), membersSize - _firstMethodPos );
-}
-
-Range<ICompositeType* const> ClassTypeImpl::getCompositeTypeAncestors()
-{
-	return Range<ICompositeType* const>();
 }
 
 } // namespace co

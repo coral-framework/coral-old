@@ -24,8 +24,9 @@ TypeTransaction::TypeTransaction()
 {
 	if( sm_activeTransaction )
 	{
-		debug( Dbg_Fatal, "Attempt to instantiate a ITypeTransaction while another "
-			"instance is active. Concurrent type creation is unsafe and disallowed in this Coral version." );
+		debug( Dbg_Fatal, "Attempt to instantiate a co.TypeTransaction while another "
+			"instance is active. Concurrent type creation is unsafe and disallowed "
+			"in this Coral version." );
 
 		CORAL_THROW( NotSupportedException,
 			"Only a single ITypeTransaction instance may exist at any moment in time" );
@@ -72,13 +73,7 @@ void TypeTransaction::commit()
 
 	// create all types not yet created
 	for( TypeBuilderList::iterator it = _typeBuilders.begin(); it != _typeBuilders.end(); ++it )
-	{
-		static_cast<ITypeBuilder*>( it->get() )->createType();
-	}
-
-	ITypeManager* tm = dynamic_cast<ITypeManager*>( getSystem()->getTypes() );
-	assert( tm );
-	CORAL_UNUSED( tm );
+		it->get()->createType();
 
 	// perform semantic checks on all types
 	for( TypeBuilderList::iterator it = _typeBuilders.begin(); it != _typeBuilders.end(); ++it )
@@ -86,6 +81,10 @@ void TypeTransaction::commit()
 		TypeSemanticChecker sc( ( *it )->createType() );
 		sc.check();
 	}
+
+	// commit all types
+	for( TypeBuilderList::iterator it = _typeBuilders.begin(); it != _typeBuilders.end(); ++it )
+		static_cast<TypeBuilder*>( it->get() )->commitType();
 
 	_commitSucceeded = true;
 
@@ -103,9 +102,7 @@ void TypeTransaction::rollback()
 
 	// destroy all types
 	for( TypeBuilderList::iterator it = _typeBuilders.begin(); it != _typeBuilders.end(); ++it )
-	{
 		static_cast<TypeBuilder*>( it->get() )->destroyType();
-	}
 
 	_rolledBack = true;
 }

@@ -17,35 +17,34 @@ namespace co {
 class Interface : public Interface_Base, public ClassTypeImpl
 {
 public:
+	Interface();
 	virtual ~Interface();
 
 	// internal methods:
-	void addSuperInterface( IInterface* superItf );
-	void addSubInterface( IInterface* subItf );
+	void setBaseType( IInterface* base );
+	void addSubType( IInterface* sub );
+	void updateSuperTypes();
+
+	// ICompositeType methods:
+	Range<IMember* const> getMembers();
+	IMember* getMember( const std::string& name );
 
 	// IInterface methods:
-	Range<IInterface* const> getInterfaceAncestors();
-	Range<IInterface* const> getSuperInterfaces();
-	Range<IInterface* const> getSubInterfaces();
+	IInterface* getBaseType();
+	Range<IInterface* const> getSuperTypes();
+	Range<IInterface* const> getSubTypes();
 	const std::string& getCppBlock();
-	bool isSubTypeOf( IInterface* itf );
+	bool isSubTypeOf( IInterface* type );
 
 	DELEGATE_co_IType( ClassTypeImpl:: );
-	DELEGATE_co_ICompositeType( ClassTypeImpl:: );
 	DELEGATE_co_IRecordType( ClassTypeImpl:: );
 	DELEGATE_co_IClassType( ClassTypeImpl:: );
 
 private:
-	Range<ICompositeType* const> getCompositeTypeAncestors();
-
-	// ancestors are computed lazily
-	void updateAncestors();
-
-private:
-	typedef std::vector<IInterface*> InterfaceVector;
-	InterfaceVector _ancestors;
-	InterfaceVector _superInterfaces;
-	InterfaceVector _subInterfaces;
+	IInterface* _baseType;
+	size_t _numSuperTypes;
+	IInterface** _superTypes;
+	std::vector<IInterface*> _subTypes;
 };
 
 } // namespace co

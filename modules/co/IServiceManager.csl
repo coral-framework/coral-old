@@ -83,10 +83,9 @@ interface IServiceManager
 	/*
 		Gets the most appropriate provider of \a serviceType for clients of the specified \a clientType.
 
-		If a service instance was not specifically added for the \a clientType, this method will pick
-		the first service instance available for a super-type of \a clientType (by doing a depth-first
-		search in the list of superInterfaces of \a clientType). Finally, if no specialized instance
-		is available for \a clientType, this method will return the global provider of \a serviceType.
+		If a service was not specifically added for the \a clientType, this method will pick the first
+		service available for a super-type of \a clientType. Finally, if no custom service is found for
+		for \a clientType, this method will return the global provider of \a serviceType.
 
 		\throw IllegalArgumentException if any of the arguments are null.
 		\throw MissingServiceException if no suitable instance of \a serviceType is available for \a clientType.

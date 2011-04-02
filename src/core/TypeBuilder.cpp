@@ -40,6 +40,11 @@ TypeBuilder::~TypeBuilder()
    // empty
 }
 
+void TypeBuilder::addMethod( Method* )
+{
+	CORAL_THROW( NotSupportedException, "the builder's type is not a class type" );
+}
+
 void TypeBuilder::destroyType()
 {
 	// remove any array created for the type before we destroy it
@@ -53,9 +58,9 @@ void TypeBuilder::destroyType()
 	_type = NULL;
 }
 
-void TypeBuilder::addMethod( Method* )
+void TypeBuilder::commitType()
 {
-	CORAL_THROW( NotSupportedException, "the builder's type is not a class type" );
+	// does nothing by default
 }
 
 INamespace* TypeBuilder::getNamespace()
@@ -83,7 +88,7 @@ void TypeBuilder::defineField( const std::string&, IType*, bool )
 	CORAL_THROW( NotSupportedException, "the builder's type is not a record type" );
 }
 
-void TypeBuilder::defineSuperType( IType* )
+void TypeBuilder::defineBaseType( IType* )
 {
 	CORAL_THROW( NotSupportedException, "the builder's type does not support inheritance" );
 }
@@ -410,7 +415,7 @@ public:
 	InterfaceTypeBuilder() : ClassTypeBuilder( TK_INTERFACE )
 	{
 		_myType = NULL;
-		_superType = NULL;
+		_baseType = NULL;
 	}
 
 	bool allocateType()
@@ -418,70 +423,71 @@ public:
 		assert( _myType == NULL );
 
 		// the 'co.IService' IInterface is pre-allocated by the ITypeManager
-		if( _name == "IService" && _namespace->getName() == "co" )
+		if( _name == "IService" && _namespace->getFullName() == "co" )
 		{
 			_myType = static_cast<Interface*>( _namespace->getType( "IService" ) );
 			_type = _myType;
 			return false;
 		}
-		else
-		{
-			_myType = new Interface;
-			_type = _myType;
-			return true;
-		}
+
+		_myType = new Interface;
+		_type = _myType;
+
+		// by default, all interfaces inherit from co.IService
+		_baseType = static_cast<Interface*>( co::typeOf<co::IService>::get() );
+		_myType->setBaseType( _baseType );
+
+		return true;
 	}
 
 	void validate()
 	{
-		if( _fields.empty() && _methods.empty() && !_superType )
-			CORAL_THROW( MissingInputException, "missing interface contents" );
+		// check for cyclic inheritance
+		IInterface* base = _baseType;
+		while( base )
+		{
+			if( base == _myType )
+				CORAL_THROW( IllegalArgumentException, "cyclic inheritance detected'" );
+			base = base->getBaseType();
+		}			
 	}
 
 	void fillType()
 	{
-		// when an interface has no explicit supertype, default to 'co.IService'
-		if( !_superType )
-		{
-			// ... unless we're defining the 'co.IService' interface itself
-			Interface* coIService = static_cast<Interface*>( typeOf<IService>::get() );
-			if( _myType != coIService )
-				_superType = coIService;
-		}
-
-		if( _superType )
-		{
-			_myType->addSuperInterface( _superType );
-			_superType->addSubInterface( _myType );
-		}
-
 		_myType->addMembers( _fields );
 		_myType->addMembers( _methods );
 		_myType->sortMembers( _myType );
 	}
 
-	void defineSuperType( IType* superType )
+	void commitType()
+	{
+		_myType->updateSuperTypes();
+		if( _baseType )
+			_baseType->addSubType( _myType );
+	}
+
+	void defineBaseType( IType* baseType )
 	{
 		assertNotCreated();
 
-		if( !superType )
-			CORAL_THROW( IllegalArgumentException, "illegal null supertype" );
+		if( _baseType && _baseType->getFullName() != "co.IService" )
+			CORAL_THROW( NotSupportedException, "multiple inheritance not supported" );
 
-		if( _superType )
-			CORAL_THROW( NotSupportedException, "multiple interface inheritance is not supported" );
+		if( !baseType )
+			CORAL_THROW( IllegalArgumentException, "illegal null baseType" );
 
-		co::TypeKind kind = superType->getKind();
+		co::TypeKind kind = baseType->getKind();
 		if( kind != co::TK_INTERFACE )
-			CORAL_THROW( IllegalArgumentException, "illegal supertype (interface expected, got "
+			CORAL_THROW( IllegalArgumentException, "illegal baseType (interface expected, got "
 							<< co::TK_STRINGS[kind] << ")" );
 
-		// check if the super-type is already contained in the _superTypes list
-		_superType = static_cast<Interface*>( superType );
+		_baseType = static_cast<Interface*>( baseType );
+		_myType->setBaseType( _baseType );
 	}
 
 private:
 	Interface* _myType;
-	Interface* _superType;
+	Interface* _baseType;
 };
 
 // ------ ComponentTypeBuilder -------------------------------------------------

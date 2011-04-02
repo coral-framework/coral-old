@@ -1,11 +1,5 @@
 local function template( writer, c, t )
-	writer( "class ", t.name, " : " )
-
-	local count = #t.superInterfaces
-	for i = 1, count do
-		writer( "public ", t.superInterfaces[i].cppName, ( i < count and ', ' or '' ) )
-	end
-
+	writer( "class ", t.name, " : public ", t.baseType.cppName )
 	writer( "\n{\npublic:\n\tvirtual ~", t.name, "() {;}" )
 
 	local cppBlock = t.cppBlock

@@ -6,14 +6,20 @@
  */
 interface IInterface extends IClassType
 {
-	// List of all ancestors of this interface, including co.IService.
-	readonly IInterface[] interfaceAncestors;
+	/*
+		Interface from which the current interface directly inherits,
+		or null if the current interface is the co.IService interface.
+	 */
+	readonly IInterface baseType;
 
-	// List of the interfaces directly inherited by this interface.
-	readonly IInterface[] superInterfaces;
+	/*
+		Ordered list of super-types. Starts with the baseType and goes all the way up to
+		the co.IService interface. Empty if the current interface is the co.IService interface.
+	 */
+	readonly IInterface[] superTypes;
 
-	// List of the interfaces that inherit directly from this interface.
-	readonly IInterface[] subInterfaces;
+	// List of interfaces that directly inherit from this interface.
+	readonly IInterface[] subTypes;
 
 	// Block of C++ code loaded from the interface's CSL file. May be empty.
 	readonly string cppBlock;

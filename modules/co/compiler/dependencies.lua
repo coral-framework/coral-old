@@ -64,8 +64,8 @@ function enqueueDependencies.TK_NATIVECLASS( enqueue, type, nextDistance )
 end
 
 function enqueueDependencies.TK_INTERFACE( enqueue, type, nextDistance )
-	for i, super in ipairs( type.superInterfaces ) do
-		enqueue( super, nextDistance )
+	if type.baseType then
+		enqueue( type.baseType, nextDistance )
 	end
 	enqueueClassType( enqueue, type, nextDistance )
 end

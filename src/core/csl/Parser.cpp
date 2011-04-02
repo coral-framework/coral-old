@@ -328,13 +328,13 @@ void Parser::onNativeClass( const std::string& cppHeader, const std::string& cpp
 	_typeBuilder->defineNativeClass( cppHeader.substr( 1, cppHeader.length() - 2 ), cppType );
 }
 
-void Parser::onSuperType( const std::string& name )
+void Parser::onBaseType( const std::string& name )
 {
 	IType* type = resolveType( name );
 	if( !type )
 		CORAL_THROW( TypeLoadException, "could not load super-type '" << name << "'" );
 
-	_typeBuilder->defineSuperType( type );
+	_typeBuilder->defineBaseType( type );
 }
 
 void Parser::onIdentifierListItem( const std::string& name )

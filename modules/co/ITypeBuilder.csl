@@ -57,13 +57,13 @@ interface ITypeBuilder
 		raises NotSupportedException, IllegalNameException, IllegalArgumentException;
 
 	/*
-		Makes a type inherit from a \a superType.
+		Makes a type inherit from a \a baseType.
 
 		\throw NotSupportedException if the builder's type was already created, or does not support inheritance.
-		\throw NotSupportedException if a supertype was already defined and multiple inheritance is not supported.
-		\throw IllegalArgumentException if the \a superType is invalid or was already defined.
+		\throw NotSupportedException if a base type was already defined.
+		\throw IllegalArgumentException if \a baseType is invalid.
 	 */
-	void defineSuperType( in IType superType )
+	void defineBaseType( in IType baseType )
 		raises NotSupportedException, IllegalArgumentException;
 
 	/*

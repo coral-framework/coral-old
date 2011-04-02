@@ -34,7 +34,7 @@ public:
 	//! Sorts the members list by (type, name) and updates _firstMethodPos.
 	void sortMembers( ICompositeType* owner );
 
-	// CompundType methods:
+	// ICompositeType methods:
 	Range<IMember* const> getMembers();
 	IMember* getMember( const std::string& name );
 
@@ -43,13 +43,6 @@ public:
 
 	// IClassType methods:
 	Range<IMethod* const> getMethods();
-
-protected:
-	/*!
-		Template method for retrieving the array of ancestors of this CompositeType.
-		Used by the getMembers() method. By default an empty array is returned.
-	 */
-	virtual Range<ICompositeType* const> getCompositeTypeAncestors();
 
 private:
 	typedef RefVector<IMember> MembersVector;

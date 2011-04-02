@@ -68,12 +68,6 @@ private:
 	// stream output operator support for MemberDeclaration
 	friend std::ostream& operator<<( std::ostream&, const co::TypeSemanticChecker::MemberDeclaration& );
 
-	// validates inheritance: checks for cyclic inheritance and multiple inheritance.
-	void checkInheritance( co::IInterface* itf );
-
-	// validates inherited members: checks for clashing names between the checked type and its super-types
-	void checkInheritedMemberClashing();
-
 	// checks if the member declaration clashes with the previously declared and inserts it if not.
 	void insertMemberDeclaration( const MemberDeclaration& memberDeclaration );
 

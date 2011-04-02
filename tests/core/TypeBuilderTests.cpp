@@ -109,7 +109,7 @@ TEST( TypeBuilderTests, componentInvalidDefinitions )
 	// invalid component class definition
 	EXPECT_THROW( cbuilder->defineIdentifier( "identifier" ), co::NotSupportedException );
 	EXPECT_THROW( cbuilder->defineField( "fieldName", anyType, false ), co::NotSupportedException );
-	EXPECT_THROW( cbuilder->defineSuperType( testInterface ), co::NotSupportedException );
+	EXPECT_THROW( cbuilder->defineBaseType( testInterface ), co::NotSupportedException );
 	EXPECT_THROW( cbuilder->definePort( "testIntMember", NULL, false ), co::IllegalArgumentException );
 	EXPECT_THROW( cbuilder->defineMethod( "testMethod" ), co::NotSupportedException );
 	EXPECT_THROW( cbuilder->defineNativeClass( "testHeader", "testName" ), co::NotSupportedException );
@@ -224,7 +224,7 @@ TEST( TypeBuilderTests, enumInvalidDefinition )
 
 	EXPECT_THROW( ebuilder->defineIdentifier( "3identifier" ), co::IllegalNameException );
 	EXPECT_THROW( ebuilder->defineField( "fieldName", anyType, false ), co::NotSupportedException );
-	EXPECT_THROW( ebuilder->defineSuperType( testInterface ), co::NotSupportedException );
+	EXPECT_THROW( ebuilder->defineBaseType( testInterface ), co::NotSupportedException );
 
 	EXPECT_NO_THROW( tct->rollback() );
 }
@@ -365,7 +365,7 @@ TEST( TypeBuilderTests, interfaceInvalidDefinition )
 	// invalid interface definitions
 	EXPECT_THROW( ibuilder->defineIdentifier( "identifier" ), co::NotSupportedException );
 	EXPECT_THROW( ibuilder->defineField( "2fieldName", anyType, false ), co::IllegalNameException );
-	EXPECT_THROW( ibuilder->defineSuperType( NULL ), co::IllegalArgumentException );
+	EXPECT_THROW( ibuilder->defineBaseType( NULL ), co::IllegalArgumentException );
 	EXPECT_THROW( ibuilder->definePort( "testIntMember", testInterface, false ), co::NotSupportedException );
 	EXPECT_THROW( ibuilder->defineMethod( "$testMethod" ), co::IllegalNameException );
 	EXPECT_THROW( ibuilder->defineMethod( "" ), co::IllegalNameException );
@@ -378,9 +378,6 @@ TEST( TypeBuilderTests, interfaceDefinition )
 {
 	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
 	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_INTERFACE, "builderTest.AInterfaceType", tct.get() );
-
-	// try creating an incomplete interface
-	EXPECT_THROW( builder->createType(), co::MissingInputException );
 
 	// define builderTest.AInterfaceType:
 	co::IType* stringType = TestHelper::type( "string" );
@@ -396,42 +393,46 @@ TEST( TypeBuilderTests, interfaceDefinition )
 	EXPECT_NO_THROW( ( mb2 = superBuilder->defineMethod( "parentMethod" ) ) );
 	EXPECT_NO_THROW( mb2->createMethod() );
 
-	// get super-type even before finishing creating it (it should be available)
-	co::IInterface* superInterface = dynamic_cast<co::IInterface*>( TestHelper::type( "builderTest.ASuperInterfaceType" ) );
-	EXPECT_TRUE( superInterface != NULL );
+	// get the super-type before even finishing creating it (it should be available)
+	co::IInterface* super = dynamic_cast<co::IInterface*>( TestHelper::type( "builderTest.ASuperInterfaceType" ) );
+	EXPECT_TRUE( super != NULL );
 
 	// try inheriting from an incompatible type
-	EXPECT_THROW( builder->defineSuperType( stringType ), co::IllegalArgumentException );
+	EXPECT_THROW( builder->defineBaseType( stringType ), co::IllegalArgumentException );
 
 	// add the super-type to the interface type
-	builder->defineSuperType( superInterface );
+	builder->defineBaseType( super );
 
 	// try multiple inheritance
-	EXPECT_THROW( builder->defineSuperType( builder->getInterface() ), co::NotSupportedException );
+	EXPECT_THROW( builder->defineBaseType( builder->getInterface() ), co::NotSupportedException );
 
 	EXPECT_NO_THROW( superBuilder->createType() );
 
-	co::IInterface* interface = dynamic_cast<co::IInterface*>( builder->createType() );
-	EXPECT_TRUE( interface != NULL );
+	co::IInterface* itf = dynamic_cast<co::IInterface*>( builder->createType() );
+	EXPECT_TRUE( itf != NULL );
 
-	ASSERT_TRUE( interface->getMember( "name" ) != NULL );
-	ASSERT_TRUE( interface->getMember( "parentMethod" ) != NULL );
-	ASSERT_TRUE( interface->getMember( "childMethod" ) != NULL );
-	ASSERT_TRUE( interface->getMember( "testName" ) != NULL );
-	ASSERT_TRUE( interface->getMember( "testSecondName" ) != NULL );
+	ASSERT_TRUE( itf->getMember( "name" ) != NULL );
+	ASSERT_TRUE( itf->getMember( "parentMethod" ) != NULL );
+	ASSERT_TRUE( itf->getMember( "childMethod" ) != NULL );
+	ASSERT_TRUE( itf->getMember( "testName" ) != NULL );
+	ASSERT_TRUE( itf->getMember( "testSecondName" ) != NULL );
 
-	ASSERT_EQ( 1, interface->getMethods().getSize() );
-	ASSERT_EQ( 2, interface->getFields().getSize() );
+	ASSERT_EQ( 1, itf->getMethods().getSize() );
+	ASSERT_EQ( 2, itf->getFields().getSize() );
 
-	ASSERT_TRUE( interface->getSuperInterfaces().getSize() == 1 );
-	ASSERT_TRUE( interface->getSuperInterfaces().getFirst() == superInterface );
-	ASSERT_TRUE( interface->getSubInterfaces().getSize() == 0 );
-
-	ASSERT_TRUE( superInterface->getSuperInterfaces().getSize() == 1 );
-	ASSERT_TRUE( superInterface->getSubInterfaces().getSize() == 1 );
-	ASSERT_TRUE( superInterface->getSubInterfaces().getFirst() == interface );
+	ASSERT_EQ( itf->getBaseType(), super );
+	ASSERT_EQ( itf->getSuperTypes().getSize(), 0 );
+	ASSERT_EQ( super->getSubTypes().getSize(), 0 );
 
 	EXPECT_NO_THROW( tct->commit() );
+
+	ASSERT_EQ( itf->getSuperTypes().getSize(), 2 );
+	ASSERT_EQ( itf->getSuperTypes().getFirst(), super );
+	ASSERT_EQ( itf->getSubTypes().getSize(), 0 );
+
+	ASSERT_EQ( super->getSuperTypes().getSize(), 1 );
+	ASSERT_EQ( super->getSubTypes().getSize(), 1 );
+	ASSERT_EQ( super->getSubTypes().getFirst(), itf );
 }
 
 TEST( TypeBuilderTests, interfaceGetMethods )
@@ -470,7 +471,7 @@ TEST( TypeBuilderTests, nativeClassInvalidDefinitions )
 	// invalid native class definition
 	EXPECT_THROW( nbuilder->defineIdentifier( "identifier" ), co::NotSupportedException );
 	EXPECT_THROW( nbuilder->defineField( "0_fieldName", anyType, false ), co::IllegalNameException );
-	EXPECT_THROW( nbuilder->defineSuperType( testInterface ), co::NotSupportedException );
+	EXPECT_THROW( nbuilder->defineBaseType( testInterface ), co::NotSupportedException );
 	EXPECT_THROW( nbuilder->definePort( "testIntMember", testInterface, false ), co::NotSupportedException );
 	EXPECT_THROW( nbuilder->defineMethod( "" ), co::IllegalNameException );
 	EXPECT_THROW( nbuilder->defineNativeClass( "header", "" ), co::IllegalArgumentException );
@@ -561,7 +562,7 @@ TEST( TypeBuilderTests, structInvalidDefinition )
 	// invalid struct definitions
 	EXPECT_THROW( sbuilder->defineIdentifier( "identifier" ), co::NotSupportedException );
 	EXPECT_THROW( sbuilder->defineField( "1fieldName", anyType, false ), co::IllegalNameException );
-	EXPECT_THROW( sbuilder->defineSuperType( testInterface ), co::NotSupportedException );
+	EXPECT_THROW( sbuilder->defineBaseType( testInterface ), co::NotSupportedException );
 	EXPECT_THROW( sbuilder->definePort( "testIntMember", testInterface, false ), co::NotSupportedException );
 	EXPECT_THROW( sbuilder->defineMethod( "testMethod" ), co::NotSupportedException );
 	EXPECT_THROW( sbuilder->defineNativeClass( "testHeader", "testName" ), co::NotSupportedException );

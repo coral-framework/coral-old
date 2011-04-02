@@ -61,7 +61,7 @@ void ServiceManager::addServiceForType( IInterface* serviceType, IInterface* cli
 	CHECK_NOT_NULL( clientType );
 
 	// is clientType the co.IService interface?
-	if( clientType->getSuperInterfaces().isEmpty() )
+	if( !clientType->getBaseType() )
 	{
 		addService( serviceType, service );
 		return;
@@ -87,7 +87,7 @@ void ServiceManager::addServiceProviderForType( IInterface* serviceType, IInterf
 	CHECK_NOT_NULL( clientType );
 
 	// is clientType the co.IService interface?
-	if( clientType->getSuperInterfaces().isEmpty() )
+	if( !clientType->getBaseType() )
 	{
 		addServiceProvider( serviceType, componentName );
 		return;
@@ -259,7 +259,7 @@ void ServiceManager::createService( IInterface* serviceType, LazyService& lazy, 
 IService* ServiceManager::getCustomService( ServiceRecord& rec, IInterface* serviceType, IInterface* clientType )
 {
 	// pick the first service instance available for (a super-type of) clientType
-	LazyService* lazy = findCustomService( rec, serviceType, clientType );
+	LazyService* lazy = findCustomService( rec, clientType );
 
 	// if none is available, fall back to the global provider
 	if( !lazy )
@@ -275,23 +275,19 @@ IService* ServiceManager::getCustomService( ServiceRecord& rec, IInterface* serv
 	return lazy->getService();
 }
 
-ServiceManager::LazyService* ServiceManager::findCustomService( ServiceRecord& rec, IInterface* serviceType, IInterface* clientType )
+ServiceManager::LazyService* ServiceManager::findCustomService( ServiceRecord& rec, IInterface* clientType )
 {
-	Range<IInterface* const> superInterfaces = clientType->getSuperInterfaces();
-	if( superInterfaces.isEmpty() )
-		return NULL; // we reached a co.IService
-
-	// check if a custom service instance was provided for this clientType
 	CustomServicesMap::iterator it = rec.custom.find( clientType );
 	if( it != rec.custom.end() )
 		return &it->second;
 
-	// proceed with the depth-first search
-	for( ; superInterfaces; superInterfaces.popFirst() )
+	Range<IInterface* const> superTypes = clientType->getSuperTypes();
+	for( ; superTypes; superTypes.popFirst() )
 	{
-		LazyService* res = findCustomService( rec, serviceType, superInterfaces.getFirst() );
-		if( res )
-			return res;
+		// check if a custom service instance was provided for this clientType
+		CustomServicesMap::iterator it = rec.custom.find( superTypes.getFirst() );
+		if( it != rec.custom.end() )
+			return &it->second;
 	}
 
 	return NULL;

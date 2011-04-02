@@ -96,10 +96,8 @@ end
 
 function write.TK_INTERFACE( writer, t )
 	writer( "interface class ", t.name )
-	if #t.superInterfaces > 0 then writer " : " end
-	for i, s in ipairs( t.superInterfaces ) do
-		if i > 1 then writer ", " end
-		writer( s.docName )
+	if t.baseType then
+		writer( " : ", t.baseType.docName )
 	end
 	writer( "\n{\n" )
 	writeFieldsAndMethods( writer, t )

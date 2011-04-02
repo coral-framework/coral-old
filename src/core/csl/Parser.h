@@ -50,7 +50,7 @@ public:
 	void onImportClause( const std::string& importTypeName );
 	void onNativeClass( const std::string& cppType, const std::string& cppHeader );
 	void onIdentifierListItem( const std::string& name );
-	void onSuperType( const std::string& typeName );
+	void onBaseType( const std::string& typeName );
 	void onComponentInterface( bool isFacet, const std::string& name );
 	void onField( const std::string& name, bool isReadOnly );
 	void onMethod( const std::string& name );

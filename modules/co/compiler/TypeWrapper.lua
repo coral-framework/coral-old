@@ -193,21 +193,23 @@ function autoFields.typesNeededInReflector( t )
 		end
 	end
 
-	-- add forward-decl types from all ancestors
-	for i, ancestor in ipairs( t.interfaceAncestors ) do
-		if ancestor.fullName ~= 'co.IService' then
-			for i, a in ipairs( ancestor.fields ) do
-				addType( a.type )
-			end
+	-- add forward-decl types from all supertypes
+	for i, super in ipairs( t.superTypes ) do
+		if super.fullName == 'co.IService' then
+			break
+		end
 
-			for i, m in ipairs( ancestor.methods ) do
-				local returnType = m.returnType
-				if returnType then
-					addType( returnType )
-				end
-				for i, p in ipairs( m.parameters ) do
-					addType( p.type )
-				end
+		for i, field in ipairs( super.fields ) do
+			addType( field.type )
+		end
+
+		for i, method in ipairs( super.methods ) do
+			local returnType = method.returnType
+			if returnType then
+				addType( returnType )
+			end
+			for i, param in ipairs( method.parameters ) do
+				addType( param.type )
 			end
 		end
 	end
@@ -279,9 +281,8 @@ end
 
 function traverse.TK_INTERFACE( t )
 	traverseClassType( t )
-
-	for i, super in ipairs( t.superInterfaces ) do
-		t:includeHeader( super )
+	if t.baseType then
+		t:includeHeader( t.baseType )
 	end
 end
 

@@ -103,7 +103,7 @@ private:
 	void createService( IInterface* serviceType, LazyService& lazy, IInterface* clientType = 0 );
 
 	IService* getCustomService( ServiceRecord& rec, IInterface* serviceType, IInterface* clientType );
-	LazyService* findCustomService( ServiceRecord& rec, IInterface* serviceType, IInterface* clientType );
+	LazyService* findCustomService( ServiceRecord& rec, IInterface* clientType );
 
 private:
 	bool _isLazy;

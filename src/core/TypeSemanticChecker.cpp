@@ -27,53 +27,7 @@ void TypeSemanticChecker::check()
 	if( dynamic_cast<ICompositeType*>( _type ) == NULL )
 		return;
 
-	co::IInterface* itf = dynamic_cast<IInterface*>( _type );
-	if( itf )
-		checkInheritance( itf );
-
 	checkMemberDeclarations( _type );
-}
-
-void TypeSemanticChecker::checkInheritance( co::IInterface* itf )
-{
-	// assert no multiple inheritance from the same type
-	co::Range<co::IInterface* const> superTypes = itf->getSuperInterfaces();
-	for( ; superTypes; superTypes.popFirst() )
-	{
-		co::IInterface* currentSuper = superTypes.getFirst();
-
-		// check for cyclic inheritance
-		if( currentSuper->isSubTypeOf( itf ) )
-		{
-			CORAL_THROW( SemanticException, "cyclic inheritance detected in type '"
-				<< itf->getFullName() << "' through supertype '"
-				<< currentSuper->getFullName() << "'" );
-		}
-
-		/*
-			Check for redundant direct inheritances, excluding this super-type from the list.
-			This method actually checks if theres more than one way of reaching an ancestral
-			(i.e. indirect super-type) from the _type's list of direct super-types.
-		 */
-		co::Range<co::IInterface* const> subList( superTypes );
-		for( subList.popFirst(); subList; subList.popFirst() )
-		{
-			// check if there is more than one way of reaching a super-type
-			co::IInterface* anotherSuper = subList.getFirst();
-
-			co::IInterface* toBlame = NULL;
-			if( anotherSuper->isSubTypeOf( currentSuper ) )
-				toBlame = currentSuper;
-			else if( currentSuper->isSubTypeOf( anotherSuper ) )
-				toBlame = anotherSuper;
-
-			if( toBlame )
-			{
-				CORAL_THROW( SemanticException, "type '" << itf->getFullName()
-					<< "' inherits more than once from supertype '" << toBlame->getFullName() << "'" );
-			}
-		}
-	}
 }
 
 std::ostream& operator<<( std::ostream& out, const co::TypeSemanticChecker::MemberDeclaration& md )
@@ -141,12 +95,8 @@ void TypeSemanticChecker::checkMemberDeclarations( co::IType* type )
 	}
 
 	co::IInterface* itf = dynamic_cast<co::IInterface*>( type );
-	if( itf )
-	{
-		co::Range<co::IInterface* const> superTypes = itf->getSuperInterfaces();
-		for( ; superTypes; superTypes.popFirst() )
-			checkMemberDeclarations( superTypes.getFirst() );
-	}
+	if( itf && itf->getBaseType() )
+		checkMemberDeclarations( itf->getBaseType() );
 }
 
 } // namespace co

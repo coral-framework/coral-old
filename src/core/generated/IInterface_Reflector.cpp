@@ -43,39 +43,6 @@ public:
 	void serviceRetain() { _provider->serviceRetain(); }
 	void serviceRelease() { _provider->serviceRelease(); }
 
-	// co.IClassType Methods:
-
-	co::Range<co::IMethod* const> getMethods()
-	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IClassType>( 0 ) );
-        return res.get< co::Range<co::IMethod* const> >();
-	}
-
-	// co.IRecordType Methods:
-
-	co::Range<co::IField* const> getFields()
-	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IRecordType>( 0 ) );
-        return res.get< co::Range<co::IField* const> >();
-	}
-
-	// co.ICompositeType Methods:
-
-	co::Range<co::IMember* const> getMembers()
-	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ICompositeType>( 0 ) );
-        return res.get< co::Range<co::IMember* const> >();
-	}
-
-	co::IMember* getMember( const std::string& name_ )
-	{
-		co::Any args[1];
-		args[0].set< const std::string& >( name_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ICompositeType>( 0 ), range );
-		return res.get< co::IMember* >();
-	}
-
 	// co.IType Methods:
 
 	const co::Uuid& getBinarySignature()
@@ -127,27 +94,60 @@ public:
 		_provider->dynamicSetField( _cookie, getField<co::IType>( 6 ), arg );
 	}
 
+	// co.ICompositeType Methods:
+
+	co::Range<co::IMember* const> getMembers()
+	{
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ICompositeType>( 0 ) );
+        return res.get< co::Range<co::IMember* const> >();
+	}
+
+	co::IMember* getMember( const std::string& name_ )
+	{
+		co::Any args[1];
+		args[0].set< const std::string& >( name_ );
+		co::Range<co::Any const> range( args, 1 );
+		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ICompositeType>( 0 ), range );
+		return res.get< co::IMember* >();
+	}
+
+	// co.IRecordType Methods:
+
+	co::Range<co::IField* const> getFields()
+	{
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IRecordType>( 0 ) );
+        return res.get< co::Range<co::IField* const> >();
+	}
+
+	// co.IClassType Methods:
+
+	co::Range<co::IMethod* const> getMethods()
+	{
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IClassType>( 0 ) );
+        return res.get< co::Range<co::IMethod* const> >();
+	}
+
 	// co.IInterface Methods:
+
+	co::IInterface* getBaseType()
+	{
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IInterface>( 0 ) );
+        return res.get< co::IInterface* >();
+	}
 
 	const std::string& getCppBlock()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IInterface>( 0 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IInterface>( 1 ) );
         return res.get< const std::string& >();
 	}
 
-	co::Range<co::IInterface* const> getInterfaceAncestors()
-	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IInterface>( 1 ) );
-        return res.get< co::Range<co::IInterface* const> >();
-	}
-
-	co::Range<co::IInterface* const> getSubInterfaces()
+	co::Range<co::IInterface* const> getSubTypes()
 	{
 		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IInterface>( 2 ) );
         return res.get< co::Range<co::IInterface* const> >();
 	}
 
-	co::Range<co::IInterface* const> getSuperInterfaces()
+	co::Range<co::IInterface* const> getSuperTypes()
 	{
 		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IInterface>( 3 ) );
         return res.get< co::Range<co::IInterface* const> >();
@@ -216,10 +216,10 @@ public:
 		co::IInterface* p = checkInstance( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< const std::string& >( p->getCppBlock() ); break;
-		case 1:		value.set< co::Range<co::IInterface* const> >( p->getInterfaceAncestors() ); break;
-		case 2:		value.set< co::Range<co::IInterface* const> >( p->getSubInterfaces() ); break;
-		case 3:		value.set< co::Range<co::IInterface* const> >( p->getSuperInterfaces() ); break;
+		case 0:		value.set< co::IInterface* >( p->getBaseType() ); break;
+		case 1:		value.set< const std::string& >( p->getCppBlock() ); break;
+		case 2:		value.set< co::Range<co::IInterface* const> >( p->getSubTypes() ); break;
+		case 3:		value.set< co::Range<co::IInterface* const> >( p->getSuperTypes() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

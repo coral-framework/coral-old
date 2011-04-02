@@ -7,80 +7,104 @@
 #include "TypeManager.h"
 #include <co/Coral.h>
 #include <co/ISystem.h>
-#include <algorithm>
 
 namespace co {
 
-Interface::~Interface()
+Interface::Interface() : _baseType( NULL ), _numSuperTypes( 0 ), _superTypes( NULL )
 {
 	// empty
 }
 
-void Interface::addSuperInterface( IInterface* superItf )
+Interface::~Interface()
 {
-	_superInterfaces.push_back( superItf );
+	delete[] _superTypes;
 }
 
-void Interface::addSubInterface( IInterface* subItf )
+void Interface::setBaseType( IInterface* base )
 {
-	_subInterfaces.push_back( subItf );
+	_baseType = base;
 }
 
-Range<IInterface* const> Interface::getInterfaceAncestors()
+void Interface::addSubType( IInterface* sub )
 {
-	updateAncestors();
-	return _ancestors;
+	_subTypes.push_back( sub );
 }
 
-Range<IInterface* const> Interface::getSuperInterfaces()
+void Interface::updateSuperTypes()
 {
-	return _superInterfaces;
+	assert( _numSuperTypes == 0 && !_superTypes );
+
+	if( !_baseType )
+	{
+		assert( getFullName() == "co.IService" );
+		return;
+	}
+
+	IInterface* base = _baseType;
+	while( base )
+	{
+		++_numSuperTypes;
+		base = base->getBaseType();
+	}
+
+	_superTypes = new IInterface*[_numSuperTypes];
+
+	base = _baseType;
+	for( size_t i = 0; i < _numSuperTypes; ++i )
+	{
+		_superTypes[i] = base;
+		base = base->getBaseType();		
+	}
+
+	assert( _superTypes[_numSuperTypes - 1]->getFullName() == "co.IService" );
 }
 
-Range<IInterface* const> Interface::getSubInterfaces()
+Range<IMember* const> Interface::getMembers()
 {
-	return _subInterfaces;
+	return ClassTypeImpl::getMembers();
+}
+
+IMember* Interface::getMember( const std::string& name )
+{
+	IMember* res = ClassTypeImpl::getMember( name );
+
+	if( !res && _baseType )
+		res = _baseType->getMember( name );
+
+	return res;
+}
+
+IInterface* Interface::getBaseType()
+{
+	return _baseType;
+}
+
+Range<IInterface* const> Interface::getSuperTypes()
+{
+	return Range<IInterface* const>( _superTypes, _numSuperTypes );
+}
+
+Range<IInterface* const> Interface::getSubTypes()
+{
+	return _subTypes;
 }
 
 const std::string& Interface::getCppBlock()
 {
-	TypeManager* tm = dynamic_cast<TypeManager*>( getSystem()->getTypes() );
-	assert( tm );
+	TypeManager* tm = static_cast<TypeManager*>( getSystem()->getTypes() );
 	return tm->getCppBlock( getFullName() );
 }
 
-bool Interface::isSubTypeOf( IInterface* itf )
+bool Interface::isSubTypeOf( IInterface* type )
 {
-	updateAncestors();
-	return itf == this || std::binary_search( _ancestors.begin(), _ancestors.end(), itf );
-}
+	if( type == this )
+		return true;
 
-Range<ICompositeType* const> Interface::getCompositeTypeAncestors()
-{
-	updateAncestors();
-	return _ancestors;
-}
+	for( size_t i = 0; i < _numSuperTypes; ++i )
+		if( _superTypes[i] == type )
+			return true;
 
-void Interface::updateAncestors()
-{
-	if( !_ancestors.empty() )
-		return;
-
-	// add all ancestors from super-interfaces
-	size_t count = _superInterfaces.size();
-	for( size_t i = 0; i < count; ++i )
-	{
-		IInterface* super = _superInterfaces[i];
-		_ancestors.push_back( super );
-
-		Range<IInterface* const> ancestors = super->getInterfaceAncestors();
-		for( ; ancestors; ancestors.popFirst() )
-			_ancestors.push_back( ancestors.getFirst() );
-	}
-
-	// remove duplicates
-	std::sort( _ancestors.begin(), _ancestors.end() );
-	_ancestors.erase( std::unique( _ancestors.begin(), _ancestors.end() ), _ancestors.end() );
+	return false;
 }
 
 CORAL_EXPORT_COMPONENT( Interface, Interface );

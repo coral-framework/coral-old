@@ -43,31 +43,6 @@ public:
 	void serviceRetain() { _provider->serviceRetain(); }
 	void serviceRelease() { _provider->serviceRelease(); }
 
-	// co.IRecordType Methods:
-
-	co::Range<co::IField* const> getFields()
-	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IRecordType>( 0 ) );
-        return res.get< co::Range<co::IField* const> >();
-	}
-
-	// co.ICompositeType Methods:
-
-	co::Range<co::IMember* const> getMembers()
-	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ICompositeType>( 0 ) );
-        return res.get< co::Range<co::IMember* const> >();
-	}
-
-	co::IMember* getMember( const std::string& name_ )
-	{
-		co::Any args[1];
-		args[0].set< const std::string& >( name_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ICompositeType>( 0 ), range );
-		return res.get< co::IMember* >();
-	}
-
 	// co.IType Methods:
 
 	const co::Uuid& getBinarySignature()
@@ -117,6 +92,31 @@ public:
 		co::Any arg;
 		arg.set< co::IReflector* >( reflector_ );
 		_provider->dynamicSetField( _cookie, getField<co::IType>( 6 ), arg );
+	}
+
+	// co.ICompositeType Methods:
+
+	co::Range<co::IMember* const> getMembers()
+	{
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ICompositeType>( 0 ) );
+        return res.get< co::Range<co::IMember* const> >();
+	}
+
+	co::IMember* getMember( const std::string& name_ )
+	{
+		co::Any args[1];
+		args[0].set< const std::string& >( name_ );
+		co::Range<co::Any const> range( args, 1 );
+		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ICompositeType>( 0 ), range );
+		return res.get< co::IMember* >();
+	}
+
+	// co.IRecordType Methods:
+
+	co::Range<co::IField* const> getFields()
+	{
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IRecordType>( 0 ) );
+        return res.get< co::Range<co::IField* const> >();
 	}
 
 	// co.IStruct Methods:

@@ -19,13 +19,13 @@ class IInterface : public co::IClassType
 public:
 	virtual ~IInterface() {;}
 
+	virtual co::IInterface* getBaseType() = 0;
+
 	virtual const std::string& getCppBlock() = 0;
 
-	virtual co::Range<co::IInterface* const> getInterfaceAncestors() = 0;
+	virtual co::Range<co::IInterface* const> getSubTypes() = 0;
 
-	virtual co::Range<co::IInterface* const> getSubInterfaces() = 0;
-
-	virtual co::Range<co::IInterface* const> getSuperInterfaces() = 0;
+	virtual co::Range<co::IInterface* const> getSuperTypes() = 0;
 
 	virtual bool isSubTypeOf( co::IInterface* type ) = 0;
 };

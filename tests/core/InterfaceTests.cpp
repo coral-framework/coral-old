@@ -77,14 +77,6 @@ TEST( InterfaceTests, deepInheritanceTree )
 
 TEST( InterfaceTests, invalidDeclarations )
 {
-	CSL_TEST_BEGIN( "InterfaceTests.InvalidDeclarations.emptyDeclaration" )
-	CSL_EXPECT_SEMANTIC_ERROR( "missing interface contents" )
-	CSL_TEST_END()
-
-	CSL_TEST_BEGIN( "InterfaceTests.InvalidDeclarations.emptyDeclarationWithComment" )
-	CSL_EXPECT_SEMANTIC_ERROR( "missing interface contents" )
-	CSL_TEST_END()
-
 	CSL_TEST_BEGIN( "InterfaceTests.InvalidDeclarations.invalidFieldName" )
 	CSL_EXPECT_ERROR( "must start with a lowercase letter", "invalidFieldName.csl", 6 )
 	CSL_TEST_END()
@@ -128,6 +120,10 @@ TEST( InterfaceTests, invalidDeclarations )
 TEST( InterfaceTests, validDeclarations )
 {
 	CSL_TEST( "InterfaceTests.ValidDeclarations.validInterface" )
+
+	CSL_TEST( "InterfaceTests.ValidDeclarations.emptyDeclaration" )
+
+	CSL_TEST( "InterfaceTests.ValidDeclarations.emptyDeclarationWithComment" )
 }
 
 TEST( InterfaceTests, cyclicInheritance )

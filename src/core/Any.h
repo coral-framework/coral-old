@@ -479,15 +479,14 @@ struct VariableHelper<double>
 				<tt>std::vector<\e ValueType></tt>.
 		  - It is possible to retrieve a <tt>co::Range<const \e ValueType></tt> from an array passed as
 				either a <tt>co::Range<\e ValueType></tt> or a <tt>std::vector<\e ValueType></tt>.
-		  - It is possible to retrieve a <tt>co::Range<\e SuperInterface* const></tt> from an array
-				passed as either a <tt>co::Range<\e SubInterface* [const]></tt>, a
-				<tt>std::vector<\e SubInterface*></tt> or a <tt>co::RefVector<\e SubInterface></tt>.
+		  - It is possible to retrieve a <tt>co::Range<\e SuperType* const></tt> from an array
+				passed as either a <tt>co::Range<\e SubType* [const]></tt>, a
+				<tt>std::vector<\e SubType*></tt> or a <tt>co::RefVector<\e SubType></tt>.
 		\par
 		Non-listed cases must be retrieved by exact type.
-		In all rules, <tt>\e ValueType</tt> is a Coral value (such as a \c bool or a \c struct), optionally
-		passed by reference; and both <tt>\e SubInterface</tt> and <tt>\e SuperInterface</tt> are Coral
-		interfaces, where <tt>\e SubInterface</tt> is a subtype of <tt>\e SuperInterface</tt>, or both
-		are the same interface.
+		In all rules, \e ValueType is a Coral value (such as a \c bool or a \c struct), optionally
+		passed by reference; and both \e SubType and \e SuperType are Coral interfaces, where \e SubType
+		is a subtype of \e SuperType, or both are the same interface.
 
  	\par Automatic Conversions for Values
 		All types storable as values in a co::Any can be converted to any other value type.

@@ -70,6 +70,14 @@ public:
 		return res.get< co::IType* >();
 	}
 
+	void defineBaseType( co::IType* baseType_ )
+	{
+		co::Any args[1];
+		args[0].set< co::IType* >( baseType_ );
+		co::Range<co::Any const> range( args, 1 );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 1 ), range );
+	}
+
 	void defineField( const std::string& name_, co::IType* type_, bool isReadOnly_ )
 	{
 		co::Any args[3];
@@ -77,7 +85,7 @@ public:
 		args[1].set< co::IType* >( type_ );
 		args[2].set< bool >( isReadOnly_ );
 		co::Range<co::Any const> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 1 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 2 ), range );
 	}
 
 	void defineIdentifier( const std::string& name_ )
@@ -85,7 +93,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 2 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 3 ), range );
 	}
 
 	co::IMethodBuilder* defineMethod( const std::string& name_ )
@@ -93,7 +101,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 3 ), range );
+		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 4 ), range );
 		return res.get< co::IMethodBuilder* >();
 	}
 
@@ -103,7 +111,7 @@ public:
 		args[0].set< const std::string& >( nativeHeader_ );
 		args[1].set< const std::string& >( nativeName_ );
 		co::Range<co::Any const> range( args, 2 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 4 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 5 ), range );
 	}
 
 	void definePort( const std::string& name_, co::IInterface* type_, bool isFacet_ )
@@ -113,14 +121,6 @@ public:
 		args[1].set< co::IInterface* >( type_ );
 		args[2].set< bool >( isFacet_ );
 		co::Range<co::Any const> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 5 ), range );
-	}
-
-	void defineSuperType( co::IType* superType_ )
-	{
-		co::Any args[1];
-		args[0].set< co::IType* >( superType_ );
-		co::Range<co::Any const> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 6 ), range );
 	}
 
@@ -215,6 +215,13 @@ public:
 				break;
 			case 4:
 				{
+					co::IType* baseType_ = args[++argIndex].get< co::IType* >();
+					argIndex = -1;
+					p->defineBaseType( baseType_ );
+				}
+				break;
+			case 5:
+				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					co::IType* type_ = args[++argIndex].get< co::IType* >();
 					bool isReadOnly_ = args[++argIndex].get< bool >();
@@ -222,21 +229,21 @@ public:
 					p->defineField( name_, type_, isReadOnly_ );
 				}
 				break;
-			case 5:
+			case 6:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
 					p->defineIdentifier( name_ );
 				}
 				break;
-			case 6:
+			case 7:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
 					res.set< co::IMethodBuilder* >( p->defineMethod( name_ ) );
 				}
 				break;
-			case 7:
+			case 8:
 				{
 					const std::string& nativeHeader_ = args[++argIndex].get< const std::string& >();
 					const std::string& nativeName_ = args[++argIndex].get< const std::string& >();
@@ -244,20 +251,13 @@ public:
 					p->defineNativeClass( nativeHeader_, nativeName_ );
 				}
 				break;
-			case 8:
+			case 9:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					co::IInterface* type_ = args[++argIndex].get< co::IInterface* >();
 					bool isFacet_ = args[++argIndex].get< bool >();
 					argIndex = -1;
 					p->definePort( name_, type_, isFacet_ );
-				}
-				break;
-			case 9:
-				{
-					co::IType* superType_ = args[++argIndex].get< co::IType* >();
-					argIndex = -1;
-					p->defineSuperType( superType_ );
 				}
 				break;
 			default:

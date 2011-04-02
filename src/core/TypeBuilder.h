@@ -34,14 +34,16 @@ public:
 public:
 	virtual ~TypeBuilder();
 
-	/*!
-		Internal method. Destroys and removes all references to the type created by this builder.
-		This only works if the type was not committed, and is used in ITypeTransaction::rollback().
-	 */
+	// Internal methods:
+
+	// Called from IMethodBuilder to add a method definition.
+	virtual void addMethod( Method* methodInfo );
+
+	// Destroys and removes all references to our type, assuming it was not committed yet.
 	void destroyType();
 
-	//! Template method: tries to add a method definition (called from IMethodBuilder).
-	virtual void addMethod( Method* methodInfo );
+	// Executed once we're sure the type's transaction is going to be committed.
+	virtual void commitType();
 
 	// ITypeBuilder methods:
 	INamespace* getNamespace();
@@ -49,7 +51,7 @@ public:
 	const std::string& getTypeName();
 	void defineIdentifier( const std::string& name );
 	void defineField( const std::string& name, IType* type, bool isReadOnly );
-	void defineSuperType( IType* superType );
+	void defineBaseType( IType* superType );
 	void definePort( const std::string& name, IInterface* type, bool isFacet );
 	IMethodBuilder* defineMethod( const std::string& name );
 	void defineNativeClass( const std::string& nativeHeader, const std::string& nativeName );

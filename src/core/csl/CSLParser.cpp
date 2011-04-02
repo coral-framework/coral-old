@@ -3714,7 +3714,7 @@ inheritance_declaration(pCSLParser ctx)
             if ( BACKTRACKING==0 ) 
             {
 
-                			ctx->parser->onSuperType( (const char*)(STRSTREAM->toStringTT(STRSTREAM, superType.start, superType.stop))->chars );
+                			ctx->parser->onBaseType( (const char*)(STRSTREAM->toStringTT(STRSTREAM, superType.start, superType.stop))->chars );
                 		
             }
 

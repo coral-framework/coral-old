@@ -161,10 +161,9 @@ public:
 			end
 		end
 
-		for i, ancestor in ipairs( t.interfaceAncestors ) do
-			if ancestor.fullName ~= 'co.IService' then
-				generateProxyMethodsFor( ancestor )
-			end
+		for i = #t.superTypes - 1, 1, -1 do
+			local super = t.superTypes[i]
+			generateProxyMethodsFor( super )
 		end
 
 		if t.fullName ~= 'co.IService' then
