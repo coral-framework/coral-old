@@ -39,11 +39,23 @@ public:
 	// Called from IMethodBuilder to add a method definition.
 	virtual void addMethod( Method* methodInfo );
 
-	// Destroys and removes all references to our type, assuming it was not committed yet.
-	void destroyType();
+	/*
+		Called after createType() is called for all types in a transaction,
+		to validate the final state of the types before they are committed.		
+	 */
+	virtual void validate();
 
-	// Executed once we're sure the type's transaction is going to be committed.
-	virtual void commitType();
+	/*
+		Executed once all types in the transaction have been validated and
+		we're sure that everything is going to be committed.
+	 */
+	virtual void commit();
+
+	/*
+		The transaction failed. Destroys and removes all references to our type.
+		The type must not have been committed yet.
+	 */
+	virtual void rollback();
 
 	// ITypeBuilder methods:
 	INamespace* getNamespace();
@@ -73,11 +85,10 @@ protected:
 	 */
 	virtual bool allocateType() = 0;
 
-	//! Template method to check for missing data (may throw MissingInputException).
-	virtual void validate() = 0;
-
-	//! Template method to populate the type with the data we have collected.
-	//! Should only be called after validate() has made sure all required data is available.
+	/*!
+		Template method to populate a type with all the provided data.
+		If not all required data has been provided, a MissingInputException is raised.
+	 */
 	virtual void fillType() = 0;
 
 protected:

@@ -15,7 +15,7 @@
 #include <co/IField.h>
 #include <co/IModuleManager.h>
 #include <co/IServiceManager.h>
-#include <co/LifeCycleException.h>
+#include <co/IllegalStateException.h>
 #include <co/ITypeTransaction.h>
 #include <co/IllegalArgumentException.h>
 #include <moduleA/TestInterface.h>
@@ -71,10 +71,10 @@ TEST( ModuleTests, systemAndModuleLifeCycles )
 	co::ISystem* system = co::getSystem();
 
 	// cannot tearDown() before setting the system up
-	EXPECT_THROW( system->tearDown(), co::LifeCycleException );
+	EXPECT_THROW( system->tearDown(), co::IllegalStateException );
 
 	// cannot setupPresentation() before setupBase()
-	EXPECT_THROW( system->setupPresentation(), co::LifeCycleException );
+	EXPECT_THROW( system->setupPresentation(), co::IllegalStateException );
 
 	// setupBase() requiring moduleA
 	std::string requiredModule( "moduleA" );
@@ -90,7 +90,7 @@ TEST( ModuleTests, systemAndModuleLifeCycles )
 	EXPECT_EQ( co::ModuleState_Integrated, moduleA->getState() );
 
 	// cannot tearDown() because the system was not fully set up yet (setupPresentation())
-	EXPECT_THROW( system->tearDown(), co::LifeCycleException );
+	EXPECT_THROW( system->tearDown(), co::IllegalStateException );
 
 	// setupPresentation()
 	system->setupPresentation();
@@ -114,7 +114,7 @@ TEST( ModuleTests, systemAndModuleLifeCycles )
 	EXPECT_EQ( co::ModuleState_Disposed, moduleB->getState() );
 
 	// cannot load additional modules after the system is torn down
-	EXPECT_THROW( system->getModules()->load( "whatever" ), co::LifeCycleException );
+	EXPECT_THROW( system->getModules()->load( "whatever" ), co::IllegalStateException );
 
 	// we need another full restart
 	co::shutdown();
@@ -124,7 +124,7 @@ TEST( ModuleTests, systemAndModuleLifeCycles )
 	system->setup();
 
 	// cannot setup() the system again before tearing it down
-	EXPECT_THROW( system->setup(), co::LifeCycleException );
+	EXPECT_THROW( system->setup(), co::IllegalStateException );
 }
 
 TEST( ModuleTests, crossModuleInheritance )

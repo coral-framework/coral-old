@@ -31,8 +31,8 @@ interface IObject
 
 		\throw NoSuchPortException if \a receptacle is not a valid component receptacle.
 		\throw IllegalCastException if \a service is incompatible with the \a receptacle.
-		\throw LifeCycleException if \a receptacle cannot be changed in the current state.
+		\throw IllegalStateException if \a receptacle cannot be changed in the current object state.
 	 */
 	void setService( in IPort receptacle, in IService service )
-		raises NoSuchPortException, IllegalCastException, LifeCycleException;
+		raises NoSuchPortException, IllegalCastException, IllegalStateException;
 };

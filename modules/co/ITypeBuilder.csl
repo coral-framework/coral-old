@@ -30,7 +30,6 @@ interface ITypeBuilder
 		\throw IllegalNameException if \a name is not a valid identifier.
 		\throw IllegalArgumentException if \a type is invalid (NULL, a component or an exception).
 		\throw IllegalArgumentException if \a isReadOnly is \a true and the builder's kind is TK_STRUCT.
-		\throw IllegalNameException if \a name clashes with other members.
 	 */
 	void defineField( in string name, in IType type, in bool isReadOnly )
 		raises NotSupportedException, IllegalNameException, IllegalArgumentException;
@@ -42,7 +41,6 @@ interface ITypeBuilder
 
 		\throw NotSupportedException if the builder's type was already created, or is not a class type.
 		\throw IllegalNameException if \a name is not a valid identifier.
-		\throw IllegalNameException  if \a name clashes with other members.
 	 */
 	IMethodBuilder defineMethod( in string name ) raises NotSupportedException, IllegalNameException;
 
@@ -50,7 +48,7 @@ interface ITypeBuilder
 		Adds a port to a component.
 
 		\throw NotSupportedException if the builder's type was already created, or is not a component.
-		\throw IllegalNameException if \a name is not a valid identifier or clashes with other members.
+		\throw IllegalNameException if \a name is not a valid identifier.
 		\throw IllegalArgumentException if \a type is invalid (e.g. NULL).
 	 */
 	void definePort( in string name, in IInterface type, in bool isFacet )

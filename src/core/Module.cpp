@@ -10,7 +10,7 @@
 #include <co/INamespace.h>
 #include <co/ITypeManager.h>
 #include <co/IModulePartLoader.h>
-#include <co/LifeCycleException.h>
+#include <co/IllegalStateException.h>
 #include <co/reserved/LibraryManager.h>
 #include <cassert>
 #include <iostream>
@@ -52,7 +52,7 @@ void Module::initialize( const std::string& moduleName )
 void Module::addPart( IModulePart* part )
 {
 	if( _state != ModuleState_None )
-		throw LifeCycleException( "cannot add a module part to a module after it has been initialized" );
+		throw IllegalStateException( "cannot add a module part to a module after it has been initialized" );
 
 	assert( part );
 	_parts.push_back( part );
@@ -87,7 +87,7 @@ void Module::setRank( int32 rank )
 void Module::initialize()
 {
 	if( _state != ModuleState_None )
-		throw LifeCycleException( "the module's state is not ModuleState_None" );
+		throw IllegalStateException( "the module's state is not ModuleState_None" );
 
 	for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->initialize( this );
@@ -98,7 +98,7 @@ void Module::initialize()
 void Module::integrate()
 {
 	if( _state != ModuleState_Initialized )
-		throw LifeCycleException( "the module's state is not ModuleState_Initialized" );
+		throw IllegalStateException( "the module's state is not ModuleState_Initialized" );
 
 	for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->integrate( this );
@@ -109,7 +109,7 @@ void Module::integrate()
 void Module::integratePresentation()
 {
 	if( _state != ModuleState_Integrated )
-		throw LifeCycleException( "the module's state is not ModuleState_Integrated" );
+		throw IllegalStateException( "the module's state is not ModuleState_Integrated" );
 
 	for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->integratePresentation( this );
@@ -120,7 +120,7 @@ void Module::integratePresentation()
 void Module::disintegrate()
 {
 	if( _state != ModuleState_PresentationIntegrated )
-		throw LifeCycleException( "the module's state is not ModuleState_PresentationIntegrated" );
+		throw IllegalStateException( "the module's state is not ModuleState_PresentationIntegrated" );
 
 	for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->disintegrate( this );
@@ -131,7 +131,7 @@ void Module::disintegrate()
 void Module::dispose()
 {
 	if( _state != ModuleState_Disintegrated )
-		throw LifeCycleException( "the module's state is not ModuleState_Disintegrated" );
+		throw IllegalStateException( "the module's state is not ModuleState_Disintegrated" );
 
 	for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->dispose( this );
@@ -145,7 +145,7 @@ void Module::dispose()
 void Module::abort()
 {
 	if( _state >= ModuleState_Disintegrated )
-		throw LifeCycleException( "the module is being or was already disposed" );
+		throw IllegalStateException( "the module is being or was already disposed" );
 
 	// just ignore exceptions raised by ModuleParts from this point on
 	for( int i = 0; i < 2; ++i ) // this loop is just to avoid duplicating the 'catch' code

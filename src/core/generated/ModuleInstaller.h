@@ -34,6 +34,7 @@ public:
 		TypeId_IllegalArgumentException,
 		TypeId_IllegalCastException,
 		TypeId_IllegalNameException,
+		TypeId_IllegalStateException,
 		TypeId_IMember,
 		TypeId_IMethod,
 		TypeId_IMethodBuilder,
@@ -57,7 +58,6 @@ public:
 		TypeId_ITypeBuilder,
 		TypeId_ITypeManager,
 		TypeId_ITypeTransaction,
-		TypeId_LifeCycleException,
 		TypeId_MemberKind,
 		TypeId_Method,
 		TypeId_MethodBuilder,
@@ -74,7 +74,6 @@ public:
 		TypeId_NotSupportedException,
 		TypeId_Parameter,
 		TypeId_Port,
-		TypeId_SemanticException,
 		TypeId_ServiceManager,
 		TypeId_Struct,
 		TypeId_System,
@@ -140,6 +139,7 @@ co::IReflector* __createIInterfaceReflector();
 co::IReflector* __createIllegalArgumentExceptionReflector();
 co::IReflector* __createIllegalCastExceptionReflector();
 co::IReflector* __createIllegalNameExceptionReflector();
+co::IReflector* __createIllegalStateExceptionReflector();
 co::IReflector* __createIMemberReflector();
 co::IReflector* __createIMethodReflector();
 co::IReflector* __createIMethodBuilderReflector();
@@ -163,7 +163,6 @@ co::IReflector* __createITypeReflector();
 co::IReflector* __createITypeBuilderReflector();
 co::IReflector* __createITypeManagerReflector();
 co::IReflector* __createITypeTransactionReflector();
-co::IReflector* __createLifeCycleExceptionReflector();
 co::IReflector* __createMemberKindReflector();
 co::IReflector* __createMethodReflector();
 co::IReflector* __createMethodBuilderReflector();
@@ -180,7 +179,6 @@ co::IReflector* __createNoSuchPortExceptionReflector();
 co::IReflector* __createNotSupportedExceptionReflector();
 co::IReflector* __createParameterReflector();
 co::IReflector* __createPortReflector();
-co::IReflector* __createSemanticExceptionReflector();
 co::IReflector* __createServiceManagerReflector();
 co::IReflector* __createStructReflector();
 co::IReflector* __createSystemReflector();

@@ -23,7 +23,7 @@ TEST( ComponentTests, invalidDefinitions )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "ComponentTests.InvalidDefinitions.memberClash" )
-	CSL_EXPECT_ERROR( "clashes with a previous definition", "memberClash.csl", 5 )
+	CSL_EXPECT_SEMANTIC_ERROR( "duplicate" )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "ComponentTests.InvalidDefinitions.notAnInterfaceMember" )

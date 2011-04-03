@@ -27,45 +27,45 @@ interface IModule
 		in the ModuleState_Initialized state.
 
 		The module's state must be ModuleState_None when this method is called,
-		or a LifeCycleException will be raised.
+		or a IllegalStateException will be raised.
 	 */
-	void initialize() raises LifeCycleException;
+	void initialize() raises IllegalStateException;
 
 	/*
 		Runs the integration phase on all module parts and leaves the module
 		in the ModuleState_Integrated state.
 
 		The module's state must be ModuleState_Initialized when this method
-		is called, or a LifeCycleException will be raised.
+		is called, or a IllegalStateException will be raised.
 	 */
-	void integrate() raises LifeCycleException, MissingServiceException;
+	void integrate() raises IllegalStateException, MissingServiceException;
 
 	/*
 		Runs the presentation integration phase on all module parts and leaves the
 		module in the ModuleState_PresentationIntegrated state.
 
 		The module's state must be ModuleState_Integrated when this method is called,
-		or a LifeCycleException will be raised.
+		or a IllegalStateException will be raised.
 	 */
-	void integratePresentation() raises LifeCycleException;
+	void integratePresentation() raises IllegalStateException;
 
 	/*
 		Runs the disintegration phase on all module parts and leaves the module
 		in the ModuleState_Disintegrated state.
 
 		The module's state must be ModuleState_PresentationIntegrated when this
-		method is called, or a LifeCycleException will be raised.
+		method is called, or a IllegalStateException will be raised.
 	 */
-	void disintegrate() raises LifeCycleException;
+	void disintegrate() raises IllegalStateException;
 
 	/*
 		Runs the disposal phase on all module parts, unloads all module parts,
 		then leaves the module in the ModuleState_Disposed state.
 
 		The module's state must be ModuleState_Disintegrated when this method
-		is called, or a LifeCycleException will be raised.
+		is called, or a IllegalStateException will be raised.
 	 */
-	void dispose() raises LifeCycleException;
+	void dispose() raises IllegalStateException;
 
 	/*
 		Runs the disintegration and/or disposal phase on this module,
@@ -75,9 +75,9 @@ interface IModule
 		integration phase had run successfully for the module.
 
 		The module's state must preceed ModuleState_Disintegrated when this
-		method is called, or a LifeCycleException will be raised.
+		method is called, or a IllegalStateException will be raised.
 	 */
-	void abort() raises LifeCycleException;
+	void abort() raises IllegalStateException;
 
 	//---------- End of Life Cycle Control Methods -------------------//
 };

@@ -64,7 +64,7 @@ interface IModuleManager
 		immediately raise a ModuleLoadException.
 
 		This method can only be used after the system is set up, and only if it
-		is not being torn down; otherwise, a LifeCycleException will be raised.
+		is not being torn down; otherwise, a IllegalStateException will be raised.
 	 */
-	IModule load( in string moduleName ) raises ModuleLoadException, LifeCycleException;
+	IModule load( in string moduleName ) raises ModuleLoadException, IllegalStateException;
 };

@@ -1,2 +1,0 @@
-// Raised to indicate that a service is in an unexpected or invalid state.
-exception LifeCycleException;

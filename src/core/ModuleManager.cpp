@@ -11,7 +11,7 @@
 #include <co/INamespace.h>
 #include <co/SystemState.h>
 #include <co/ITypeManager.h>
-#include <co/LifeCycleException.h>
+#include <co/IllegalStateException.h>
 #include <co/ModuleLoadException.h>
 #include <co/IllegalArgumentException.h>
 #include <algorithm>
@@ -130,10 +130,10 @@ IModule* ModuleManager::load( const std::string& moduleName )
 	SystemState systemState = getSystem()->getState();
 
 	if( systemState < SystemState_Initializing )
-		throw LifeCycleException( "cannot load modules before the system is set up" );
+		throw IllegalStateException( "cannot load modules before the system is set up" );
 
 	if( systemState > SystemState_Running )
-		throw LifeCycleException( "cannot load modules while the system is being torn down" );
+		throw IllegalStateException( "cannot load modules while the system is being torn down" );
 
 	if( _loaders.empty() )
 		throw ModuleLoadException( "there are no installed module loaders" );

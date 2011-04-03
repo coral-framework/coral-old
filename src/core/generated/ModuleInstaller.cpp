@@ -73,6 +73,7 @@ co::IReflector* co::ModuleInstaller::createReflector( TypeId typeId )
 	case TypeId_IllegalArgumentException: res = co::__createIllegalArgumentExceptionReflector(); break;
 	case TypeId_IllegalCastException: res = co::__createIllegalCastExceptionReflector(); break;
 	case TypeId_IllegalNameException: res = co::__createIllegalNameExceptionReflector(); break;
+	case TypeId_IllegalStateException: res = co::__createIllegalStateExceptionReflector(); break;
 	case TypeId_IMember: res = co::__createIMemberReflector(); break;
 	case TypeId_IMethod: res = co::__createIMethodReflector(); break;
 	case TypeId_IMethodBuilder: res = co::__createIMethodBuilderReflector(); break;
@@ -96,7 +97,6 @@ co::IReflector* co::ModuleInstaller::createReflector( TypeId typeId )
 	case TypeId_ITypeBuilder: res = co::__createITypeBuilderReflector(); break;
 	case TypeId_ITypeManager: res = co::__createITypeManagerReflector(); break;
 	case TypeId_ITypeTransaction: res = co::__createITypeTransactionReflector(); break;
-	case TypeId_LifeCycleException: res = co::__createLifeCycleExceptionReflector(); break;
 	case TypeId_MemberKind: res = co::__createMemberKindReflector(); break;
 	case TypeId_Method: res = co::__createMethodReflector(); break;
 	case TypeId_MethodBuilder: res = co::__createMethodBuilderReflector(); break;
@@ -113,7 +113,6 @@ co::IReflector* co::ModuleInstaller::createReflector( TypeId typeId )
 	case TypeId_NotSupportedException: res = co::__createNotSupportedExceptionReflector(); break;
 	case TypeId_Parameter: res = co::__createParameterReflector(); break;
 	case TypeId_Port: res = co::__createPortReflector(); break;
-	case TypeId_SemanticException: res = co::__createSemanticExceptionReflector(); break;
 	case TypeId_ServiceManager: res = co::__createServiceManagerReflector(); break;
 	case TypeId_Struct: res = co::__createStructReflector(); break;
 	case TypeId_System: res = co::__createSystemReflector(); break;

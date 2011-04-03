@@ -3,7 +3,7 @@
  * See Copyright Notice in Coral.h
  */
 
-#include <co/LifeCycleException.h>
+#include <co/IllegalStateException.h>
 #include <co/reserved/ReflectorBase.h>
 #include <cassert>
 
@@ -11,40 +11,40 @@ namespace co {
 
 // ------ Reflector Component ------ //
 
-class LifeCycleException_Reflector : public co::ReflectorBase
+class IllegalStateException_Reflector : public co::ReflectorBase
 {
 public:
-	LifeCycleException_Reflector()
+	IllegalStateException_Reflector()
 	{
 		// empty
 	}
 
-	virtual ~LifeCycleException_Reflector()
+	virtual ~IllegalStateException_Reflector()
 	{
 		// empty
 	}
 
 	co::IType* getType()
 	{
-		return co::typeOf<co::LifeCycleException>::get();
+		return co::typeOf<co::IllegalStateException>::get();
 	}
 
 	co::int32 getSize()
 	{
-		return sizeof(co::LifeCycleException);
+		return sizeof(co::IllegalStateException);
 	}
 
 	void raise( const std::string& message )
 	{
-		throw co::LifeCycleException( message );
+		throw co::IllegalStateException( message );
 	}
 };
 
 // ------ Reflector Creation Function ------ //
 
-co::IReflector* __createLifeCycleExceptionReflector()
+co::IReflector* __createIllegalStateExceptionReflector()
 {
-    return new LifeCycleException_Reflector;
+    return new IllegalStateException_Reflector;
 }
 
 } // namespace co

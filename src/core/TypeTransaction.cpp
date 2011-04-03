@@ -6,7 +6,6 @@
 #include "TypeTransaction.h"
 #include "TypeBuilder.h"
 #include "TypeManager.h"
-#include "TypeSemanticChecker.h"
 #include <co/IType.h>
 #include <co/Coral.h>
 #include <co/ISystem.h>
@@ -17,8 +16,7 @@
 
 namespace co {
 
-TypeTransaction*
-	TypeTransaction::sm_activeTransaction( NULL );
+TypeTransaction* TypeTransaction::sm_activeTransaction( NULL );
 
 TypeTransaction::TypeTransaction()
 {
@@ -75,16 +73,13 @@ void TypeTransaction::commit()
 	for( TypeBuilderList::iterator it = _typeBuilders.begin(); it != _typeBuilders.end(); ++it )
 		it->get()->createType();
 
-	// perform semantic checks on all types
+	// validate all types
 	for( TypeBuilderList::iterator it = _typeBuilders.begin(); it != _typeBuilders.end(); ++it )
-	{
-		TypeSemanticChecker sc( ( *it )->createType() );
-		sc.check();
-	}
+		static_cast<TypeBuilder*>( it->get() )->validate();
 
 	// commit all types
 	for( TypeBuilderList::iterator it = _typeBuilders.begin(); it != _typeBuilders.end(); ++it )
-		static_cast<TypeBuilder*>( it->get() )->commitType();
+		static_cast<TypeBuilder*>( it->get() )->commit();
 
 	_commitSucceeded = true;
 
@@ -102,7 +97,7 @@ void TypeTransaction::rollback()
 
 	// destroy all types
 	for( TypeBuilderList::iterator it = _typeBuilders.begin(); it != _typeBuilders.end(); ++it )
-		static_cast<TypeBuilder*>( it->get() )->destroyType();
+		static_cast<TypeBuilder*>( it->get() )->rollback();
 
 	_rolledBack = true;
 }

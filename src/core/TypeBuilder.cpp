@@ -20,9 +20,10 @@
 #include "NativeClass.h"
 #include <co/Coral.h>
 #include <co/IllegalNameException.h>
+#include <co/IllegalStateException.h>
 #include <co/MissingInputException.h>
-#include <co/IllegalArgumentException.h>
 #include <co/NotSupportedException.h>
+#include <co/IllegalArgumentException.h>
 #include <co/reserved/LexicalUtils.h>
 #include <algorithm>
 #include <sstream>
@@ -45,7 +46,17 @@ void TypeBuilder::addMethod( Method* )
 	CORAL_THROW( NotSupportedException, "the builder's type is not a class type" );
 }
 
-void TypeBuilder::destroyType()
+void TypeBuilder::validate()
+{
+	// does nothing by default
+}
+
+void TypeBuilder::commit()
+{
+	// does nothing by default
+}
+
+void TypeBuilder::rollback()
 {
 	// remove any array created for the type before we destroy it
 	IType* arrayType = _namespace->getType( _type->getName() + "[]" );
@@ -56,11 +67,6 @@ void TypeBuilder::destroyType()
 
 	_kind = TK_NONE;
 	_type = NULL;
-}
-
-void TypeBuilder::commitType()
-{
-	// does nothing by default
 }
 
 INamespace* TypeBuilder::getNamespace()
@@ -113,9 +119,7 @@ IType* TypeBuilder::createType()
 	if( _typeWasCreated )
 		return _type.get();
 
-	validate();
 	fillType();
-
 	_typeWasCreated = true;
 
 	return _type.get();
@@ -148,12 +152,12 @@ void TypeBuilder::assertNotCreated()
 		CORAL_THROW( NotSupportedException, "the builder's type was already created" );
 }
 
-// ------ EnumTypeBuilder ------------------------------------------------------
+// ------ EnumBuilder ------------------------------------------------------
 
-class EnumTypeBuilder : public TypeBuilder
+class EnumBuilder : public TypeBuilder
 {
 public:
-	EnumTypeBuilder() : TypeBuilder( TK_ENUM )
+	EnumBuilder() : TypeBuilder( TK_ENUM )
 	{
 		_myType = NULL;
 	}
@@ -163,20 +167,7 @@ public:
 		assert( _myType == NULL );
 		_myType = new Enum;
 		_type = _myType;
-		return true;	}
-
-	void validate()
-	{
-		if( _identifiers.empty() )
-			CORAL_THROW( MissingInputException, "missing enum identifiers" );
-	}
-
-	void fillType()
-	{
-		for( Range<std::string> r( _identifiers ); r; r.popFirst() )
-		{
-			_myType->addIdentifier( r.getFirst() );
-		}
+		return true;
 	}
 
 	void defineIdentifier( const std::string& name )
@@ -191,6 +182,17 @@ public:
 			CORAL_THROW( IllegalNameException, "invalid duplicate identifier '" << name << "'" );
 
 		_identifiers.push_back( name );
+	}
+
+	void fillType()
+	{
+		if( _identifiers.empty() )
+			CORAL_THROW( MissingInputException, "missing enum identifiers" );
+
+		for( Range<std::string> r( _identifiers ); r; r.popFirst() )
+		{
+			_myType->addIdentifier( r.getFirst() );
+		}
 	}
 
 private:
@@ -216,11 +218,6 @@ public:
 		return true;
 	}
 
-	void validate()
-	{
-		// empty
-	}
-
 	void fillType()
 	{
 		// empty
@@ -232,10 +229,64 @@ private:
 
 // ------ RecordTypeBuilder ----------------------------------------------------
 
-class RecordTypeBuilder : public TypeBuilder
+class CompositeTypeBuilder : public TypeBuilder
 {
 public:
-	RecordTypeBuilder( TypeKind kind ) : TypeBuilder( kind )
+	CompositeTypeBuilder( TypeKind kind ) : TypeBuilder( kind )
+	{;}
+
+	inline IMember* getMember( const std::string& name )
+	{
+		return static_cast<ICompositeType*>( _type.get() )->getMember( name );
+	}
+
+	inline const char* describe( IMember* m )
+	{
+		return m->getKind() == MK_METHOD ? "method" : "field";
+	}
+
+	// Reusable method to handle member clashes.
+	void handleMemberClash( const char* what, IMember* m, IMember* found )
+	{
+		if( !found || m == found ) return;
+
+		std::stringstream ss;
+		ss << "name clash in type '" << _type->getFullName() << "' between ";
+		ss << what << " '" << m->getName() << "' ";
+
+		ICompositeType* mOwner = m->getOwner();
+		ICompositeType* foundOwner = found->getOwner();
+
+		if( mOwner == foundOwner )
+		{
+			ss << "and " << describe( found ) << " '" << found->getName() << "'";
+		}
+		else
+		{
+			ss << "(from '" << mOwner->getFullName() << "') and " << describe( found );
+			ss << " '" << found->getName() << "' (from '" << foundOwner->getFullName() << "')";
+		}
+
+		throw IllegalNameException( ss.str() );
+	}
+
+	// Template method that looks for possible collisions with 'm'.
+	virtual void checkForMemberClashes( IMember* m ) = 0;
+
+	void validate()
+	{
+		Range<IMember* const> members = static_cast<ICompositeType*>( _type.get() )->getMembers();
+		for( ; members; members.popFirst() )
+			checkForMemberClashes( members.getFirst() );
+	}
+};
+
+// ------ RecordTypeBuilder ----------------------------------------------------
+
+class RecordTypeBuilder : public CompositeTypeBuilder
+{
+public:
+	RecordTypeBuilder( TypeKind kind ) : CompositeTypeBuilder( kind )
 	{;}
 
 	void defineField( const std::string& name, IType* type, bool isReadOnly )
@@ -265,13 +316,6 @@ public:
 		if( !LexicalUtils::isValidFieldName( name ) )
 			CORAL_THROW( IllegalNameException, "field names must start with a lowercase letter" );
 
-		size_t count = _fields.size();
-		for( size_t i = 0; i < count; ++i )
-		{
-			if( _fields[i]->getName() == name )
-				CORAL_THROW( IllegalNameException, "field name '" << name << "' clashes with a previous definition" );
-		}
-
 		Field* attr = new Field;
 		attr->setType( type );
 		attr->setName( name );
@@ -280,16 +324,21 @@ public:
 		_fields.push_back( attr );
 	}
 
+	void checkForMemberClashes( IMember* m )
+	{
+		handleMemberClash( "field", m, getMember( m->getName() ) );
+	}
+
 protected:
 	RefVector<IField> _fields;
 };
 
-// ------ StructTypeBuilder ----------------------------------------------------
+// ------ StructBuilder ----------------------------------------------------
 
-class StructTypeBuilder : public RecordTypeBuilder
+class StructBuilder : public RecordTypeBuilder
 {
 public:
-	StructTypeBuilder() : RecordTypeBuilder( TK_STRUCT )
+	StructBuilder() : RecordTypeBuilder( TK_STRUCT )
 	{
 		_myType = NULL;
 	}
@@ -302,14 +351,11 @@ public:
 		return true;
 	}
 
-	void validate()
+	void fillType()
 	{
 		if( _fields.empty() )
 			CORAL_THROW( MissingInputException, "missing struct contents" );
-	}
 
-	void fillType()
-	{
 		_myType->addMembers( _fields );
 		_myType->sortMembers( _myType );
 	}
@@ -346,16 +392,42 @@ public:
 		return methodBuilder;
 	}
 
+
+	void checkForMemberClashes( IMember* m )
+	{
+		const std::string& name = m->getName();
+		if( m->getKind() == MK_METHOD )
+		{
+			handleMemberClash( "method", m, getMember( name ) );
+		}
+		else
+		{
+			assert( m->getKind() == MK_FIELD );
+
+			handleMemberClash( "field", m, getMember( name ) );
+
+			std::string accessor;
+			LexicalUtils::formatAccessor( name, LexicalUtils::Getter, accessor );
+			handleMemberClash( "the getter of field", m, getMember( accessor ) );
+
+			if( static_cast<IField*>( m )->getIsReadOnly() == false )
+			{
+				LexicalUtils::formatAccessor( name, LexicalUtils::Setter, accessor );
+				handleMemberClash( "the setter of field", m, getMember( accessor ) );
+			}
+		}
+	}
+
 protected:
 	RefVector<IMethod> _methods;
 };
 
-// ------ NativeClassTypeBuilder -----------------------------------------------
+// ------ NativeClassBuilder -----------------------------------------------
 
-class NativeClassTypeBuilder : public ClassTypeBuilder
+class NativeClassBuilder : public ClassTypeBuilder
 {
 public:
-	NativeClassTypeBuilder() : ClassTypeBuilder( TK_NATIVECLASS )
+	NativeClassBuilder() : ClassTypeBuilder( TK_NATIVECLASS )
 	{
 		_myType = NULL;
 	}
@@ -366,25 +438,6 @@ public:
 		_myType = new NativeClass;
 		_type = _myType;
 		return true;
-	}
-
-	void validate()
-	{
-		if( _nativeHeader.empty() )
-			CORAL_THROW( MissingInputException, "missing native header" );
-
-		if( _nativeName.empty() )
-			CORAL_THROW( MissingInputException, "missing native name" );
-	}
-
-	void fillType()
-	{
-		_myType->setNativeHeader( _nativeHeader );
-		_myType->setNativeName( _nativeName );
-
-		_myType->addMembers( _fields );
-		_myType->addMembers( _methods );
-		_myType->sortMembers( _myType );
 	}
 
 	void defineNativeClass( const std::string& nativeHeader, const std::string& nativeName )
@@ -401,18 +454,34 @@ public:
 		_nativeName = nativeName;
 	}
 
+	void fillType()
+	{
+		if( _nativeHeader.empty() )
+			CORAL_THROW( MissingInputException, "missing native header" );
+
+		if( _nativeName.empty() )
+			CORAL_THROW( MissingInputException, "missing native name" );
+
+		_myType->setNativeHeader( _nativeHeader );
+		_myType->setNativeName( _nativeName );
+
+		_myType->addMembers( _fields );
+		_myType->addMembers( _methods );
+		_myType->sortMembers( _myType );
+	}
+
 private:
 	NativeClass* _myType;
 	std::string _nativeHeader;
 	std::string _nativeName;
 };
 
-// ------ InterfaceTypeBuilder -------------------------------------------------
+// ------ InterfaceBuilder -------------------------------------------------
 
-class InterfaceTypeBuilder : public ClassTypeBuilder
+class InterfaceBuilder : public ClassTypeBuilder
 {
 public:
-	InterfaceTypeBuilder() : ClassTypeBuilder( TK_INTERFACE )
+	InterfaceBuilder() : ClassTypeBuilder( TK_INTERFACE )
 	{
 		_myType = NULL;
 		_baseType = NULL;
@@ -440,32 +509,6 @@ public:
 		return true;
 	}
 
-	void validate()
-	{
-		// check for cyclic inheritance
-		IInterface* base = _baseType;
-		while( base )
-		{
-			if( base == _myType )
-				CORAL_THROW( IllegalArgumentException, "cyclic inheritance detected'" );
-			base = base->getBaseType();
-		}			
-	}
-
-	void fillType()
-	{
-		_myType->addMembers( _fields );
-		_myType->addMembers( _methods );
-		_myType->sortMembers( _myType );
-	}
-
-	void commitType()
-	{
-		_myType->updateSuperTypes();
-		if( _baseType )
-			_baseType->addSubType( _myType );
-	}
-
 	void defineBaseType( IType* baseType )
 	{
 		assertNotCreated();
@@ -485,17 +528,60 @@ public:
 		_myType->setBaseType( _baseType );
 	}
 
+	void fillType()
+	{
+		_myType->addMembers( _fields );
+		_myType->addMembers( _methods );
+		_myType->sortMembers( _myType );
+	}
+
+	void validate()
+	{
+		// check for cyclic inheritance
+		IInterface* base = _baseType;
+		while( base )
+		{
+			if( base == _myType )
+				CORAL_THROW( IllegalStateException, "cyclic inheritance detected'" );
+			base = base->getBaseType();
+		}
+
+		_myType->updateSuperTypes();
+
+		// check for member clashes, considering all super types
+		IInterface* type = _myType;
+		Range<IInterface* const> superTypes = type->getSuperTypes();
+		while( 1 )
+		{
+			Range<IMember* const> members = type->getMembers();
+			for( ; members; members.popFirst() )
+				checkForMemberClashes( members.getFirst() );
+
+			if( !superTypes )
+				break;
+
+			type = superTypes.getFirst();
+			superTypes.popFirst();
+		}
+	}
+
+	void commit()
+	{
+		if( _baseType )
+			_baseType->addSubType( _myType );
+	}
+
 private:
 	Interface* _myType;
 	Interface* _baseType;
 };
 
-// ------ ComponentTypeBuilder -------------------------------------------------
+// ------ ComponentBuilder -------------------------------------------------
 
-class ComponentTypeBuilder : public TypeBuilder
+class ComponentBuilder : public TypeBuilder
 {
 public:
-	ComponentTypeBuilder() : TypeBuilder( TK_COMPONENT )
+	ComponentBuilder() : TypeBuilder( TK_COMPONENT )
 	{
 		_myType = NULL;
 	}
@@ -508,18 +594,6 @@ public:
 		return true;
 	}
 
-	void validate()
-	{
-		if( _interfaces.empty() )
-			CORAL_THROW( MissingInputException, "missing component ports" );
-	}
-
-	void fillType()
-	{
-		_myType->addPorts( _interfaces );
-		_myType->sortPorts();
-	}
-
 	void definePort( const std::string& name, IInterface* type, bool isFacet )
 	{
 		assertNotCreated();
@@ -530,18 +604,33 @@ public:
 		if( !LexicalUtils::isValidIdentifier( name ) )
 			CORAL_THROW( IllegalNameException, "port name '" << name << "' is not a valid indentifier");
 
-		for( Range<IPort* const> r( _interfaces ); r; r.popFirst() )
-		{
-			if( r.getFirst()->getName() == name )
-				CORAL_THROW( IllegalNameException, "port name '" << name << "' clashes with a previous definition" );
-		}
-
 		Port* port = new Port;
 		port->setName( name );
 		port->setType( type );
 		port->setIsFacet( isFacet );
 
 		_interfaces.push_back( port );
+	}
+
+	void fillType()
+	{
+		if( _interfaces.empty() )
+			CORAL_THROW( MissingInputException, "missing component ports" );
+
+		_myType->addPorts( _interfaces );
+		_myType->sortPorts();
+	}
+
+	void validate()
+	{
+		Range<IPort* const> ports = _myType->getPorts();
+		IPort* lastPort = ports.getFirst();
+		for( ports.popFirst(); ports; ports.popFirst() )
+		{
+			if( lastPort->getName() == ports.getFirst()->getName() )
+				CORAL_THROW( IllegalNameException, "duplicate port '" << lastPort->getName()
+					<< "' in component '" << _myType->getFullName() << "'" );
+		}
 	}
 
 private:
@@ -556,12 +645,12 @@ ITypeBuilder* TypeBuilder::create( TypeKind kind, INamespace* ns, const std::str
 	TypeBuilder* tb = NULL;
 	switch( kind )
 	{
-	case TK_ENUM:			tb = new EnumTypeBuilder;			break;
-	case TK_EXCEPTION:		tb = new ExceptionTypeBuilder;		break;
-	case TK_STRUCT:			tb = new StructTypeBuilder;			break;
-	case TK_NATIVECLASS:	tb = new NativeClassTypeBuilder;	break;
-	case TK_INTERFACE:		tb = new InterfaceTypeBuilder;		break;
-	case TK_COMPONENT:		tb = new ComponentTypeBuilder;		break;
+	case TK_ENUM:			tb = new EnumBuilder;			break;
+	case TK_EXCEPTION:		tb = new ExceptionTypeBuilder;	break;
+	case TK_STRUCT:			tb = new StructBuilder;			break;
+	case TK_NATIVECLASS:	tb = new NativeClassBuilder;	break;
+	case TK_INTERFACE:		tb = new InterfaceBuilder;		break;
+	case TK_COMPONENT:		tb = new ComponentBuilder;		break;
 	default:
 		assert( false );
 	}
@@ -590,11 +679,6 @@ public:
 		return false;
 	}
 
-	void validate()
-	{
-		raiseNoTypeBuilderException();
-	}
-
 	void fillType()
 	{
 		raiseNoTypeBuilderException();
@@ -603,7 +687,7 @@ public:
 private:
 	void raiseNoTypeBuilderException()
 	{
-		throw NotSupportedException( "" );
+		throw NotSupportedException();
 	}
 };
 

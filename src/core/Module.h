@@ -29,7 +29,7 @@ public:
 		Adds a constituent part of this module.
 
 		The module's state must be ModuleState_None when this method is called,
-		or a LifeCycleException will be raised.
+		or a IllegalStateException will be raised.
 	 */
 	void addPart( IModulePart* part );
 

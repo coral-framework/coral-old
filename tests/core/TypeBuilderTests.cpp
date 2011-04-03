@@ -20,7 +20,6 @@
 #include <co/IMethodBuilder.h>
 #include <co/IInterface.h>
 #include <co/INativeClass.h>
-#include <co/SemanticException.h>
 #include <co/IllegalNameException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -28,10 +27,7 @@
 
 #include <gtest/gtest.h>
 
-/*
-	ITypeBuilder general tests:
-	The above tests are concerned in testing ITypeBuilder main features.
- */
+// General tests:
 
 TEST( TypeBuilderTests, cyclicDependencies )
 {
@@ -74,19 +70,6 @@ TEST( TypeBuilderTests, typeNameInvalidIdentifier )
 
 	tct->rollback();
 }
-
-/*
-	ITypeBuilder tests by types:
-	The above tests are concerned in testing ITypeBuilder with main Coral Types.
-	There is at least one test for each of the above types, divided in sections:
-
-		IComponent
-		IEnum
-		IException
-		IInterface
-		INativeClass
-		IStruct
- */
 
 // IComponent:
 
@@ -131,8 +114,6 @@ TEST( TypeBuilderTests, componentDefinition )
 	componentBuilder->definePort( "Facet", interfaceTest, true );
 
 	EXPECT_THROW( componentBuilder->definePort( "NullInterface", NULL, false ), co::IllegalArgumentException );
-	EXPECT_THROW( componentBuilder->definePort( "Receptacle", interfaceTest, false ), co::IllegalNameException );
-
 	EXPECT_NO_THROW( tct->commit() );
 
 	co::IComponent* component = dynamic_cast<co::IComponent*>( componentBuilder->createType() );
@@ -520,7 +501,7 @@ TEST( TypeBuilderTests, nativeClassMemberClash )
 	mb->createMethod();
 	builder->defineNativeClass( "MyHeaderName", "myNativeName" );
 
-	EXPECT_THROW( tct->commit(), co::SemanticException );
+	EXPECT_THROW( tct->commit(), co::IllegalNameException );
 	EXPECT_NO_THROW( tct->rollback() );
 }
 
@@ -590,12 +571,10 @@ TEST( TypeBuilderTests, structDefinition )
 	co::IType* uint32Type = TestHelper::type( "uint32" );
 
 	builder->defineField( "myField", uint32Type, false );
-
-	EXPECT_THROW( builder->defineField( "myReadOnlyField", uint32Type, true ), co::IllegalArgumentException );
-	EXPECT_THROW( builder->defineField( "myField", uint32Type, false ), co::IllegalNameException );
+	
 	EXPECT_THROW( builder->defineField( "myNullTypeField", NULL, false ), co::IllegalArgumentException );
-
-	EXPECT_NO_THROW( transaction->commit() );
+	EXPECT_THROW( builder->defineField( "myReadOnlyField", uint32Type, true ), co::IllegalArgumentException );
+	ASSERT_NO_THROW( transaction->commit() );
 
 	co::IStruct* structType = dynamic_cast<co::IStruct*>( TestHelper::type( "StructTests.BuidlerTestStruct" ) );
 	ASSERT_TRUE( structType != NULL );

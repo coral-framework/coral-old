@@ -4,7 +4,7 @@
  */
 
 #include "System.h"
-#include <co/LifeCycleException.h>
+#include <co/IllegalStateException.h>
 #include <co/reserved/LibraryManager.h>
 
 namespace co {
@@ -52,7 +52,7 @@ IServiceManager* System::getServices()
 void System::setupBase( Range<std::string const> requiredModules )
 {
 	if( _state != SystemState_None )
-		throw LifeCycleException( "the system's state is not SystemState_None" );
+		throw IllegalStateException( "the system's state is not SystemState_None" );
 
 	_state = SystemState_Initializing;
 
@@ -77,7 +77,7 @@ void System::setupBase( Range<std::string const> requiredModules )
 void System::setupPresentation()
 {
 	if( _state != SystemState_Integrated )
-		throw LifeCycleException( "the system's state is not SystemState_Integrated" );
+		throw IllegalStateException( "the system's state is not SystemState_Integrated" );
 
 	_state = SystemState_IntegratingPresentation;
 
@@ -89,7 +89,7 @@ void System::setupPresentation()
 void System::tearDown()
 {
 	if( _state != SystemState_Running )
-		throw LifeCycleException( "the system's state is not SystemState_Running" );
+		throw IllegalStateException( "the system's state is not SystemState_Running" );
 
 	// dispose all modules
 	_modules->updateModules( ModuleState_Disintegrated );
