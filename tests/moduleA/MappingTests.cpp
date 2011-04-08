@@ -12,7 +12,7 @@
 #include <moduleA/TestStruct.h>
 #include <moduleA/TestException.h>
 #include <moduleA/TestInterface.h>
-#include <moduleA/DummyInterface.h>
+#include <moduleA/IDummy.h>
 #include <moduleA/TestNamespaces.h>
 #include <moduleA/BadlySortedStruct.h>
 
@@ -123,13 +123,13 @@ TEST( MappingTests, interface )
 	std::vector<co::int32> intVector( 1, 1 );
 	co::Range<co::int32 const> intList(  intVector );
 
-	co::RefVector<moduleA::DummyInterface> interfaceRefVector;
+	co::RefVector<moduleA::IDummy> interfaceRefVector;
 	interfaceRefVector.push_back( NULL );
 
-	std::vector<moduleA::DummyInterface*> interfaceVector;
+	std::vector<moduleA::IDummy*> interfaceVector;
 	interfaceVector.push_back( NULL );
 
-	co::Range<moduleA::DummyInterface* const> interfaceList( interfaceVector );
+	co::Range<moduleA::IDummy* const> interfaceList( interfaceVector );
 
 	// Callling this method should NOT alter the parameters
 	ti->testInParameters( size, enumValue, text, testStruct, NULL, intList, interfaceList );
@@ -139,7 +139,7 @@ TEST( MappingTests, interface )
 	ASSERT_EQ( moduleA::Second, enumValue );
 	ASSERT_EQ( 42, testStruct.anInt16 );
 
-	moduleA::DummyInterface* dummyPtr = NULL;
+	moduleA::IDummy* dummyPtr = NULL;
 
 	// Callling this method should modify the parameters
 	ti->testOutParameters( size, enumValue, text, testStruct, dummyPtr, intVector, interfaceRefVector );
@@ -179,7 +179,7 @@ TEST( MappingTests, nameOf )
 {
  	EXPECT_STREQ( "moduleA.TestNamespaces", co::nameOf<moduleA::TestNamespaces>::get() );
  	EXPECT_STREQ( "moduleA.Continent.Country.China", co::nameOf<moduleA::Continent::Country::China>::get() );
- 	EXPECT_STREQ( "moduleA.DummyInterface", co::nameOf<moduleA::DummyInterface>::get() );
+ 	EXPECT_STREQ( "moduleA.IDummy", co::nameOf<moduleA::IDummy>::get() );
  	EXPECT_STREQ( "moduleA.TestStruct", co::nameOf<moduleA::TestStruct>::get() );
  	EXPECT_STREQ( "moduleA.TestEnum", co::nameOf<moduleA::TestEnum>::get() );
  	EXPECT_STREQ( "moduleA.TestException", co::nameOf<moduleA::TestException>::get() );

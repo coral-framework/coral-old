@@ -5,7 +5,7 @@
 
 #include "TestComponent_Base.h"
 #include <moduleA/TestStruct.h>
-#include <moduleA/DummyInterface.h>
+#include <moduleA/IDummy.h>
 #include <cassert>
 
 namespace moduleA {
@@ -25,22 +25,22 @@ public:
 
 	// TestInterface: methods:
 
-	DummyInterface* getDummyInterfaceField()
+	IDummy* getDummyInterfaceField()
 	{
 		return _dummyInterface.get();
 	}
 
-	void setDummyInterfaceField( DummyInterface* dummyInterfaceField )
+	void setDummyInterfaceField( IDummy* dummyInterfaceField )
 	{
 		_dummyInterface = dummyInterfaceField;
 	}
 
-	co::Range<DummyInterface* const> getDummyInterfaces()
+	co::Range<IDummy* const> getDummyInterfaces()
 	{
 		return _dummyInterfaces;
 	}
 
-	void setDummyInterfaces( co::Range<DummyInterface* const> dummyInterfaces )
+	void setDummyInterfaces( co::Range<IDummy* const> dummyInterfaces )
 	{
 		_dummyInterfaces.clear();
 		for( ; dummyInterfaces; dummyInterfaces.popFirst() )
@@ -114,8 +114,8 @@ public:
 
 	void testInParameters( float size, TestEnum enumValue,
 		const std::string& text, const TestStruct& testStruct,
-		DummyInterface* dummyInterface, co::Range<co::int32 const> intList,
-		co::Range<DummyInterface* const> interfaces )
+		IDummy* dummyInterface, co::Range<co::int32 const> intList,
+		co::Range<IDummy* const> interfaces )
 	{
 		size = -1;
 		enumValue = First;
@@ -132,7 +132,7 @@ public:
 		myFirstInt = -1;
 
 		assert( !interfaces.isEmpty() );
-		DummyInterface* firstInterface = interfaces.getFirst();
+		IDummy* firstInterface = interfaces.getFirst();
 		firstInterface = NULL;
 
 		// suppress warnings in release mode
@@ -143,8 +143,8 @@ public:
 
 	void testOutParameters( float& size, TestEnum& enumValue,
 		std::string& text, TestStruct& testStruct,
-		DummyInterface*& dummyInterface, std::vector<co::int32>& intList,
-		co::RefVector<DummyInterface>& interfaces )
+		IDummy*& dummyInterface, std::vector<co::int32>& intList,
+		co::RefVector<IDummy>& interfaces )
 	{
 		size = -1;
 		enumValue = First;
@@ -213,12 +213,12 @@ private:
 	co::RefPtr<co::IType> _type;
 	co::RefPtr<co::IInterface> _itf;
 
-	co::RefPtr<DummyInterface> _dummyInterface;
+	co::RefPtr<IDummy> _dummyInterface;
 	std::string _name;
 	std::string _readOnlyString;
 
 	std::vector<std::string> _names;
-	co::RefVector<DummyInterface> _dummyInterfaces;
+	co::RefVector<IDummy> _dummyInterfaces;
 	TestEnum _testEnum;
 	TestStruct _testStruct;
 	std::vector<TestStruct> _testStructArray;

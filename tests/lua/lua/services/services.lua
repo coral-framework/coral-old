@@ -1,5 +1,28 @@
 require "lua.test"
 
+--------------------------------------------------------------------------------
+-- Auxiliary Lua component that implements a dummy service
+--------------------------------------------------------------------------------
+
+local DummyProvider = co.Component{ name = "lua.test.DummyProvider", provides = { dummy = "moduleA.IDummy" } }
+
+function DummyProvider.dummy:getFoo()
+	return self.foo or "foo"
+end
+
+function DummyProvider.dummy:setFoo( foo )
+	self.foo = foo
+end
+
+function bindFooForType( fooValue, typeName )
+	local object = DummyProvider{ foo = fooValue }
+	co.system.services:addServiceForType( co.Type "moduleA.IDummy", co.Type[typeName], object.dummy )
+end
+
+--------------------------------------------------------------------------------
+-- Module / Test Code
+--------------------------------------------------------------------------------
+
 local M = {}
 
 function M:initialize( module )
@@ -26,6 +49,14 @@ function M:initialize( module )
 	ASSERT_EQ( co.getService( "moduleA.IHuman", bc ), bc.batman )
 	ASSERT_EQ( co.getService( "moduleA.IHuman", bc.batman ), bc.batman )
 	ASSERT_EQ( co.getService( "moduleA.IHuman", bc.fruitBat ), bc.batman )
+
+	-- test for custom service providers implemented in Lua
+	bindFooForType( "Bat", "moduleA.IBat" )
+	bindFooForType( "Human", "moduleA.IHuman" )
+
+	ASSERT_ERROR( function() co.getService "moduleA.IDummy" end, "service has no global instance" )
+	ASSERT_EQ( co.getService( "moduleA.IDummy", "moduleA.IBat" ).foo, "Bat" )
+	ASSERT_EQ( co.getService( "moduleA.IDummy", "moduleA.IHuman" ).foo, "Human" )
 end
 
 return M

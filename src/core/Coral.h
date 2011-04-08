@@ -6,17 +6,14 @@
 #ifndef _CO_CORAL_H_
 #define _CO_CORAL_H_
 
-#include <co/Platform.h>
+#include <co/IInterface.h>
 #include <co/Range.h>
 
 namespace co {
 
 // Forward Decls:
-class IType;
 class IObject;
 class ISystem;
-class IService;
-class IInterface;
 
 // ------ Coral Path -----------------------------------------------------------
 
