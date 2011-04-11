@@ -127,18 +127,12 @@ IType* TypeBuilder::createType()
 
 void TypeBuilder::initialize( INamespace* ns, const std::string& name )
 {
-	assert( dynamic_cast<Namespace*>( ns ) );
 	_namespace = static_cast<Namespace*>( ns );
 	_name = name;
 
 	// pre-allocate our empty type
 	if( allocateType() )
 	{
-		TypeImpl* type = dynamic_cast<TypeImpl*>( _type.get() );
-		assert( type );
-
-		type->setType( _namespace.get(), _name, _kind );
-
 		// add the type to its namespace (should be removed if it is rolled back)
 		_namespace->addType( _type.get() );
 	}
@@ -152,24 +146,36 @@ void TypeBuilder::assertNotCreated()
 		CORAL_THROW( NotSupportedException, "the builder's type was already created" );
 }
 
-// ------ EnumBuilder ------------------------------------------------------
+// ------ TemplateBuilder ------------------------------------------------------
 
-class EnumBuilder : public TypeBuilder
+// Re-usable template for implementing common bits of the TypeBuilders.
+template<typename Base, typename Type, TypeKind kind>
+class TemplateBuilder : public Base
 {
 public:
-	EnumBuilder() : TypeBuilder( TK_ENUM )
-	{
-		_myType = NULL;
-	}
+	typedef TemplateBuilder<Base,Type,kind> Template;
+
+	TemplateBuilder() : Base( kind ), _myType( NULL )
+	{;}
 
 	bool allocateType()
 	{
 		assert( _myType == NULL );
-		_myType = new Enum;
-		_type = _myType;
+		_myType = new Type;
+		_myType->setType( this->_namespace.get(), this->_name, this->_kind );
+		this->_type = _myType;
 		return true;
 	}
 
+protected:
+	Type* _myType;
+};
+
+// ------ EnumBuilder ----------------------------------------------------------
+
+class EnumBuilder : public TemplateBuilder<TypeBuilder, Enum, TK_ENUM>
+{
+public:
 	void defineIdentifier( const std::string& name )
 	{
 		assertNotCreated();
@@ -196,35 +202,18 @@ public:
 	}
 
 private:
-	Enum* _myType;
 	std::vector<std::string> _identifiers;
 };
 
 // ------ ExceptionTypeBuilder -------------------------------------------------
 
-class ExceptionTypeBuilder : public TypeBuilder
+class ExceptionTypeBuilder : public TemplateBuilder<TypeBuilder, ExceptionType, TK_EXCEPTION>
 {
 public:
-	ExceptionTypeBuilder() : TypeBuilder( TK_EXCEPTION )
-	{
-		_myType = NULL;
-	}
-
-	bool allocateType()
-	{
-		assert( _myType == NULL );
-		_myType = new ExceptionType;
-		_type = _myType;
-		return true;
-	}
-
 	void fillType()
 	{
 		// empty
 	}
-
-private:
-	ExceptionType* _myType;
 };
 
 // ------ RecordTypeBuilder ----------------------------------------------------
@@ -335,22 +324,9 @@ protected:
 
 // ------ StructBuilder ----------------------------------------------------
 
-class StructBuilder : public RecordTypeBuilder
+class StructBuilder : public TemplateBuilder<RecordTypeBuilder, Struct, TK_STRUCT>
 {
 public:
-	StructBuilder() : RecordTypeBuilder( TK_STRUCT )
-	{
-		_myType = NULL;
-	}
-
-	bool allocateType()
-	{
-		assert( _myType == NULL );
-		_myType = new Struct;
-		_type = _myType;
-		return true;
-	}
-
 	void fillType()
 	{
 		if( _fields.empty() )
@@ -359,9 +335,6 @@ public:
 		_myType->addMembers( _fields );
 		_myType->sortMembers( _myType );
 	}
-
-private:
-	Struct* _myType;
 };
 
 // ------ ClassTypeBuilder -----------------------------------------------------
@@ -424,22 +397,9 @@ protected:
 
 // ------ NativeClassBuilder -----------------------------------------------
 
-class NativeClassBuilder : public ClassTypeBuilder
+class NativeClassBuilder : public TemplateBuilder<ClassTypeBuilder, NativeClass, TK_NATIVECLASS>
 {
 public:
-	NativeClassBuilder() : ClassTypeBuilder( TK_NATIVECLASS )
-	{
-		_myType = NULL;
-	}
-
-	bool allocateType()
-	{
-		assert( _myType == NULL );
-		_myType = new NativeClass;
-		_type = _myType;
-		return true;
-	}
-
 	void defineNativeClass( const std::string& nativeHeader, const std::string& nativeName )
 	{
 		assertNotCreated();
@@ -471,21 +431,17 @@ public:
 	}
 
 private:
-	NativeClass* _myType;
 	std::string _nativeHeader;
 	std::string _nativeName;
 };
 
 // ------ InterfaceBuilder -------------------------------------------------
 
-class InterfaceBuilder : public ClassTypeBuilder
+class InterfaceBuilder : public TemplateBuilder<ClassTypeBuilder, Interface, TK_INTERFACE>
 {
 public:
-	InterfaceBuilder() : ClassTypeBuilder( TK_INTERFACE )
-	{
-		_myType = NULL;
-		_baseType = NULL;
-	}
+	InterfaceBuilder() : _baseType( NULL )
+	{;}
 
 	bool allocateType()
 	{
@@ -499,8 +455,7 @@ public:
 			return false;
 		}
 
-		_myType = new Interface;
-		_type = _myType;
+		Template::allocateType();
 
 		// by default, all interfaces inherit from co.IService
 		_baseType = static_cast<Interface*>( co::typeOf<co::IService>::get() );
@@ -572,28 +527,14 @@ public:
 	}
 
 private:
-	Interface* _myType;
 	Interface* _baseType;
 };
 
 // ------ ComponentBuilder -------------------------------------------------
 
-class ComponentBuilder : public TypeBuilder
+class ComponentBuilder : public TemplateBuilder<TypeBuilder, Component, TK_COMPONENT>
 {
 public:
-	ComponentBuilder() : TypeBuilder( TK_COMPONENT )
-	{
-		_myType = NULL;
-	}
-
-	bool allocateType()
-	{
-		assert( _myType == NULL );
-		_myType = new Component;
-		_type = _myType;
-		return true;
-	}
-
 	void definePort( const std::string& name, IInterface* type, bool isFacet )
 	{
 		assertNotCreated();
@@ -634,7 +575,6 @@ public:
 	}
 
 private:
-	Component* _myType;
 	RefVector<IPort> _interfaces;
 };
 

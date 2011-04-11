@@ -170,7 +170,7 @@ public:
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		co::INamespace* p = checkInstance( instance, field );
+		co::INamespace* p = co::checkInstance<co::INamespace>( instance, field );
 		switch( field->getIndex() )
 		{
 		case 0:		value.set< co::Range<co::INamespace* const> >( p->getChildNamespaces() ); break;
@@ -185,7 +185,7 @@ public:
 
 	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		co::INamespace* p = checkInstance( instance, field );
+		co::INamespace* p = co::checkInstance<co::INamespace>( instance, field );
 		switch( field->getIndex() )
 		{
 		case 0:		raiseFieldIsReadOnly( field ); break;
@@ -202,7 +202,7 @@ public:
 
 	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
 	{
-		co::INamespace* p = checkInstance( instance, method );
+		co::INamespace* p = co::checkInstance<co::INamespace>( instance, method );
 		checkNumArguments( method, args.getSize() );
 		int argIndex = -1;
 		try
@@ -254,28 +254,6 @@ public:
 			throw;
 		}
 		CORAL_UNUSED( res );
-	}
-
-private:
-	co::INamespace* checkInstance( const co::Any& any, co::IMember* member )
-	{
-		if( !member )
-			throw co::IllegalArgumentException( "illegal null member info" );
-
-		// make sure that 'any' is an instance of this type
-		co::IInterface* myType = co::typeOf<co::INamespace>::get();
-
-		co::INamespace* res;
-		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::INamespace*>( any.getState().data.service ) ) )
-			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::INamespace*, but got " << any );
-
-		// make sure that 'member' belongs to this type
-		co::ICompositeType* owner = member->getOwner();
-		if( owner != myType )
-			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
-				<< owner->getFullName() << ", not to co.INamespace" );
-
-		return res;
 	}
 };
 

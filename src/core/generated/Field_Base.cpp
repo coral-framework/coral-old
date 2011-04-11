@@ -57,7 +57,7 @@ void Field_Base::serviceRelease()
 co::IComponent* Field_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.Field" );
-	assert( dynamic_cast<co::IComponent*>( type ) );
+	assert( type->getKind() == co::TK_COMPONENT );
 	return static_cast<co::IComponent*>( type );
 }
 

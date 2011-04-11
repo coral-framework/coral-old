@@ -156,10 +156,10 @@ TEST( ModuleTests, crossModuleReflection )
 	EXPECT_NO_THROW( reflector->createValue( instancePtr, size ) );
 
 	// get an IField
-	co::ICompositeType* ct = dynamic_cast<co::ICompositeType*>( type );
+	co::ICompositeType* ct = co::cast<co::ICompositeType>( type );
 	assert( ct );
 
-	co::IField* anInt8Field = dynamic_cast<co::IField*>( ct->getMember( "anInt8" ) );
+	co::IField* anInt8Field = co::cast<co::IField>( ct->getMember( "anInt8" ) );
 	assert( anInt8Field );
 
 	// exercise the reflection API
@@ -184,7 +184,7 @@ TEST( ModuleTests, crossModuleReflection )
 	}
 	catch( co::IllegalArgumentException& e )
 	{
-		EXPECT_EQ( "expected a valid moduleA::TestStruct*, but got (co::int32)-1", e.getMessage() );
+		EXPECT_EQ( "illegal instance type (moduleA.TestStruct expected, got (co::int32)-1)", e.getMessage() );
 	}
 
 	reflector->destroyValue( instancePtr );

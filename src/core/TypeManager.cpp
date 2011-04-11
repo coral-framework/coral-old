@@ -153,14 +153,13 @@ IArray* TypeManager::getArrayOf( IType* elementType )
 	arrayName.append( elementTypeName );
 	arrayName.append( "[]" );
 
-	assert( dynamic_cast<Namespace*>( elementType->getNamespace() ) );
 	Namespace* ns = static_cast<Namespace*>( elementType->getNamespace() );
 
 	// try to locate an existing array of this type
 	IType* existingArrayType = ns->getType( arrayName );
 	if( existingArrayType )
 	{
-		assert( dynamic_cast<IArray*>( existingArrayType ) );
+		assert( existingArrayType->getKind() == TK_ARRAY );
 		return static_cast<IArray*>( existingArrayType );
 	}
 
@@ -238,7 +237,7 @@ void TypeManager::defineBuiltInTypes()
 
 	// pre-load the 'co.IService' type and all its dependencies
 	INamespace* coNS = rootNS->defineChildNamespace( "co" );
-	assert( dynamic_cast<Namespace*>( coNS ) );
+	assert( coNS );
 	Namespace* castNS = static_cast<Namespace*>( coNS );
 
 	RefPtr<Interface> serviceType = new Interface;

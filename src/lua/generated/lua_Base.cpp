@@ -60,7 +60,7 @@ void lua_Base::serviceRelease()
 co::IComponent* lua_Base::getComponent()
 {
 	co::IType* type = co::getType( "lua.lua" );
-	assert( dynamic_cast<co::IComponent*>( type ) );
+	assert( type->getKind() == co::TK_COMPONENT );
 	return static_cast<co::IComponent*>( type );
 }
 

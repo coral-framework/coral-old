@@ -76,7 +76,7 @@ void Component_Base::serviceRelease()
 co::IComponent* Component_Base::getComponent()
 {
 	co::IType* type = co::getType( "lua.Component" );
-	assert( dynamic_cast<co::IComponent*>( type ) );
+	assert( type->getKind() == co::TK_COMPONENT );
 	return static_cast<co::IComponent*>( type );
 }
 

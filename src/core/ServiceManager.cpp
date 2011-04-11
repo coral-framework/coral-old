@@ -203,8 +203,7 @@ void ServiceManager::validateService( IInterface* serviceType, IService* service
 {
 	CHECK_NOT_NULL( serviceType );
 	CHECK_NOT_NULL( service );
-	if( !service->getInterface()->isSubTypeOf( serviceType ) )
-		raiseIncompatibleService( serviceType, service );
+	ensureIsA( service, serviceType );
 }
 
 IComponent* ServiceManager::validateComponent( IInterface* serviceType, const std::string& componentName )
@@ -214,7 +213,7 @@ IComponent* ServiceManager::validateComponent( IInterface* serviceType, const st
 	IComponent* ct = NULL;
 	try
 	{
-		ct = dynamic_cast<IComponent*>( getType( componentName ) );
+		ct = co::cast<IComponent>( getType( componentName ) );
 	}
 	catch( ... )
 	{;}

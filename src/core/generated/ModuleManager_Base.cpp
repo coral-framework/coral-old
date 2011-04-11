@@ -57,7 +57,7 @@ void ModuleManager_Base::serviceRelease()
 co::IComponent* ModuleManager_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.ModuleManager" );
-	assert( dynamic_cast<co::IComponent*>( type ) );
+	assert( type->getKind() == co::TK_COMPONENT );
 	return static_cast<co::IComponent*>( type );
 }
 

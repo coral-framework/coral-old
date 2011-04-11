@@ -105,8 +105,7 @@ void MethodBuilder::createMethod()
 	mic->setExceptions( _expectedExceptions );
 	mic->setReturnType( _returnType );
 
-	// notice: the call to addMethod() below may throw an exception if the TB's type was already created
-	assert( dynamic_cast<TypeBuilder*>( _typeBuilder.get() ) );
+	// notice: this may throw an exception if the TB's type was already created
 	static_cast<TypeBuilder*>( _typeBuilder.get() )->addMethod( mic );
 }
 

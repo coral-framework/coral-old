@@ -14,7 +14,7 @@ namespace co {
 /*!
 	Implements co.IField.
  */
-class Field : public Field_Base, public MemberImpl
+class Field : public Member<Field_Base>
 {
 public:
 	Field();
@@ -30,8 +30,6 @@ public:
 	// IField methods:
 	IType* getType();
 	bool getIsReadOnly();
-
-	DELEGATE_co_IMember( MemberImpl:: );
 
 private:
 	IType* _type;

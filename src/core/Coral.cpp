@@ -9,14 +9,11 @@
 #include <co/Coral.h>
 #include <co/RefPtr.h>
 #include <co/IReflector.h>
-#include <co/IPort.h>
-#include <co/NoSuchPortException.h>
 #include <co/reserved/OS.h>
 #include <co/reserved/LibraryManager.h>
 #include <cstdio>
 #include <cstdarg>
 #include <cstdlib>
-#include <sstream>
 #include <algorithm>
 
 namespace co {
@@ -150,17 +147,6 @@ IObject* newInstance( const std::string& fullName )
 	IReflector* reflector = type->getReflector();
 	assert( reflector );
 	return reflector->newInstance();
-}
-
-void bindService( IObject* instance, const std::string& receptacleName, IService* service )
-{
-	assert( instance );
-	IComponent* component = instance->getComponent();
-	IPort* port = dynamic_cast<IPort*>( component->getMember( receptacleName ) );
-	if( !port )
-		CORAL_THROW( NoSuchPortException, "no such receptacle '" << receptacleName
-						<< "' in component " << component->getFullName() );
-	instance->setService( port, service );
 }
 
 inline IServiceManager* getServices()

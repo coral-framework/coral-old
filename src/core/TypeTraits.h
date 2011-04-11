@@ -13,24 +13,47 @@
 
 namespace co {
 
-// forward declarations:
+// Forward Decls:
+class IEnum;
 class IType;
 class IArray;
-class IEnum;
-class IException;
+class IObject;
 class IStruct;
-class INativeClass;
+class IService;
+class IException;
 class IInterface;
 class IComponent;
+class INativeClass;
 
 /*!
-	Array that maps a co::TypeKind to its Coral-style string representation.
+	Array that maps a TypeKind to its Coral-style string representation.
 	Use with caution, always make sure ( index >= 0 && index <= co::TK_COMPONENT ).
  */
 extern CORAL_EXPORT const std::string TK_STRINGS[];
 
 //! Just like co::TK_STRINGS, but contains C++ style strings (e.g. 'co::Any' instead of 'any').
 extern CORAL_EXPORT const std::string TK_STRINGS_CPP[];
+
+
+/****************************************************************************/
+/* Internal Helper Functions (to avoid type dependencies in template code)  */
+/****************************************************************************/
+
+#ifndef DOXYGEN
+
+// Returns the kind of a 'type'.
+CORAL_EXPORT TypeKind getKind( IType* type );
+
+// Gets a service of the given 'type', provided by 'object'.
+CORAL_EXPORT IService* getServiceByType( IObject* object, IInterface* type );
+
+// Gets a service from 'object' by its port name.
+CORAL_EXPORT IService* getServiceByName( IObject* object, const std::string& portName );
+
+// Binds a 'service' to the receptacle identified by 'receptacleName' in 'object'.
+CORAL_EXPORT void setServiceByName( IObject* object, const std::string& receptacleName, IService* service );
+
+#endif
 
 
 /****************************************************************************/
@@ -82,7 +105,7 @@ struct nameOf
 	}
 };
 
-// the specialization for co::TypeKind must go here to avoid mutual dependencies
+// this specialization must go here to avoid mutual dependencies
 template<> struct nameOf<TypeKind> { static const char* get() { return "co.TypeKind"; } };
 
 
@@ -94,10 +117,11 @@ template<> struct nameOf<TypeKind> { static const char* get() { return "co.TypeK
 template<typename T, typename R>
 struct typeOfBase
 {
-	static R* get()
+	typedef R Interface;
+	static Interface* get()
 	{
 		IType* type = getType( nameOf<T>::get() );
-		assert( dynamic_cast<R*>( type ) );
+		assert( getKind( type ) == kindOf<T>::kind );
 		return static_cast<R*>( type );
 	}
 };
@@ -167,7 +191,8 @@ struct get
 
 	static const bool isConst = isConst<PointedType>::value;
 	static const bool isPointer = isPointer<ReferencedType>::value;
-	static const bool isPointerConst = co::traits::get<T>::isPointer && co::traits::isConst<ReferencedType>::value;
+	static const bool isPointerConst = traits::get<T>::isPointer
+							&& traits::isConst<ReferencedType>::value;
 	static const bool isReference = isReference<T>::value;
 
 	static const TypeKind kind = kindOf<CoreType>::kind;
@@ -204,14 +229,49 @@ struct typeOfArrayBase
 {
 	static IArray* get()
 	{
-		co::IType* type = getType( nameOf<std::vector<ET> >::get() );
-		assert( dynamic_cast<IArray*>( type ) );
+		IType* type = getType( nameOf<std::vector<ET> >::get() );
+		assert( getKind( type ) == TK_ARRAY );
 		return static_cast<IArray*>( type );
 	}
 };
 
 template<typename T>
 struct typeOf<std::vector<T> > : public typeOfArrayBase<T> {};
+
+
+/****************************************************************************/
+/* Basic RTTI functions                                                     */
+/****************************************************************************/
+
+/*!
+	Returns whether a \a service is of a given \a type.
+	This method always returns \c true if \a service is NULL.
+ */
+CORAL_EXPORT bool isA( IService* service, IInterface* type );
+
+template<typename SubType>
+inline bool isA( IService* service )
+{
+	return isA( service, typeOf<SubType>::get() );
+}
+
+/*!
+	Raises an IllegalCastException if \a service if not of a given \a type.
+	No exception is raised if \a service is NULL.
+ */
+CORAL_EXPORT void ensureIsA( IService* service, IInterface* type );
+
+/*!
+	Downcasts a service, raising an IllegalCastException on failure.
+	The cast always succeeds for NULL pointers (result is a NULL pointer).
+	\throw IllegalCastException if the service is not of the requested type.
+ */
+template<typename SubType>
+inline SubType* cast( IService* service )
+{
+	ensureIsA( service, typeOf<SubType>::get() );
+	return static_cast<SubType*>( service );
+}
 
 } // namespace co
 

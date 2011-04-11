@@ -250,15 +250,17 @@ int coPackage::newComponentInstance( lua_State* L )
 
 	co::Any any;
 	CompositeTypeBinding::getInstance( L, 1, any );
-	LuaComponent* prototype = dynamic_cast<LuaComponent*>( any.get<co::IReflector*>() );
+	co::IReflector* prototype = any.get<co::IReflector*>();
 	if( !prototype )
 		throw lua::Exception( "bad argument #1 to co.newComponentInstance (lua.Component.reflector expected)" );
+
+	assert( prototype->getFacet()->getOwner()->getFullName() == "lua.Component" );
 
 	lua_pushvalue( L, 2 );
 	int tableRef = luaL_ref( L, LUA_REGISTRYINDEX );
 
 	LuaComponent* lc = new LuaComponent;
-	lc->setComponentInstance( prototype, tableRef );
+	lc->setComponentInstance( static_cast<LuaComponent*>( prototype ), tableRef );
 
 	LuaState::push( L, static_cast<co::IObject*>( lc ) );
 
@@ -420,8 +422,8 @@ bool CompositeTypeBinding::pushMember( lua_State* L, co::ICompositeType* ct, boo
 
 			// try to find the member
 			const char* memberName = lua_tostring( L, 2 );
-			co::IMember* mi = ct->getMember( memberName );
-			if( !mi )
+			co::IMember* member = ct->getMember( memberName );
+			if( !member )
 			{
 				if( mustExist )
 				{
@@ -439,11 +441,9 @@ bool CompositeTypeBinding::pushMember( lua_State* L, co::ICompositeType* ct, boo
 			}
 
 			// push the member
-			lua_pushlightuserdata( L, mi );
-			if( dynamic_cast<co::IMethod*>( mi ) != NULL )
-			{
+			lua_pushlightuserdata( L, member );
+			if( member->getKind() == co::MK_METHOD )
 				lua_pushcclosure( L, callMethod, 1 );
-			}
 
 			// cache the member for future use
 			lua_pushvalue( L, 2 );

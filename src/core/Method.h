@@ -17,7 +17,7 @@ namespace co {
 /*!
 	Implements co.IMethod.
  */
-class Method : public Method_Base, public MemberImpl
+class Method : public Member<Method_Base>
 {
 public:
 	virtual ~Method();
@@ -34,8 +34,6 @@ public:
 	IType* getReturnType();
 	Range<IParameter* const> getParameters();
 	Range<IException* const> getExceptions();
-
-	DELEGATE_co_IMember( MemberImpl:: );
 
 private:
 	IType* _returnType;

@@ -25,7 +25,7 @@ static co::IInterface* createDummyInterface( const std::string& name, co::ITypeT
 	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_INTERFACE, name, tct );
 	builder->defineField( "dummyAtr", TestHelper::type( "string" ), false );
 
-	return dynamic_cast<co::IInterface*>( builder->createType() );
+	return co::cast<co::IInterface>( builder->createType() );
 }
 
 TEST( SignatureCalculatorTests, binarySignatureIndependsOnFieldDefineOrder )
@@ -148,14 +148,14 @@ TEST( SignatureCalculatorTests, methodSignature )
 	co::RefPtr<co::IMethodBuilder> methodBuilder1 = builder1->defineMethod( "Ask" );
 	methodBuilder1->defineParameter( "question", TestHelper::type( "string" ), true, false );
 	methodBuilder1->createMethod();
-	co::IInterface* first = dynamic_cast<co::IInterface*>( builder1->createType() );
+	co::IInterface* first = co::cast<co::IInterface>( builder1->createType() );
 
 	// variations with diferent signature
 	co::RefPtr<co::ITypeBuilder> var1builder = TestHelper::createBuilder( co::TK_INTERFACE, "MethodSignatureTest.Variation1", tct.get() );
 	co::RefPtr<co::IMethodBuilder> var1methodBuilder = var1builder->defineMethod( "Ask" );
 	var1methodBuilder->defineParameter( "question", TestHelper::type( "string" ), true, true );
 	var1methodBuilder->createMethod();
-	co::IInterface* variation1 = dynamic_cast<co::IInterface*>( var1builder->createType() );
+	co::IInterface* variation1 = co::cast<co::IInterface>( var1builder->createType() );
 
 	EXPECT_TRUE( first->getBinarySignature() != variation1->getBinarySignature() );
 	EXPECT_TRUE( first->getFullSignature() != variation1->getFullSignature() );
@@ -164,7 +164,7 @@ TEST( SignatureCalculatorTests, methodSignature )
 	co::RefPtr<co::IMethodBuilder> var2methodBuilder = var2builder->defineMethod( "Ask" );
 	var2methodBuilder->defineParameter( "question", TestHelper::type( "string" ), false, true );
 	var2methodBuilder->createMethod();
-	co::IInterface* variation2 = dynamic_cast<co::IInterface*>( var2builder->createType() );
+	co::IInterface* variation2 = co::cast<co::IInterface>( var2builder->createType() );
 
 	EXPECT_TRUE( first->getBinarySignature() != variation2->getBinarySignature() );
 	EXPECT_TRUE( first->getFullSignature() != variation2->getFullSignature() );
@@ -173,7 +173,7 @@ TEST( SignatureCalculatorTests, methodSignature )
 	co::RefPtr<co::IMethodBuilder> var3methodBuilder = var3builder->defineMethod( "Ask" );
 	var3methodBuilder->defineParameter( "question", TestHelper::type( "int32" ), true, false );
 	var3methodBuilder->createMethod();
-	co::IInterface* variation3 = dynamic_cast<co::IInterface*>( var3builder->createType() );
+	co::IInterface* variation3 = co::cast<co::IInterface>( var3builder->createType() );
 
 	EXPECT_TRUE( first->getBinarySignature() != variation3->getBinarySignature() );
 	EXPECT_TRUE( first->getFullSignature() != variation3->getFullSignature() );
@@ -183,7 +183,7 @@ TEST( SignatureCalculatorTests, methodSignature )
 	var4methodBuilder->defineParameter( "question", TestHelper::type( "string" ), true, false );
 	var4methodBuilder->defineReturnType( TestHelper::type("string") );
 	var4methodBuilder->createMethod();
-	co::IInterface* variation4 = dynamic_cast<co::IInterface*>( var4builder->createType() );
+	co::IInterface* variation4 = co::cast<co::IInterface>( var4builder->createType() );
 
 	EXPECT_TRUE( first->getBinarySignature() != variation4->getBinarySignature() );
 	EXPECT_TRUE( first->getFullSignature() != variation4->getFullSignature() );
@@ -193,7 +193,7 @@ TEST( SignatureCalculatorTests, methodSignature )
 	var5methodBuilder->defineParameter( "question", TestHelper::type( "string" ), true, false );
 	var5methodBuilder->defineReturnType( TestHelper::type("int32") );
 	var5methodBuilder->createMethod();
-	co::IInterface* variation5 = dynamic_cast<co::IInterface*>( var5builder->createType() );
+	co::IInterface* variation5 = co::cast<co::IInterface>( var5builder->createType() );
 
 	EXPECT_TRUE( first->getBinarySignature() != variation5->getBinarySignature() );
 	EXPECT_TRUE( first->getFullSignature() != variation5->getFullSignature() );
@@ -208,25 +208,25 @@ TEST( SignatureCalculatorTests, fieldSignature )
 
 	co::RefPtr<co::ITypeBuilder> builder1 = TestHelper::createBuilder( co::TK_INTERFACE, "FieldSignatureTest.First", tct.get() );
 	builder1->defineField( "name", TestHelper::type( "string" ), true );
-	co::IInterface* first = dynamic_cast<co::IInterface*>( builder1->createType() );
+	co::IInterface* first = co::cast<co::IInterface>( builder1->createType() );
 
 	//variations with the same binary signature
 	co::RefPtr<co::ITypeBuilder> builder2 = TestHelper::createBuilder( co::TK_INTERFACE, "FieldSignatureTest.SameBinary1", tct.get() );
 	builder2->defineField( "name", TestHelper::type( "string" ), true );
-	co::IInterface* sameBinary1 = dynamic_cast<co::IInterface*>( builder2->createType() );
+	co::IInterface* sameBinary1 = co::cast<co::IInterface>( builder2->createType() );
 
 	co::RefPtr<co::ITypeBuilder> builder3 = TestHelper::createBuilder( co::TK_INTERFACE, "FieldSignatureTest.SameBinary2", tct.get() );
 	builder3->defineField( "fullName", TestHelper::type( "string" ), true );
-	co::IInterface* sameBinary2 = dynamic_cast<co::IInterface*>( builder3->createType() );
+	co::IInterface* sameBinary2 = co::cast<co::IInterface>( builder3->createType() );
 
 	// variations with diferent signature
 	co::RefPtr<co::ITypeBuilder> builder4 = TestHelper::createBuilder( co::TK_INTERFACE, "FieldSignatureTest.Variation1", tct.get() );
 	builder4->defineField( "fullName", TestHelper::type( "string" ), false );
-	co::IInterface* variation1 = dynamic_cast<co::IInterface*>( builder4->createType() );
+	co::IInterface* variation1 = co::cast<co::IInterface>( builder4->createType() );
 
 	co::RefPtr<co::ITypeBuilder> builder5 = TestHelper::createBuilder( co::TK_INTERFACE, "FieldSignatureTest.Variation2", tct.get() );
 	builder5->defineField( "name", TestHelper::type( "int32" ), false );
-	co::IInterface* variation2 = dynamic_cast<co::IInterface*>( builder5->createType() );
+	co::IInterface* variation2 = co::cast<co::IInterface>( builder5->createType() );
 
 	ASSERT_NO_THROW( tct->commit() );
 

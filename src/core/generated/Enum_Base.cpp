@@ -57,7 +57,7 @@ void Enum_Base::serviceRelease()
 co::IComponent* Enum_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.Enum" );
-	assert( dynamic_cast<co::IComponent*>( type ) );
+	assert( type->getKind() == co::TK_COMPONENT );
 	return static_cast<co::IComponent*>( type );
 }
 

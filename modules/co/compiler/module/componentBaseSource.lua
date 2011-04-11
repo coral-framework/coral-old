@@ -95,7 +95,7 @@ void ]], t.name, [[_Base::serviceRelease()
 co::IComponent* ]], t.name, [[_Base::getComponent()
 {
 	co::IType* type = co::getType( "]], t.fullName, [[" );
-	assert( dynamic_cast<co::IComponent*>( type ) );
+	assert( type->getKind() == co::TK_COMPONENT );
 	return static_cast<co::IComponent*>( type );
 }
 
@@ -134,7 +134,7 @@ void ]], t.name, [[_Base::setService( co::IPort* receptacle, co::IService* servi
 
 		for i, itf in ipairs( receptacles ) do
 			writer( "\tcase ", itf.index, ":\t\t", t.formatAccessor( "set", itf.name, "Service" ),
-				"( checkedCast<", itf.type.cppName, ">( service ) ); break;\n" )
+				"( co::cast<", itf.type.cppName, ">( service ) ); break;\n" )
 		end
 
 		writer( [[

@@ -4,8 +4,17 @@
  */
 
 #include "TypeTraits.h"
+#include <co/IPort.h>
+#include <co/IObject.h>
+#include <co/IInterface.h>
+#include <co/IComponent.h>
+#include <co/NoSuchPortException.h>
+#include <co/IllegalCastException.h>
+#include <sstream>
 
-const std::string co::TK_STRINGS[] =
+namespace co {
+
+const std::string TK_STRINGS[] =
 {
 	"<none>",
 	"any",
@@ -31,7 +40,7 @@ const std::string co::TK_STRINGS[] =
 	"<off by one!>"
 };
 
-const std::string co::TK_STRINGS_CPP[] =
+const std::string TK_STRINGS_CPP[] =
 {
 	"<NONE>",
 	"co::Any",
@@ -56,3 +65,64 @@ const std::string co::TK_STRINGS_CPP[] =
 	"<COMPONENT>",
 	"<OFF_BY_ONE!>"
 };
+
+TypeKind getKind( IType* type )
+{
+	assert( type );
+	return type->getKind();
+}
+
+IService* getServiceByType( IObject* object, IInterface* type )
+{
+	assert( object && type );
+	IComponent* component = object->getComponent();
+	Range<IPort* const> facets = component->getFacets();
+	for( ; facets; facets.popFirst() )
+		if( facets.getFirst()->getType()->isSubTypeOf( type ) )
+			return object->getService( facets.getFirst() );
+	CORAL_THROW( NoSuchPortException, "component '" << component->getFullName()
+		<< "' does not provide a facet of type '" << type->getFullName() << "'"  )
+}
+
+IService* getServiceByName( IObject* object, const std::string& portName )
+{
+	assert( object );
+	IComponent* component = object->getComponent();
+	IMember* port = component->getMember( portName );
+	if( !port )
+		CORAL_THROW( NoSuchPortException, "no such port '" << portName
+			<< "' in component '" << component->getFullName() << "'" );
+	return object->getService( static_cast<IPort*>( port ) );
+}
+
+void setServiceByName( IObject* object, const std::string& receptacleName, IService* service )
+{
+	assert( object );
+	IComponent* component = object->getComponent();
+	IMember* port = component->getMember( receptacleName );
+	if( !port )
+		CORAL_THROW( NoSuchPortException, "no such receptacle '" << receptacleName
+			<< "' in component '" << component->getFullName() << "'" );
+	object->setService( static_cast<IPort*>( port ), service );
+}
+
+CORAL_FORCE_INLINE bool _isA( IService* service, IInterface* type )
+{
+	assert( type );
+	return !service || service->getInterface()->isSubTypeOf( type );
+}
+
+bool isA( IService* service, IInterface* type )
+{
+	return _isA( service, type );
+}
+
+void ensureIsA( IService* service, IInterface* type )
+{
+	if( !_isA( service, type ) )
+		CORAL_THROW( IllegalCastException, "incompatible service ("
+					<< type->getFullName() << " expected, got "
+					<< service->getInterface()->getFullName() << ")" );
+}
+
+} // namespace co

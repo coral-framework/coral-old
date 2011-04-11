@@ -24,9 +24,7 @@ TypeLoader::TypeLoader( const std::string& fullTypeName,
 						ITypeManager* tm )
 	: _fullTypeName( fullTypeName ), _path( path )
 {
-	assert( dynamic_cast<TypeManager*>( tm ) );
 	_typeManager = static_cast<TypeManager*>( tm );
-
 	_parentLoader = NULL;
 	_namespace = NULL;
 	_transaction = new TypeTransaction();

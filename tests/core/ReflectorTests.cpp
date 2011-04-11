@@ -106,12 +106,10 @@ TEST( ReflectorTests, exceptions )
 template<typename T>
 T* getMember( co::IType* type, const char* memberName )
 {
-	co::ICompositeType* ct = dynamic_cast<co::ICompositeType*>( type );
-	assert( ct );
-
-	T* mi = dynamic_cast<T*>( ct->getMember( memberName ) );
+	assert( type );
+	co::ICompositeType* ct = co::cast<co::ICompositeType>( type );
+	T* mi = co::cast<T>( ct->getMember( memberName ) );
 	assert( mi );
-
 	return mi;
 }
 

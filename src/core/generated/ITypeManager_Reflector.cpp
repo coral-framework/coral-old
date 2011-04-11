@@ -170,7 +170,7 @@ public:
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		co::ITypeManager* p = checkInstance( instance, field );
+		co::ITypeManager* p = co::checkInstance<co::ITypeManager>( instance, field );
 		switch( field->getIndex() )
 		{
 		case 0:		value.set< bool >( p->getDocumentationParsing() ); break;
@@ -181,7 +181,7 @@ public:
 
 	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		co::ITypeManager* p = checkInstance( instance, field );
+		co::ITypeManager* p = co::checkInstance<co::ITypeManager>( instance, field );
 		switch( field->getIndex() )
 		{
 		case 0:		p->setDocumentationParsing( value.get< bool >() ); break;
@@ -194,7 +194,7 @@ public:
 
 	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
 	{
-		co::ITypeManager* p = checkInstance( instance, method );
+		co::ITypeManager* p = co::checkInstance<co::ITypeManager>( instance, method );
 		checkNumArguments( method, args.getSize() );
 		int argIndex = -1;
 		try
@@ -259,28 +259,6 @@ public:
 			throw;
 		}
 		CORAL_UNUSED( res );
-	}
-
-private:
-	co::ITypeManager* checkInstance( const co::Any& any, co::IMember* member )
-	{
-		if( !member )
-			throw co::IllegalArgumentException( "illegal null member info" );
-
-		// make sure that 'any' is an instance of this type
-		co::IInterface* myType = co::typeOf<co::ITypeManager>::get();
-
-		co::ITypeManager* res;
-		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::ITypeManager*>( any.getState().data.service ) ) )
-			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::ITypeManager*, but got " << any );
-
-		// make sure that 'member' belongs to this type
-		co::ICompositeType* owner = member->getOwner();
-		if( owner != myType )
-			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
-				<< owner->getFullName() << ", not to co.ITypeManager" );
-
-		return res;
 	}
 };
 

@@ -360,17 +360,14 @@ co::IService* LuaComponent::getDynamicReceptacle( co::IPort* port )
 	__END_LUA_API_CODE__
 
 	// check interface compatibility
-	if( res && !res->getInterface()->isSubTypeOf( port->getType() ) )
-		raiseIncompatibleService( port->getType(), res );
-
+	co::ensureIsA( res, port->getType() );
 	return res;
 }
 
 void LuaComponent::setDynamicReceptacle( co::IPort* receptacle, co::IService* instance )
 {
 	// check interface compatibility
-	if( instance && !instance->getInterface()->isSubTypeOf( receptacle->getType() ) )
-		raiseIncompatibleService( receptacle->getType(), instance );
+	co::ensureIsA( instance, receptacle->getType() );
 
 	__BEGIN_LUA_API_CODE__
 

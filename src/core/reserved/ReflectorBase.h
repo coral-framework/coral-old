@@ -7,7 +7,12 @@
 #define _CO_RESERVED_REFLECTORBASE_H_
 
 #include "ComponentBase.h"
+#include <co/IField.h>
+#include <co/IMethod.h>
+#include <co/IInterface.h>
 #include <co/IReflector.h>
+#include <co/IllegalArgumentException.h>
+#include <sstream>
 
 namespace co {
 
@@ -63,16 +68,16 @@ protected:
 	void checkValidSize( size_t expectedSize, size_t actualSize );
 
 	//! Raises co::IllegalArgumentException if handler is NULL.
-	void checkValidDynamicProvider( co::IDynamicServiceProvider* provider );
+	void checkValidDynamicProvider( IDynamicServiceProvider* provider );
 
 	//! Raises co::MissingInputException if \a numArgs is lesser than \a mi's expected number of args.
-	void checkNumArguments( co::IMethod* mi, size_t numArgs );
+	void checkNumArguments( IMethod* mi, size_t numArgs );
 
 	//! Raises an exception because setField() was called on a read-only field.
-	void raiseFieldIsReadOnly( co::IField* ai );
+	void raiseFieldIsReadOnly( IField* ai );
 
 	//! Re-raises a co::IllegalCastException with info about which method parameter raised the exception.
-	void raiseArgumentTypeException( co::IMethod* mi, int argIndex, const co::IllegalCastException& e );
+	void raiseArgumentTypeException( IMethod* mi, int argIndex, const IllegalCastException& e );
 
 	/*!
 		Raises a co::IllegalArgumentException for cases (that "should never happen")
@@ -83,6 +88,76 @@ protected:
 	//! Raises co::NotSupportedException, e.g. for unimplemented methods.
 	void raiseNotSupportedException();
 };
+
+/****************************************************************************/
+/* Auxiliary templates used internally by the generated reflectors          */
+/****************************************************************************/
+
+#ifndef DOXYGEN
+
+namespace {
+template<typename M> struct nullMemberMsg { static const char* get() { return "illegal null member"; } };
+template<> struct nullMemberMsg<IField> { static const char* get() { return "illegal null field"; } };
+template<> struct nullMemberMsg<IMethod> { static const char* get() { return "illegal null method"; } };
+}
+
+template<typename M>
+void checkMember( ICompositeType* ct, M* member )
+{
+	if( !member )
+		throw co::IllegalArgumentException( nullMemberMsg<M>::get() );
+
+	ICompositeType* owner = member->getOwner();
+	if( owner != ct )
+		CORAL_THROW( IllegalArgumentException, "member '" << member->getName()
+			<< "' belongs to '" << owner->getFullName()
+			<< "', not to '" << ct->getFullName() << "'" );
+}
+
+template<typename T, typename TType>
+struct CheckInstance
+{
+	static T* check( const Any& any, TType* type )
+	{
+		if( any.getKind() != kindOf<T>::kind || any.getType() != type )
+			CORAL_THROW( IllegalArgumentException, "illegal instance type ("
+				<< type->getFullName() << " expected, got " << any << ")" );
+
+		void* ptr = any.getState().data.ptr;
+		if( !ptr )
+			throw co::IllegalArgumentException( "illegal null instance" );
+
+		return reinterpret_cast<T*>( ptr );
+	}
+};
+
+template<typename T>
+struct CheckInstance<T, IInterface>
+{
+	static T* check( const Any& any, IInterface* type )
+	{
+		if( any.getKind() != TK_INTERFACE || !any.getInterface()->isSubTypeOf( type ) )
+			CORAL_THROW( IllegalArgumentException, "illegal instance type ("
+				<< type->getFullName() << " expected, got " << any << ")" );
+		
+		IService* service = any.getState().data.service;
+		if( !service )
+			throw co::IllegalArgumentException( "illegal null instance" );
+		
+		return static_cast<T*>( service );
+	}
+};
+
+template<typename T, typename M>
+T* checkInstance( const Any& any, M* member )
+{
+	typedef typeOf<T> typeOfT;
+	typename typeOfT::Interface* type = typeOfT::get();
+	checkMember( type, member );
+	return CheckInstance<T, typename typeOfT::Interface>::check( any, type );
+}
+
+#endif
 
 } // namespace co
 

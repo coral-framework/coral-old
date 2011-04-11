@@ -30,7 +30,7 @@ TEST( MethodBuilderTests, theTest )
 	co::IType* stringType = 	TestHelper::type( "string" );
 
 	co::RefPtr<co::ITypeBuilder> exbuilder = TestHelper::createBuilder( co::TK_EXCEPTION, "MethodBuilderbuilderTest.NewException", tct.get() );
-	co::IException* testException = dynamic_cast<co::IException*>( exbuilder->createType() );
+	co::IException* testException = co::cast<co::IException>( exbuilder->createType() );
 
 	co::RefPtr<co::IMethodBuilder> mb = typeBuilder->defineMethod( "testMethod" );
 
@@ -51,10 +51,10 @@ TEST( MethodBuilderTests, theTest )
 
 	EXPECT_NO_THROW( mb->createMethod() );
 
-	co::IInterface* itf = dynamic_cast<co::IInterface*>( typeBuilder->createType() );
+	co::IInterface* itf = co::cast<co::IInterface>( typeBuilder->createType() );
 	ASSERT_TRUE( itf != NULL );
 
-	co::IMethod* mInfo = dynamic_cast<co::IMethod*>( itf->getMember( "testMethod" ) );
+	co::IMethod* mInfo = co::cast<co::IMethod>( itf->getMember( "testMethod" ) );
 	ASSERT_TRUE( mInfo != NULL );
 
 	ASSERT_EQ( 3, mInfo->getParameters().getSize() );

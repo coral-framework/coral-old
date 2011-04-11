@@ -8,28 +8,43 @@ interface IObject
 
 	<c++
 		/*!
-			<tt>getService<T>()</tt>: convenience method that returns a built-in service of type 'T'
-			provided by the component. Please notice that this method only works for static facets.
-			It will not retrieve services from dynamic facets, such as those implemented in Lua.
+			Retrieves a service provided by this object by its type.
+			Result is undefined if the component provides more than one service of type 'T'.
+			\tparam T interface of the requested service.
 		 */
-		template<typename T> inline T* getService() { return dynamic_cast<T*>( this ); }
+		template<typename T> inline T* getService()
+		{
+			return static_cast<T*>( getServiceByType( this, typeOf<T>::get() ) );
+		}
+
+		// Returns the service "provided by" or "bound to" the port named \a portName.
+		inline IService* getService( const std::string& portName )
+		{
+			return getServiceByName( this, portName );
+		}
+
+		// Binds a \a service to the receptacle named \a receptacleName.
+		inline void setService( const std::string& receptacleName, IService* service )
+		{
+			setServiceByName( this, receptacleName, service );
+		}
 	c++>
 
 	/*
-		Retrieves the service "provided by" or "bound to" one of this object's ports.
+		Returns the service "provided by" or "bound to" one of this object's ports.
 
-		If \a port is a \e facet, this method returns the corresponding service <em>provided by</em>
-		the component. Otherwise, if \a port is a \e receptacle, this method returns the service that
-		is currently <em>bound to</em> the receptacle (null indicates no service is bound).
+		If \a port is a \e facet, this method returns the corresponding service \e provided \e by
+		this component instance. Otherwise, if \a port is a \e receptacle, this method returns the
+		service currently \e bound \e to the receptacle (null indicates no service is bound).
 
-		\throw NoSuchPortException if the \a port is invalid.
+		\throw NoSuchPortException if \a port is invalid.
 	 */
 	IService getService( in IPort port ) raises NoSuchPortException;
 
 	/*
 		Binds a \a service to one of this object's receptacles.
 
-		\throw NoSuchPortException if \a receptacle is not a valid component receptacle.
+		\throw NoSuchPortException if \a receptacle is not a valid receptacle.
 		\throw IllegalCastException if \a service is incompatible with the \a receptacle.
 		\throw IllegalStateException if \a receptacle cannot be changed in the current object state.
 	 */

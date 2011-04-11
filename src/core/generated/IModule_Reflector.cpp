@@ -161,7 +161,7 @@ public:
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		co::IModule* p = checkInstance( instance, field );
+		co::IModule* p = co::checkInstance<co::IModule>( instance, field );
 		switch( field->getIndex() )
 		{
 		case 0:		value.set< co::INamespace* >( p->getNamespace() ); break;
@@ -174,7 +174,7 @@ public:
 
 	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		co::IModule* p = checkInstance( instance, field );
+		co::IModule* p = co::checkInstance<co::IModule>( instance, field );
 		switch( field->getIndex() )
 		{
 		case 0:		raiseFieldIsReadOnly( field ); break;
@@ -189,7 +189,7 @@ public:
 
 	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
 	{
-		co::IModule* p = checkInstance( instance, method );
+		co::IModule* p = co::checkInstance<co::IModule>( instance, method );
 		checkNumArguments( method, args.getSize() );
 		int argIndex = -1;
 		try
@@ -241,28 +241,6 @@ public:
 			throw;
 		}
 		CORAL_UNUSED( res );
-	}
-
-private:
-	co::IModule* checkInstance( const co::Any& any, co::IMember* member )
-	{
-		if( !member )
-			throw co::IllegalArgumentException( "illegal null member info" );
-
-		// make sure that 'any' is an instance of this type
-		co::IInterface* myType = co::typeOf<co::IModule>::get();
-
-		co::IModule* res;
-		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::IModule*>( any.getState().data.service ) ) )
-			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::IModule*, but got " << any );
-
-		// make sure that 'member' belongs to this type
-		co::ICompositeType* owner = member->getOwner();
-		if( owner != myType )
-			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
-				<< owner->getFullName() << ", not to co.IModule" );
-
-		return res;
 	}
 };
 

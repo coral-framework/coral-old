@@ -183,7 +183,7 @@ public:
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		co::IComponent* p = checkInstance( instance, field );
+		co::IComponent* p = co::checkInstance<co::IComponent>( instance, field );
 		switch( field->getIndex() )
 		{
 		case 0:		value.set< co::Range<co::IPort* const> >( p->getFacets() ); break;
@@ -195,7 +195,7 @@ public:
 
 	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		co::IComponent* p = checkInstance( instance, field );
+		co::IComponent* p = co::checkInstance<co::IComponent>( instance, field );
 		switch( field->getIndex() )
 		{
 		case 0:		raiseFieldIsReadOnly( field ); break;
@@ -209,32 +209,10 @@ public:
 
 	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
 	{
-		checkInstance( instance, method );
+		co::checkInstance<co::IComponent>( instance, method );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( args );
 		CORAL_UNUSED( res );
-	}
-
-private:
-	co::IComponent* checkInstance( const co::Any& any, co::IMember* member )
-	{
-		if( !member )
-			throw co::IllegalArgumentException( "illegal null member info" );
-
-		// make sure that 'any' is an instance of this type
-		co::IInterface* myType = co::typeOf<co::IComponent>::get();
-
-		co::IComponent* res;
-		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::IComponent*>( any.getState().data.service ) ) )
-			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::IComponent*, but got " << any );
-
-		// make sure that 'member' belongs to this type
-		co::ICompositeType* owner = member->getOwner();
-		if( owner != myType )
-			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
-				<< owner->getFullName() << ", not to co.IComponent" );
-
-		return res;
 	}
 };
 

@@ -57,7 +57,7 @@ void MethodBuilder_Base::serviceRelease()
 co::IComponent* MethodBuilder_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.MethodBuilder" );
-	assert( dynamic_cast<co::IComponent*>( type ) );
+	assert( type->getKind() == co::TK_COMPONENT );
 	return static_cast<co::IComponent*>( type );
 }
 

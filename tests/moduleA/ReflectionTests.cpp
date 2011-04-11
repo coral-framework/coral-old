@@ -22,12 +22,10 @@
 template<typename T>
 T* getMember( co::IType* type, const char* memberName )
 {
-	co::ICompositeType* ct = dynamic_cast<co::ICompositeType*>( type );
-	assert( ct );
-
-	T* mi = dynamic_cast<T*>( ct->getMember( memberName ) );
+	assert( type );
+	co::ICompositeType* ct = co::cast<co::ICompositeType>( type );
+	T* mi = co::cast<T>( ct->getMember( memberName ) );
 	assert( mi );
-
 	return mi;
 }
 
@@ -124,7 +122,7 @@ TEST( ReflectionTests, getAndBindComponentInterfaces )
 	co::IComponent* type = instance->getComponent();
 
 	// get a facet info
-	co::IPort* testInterfaceInfo = dynamic_cast<co::IPort*>( type->getMember( "testInterface" ) );
+	co::IPort* testInterfaceInfo = co::cast<co::IPort>( type->getMember( "testInterface" ) );
 	ASSERT_TRUE( testInterfaceInfo != NULL );
 
 	// get the 'testInterface' instance
@@ -135,8 +133,8 @@ TEST( ReflectionTests, getAndBindComponentInterfaces )
 	EXPECT_THROW( instance->setService( testInterfaceInfo, service ), co::NoSuchPortException );
 
 	// get IPort's for the receptacles
-	co::IPort* typePort = dynamic_cast<co::IPort*>( type->getMember( "type" ) );
-	co::IPort* itfTypePort = dynamic_cast<co::IPort*>( type->getMember( "itf" ) );
+	co::IPort* typePort = co::cast<co::IPort>( type->getMember( "type" ) );
+	co::IPort* itfTypePort = co::cast<co::IPort>( type->getMember( "itf" ) );
 	ASSERT_TRUE( typePort && itfTypePort );
 
 	// get the service currently bound to the 'type' receptacle (should be null)
@@ -159,8 +157,9 @@ TEST( ReflectionTests, getAndBindComponentInterfaces )
 	EXPECT_EQ( itf->getProvider(), service->getProvider() );
 	EXPECT_EQ( itf->getFacet(), service->getFacet() );
 
-	// try setting a receptacle by name
-	co::bindService( instance.get(), "type", NULL );
+	// try getting/setting a receptacle by name
+	EXPECT_EQ( itf, instance->getService( "type" ) );
+	instance->setService( "type", NULL );
 	EXPECT_EQ( NULL, instance->getService( typePort ) );
-	EXPECT_THROW( co::bindService( instance.get(), "noReceptacle", NULL ), co::NoSuchPortException );
+	EXPECT_THROW( instance->setService( "noReceptacle", NULL ), co::NoSuchPortException );
 }

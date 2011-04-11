@@ -57,7 +57,7 @@ void Struct_Base::serviceRelease()
 co::IComponent* Struct_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.Struct" );
-	assert( dynamic_cast<co::IComponent*>( type ) );
+	assert( type->getKind() == co::TK_COMPONENT );
 	return static_cast<co::IComponent*>( type );
 }
 

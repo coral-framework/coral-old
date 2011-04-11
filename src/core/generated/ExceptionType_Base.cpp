@@ -57,7 +57,7 @@ void ExceptionType_Base::serviceRelease()
 co::IComponent* ExceptionType_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.ExceptionType" );
-	assert( dynamic_cast<co::IComponent*>( type ) );
+	assert( type->getKind() == co::TK_COMPONENT );
 	return static_cast<co::IComponent*>( type );
 }
 

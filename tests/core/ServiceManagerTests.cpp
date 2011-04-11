@@ -70,7 +70,7 @@ TEST( ServiceManagerTests, lazyGlobalService )
 	EXPECT_EQ( tctType, service->getInterface() );
 
 	// remove the service
-	co::ITypeTransaction* tct = dynamic_cast<co::ITypeTransaction*>( service );
+	co::ITypeTransaction* tct = co::cast<co::ITypeTransaction>( service );
 	ASSERT_TRUE( tct != NULL );
 
 	tct->rollback();
@@ -144,7 +144,7 @@ TEST( ServiceManagerTests, customServicesPerInstance )
 	ASSERT_TRUE( aMethod != NULL );
 
 	co::IService* itf = sm->getServiceForInstance( memberInfoType, aMethod );
-	co::IMember* mi = dynamic_cast<co::IMember*>( itf );
+	co::IMember* mi = co::cast<co::IMember>( itf );
 	ASSERT_TRUE( mi != NULL );
 	EXPECT_EQ( "serviceRetain", mi->getName() );
 

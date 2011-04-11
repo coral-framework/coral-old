@@ -57,7 +57,7 @@ void ModulePartLoader_Base::serviceRelease()
 co::IComponent* ModulePartLoader_Base::getComponent()
 {
 	co::IType* type = co::getType( "co.ModulePartLoader" );
-	assert( dynamic_cast<co::IComponent*>( type ) );
+	assert( type->getKind() == co::TK_COMPONENT );
 	return static_cast<co::IComponent*>( type );
 }
 

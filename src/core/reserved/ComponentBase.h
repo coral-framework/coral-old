@@ -6,8 +6,9 @@
 #ifndef _CO_RESERVED_COMPONENTBASE_H_
 #define _CO_RESERVED_COMPONENTBASE_H_
 
+#include <co/IPort.h>
 #include <co/IObject.h>
-#include <co/IllegalArgumentException.h>
+#include <co/IInterface.h>
 
 namespace co {
 
@@ -47,20 +48,6 @@ protected:
 
 	//! Raises a NoSuchPortException for cases that "should never happen" (e.g. invalid port index).
 	void raiseUnexpectedPortIndex();
-
-	//! Downcasts a service, throwing co::IllegalArgumentException if the cast fails.
-	template<typename T>
-	inline T* checkedCast( IService* ptr )
-	{
-		if( !ptr ) return NULL; // null pointers are always compatible
-		T* castedPtr = dynamic_cast<T*>( ptr );
-		if( !castedPtr )
-			raiseIncompatibleService( typeOf<T>::get(), ptr );
-		return castedPtr;
-	}
-
-	//! Raises an IllegalCastException for when a \a service is not of the \a expectedType.
-	void raiseIncompatibleService( IInterface* expectedType, IService* service );
 
 	/*!
 		Utility method to dynamically define simple, internal component types (i.e.

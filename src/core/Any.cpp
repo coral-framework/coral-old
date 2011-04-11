@@ -762,10 +762,7 @@ void Any::makeOut( IType* paramType )
 			assert( getKind() == TK_ARRAY && isConst() == false );
 		else
 		{
-			IArray* arrayType = dynamic_cast<IArray*>( paramType );
-			assert( arrayType );
-
-			IType* elementType = arrayType->getElementType();
+			IType* elementType = static_cast<IArray*>( paramType )->getElementType();
 			TypeKind elementKind = elementType->getKind();
 
 			PseudoVector& pv = createArray( elementType );

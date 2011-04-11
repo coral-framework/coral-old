@@ -105,21 +105,21 @@ public:
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		checkInstance( instance, field );
+		co::checkInstance<lua::ILauncher>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
 	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		checkInstance( instance, field );
+		co::checkInstance<lua::ILauncher>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
 	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
 	{
-		lua::ILauncher* p = checkInstance( instance, method );
+		lua::ILauncher* p = co::checkInstance<lua::ILauncher>( instance, method );
 		checkNumArguments( method, args.getSize() );
 		int argIndex = -1;
 		try
@@ -148,28 +148,6 @@ public:
 			throw;
 		}
 		CORAL_UNUSED( res );
-	}
-
-private:
-	lua::ILauncher* checkInstance( const co::Any& any, co::IMember* member )
-	{
-		if( !member )
-			throw co::IllegalArgumentException( "illegal null member info" );
-
-		// make sure that 'any' is an instance of this type
-		co::IInterface* myType = co::typeOf<lua::ILauncher>::get();
-
-		lua::ILauncher* res;
-		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<lua::ILauncher*>( any.getState().data.service ) ) )
-			CORAL_THROW( co::IllegalArgumentException, "expected a valid lua::ILauncher*, but got " << any );
-
-		// make sure that 'member' belongs to this type
-		co::ICompositeType* owner = member->getOwner();
-		if( owner != myType )
-			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
-				<< owner->getFullName() << ", not to lua.ILauncher" );
-
-		return res;
 	}
 };
 

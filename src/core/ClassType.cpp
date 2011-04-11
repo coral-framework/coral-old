@@ -4,7 +4,8 @@
  */
 
 #include "ClassType.h"
-#include "Member.h"
+#include "Field.h"
+#include "Method.h"
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IInterface.h>
@@ -64,13 +65,17 @@ void ClassTypeImpl::sortMembers( ICompositeType* owner )
 	size_t count = _members.size();
 	for( size_t i = 0; i < count; ++i )
 	{
-		MemberImpl* mii = dynamic_cast<MemberImpl*>( _members[i].get() );
-		assert( mii );
-		mii->setOwner( owner, i );
+		if( _members[i]->getKind() == MK_FIELD )
+		{
+			static_cast<Field*>( _members[i].get() )->setOwner( owner, i );
+		}
+		else
+		{
+			static_cast<Method*>( _members[i].get() )->setOwner( owner, i );
 
-		if( _firstMethodPos == size_t( -1 )
-				&& dynamic_cast<IMethod*>( _members[i].get() ) )
-			_firstMethodPos = i;
+			if( _firstMethodPos == size_t( -1 ) )
+				_firstMethodPos = i;
+		}
 	}
 
 	if( _firstMethodPos == size_t( -1 ) )

@@ -141,21 +141,21 @@ public:
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		checkInstance( instance, field );
+		co::checkInstance<co::IDynamicServiceProvider>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
 	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		checkInstance( instance, field );
+		co::checkInstance<co::IDynamicServiceProvider>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
 	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
 	{
-		co::IDynamicServiceProvider* p = checkInstance( instance, method );
+		co::IDynamicServiceProvider* p = co::checkInstance<co::IDynamicServiceProvider>( instance, method );
 		checkNumArguments( method, args.getSize() );
 		int argIndex = -1;
 		try
@@ -217,28 +217,6 @@ public:
 			throw;
 		}
 		CORAL_UNUSED( res );
-	}
-
-private:
-	co::IDynamicServiceProvider* checkInstance( const co::Any& any, co::IMember* member )
-	{
-		if( !member )
-			throw co::IllegalArgumentException( "illegal null member info" );
-
-		// make sure that 'any' is an instance of this type
-		co::IInterface* myType = co::typeOf<co::IDynamicServiceProvider>::get();
-
-		co::IDynamicServiceProvider* res;
-		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<co::IDynamicServiceProvider*>( any.getState().data.service ) ) )
-			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::IDynamicServiceProvider*, but got " << any );
-
-		// make sure that 'member' belongs to this type
-		co::ICompositeType* owner = member->getOwner();
-		if( owner != myType )
-			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
-				<< owner->getFullName() << ", not to co.IDynamicServiceProvider" );
-
-		return res;
 	}
 };
 

@@ -381,11 +381,10 @@ void Parser::onExeptionRaised( const std::string& name )
 	if( !type )
 		CORAL_THROW( TypeLoadException, "error loading exception type '" << name << "'" );
 
-	IException* exeptionType = dynamic_cast<IException*>( type );
-	if( !exeptionType )
+	if( type->getKind() != TK_EXCEPTION )
 		CORAL_THROW( TypeLoadException, "attempt to raise non-exception type '" << type->getFullName() << "'" );
 
-	_methodBuilder->defineException( exeptionType );
+	_methodBuilder->defineException( static_cast<IException*>( type ) );
 }
 
 void Parser::onEndMethod()

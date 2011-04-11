@@ -30,11 +30,11 @@ TEST( TypeLoaderTests, clashingImports )
 TEST( TypeLoaderTests, validImport )
 {
 	CSL_TEST( "TypeLoaderTests.ImportClauseTests.ValidImports" );
-	co::IInterface* designer = dynamic_cast<co::IInterface*>( TestHelper::type( "TypeLoaderTests.ImportClauseTests.Roles.Designer") );
+	co::IInterface* designer = co::cast<co::IInterface>( TestHelper::type( "TypeLoaderTests.ImportClauseTests.Roles.Designer") );
 
 	ASSERT_TRUE( designer != NULL );
 
-	co::IField* field = dynamic_cast<co::IField*>( designer->getMember( "mainOffice" ) );
+	co::IField* field = co::cast<co::IField>( designer->getMember( "mainOffice" ) );
 
 	ASSERT_TRUE( field != NULL );
 
@@ -212,7 +212,7 @@ TEST( TypeLoaderTests, singleCppBlock )
 {
 	CSL_TEST( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" );
 
-	co::IInterface* it = dynamic_cast<co::IInterface*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" ) );
+	co::IInterface* it = co::cast<co::IInterface>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" ) );
 	ASSERT_TRUE( it != NULL );
 
 	const std::string& str = it->getCppBlock();
@@ -224,7 +224,7 @@ TEST( TypeLoaderTests, multipleCppBlocks )
 {
 	CSL_TEST( "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" );
 
-	co::IInterface* it = dynamic_cast<co::IInterface*>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" ) );
+	co::IInterface* it = co::cast<co::IInterface>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" ) );
 	ASSERT_TRUE( it != NULL );
 
 	const std::string& str = it->getCppBlock();

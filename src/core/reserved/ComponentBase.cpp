@@ -17,7 +17,6 @@
 #include <co/IInterface.h>
 #include <co/ITypeTransaction.h>
 #include <co/NoSuchPortException.h>
-#include <co/IllegalCastException.h>
 #include <sstream>
 
 namespace co {
@@ -65,12 +64,6 @@ void ComponentBase::raiseUnexpectedPortIndex()
 {
 	assert( false );
 	throw NoSuchPortException( "unexpected invalid port index" );
-}
-
-void ComponentBase::raiseIncompatibleService( IInterface* expectedType, IService* service )
-{
-	CORAL_THROW( IllegalCastException, "incompatible service (" << expectedType->getFullName()
-					<< " expected, got " << service->getInterface()->getFullName() << ")" );
 }
 
 IComponent* ComponentBase::getOrCreateInternalComponent(

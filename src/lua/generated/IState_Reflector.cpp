@@ -118,21 +118,21 @@ public:
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		checkInstance( instance, field );
+		co::checkInstance<lua::IState>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
 	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		checkInstance( instance, field );
+		co::checkInstance<lua::IState>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
 	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
 	{
-		lua::IState* p = checkInstance( instance, method );
+		lua::IState* p = co::checkInstance<lua::IState>( instance, method );
 		checkNumArguments( method, args.getSize() );
 		int argIndex = -1;
 		try
@@ -172,28 +172,6 @@ public:
 			throw;
 		}
 		CORAL_UNUSED( res );
-	}
-
-private:
-	lua::IState* checkInstance( const co::Any& any, co::IMember* member )
-	{
-		if( !member )
-			throw co::IllegalArgumentException( "illegal null member info" );
-
-		// make sure that 'any' is an instance of this type
-		co::IInterface* myType = co::typeOf<lua::IState>::get();
-
-		lua::IState* res;
-		if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<lua::IState*>( any.getState().data.service ) ) )
-			CORAL_THROW( co::IllegalArgumentException, "expected a valid lua::IState*, but got " << any );
-
-		// make sure that 'member' belongs to this type
-		co::ICompositeType* owner = member->getOwner();
-		if( owner != myType )
-			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
-				<< owner->getFullName() << ", not to lua.IState" );
-
-		return res;
 	}
 };
 

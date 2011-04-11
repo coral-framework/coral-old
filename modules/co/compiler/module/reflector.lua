@@ -307,7 +307,7 @@ public:
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		]], t.cppName, [[* p = checkInstance( instance, field );
+		]], t.cppName, [[* p = co::checkInstance<]], t.cppName, [[>( instance, field );
 		switch( field->getIndex() )
 		{
 ]] )
@@ -324,7 +324,7 @@ public:
 
 	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		]], t.cppName, [[* p = checkInstance( instance, field );
+		]], t.cppName, [[* p = co::checkInstance<]], t.cppName, [[>( instance, field );
 		switch( field->getIndex() )
 		{
 ]] )
@@ -350,13 +350,13 @@ public:
 		writer( "\n\tvoid getField( const co::Any& instance, co::IField* field, co::Any& value )\n\t{\n" )
 
 		if #t.fields > 0 then
-			writer( "\t\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "& r" or "* p" ), [[ = checkInstance( instance, field );
+			writer( "\t\t", t.cppName, [[* p = co::checkInstance<]], t.cppName, [[>( instance, field );
 		switch( field->getIndex() )
 		{
 ]] )
 			for i, a in ipairs( t.fields ) do
 				writer( "\t\tcase ", a.index, ":\t\tvalue.set< ", t.formatInput( a.type ), " >( ", callPrefix,
-					t.formatAccessor( "get", a.name ), "(", ( t.kind == 'TK_NATIVECLASS' and " r " or "" ), ") ); break;\n" )
+					t.formatAccessor( "get", a.name ), "(", ( t.kind == 'TK_NATIVECLASS' and " *p " or "" ), ") ); break;\n" )
 			end
 
 			writer [[
@@ -364,11 +364,11 @@ public:
 		}
 ]]
 		else
-			writer [[
-		checkInstance( instance, field );
+			writer( [[
+		co::checkInstance<]], t.cppName, [[>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
-]]
+]] )
 		end
 
 		writer [[
@@ -378,7 +378,7 @@ public:
 	{
 ]]
 		if #t.fields > 0 then
-			writer( "\t\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "& r" or "* p" ), [[ = checkInstance( instance, field );
+			writer( "\t\t", t.cppName, [[* p = co::checkInstance<]], t.cppName, [[>( instance, field );
 		switch( field->getIndex() )
 		{
 ]] )
@@ -387,22 +387,22 @@ public:
 					writer( "\t\tcase ", a.index, ":\t\traiseFieldIsReadOnly( field ); break;\n" )
 				else
 					writer( "\t\tcase ", a.index, ":\t\t", callPrefix, t.formatAccessor( "set", a.name ), "( ",
-						( t.kind == 'TK_NATIVECLASS' and "r, " or "" ), "value.get< ", t.formatInput( a.type ), " >() ); break;\n" )
+						( t.kind == 'TK_NATIVECLASS' and "*p, " or "" ), "value.get< ", t.formatInput( a.type ), " >() ); break;\n" )
 				end
 			end
 
 			writer( [[
 		default:	raiseUnexpectedMemberIndex();
 		}
-		CORAL_UNUSED( ]], t.kind == 'TK_NATIVECLASS' and "r" or "p", [[ );
+		CORAL_UNUSED( p );
 		CORAL_UNUSED( value );
 ]] )
 		else
-			writer [[
-		checkInstance( instance, field );
+			writer( [[
+		co::checkInstance<]], t.cppName, [[>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
-]]
+]] )
 		end
 
 		writer [[
@@ -412,7 +412,7 @@ public:
 	{
 ]]
 		if #t.methods > 0 then
-			writer( "\t\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "& r" or "* p" ), [[ = checkInstance( instance, method );
+			writer( "\t\t", t.cppName, [[* p = co::checkInstance<]], t.cppName, [[>( instance, method );
 		checkNumArguments( method, args.getSize() );
 		int argIndex = -1;
 		try
@@ -437,14 +437,14 @@ public:
 				if #m.parameters > 0 then
 					writer( "( " )
 					if t.kind == 'TK_NATIVECLASS' then
-						writer( "r, " )
+						writer( "*p, " )
 					end
 					for i, p in ipairs( m.parameters ) do
 						writer( p.name, i < #m.parameters and "_, " or "_" )
 					end
 					writer( " )" )
 				elseif t.kind == 'TK_NATIVECLASS' then
-					writer( "( r )" )
+					writer( "( *p )" )
 				else
 					writer( "()" )
 				end
@@ -472,58 +472,15 @@ public:
 		CORAL_UNUSED( res );
 ]]
 		else
-			writer [[
-		checkInstance( instance, method );
+			writer( [[
+		co::checkInstance<]], t.cppName, [[>( instance, method );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( args );
 		CORAL_UNUSED( res );
-]]
+]] )
 		end
 
 		writer( "\t}\n" )
-	end
-
-	if t.kind ~= 'TK_COMPONENT' then
-		if t.fields then
-			writer( "\nprivate:\n" )
-			writer( "\t", t.cppName, ( t.kind == 'TK_NATIVECLASS' and "&" or "*" ),
-				[[ checkInstance( const co::Any& any, co::IMember* member )
-	{
-		if( !member )
-			throw co::IllegalArgumentException( "illegal null member info" );
-
-		// make sure that 'any' is an instance of this type
-		co::]], t.typeInterfaceName, [[* myType = co::typeOf<]], t.cppName, [[>::get();
-
-		]] )
-
-			if t.kind == 'TK_INTERFACE' then
-				writer( t.cppName, "* res;\n\t\t" )
-				writer( "if( any.getKind() != co::TK_INTERFACE || !( res = dynamic_cast<", t.cppName, "*>( any.getState().data.service ) ) )\n" )
-			else
-				writer( "if( any.getKind() != co::", t.kind, " || any.getType() != myType || any.getState().data.ptr == NULL )\n" )
-			end
-
-			writer( [[
-			CORAL_THROW( co::IllegalArgumentException, "expected a valid ]], t.cppName, [[*, but got " << any );
-
-		// make sure that 'member' belongs to this type
-		co::ICompositeType* owner = member->getOwner();
-		if( owner != myType )
-			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
-				<< owner->getFullName() << ", not to ]], t.fullName, [[" );
-
-		]] )
-
-			if t.kind == 'TK_INTERFACE' then
-				writer( "return res;\n" )
-			else
-				writer( "return ", t.kind == 'TK_NATIVECLASS' and "*" or "", "reinterpret_cast<",
-					t.cppName, "*>( any.getState().data.ptr );\n" )
-			end
-
-			writer( "\t}\n" )
-		end
 	end
 
 	writer( [[

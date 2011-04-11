@@ -27,11 +27,26 @@ public:
 	// Code From <c++ Block:
 	
 		/*!
-			<tt>getService<T>()</tt>: convenience method that returns a built-in service of type 'T'
-			provided by the component. Please notice that this method only works for static facets.
-			It will not retrieve services from dynamic facets, such as those implemented in Lua.
+			Retrieves a service provided by this object by its type.
+			Result is undefined if the component provides more than one service of type 'T'.
+			\tparam T interface of the requested service.
 		 */
-		template<typename T> inline T* getService() { return dynamic_cast<T*>( this ); }
+		template<typename T> inline T* getService()
+		{
+			return static_cast<T*>( getServiceByType( this, typeOf<T>::get() ) );
+		}
+
+		// Returns the service "provided by" or "bound to" the port named \a portName.
+		inline IService* getService( const std::string& portName )
+		{
+			return getServiceByName( this, portName );
+		}
+
+		// Binds a \a service to the receptacle named \a receptacleName.
+		inline void setService( const std::string& receptacleName, IService* service )
+		{
+			setServiceByName( this, receptacleName, service );
+		}
 	
 	// End Of c++> Block
 

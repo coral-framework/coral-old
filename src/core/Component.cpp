@@ -4,7 +4,7 @@
  */
 
 #include "Component.h"
-#include "Member.h"
+#include "Port.h"
 #include <algorithm>
 
 namespace co {
@@ -57,11 +57,10 @@ void Component::sortPorts()
 	size_t count = _ports.size();
 	for( size_t i = 0; i < count; ++i )
 	{
-		MemberImpl* mii = dynamic_cast<MemberImpl*>( _ports[i].get() );
-		assert( mii );
-		mii->setOwner( this, i );
+		Port* port = static_cast<Port*>( _ports[i].get() );
+		port->setOwner( this, i );
 
-		if( _firstReceptacle == size_t( -1 ) && !_ports[i]->getIsFacet() )
+		if( _firstReceptacle == size_t( -1 ) && !port->getIsFacet() )
 			_firstReceptacle = i;
 	}
 

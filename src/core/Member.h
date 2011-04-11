@@ -8,32 +8,43 @@
 
 #include <co/IMember.h>
 
+namespace co {
+
 /*!
 	Re-usable implementation of co::IMember.
  */
-class MemberImpl
+template<class Base>
+class Member : public Base
 {
 public:
-	MemberImpl();
+	Member() : _owner( 0 ), _index( -1 )
+	{;}
 
 	// internal methods:
-	void setName( const std::string& name );
-	void setOwner( co::ICompositeType* owner, size_t index );
+	void setName( const std::string& name )
+	{
+		_name = name;
+	}
+
+	void setOwner( ICompositeType* owner, size_t index )
+	{
+		_owner = owner;
+		
+		assert( index < MAX_UINT32 );
+		_index = static_cast<uint32>( index );
+	}
 
 	// co::IMember methods:
-	const std::string& getName();
-	co::ICompositeType* getOwner();
-	co::uint16 getIndex();
+	const std::string& getName() { return _name; }
+	ICompositeType* getOwner() { return _owner; }
+	uint16 getIndex() { return _index; }
 
 private:
 	std::string _name;
-	co::ICompositeType* _owner;
-	co::uint16 _index;
+	ICompositeType* _owner;
+	uint16 _index;
 };
 
-#define DELEGATE_co_IMember( DELEGATE ) \
-	const std::string& getName() { return DELEGATE getName(); } \
-	co::ICompositeType* getOwner() { return DELEGATE getOwner(); } \
-	co::uint16 getIndex() { return DELEGATE getIndex(); }
+} // namespace co
 
 #endif

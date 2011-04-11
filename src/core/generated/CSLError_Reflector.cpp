@@ -56,7 +56,7 @@ public:
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		co::CSLError* p = checkInstance( instance, field );
+		co::CSLError* p = co::checkInstance<co::CSLError>( instance, field );
 		switch( field->getIndex() )
 		{
 		case 0:		value.set< const std::string& >( p->filename ); break;
@@ -68,7 +68,7 @@ public:
 
 	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		co::CSLError* p = checkInstance( instance, field );
+		co::CSLError* p = co::checkInstance<co::CSLError>( instance, field );
 		switch( field->getIndex() )
 		{
 		case 0:		p->filename = value.get< const std::string& >(); break;
@@ -76,27 +76,6 @@ public:
 		case 2:		p->message = value.get< const std::string& >(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
-	}
-
-private:
-	co::CSLError* checkInstance( const co::Any& any, co::IMember* member )
-	{
-		if( !member )
-			throw co::IllegalArgumentException( "illegal null member info" );
-
-		// make sure that 'any' is an instance of this type
-		co::IStruct* myType = co::typeOf<co::CSLError>::get();
-
-		if( any.getKind() != co::TK_STRUCT || any.getType() != myType || any.getState().data.ptr == NULL )
-			CORAL_THROW( co::IllegalArgumentException, "expected a valid co::CSLError*, but got " << any );
-
-		// make sure that 'member' belongs to this type
-		co::ICompositeType* owner = member->getOwner();
-		if( owner != myType )
-			CORAL_THROW( co::IllegalArgumentException, "member '" << member->getName() << "' belongs to "
-				<< owner->getFullName() << ", not to co.CSLError" );
-
-		return reinterpret_cast<co::CSLError*>( any.getState().data.ptr );
 	}
 };
 

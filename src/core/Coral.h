@@ -125,14 +125,6 @@ CORAL_EXPORT IType* getType( const std::string& fullName );
 CORAL_EXPORT IObject* newInstance( const std::string& fullName );
 
 /*!
-	Binds a \a service to the receptacle identified by \a receptacleName in \a object.
-	You should generally use IObject::setService() instead of this function.
-	Please refer to IObject::setService() for the list of exceptions this function may throw.
-	\ingroup convenience
- */
-CORAL_EXPORT void bindService( IObject* object, const std::string& receptacleName, IService* service );
-
-/*!
 	\brief Utility function to get the best provider of \a serviceType for clients of type \a clientType.
 	If \a clientType is null this function will retrieve the service's global instance.
 	Please refer to co::IServiceManager::getServiceForType() for the list of exceptions this function may throw.

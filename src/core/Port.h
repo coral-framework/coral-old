@@ -14,7 +14,7 @@ namespace co {
 /*!
 	Implements co.IPort.
  */
-class Port : public Port_Base, public MemberImpl
+class Port : public Member<Port_Base>
 {
 public:
 	Port();
@@ -30,8 +30,6 @@ public:
 	// IPort methods:
 	IInterface* getType();
 	bool getIsFacet();
-
-	DELEGATE_co_IMember( MemberImpl:: );
 
 private:
 	IInterface* _type;
