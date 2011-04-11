@@ -106,20 +106,16 @@ void setServiceByName( IObject* object, const std::string& receptacleName, IServ
 	object->setService( static_cast<IPort*>( port ), service );
 }
 
-CORAL_FORCE_INLINE bool _isA( IService* service, IInterface* type )
+bool isA( IService* service, IInterface* type )
 {
 	assert( type );
 	return !service || service->getInterface()->isSubTypeOf( type );
 }
 
-bool isA( IService* service, IInterface* type )
-{
-	return _isA( service, type );
-}
-
 void ensureIsA( IService* service, IInterface* type )
 {
-	if( !_isA( service, type ) )
+	assert( type );
+	if( service && !service->getInterface()->isSubTypeOf( type ) )
 		CORAL_THROW( IllegalCastException, "incompatible service ("
 					<< type->getFullName() << " expected, got "
 					<< service->getInterface()->getFullName() << ")" );
