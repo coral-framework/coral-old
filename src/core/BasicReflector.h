@@ -3,30 +3,40 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _BASICREFLECTOR_H_
-#define _BASICREFLECTOR_H_
+#ifndef _CO_BASICREFLECTOR_H_
+#define _CO_BASICREFLECTOR_H_
 
 #include "reserved/ReflectorBase.h"
 
+namespace co {
+
 /*!
-	The reflector for all "basic" types; i.e. any, all primitives, arrays,
-	enums and exceptions. Also doubles as a reflector for all the "internal"
-	components (i.e. lower-level components that don't have a functioning
-	reflector, such as the reflectors themselves).
+	Reflector for all "basic" types (i.e. any, all primitives, arrays
+	and enums). Also doubles as a reflector for all "internal" components
+	(that can't have a real reflector, such as the reflectors themselves).
  */
-class BasicReflector : public co::ReflectorBase
+class BasicReflector : public ReflectorBase
 {
 public:
-	BasicReflector( co::IType* type );
-	virtual ~BasicReflector();
+	/*!
+		Factory method.
 
-	// co::IReflector methods:
-	co::IType* getType();
-	co::int32 getSize();
-	IObject* newInstance();
+		\pre \a type must be either of a non-user-definable kind,
+				or an internal component.
+	 */
+	static IReflector* create( IType* type );
 
-private:
-	co::IType* _type;
+public:
+	// IReflector methods:
+	IType* getType();
+	uint32 getSize() = 0;
+
+protected:
+	inline BasicReflector( IType* t ) : _type( t ) {;}
+
+	IType* _type;
 };
 
-#endif // _BASICREFLECTOR_H_
+} // namespace co
+
+#endif

@@ -105,7 +105,7 @@ public:
 		return co::typeOf<lua::IState>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(lua::IState);
 	}

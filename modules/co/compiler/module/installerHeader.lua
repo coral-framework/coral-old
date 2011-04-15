@@ -23,7 +23,9 @@ public:
 ]] )
 
 	for i, t in ipairs( c.types ) do
-		writer( "\t\tTypeId_", t.name, ",\n" )
+		if t.kind ~= 'TK_ENUM' then
+			writer( "\t\tTypeId_", t.name, ",\n" )
+		end
 	end
 
 	writer( [[
@@ -66,7 +68,9 @@ private:
 ]] )
 
 	for i, t in ipairs( c.types ) do
-		writer( "co::IReflector* __create", t.name, "Reflector();\n" )
+		if t.kind ~= 'TK_ENUM' then
+			writer( "co::IReflector* __create", t.name, "Reflector();\n" )
+		end
 	end
 
 	writer( "\n" )

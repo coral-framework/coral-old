@@ -147,13 +147,11 @@ TEST( ModuleTests, crossModuleReflection )
 	co::IReflector* reflector = type->getReflector();
 	ASSERT_TRUE( reflector != NULL );
 
-	const int size = reflector->getSize();
-	std::vector<co::uint8> instanceMemory( size );
+	std::vector<co::uint8> instanceMemory( reflector->getSize() );
 	void* instancePtr = &instanceMemory.front();
 	co::Any instanceAny( type, co::Any::VarIsPointer, instancePtr );
 
-	EXPECT_THROW( reflector->createValue( instancePtr, 1337 ), co::IllegalArgumentException );
-	EXPECT_NO_THROW( reflector->createValue( instancePtr, size ) );
+	EXPECT_NO_THROW( reflector->createValue( instancePtr ) );
 
 	// get an IField
 	co::ICompositeType* ct = co::cast<co::ICompositeType>( type );

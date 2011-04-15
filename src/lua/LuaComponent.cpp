@@ -262,7 +262,7 @@ const co::Any& LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi, c
 	return _res;
 }
 
-co::int32 LuaComponent::getSize()
+co::uint32 LuaComponent::getSize()
 {
 	return sizeof(LuaComponent);
 }
@@ -272,7 +272,7 @@ co::IType* LuaComponent::getType()
 	return _componentType;
 }
 
-void LuaComponent::createValue( void*, size_t )
+void LuaComponent::createValue( void* )
 {
 	raiseNotSupportedException();
 }

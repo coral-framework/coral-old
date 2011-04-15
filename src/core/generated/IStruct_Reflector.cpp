@@ -159,7 +159,7 @@ public:
 		return co::typeOf<co::IStruct>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(co::IStruct);
 	}

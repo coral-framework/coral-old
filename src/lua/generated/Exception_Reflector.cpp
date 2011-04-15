@@ -32,7 +32,7 @@ public:
 		return co::typeOf<lua::Exception>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(lua::Exception);
 	}

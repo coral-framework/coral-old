@@ -209,7 +209,9 @@ function Compiler:generateModule( moduleName )
 			expand( outDir, t.name .. "_Base.cpp", componentBaseSource, self, t )
 			expand( templatesDir, t.name .. ".cpp", componentTemplate, self, t )
 		end
-		expand( outDir, t.name .. "_Reflector.cpp", reflector, self, t )
+		if t.kind ~= 'TK_ENUM' then
+			expand( outDir, t.name .. "_Reflector.cpp", reflector, self, t )
+		end
 	end
 
 	-- Generate per-module files (only if at least one file was out of date)

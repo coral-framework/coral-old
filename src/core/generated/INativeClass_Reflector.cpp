@@ -179,7 +179,7 @@ public:
 		return co::typeOf<co::INativeClass>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(co::INativeClass);
 	}

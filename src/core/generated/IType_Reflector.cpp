@@ -130,7 +130,7 @@ public:
 		return co::typeOf<co::IType>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(co::IType);
 	}

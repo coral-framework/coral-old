@@ -165,7 +165,7 @@ public:
 		return co::typeOf<co::IClassType>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(co::IClassType);
 	}

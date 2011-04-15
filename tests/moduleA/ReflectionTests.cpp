@@ -52,7 +52,7 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 	// --- in-place allocation:
 	co::uint8 memoryArea[sizeof(moduleA::TestStruct)];
 	moduleA::TestStruct* ts = reinterpret_cast<moduleA::TestStruct*>( memoryArea );
-	reflector->createValue( ts, sizeof(moduleA::TestStruct) );
+	reflector->createValue( ts );
 
 	EXPECT_FALSE( ts->aType.isValid() );
 	EXPECT_EQ( 0, ts->floatArray.size() );

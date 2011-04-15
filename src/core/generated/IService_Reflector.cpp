@@ -80,7 +80,7 @@ public:
 		return co::typeOf<co::IService>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(co::IService);
 	}

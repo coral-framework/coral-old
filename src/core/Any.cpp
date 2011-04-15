@@ -953,7 +953,7 @@ Any::PseudoVector& Any::createArray( IType* elementType, size_t n )
 			uint8* endPtr = beginPtr + ( elementSize * n );
 
 			for( uint8* p = beginPtr; p < endPtr; p += elementSize )
-				_object.array.reflector->createValue( p, elementSize );
+				_object.array.reflector->createValue( p );
 		}
 		break;
 
@@ -1001,7 +1001,7 @@ void* Any::createComplexValue( IType* type )
 		res = _object.complex.inplaceArea;
 	}
 
-	_object.complex.reflector->createValue( res, size );
+	_object.complex.reflector->createValue( res );
 	setVariable( type, Any::VarIsReference, res );
 
 	return res;

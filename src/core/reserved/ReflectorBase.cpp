@@ -82,7 +82,7 @@ void ReflectorBase::setService( IPort* receptacle, IService* )
 	raiseUnexpectedPortIndex();
 }
 
-void ReflectorBase::createValue( void*, size_t )
+void ReflectorBase::createValue( void* )
 {
 	raiseNotSupportedException();
 }
@@ -127,12 +127,6 @@ void ReflectorBase::invoke( const Any&, IMethod*, Range<Any const>, Any& )
 void ReflectorBase::raise( const std::string& )
 {
 	raiseNotSupportedException();
-}
-
-void ReflectorBase::checkValidSize( size_t expectedSize, size_t actualSize )
-{
-	if( expectedSize != actualSize )
-		throw co::IllegalArgumentException( "instance size mismatch" );
 }
 
 void ReflectorBase::checkValidDynamicProvider( co::IDynamicServiceProvider* provider )

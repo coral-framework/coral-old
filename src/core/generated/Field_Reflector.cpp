@@ -9,7 +9,7 @@
 namespace co {
 
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
-co::int32 __Field_getSize();
+co::uint32 __Field_getSize();
 co::IObject* __Field_newInstance();
 
 // ------ Reflector Component ------ //
@@ -32,7 +32,7 @@ public:
 		return co::getType( "co.Field" );
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return __Field_getSize();
 	}

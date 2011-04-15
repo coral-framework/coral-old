@@ -9,7 +9,7 @@
 namespace lua {
 
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
-co::int32 __lua_getSize();
+co::uint32 __lua_getSize();
 co::IObject* __lua_newInstance();
 
 void moduleRetain();
@@ -35,7 +35,7 @@ public:
 		return co::getType( "lua.lua" );
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return __lua_getSize();
 	}

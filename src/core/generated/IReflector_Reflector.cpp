@@ -44,10 +44,10 @@ public:
 
 	// co.IReflector Methods:
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IReflector>( 0 ) );
-        return res.get< co::int32 >();
+        return res.get< co::uint32 >();
 	}
 
 	co::IType* getType()
@@ -113,7 +113,7 @@ public:
 
 	// These co::IReflector methods are not part of the reflection system:
 
-	void createValue( void*, size_t )
+	void createValue( void* )
 	{
 		throw co::NotSupportedException( "co::IReflector::createValue() cannot be called through a proxy interface." );
 	}
@@ -166,7 +166,7 @@ public:
 		return co::typeOf<co::IReflector>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(co::IReflector);
 	}
@@ -182,7 +182,7 @@ public:
 		co::IReflector* p = co::checkInstance<co::IReflector>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::int32 >( p->getSize() ); break;
+		case 0:		value.set< co::uint32 >( p->getSize() ); break;
 		case 1:		value.set< co::IType* >( p->getType() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}

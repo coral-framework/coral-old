@@ -128,8 +128,8 @@ public:
 class InterfaceBinding : public CompositeTypeBinding
 {
 public:
-	//! Pushes a new instance of a co::IService* userdata onto the stack.
-	static void create( lua_State* L, co::IService* itf );
+	//! Pushes a new service userdata onto the stack.
+	static void create( lua_State* L, co::IService* service );
 
 	//! Gets the pointer of a verified service userdata.
 	inline static co::IService* getInstance( lua_State* L, int index )

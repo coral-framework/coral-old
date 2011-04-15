@@ -71,7 +71,7 @@ IComponent* ComponentBase::getOrCreateInternalComponent(
 {
 	std::string fullTypeName( componentName );
 
-	// get the IComponent if it already exists
+	// get the component if it already exists
 	ITypeManager* tm = getSystem()->getTypes();
 	IType* type = tm->findType( fullTypeName );
 	if( type )
@@ -80,7 +80,7 @@ IComponent* ComponentBase::getOrCreateInternalComponent(
 		return static_cast<IComponent*>( type );
 	}
 
-	// create the IComponent if it's not defined
+	// otherwise, create the component
 	IType* itfType = getType( interfaceName );
 	assert( itfType->getKind() == TK_INTERFACE );
 
@@ -112,11 +112,10 @@ IComponent* ComponentBase::getOrCreateInternalComponent(
 	type = tb->createType();
 	assert( type && type->getKind() == TK_COMPONENT );
 
-	// set the IComponent with a dummy reflector
-	IComponent* component = static_cast<IComponent*>( type );
-	component->setReflector( new BasicReflector( component ) );
+	// set the component with a basic reflector
+	type->setReflector( BasicReflector::create( type ) );
 
-	return component;
+	return static_cast<IComponent*>( type );
 }
 
 } // namespace 'co'

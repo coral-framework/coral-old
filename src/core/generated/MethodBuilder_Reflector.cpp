@@ -9,7 +9,7 @@
 namespace co {
 
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
-co::int32 __MethodBuilder_getSize();
+co::uint32 __MethodBuilder_getSize();
 co::IObject* __MethodBuilder_newInstance();
 
 // ------ Reflector Component ------ //
@@ -32,7 +32,7 @@ public:
 		return co::getType( "co.MethodBuilder" );
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return __MethodBuilder_getSize();
 	}

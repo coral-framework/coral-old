@@ -33,14 +33,13 @@ public:
 		return co::typeOf<co::CSLError>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(co::CSLError);
 	}
 
-	void createValue( void* address, size_t length )
+	void createValue( void* address )
 	{
-		checkValidSize( sizeof(co::CSLError), length );
 		new( address ) co::CSLError;
     }
 

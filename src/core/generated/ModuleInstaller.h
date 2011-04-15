@@ -58,7 +58,6 @@ public:
 		TypeId_ITypeBuilder,
 		TypeId_ITypeManager,
 		TypeId_ITypeTransaction,
-		TypeId_MemberKind,
 		TypeId_Method,
 		TypeId_MethodBuilder,
 		TypeId_MissingInputException,
@@ -67,7 +66,6 @@ public:
 		TypeId_ModuleLoadException,
 		TypeId_ModuleManager,
 		TypeId_ModulePartLoader,
-		TypeId_ModuleState,
 		TypeId_Namespace,
 		TypeId_NativeClass,
 		TypeId_NoSuchPortException,
@@ -77,10 +75,8 @@ public:
 		TypeId_ServiceManager,
 		TypeId_Struct,
 		TypeId_System,
-		TypeId_SystemState,
 		TypeId_Type,
 		TypeId_TypeBuilder,
-		TypeId_TypeKind,
 		TypeId_TypeLoadException,
 		TypeId_TypeManager,
 		TypeId_TypeTransaction,
@@ -163,7 +159,6 @@ co::IReflector* __createITypeReflector();
 co::IReflector* __createITypeBuilderReflector();
 co::IReflector* __createITypeManagerReflector();
 co::IReflector* __createITypeTransactionReflector();
-co::IReflector* __createMemberKindReflector();
 co::IReflector* __createMethodReflector();
 co::IReflector* __createMethodBuilderReflector();
 co::IReflector* __createMissingInputExceptionReflector();
@@ -172,7 +167,6 @@ co::IReflector* __createModuleReflector();
 co::IReflector* __createModuleLoadExceptionReflector();
 co::IReflector* __createModuleManagerReflector();
 co::IReflector* __createModulePartLoaderReflector();
-co::IReflector* __createModuleStateReflector();
 co::IReflector* __createNamespaceReflector();
 co::IReflector* __createNativeClassReflector();
 co::IReflector* __createNoSuchPortExceptionReflector();
@@ -182,10 +176,8 @@ co::IReflector* __createPortReflector();
 co::IReflector* __createServiceManagerReflector();
 co::IReflector* __createStructReflector();
 co::IReflector* __createSystemReflector();
-co::IReflector* __createSystemStateReflector();
 co::IReflector* __createTypeReflector();
 co::IReflector* __createTypeBuilderReflector();
-co::IReflector* __createTypeKindReflector();
 co::IReflector* __createTypeLoadExceptionReflector();
 co::IReflector* __createTypeManagerReflector();
 co::IReflector* __createTypeTransactionReflector();

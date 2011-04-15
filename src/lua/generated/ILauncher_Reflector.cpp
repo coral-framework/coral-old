@@ -92,7 +92,7 @@ public:
 		return co::typeOf<lua::ILauncher>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(lua::ILauncher);
 	}

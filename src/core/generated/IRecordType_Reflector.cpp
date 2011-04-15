@@ -157,7 +157,7 @@ public:
 		return co::typeOf<co::IRecordType>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(co::IRecordType);
 	}

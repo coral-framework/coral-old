@@ -29,7 +29,7 @@ public:
 		return co::typeOf<co::TypeLoadException>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(co::TypeLoadException);
 	}

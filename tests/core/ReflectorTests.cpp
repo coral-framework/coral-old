@@ -23,14 +23,12 @@
 #include <co/NotSupportedException.h>
 #include <gtest/gtest.h>
 
-TEST( ReflectorTests, basicTypes )
+TEST( ReflectorTests, basicReflectors )
 {
 	static const char* BASIC_TYPE_NAMES[] = {
 		"any", "bool", "int8", "uint8", "int16", "uint16", "int32", "uint32",
 		"int64", "uint64", "float", "double", "string",
-		"co.IType[]",	// an array
 		"co.TypeKind",	// an enum
-		"co.IllegalNameException" // an exception
 	};
 
 	const int NUM_TYPES = CORAL_ARRAY_LENGTH( BASIC_TYPE_NAMES );
@@ -42,9 +40,12 @@ TEST( ReflectorTests, basicTypes )
 		ASSERT_TRUE( types[i] != NULL );
 	}
 
-	// dummy co::Any instance
+	// dummy arguments
 	co::Any any;
 	co::Range<co::Any const> anyRange;
+
+	co::uint8 buffer1[sizeof(co::Any)];
+	co::uint8 buffer2[sizeof(co::Any)];
 
 	// make sure all types have a BasicReflector
 	for( int i = 0; i < NUM_TYPES; ++i )
@@ -54,15 +55,51 @@ TEST( ReflectorTests, basicTypes )
 
 		EXPECT_EQ( types[i], reflector->getType() );
 		EXPECT_GT( reflector->getSize(), 0 );
+		
+		if( i == NUM_TYPES - 1 )
+			printf( "afe" );
 
-		EXPECT_THROW( reflector->createValue( NULL, 0 ), co::NotSupportedException );
-		EXPECT_THROW( reflector->destroyValue( NULL ), co::NotSupportedException );
+		ASSERT_NO_THROW( reflector->createValue( buffer1 ) ) << BASIC_TYPE_NAMES[i];
+		ASSERT_NO_THROW( reflector->createValue( buffer2 ) );
+
+		ASSERT_NO_THROW( reflector->copyValue( buffer2, buffer1 ) );
+
+		ASSERT_NO_THROW( reflector->destroyValue( buffer1 ) );
+		ASSERT_NO_THROW( reflector->destroyValue( buffer2 ) );
+
 		EXPECT_THROW( reflector->newInstance(), co::NotSupportedException );
 		EXPECT_THROW( reflector->newDynamicProxy( NULL ), co::NotSupportedException );
 		EXPECT_THROW( reflector->getField( any, NULL, any ), co::NotSupportedException );
 		EXPECT_THROW( reflector->setField( any, NULL, any ), co::NotSupportedException );
 		EXPECT_THROW( reflector->invoke( any, NULL, anyRange, any ), co::NotSupportedException );
 	}
+}
+
+TEST( ReflectorTests, arrayReflectors )
+{
+	co::IType* type = co::getType( "co.IType[]" );
+	ASSERT_TRUE( type != NULL );
+	ASSERT_EQ( type->getKind(), co::TK_ARRAY );
+
+	co::IReflector* reflector = type->getReflector();
+	ASSERT_TRUE( reflector != NULL );
+
+	EXPECT_EQ( type, reflector->getType() );
+	EXPECT_GT( reflector->getSize(), 0 );
+
+	EXPECT_THROW( reflector->createValue( NULL ), co::NotSupportedException );
+	EXPECT_THROW( reflector->copyValue( NULL, NULL ), co::NotSupportedException );
+	EXPECT_THROW( reflector->destroyValue( NULL ), co::NotSupportedException );	
+	EXPECT_THROW( reflector->newInstance(), co::NotSupportedException );
+	EXPECT_THROW( reflector->newDynamicProxy( NULL ), co::NotSupportedException );
+
+	// dummy arguments
+	co::Any any;
+	co::Range<co::Any const> anyRange;
+
+	EXPECT_THROW( reflector->getField( any, NULL, any ), co::NotSupportedException );
+	EXPECT_THROW( reflector->setField( any, NULL, any ), co::NotSupportedException );
+	EXPECT_THROW( reflector->invoke( any, NULL, anyRange, any ), co::NotSupportedException );
 }
 
 TEST( ReflectorTests, reflectorComponent )
@@ -139,8 +176,8 @@ TEST( ReflectorTests, structSimple )
 	co::CSLError* s1 = reinterpret_cast<co::CSLError*>( memoryArea );
 	co::CSLError* s2 = reinterpret_cast<co::CSLError*>( memoryArea + sizeof(co::CSLError) );
 
-	reflector->createValue( s1, sizeof(co::CSLError) );
-	reflector->createValue( s2, sizeof(co::CSLError) );
+	reflector->createValue( s1 );
+	reflector->createValue( s2 );
 
 	EXPECT_EQ( 0, s1->line );
 	EXPECT_EQ( 0, s1->message.length() );
@@ -212,8 +249,6 @@ TEST( ReflectorTests, structExceptions )
 
 	co::uint8 memoryArea[sizeof(co::CSLError)];
 	co::CSLError* s1 = reinterpret_cast<co::CSLError*>( memoryArea );
-
-	EXPECT_THROW( reflector->createValue( s1, 1337 ), co::IllegalArgumentException );
 
 	co::Any a1;
 	co::IField* lineField = getField( type, "line" );
@@ -343,7 +378,7 @@ TEST( ReflectorTests, nativeClass )
 
 	co::Uuid* u2 = reinterpret_cast<co::Uuid*>( memoryArea );
 
-	reflector->createValue( u2, sizeof(co::Uuid) );
+	reflector->createValue( u2 );
 
 	EXPECT_EQ( u1, *u2 );
 

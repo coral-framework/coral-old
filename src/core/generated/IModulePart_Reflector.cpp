@@ -120,7 +120,7 @@ public:
 		return co::typeOf<co::IModulePart>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(co::IModulePart);
 	}

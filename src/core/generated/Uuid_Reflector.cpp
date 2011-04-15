@@ -35,14 +35,13 @@ public:
 		return co::typeOf<co::Uuid>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(co::Uuid);
 	}
 
-	void createValue( void* address, size_t length )
+	void createValue( void* address )
 	{
-		checkValidSize( sizeof(co::Uuid), length );
 		new( address ) co::Uuid;
     }
 

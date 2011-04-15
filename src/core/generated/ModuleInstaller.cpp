@@ -97,7 +97,6 @@ co::IReflector* co::ModuleInstaller::createReflector( TypeId typeId )
 	case TypeId_ITypeBuilder: res = co::__createITypeBuilderReflector(); break;
 	case TypeId_ITypeManager: res = co::__createITypeManagerReflector(); break;
 	case TypeId_ITypeTransaction: res = co::__createITypeTransactionReflector(); break;
-	case TypeId_MemberKind: res = co::__createMemberKindReflector(); break;
 	case TypeId_Method: res = co::__createMethodReflector(); break;
 	case TypeId_MethodBuilder: res = co::__createMethodBuilderReflector(); break;
 	case TypeId_MissingInputException: res = co::__createMissingInputExceptionReflector(); break;
@@ -106,7 +105,6 @@ co::IReflector* co::ModuleInstaller::createReflector( TypeId typeId )
 	case TypeId_ModuleLoadException: res = co::__createModuleLoadExceptionReflector(); break;
 	case TypeId_ModuleManager: res = co::__createModuleManagerReflector(); break;
 	case TypeId_ModulePartLoader: res = co::__createModulePartLoaderReflector(); break;
-	case TypeId_ModuleState: res = co::__createModuleStateReflector(); break;
 	case TypeId_Namespace: res = co::__createNamespaceReflector(); break;
 	case TypeId_NativeClass: res = co::__createNativeClassReflector(); break;
 	case TypeId_NoSuchPortException: res = co::__createNoSuchPortExceptionReflector(); break;
@@ -116,10 +114,8 @@ co::IReflector* co::ModuleInstaller::createReflector( TypeId typeId )
 	case TypeId_ServiceManager: res = co::__createServiceManagerReflector(); break;
 	case TypeId_Struct: res = co::__createStructReflector(); break;
 	case TypeId_System: res = co::__createSystemReflector(); break;
-	case TypeId_SystemState: res = co::__createSystemStateReflector(); break;
 	case TypeId_Type: res = co::__createTypeReflector(); break;
 	case TypeId_TypeBuilder: res = co::__createTypeBuilderReflector(); break;
-	case TypeId_TypeKind: res = co::__createTypeKindReflector(); break;
 	case TypeId_TypeLoadException: res = co::__createTypeLoadExceptionReflector(); break;
 	case TypeId_TypeManager: res = co::__createTypeManagerReflector(); break;
 	case TypeId_TypeTransaction: res = co::__createTypeTransactionReflector(); break;

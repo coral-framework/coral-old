@@ -9,7 +9,7 @@
 namespace co {
 
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
-co::int32 __Parameter_getSize();
+co::uint32 __Parameter_getSize();
 co::IObject* __Parameter_newInstance();
 
 // ------ Reflector Component ------ //
@@ -32,7 +32,7 @@ public:
 		return co::getType( "co.Parameter" );
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return __Parameter_getSize();
 	}

@@ -162,7 +162,7 @@ public:
 		return co::typeOf<co::ITypeBuilder>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(co::ITypeBuilder);
 	}

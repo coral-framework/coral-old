@@ -37,11 +37,9 @@ public:
 		/*!
 			Constructs an instance of a struct or native class in the specified memory area.
 			\param[in] address memory address where the instance is to be constructed.
-			\param[in] length number of bytes (starting at \a address) reserved for the instance.
-			\throw IllegalArgumentException if the passed \a length is not equal to the type's \a size.
 			\throw NotSupportedException if the \a type is neither a struct nor a native class.
 		 */
-		virtual void createValue( void* address, size_t length ) = 0;
+		virtual void createValue( void* address ) = 0;
 
 		/*!
 			Sets the complex value at \a toAddress with a copy of the complex value at \a fromAddress.
@@ -60,7 +58,7 @@ public:
 	
 	// End Of c++> Block
 
-	virtual co::int32 getSize() = 0;
+	virtual co::uint32 getSize() = 0;
 
 	virtual co::IType* getType() = 0;
 

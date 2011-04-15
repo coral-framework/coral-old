@@ -84,44 +84,44 @@ const Uuid& TypeImpl::getBinarySignature( IType* myType )
 
 IReflector* TypeImpl::getReflector( IType* myType )
 {
-	if( !_reflector.isValid() )
-	{
-		if( _kind < TK_STRUCT )
-		{
-			// BasicReflectors are instantiated on demand
-			_reflector = new BasicReflector( myType );
-		}
-		else
-		{
-			/*
-				Loading the type's module should cause its reflector to be installed.
-				Notice that reflectors cannot be obtained before the system is set up
-				(ISystem::setupBase()), since we cannot load modules before that.
-			 */
-			try
-			{
-				getSystem()->getModules()->load( myType->getNamespace()->getFullName() );
-			}
-			catch( std::exception& e )
-			{
-				// if an exception was raised, it is fair to expect the reflector was not installed
-				assert( !_reflector.isValid() );
+	if( _reflector.isValid() )
+		return _reflector.get();
 
-				CORAL_THROW( ModuleLoadException, "could not obtain a reflector for '"
-								<< myType->getFullName() << "': " << e.what() );
-			}
-			catch( ... )
-			{
-				CORAL_THROW( ModuleLoadException, "could not obtain a reflector for '"
-								<< myType->getFullName() << "': unknown exception" );
-			}
+	if( _kind < TK_STRUCT )
+	{
+		// basic reflectors are instantiated on demand
+		_reflector = BasicReflector::create( myType );
+	}
+	else
+	{
+		/*
+			Loading the type's module should cause its reflector to be installed.
+			Notice that reflectors cannot be obtained before the system is set up
+			(ISystem::setupBase()), since we cannot load modules before that.
+		 */
+		try
+		{
+			getSystem()->getModules()->load( myType->getNamespace()->getFullName() );
+		}
+		catch( std::exception& e )
+		{
+			// if an exception was raised, it is fair to expect the reflector was not installed
+			assert( !_reflector.isValid() );
+
+			CORAL_THROW( ModuleLoadException, "could not obtain a reflector for '"
+							<< myType->getFullName() << "': " << e.what() );
+		}
+		catch( ... )
+		{
+			CORAL_THROW( ModuleLoadException, "could not obtain a reflector for '"
+							<< myType->getFullName() << "': unknown exception" );
 		}
 	}
 
-	if( !_reflector.isValid() )
-		CORAL_THROW( ModuleLoadException, "type '" << myType->getFullName() << "' has no reflector" );
+	if( _reflector.isValid() )
+		return _reflector.get();
 
-	return _reflector.get();
+	CORAL_THROW( ModuleLoadException, "type '" << myType->getFullName() << "' has no reflector" );
 }
 
 void TypeImpl::setReflector( IReflector* reflector )

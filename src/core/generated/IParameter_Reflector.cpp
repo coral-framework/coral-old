@@ -104,7 +104,7 @@ public:
 		return co::typeOf<co::IParameter>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(co::IParameter);
 	}

@@ -47,7 +47,7 @@ public:
     void setService( IPort*, IService* );
 
 	// co::IReflector methods:
-	void createValue( void* address, size_t length );
+	void createValue( void* address );
     void copyValue( const void* fromAddress, void* toAddress );
     void destroyValue( void* address );
     IObject* newInstance();
@@ -63,9 +63,6 @@ protected:
 	{
 		address->~T();
 	}
-
-	//! Raises co::IllegalArgumentException if the passed sizes do not match.
-	void checkValidSize( size_t expectedSize, size_t actualSize );
 
 	//! Raises co::IllegalArgumentException if handler is NULL.
 	void checkValidDynamicProvider( IDynamicServiceProvider* provider );
@@ -139,11 +136,11 @@ struct CheckInstance<T, IInterface>
 		if( any.getKind() != TK_INTERFACE || !any.getInterface()->isSubTypeOf( type ) )
 			CORAL_THROW( IllegalArgumentException, "illegal instance type ("
 				<< type->getFullName() << " expected, got " << any << ")" );
-		
+
 		IService* service = any.getState().data.service;
 		if( !service )
 			throw co::IllegalArgumentException( "illegal null instance" );
-		
+
 		return static_cast<T*>( service );
 	}
 };

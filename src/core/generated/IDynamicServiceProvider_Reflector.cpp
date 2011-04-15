@@ -128,7 +128,7 @@ public:
 		return co::typeOf<co::IDynamicServiceProvider>::get();
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return sizeof(co::IDynamicServiceProvider);
 	}

@@ -369,7 +369,7 @@ void CompositeTypeBinding::pushMetatable( lua_State* L, co::ICompositeType* ct, 
 		lua_pushlightuserdata( L, ct );
 		lua_rawseti( L, -2, 1 );
 
-		// if a IReflector was provided, save it at MT[2]
+		// if a reflector was provided, save it at MT[2]
 		if( reflector )
 		{
 			lua_pushlightuserdata( L, reflector );
@@ -473,54 +473,38 @@ bool CompositeTypeBinding::pushMember( lua_State* L, co::ICompositeType* ct, boo
 inline co::IField* checkField( lua_State* L, int index )
 {
 	assert( lua_islightuserdata( L, index ) );
-	co::IMember* mi = reinterpret_cast<co::IMember*>( lua_touserdata( L, index ) );
-	return static_cast<co::IField*>( mi );
+	co::IMember* member = reinterpret_cast<co::IMember*>( lua_touserdata( L, index ) );
+	return static_cast<co::IField*>( member );
 }
 
 void CompositeTypeBinding::getField( lua_State* L, const co::Any& instance )
 {
-	co::IField* ai = checkField( L, -1 );
-	co::IReflector* reflector = ai->getOwner()->getReflector();
+	co::IField* field = checkField( L, -1 );
+	co::IReflector* reflector = field->getOwner()->getReflector();
 	co::Any value;
-	reflector->getField( instance, ai, value );
+	reflector->getField( instance, field, value );
 	lua_pop( L, 1 );
 	LuaState::push( L, value );
 }
 
 void CompositeTypeBinding::setField( lua_State* L, const co::Any& instance )
 {
-	co::IField* ai = checkField( L, -2 );
-	co::IReflector* reflector = ai->getOwner()->getReflector();
+	co::IField* field = checkField( L, -2 );
+	co::IReflector* reflector = field->getOwner()->getReflector();
 	co::Any value;
-	LuaState::getAny( L, -1, ai->getType(), value );
-	reflector->setField( instance, ai, value );
+	LuaState::getAny( L, -1, field->getType(), value );
+	reflector->setField( instance, field, value );
 	lua_pop( L, 2 );
 }
 
 int CompositeTypeBinding::callMethod( lua_State* L )
 {
 	// get the co::IMethod* from upvalue 1
-	co::IMethod* mi = static_cast<co::IMethod*>(
-							reinterpret_cast<co::IMember*>(
+	co::IMethod* method = static_cast<co::IMethod*>( reinterpret_cast<co::IMember*>(
 								lua_touserdata( L, lua_upvalueindex( 1 ) ) ) );
 
-	// check the passed instance
-	co::ICompositeType* objectType = mi->getOwner();
-
-	co::Any instance;
-	tryGetInstance( L, 1, instance );
-	if( !instance.isValid() ||
-		( instance.getType() != objectType &&
-			( instance.getKind() != co::TK_INTERFACE || objectType->getKind() != co::TK_INTERFACE ||
-				!instance.getInterface()->isSubTypeOf( static_cast<co::IInterface*>( objectType ) ) ) ) )
-	{
-		const char* typeName = ( instance.isValid() ? instance.getType()->getFullName().c_str() : luaL_typename( L, 1 ) );
-		luaL_error( L, "bad instance for method '%s' (%s expected, got %s)",
-			mi->getName().c_str(), objectType->getFullName().c_str(), typeName );
-	}
-
 	// get the method's list of parameters
-	co::Range<co::IParameter* const> paramList = mi->getParameters();
+	co::Range<co::IParameter* const> paramList = method->getParameters();
 
 	/*
 		We currently set a hardcoded limit on the number of method parameters.
@@ -531,7 +515,7 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 	int numParams = static_cast<int>( paramList.getSize() );
 	if( numParams > MAX_NUM_PARAMETERS )
 		luaL_error( L, "method '%s' exceeds the hardcoded limit of %d parameters",
-						mi->getName().c_str(), MAX_NUM_PARAMETERS );
+						method->getName().c_str(), MAX_NUM_PARAMETERS );
 
 	__BEGIN_EXCEPTIONS_BARRIER__
 
@@ -579,7 +563,7 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 	catch( const co::Exception& e )
 	{
 		lua_pushfstring( L, "bad argument #%d to method '%s' (%s)",
-							i + 1, mi->getName().c_str(), e.getMessage().c_str() );
+					i + 1, method->getName().c_str(), e.getMessage().c_str() );
 		throw lua::MsgOnStackException();
 	}
 
@@ -587,20 +571,20 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 	if( numRequiredArgs > numPassedArgs )
 	{
 		lua_pushfstring( L, "insufficient number of arguments to method '%s' (%d expected, got %d)",
-							mi->getName().c_str(), numRequiredArgs, numPassedArgs );
+			method->getName().c_str(), numRequiredArgs, numPassedArgs );
 		throw lua::MsgOnStackException();
 	}
 
 	// invoke the method
-
-	co::Any returnValue;
-	co::IReflector* reflector = objectType->getReflector();
-	reflector->invoke( instance, mi, co::Range<co::Any const>( args, numParams ), returnValue );
+	co::Any instance, returnValue;
+	tryGetInstance( L, 1, instance );
+	co::IReflector* reflector = method->getOwner()->getReflector();
+	reflector->invoke( instance, method, co::Range<co::Any const>( args, numParams ), returnValue );
 
 	// return result and output parameters
 
 	int numOut = 0;
-	if( mi->getReturnType() != NULL )
+	if( method->getReturnType() != NULL )
 	{
 		++numOut;
 		LuaState::push( L, returnValue );
@@ -638,18 +622,18 @@ void ComponentBinding::create( lua_State* L, co::IObject* object )
 	lua_setmetatable( L, -2 );
 }
 
-inline co::IPort* checkInterfaceInfo( lua_State* L, int index )
+inline co::IPort* checkPort( lua_State* L, int index )
 {
 	assert( lua_islightuserdata( L, index ) );
-	co::IMember* mi = reinterpret_cast<co::IMember*>( lua_touserdata( L, index ) );
-	return static_cast<co::IPort*>( mi );
+	co::IMember* member = reinterpret_cast<co::IMember*>( lua_touserdata( L, index ) );
+	return static_cast<co::IPort*>( member );
 }
 
-inline bool isStringComponentType( lua_State* L, int index )
+inline bool isStringComponent( lua_State* L, int index )
 {
-	size_t strlen;
-	const char* str = lua_tolstring( L, index, &strlen );
-	return ( strlen == 9 && strncmp( str, "component", strlen ) == 0 );
+	size_t length;
+	const char* str = lua_tolstring( L, index, &length );
+	return ( length == 9 && strncmp( str, "component", length ) == 0 );
 }
 
 int ComponentBinding::index( lua_State* L )
@@ -662,7 +646,7 @@ int ComponentBinding::index( lua_State* L )
 
 	co::IObject* object = *ud;
 
-	if( isStringComponentType( L, 2 ) )
+	if( isStringComponent( L, 2 ) )
 	{
 		LuaState::push( L, object->getComponent() );
 		return 1;
@@ -671,9 +655,9 @@ int ComponentBinding::index( lua_State* L )
 	if( pushMember( L, object->getComponent() ) )
 	{
 		assert( lua_islightuserdata( L, -1 ) );
-		co::IPort* port = checkInterfaceInfo( L, -1 );
-		co::IService* itf = object->getService( port );
-		LuaState::push( L, itf );
+		co::IPort* port = checkPort( L, -1 );
+		co::IService* service = object->getService( port );
+		LuaState::push( L, service );
 	}
 
 	return 1;
@@ -689,14 +673,14 @@ int ComponentBinding::newIndex( lua_State* L )
 
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	if( isStringComponentType( L, 2 ) )
+	if( isStringComponent( L, 2 ) )
 		throw co::IllegalArgumentException( "'component' is a facet and cannot be set" );
 
 	co::IObject* object = *ud;
 	pushMember( L, object->getComponent(), true );
 	if( lua_islightuserdata( L, -1 ) )
 	{
-		co::IPort* port = checkInterfaceInfo( L, -1 );
+		co::IPort* port = checkPort( L, -1 );
 		if( port->getIsFacet() )
 		{
 			lua_pushliteral( L, "'" );
@@ -705,11 +689,11 @@ int ComponentBinding::newIndex( lua_State* L )
 			lua_concat( L, 3 );
 			throw lua::MsgOnStackException();
 		}
-		co::IService* itf;
+		co::IService* service;
 		co::Any any;
-		any.setVariable( port->getType(), co::Any::VarIsPointer|co::Any::VarIsReference, &itf );
+		any.setVariable( port->getType(), co::Any::VarIsPointer|co::Any::VarIsReference, &service );
 		LuaState::getValue( L, 3, any );
-		object->setService( port, itf );
+		object->setService( port, service );
 	}
 
 	return 0;
@@ -746,16 +730,16 @@ int ComponentBinding::toString( lua_State* L )
 /*  Helper class for binding co::Interfaces to Lua                           */
 /*****************************************************************************/
 
-void InterfaceBinding::create( lua_State* L, co::IService* itf )
+void InterfaceBinding::create( lua_State* L, co::IService* service )
 {
 	// create the userdata
 	co::IService** ud = reinterpret_cast<co::IService**>( lua_newuserdata( L, sizeof(co::IService*) ) );
 
-	*ud = itf;
-	itf->serviceRetain();
+	*ud = service;
+	service->serviceRetain();
 
 	// set the userdata's metatable
-	pushMetatable( L, itf->getInterface() );
+	pushMetatable( L, service->getInterface() );
 	lua_setmetatable( L, -2 );
 }
 
@@ -767,10 +751,10 @@ int InterfaceBinding::index( lua_State* L )
 
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	co::IService* itf = *ud;
-	if( pushMember( L, itf->getInterface() ) )
+	co::IService* service = *ud;
+	if( pushMember( L, service->getInterface() ) )
 		if( lua_islightuserdata( L, -1 ) )
-			getField( L, itf );
+			getField( L, service );
 
 	return 1;
 
@@ -785,8 +769,8 @@ int InterfaceBinding::newIndex( lua_State* L )
 
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	co::IService* itf = *ud;
-	pushMember( L, itf->getInterface(), true );
+	co::IService* service = *ud;
+	pushMember( L, service->getInterface(), true );
 	if( lua_isfunction( L, -1 ) )
 	{
 		lua_pushliteral( L, "'" );
@@ -797,7 +781,7 @@ int InterfaceBinding::newIndex( lua_State* L )
 	}
 
 	lua_pushvalue( L, 3 );
-	setField( L, itf );
+	setField( L, service );
 
 	return 0;
 
@@ -823,8 +807,8 @@ int InterfaceBinding::toString( lua_State* L )
 	co::IService** ud = reinterpret_cast<co::IService**>( lua_touserdata( L, 1 ) );
 	assert( ud );
 
-	co::IService* itf = *ud;
-	lua_pushfstring( L, "%s: %p", itf->getInterface()->getFullName().c_str(), itf );
+	co::IService* service = *ud;
+	lua_pushfstring( L, "%s: %p", service->getInterface()->getFullName().c_str(), service );
 
 	return 1;
 }
@@ -841,9 +825,8 @@ void ComplexValueBinding::push( lua_State* L, co::IType* type, void* instancePtr
 	reflector->serviceRetain();
 
 	// create the userdata
-	size_t size = reflector->getSize();
-	void* ud = lua_newuserdata( L, size );
-	reflector->createValue( ud, size );
+	void* ud = lua_newuserdata( L, reflector->getSize() );
+	reflector->createValue( ud );
 
 	// if an instance was provided, copy it
 	if( instancePtr )

@@ -38,9 +38,9 @@ public:
 	const co::Any& dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<co::Any const> args );
 
 	// co::IReflector methods:
-	co::int32 getSize();
+	co::uint32 getSize();
 	co::IType* getType();
-	void createValue( void* address, size_t length );
+	void createValue( void* address );
     void copyValue( const void* fromAddress, void* toAddress );
     void destroyValue( void* address );
 	co::IObject* newInstance();

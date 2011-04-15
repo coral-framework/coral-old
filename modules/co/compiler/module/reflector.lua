@@ -58,7 +58,7 @@ local function template( writer, c, t )
 	if t.kind == 'TK_COMPONENT' then
 		writer( [[
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
-co::int32 __]], t.name, [[_getSize();
+co::uint32 __]], t.name, [[_getSize();
 co::IObject* __]], t.name, [[_newInstance();
 
 ]] )
@@ -174,7 +174,7 @@ public:
 			writer [[
 	// These co::IReflector methods are not part of the reflection system:
 
-	void createValue( void*, size_t )
+	void createValue( void* )
 	{
 		throw co::NotSupportedException( "co::IReflector::createValue() cannot be called through a proxy interface." );
 	}
@@ -247,7 +247,7 @@ public:
 
 	if t.kind == 'TK_COMPONENT' then
 		writer( [[
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return __]], t.name, [[_getSize();
 	}
@@ -260,7 +260,7 @@ public:
 	}
 ]] )
 	else
-		writer( "\tco::int32 getSize()\n\t{\n\t\treturn sizeof(", t.cppName, ");\n\t}\n" )
+		writer( "\tco::uint32 getSize()\n\t{\n\t\treturn sizeof(", t.cppName, ");\n\t}\n" )
 	end
 
 	if t.kind == 'TK_EXCEPTION' then
@@ -274,9 +274,8 @@ public:
 	elseif t.kind == 'TK_STRUCT' or t.kind == 'TK_NATIVECLASS' then
 		writer( [[
 
-	void createValue( void* address, size_t length )
+	void createValue( void* address )
 	{
-		checkValidSize( sizeof(]], t.cppName, [[), length );
 		new( address ) ]], t.cppName, [[;
     }
 

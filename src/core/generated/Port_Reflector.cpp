@@ -9,7 +9,7 @@
 namespace co {
 
 // The following two functions are implemented by CORAL_EXPORT_COMPONENT()
-co::int32 __Port_getSize();
+co::uint32 __Port_getSize();
 co::IObject* __Port_newInstance();
 
 // ------ Reflector Component ------ //
@@ -32,7 +32,7 @@ public:
 		return co::getType( "co.Port" );
 	}
 
-	co::int32 getSize()
+	co::uint32 getSize()
 	{
 		return __Port_getSize();
 	}
