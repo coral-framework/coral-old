@@ -94,16 +94,10 @@ public:
 	//@}
 
 	//! Dereference operator.
-	//@{
-	inline T& operator * ()  { return *_ptr; }
-	inline const T& operator * () const { return *_ptr; }
-	//@}
+	inline T& operator * () const { return *_ptr; }
 
 	//! Member access operator.
-	//@{
-	inline T* operator -> () { return _ptr; }
-	inline const T* operator -> () const { return _ptr; }
-	//@}
+	inline T* operator -> () const { return _ptr; }
 
 	//! Invalid (i.e. null) internal pointer test operator.
 	inline bool operator!() const { return _ptr == 0; }
@@ -112,10 +106,7 @@ public:
 	inline bool isValid() const { return _ptr != 0; }
 
 	//! Returns the internal pointer stored in this smart pointer.
-	//@{
-	inline T* get() { return _ptr; }
-	inline const T* get() const { return _ptr; }
-	//@}
+	inline T* get() const { return _ptr; }
 
 	/*!
 		Efficiently swaps the internal pointers of two co::RefPtr's.
