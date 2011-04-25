@@ -7,6 +7,8 @@
 
 #include <co/Uuid.h>
 #include <co/Any.h>
+#include <co/Coral.h>
+#include <co/IType.h>
 #include <co/ISystem.h>
 #include <co/IModule.h>
 #include <co/CSLError.h>
@@ -20,9 +22,9 @@
 #include <co/IRecordType.h>
 #include <co/IllegalCastException.h>
 
-/****************************************************************************
+/******************************************************************************
  *	Performance / Portability Tests
- ****************************************************************************/
+ ******************************************************************************/
 
 TEST( AnyTests, sizeOf )
 {
@@ -83,11 +85,11 @@ TEST( AnyTests, stdVectorMemoryLayout )
 	ASSERT_EQ( 64, bytesVector.size() );
 }
 
-/*****************************************************************************
+/******************************************************************************
  *	A 'constructor' test checks whether the co::Any is detecting the correct
  *	type for a variable passed to its constructor. It may also include basic
  *	retrieval tests for the values passed to the constructor.
- *****************************************************************************/
+ ******************************************************************************/
 
 void EXPECT_ANY_STREQ( const co::Any& any, const char* str )
 {
@@ -664,10 +666,10 @@ TEST( AnyTests, setGetInterface )
 	}
 }
 
-/*****************************************************************************
+/******************************************************************************
  *	A 'coercion' test checks whether a stored variable is correctly
  *	implicitly converted to a different type at retrieval time.
- *****************************************************************************/
+ ******************************************************************************/
 
 TEST( AnyTests, coercionsFromBool )
 {
@@ -1037,9 +1039,9 @@ TEST( AnyTests, coercionsFromStdVector )
 	EXPECT_THROW( superVecAny.get<co::Range<co::IInterface* const> >(), co::IllegalCastException );
 }
 
-/****************************************************************************
+/*******************************************************************************
  *	Tests for the custom variable setters and constructors
- ****************************************************************************/
+ ******************************************************************************/
 
 TEST( AnyTests, setService )
 {
@@ -1130,9 +1132,9 @@ TEST( AnyTests, setArray )
 	EXPECT_EQ( automatic, manual );
 }
 
-/***************************************************************************
+/******************************************************************************
  *	Tests for the Temporary Objects API
- ****************************************************************************/
+ ******************************************************************************/
 
 template<typename T>
 void testTemporaryComplexValue( const T& sample )
@@ -1165,4 +1167,55 @@ TEST( AnyTests, temporaryComplexValues )
 	cslError.message = "msg";
 	cslError.line = 3;
 	testTemporaryComplexValue<co::CSLError>( cslError );
+}
+
+/******************************************************************************
+ *	Tests for co::Any::swap()
+ ******************************************************************************/
+
+TEST( AnyTests, swapValues )
+{
+	co::IType* type = co::typeOf<co::IType>::get();
+
+	co::Any a( type ), b( 7 ), c( 3.14 );
+	EXPECT_EQ( type, a.get<co::IType*>() );
+	EXPECT_EQ( 7, b.get<int>() );
+	EXPECT_EQ( 3.14, c.get<double>() );
+
+	a.swap( b );
+	EXPECT_EQ( 7, a.get<int>() );
+	EXPECT_EQ( type, b.get<co::IType*>() );
+	EXPECT_EQ( 3.14, c.get<double>() );
+
+	c.swap( b );
+	EXPECT_EQ( 7, a.get<int>() );
+	EXPECT_EQ( 3.14, b.get<double>() );
+	EXPECT_EQ( type, c.get<co::IType*>() );
+}
+
+TEST( AnyTests, swapTemporaryObjects )
+{
+	co::IType* type = co::typeOf<co::IType>::get();
+	co::Any a( type );
+
+	co::Any b;
+	co::Uuid uuid( co::Uuid::createRandom() );
+	b.createComplexValue<co::Uuid>() = uuid;
+
+	co::Any c;
+	c.createString() = "hello world";
+
+	EXPECT_EQ( type, a.get<co::IType*>() );
+	EXPECT_EQ( uuid, b.get<co::Uuid&>() );
+	EXPECT_EQ( "hello world", c.get<const std::string&>() );
+
+	a.swap( b );
+	EXPECT_EQ( uuid, a.get<co::Uuid&>() );
+	EXPECT_EQ( type, b.get<co::IType*>() );
+	EXPECT_EQ( "hello world", c.get<const std::string&>() );
+
+	c.swap( b );
+	EXPECT_EQ( uuid, a.get<co::Uuid&>() );
+	EXPECT_EQ( "hello world", b.get<const std::string&>() );
+	EXPECT_EQ( type, c.get<co::IType*>() );
 }

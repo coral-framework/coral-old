@@ -16,7 +16,7 @@ namespace co {
 	\tparam T a service type (co::IService).
 
 	Supports automatic coercion to co::Range< T* >.
-	Also offers extra methods for sorted arrays: sortedInsert() and sortedFind().
+	Also offers extra methods for sorted vectors.
  */
 template<class T>
 class RefVector : public std::vector< co::RefPtr<T> >
@@ -25,93 +25,77 @@ public:
 	//! Default constructor.
 	inline RefVector() : std::vector< co::RefPtr<T> >() {;}
 
-	//! Creates a vector with \a n null pointers.
+	//! Creates a vector with \a n null references.
 	inline RefVector( size_t n ) : std::vector< co::RefPtr<T> >( n ) {;}
 
-	/*!
-		Performs a binary search on the sorted range [first,last] using a \c Comparator function.
-
-		Returns \c true if a matching element is found, or \c false if the key is not in the
-		sorted range. In either case, the parameter \a pos is set to the index where the element
-		should be located in the sorted range.
-
-		\note The \c Comparator function is defined as follows:
-			\code int Comparator( const T* element, const Key& key ) \endcode
-			- returns \b zero when <tt>element == key</tt>
-			- returns \b <tt><0</tt> when <tt>element < key</tt>
-			- returns \b <tt>>0</tt> when <tt>element > key</tt>
-
-		\warning Assumes the specified range is already sorted according to the \c Comparator function.
-		\sa sortedInsert()
-	 */
-	template<class Key, class Comparator>
-	inline bool sortedFind( const Key& key, Comparator compare, size_t first, size_t last, size_t& pos )
+	//! Gets a sub-range of this vector.
+	inline Range<T*> getRange( size_t first, size_t size )
 	{
-		assert( last < this->size() );
-		while( first <= last )
-		{
-			pos = ( first + last ) / 2;
-			int comp = compare( (*this)[pos].get(), key );
-			if( comp < 0 )
-				first = pos + 1;	// repeat search in right half
-			else if( comp > 0 )
-			{
-				if( pos == 0 )
-					break;
-				last = pos - 1;		// repeat search in left half
-			}
-			else
-				return true;
-		}
-		pos = first;
-		return false;
+		return Range<T*>( size == 0 ? NULL : reinterpret_cast<T**>( &( (*this)[0] ) ) + first, size );
 	}
 
 	/*!
-		\overload
-		This overload operates on the whole co::RefVector, in the range [0, n - 1].
-	 */
-	template<class Key, class Comparator>
-	inline bool sortedFind( const Key& key, Comparator compare, size_t& pos )
-	{
-		if( this->empty() )
-		{
-			pos = 0;
-			return false;
-		}
-		return sortedFind( key, compare, 0, this->size() - 1, pos );
-	}
-
-	/*!
-		Inserts a new element in a sorted vector of interfaces. Intended for use in combination
-		with sortedFind(). See sortedFind() for a description of the \c Comparator function.
-		\return \c true on success; or \c false if an existing element with the same key was found.
-		\sa sortedFind()
-		\note This method is supposed to be slightly more efficient than using std::lower_bound
-				and insert(), mainly because it uses co::RefPtr<T>::swap().
+		Inserts an element in a sorted ref-vector.
+		See binarySearch() for a description of the comparison function.
+		\return false if and only if there's an existing element with the same key.
 	 */
 	template<typename Key, typename Comparator>
-	inline bool sortedInsert( const Key& key, T* element, Comparator compare )
+	bool sortedInsert( const Key& key, T* element, Comparator compare )
 	{
-		size_t pos;
-		if( sortedFind( key, compare, pos ) )
+		size_t pos, size = this->size();
+		if( binarySearch( getRange( 0, size ), key, compare, pos ) )
 			return false;
 
 		// insert the new element at the back
 		this->push_back( element );
 
 		// slide the new element to the correct position
-		for( size_t i = this->size() - 1; i > pos; --i )
+		for( size_t i = size; i > pos; --i )
 			(*this)[i - 1].swap( (*this)[i] );
 
 		return true;
 	}
 
 	//! \overload
-	template<typename Key, typename Comparator>
-	inline bool sortedInsert( const Key& key, co::RefPtr<T>& element, Comparator compare )
+	template<typename Comparator>
+	bool sortedInsert( T* element, Comparator compare )
 	{
-		return sortedInsert<Key, Comparator>( key, element.get(), compare );
+		return sortedInsert( element, element, compare );
+	}
+
+	/*!
+		Removes an element from a sorted ref-vector.
+		See binarySearch() for a description of the comparison function.
+		\return true if an element with the given \a key was removed;
+				false is none was found.
+	 */
+	template<typename Key, typename Comparator>
+	bool sortedRemove( const Key& key, Comparator compare )
+	{
+		size_t pos, size = this->size();
+		if( !binarySearch( getRange( 0, size ), key, compare, pos ) )
+			return false;
+
+		// slide the removed element to the end
+		while( ++pos < size )
+			(*this)[pos - 1].swap( (*this)[pos] );
+
+		// pop the removed element
+		this->pop_back();
+
+		return true;
+	}
+
+	/*!
+		Performs a binary search on a sorted ref-vec.
+		Returns the element position, or <tt>std::string::npos</tt> if no element is found.
+	 */
+	template<typename Key, typename Comparator>
+	size_t sortedFind( const Key& key, Comparator compare )
+	{
+		size_t pos;
+		return binarySearch( getRange( 0, this->size() ), key, compare, pos )
+			? pos : std::string::npos;
 	}
 };
 
@@ -151,4 +135,4 @@ struct typeOf<RefVector<T> > : public typeOfArrayBase<T> {};
 
 } // namespace co
 
-#endif
+#endif // _CO_REFVECTOR_H_

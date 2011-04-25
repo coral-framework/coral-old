@@ -19,7 +19,7 @@
 #include <cassert>
 #include <cstddef>
 
-//------ Build Mode Detection ------------------------------------------------
+//------ Build Mode Detection --------------------------------------------------
 
 #if defined(_DEBUG) || !defined(NDEBUG)
 	#define CORAL_BUILD_MODE "debug"
@@ -28,7 +28,7 @@
 	#define CORAL_BUILD_MODE "release"
 #endif
 
-//------ Recognized Operating Systems (CORAL_OS_x) ---------------------------
+//------ Recognized Operating Systems (CORAL_OS_x) -----------------------------
 
 #if defined(__APPLE__) && (defined(__GNUC__) || defined(__xlC__) || defined(__xlc__))
 	#define CORAL_OS_MAC
@@ -45,7 +45,7 @@
 	#define CORAL_OS_UNIX
 #endif
 
-//------ Recognized compilers (CORAL_CC_x) -----------------------------------
+//------ Recognized compilers (CORAL_CC_x) -------------------------------------
 
 #if defined(_MSC_VER)
 	#define CORAL_CC_MSVC
@@ -53,7 +53,7 @@
 	#define CORAL_CC_GNU
 #endif
 
-//------ Determine the CORAL_BUILD_KEY ---------------------------------------
+//------ Determine the CORAL_BUILD_KEY -----------------------------------------
 
 #if defined(CORAL_OS_LINUX)
 	#define CORAL_OS_NAME "Linux"
@@ -101,7 +101,7 @@
 #define CORAL_BUILD_KEY		CORAL_OS_NAME " " CORAL_ARCH_NAME " " CORAL_CC_NAME "-" CORAL_CC_VERSION
 
 
-//------ Portable Integer Types ----------------------------------------------
+//------ Portable Integer Types ------------------------------------------------
 
 #if defined(CORAL_CC_GNU)
 	#include <sys/types.h>
@@ -245,7 +245,7 @@ template<> struct CompileTimeError<true> {};
 
 } // namespace co
 
-//------ Portable shared-library interface attributes ------
+//------ Portable shared-library interface attributes --------------------------
 
 #ifndef DOXYGEN
 

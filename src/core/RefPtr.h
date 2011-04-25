@@ -46,17 +46,16 @@ public:
 	//! Assignment operator.
 	inline RefPtr& operator = ( const RefPtr& other )
 	{
-		if( _ptr == other._ptr )
-			return *this;
+		if( _ptr != other._ptr )
+		{
+			T* old = _ptr;
+			_ptr = other._ptr;
+			tryRetain();
 
-		T* old = _ptr;
-		_ptr = other._ptr;
-		tryRetain();
-
-		// always release last
-		if( old )
-			old->serviceRelease();
-
+			// always release last
+			if( old )
+				old->serviceRelease();
+		}
 		return *this;
 	}
 
@@ -119,6 +118,9 @@ public:
 		other._ptr = temp;
 	}
 
+	//! ADL-based overload for swap().
+	friend inline void swap( RefPtr& a, RefPtr& b ) { a.swap( b ); }
+
 private:
 	inline void tryRetain()
 	{
@@ -147,4 +149,4 @@ inline std::ostream& operator << ( std::ostream& stream, const co::RefPtr<T>& rp
 }
 #endif
 
-#endif
+#endif // _CO_REFPTR_H_

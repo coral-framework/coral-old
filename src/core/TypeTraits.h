@@ -8,6 +8,7 @@
 
 #include <co/Platform.h>
 #include <co/TypeKind.h>
+#include <algorithm>
 #include <string>
 #include <vector>
 

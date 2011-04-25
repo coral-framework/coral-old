@@ -14,7 +14,7 @@ namespace co {
 
 #ifndef DOXYGEN
 
-// Instructs an Range how to extract an array out of a custom container.
+// Instructs a Range how to extract an array out of a custom container.
 template<typename T, typename C>
 struct RangeAdaptor
 {
@@ -64,14 +64,14 @@ struct RangeAdaptor<T, std::vector<ET*> >
 #endif
 
 /*!
-	\brief An advanced iterator for one-dimensional arrays.
+	\brief A higher-level iterator for one-dimensional arrays.
 	\tparam T any acceptable element type for a C++ array.
 
 	The range [start, end) is represented by two pointers.
 	The first and the last elements can be obtained by getFirst() and getLast(), respectively.
 	A traversal can be made in either direction using popFirst() or popLast().
 	It's also possible to index an array element directly using operator[].
-	Testing an Range object is equivalent to testing whether it isEmpty().
+	Testing a range is equivalent to testing whether it isEmpty().
 
 	Here's an example of how to iterate over a range:
 	\code
@@ -96,14 +96,14 @@ template<typename T>
 class Range
 {
 public:
-	//! Creates an empty array range.
+	//! Creates a default empty array range.
 	Range() : _start( 0 ), _end( 0 )
 	{;}
 
 	/*!
 		Creates the range [start, end) out of two pointers.
 		\param[in] start pointer to the first element in the range.
-		\param[in] end pointer to the location right after the last element in the range.
+		\param[in] end the address right after the last element in the range.
 	 */
 	Range( T* start, T* end ) : _start( start ), _end( end )
 	{
@@ -136,8 +136,13 @@ public:
 	}
 
 	//! Destructor.
-	~Range()
-	{;}
+	inline ~Range() {;}
+
+	//! Returns a pointer to the start of the array.
+	inline T* getStart() const { return _start; }
+
+	//! Returns the address right after the last element in the array.
+	inline T* getEnd() const { return _end; }
 
 	//! Returns true if the range is empty.
 	inline bool isEmpty() const { return _start == _end; }
@@ -145,7 +150,7 @@ public:
 	//! Returns the number of elements in the range.
 	inline size_t getSize() const { return _end - _start; }
 
-	//! Testing the range is equivalent to testing if it's not empty.
+	//! Testing the range is equivalent to testing whether it is nonempty.
 	inline operator bool() const { return _start != _end; }
 
 	//! Returns the first element in the range.
@@ -160,40 +165,18 @@ public:
 	//! Returns the last element in the range (const version).
 	inline const T& getLast() const { return *( _end - 1 ); }
 
-	//! Removes the first element from the range, if it's not empty.
+	//! Removes the first element from the range, if it is nonempty.
 	inline void popFirst()
 	{
 		if( _start < _end )
 			++_start;
 	}
 
-	//! Removes the last element from the range, if it's not empty.
+	//! Removes the last element from the range, if it is nonempty.
 	inline void popLast()
 	{
 		if( _start < _end )
 			--_end;
-	}
-
-	/*!
-		Assigns the range to a std::vector-compatible container.
-	 */
-	template<typename C>
-	inline void assignTo( C& container ) const
-	{
-		size_t size = getSize();
-		if( container.capacity() < size )
-		{
-			container.clear();
-			container.reserve( size );
-			for( size_t i = 0; i < size; ++i )
-				container.push_back( _start[i] );
-		}
-		else
-		{
-			container.resize( size );
-			for( size_t i = 0; i < size; ++i )
-				container[i] = _start[i];
-		}
 	}
 
 	//! Unchecked random access to range elements.
@@ -213,9 +196,9 @@ private:
 
 #ifndef DOXYGEN
 
-/****************************************************************************/
-/* All type-traits definitions related to co::Range are located below  */
-/****************************************************************************/
+/******************************************************************************/
+/* Type-traits definitions for co::Range                                      */
+/******************************************************************************/
 
 template<typename T>
 struct kindOf<Range<T> > : public kindOfBase<TK_ARRAY> {};
@@ -227,6 +210,85 @@ template<typename T>
 struct typeOf<Range<T> > : public typeOfArrayBase<T> {};
 
 #endif // DOXYGEN
+
+/******************************************************************************/
+/* Simple template library based on co::Range                                 */
+/******************************************************************************/
+
+/*!
+	Copies the elements in \a source into the given \a destination range.
+ */
+template<typename T>
+void copy( Range<T> source, Range<T> destination )
+{
+	size_t size = source.getSize();
+	assert( size <= destination.getSize() );
+	for( size_t i = 0; i < size; ++i )
+		destination[i] = source[i];
+}
+
+/*!
+	Assigns the contents of a \a source range to a
+	std::vector-compatible \a container.
+ */
+template<typename T, typename C>
+void assign( Range<T> source, C& container )
+{
+	size_t size = source.getSize();
+	container.resize( size );
+	for( size_t i = 0; i < size; ++i )
+		container[i] = source[i];
+}
+
+/*!
+	\brief Performs a binary search on a sorted \a range using a comparison function.
+ 
+	Returns \c true if a matching element is found, or \c false if the key is
+	not in the sorted range. In either case, the parameter \a pos is set to the
+	index where the element should be located in the sorted range.
+
+	The search relies on a key-based comparison function, which is more
+	flexible (and often more efficient) than element-based STL comparators.
+
+	The comparison function is defined is follows:
+		\code int compare( const Key& key, const T& element ) \endcode
+		- returns \b zero when <tt>key == element</tt>
+		- returns \b <tt><0</tt> when <tt>key < element</tt>
+		- returns \b <tt>>0</tt> when <tt>key > element</tt>
+
+	\warning The \a range must already be sorted according to the comparison function.
+ */
+template<typename T, typename Key, typename Comparator>
+bool binarySearch( Range<T> range, const Key& key, Comparator compare, size_t& pos )
+{
+	pos = range.getSize();
+	if( pos == 0 )
+		return false;
+
+	size_t first = 0, last = pos - 1;
+	while( 1 )
+	{
+		pos = ( first + last ) / 2;
+		int comp = compare( key, range[pos] );
+		if( comp > 0 )
+		{
+			// repeat search in right half
+			first = pos + 1;
+			if( pos == last )
+				break;
+		}		
+		else if( comp < 0 )
+		{
+			// repeat search in left half
+			if( pos == 0 )
+				break;
+			last = pos - 1;
+		}
+		else return true;
+	}
+	pos = first;
+	return false;
+}
 
 } // namespace co
 

@@ -68,4 +68,4 @@ template<> struct kindOf<Exception> : public kindOfBase<TK_EXCEPTION> {};
 		throw exceptionType( throwMessageStringStream.str() ); \
 	}
 
-#endif
+#endif // _CO_EXCEPTION_H_

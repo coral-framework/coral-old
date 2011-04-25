@@ -870,6 +870,9 @@ public:
 
 	//@}
 
+	//! Swaps the contents of two co::Any's.
+	void swap( Any& other );
+
 	//! Equality test operator.
 	bool operator==( const Any& other ) const;
 
@@ -907,8 +910,7 @@ private:
 	 */
 	State _state;
 
-	// Temporary object data.
-	union
+	union TemporaryObjectData
 	{
 		State::Data data;
 		uint8 stringArea[sizeof(std::string)];
@@ -932,6 +934,8 @@ private:
 template<> struct kindOf<Any> { static const TypeKind kind = TK_ANY; };
 #endif // DOXYGEN
 
+inline void swap( Any& a, Any& b ) { a.swap( b ); }
+
 } // namespace co
 
 #ifndef DOXYGEN
@@ -944,5 +948,8 @@ CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::__any::State
 	\relates co::Any
  */
 CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::Any& a );
+
+// std::swap specialization for co::Any:
+namespace std { template<> inline void swap( co::Any& a, co::Any& b ) { a.swap( b ); } }
 
 #endif // _CO_ANY_H_

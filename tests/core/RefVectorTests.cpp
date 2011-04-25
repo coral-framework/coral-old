@@ -93,9 +93,9 @@ TEST( RefVectorTests, castedPtrRange )
 	//co::Range<co::INamespace*> invalidRange( refVec );
 }
 
-inline int pseudoInterfaceComparator( PseudoInterface* itf, co::int32 key )
+inline int pseudoInterfaceComparator( co::int32 key, PseudoInterface* itf )
 {
-	return ( itf->getKey() == key ? 0 : ( itf->getKey() < key ? -1 : 1 ) );
+	return ( itf->getKey() == key ? 0 : ( key < itf->getKey() ? -1 : 1 ) );
 }
 
 TEST( RefVectorTests, sortedRefVector )
@@ -106,10 +106,10 @@ TEST( RefVectorTests, sortedRefVector )
 	co::RefPtr<PseudoInterface> o4 = new PseudoInterface( 4 );
 
 	co::RefVector<PseudoInterface> refVec;
-	refVec.sortedInsert( o2->getKey(), o2, pseudoInterfaceComparator );
-	refVec.sortedInsert( o4->getKey(), o4, pseudoInterfaceComparator );
+	refVec.sortedInsert( o2->getKey(), o2.get(), pseudoInterfaceComparator );
+	refVec.sortedInsert( o4->getKey(), o4.get(), pseudoInterfaceComparator );
 	refVec.sortedInsert( o3->getKey(), o3.get(), pseudoInterfaceComparator );
-	refVec.sortedInsert( o1->getKey(), o1, pseudoInterfaceComparator );
+	refVec.sortedInsert( o1->getKey(), o1.get(), pseudoInterfaceComparator );
 
 	EXPECT_EQ( refVec[0], o1 );
 	EXPECT_EQ( refVec[1], o2 );
@@ -118,8 +118,5 @@ TEST( RefVectorTests, sortedRefVector )
 
 	// sanity check
 	EXPECT_NE( refVec[0], refVec[3] );
-
-	size_t pos;
-	EXPECT_TRUE( refVec.sortedFind( o3->getKey(), pseudoInterfaceComparator, pos ) );
-	EXPECT_EQ( pos, 2 );
+	EXPECT_EQ( refVec.sortedFind( o3->getKey(), pseudoInterfaceComparator ), 2 );
 }

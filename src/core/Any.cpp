@@ -1096,6 +1096,24 @@ void Any::destroyObject()
 	_state.objectKind = TK_NONE;
 }
 
+void Any::swap( Any& other )
+{
+	State tmpState( _state );
+	TemporaryObjectData tmpObject( _object );
+
+	// copy 'other' to 'this'
+	_state = other._state;
+	_object = other._object;
+	if( _state.data.ptr == &other._object )
+		_state.data.ptr = &_object;
+
+	// copy 'this' to 'other'
+	other._state = tmpState;
+	other._object = tmpObject;
+	if( tmpState.data.ptr == &_object )
+		other._state.data.ptr = &other._object;
+}
+
 bool Any::operator==( const Any& other ) const
 {
 	if( _state.kind != other._state.kind || _state.type != other._state.type )

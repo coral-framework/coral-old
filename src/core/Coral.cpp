@@ -14,7 +14,6 @@
 #include <cstdio>
 #include <cstdarg>
 #include <cstdlib>
-#include <algorithm>
 
 namespace co {
 

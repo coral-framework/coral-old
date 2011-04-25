@@ -55,11 +55,8 @@ TEST( ReflectorTests, basicReflectors )
 
 		EXPECT_EQ( types[i], reflector->getType() );
 		EXPECT_GT( reflector->getSize(), 0 );
-		
-		if( i == NUM_TYPES - 1 )
-			printf( "afe" );
 
-		ASSERT_NO_THROW( reflector->createValue( buffer1 ) ) << BASIC_TYPE_NAMES[i];
+		ASSERT_NO_THROW( reflector->createValue( buffer1 ) );
 		ASSERT_NO_THROW( reflector->createValue( buffer2 ) );
 
 		ASSERT_NO_THROW( reflector->copyValue( buffer2, buffer1 ) );

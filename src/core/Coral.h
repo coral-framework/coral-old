@@ -211,4 +211,4 @@ CORAL_EXPORT bool findModuleFile( const std::string& moduleName, const std::stri
 
  *****************************************************************************/
 
-#endif
+#endif // _CO_CORAL_H_

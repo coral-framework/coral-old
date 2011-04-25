@@ -5,32 +5,8 @@
 
 #include "Component.h"
 #include "Port.h"
-#include <algorithm>
 
 namespace co {
-
-// ------ Helper Comparators ---------------------------------------------------
-
-inline int portComparator( IPort* port, const std::string& name )
-{
-	return port->getName().compare( name );
-}
-
-inline bool sortPortsByKindThenName( const RefPtr<IPort>& a, const RefPtr<IPort>& b )
-{
-	bool isFacetA = const_cast<IPort*>( a.get() )->getIsFacet();
-	bool isFacetB = const_cast<IPort*>( b.get() )->getIsFacet();
-
-	if( ( !isFacetA && isFacetB ) || ( isFacetA && !isFacetB ) )
-	{
-		return isFacetA; // facets come first
-	}
-
-	return const_cast<IPort*>( a.get() )->getName()
-			< const_cast<IPort*>( b.get() )->getName();
-}
-
-// ------ Component -----------------------------------------------
 
 Component::Component() : _firstReceptacle( -1 )
 {
@@ -48,6 +24,20 @@ void Component::addPorts( Range<IPort* const> ports )
 	for( ; ports; ports.popFirst() )
 		_ports.push_back( ports.getFirst() );
 }
+
+inline bool sortPortsByKindThenName( const RefPtr<IPort>& a, const RefPtr<IPort>& b )
+{
+	bool isFacetA = const_cast<IPort*>( a.get() )->getIsFacet();
+	bool isFacetB = const_cast<IPort*>( b.get() )->getIsFacet();
+
+	if( ( !isFacetA && isFacetB ) || ( isFacetA && !isFacetB ) )
+	{
+		return isFacetA; // facets come first
+	}
+
+	return const_cast<IPort*>( a.get() )->getName()
+			< const_cast<IPort*>( b.get() )->getName();
+}	
 
 void Component::sortPorts()
 {
@@ -73,18 +63,31 @@ Range<IMember* const> Component::getMembers()
 	return _ports;
 }
 
+inline int nameComparator( const std::string& name, IPort* port )
+{
+	return name.compare( port->getName() );
+}
+
 IMember* Component::getMember( const std::string& name )
 {
 	size_t pos;
 
 	// first, look for a facet
-	if( _firstReceptacle > 0 && _ports.sortedFind( name, portComparator, 0, _firstReceptacle - 1, pos ) )
-		return _ports[pos].get();
+	if( _firstReceptacle > 0 )
+	{
+		Range<IPort*> range( _ports.getRange( 0, _firstReceptacle ) );
+		if( binarySearch( range, name, nameComparator, pos ) )
+			return range[pos];
+	}
 
 	// then look for a receptacle
-	size_t numItfs = _ports.size();
-	if( _firstReceptacle < numItfs && _ports.sortedFind( name, portComparator, _firstReceptacle, numItfs - 1, pos ) )
-		return _ports[pos].get();
+	size_t size = _ports.size();
+	if( _firstReceptacle < size )
+	{
+		Range<IPort*> range( _ports.getRange( _firstReceptacle, size - _firstReceptacle ) );
+		if( binarySearch( range, name, nameComparator, pos ) )
+			return range[pos];
+	}
 
 	return NULL;
 }

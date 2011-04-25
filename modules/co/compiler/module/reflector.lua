@@ -330,7 +330,7 @@ public:
 
 		for i, a in ipairs( t.fields ) do
 			if a.type.kind == 'TK_ARRAY' then
-				writer( "\t\tcase ", a.index, ":\t\tvalue.get< ", t.formatInput( a.type ), " >().assignTo( p->", a.name, " ); break;\n" )
+				writer( "\t\tcase ", a.index, ":\t\tco::assign( value.get< ", t.formatInput( a.type ), " >(), p->", a.name, " ); break;\n" )
 			else
 				writer( "\t\tcase ", a.index, ":\t\tp->", a.name, " = value.get< ", t.formatInput( a.type ), " >(); break;\n" )
 			end

@@ -9,29 +9,8 @@
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IInterface.h>
-#include <algorithm>
 
 namespace co {
-
-//------ Helper Comparators ----------------------------------------------------
-
-inline int memberComparator( IMember* memberInfo, const std::string& name )
-{
-	return memberInfo->getName().compare( name );
-}
-
-inline bool memberKindComparator( IMember* mA, IMember* mB )
-{
-	bool isFieldA = ( mA->getKind() == MK_FIELD );
-	bool isFieldB = ( mB->getKind() == MK_FIELD );
-
-	if( ( !isFieldA && isFieldB ) || ( isFieldA && !isFieldB ) )
-		return isFieldA;
-
-	return mA->getName() < mB->getName();
-}
-
-//------ ClassTypeImpl -----------------------------------------------------
 
 ClassTypeImpl::ClassTypeImpl() : _firstMethodPos( -1 )
 {
@@ -48,6 +27,17 @@ void ClassTypeImpl::addMembers( Range<IMember* const> members )
 	_members.reserve( _members.size() + members.getSize() );
 	for( ; members; members.popFirst() )
 		_members.push_back( members.getFirst() );
+}
+
+inline bool memberKindComparator( IMember* mA, IMember* mB )
+{
+	bool isFieldA = ( mA->getKind() == MK_FIELD );
+	bool isFieldB = ( mB->getKind() == MK_FIELD );
+
+	if( ( !isFieldA && isFieldB ) || ( isFieldA && !isFieldB ) )
+		return isFieldA;
+
+	return mA->getName() < mB->getName();
 }
 
 void ClassTypeImpl::sortMembers( ICompositeType* owner )
@@ -87,18 +77,31 @@ Range<IMember* const> ClassTypeImpl::getMembers()
 	return _members;
 }
 
+inline int nameComparator( const std::string& name, IMember* memberInfo )
+{
+	return name.compare( memberInfo->getName() );
+}
+
 IMember* ClassTypeImpl::getMember( const std::string& name )
 {
 	size_t pos;
 
 	// first, look for a field
-	if( _firstMethodPos > 0 && _members.sortedFind( name, memberComparator, 0, _firstMethodPos - 1, pos ) )
-		return _members[pos].get();
+	if( _firstMethodPos > 0 )
+	{
+		Range<IMember*> range( _members.getRange( 0, _firstMethodPos ) );
+		if( binarySearch( range, name, nameComparator, pos ) )
+			return range[pos];
+	}
 
 	// if it's not a field, look for a method
-	size_t membersSize = _members.size();
-	if( _firstMethodPos < membersSize && _members.sortedFind( name, memberComparator, _firstMethodPos, membersSize - 1, pos ) )
-		return _members[pos].get();
+	size_t size = _members.size();
+	if( _firstMethodPos < size )
+	{
+		Range<IMember*> range( _members.getRange( _firstMethodPos, size - _firstMethodPos ) );
+		if( binarySearch( range, name, nameComparator, pos ) )
+			return range[pos];
+	}
 
 	return NULL;
 }

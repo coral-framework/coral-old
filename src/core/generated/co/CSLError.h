@@ -24,7 +24,7 @@ struct CSLError
 		line()
 	{;}
 
-	//! Default equality test operator.
+	//! Equality test operator.
 	inline bool operator==( const CSLError& o ) const
 	{
 		return (
@@ -34,8 +34,17 @@ struct CSLError
 		);
 	}
 
-	//! Default inequality test operator.
+	//! Inequality test operator.
 	inline bool operator!=( const CSLError& o ) const { return !( *this == o ); }
+
+	//! ADL-based overload for swap() calls.
+	friend inline void swap( CSLError& a, CSLError& b )
+	{
+		using std::swap;
+		swap( a.filename, b.filename );
+		swap( a.message, b.message );
+		swap( a.line, b.line );
+	}
 };
 
 } // namespace co

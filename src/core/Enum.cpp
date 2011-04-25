@@ -4,7 +4,6 @@
  */
 
 #include "Enum.h"
-#include <algorithm>
 
 namespace co {
 

@@ -60,7 +60,7 @@ local function template( writer, c, t )
 	writer( [[
 	{;}
 
-	//! Default equality test operator.
+	//! Equality test operator.
 	inline bool operator==( const ]], t.name, [[& o ) const
 	{
 		return (
@@ -75,8 +75,22 @@ local function template( writer, c, t )
 		);
 	}
 
-	//! Default inequality test operator.
+	//! Inequality test operator.
 	inline bool operator!=( const ]], t.name, [[& o ) const { return !( *this == o ); }
+
+	//! ADL-based overload for swap() calls.
+	friend inline void swap( ]], t.name, [[& a, ]], t.name, [[& b )
+	{
+		using std::swap;
+]] )
+
+	for ii, i in ipairs( sortedIndices ) do
+		local field = fields[i]
+		writer( "\t\tswap( a.", field.name, ", b.", field.name, " );\n" )
+	end
+
+	writer( [[
+	}
 };
 ]] )
 

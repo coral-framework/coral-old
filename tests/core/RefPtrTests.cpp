@@ -80,9 +80,10 @@ TEST( RefPtrTests, refPtrSwap )
 
 	co::RefPtr<PseudoInterface> ptr1;
 	{
+		using std::swap;
 		co::RefPtr<PseudoInterface> ptr2( obj );
 		ptr2.swap( ptr1 );
-		ptr1.swap( ptr2 );
+		swap( ptr1, ptr2 );
 		ptr2.swap( ptr1 );
 	}
 

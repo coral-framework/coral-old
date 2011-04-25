@@ -25,7 +25,6 @@
 #include <co/NotSupportedException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/LexicalUtils.h>
-#include <algorithm>
 #include <sstream>
 
 namespace co {

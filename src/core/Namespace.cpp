@@ -11,24 +11,9 @@
 #include <co/IllegalNameException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/LexicalUtils.h>
-#include <algorithm>
 #include <sstream>
 
 namespace co {
-
-// ------ Helper Comparators ---------------------------------------------------
-
-inline int typeComparator( IType* type, const std::string& name )
-{
-	return type->getName().compare( name );
-}
-
-inline int namespaceComparator( INamespace* ns, const std::string& name )
-{
-	return ns->getName().compare( name );
-}
-
-// ------ INamespace ------------------------------------------------------------
 
 Namespace::Namespace() : _parent( 0 )
 {
@@ -68,8 +53,7 @@ void Namespace::addType( IType* type )
 
 	const std::string& name = type->getName();
 
-	size_t pos;
-	if( _childNamespaces.sortedFind( name, namespaceComparator, pos ) )
+	if( findChildNamespace( name ) )
 		throwClashingNamespace( name );
 
 	if( !_types.sortedInsert( name, type, typeComparator ) )
@@ -82,12 +66,9 @@ void Namespace::removeType( IType* type )
 
 	const std::string& name = type->getName();
 
-	size_t pos;
-	bool typeExists = _types.sortedFind( name, typeComparator, pos );
-	assert( typeExists );
-	CORAL_UNUSED( typeExists );
-
-	_types.erase( _types.begin() + pos );
+	bool removed = _types.sortedRemove( name, typeComparator );
+	assert( removed );
+	CORAL_UNUSED( removed );
 }
 
 const std::string& Namespace::getName()
@@ -122,18 +103,12 @@ IModule* Namespace::getModule()
 
 IType* Namespace::getType( const std::string& name )
 {
-	size_t pos;
-	if( _types.sortedFind( name, typeComparator, pos ) )
-		return _types[pos].get();
-	return NULL;
+	return findType( name );
 }
 
 INamespace* Namespace::getChildNamespace( const std::string& name )
 {
-	size_t pos;
-	if( _childNamespaces.sortedFind( name, namespaceComparator, pos ) )
-		return _childNamespaces[pos].get();
-	return NULL;
+	return findChildNamespace( name );
 }
 
 ITypeBuilder* Namespace::defineType( const std::string& name, TypeKind typeKind, ITypeTransaction* transaction )
@@ -147,11 +122,11 @@ ITypeBuilder* Namespace::defineType( const std::string& name, TypeKind typeKind,
 	if( !transaction )
 		throw IllegalArgumentException( "illegal null transaction" );
 
-	size_t pos;
-	if( _types.sortedFind( name, typeComparator, pos ) && _types[pos]->getFullName() != "co.IService" )
+	IType* type;
+	if( ( type = findType( name ) ) && type->getFullName() != "co.IService" )
 		throwClashingType( name );
 
-	if( _childNamespaces.sortedFind( name, namespaceComparator, pos ) )
+	if( findChildNamespace( name ) )
 		throwClashingNamespace( name );
 
 	ITypeBuilder* tb = TypeBuilder::create( typeKind, this, name );

@@ -46,18 +46,39 @@ private:
 	void throwClashingType( const std::string& name );
 	void throwClashingNamespace( const std::string& name );
 
+	inline static int typeComparator( const std::string& name, IType* type )
+	{
+		return name.compare( type->getName() );
+	}
+
+	inline IType* findType( const std::string& name )
+	{
+		size_t pos;
+		if( binarySearch( Range<IType*>( _types ), name, typeComparator, pos ) )
+			return _types[pos].get();
+		return NULL;
+	}
+
+	inline static int namespaceComparator( const std::string& name, INamespace* ns )
+	{
+		return name.compare( ns->getName() );
+	}
+
+	inline INamespace* findChildNamespace( const std::string& name )
+	{
+		size_t pos;
+		if( binarySearch( Range<INamespace*>( _childNamespaces ), name, namespaceComparator, pos ) )
+			return _childNamespaces[pos].get();
+		return NULL;
+	}
+
 private:
 	std::string _name;
 	std::string _fullName;
 	INamespace* _parent;
-
 	RefPtr<IModule> _module;
-
-	typedef RefVector<IType> TypeVector;
-	TypeVector _types;
-	
-	typedef RefVector<INamespace> NamespaceVector;
-	NamespaceVector _childNamespaces;
+	RefVector<IType> _types;
+	RefVector<INamespace> _childNamespaces;
 };
 
 } // namespace co

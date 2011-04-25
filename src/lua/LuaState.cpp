@@ -475,7 +475,7 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 		}
 		break;
 	case co::TK_ARRAY:
-		// array no requested?
+		// array not requested?
 		if( var.getState().data.ptr == NULL )
 			break;
 		// array not provided?
