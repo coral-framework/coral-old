@@ -180,10 +180,10 @@ public:
 	}
 
 	//! Unchecked random access to range elements.
-	inline T& operator[]( int index ) { return *( _start + index ); }
+	inline T& operator[]( size_t index ) { return *( _start + index ); }
 
 	//! Unchecked random access to range elements (const version).
-	inline const T& operator[]( int index ) const { return *( _start + index ); }
+	inline const T& operator[]( size_t index ) const { return *( _start + index ); }
 
 private:
 	T* _start;
