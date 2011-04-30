@@ -16,7 +16,7 @@
 namespace co {
 
 Library::Library( const std::string& fileName )
-	: _fileName( fileName ), _handle( 0 ), _loadHints( 0 )
+	: _fileName( fileName ), _handle( 0 ), _loadHints( 0 ), _noDlClose( false )
 {
 	// empty
 }
@@ -125,12 +125,12 @@ void* Library::doResolve( const char* symbolName )
 void Library::doUnload()
 {
 #ifdef CORAL_OS_WIN
-	bool unloadFailed = !FreeLibrary( static_cast<HINSTANCE>( _handle ) );
+	bool unloaded = FreeLibrary( static_cast<HINSTANCE>( _handle ) );
 #else
-	bool unloadFailed = ( dlclose( _handle ) != 0 );
+	bool unloaded = _noDlClose || ( dlclose( _handle ) != 0 );
 #endif
 
-	if( unloadFailed )
+	if( !unloaded )
 	{
 		std::string errorMsg;
 		getLastErrorMessage( errorMsg );

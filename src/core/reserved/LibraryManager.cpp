@@ -15,10 +15,14 @@ namespace
 {
 	LibraryMap sg_loadedLibs;
 	LibraryList sg_releasedLibs;
+	bool sg_noDlClose( false );
 }
 
 void co::LibraryManager::add( co::IModulePart* part, co::Library* library )
-{	
+{
+	if( sg_noDlClose )
+		library->setNoDlClose( true );
+
 	sg_loadedLibs.insert( LibraryMap::value_type( part, library ) );
 }
 
@@ -46,4 +50,9 @@ void co::LibraryManager::releaseAll()
 void co::LibraryManager::flush()
 {
 	sg_releasedLibs.clear();
+}
+
+void co::LibraryManager::setNoDlClose()
+{
+	sg_noDlClose = true;
 }

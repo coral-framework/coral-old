@@ -58,15 +58,26 @@ public:
 	inline void* getHandle() const { return _handle; }
 
 	//! Returns the currently set load hints (see LoadHint).
-	inline int getLoadHints() const { return _loadHints; }
+	inline co::uint8 getLoadHints() const { return _loadHints; }
 
-	//! Sets current load hints (an <tt>OR</tt>'ed a combination of the constants in LoadHint).
-	//! To take effect, this method must be called before any call to load() or resolve().
-	inline void setLoadHints( int hints ) { _loadHints = hints; }
+	/*!
+		Sets the current load hints (any of the constants in LoadHint, \c OR'ed).
+		This method must be called before any call to load() or resolve().
+	 */
+	inline void setLoadHints( co::uint8 hints ) { _loadHints = hints; }
+
+	/*!
+		If this is set to true, dlclose() will not be called to unload the
+		library on UNIX, leaving the shared-object on memory when the process
+		ends. This may be useful if you are post-analyzing your application
+		with a tool such as valgrind. This has no effect on Windows.		
+	 */
+	inline void setNoDlClose( bool noDlClose ) { _noDlClose = noDlClose; }
 
 	/*!
 		Loads the library (if not currently loaded) using the current load hints.
-		Note that you are not required to call this method explicitly, as resolve() will call it internally.
+		Note that you are not required to call this method explicitly, since
+		resolve() will call it when needed.
 		\throw ModuleLoadException if an error occurs while loading the library.
 	 */
 	void load();
@@ -103,7 +114,8 @@ private:
 private:
 	std::string _fileName;
 	void* _handle;
-	int _loadHints;
+	co::uint8 _loadHints;
+	bool _noDlClose; // if true, won't call dlclose() on UNIX (default = false)
 };
 
 }; // namespace co

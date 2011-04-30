@@ -34,6 +34,13 @@ public:
 
 	//! Unloads all released libraries that are still loaded.
 	static void flush();
+
+	/*!
+		Call this before initialization to skip dlclose() calls when unloading
+		a module on UNIX. This may be useful if you are post-analyzing your
+		application with a tool such as valgrind. Has no effect on Windows.
+	 */
+	static void setNoDlClose();
 };
 
 } // namespace co
