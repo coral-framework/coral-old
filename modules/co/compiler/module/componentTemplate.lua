@@ -39,6 +39,25 @@ local function writeMethodTemplate( writer, t, methodName, returnType, parameter
 ]] )
 end
 
+local function extractInterfaces( facets )
+	local implemented = {}
+	local interfaces = {}
+	for i, facet in ipairs( facets ) do
+		local type = facet.type
+		local superTypes = type.superTypes
+		for i = #superTypes - 1, 1, -1 do
+			local itf = superTypes[i]
+			if not implemented[itf] then
+				interfaces[#interfaces + 1] = itf
+			end
+		end
+		if not implemented[type] then
+			interfaces[#interfaces + 1] = type
+		end
+	end
+	return interfaces
+end
+
 local function template( writer, c, t )
 	writer( [[
 /*
@@ -76,13 +95,11 @@ public:
 	}
 ]] )
 
-	for i, facet in ipairs( t.facets ) do
+	for i, itf in ipairs( extractInterfaces( t.facets ) ) do
 		writer( [[
 
-	// ------ ]], facet.type.fullName, [[ Methods ------ //
+	// ------ ]], itf.fullName, [[ Methods ------ //
 ]] )
-		local itf = facet.type
-
 		-- Field Accessors
 		for i, field in ipairs( itf.fields ) do
 			writeMethodTemplate( writer, t, t.formatAccessor( "get", field.name ), field.type )
