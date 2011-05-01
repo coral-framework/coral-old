@@ -29,9 +29,9 @@ public:
 	void setOwner( ICompositeType* owner, size_t index )
 	{
 		_owner = owner;
-		
+
 		assert( index < MAX_UINT32 );
-		_index = static_cast<uint32>( index );
+		_index = static_cast<uint16>( index );
 	}
 
 	// co::IMember methods:

@@ -613,6 +613,11 @@ co::int32 LuaState::callFunction( const std::string& moduleName, const std::stri
 	}
 }
 
+void LuaState::collectGarbage()
+{
+	lua_gc( getL(), LUA_GCCOLLECT, 0 );
+}
+
 void LuaState::pushInstancesTable( lua_State* L )
 {
 	if( sm_instancesTableRegIdx == 0 )

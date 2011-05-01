@@ -91,7 +91,9 @@ public:
 	bool findScript( const std::string& name, std::string& filename );
 
 	co::int32 callFunction( const std::string& moduleName, const std::string& functionName,
-								co::Range<const co::Any> args, co::Range<const co::Any> results );
+		co::Range<const co::Any> args, co::Range<const co::Any> results );
+
+	void collectGarbage();
 
 private:
 	template<typename BindingClass, typename InstanceType>

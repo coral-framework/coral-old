@@ -68,6 +68,9 @@ void moduleRelease()
 		assert( sg_instance.isValid() );
 		co::LibraryManager::release( sg_instance.get() );
 	}
+
+	// module retain/release mismatch?
+	assert( sg_refCount >= 0 );
 }
 
 // implemented by CORAL_EXPORT_MODULE_PART()

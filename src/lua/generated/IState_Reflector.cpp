@@ -57,13 +57,19 @@ public:
 		return res.get< co::int32 >();
 	}
 
+	void collectGarbage()
+	{
+		co::Range<co::Any const> range;
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 1 ), range );
+	}
+
 	bool findScript( const std::string& name_, std::string& filename_ )
 	{
 		co::Any args[2];
 		args[0].set< const std::string& >( name_ );
 		args[1].set< std::string& >( filename_ );
 		co::Range<co::Any const> range( args, 2 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 1 ), range );
+		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 2 ), range );
 		return res.get< bool >();
 	}
 
@@ -150,6 +156,11 @@ public:
 				}
 				break;
 			case 1:
+				{
+					p->collectGarbage();
+				}
+				break;
+			case 2:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					std::string& filename_ = args[++argIndex].get< std::string& >();

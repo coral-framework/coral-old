@@ -54,7 +54,7 @@ TEST( ReflectorTests, basicReflectors )
 		ASSERT_TRUE( reflector != NULL );
 
 		EXPECT_EQ( types[i], reflector->getType() );
-		EXPECT_GT( reflector->getSize(), 0 );
+		EXPECT_GT( reflector->getSize(), co::uint32( 0 ) );
 
 		ASSERT_NO_THROW( reflector->createValue( buffer1 ) );
 		ASSERT_NO_THROW( reflector->createValue( buffer2 ) );
@@ -82,11 +82,11 @@ TEST( ReflectorTests, arrayReflectors )
 	ASSERT_TRUE( reflector != NULL );
 
 	EXPECT_EQ( type, reflector->getType() );
-	EXPECT_GT( reflector->getSize(), 0 );
+	EXPECT_GT( reflector->getSize(), co::uint32( 0 ) );
 
 	EXPECT_THROW( reflector->createValue( NULL ), co::NotSupportedException );
 	EXPECT_THROW( reflector->copyValue( NULL, NULL ), co::NotSupportedException );
-	EXPECT_THROW( reflector->destroyValue( NULL ), co::NotSupportedException );	
+	EXPECT_THROW( reflector->destroyValue( NULL ), co::NotSupportedException );
 	EXPECT_THROW( reflector->newInstance(), co::NotSupportedException );
 	EXPECT_THROW( reflector->newDynamicProxy( NULL ), co::NotSupportedException );
 

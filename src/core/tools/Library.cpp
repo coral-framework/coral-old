@@ -125,9 +125,9 @@ void* Library::doResolve( const char* symbolName )
 void Library::doUnload()
 {
 #ifdef CORAL_OS_WIN
-	bool unloaded = FreeLibrary( static_cast<HINSTANCE>( _handle ) );
+	bool unloaded = ( FreeLibrary( static_cast<HINSTANCE>( _handle ) ) != FALSE );
 #else
-	bool unloaded = _noDlClose || ( dlclose( _handle ) != 0 );
+	bool unloaded = ( _noDlClose || ( dlclose( _handle ) == 0 ) );
 #endif
 
 	if( !unloaded )
@@ -136,7 +136,7 @@ void Library::doUnload()
 		getLastErrorMessage( errorMsg );
 		CORAL_THROW( ModuleLoadException, "error unloading library '" << _fileName << "': " << errorMsg );
 	}
-	
+
 	_handle = 0;
 }
 

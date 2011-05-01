@@ -40,4 +40,9 @@ interface IState
 	 */
 	int32 callFunction( in string moduleName, in string functionName, in any[] args, in any[] results )
 			raises Exception;
+
+	/*
+		Invokes a full cycle of the Lua garbage collector.
+	 */
+	void collectGarbage();
 };
