@@ -225,6 +225,7 @@ MACRO( CORAL_DEFAULT_TARGET_PROPERTIES targetName )
 
 	# Disable unavoidable MSVC warnings
 	IF( MSVC )
+		ADD_DEFINITIONS( "/wd4251" ) # type needs to have dll-interface to be used by clients
 		ADD_DEFINITIONS( "/wd4275" ) # non dll-interface class used as base for dll-interface class
 		SET_PROPERTY( TARGET ${targetName} APPEND PROPERTY COMPILE_DEFINITIONS
 				"_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE" )
