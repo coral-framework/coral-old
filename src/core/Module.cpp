@@ -29,7 +29,7 @@ Module::~Module()
 	assert( _state >= ModuleState_Disposed );
 }
 
-void Module::initialize( const std::string& moduleName )
+void Module::setName( const std::string& moduleName )
 {
 	// get or create a namespace for this module
 	INamespace* ns = getSystem()->getTypes()->getRootNS();
@@ -49,13 +49,13 @@ void Module::initialize( const std::string& moduleName )
 	static_cast<Namespace*>( ns )->setModule( this );
 }
 
-void Module::addPart( IModulePart* part )
+void Module::addPart( IModulePart* modulePart )
 {
 	if( _state != ModuleState_None )
 		throw IllegalStateException( "cannot add a module part to a module after it has been initialized" );
 
-	assert( part );
-	_parts.push_back( part );
+	assert( modulePart );
+	_parts.push_back( modulePart );
 }
 
 ModuleState Module::getState()
@@ -89,8 +89,12 @@ void Module::initialize()
 	if( _state != ModuleState_None )
 		throw IllegalStateException( "the module's state is not ModuleState_None" );
 
-	for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
-		ar.getFirst()->initialize( this );
+	/*
+		Notice: all initialize() calls are done (by the module manager)
+		interleaved with the loading of module parts, so that a modulePart's
+		initialization may add a new ModulePartLoader which is immediately
+		used to load a new part for the same module.
+	 */
 
 	_state = ModuleState_Initialized;
 }

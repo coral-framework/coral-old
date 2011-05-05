@@ -142,51 +142,68 @@ IModule* ModuleManager::load( const std::string& moduleName )
 	if( alreadyLoaded )
 		return alreadyLoaded;
 
-	// load ModuleParts
+	/*
+		Load and initialize ModuleParts. Notice that once we initialize a part,
+		it may register a new ModulePartLoader that must also be considered.
+	 */
+
+	// the IModule is created on demand
 	Module* module = NULL;
-	for( ModulePartLoaderList::iterator it = _loaders.begin(); it != _loaders.end(); ++it )
-	{
-		IModulePartLoader* loader = it->get();
-		if( loader->canLoadModulePart( moduleName ) )
-		{
-			try
-			{
-				RefPtr<IModulePart> part = loader->loadModulePart( moduleName );
-				if( !part.isValid() )
-					throw Exception( "loader returned a null IModulePart" );
 
-				// create the IModule on demand
-				if( !module )
-					module = createModule( moduleName );
+	// for error handling: whether a part was being loaded (true) or initialized (false)
+	bool wasLoading = true;
 
-				module->addPart( part.get() );
-			}
-			catch( std::exception& e )
-			{
-				// if a part cannot be loaded, the whole module is aborted
-				if( module )
-					module->abort();
-
-				CORAL_THROW( ModuleLoadException, "error loading module '" << moduleName << "': " << e.what() );
-			}
-		}
-	}
-
-	if( !module )
-		CORAL_THROW( ModuleLoadException, "none of the module loaders recognized '"
-						<< moduleName << "' as a module" );
-
-	// initialize the module
 	try
 	{
-		module->initialize();
+		size_t numLoaders = _loaders.size();
+		for( size_t i = 0; i < numLoaders; ++i )
+		{
+			IModulePartLoader* loader = _loaders[i].get();
+			if( !loader->canLoadModulePart( moduleName ) )
+				continue;
+
+			// load the module part
+			wasLoading = true;
+
+			RefPtr<IModulePart> part( loader->loadModulePart( moduleName ) );
+			if( !part.isValid() )
+				throw ModuleLoadException( "loader returned a null IModulePart" );
+
+			if( !module )
+				module = createModule( moduleName );
+			module->addPart( part.get() );
+
+			// initialize the module part
+			wasLoading = false;
+			part->initialize( module );
+
+			// this module part may have added a new IModulePartLoader
+			size_t newNumLoaders = _loaders.size();
+			assert( newNumLoaders >= numLoaders );
+			numLoaders = newNumLoaders;
+		}
 	}
 	catch( std::exception& e )
 	{
-		module->abort();
-		CORAL_THROW( ModuleLoadException, "exception raised by module '" << moduleName
-						<< "' during initialization: " << e.what() );
+		// any error while loading or initializing a part aborts the whole module
+		if( module )
+			module->abort();
+
+		std::stringstream ss;
+		if( wasLoading )
+			ss << "error loading module '" << moduleName << "': ";
+		else
+			ss << "exception raised by module '" << moduleName << "' during initialization: ";
+		ss << e.what();
+
+		throw ModuleLoadException( ss.str() );
 	}
+
+	if( module )
+		module->initialize();
+	else
+		CORAL_THROW( ModuleLoadException,
+			"none of the module loaders recognized '" << moduleName << "' as a module" );
 
 	verifyModuleIntegrity( module );
 	syncModuleWithSystemState( module );
@@ -201,7 +218,7 @@ Module* ModuleManager::createModule( const std::string& moduleName )
 	// add it to the list of loaded modules
 	_modules.push_back( module );
 
-	module->initialize( moduleName );
+	module->setName( moduleName );
 
 	return module;
 }

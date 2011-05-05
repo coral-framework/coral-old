@@ -23,15 +23,15 @@ public:
 	virtual ~Module();
 
 	// internal methods:
-	void initialize( const std::string& moduleName );
+	void setName( const std::string& moduleName );
 
 	/*!
-		Adds a constituent part of this module.
+		Adds a \a modulePart to this module.
 
 		The module's state must be ModuleState_None when this method is called,
 		or a IllegalStateException will be raised.
 	 */
-	void addPart( IModulePart* part );
+	void addPart( IModulePart* modulePart );
 
 	// IModule methods:
 	ModuleState getState();
