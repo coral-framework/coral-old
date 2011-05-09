@@ -9,6 +9,11 @@ public:
 	]], t.name, [[( const std::string& message )
 		: co::Exception( message )
 	{;}
+
+	virtual ~]], t.name, [[() throw()
+	{;}
+
+	inline const char* getTypeName() const { return "]], t.fullName, [["; }
 };
 ]] )
 end

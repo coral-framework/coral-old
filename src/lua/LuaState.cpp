@@ -311,12 +311,12 @@ void LuaState::push( lua_State* L, co::IService* itf )
 	if( itf && itf->getInterface()->getFullName() == "co.IObject" )
 		push( L, static_cast<co::IObject*>( itf ) );
 	else
-		pushInstance<InterfaceBinding, co::IService>( L, itf );
+		pushInstance<ServiceBinding, co::IService>( L, itf );
 }
 
 void LuaState::push( lua_State* L, co::IObject* object )
 {
-	pushInstance<ComponentBinding, co::IObject>( L, object );
+	pushInstance<ObjectBinding, co::IObject>( L, object );
 }
 
 void LuaState::getAny( lua_State* L, int index, co::IType* expectedType, co::Any& any )
@@ -522,7 +522,7 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 			int tp = lua_type( L, index );
 			if( tp == LUA_TTABLE )
 			{
-				lua_getfield( L, index, "__interface" );
+				lua_getfield( L, index, "__service" );
 				if( lua_type( L, -1 ) == LUA_TUSERDATA )
 				{
 					tp = LUA_TUSERDATA;
@@ -535,7 +535,7 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 				ct = CompositeTypeBinding::getType( L, index );
 				co::TypeKind kind = ct ? ct->getKind() : co::TK_NONE;
 				if( kind == co::TK_INTERFACE || kind == co::TK_COMPONENT )
-					itf = InterfaceBinding::getInstance( L, index );
+					itf = ServiceBinding::getInstance( L, index );
 			}
 
 			lua_settop( L, stackTop );

@@ -118,18 +118,18 @@ end
 -------------------------------------------------------------------------------
 -- componentPrototype = co.Component( desc )
 --
--- Defines a Coral component type implemented in Lua.
+-- Defines a Coral component implemented in Lua.
 --
--- Receives a table describing the component type, with three fields:
---		desc.name = a fully-qualified Coral type name for the component.
---		desc.provides = a map of interface names to interface type names.
---		desc.receives = a map of interface names to interface type names.
--- Either 'provides' or 'receives' can be omitted, but at least one interface
--- must be defined. When providing both tables, beware of port name clashes.
+-- Receives a table describing the component, with three fields:
+--		desc.name = a fully-qualified type name for the component.
+--		desc.provides = a map of facet names to interface names.
+--		desc.receives = a map of receptacle names to interface names.
+-- Either 'provides' or 'receives' can be omitted, but at least one port must
+-- be defined. When providing both tables, beware of port name clashes.
 --
--- The 'desc' table is converted into a component prototype table and returned
--- as the function result. A brand new component prototype table contains only
--- the component's facets, as interface prototype tables.
+-- The 'desc' table is turned into a component prototype table and returned as
+-- the function result. A fresh component prototype table contains only the
+-- component's facets, as facet prototype tables.
 --
 -- Prototype tables should be populated with Lua methods to implement the component.
 -- A method will only affect a specific facet if it is added to the facet's prototype
@@ -241,33 +241,24 @@ function co.Component( t )
 	t.__receives = receives
 	t.__reflector = coNewComponentType( ct, t )
 
-	-- a component prototype table is the MT for its component instances
+	-- a component prototype table is the MT for its facet and object tables
 	t.__index = function( _, k ) return t[k] end
 
 	-- create prototype tables for the facets
 	for k, v in pairs( provides ) do
-		t[k] = {}
+		t[k] = setmetatable( {}, t )
 	end
 
 	return setmetatable( t, ComponentMT )
 end
 
-local function interfaceMT__index( itfTable, k )
-	return itfTable.__protoItf[k] or getmetatable( itfTable )[k]
-end
+function ComponentMT.__call( componentTable, objectTable )
+	objectTable = objectTable or {}
 
-function ComponentMT.__call( protoTable, instanceTable )
-	instanceTable = instanceTable or {}
-	instanceTable.__index = interfaceMT__index
+	local object = coNewComponentInstance( componentTable.__reflector, objectTable )
+	objectTable.object = object
 
-	local instance = coNewComponentInstance( protoTable.__reflector, instanceTable )
+	setmetatable( objectTable, componentTable )
 
-	-- setup the facet instance tables
-	for k, v in pairs( protoTable.__provides ) do
-		instanceTable[k] = setmetatable( { __interface = instance[k], __protoItf = protoTable[k] }, instanceTable )
-	end
-
-	setmetatable( instanceTable, protoTable )
-
-	return instance
+	return object
 end

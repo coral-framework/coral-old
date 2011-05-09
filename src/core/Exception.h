@@ -33,13 +33,16 @@ public:
 	//! Destructor.
 	virtual ~Exception() throw();
 
+	//! Returns the exception's fully-qualified type name.
+	virtual const char* getTypeName() const;
+
 	//! Returns the exception message.
 	inline const std::string& getMessage() const { return _message; }
 
 	//! Sets the exception message.
 	inline void setMessage( const std::string& message ) { _message = message; }
 
-	//! Returns the exception message as C-string, for compatibility with std::exception.
+	//! Returns the exception message as a C string, for compatibility with std::exception.
 	virtual const char* what() const throw();
 
 private:

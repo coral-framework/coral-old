@@ -52,12 +52,13 @@ public:
 
 private:
 	inline co::IPort* getFacet( co::int32 cookie );
-	void pushInterfaceInstanceTable( lua_State* L, co::int32 cookie );
-	void pushAccessorName( lua_State* L, const char* prefix, const std::string& fieldName, const char* suffix = NULL );
+	void pushFacetTable( lua_State* L, co::int32 cookie );
+	void pushAccessorName( lua_State* L, const char* prefix,
+			const std::string& fieldName, const char* suffix = NULL );
 	void getMethod( lua_State* L, int t, co::int32 cookie = -1 );
 
-	co::IService* getDynamicReceptacle( co::IPort* port );
-	void setDynamicReceptacle( co::IPort* receptacle, co::IService* instance );
+	co::IService* dynamicGetService( co::IPort* port );
+	void dynamicSetService( co::IPort* receptacle, co::IService* instance );
 
 	void raiseNotSupportedException();
 
@@ -66,23 +67,23 @@ private:
 	co::IComponent* _componentType;
 
 	/*
-		Array of proxy interfaces created for the component's facets. If '_facets'
-		is NULL, it means this is a 'component type', not a 'component instance'.
+		Array of proxy interfaces created for the component facets. If '_facets'
+		is NULL, it means this is a "Lua component type", not an instance.
 	 */
 	co::IService** _facets;
 
-	// Length of the '_serverItfs' array.
+	// Length of the '_facets' array.
 	int _numFacets;
 
 	/*
 		Lua registry reference to the component's table.
-		If this instance is a 'component type', '_tableRef' will be a reference to
-		the component's prototype table. Otherwise, it will be a reference to
-		the component's instance table.
+		If this instance is a "Lua component type", _tableRef will be a
+		reference to the component's prototype table. Otherwise, it will
+		be a reference to the component's instance table.
 	 */
 	int _tableRef;
 
-	// used by the co::IDynamicServiceProvider methods to return values
+	// for the co::IDynamicServiceProvider methods to return values
 	co::Any _res;
 };
 

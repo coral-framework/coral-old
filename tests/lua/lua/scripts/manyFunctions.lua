@@ -20,4 +20,8 @@ function M.raise( exceptionType, message )
 	co.raise( exceptionType, message )
 end
 
+function M.causeIllegalStateException()
+	co.system:setupBase( {} )
+end
+
 return M

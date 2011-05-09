@@ -21,6 +21,11 @@ public:
 	ModuleLoadException( const std::string& message )
 		: co::Exception( message )
 	{;}
+
+	virtual ~ModuleLoadException() throw()
+	{;}
+
+	inline const char* getTypeName() const { return "co.ModuleLoadException"; }
 };
 
 } // namespace co

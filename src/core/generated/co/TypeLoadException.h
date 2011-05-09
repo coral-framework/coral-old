@@ -21,6 +21,11 @@ public:
 	TypeLoadException( const std::string& message )
 		: co::Exception( message )
 	{;}
+
+	virtual ~TypeLoadException() throw()
+	{;}
+
+	inline const char* getTypeName() const { return "co.TypeLoadException"; }
 };
 
 } // namespace co

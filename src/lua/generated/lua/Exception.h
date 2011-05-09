@@ -21,6 +21,11 @@ public:
 	Exception( const std::string& message )
 		: co::Exception( message )
 	{;}
+
+	virtual ~Exception() throw()
+	{;}
+
+	inline const char* getTypeName() const { return "lua.Exception"; }
 };
 
 } // namespace lua

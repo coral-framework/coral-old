@@ -21,6 +21,11 @@ public:
 	NotSupportedException( const std::string& message )
 		: co::Exception( message )
 	{;}
+
+	virtual ~NotSupportedException() throw()
+	{;}
+
+	inline const char* getTypeName() const { return "co.NotSupportedException"; }
 };
 
 } // namespace co

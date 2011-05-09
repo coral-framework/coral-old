@@ -9,6 +9,7 @@
 #include <co/IModuleManager.h>
 #include <co/ModuleLoadException.h>
 #include <co/MissingInputException.h>
+#include <co/IllegalStateException.h>
 #include <co/IllegalArgumentException.h>
 #include <lua/IState.h>
 #include <lua/Exception.h>
@@ -76,12 +77,14 @@ TEST( LuaTests, assertEq )
 
 TEST( LuaTests, assertErrorNoError )
 {
-	ASSERT_ERROR( "lua.assertErrorNoError", "ASSERT_ERROR failed: no error was raised, though one was expected" );
+	ASSERT_ERROR( "lua.assertErrorNoError",
+					"ASSERT_ERROR failed: no error was raised, though one was expected" );
 }
 
 TEST( LuaTests, assertErrorMismatch )
 {
-	ASSERT_ERROR( "lua.assertErrorMismatch", "does not contain the expected message ('expected message')" );
+	ASSERT_ERROR( "lua.assertErrorMismatch",
+					"does not contain the expected message (\"expected message\")" );
 }
 
 TEST( LuaTests, assertTrue )
@@ -306,4 +309,14 @@ TEST( LuaTests, exceptionTypes )
 	message = "message";
 	ASSERT_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions", "raise", argRange, empty ),
 						lua::Exception, "error throwing an exception of type 'invalid type' from Lua" );
+}
+
+TEST( LuaTests, preserveExceptionType )
+{
+	co::RefPtr<lua::IState> luaState = co::getService<lua::IState>();
+
+	co::Range<const co::Any> empty;
+
+	ASSERT_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions",
+		"causeIllegalStateException", empty, empty ), co::IllegalStateException, "not SystemState_None" );
 }

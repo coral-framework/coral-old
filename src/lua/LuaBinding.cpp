@@ -49,11 +49,11 @@ static void handleException( lua_State* L )
 	}
 	catch( const co::Exception& e )
 	{
-		lua_pushstring( L, e.getMessage().c_str() );
+		lua_pushfstring( L, "{%s}%s", e.getTypeName(), e.getMessage().c_str() );
 	}
     catch( const std::exception& e )
     {
-		lua_pushfstring( L, "C++ exception: %s", e.what() );
+		lua_pushfstring( L, "std::exception: %s", e.what() );
     }
 	catch( ... )
 	{
@@ -252,7 +252,7 @@ int coPackage::newComponentInstance( lua_State* L )
 	CompositeTypeBinding::getInstance( L, 1, any );
 	co::IReflector* prototype = any.get<co::IReflector*>();
 	if( !prototype )
-		throw lua::Exception( "bad argument #1 to co.newComponentInstance (lua.Component.reflector expected)" );
+		throw lua::Exception( "bad argument #1 to co.newComponentInstance (reflector expected)" );
 
 	assert( prototype->getFacet()->getOwner()->getFullName() == "lua.Component" );
 
@@ -309,7 +309,7 @@ bool CompositeTypeBinding::tryGetInstance( lua_State* L, int udataIdx, co::Any& 
 		break;
 	case co::TK_INTERFACE:
 	case co::TK_COMPONENT:
-		instance.setService( InterfaceBinding::getInstance( L, udataIdx ) );
+		instance.setService( ServiceBinding::getInstance( L, udataIdx ) );
 		break;
 	default:
 		assert( false );
@@ -342,8 +342,8 @@ struct Metamethods
 static const Metamethods METAMETHODS_TABLE[] = {
 	{ StructBinding::index, StructBinding::newIndex, StructBinding::gc, StructBinding::toString },
 	{ NativeClassBinding::index, NativeClassBinding::newIndex, NativeClassBinding::gc, NativeClassBinding::toString },
-	{ InterfaceBinding::index, InterfaceBinding::newIndex, InterfaceBinding::gc, InterfaceBinding::toString },
-	{ ComponentBinding::index, ComponentBinding::newIndex, ComponentBinding::gc, ComponentBinding::toString }
+	{ ServiceBinding::index, ServiceBinding::newIndex, ServiceBinding::gc, ServiceBinding::toString },
+	{ ObjectBinding::index, ObjectBinding::newIndex, ObjectBinding::gc, ObjectBinding::toString }
 };
 
 void CompositeTypeBinding::pushMetatable( lua_State* L, co::ICompositeType* ct, co::IReflector* reflector )
@@ -606,10 +606,10 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 }
 
 /*****************************************************************************/
-/*  Helper class for binding co::Components to Lua                           */
+/*  Helper class for binding co::IObjects to Lua                             */
 /*****************************************************************************/
 
-void ComponentBinding::create( lua_State* L, co::IObject* object )
+void ObjectBinding::create( lua_State* L, co::IObject* object )
 {
 	// create the userdata
 	co::IObject** ud = reinterpret_cast<co::IObject**>( lua_newuserdata( L, sizeof(co::IObject*) ) );
@@ -636,7 +636,7 @@ inline bool isStringComponent( lua_State* L, int index )
 	return ( length == 9 && strncmp( str, "component", length ) == 0 );
 }
 
-int ComponentBinding::index( lua_State* L )
+int ObjectBinding::index( lua_State* L )
 {
 	co::IObject** ud = reinterpret_cast<co::IObject**>( lua_touserdata( L, 1 ) );
 	assert( ud );
@@ -665,7 +665,7 @@ int ComponentBinding::index( lua_State* L )
 	__END_EXCEPTIONS_BARRIER__
 }
 
-int ComponentBinding::newIndex( lua_State* L )
+int ObjectBinding::newIndex( lua_State* L )
 {
 	co::IObject** ud = reinterpret_cast<co::IObject**>( lua_touserdata( L, 1 ) );
 	assert( ud );
@@ -701,7 +701,7 @@ int ComponentBinding::newIndex( lua_State* L )
 	__END_EXCEPTIONS_BARRIER__
 }
 
-int ComponentBinding::gc( lua_State* L )
+int ObjectBinding::gc( lua_State* L )
 {
 	co::IObject** ud = reinterpret_cast<co::IObject**>( lua_touserdata( L, 1 ) );
 	assert( ud );
@@ -715,7 +715,7 @@ int ComponentBinding::gc( lua_State* L )
 	__END_EXCEPTIONS_BARRIER__
 }
 
-int ComponentBinding::toString( lua_State* L )
+int ObjectBinding::toString( lua_State* L )
 {
 	co::IObject** ud = reinterpret_cast<co::IObject**>( lua_touserdata( L, 1 ) );
 	assert( ud );
@@ -730,7 +730,7 @@ int ComponentBinding::toString( lua_State* L )
 /*  Helper class for binding co::Interfaces to Lua                           */
 /*****************************************************************************/
 
-void InterfaceBinding::create( lua_State* L, co::IService* service )
+void ServiceBinding::create( lua_State* L, co::IService* service )
 {
 	// create the userdata
 	co::IService** ud = reinterpret_cast<co::IService**>( lua_newuserdata( L, sizeof(co::IService*) ) );
@@ -743,7 +743,7 @@ void InterfaceBinding::create( lua_State* L, co::IService* service )
 	lua_setmetatable( L, -2 );
 }
 
-int InterfaceBinding::index( lua_State* L )
+int ServiceBinding::index( lua_State* L )
 {
 	co::IService** ud = reinterpret_cast<co::IService**>( lua_touserdata( L, 1 ) );
 	assert( ud );
@@ -761,7 +761,7 @@ int InterfaceBinding::index( lua_State* L )
 	__END_EXCEPTIONS_BARRIER__
 }
 
-int InterfaceBinding::newIndex( lua_State* L )
+int ServiceBinding::newIndex( lua_State* L )
 {
 	co::IService** ud = reinterpret_cast<co::IService**>( lua_touserdata( L, 1 ) );
 	assert( ud );
@@ -788,7 +788,7 @@ int InterfaceBinding::newIndex( lua_State* L )
 	__END_EXCEPTIONS_BARRIER__
 }
 
-int InterfaceBinding::gc( lua_State* L )
+int ServiceBinding::gc( lua_State* L )
 {
 	co::IService** ud = reinterpret_cast<co::IService**>( lua_touserdata( L, 1 ) );
 	assert( ud );
@@ -802,7 +802,7 @@ int InterfaceBinding::gc( lua_State* L )
 	__END_EXCEPTIONS_BARRIER__
 }
 
-int InterfaceBinding::toString( lua_State* L )
+int ServiceBinding::toString( lua_State* L )
 {
 	co::IService** ud = reinterpret_cast<co::IService**>( lua_touserdata( L, 1 ) );
 	assert( ud );

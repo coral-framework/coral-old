@@ -13,12 +13,15 @@ end
 function ASSERT_ERROR( func, expectedErrorMsg )
 	local ok, msg = pcall( func )
 	if not ok then
-		if expectedErrorMsg and ( msg ~= expectedErrorMsg and not msg:find( expectedErrorMsg ) ) then
-			error( "ASSERT_ERROR failed: raised error ('" .. msg .. "') does not contain the expected message ('"
-					.. expectedErrorMsg .. "')", 2 )
+		if expectedErrorMsg and ( msg ~= expectedErrorMsg and not msg:find( expectedErrorMsg, 1, true ) ) then
+			error( 'ASSERT_ERROR failed: raised error ("' .. msg .. '") does not contain the expected message ("'
+					.. expectedErrorMsg .. '")', 2 )
 		end
 	else
-		error( "ASSERT_ERROR failed: no error was raised, though " .. ( not expectedErrorMsg and "one was expected" or
-			( "the following was expected: '" .. expectedErrorMsg .. "'" ) ), 2 )
+		local explanation = "one was expected"
+		if expectedErrorMsg then
+			explanation = "the following was expected: '" .. expectedErrorMsg .. "'"
+		end
+		error( "ASSERT_ERROR failed: no error was raised, though " .. explanation, 2 )
 	end
 end

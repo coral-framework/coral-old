@@ -21,6 +21,11 @@ public:
 	IllegalNameException( const std::string& message )
 		: co::Exception( message )
 	{;}
+
+	virtual ~IllegalNameException() throw()
+	{;}
+
+	inline const char* getTypeName() const { return "co.IllegalNameException"; }
 };
 
 } // namespace co

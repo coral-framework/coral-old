@@ -109,7 +109,7 @@ private:
 /*!
 	Static class for binding co::Components to Lua.
  */
-class ComponentBinding : public CompositeTypeBinding
+class ObjectBinding : public CompositeTypeBinding
 {
 public:
 	//! Pushes a new instance of a co::IObject* userdata onto the stack.
@@ -125,7 +125,7 @@ public:
 /*!
 	Static class for binding co::Interfaces to Lua.
  */
-class InterfaceBinding : public CompositeTypeBinding
+class ServiceBinding : public CompositeTypeBinding
 {
 public:
 	//! Pushes a new service userdata onto the stack.

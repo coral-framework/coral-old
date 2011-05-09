@@ -36,8 +36,8 @@ end
 function BatComponent:fightCrime()
 	-- test passing our own interfaces to another component
 	local component = self.target1.provider
-	component.bat = self.vampireBat
-	component.target1 = self.batman
+	component.bat = self.object.vampireBat
+	component.target1 = self.object.batman
 end
 
 function BatComponent:getBatService() return self.bat end

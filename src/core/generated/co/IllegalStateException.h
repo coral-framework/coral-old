@@ -21,6 +21,11 @@ public:
 	IllegalStateException( const std::string& message )
 		: co::Exception( message )
 	{;}
+
+	virtual ~IllegalStateException() throw()
+	{;}
+
+	inline const char* getTypeName() const { return "co.IllegalStateException"; }
 };
 
 } // namespace co

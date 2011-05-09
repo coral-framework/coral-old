@@ -21,6 +21,11 @@ public:
 	MissingInputException( const std::string& message )
 		: co::Exception( message )
 	{;}
+
+	virtual ~MissingInputException() throw()
+	{;}
+
+	inline const char* getTypeName() const { return "co.MissingInputException"; }
 };
 
 } // namespace co

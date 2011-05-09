@@ -21,6 +21,11 @@ public:
 	IllegalCastException( const std::string& message )
 		: co::Exception( message )
 	{;}
+
+	virtual ~IllegalCastException() throw()
+	{;}
+
+	inline const char* getTypeName() const { return "co.IllegalCastException"; }
 };
 
 } // namespace co

@@ -21,6 +21,11 @@ public:
 	MissingServiceException( const std::string& message )
 		: co::Exception( message )
 	{;}
+
+	virtual ~MissingServiceException() throw()
+	{;}
+
+	inline const char* getTypeName() const { return "co.MissingServiceException"; }
 };
 
 } // namespace co

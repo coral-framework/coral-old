@@ -21,6 +21,11 @@ public:
 	NoSuchPortException( const std::string& message )
 		: co::Exception( message )
 	{;}
+
+	virtual ~NoSuchPortException() throw()
+	{;}
+
+	inline const char* getTypeName() const { return "co.NoSuchPortException"; }
 };
 
 } // namespace co
