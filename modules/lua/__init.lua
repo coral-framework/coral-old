@@ -7,9 +7,12 @@ local error = error
 local pairs = pairs
 local ipairs = ipairs
 local tostring = tostring
-local getmetatable = getmetatable
 local setmetatable = setmetatable
 
+local debug = require "debug"
+local rawgetmetatable = debug.getmetatable
+
+local co = co
 local coNew = co.new
 local coGetType = co.getType
 local coFindScript = co.findScript
@@ -44,13 +47,17 @@ table.insert( package.loaders, 2, function( moduleName )
 	end
 end )
 
--------------------------------------------------------------------------------
--- type = co.Type[typeName]
---
--- co.Type is a smart table that fetches and caches Coral types. It can be
--- indexed or called, always with a fully-qualified type name. For example:
---		local type = co.Type[fullTypeName]
---		local type = co.Type "my.InterfaceName"
+
+--[[----------------------------------------------------------------------------
+
+type = co.Type[typeName]
+
+co.Type is a smart table that fetches and caches Coral types. It can be
+indexed or called, always with a fully-qualified type name. For example:
+	local type = co.Type[fullTypeName]
+	local type = co.Type "my.InterfaceName"
+
+]]
 
 local coTypeMT = {}
 
@@ -67,40 +74,69 @@ end
 local coType = setmetatable( {}, coTypeMT )
 co.Type = coType
 
--------------------------------------------------------------------------------
--- Function co.raise( exceptionType, message )
+
+--[[----------------------------------------------------------------------------
+
+typeName = co.typeOf( coralValue )
+
+Returns the fully-qualified type name of a Coral value. Works for Coral structs,
+native classes, services and objects. For everything else, returns nil.
+
+]]
+
+local function coTypeOf( v )
+	local res = rawgetmetatable( v )
+	if res then
+		res = res.__coraltype
+	end
+	return res
+end
+
+co.typeOf = coTypeOf
+
+
+--[[----------------------------------------------------------------------------
+
+co.raise( exceptionType, message )
+
+]]
 
 co.raise = function( exceptionType, message )
 	error( "{" .. exceptionType .. "}" .. message, 0 )
 end
 
--------------------------------------------------------------------------------
--- service = co.getService( serviceName[, client] )
---
--- Performs all kinds of service lookups: global, specialized by client type,
--- or specialized by client instance.
---
--- Parameter 'serviceName' is a fully-qualified interface type name (string),
--- indicating the kind of service you are trying to obtain.
---
--- If parameter 'client' is omitted, this function will attempt to get the
--- global provider of the specified type of service. Otherwise, \a client must
--- be either the name (string) or an instance of another service.
---
--- If \a client is an interface name (string), co.getService() will pick the most
--- specialized service available for clients of this type. Otherwise, if \a client
--- is a service, co.getService() will pick the most specialized service available
--- for the component instance providing the service, considering all its facets.
---
--- Examples:
---     local itf = co.getService( "gfx.IDrawer" )
---     Gets the global (or default) instance of 'gfx.IDrawer'. Much like a singleton.
---
---     local itf = co.getService( "gfx.IDrawer", "obj.IPlayer" )
---     Gets an instance of 'gfx.IDrawer' specialized for an 'obj.IPlayer'.
---
---     local itf = co.getService( "gfx.IDrawer", obj )
---     Gets an instance of 'gfx.IDrawer' specialized for this 'obj' instance.
+
+--[[----------------------------------------------------------------------------
+
+service = co.getService( serviceName[, client] )
+
+Performs all kinds of service lookups: global, specialized by client type,
+or specialized by client instance.
+
+Parameter 'serviceName' is a fully-qualified interface type name (string),
+indicating the kind of service you are trying to obtain.
+
+If parameter 'client' is omitted, this function will attempt to get the
+global provider of the specified type of service. Otherwise, \a client must
+be either the name (string) or an instance of another service.
+
+If \a client is an interface name (string), co.getService() will pick the most
+specialized service available for clients of this type. Otherwise, if \a client
+is a service, co.getService() will pick the most specialized service available
+for the component instance providing the service, considering all its facets.
+
+Examples:
+
+	local itf = co.getService( "gfx.IDrawer" )
+	Gets the global (or default) instance of 'gfx.IDrawer'. Much like a singleton.
+
+	local itf = co.getService( "gfx.IDrawer", "obj.IPlayer" )
+	Gets an instance of 'gfx.IDrawer' specialized for an 'obj.IPlayer'.
+
+	local itf = co.getService( "gfx.IDrawer", obj )
+	Gets an instance of 'gfx.IDrawer' specialized for this 'obj' instance.
+
+]]
 
 local serviceManager = co.system.services
 
@@ -115,37 +151,41 @@ function co.getService( serviceName, client )
 	end
 end
 
--------------------------------------------------------------------------------
--- componentPrototype = co.Component( desc )
---
--- Defines a Coral component implemented in Lua.
---
--- Receives a table describing the component, with three fields:
---		desc.name = a fully-qualified type name for the component.
---		desc.provides = a map of facet names to interface names.
---		desc.receives = a map of receptacle names to interface names.
--- Either 'provides' or 'receives' can be omitted, but at least one port must
--- be defined. When providing both tables, beware of port name clashes.
---
--- The 'desc' table is turned into a component prototype table and returned as
--- the function result. A fresh component prototype table contains only the
--- component's facets, as facet prototype tables.
---
--- Prototype tables should be populated with Lua methods to implement the component.
--- A method will only affect a specific facet if it is added to the facet's prototype
--- table; conversely, it will affect all facets if added to the component's prototype
--- table. For example:
---		local MyComponent = co.Component{ ... }
---		function MyComponent:doSomething() print "all interfaces" end
---		function MyComponent.someItf:doSomething() print "just someItf" end
---
--- A component can be instantiated by calling the component's prototype table. For example:
---		local instance = MyComponent() -- either no args, or...
---		local instance = MyComponent{} -- a table, which is re-used as the component instance.
---		local instance = MyComponent{ initial = 1, values = 2, areOK = 3 }
---
--- It is also possible to instantiate a Lua component from C++ by using the component's
--- type reflector. Therefore, co::newInstance() should also work for Lua components.
+
+--[[----------------------------------------------------------------------------
+
+componentPrototype = co.Component( desc )
+
+Defines a Coral component implemented in Lua.
+
+Receives a table describing the component, with three fields:
+	desc.name = a fully-qualified type name for the component.
+	desc.provides = a map of facet names to interface names.
+	desc.receives = a map of receptacle names to interface names.
+Either 'provides' or 'receives' can be omitted, but at least one port must
+be defined. When providing both tables, beware of port name clashes.
+
+The 'desc' table is turned into a component prototype table and returned as
+the function result. A fresh component prototype table contains only the
+component's facets, as facet prototype tables.
+
+Prototype tables should be populated with Lua methods to implement the component.
+A method will only affect a specific facet if it is added to the facet's prototype
+table; conversely, it will affect all facets if added to the component's prototype
+table. For example:
+	local MyComponent = co.Component{ ... }
+	function MyComponent:doSomething() print "all interfaces" end
+	function MyComponent.someItf:doSomething() print "just someItf" end
+
+A component can be instantiated by calling the component's prototype table. For example:
+	local instance = MyComponent() -- either no args, or...
+	local instance = MyComponent{} -- a table, which is re-used as the component instance.
+	local instance = MyComponent{ initial = 1, values = 2, areOK = 3 }
+
+It is also possible to instantiate a Lua component from C++ by using the component's
+type reflector. Therefore, co::newInstance() should also work for Lua components.
+
+]]
 
 local function checkComponentInterfaces( provides, receives )
 	local ok = false

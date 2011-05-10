@@ -5,11 +5,11 @@ local M = {}
 function M:initialize( module )
 	-- test the co.system interface
 	ASSERT_TRUE( co.system )
-	ASSERT_EQ( co.system.interface.fullName, "co.ISystem" )
+	ASSERT_EQ( "co.ISystem", co.system.interface.fullName )
 
 	-- test the co.getType() function
-	ASSERT_EQ( co.getType( "bool" ).fullName, "bool" )
-	ASSERT_EQ( co.getType( "co.IArray" ).name, "IArray" )
+	ASSERT_EQ( "bool", co.getType( "bool" ).fullName )
+	ASSERT_EQ( "IArray", co.getType( "co.IArray" ).name )
 	ASSERT_ERROR( function() co.getType( "nonExistingType" ) end, "could not load type 'nonExistingType'" )
 
 	-- test the co.Type table
@@ -19,19 +19,30 @@ function M:initialize( module )
 
 	-- test the co.new() function
 	local testObject = co.new "moduleA.TestComponent"
-	ASSERT_EQ( testObject.component.fullName, "moduleA.TestComponent" )
+	ASSERT_EQ( "moduleA.TestComponent", testObject.component.fullName )
 
 	local testStruct = co.new "moduleA.TestStruct"
-	ASSERT_EQ( testStruct.anInt8, 0 )
+	ASSERT_EQ( 0, testStruct.anInt8 )
 
 	local testNativeClass = co.new "moduleA.Vec2D"
-	ASSERT_EQ( testNativeClass.x, 0 )
-	ASSERT_EQ( testNativeClass.y, 0 )
+	ASSERT_EQ( 0, testNativeClass.x )
+	ASSERT_EQ( 0, testNativeClass.y )
 
 	ASSERT_ERROR( function() co.new "co.IType" end, "co.IType is not instantiable" )
 	ASSERT_ERROR( function() co.new "co.SystemState" end, "co.SystemState is not instantiable" )
 	ASSERT_ERROR( function() co.new "int8" end, "int8 is not instantiable" )
 	ASSERT_ERROR( function() co.new "nonExistingType" end, "could not load type 'nonExistingType'" )
+
+	-- test the co.typeOf() function
+	ASSERT_EQ( "co.ISystem", co.typeOf( co.system ) )
+	ASSERT_EQ( "co.IInterface", co.typeOf( co.system.interface ) )
+	ASSERT_EQ( "moduleA.TestComponent", co.typeOf( testObject ) )
+	ASSERT_EQ( "moduleA.TestStruct", co.typeOf( testStruct ) )
+	ASSERT_EQ( "moduleA.Vec2D", co.typeOf( testNativeClass ) )
+	ASSERT_TRUE( co.typeOf( 7 ) == nil )
+	ASSERT_TRUE( co.typeOf( 'x' ) == nil )
+	ASSERT_TRUE( co.typeOf( co.Type ) == nil )
+	ASSERT_TRUE( co.typeOf( co.typeOf ) == nil )
 
 	-- test findScript()
 	ASSERT_TRUE( co.findScript( "lua.coPackage.coPackage" ) )

@@ -270,7 +270,7 @@ int coPackage::newComponentInstance( lua_State* L )
 }
 
 /*****************************************************************************/
-/*  Class with re-usable functions for binding co::CompositeTypes to Lua      */
+/*  Class with re-usable functions for binding co::CompositeTypes to Lua     */
 /*****************************************************************************/
 
 CompositeTypeBinding::CompositeTypeList CompositeTypeBinding::sm_boundTypes;
@@ -363,7 +363,7 @@ void CompositeTypeBinding::pushMetatable( lua_State* L, co::ICompositeType* ct, 
 		const Metamethods& mms = METAMETHODS_TABLE[tag - co::TK_STRUCT];
 
 		lua_pop( L, 1 );
-		lua_createtable( L, 1, 4 );
+		lua_createtable( L, 1, 5 );
 
 		// save the ICompositeType at MT[1]
 		lua_pushlightuserdata( L, ct );
@@ -394,6 +394,10 @@ void CompositeTypeBinding::pushMetatable( lua_State* L, co::ICompositeType* ct, 
 		assert( mms.toString );
 		lua_pushliteral( L, "__tostring" );
 		lua_pushcfunction( L, mms.toString );
+		lua_rawset( L, -3 );
+
+		lua_pushliteral( L, "__coraltype" );
+		lua_pushstring( L, ct->getFullName().c_str() );
 		lua_rawset( L, -3 );
 
 		// save the metatable in the registry
