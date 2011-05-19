@@ -20,11 +20,11 @@ end
 local function writeMethodTemplate( writer, t, methodName, returnType, parameters )
 	writer( [[
 
-]], t.formatInput( returnType ), " ", t.name, "::", methodName, "( ", t.cppName, "& instance" )
-	if parameters and #parameters > 0 then
+]], t.formatInput( returnType ), " ", t.name, "_Adapter::", methodName, "( ", t.cppName, "& instance" )
+	if parameters then
 		for i, p in ipairs( parameters ) do
 			local paramType = ( p.isOut and t.formatOutput or t.formatInput )( p.type )
-			writer( paramType, " ", p.name, ( i < #parameters and ', ' or '' ) )
+			writer( ", ", paramType, " ", p.name )
 		end
 	end
 	writer( [[ )
