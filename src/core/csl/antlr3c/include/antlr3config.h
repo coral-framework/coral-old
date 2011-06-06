@@ -5,7 +5,7 @@
 
 /* Define if 64 bit mode required */
 #if CORAL_POINTER_SIZE == 8
-#define ANTLR3_USE_64BIT 1
+	#define ANTLR3_USE_64BIT 1
 #endif
 
 /* Define to 1 if you have the `accept' function. */

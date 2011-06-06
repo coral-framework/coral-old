@@ -670,7 +670,7 @@ _next    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 	return t;
 }
 
-#ifdef ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4100)
 #endif
@@ -684,7 +684,7 @@ dupTok	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el)
 	ANTLR3_FPRINTF(stderr, "dup() cannot be called on a token rewrite stream!!");
 	return NULL;
 }
-#ifdef ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
@@ -698,7 +698,7 @@ dupTree	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element)
 	return stream->adaptor->dupNode(stream->adaptor, (pANTLR3_BASE_TREE)element);
 }
 
-#ifdef ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4100)
 #endif
@@ -722,14 +722,14 @@ toTree   (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element)
 {
 	return (pANTLR3_BASE_TREE)element;
 }
-#ifdef ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
 /// Ensure stream emits trees; tokens must be converted to AST nodes.
 /// AST nodes can be passed through unmolested.
 ///
-#ifdef ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4100)
 #endif
@@ -740,7 +740,7 @@ toTreeNode   (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element)
 	return (pANTLR3_BASE_TREE)stream->adaptor->dupNode(stream->adaptor, (pANTLR3_BASE_TREE)element);
 }
 
-#ifdef ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 

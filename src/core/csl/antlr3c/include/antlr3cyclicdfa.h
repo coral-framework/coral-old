@@ -49,7 +49,7 @@ extern "C" {
 // useful for C++ as they are pre-generated and static in the recognizer.
 // So, we turn off those warnings, which are only at /W4 anyway.
 //
-#ifdef ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning	(push)
 #pragma warning (disable : 4510)
 #pragma warning (disable : 4512)
@@ -89,7 +89,7 @@ typedef ANTLR3_INT32		(*CDFA_SPECIAL_FUNC)   (void * , pANTLR3_BASE_RECOGNIZER ,
 
 #ifdef __cplusplus
 }
-#ifdef ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning	(pop)
 #endif
 #endif

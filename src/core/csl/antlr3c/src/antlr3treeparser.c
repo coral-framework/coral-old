@@ -177,7 +177,7 @@ mismatch	    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_B
     recognizer->recoverFromMismatchedToken(recognizer, ttype, follow);
 }
 
-#ifdef ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning	(push)
 #pragma warning (disable : 4100)
 #endif
@@ -249,7 +249,6 @@ getMissingSymbol			(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istre
 	//
 	return	node;
 }
-#ifdef ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning	(pop)
 #endif
-

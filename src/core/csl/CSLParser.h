@@ -118,7 +118,7 @@ typedef struct CSLParser_Ctx_struct CSLParser, * pCSLParser;
 
 
 
-#ifdef	ANTLR3_WINDOWS
+#ifdef _MSC_VER
 // Disable: Unreferenced parameter,							- Rules with parameters that are not used
 //          constant conditional,							- ANTLR realizes that a prediction is always true (synpred usually)
 //          initialized but unused variable					- tree rewrite variables declared but not needed

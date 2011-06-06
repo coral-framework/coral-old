@@ -142,8 +142,8 @@ typedef	UINT8	ANTLR3_BOOLEAN, *pANTLR3_BOOLEAN;
 #else
 // Mingw uses stdint.h and fails to define standard Microsoft typedefs
 // such as UINT16, hence we must use stdint.h for Mingw.
-//
 #include <stdint.h>
+#include <ctype.h>
 typedef int32_t		    ANTLR3_CHAR,    *pANTLR3_CHAR;
 typedef uint32_t	    ANTLR3_UCHAR,   *pANTLR3_UCHAR;
 
@@ -208,7 +208,9 @@ typedef struct sockaddr		ANTLR3_SOCKADDRC, * pANTLR3_SOCKADDRC;	// Type used for
 
 /* Don't complain about "deprecated" functions such as strdup
  */
+#ifdef _MSC_VER
 #pragma warning( disable : 4996 )
+#endif
 
 #else
 

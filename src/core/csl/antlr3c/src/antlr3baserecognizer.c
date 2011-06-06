@@ -37,7 +37,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifdef	ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning( disable : 4100 )
 #endif
 
@@ -2226,7 +2226,7 @@ getMissingSymbol			(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istre
 }
 
 
-#ifdef	ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning( default : 4100 )
 #endif
 

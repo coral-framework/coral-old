@@ -30,15 +30,14 @@
 
 //------ Recognized Operating Systems (CORAL_OS_x) -----------------------------
 
-#if defined(__APPLE__) && (defined(__GNUC__) || defined(__xlC__) || defined(__xlc__))
+#if defined(__APPLE__) && defined(__GNUC__)
 	#define CORAL_OS_MAC
 #elif defined(__linux__) || defined(__linux)
 	#define CORAL_OS_LINUX
-#elif !defined(SAG_COM) && ( (defined(WIN64) || defined(_WIN64) || defined(__WIN64__)) \
-		|| (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)) )
+#elif defined(_WIN32) || defined(__WIN32__)
 	#define CORAL_OS_WIN
 #else
-	#error Oops! Unknown or unsupported OS!
+	#error Oops - unknown or unsupported OS!
 #endif
 
 #if !defined(CORAL_OS_WIN)
@@ -51,6 +50,9 @@
 	#define CORAL_CC_MSVC
 #elif defined(__GNUC__)
 	#define CORAL_CC_GNU
+	#if defined(__MINGW32__)
+		#define CORAL_CC_MINGW
+	#endif
 #endif
 
 //------ Determine the CORAL_BUILD_KEY -----------------------------------------
@@ -92,10 +94,14 @@
 		#error "Coral requires Visual Studio 8 (2005) or newer."
 	#endif
 #elif defined(CORAL_CC_GNU)
-	#define CORAL_CC_NAME "g++"
+	#if defined(CORAL_CC_MINGW)
+		#define CORAL_CC_NAME "mingw"
+	#else
+		#define CORAL_CC_NAME "g++"
+	#endif
 	#define CORAL_CC_VERSION CORAL_STRINGIFY(__GNUC__) "." CORAL_STRINGIFY(__GNUC_MINOR__)
 #else
-	#error "Unsupported compiler! Coral requires GCC (g++) or MSVC."
+	#error "Unsupported compiler! Coral requires GCC or MSVC."
 #endif
 
 #define CORAL_BUILD_KEY		CORAL_OS_NAME " " CORAL_ARCH_NAME " " CORAL_CC_NAME "-" CORAL_CC_VERSION

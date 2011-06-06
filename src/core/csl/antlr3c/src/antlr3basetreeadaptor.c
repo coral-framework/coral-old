@@ -35,7 +35,7 @@
 
 #include    <antlr3basetreeadaptor.h>
 
-#ifdef	ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning( disable : 4100 )
 #endif
 

@@ -112,35 +112,31 @@ bool ModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::
 	size_t reserveLen = ( moduleName.length() + ( moduleBaseName - moduleName.c_str() ) + PADDING );
 
 #ifndef CORAL_NDEBUG
-	// in debug mode, first try moduleName/moduleName_debug
+	// moduleName/moduleName_debug
 	fileNames[n].reserve( reserveLen );
 	fileNames[n].assign( moduleBaseName );
 	fileNames[n].append( "_debug" MODULE_LIB_EXT );
 	++n;
 
-	#ifdef CORAL_OS_UNIX
-		// on UNIX, also try moduleName/libmoduleName_debug
-		fileNames[n].reserve( reserveLen );
-		fileNames[n].assign( "lib" );
-		fileNames[n].append( moduleBaseName );
-		fileNames[n].append( "_debug" MODULE_LIB_EXT );
-		++n;
-	#endif
+	// moduleName/libmoduleName_debug
+	fileNames[n].reserve( reserveLen );
+	fileNames[n].assign( "lib" );
+	fileNames[n].append( moduleBaseName );
+	fileNames[n].append( "_debug" MODULE_LIB_EXT );
+	++n;
 #endif
 
-	// try moduleName/moduleName
+	// moduleName/moduleName
 	fileNames[n].assign( moduleBaseName );
 	fileNames[n].append( MODULE_LIB_EXT );
 	++n;
 
-#ifdef CORAL_OS_UNIX
-	// on UNIX, also try moduleName/libmoduleName
+	// moduleName/libmoduleName
 	fileNames[n].reserve( reserveLen );
 	fileNames[n].assign( "lib" );
 	fileNames[n].append( moduleBaseName );
 	fileNames[n].append( MODULE_LIB_EXT );
 	++n;
-#endif
 
 	std::string modulePath( moduleName );
 	OS::convertDotsToDirSeps( modulePath );

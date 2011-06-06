@@ -8,8 +8,10 @@
 PROJECT( ANTLR3C )
 
 IF( UNIX )
-    ADD_DEFINITIONS( -fPIC )
+	ADD_DEFINITIONS( -fPIC )
+ENDIF()
 
+IF( NOT MSVC )
 	# Disable GCC warnings for the antlr3c library
 	ADD_DEFINITIONS( -Wno-all -Wno-extra -Wno-unused -Wno-write-strings -Wno-cast-qual -fpermissive )
 ENDIF()

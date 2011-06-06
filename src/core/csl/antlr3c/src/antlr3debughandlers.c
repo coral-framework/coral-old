@@ -841,7 +841,7 @@ semanticPredicate		(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_BOOLEAN result, 
 	}
 }
 
-#ifdef ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning	(push)
 #pragma warning (disable : 4100)
 #endif
@@ -853,7 +853,7 @@ commence				(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 	//
 }
 
-#ifdef ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning	(pop)
 #endif
 

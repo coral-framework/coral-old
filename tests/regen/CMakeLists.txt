@@ -53,7 +53,7 @@ TARGET_LINK_LIBRARIES( tests_regen
 )
 
 # Disable warnings for AntLR-generated source files
-IF( UNIX )
+IF( NOT MSVC )
 	SET_PROPERTY(
 		SOURCE ${CORE_SOURCE_DIR}/csl/CSLLexer.cpp ${CORE_SOURCE_DIR}/csl/CSLParser.cpp
 		PROPERTY COMPILE_FLAGS "-Wno-all -Wno-extra -Wno-unused"

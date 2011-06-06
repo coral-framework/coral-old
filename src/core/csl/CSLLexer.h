@@ -120,7 +120,7 @@ typedef struct CSLLexer_Ctx_struct CSLLexer, * pCSLLexer;
 	#define	ANTLR3_INLINE_INPUT_8BIT
 
 
-#ifdef	ANTLR3_WINDOWS
+#ifdef _MSC_VER
 // Disable: Unreferenced parameter,							- Rules with parameters that are not used
 //          constant conditional,							- ANTLR realizes that a prediction is always true (synpred usually)
 //          initialized but unused variable					- tree rewrite variables declared but not needed

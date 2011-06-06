@@ -33,7 +33,7 @@
 
 #include    <antlr3tokenstream.h>
 
-#ifdef	ANTLR3_WINDOWS
+#ifdef	_MSC_VER
 #pragma warning( disable : 4100 )
 #endif
 
@@ -394,7 +394,7 @@ dbgTokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT32 k)
 	return tokLT(ts, k);
 }
 
-#ifdef	ANTLR3_WINDOWS
+#ifdef _MSC_VER
 	/* When fully optimized VC7 complains about non reachable code.
 	 * Not yet sure if this is an optimizer bug, or a bug in the flow analysis
 	 */

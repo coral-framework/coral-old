@@ -1424,7 +1424,7 @@ static	ANTLR3_UINT32   antlr3VectorSize    (pANTLR3_VECTOR vector)
     return  vector->count;
 }
 
-#ifdef ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning	(push)
 #pragma warning (disable : 4100)
 #endif
@@ -1469,7 +1469,7 @@ antlr3VectorFactoryNew	    (ANTLR3_UINT32 sizeHint)
 	factory->freeStack		= antlr3StackNew(16);
 	return  factory;
 }
-#ifdef ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning	(pop)
 #endif
 

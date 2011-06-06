@@ -397,7 +397,7 @@ reportError		    (pANTLR3_BASE_RECOGNIZER rec)
     rec->displayRecognitionError(rec, rec->state->tokenNames);
 }
 
-#ifdef	ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning( disable : 4100 )
 #endif
 

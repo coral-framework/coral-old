@@ -96,7 +96,9 @@ typedef struct dir_data {
   #define STAT_STRUCT struct _stati64
   #define chdir _chdir
   #define getcwd _getcwd
-  #define fileno _fileno
+  #ifndef fileno
+	#define fileno _fileno
+  #endif
   #define rmdir _rmdir
  #endif
 #define STAT_FUNC _stati64
@@ -665,7 +667,9 @@ static void push_st_blksize (lua_State *L, STAT_STRUCT *info) {
 #endif
 static void push_invalid (lua_State *L, STAT_STRUCT *info) {
   luaL_error(L, "invalid attribute name");
-#ifndef _WIN32
+#ifdef _WIN32
+  (void)info;
+#else
   info->st_blksize = 0; /* never reached */
 #endif
 }

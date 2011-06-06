@@ -74,10 +74,11 @@ inline int executeProgram( int argc, char* const* argv )
 	std::string cmdLine = ss.str();
 	if( CreateProcessA( 0, const_cast<LPSTR>( cmdLine.c_str() ), 0, 0, 0, CREATE_DEFAULT_ERROR_MODE, 0, 0, &si, &pi ) == FALSE )
 	{
-		fprintf( stderr, "ERROR: could not execute '%s' (error code %i)\n", argv[0], GetLastError() );
+		unsigned int errorCode = GetLastError();
+		fprintf( stderr, "ERROR: could not execute '%s' (error code %u)\n", argv[0], errorCode );
 		return 127;
 	}
-	
+
 	// wait until the program has terminated
 	WaitForSingleObject( pi.hProcess, INFINITE );
 

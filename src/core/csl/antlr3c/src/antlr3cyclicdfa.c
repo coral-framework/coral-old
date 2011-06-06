@@ -45,7 +45,7 @@
 #include    <antlr3defs.h>
 #include    <antlr3cyclicdfa.h>
 
-#ifdef	ANTLR3_WINDOWS
+#ifdef _MSC_VER
 #pragma warning( disable : 4100 )
 #endif
 
