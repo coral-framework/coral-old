@@ -17,6 +17,11 @@ local BatComponent = co.Component{
 	},
 }
 
+function BatComponent:__init()
+	assert( self.name == nil )
+	self.name = "Batman"
+end
+
 function BatComponent:getBloodsucker()
 	return self.bloodsucker or false
 end
@@ -25,12 +30,8 @@ function BatComponent.vampireBat:getBloodsucker()
 	return true
 end
 
-function BatComponent:getName()
-	return "DefaultName"
-end
-
 function BatComponent.batman:getName()
-	return "Batman"
+	return self.name
 end
 
 function BatComponent:fightCrime()

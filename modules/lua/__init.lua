@@ -300,5 +300,10 @@ function ComponentMT.__call( componentTable, objectTable )
 
 	setmetatable( objectTable, componentTable )
 
+	local constructor = componentTable.__init
+	if constructor then
+		constructor( objectTable )
+	end
+
 	return object
 end

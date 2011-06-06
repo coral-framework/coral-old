@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 #include <co/Coral.h>
+#include <co/IObject.h>
 #include <co/ISystem.h>
 #include <co/IModuleManager.h>
 #include <co/ModuleLoadException.h>
@@ -13,6 +14,8 @@
 #include <co/IllegalArgumentException.h>
 #include <lua/IState.h>
 #include <lua/Exception.h>
+
+#include <moduleA/IHuman.h>
 
 #define ASSERT_SUCCESS( moduleName ) \
 	try { co::getSystem()->getModules()->load( moduleName ); } \
@@ -144,6 +147,12 @@ TEST( LuaTests, struct )
 TEST( LuaTests, component )
 {
 	ASSERT_SUCCESS( "lua.component" );
+
+	// test if __init() is called when instantiating the component from C++
+	co::RefPtr<co::IObject> object = co::newInstance( "lua.bat.Component" );
+	moduleA::IHuman* batman = object->getService<moduleA::IHuman>();
+	ASSERT_TRUE( batman != NULL );
+	EXPECT_EQ( "Batman", batman->getName() );
 }
 
 // --- In/Out Any/Array/Struct Parameter Tests --- //

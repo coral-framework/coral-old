@@ -168,7 +168,7 @@ int main( int argc, char* argv[] )
 			"Coral Application Launcher v" CORAL_VERSION_STR " (" CORAL_BUILD_KEY " " CORAL_BUILD_MODE ")\n"
 			"Usage: coral [options] callee [ARG] ...\n"
 			"Description:\n"
-			"  A 'callee' is either a component or a method name within a component's facet.\n"
+			"  A 'callee' is either a component or a method name within a component facet.\n"
 			"  If a method is not specified, one named 'main' will be searched for in all\n"
 			"  facets of the specified component. The called method must receive either no\n"
 			"  argument or an array of strings. If the method returns a number, it will be\n"

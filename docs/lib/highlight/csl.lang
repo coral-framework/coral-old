@@ -10,11 +10,11 @@ Keywords = {
 	{	-- TypeDecl Keywords
 		Id = 2,
 		List = {
-			"attribute",
 			"class",
 			"component",
 			"enum",
 			"exception",
+			"extends",
 			"in",
 			"inout",
 			"interface",
