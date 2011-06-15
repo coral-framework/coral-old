@@ -6,9 +6,10 @@
 #ifndef _CO_PROPERTIES_H_
 #define _CO_PROPERTIES_H_
 
-#include <map>
-#include <string>
+#include <co/Platform.h>
 #include <istream>
+#include <string>
+#include <map>
 
 namespace co {
 
@@ -19,7 +20,7 @@ namespace co {
 	Deviation: escape ('\') characters are currently ignored except
 		for line continuations (i.e. escaping end-of-lines).
  */
-class Properties
+class CORAL_EXPORT Properties
 {
 public:
 	Properties();

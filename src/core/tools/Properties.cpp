@@ -4,6 +4,7 @@
  */
 
 #include "Properties.h"
+#include <cstring>
 #include <fstream>
 
 namespace {
@@ -30,7 +31,7 @@ const std::string& Properties::getProperty( const std::string& key, const std::s
 	Dictionary::iterator it = _properties.find( key );
 	return it != _properties.end() ? it->second : defaultValue;
 }
-	
+
 int Properties::load( std::istream& input )
 {
 	std::string line;
