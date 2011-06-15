@@ -1,5 +1,5 @@
 /*
- * Coral - A lightweight C++ component framework
+ * Coral - Lightweight C++ Component Framework
  * See Copyright Notice in Coral.h
  */
 
@@ -54,7 +54,7 @@ int main( int argc, char* argv[] )
 #else
 	#error Unknown or unsupported platform.
 #endif
-	
+
 	/*
 		Process command-line options. Currently, only one option is supported,
 		and if specified, it MUST be at the start of the command-line:

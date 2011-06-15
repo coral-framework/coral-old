@@ -248,7 +248,8 @@ function Compiler:loadModuleTypes()
 						for k = 1, i do
 							msg = msg .. "  [" .. k .. "] " .. coralPaths[k] .. "/" .. moduleDirPath .. "\n"
 						end
-						error( msg, 0 )
+						--error( msg, 0 )
+						print( msg )
 					end
 					self.types[#self.types + 1] = moduleType
 					self.dependencies[moduleType] = 0

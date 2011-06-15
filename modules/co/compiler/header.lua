@@ -2,7 +2,7 @@ local function template( writer, c, ... )
 	if c.moduleName == 'co' or c.moduleName == 'lua' then
 		writer( [[
 /*
- * Coral - A lightweight C++ component framework
+ * Coral - Lightweight C++ Component Framework
  * See Copyright Notice in Coral.h
  */
 ]] )

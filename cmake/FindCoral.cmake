@@ -76,13 +76,7 @@ macro( CORAL_GATHER_MODULE_TYPES _moduleTypeNames _moduleName )
 			get_filename_component( _filename ${_file} ABSOLUTE )
 			set( _filenameKey "${_moduleName}_${_name}_FILENAME" )
 			if( DEFINED ${_filenameKey} )
-				execute_process(
-					COMMAND ${CMAKE_COMMAND} -E compare_files "${_filenameKey}" "${_filename}"
-					RESULT_VARIABLE filesAreDifferent
-				)
-				if( filesAreDifferent )
-					MESSAGE( WARNING "Clashing CSL files found: '${${_filenameKey}}' clashes with '${_filename}'." )
-				endif()
+				MESSAGE( WARNING "Clashing CSL files found: '${${_filenameKey}}' clashes with '${_filename}'." )
 			else()
 				set( ${_filenameKey} "${_filename}" )
 			endif()
