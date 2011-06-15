@@ -10,6 +10,8 @@ SET( EXTRA_SOURCES
 	Utils.h
 	${CORE_SOURCE_DIR}/reserved/OS.h
 	${CORE_SOURCE_DIR}/reserved/OS.cpp
+	${CORE_SOURCE_DIR}/tools/Properties.h
+	${CORE_SOURCE_DIR}/tools/Properties.cpp
 	${CORE_SOURCE_DIR}/tools/StringTokenizer.h
 	${CORE_SOURCE_DIR}/tools/StringTokenizer.cpp
 )

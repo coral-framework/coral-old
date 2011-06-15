@@ -4,6 +4,8 @@
  */
 
 #include "Utils.h"
+#include <core/tools/Properties.h>
+#include <core/tools/StringTokenizer.h>
 
 #if defined(CORAL_OS_WIN)
 	#define EXE_SUFFIX ".exe"
@@ -18,8 +20,27 @@ int main( int argc, char* argv[] )
 	co::OS::getApplicationDir( rootDir );
 	setEnvVar( "CORAL_ROOT", rootDir );
 
-	// add $CORAL_ROOT/modules to the CORAL_PATH
-	prependToEnvVar( "CORAL_PATH", rootDir + ( CORAL_OS_DIR_SEP_STR "modules" CORAL_OS_PATH_SEP_STR ) );
+	co::Properties properties;
+	properties.load( rootDir + ( CORAL_OS_DIR_SEP_STR "coral.properties" ) );
+
+	// if dir "$CORAL_ROOT/modules" exists, add it to the CORAL_PATH
+	std::string coralPath( rootDir );
+	coralPath.append( CORAL_OS_DIR_SEP_STR "modules" CORAL_OS_PATH_SEP_STR );
+	if( !co::OS::isDir( coralPath ) )
+		coralPath.clear();
+
+	// if property "path" is defined, add it to the CORAL_PATH
+	const std::string& pathProperty = properties.getProperty( "path" );
+	if( !pathProperty.empty() )
+	{
+		coralPath.reserve( coralPath.size() + pathProperty.size() + 1 );
+		if( !coralPath.empty() )
+			coralPath.append( CORAL_OS_PATH_SEP_STR );
+		coralPath.append( pathProperty );
+	}
+
+	// add entries to the CORAL_PATH environment variable
+	prependToEnvVar( "CORAL_PATH", coralPath );
 
 	// set the OS-specific var that enables the system to locate the coral library
 	std::string libDir( rootDir );
@@ -36,7 +57,7 @@ int main( int argc, char* argv[] )
 	
 	/*
 		Process command-line options. Currently, only one option is supported,
-		and it MUST be specified at the start of the command-line:
+		and if specified, it MUST be at the start of the command-line:
 
 		--mode <string>
 			Indicates in which mode to run the Coral Application Launcher.
@@ -54,7 +75,7 @@ int main( int argc, char* argv[] )
 	if( argc >= 2 && strCaseComp( argv[1], "--mode" ) == 0 )
 	{
 		argIndex = 3;
-		if( strCaseComp( argv[2], "Debug" ) == 0 )
+		if( strCaseComp( argv[2], "debug" ) == 0 )
 			launcher = rootDir + launcherDebugPath;
 		else
 			launcher = rootDir + launcherReleasePath;
@@ -68,7 +89,7 @@ int main( int argc, char* argv[] )
 			launcher = rootDir + launcherDebugPath;
 		}
 	}
-	
+
 	if( !co::OS::isFile( launcher ) )
 	{
 		fprintf( stderr, "ERROR: the launcher executable is not available (%s)\n", launcher.c_str() );
@@ -79,16 +100,28 @@ int main( int argc, char* argv[] )
 		Prepare the command-line to invoke the Coral Application Launcher.
 		first arg = program path; last arg = NULL;
 	 */
-	int numArgs = ( argc - argIndex ) + 1;
-	char** args = new char*[numArgs + 1];
-	args[0] = const_cast<char*>( launcher.c_str() );
-	for( int i = 1; i < numArgs; ++i )
-		args[i] = argv[argIndex++];
-	args[numArgs] = NULL;
+	std::vector<char*> args;
+	args.reserve( argc );
+	args.push_back( const_cast<char*>( launcher.c_str() ) );
 
-	int res = executeProgram( numArgs, args );
+	// if property "args" was defined, parse its arguments first
+	std::vector<std::string> stringStorage;
+	const std::string& argsProperty = properties.getProperty( "args" );
+	if( !argsProperty.empty() )
+	{
+		co::StringTokenizer st( argsProperty, ";" );
+		while( st.nextToken() )
+		{
+			stringStorage.push_back( st.getToken() );
+			args.push_back( const_cast<char*>( stringStorage.back().c_str() ) );
+		}
+	}
 
-	delete[] args;
-	
-	return res;
+	// append all unprocessed command-line args
+	for( ; argIndex <= argc; ++argIndex )
+		args.push_back( argv[argIndex] );
+
+	args.push_back( NULL );
+
+	return executeProgram( args.size(), &args[0] );
 }

@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _CO_STRING_TOKENIZER_
-#define _CO_STRING_TOKENIZER_
+#ifndef _CO_STRINGTOKENIZER_H_
+#define _CO_STRINGTOKENIZER_H_
 
 #include <co/Platform.h>
 #include <string>
@@ -42,4 +42,4 @@ private:
 
 } // namespace co
 
-#endif //_CO_STRING_TOKENIZER_
+#endif // _CO_STRINGTOKENIZER_H_

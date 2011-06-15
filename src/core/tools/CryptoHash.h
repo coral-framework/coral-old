@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _CO_CRYPTO_HASH_H_
-#define _CO_CRYPTO_HASH_H_
+#ifndef _CO_CRYPTOHASH_H_
+#define _CO_CRYPTOHASH_H_
 
 #include <co/Uuid.h>
 #include <co/Platform.h>
@@ -95,4 +95,4 @@ private:
 
 } // namespace co
 
-#endif
+#endif // _CO_CRYPTOHASH_H_

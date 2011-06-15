@@ -62,30 +62,34 @@ endfunction()
 ################################################################################
 # Internal Macro to gather the list of types in a module
 ################################################################################
-MACRO( CORAL_GATHER_MODULE_TYPES _moduleTypeNames _moduleName )
-	SET( _resultList )
-	FOREACH( _repo ${CORAL_PATH} )
-		FILE( GLOB _cslFiles "${_repo}/${_moduleName}/*.csl" )
-		FOREACH( _file ${_cslFiles} )
+macro( CORAL_GATHER_MODULE_TYPES _moduleTypeNames _moduleName )
+	set( _resultList )
+	foreach( _repo ${CORAL_PATH} )
+		file( GLOB _cslFiles "${_repo}/${_moduleName}/*.csl" )
+		foreach( _file ${_cslFiles} )
 			# Get the type name and add it to the _resultList
-			GET_FILENAME_COMPONENT( _name ${_file} NAME_WE )
-			LIST( APPEND _resultList ${_name} )
+			get_filename_component( _name ${_file} NAME_WE )
+			list( APPEND _resultList ${_name} )
 
 			# Save the type's filename for later use in CORAL_GENERATE_MODULE.
 			# We issue a warning if the same type is gathered twice from two different files.
-			GET_FILENAME_COMPONENT( _filename ${_file} ABSOLUTE )
-			SET( _filenameKey "${_moduleName}_${_name}_FILENAME" )
-			IF( DEFINED ${_filenameKey} )
-				IF( NOT ${_filenameKey} STREQUAL "${_filename}" )
+			get_filename_component( _filename ${_file} ABSOLUTE )
+			set( _filenameKey "${_moduleName}_${_name}_FILENAME" )
+			if( DEFINED ${_filenameKey} )
+				execute_process(
+					COMMAND ${CMAKE_COMMAND} -E compare_files "${_filenameKey}" "${_filename}"
+					RESULT_VARIABLE filesAreDifferent
+				)
+				if( filesAreDifferent )
 					MESSAGE( WARNING "Clashing CSL files found: '${${_filenameKey}}' clashes with '${_filename}'." )
-				ENDIF()
-			ELSE()
-				SET( ${_filenameKey} "${_filename}" )
-			ENDIF()
-		ENDFOREACH()
-	ENDFOREACH()
-	SET( ${_moduleTypeNames} ${_resultList} )
-ENDMACRO()
+				endif()
+			else()
+				set( ${_filenameKey} "${_filename}" )
+			endif()
+		endforeach()
+	endforeach()
+	set( ${_moduleTypeNames} ${_resultList} )
+endmacro()
 
 ################################################################################
 # Function to generate mappings for a list of types
