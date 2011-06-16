@@ -26,7 +26,7 @@ int main( int argc, char* argv[] )
 	// if dir "$CORAL_ROOT/modules" exists, add it to the CORAL_PATH
 	std::string coralPath( rootDir );
 	coralPath.append( CORAL_OS_DIR_SEP_STR "modules" );
-	if( co::OS::isDir( coralPath ) )
+	if( !co::OS::isDir( coralPath ) )
 		coralPath.clear();
 
 	// if property "path" is defined, add it to the CORAL_PATH
@@ -119,7 +119,7 @@ int main( int argc, char* argv[] )
 	}
 
 	// append all unprocessed command-line args
-	for( ; argIndex <= argc; ++argIndex )
+	for( ; argIndex < argc; ++argIndex )
 		args.push_back( argv[argIndex] );
 
 	args.push_back( NULL );
