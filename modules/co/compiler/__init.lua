@@ -44,6 +44,9 @@ Compiler.__index = Compiler
 function Compiler:new()
 	local self = setmetatable( {}, Compiler )
 
+	-- default is to print warnings about duplicate CSL files in the path
+	self.ignoreDupesInPath = false
+
 	-- array of module types
 	self.types = {}
 
@@ -243,16 +246,18 @@ function Compiler:loadModuleTypes()
 				if typeName then
 					local moduleType = TypeWrapper:wrap( co.Type[self.moduleName .. '.' .. typeName] )
 					if self.dependencies[moduleType] == 0 then
-						local msg = "Type '" .. moduleType.fullName .. "' has a duplicate definition in "
-									.. "one of the following dirs:\n"
-						for k = 1, i do
-							msg = msg .. "  [" .. k .. "] " .. coralPaths[k] .. "/" .. moduleDirPath .. "\n"
+						if not self.ignoreDupesInPath then
+							local msg = "Type '" .. moduleType.fullName .. "' has a duplicate definition in "
+										.. "one of the following dirs:\n"
+							for k = 1, i do
+								msg = msg .. "  [" .. k .. "] " .. coralPaths[k] .. "/" .. moduleDirPath .. "\n"
+							end
+							print( msg )
 						end
-						--error( msg, 0 )
-						print( msg )
+					else
+						self.types[#self.types + 1] = moduleType
+						self.dependencies[moduleType] = 0
 					end
-					self.types[#self.types + 1] = moduleType
-					self.dependencies[moduleType] = 0
 				end
 			end
 		end

@@ -26,18 +26,19 @@ int main( int argc, char* argv[] )
 	// if dir "$CORAL_ROOT/modules" exists, add it to the CORAL_PATH
 	std::string coralPath( rootDir );
 	coralPath.append( CORAL_OS_DIR_SEP_STR "modules" );
-	if( !co::OS::isDir( coralPath ) )
+	if( co::OS::isDir( coralPath ) )
 		coralPath.clear();
 
 	// if property "path" is defined, add it to the CORAL_PATH
 	const std::string& pathProperty = properties.getProperty( "path" );
 	if( !pathProperty.empty() )
 	{
-		coralPath.reserve( coralPath.size() + pathProperty.size() + 1 );
-		if( !coralPath.empty() )
-			coralPath.append( CORAL_OS_PATH_SEP_STR );
+		coralPath.reserve( coralPath.size() + pathProperty.size() + 2 );
+		coralPath.append( CORAL_OS_PATH_SEP_STR );
 		coralPath.append( pathProperty );
 	}
+
+	coralPath.append( CORAL_OS_PATH_SEP_STR );
 
 	// add entries to the CORAL_PATH environment variable
 	prependToEnvVar( "CORAL_PATH", coralPath );

@@ -111,7 +111,7 @@ FUNCTION( CORAL_GENERATE_MAPPINGS generatedHeaders )
 
 	ADD_CUSTOM_COMMAND( OUTPUT ${resultList}
 		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS}
-			lua.Launcher co.compiler.cli ${ARGN}
+			lua.Launcher co.compiler.cli --ignoredupes ${ARGN}
 		DEPENDS ${CORAL_LAUNCHER} "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		COMMENT "Running the Coral Compiler..."
@@ -172,7 +172,7 @@ FUNCTION( CORAL_GENERATE_MODULE generatedSourceFiles moduleName )
 
 	ADD_CUSTOM_COMMAND( OUTPUT ${resultList}
 		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS}
-			lua.Launcher co.compiler.cli -g ${moduleName} ${ARGN}
+			lua.Launcher co.compiler.cli --ignoredupes -g ${moduleName} ${ARGN}
 		DEPENDS ${CORAL_LAUNCHER} "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		COMMENT "Running the Coral Compiler..."
@@ -192,7 +192,7 @@ FUNCTION( CORAL_GENERATE_DOX targetName moduleName outDir )
 
 	ADD_CUSTOM_TARGET( ${targetName}
 		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS}
-			lua.Launcher co.compiler.cli --dox -g ${moduleName} -o ${outDir} ${ARGN}
+			lua.Launcher co.compiler.cli --ignoredupes --dox -g ${moduleName} -o ${outDir} ${ARGN}
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		COMMENT "Running the Coral Compiler to extract documentation..."
 	)
