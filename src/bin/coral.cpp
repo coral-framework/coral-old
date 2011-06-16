@@ -25,7 +25,7 @@ int main( int argc, char* argv[] )
 
 	// if dir "$CORAL_ROOT/modules" exists, add it to the CORAL_PATH
 	std::string coralPath( rootDir );
-	coralPath.append( CORAL_OS_DIR_SEP_STR "modules" CORAL_OS_PATH_SEP_STR );
+	coralPath.append( CORAL_OS_DIR_SEP_STR "modules" );
 	if( !co::OS::isDir( coralPath ) )
 		coralPath.clear();
 
