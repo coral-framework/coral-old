@@ -1,7 +1,9 @@
-# Locate the GTest Framework.
-FIND_PACKAGE( GTest )
+################################################################################
+# Unit Tests
+################################################################################
 
-# We can only add the test projects if GTest is available.
+# We require the GTest Framework
+FIND_PACKAGE( GTest )
 IF( GTEST_FOUND )
 
 	# On UNIX, GTest generally depends on pthreads, but CMake does not
@@ -26,5 +28,30 @@ IF( GTEST_FOUND )
 	ADD_CUSTOM_TARGET( tests DEPENDS tests_core tests_lua tests_moduleA tests_moduleB tests_regen )
 
 ELSE()
-	MESSAGE( "WARNING: gtest not found - all tests have been disabled!" )
+	MESSAGE( "WARNING: gtest not found - most tests have been disabled!" )
 ENDIF()
+
+################################################################################
+# Smoke test the deployed executables
+################################################################################
+
+set( CORAL_PATH_STR "${CMAKE_BINARY_DIR}/modules,${CMAKE_SOURCE_DIR}/modules" )
+
+# Test the Launcher Back End
+add_test( NAME launcher COMMAND launcher -p ${CORAL_PATH_STR} lua.Launcher noscript )
+set_tests_properties( launcher PROPERTIES
+	PASS_REGULAR_EXPRESSION "launch script 'noscript' could not be found in the path"
+)
+
+# Test the Launcher Front End
+add_test( NAME coral COMMAND coral -p ${CORAL_PATH_STR} lua.Launcher noscript )
+set_tests_properties( coral PROPERTIES
+	PASS_REGULAR_EXPRESSION "launch script 'noscript' could not be found in the path"
+)
+
+# Test the Compiler Front End
+add_test( NAME coralc COMMAND coralc -g nomodule )
+set_tests_properties( coralc PROPERTIES
+	ENVIRONMENT "CORAL_PATH=${CORAL_PATH_STR}"
+	PASS_REGULAR_EXPRESSION "Generating code for module 'nomodule'"
+)

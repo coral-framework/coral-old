@@ -55,7 +55,7 @@ inline void prependToEnvVar( const char* name, const std::string& prefix )
 /*
 	Function to execute a program passing along an array of arguments.
  */
-inline int executeProgram( int argc, char* const* argv )
+inline int executeProgram( char* const* argv )
 {
 #if defined(CORAL_OS_WIN)
 	STARTUPINFO         si;
@@ -65,11 +65,8 @@ inline int executeProgram( int argc, char* const* argv )
     si.cb = sizeof(si);
 
 	std::stringstream ss;
-	for( int i = 0; i < argc; ++i )
-	{
-		if( i > 0 ) ss << ' ';
-		ss << '"' << argv[i] << '"';
-	}
+	for( char* const* arg = argv; *arg; ++arg )
+		ss << '"' << *arg << "\" ";
 
 	std::string cmdLine = ss.str();
 	if( CreateProcessA( 0, const_cast<LPSTR>( cmdLine.c_str() ), 0, 0, 0, CREATE_DEFAULT_ERROR_MODE, 0, 0, &si, &pi ) == FALSE )
@@ -88,7 +85,6 @@ inline int executeProgram( int argc, char* const* argv )
 
 #else
 
-	CORAL_UNUSED( argc );
 	pid_t pID = fork();
 	if( pID == 0 ) // child
 	{

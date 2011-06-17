@@ -2,11 +2,11 @@
 # Deployed Executables
 ################################################################################
 
-PROJECT( BIN )
+project( BIN )
 
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src ${CORE_SOURCE_DIR}/generated )
+include_directories( ${CMAKE_SOURCE_DIR}/src ${CORE_SOURCE_DIR}/generated )
 
-SET( EXTRA_SOURCES
+set( EXTRA_SOURCES
 	Utils.h
 	${CORE_SOURCE_DIR}/reserved/OS.h
 	${CORE_SOURCE_DIR}/reserved/OS.cpp
@@ -17,47 +17,49 @@ SET( EXTRA_SOURCES
 )
 
 ################################################################################
-# Build the Coral Application Launcher Front-End
+# Build the Launcher Back End
 ################################################################################
 
-ADD_EXECUTABLE( coral coral.cpp ${EXTRA_SOURCES} )
+add_executable( launcher launcher.cpp Utils.h )
+add_dependencies( launcher lua )
 
-CORAL_DEFAULT_TARGET_PROPERTIES( coral )
-SET_PROPERTY( TARGET coral APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_NO_EXPORT" )
-SET_TARGET_PROPERTIES( coral PROPERTIES	PROJECT_LABEL "Executable coral" )
-
-################################################################################
-# Build the Coral Compiler Front-End
-################################################################################
-
-ADD_EXECUTABLE( coralc coralc.cpp ${EXTRA_SOURCES} )
-
-CORAL_DEFAULT_TARGET_PROPERTIES( coralc )
-SET_PROPERTY( TARGET coralc APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_NO_EXPORT" )
-SET_TARGET_PROPERTIES( coralc PROPERTIES PROJECT_LABEL "Executable coralc" )
-
-################################################################################
-# Build the actual Coral Application Launcher
-################################################################################
-
-ADD_EXECUTABLE( launcher launcher.cpp Utils.h )
-ADD_DEPENDENCIES( launcher lua )
-
-TARGET_LINK_LIBRARIES( launcher core )
+target_link_libraries( launcher core )
 
 CORAL_DEFAULT_TARGET_PROPERTIES( launcher )
 
-SET_TARGET_PROPERTIES( launcher PROPERTIES
+set_target_properties( launcher PROPERTIES
 	PROJECT_LABEL "Executable launcher"
 )
+
+################################################################################
+# Build the Launcher Front End
+################################################################################
+
+add_executable( coral coral.cpp ${EXTRA_SOURCES} )
+add_dependencies( coral launcher )
+
+CORAL_DEFAULT_TARGET_PROPERTIES( coral )
+set_property( TARGET coral APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_NO_EXPORT" )
+set_target_properties( coral PROPERTIES	PROJECT_LABEL "Executable coral" )
+
+################################################################################
+# Build the Compiler Front End
+################################################################################
+
+add_executable( coralc coralc.cpp ${EXTRA_SOURCES} )
+add_dependencies( coralc launcher )
+
+CORAL_DEFAULT_TARGET_PROPERTIES( coralc )
+set_property( TARGET coralc APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_NO_EXPORT" )
+set_target_properties( coralc PROPERTIES PROJECT_LABEL "Executable coralc" )
 
 ################################################################################
 # Install Rules
 ################################################################################
 
 # install the front-end executables (only in release mode)
-INSTALL( TARGETS coral coralc DESTINATION . CONFIGURATIONS Release RelWithDebInfo COMPONENT Core )
+install( TARGETS coral coralc DESTINATION . CONFIGURATIONS Release RelWithDebInfo COMPONENT Core )
 
 # install the launcher executable
-INSTALL( TARGETS launcher DESTINATION bin COMPONENT Core )
-INSTALL( FILES ${CMAKE_BINARY_DIR}/bin/launcher_debug.pdb DESTINATION bin CONFIGURATIONS Debug COMPONENT Core OPTIONAL )
+install( TARGETS launcher DESTINATION bin COMPONENT Core )
+install( FILES ${CMAKE_BINARY_DIR}/bin/launcher_debug.pdb DESTINATION bin CONFIGURATIONS Debug COMPONENT Core OPTIONAL )

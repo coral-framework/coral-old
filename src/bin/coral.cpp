@@ -67,8 +67,12 @@ int main( int argc, char* argv[] )
 			mode, an error is issued. However, if this option is omitted, the front-end
 			will use any available launcher, giving preference to one in Release mode.
 	 */
-	const char* launcherReleasePath = CORAL_OS_DIR_SEP_STR "bin" CORAL_OS_DIR_SEP_STR "launcher" EXE_SUFFIX;
-	const char* launcherDebugPath = CORAL_OS_DIR_SEP_STR "bin" CORAL_OS_DIR_SEP_STR "launcher_debug" EXE_SUFFIX;
+
+	std::string launcherRelease( rootDir );
+	launcherRelease.append( CORAL_OS_DIR_SEP_STR "bin" CORAL_OS_DIR_SEP_STR "launcher" EXE_SUFFIX );
+
+	std::string launcherDebug( rootDir );
+	launcherDebug.append( CORAL_OS_DIR_SEP_STR "bin" CORAL_OS_DIR_SEP_STR "launcher_debug" EXE_SUFFIX );
 
 	int argIndex = 1;
 	std::string launcher;
@@ -77,17 +81,29 @@ int main( int argc, char* argv[] )
 	{
 		argIndex = 3;
 		if( strCaseComp( argv[2], "debug" ) == 0 )
-			launcher = rootDir + launcherDebugPath;
+			launcher = properties.getProperty( "launcher_debug", launcherDebug );
 		else
-			launcher = rootDir + launcherReleasePath;
+			launcher = properties.getProperty( "launcher", launcherRelease );
 	}
-	else // automatically choose a launcher executable
+	else
 	{
-		launcher = rootDir + launcherReleasePath;
-		if( !co::OS::isFile( launcher ) )
+		/*
+			Automatically choose a launcher executable. Search priority:
+				1) bin/launcher
+				2) bin/launcher_debug
+				3) launcher
+				4) launcher_debug
+		 */
+
+		if( co::OS::isFile( launcherRelease ) )
+			launcher = launcherRelease;
+		else if( co::OS::isFile( launcherDebug ) )
+			launcher = launcherDebug;
+		else
 		{
-			// fallback to the debug executable
-			launcher = rootDir + launcherDebugPath;
+			launcher = rootDir + ( CORAL_OS_DIR_SEP_STR "launcher" EXE_SUFFIX );
+			if( !co::OS::isFile( launcher ) )
+				launcher = rootDir + ( CORAL_OS_DIR_SEP_STR "launcher_debug" EXE_SUFFIX );
 		}
 	}
 
@@ -124,5 +140,5 @@ int main( int argc, char* argv[] )
 
 	args.push_back( NULL );
 
-	return executeProgram( args.size(), &args[0] );
+	return executeProgram( &args[0] );
 }
