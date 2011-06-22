@@ -13,6 +13,18 @@
 	#define EXE_SUFFIX
 #endif
 
+enum Mode
+{
+	Mode_Debug,
+	Mode_Release,
+	Mode_Auto
+};
+
+Mode resolveMode( const char* str )
+{
+	return strCaseComp( str, "debug" ) == 0 ? Mode_Debug : Mode_Release;
+}
+
 int main( int argc, char* argv[] )
 {
 	// set CORAL_ROOT = this executable's dir
@@ -56,17 +68,32 @@ int main( int argc, char* argv[] )
 	#error Unknown or unsupported platform.
 #endif
 
+	// determine in which mode to run the launcher
+	Mode mode = Mode_Auto;
+	const std::string& modeProperty = properties.getProperty( "mode" );
+	if( !modeProperty.empty() )
+		mode = resolveMode( modeProperty.c_str() );
+
 	/*
 		Process command-line options. Currently, only one option is supported,
 		and if specified, it MUST be at the start of the command-line:
 
 		--mode <string>
 			Indicates in which mode to run the Coral Application Launcher.
-			Any string other than 'Debug' (case sensitive) is interpreted as 'Release'.
+			Any string other than 'debug' is interpreted as 'release'.
 			If this option is specified and no launcher is available under the requested
 			mode, an error is issued. However, if this option is omitted, the front-end
-			will use any available launcher, giving preference to one in Release mode.
+			will use any available launcher, giving preference to one in release mode.
 	 */
+	int argIndex = 1;
+	if( argc >= 2 && strCaseComp( argv[1], "--mode" ) == 0 )
+	{
+		argIndex = 3;
+		mode = resolveMode( argv[2] );
+	}
+
+	// determine the launcher executable that should be used
+	std::string launcher;
 
 	std::string launcherRelease( rootDir );
 	launcherRelease.append( CORAL_OS_DIR_SEP_STR "bin" CORAL_OS_DIR_SEP_STR "launcher" EXE_SUFFIX );
@@ -74,19 +101,17 @@ int main( int argc, char* argv[] )
 	std::string launcherDebug( rootDir );
 	launcherDebug.append( CORAL_OS_DIR_SEP_STR "bin" CORAL_OS_DIR_SEP_STR "launcher_debug" EXE_SUFFIX );
 
-	int argIndex = 1;
-	std::string launcher;
+	switch( mode )
+	{
+	case Mode_Debug:
+		launcher = properties.getProperty( "launcher_debug", launcherDebug );
+		break;
 
-	if( argc >= 2 && strCaseComp( argv[1], "--mode" ) == 0 )
-	{
-		argIndex = 3;
-		if( strCaseComp( argv[2], "debug" ) == 0 )
-			launcher = properties.getProperty( "launcher_debug", launcherDebug );
-		else
-			launcher = properties.getProperty( "launcher", launcherRelease );
-	}
-	else
-	{
+	case Mode_Release:
+		launcher = properties.getProperty( "launcher", launcherRelease );
+		break;
+
+	case Mode_Auto:
 		/*
 			Automatically choose a launcher executable. Search priority:
 				1) bin/launcher
@@ -105,6 +130,10 @@ int main( int argc, char* argv[] )
 			if( !co::OS::isFile( launcher ) )
 				launcher = rootDir + ( CORAL_OS_DIR_SEP_STR "launcher_debug" EXE_SUFFIX );
 		}
+		break;
+
+	default:
+		assert( false );
 	}
 
 	if( !co::OS::isFile( launcher ) )
@@ -121,18 +150,19 @@ int main( int argc, char* argv[] )
 	args.reserve( argc );
 	args.push_back( const_cast<char*>( launcher.c_str() ) );
 
-	// if property "args" was defined, parse its arguments first
-	std::vector<std::string> stringStorage;
+	// if property "args" was defined, prepend its arguments first
+	std::vector<std::string> prependedArgs;
 	const std::string& argsProperty = properties.getProperty( "args" );
 	if( !argsProperty.empty() )
 	{
 		co::StringTokenizer st( argsProperty, ";" );
 		while( st.nextToken() )
-		{
-			stringStorage.push_back( st.getToken() );
-			args.push_back( const_cast<char*>( stringStorage.back().c_str() ) );
-		}
+			prependedArgs.push_back( st.getToken() );
 	}
+
+	// append all args in prependedArgs
+	for( size_t i = 0; i < prependedArgs.size(); ++i )
+		args.push_back( const_cast<char*>( prependedArgs[i].c_str() ) );
 
 	// append all unprocessed command-line args
 	for( ; argIndex < argc; ++argIndex )
