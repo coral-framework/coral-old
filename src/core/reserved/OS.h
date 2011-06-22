@@ -75,11 +75,11 @@ public:
 		File path combinations are evaluated in the same order they're listed, and in case of
 		ambiguities the search always returns the first match.
 
-		\param[in] listOne Outer-most list of directory paths (e.g. pass the CORAL_PATH here).
-		\param[in] listTwo Central list of directory paths (e.g. pass a list of file paths here).
+		\param[in] listA List of base directory paths (e.g. pass the CORAL_PATH here).
+		\param[in] listB List of relative file paths (e.g. potential file names).
 		\param[out] path Path to the first file found (only set if the method returns true).
-		\param[out] partOne optional; set with the substring of \a path that came from \a listOne.
-		\param[out] partTwo optional; set with the substring of \a path that came from \a listTwo.
+		\param[out] partA optional; set with the substring of \a path that came from \a listA.
+		\param[out] partB optional; set with the substring of \a path that came from \a listB.
 
 		\return true if a file is found; false otherwise.
 	*/
@@ -95,13 +95,13 @@ public:
 		File path combinations are evaluated in the same order they're listed, and in case of
 		ambiguities the search always returns the first match.
 
-		\param[in] listOne Outer-most list of directory paths (e.g. pass the CORAL_PATH here).
-		\param[in] listTwo Central list of directory paths (e.g. pass a list of module names here).
-		\param[in] listThree Inner-most list of directory paths (e.g. pass a list of file names here).
+		\param[in] listA Outer-most list of base directory paths (e.g. pass the CORAL_PATH here).
+		\param[in] listB Central list of relative directory paths (e.g. pass a list of module names here).
+		\param[in] listC Inner-most list of relative file paths (e.g. pass a list of file names here).
 		\param[out] path Path to the first file found (only set if the method returns true).
-		\param[out] partOne optional; set with the substring of \a path that came from \a listOne.
-		\param[out] partTwo optional; set with the substring of \a path that came from \a listTwo.
-		\param[out] partThree optional; set with the substring of \a path that came from \a listThree.
+		\param[out] partA optional; set with the substring of \a path that came from \a listA.
+		\param[out] partB optional; set with the substring of \a path that came from \a listB.
+		\param[out] partC optional; set with the substring of \a path that came from \a listC.
 
 		\return true if a file is found; false otherwise.
 	*/
@@ -112,7 +112,6 @@ public:
 							 std::string* partA = 0,
 							 std::string* partB = 0,
 							 std::string* partC = 0 );
-
 };
 
 } // namespace co

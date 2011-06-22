@@ -180,7 +180,7 @@ inline T* getService( co::IService* clientInstance )
 	This can be used to resolve the absolute pathname of a module resource file.
 	\param[in] moduleName Full name of the module where the file is located.
 	\param[in] fileName Exact name of the file we're looking for in the module's dir.
-	\param[out] set with the absolute path to the file, if one is found.
+	\param[out] filePath set with the absolute path to the file, if one is found.
 	\return true if a file was found; false if the search failed.
  */
 CORAL_EXPORT bool findModuleFile( const std::string& moduleName, const std::string& fileName, std::string& filePath );

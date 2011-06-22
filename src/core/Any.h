@@ -932,15 +932,19 @@ private:
 
 #ifndef DOXYGEN
 template<> struct kindOf<Any> { static const TypeKind kind = TK_ANY; };
-#endif // DOXYGEN
-
 inline void swap( Any& a, Any& b ) { a.swap( b ); }
+#endif // DOXYGEN
 
 } // namespace co
 
 #ifndef DOXYGEN
+
+// std::swap specialization for co::Any:
+namespace std { template<> inline void swap( co::Any& a, co::Any& b ) { a.swap( b ); } }
+
 // Prints the complete C++ type name of the variable stored in a __any::State.
 CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::__any::State& s );
+
 #endif // DOXYGEN
 
 /*!
@@ -948,8 +952,5 @@ CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::__any::State
 	\relates co::Any
  */
 CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::Any& a );
-
-// std::swap specialization for co::Any:
-namespace std { template<> inline void swap( co::Any& a, co::Any& b ) { a.swap( b ); } }
 
 #endif // _CO_ANY_H_

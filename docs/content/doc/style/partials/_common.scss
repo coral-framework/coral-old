@@ -84,10 +84,13 @@ pre {
 #logotitle {
 	float: left;
 	padding: 15px 0px 0px 20px;
+	width: 75px;
+	height: 75px;
+	background: transparent url('../images/coral-logo.png') no-repeat scroll 15px 10px;
 	a:hover{ text-decoration: none; }
 	h1 {
 		top: 25px;
-		left: 69px;
+		left: 102px;
 		position: absolute;
 		color: $link-color;
 		font-size: 27px;

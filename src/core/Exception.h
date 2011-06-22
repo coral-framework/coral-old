@@ -61,7 +61,7 @@ template<> struct kindOf<Exception> : public kindOfBase<TK_EXCEPTION> {};
 
 /*!
 	Macro to raise an exception with a std::ostream-style formatted message.
-	You must #include \<sstream\> to use this macro.
+	You must \c \#include \<sstream\> to use this macro.
 	\relates co::Exception
  */
 #define CORAL_THROW( exceptionType, message ) \
