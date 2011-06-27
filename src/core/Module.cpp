@@ -17,6 +17,16 @@
 
 namespace co {
 
+const char* MODULE_STATE_STRINGS[] = {
+	"at an unknown state",
+	"initialized",
+	"integrated",
+	"running",
+	"disintegrated",
+	"disposed",
+	"aborted"
+};
+
 Module::Module()
 {
 	_state = ModuleState_None;

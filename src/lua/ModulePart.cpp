@@ -75,6 +75,7 @@ public:
 	void disintegrate( co::IModule* )
 	{
 		co::getSystem()->getModules()->uninstallLoader( _luaModulePartLoader.get() );
+		lua_gc( LuaState::getL(), LUA_GCCOLLECT, 0 );
 	}
 
 	void dispose( co::IModule* )

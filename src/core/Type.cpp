@@ -4,6 +4,7 @@
  */
 
 #include "Type.h"
+#include "Module.h"
 #include "BasicReflector.h"
 #include "SignatureCalculator.h"
 #include <co/Coral.h>
@@ -91,8 +92,13 @@ IReflector* TypeImpl::getReflector( IType* myType )
 	{
 		// basic reflectors are instantiated on demand
 		_reflector = BasicReflector::create( myType );
+		return _reflector.get();
 	}
-	else
+
+	// is the type's module already loaded?
+	INamespace* ns = myType->getNamespace();
+	IModule* module = ns->getModule();
+	if( !module )
 	{
 		/*
 			Loading the type's module should cause its reflector to be installed.
@@ -101,7 +107,7 @@ IReflector* TypeImpl::getReflector( IType* myType )
 		 */
 		try
 		{
-			getSystem()->getModules()->load( myType->getNamespace()->getFullName() );
+			module = getSystem()->getModules()->load( ns->getFullName() );
 		}
 		catch( std::exception& e )
 		{
@@ -118,10 +124,14 @@ IReflector* TypeImpl::getReflector( IType* myType )
 		}
 	}
 
+	assert( module );
+
 	if( _reflector.isValid() )
 		return _reflector.get();
 
-	CORAL_THROW( ModuleLoadException, "type '" << myType->getFullName() << "' has no reflector" );
+	CORAL_THROW( ModuleLoadException, "module '" << ns->getFullName() << "' is currently "
+		<< MODULE_STATE_STRINGS[module->getState()] << ", and type '"
+		<< myType->getFullName() << "' has no reflector" );
 }
 
 void TypeImpl::setReflector( IReflector* reflector )
