@@ -75,6 +75,12 @@ public:
 	void disintegrate( co::IModule* )
 	{
 		co::getSystem()->getModules()->uninstallLoader( _luaModulePartLoader.get() );
+
+		/*
+			This is our last chance to call __gc metamethods that require
+			reflectors, since reflectors are no longer available in the
+			dispose() phase.			
+		 */
 		lua_gc( LuaState::getL(), LUA_GCCOLLECT, 0 );
 	}
 
