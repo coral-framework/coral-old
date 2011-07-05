@@ -14,7 +14,7 @@ ModulePart::ModulePart()
 	lua_State* L = LuaState::getL();
 	assert( lua_type( L, -1 ) == LUA_TTABLE );
 
-	// save the module table in the registry indexed by our 'this' pointer
+	// save the module table in the registry indexed by our own pointer
 	lua_pushlightuserdata( L, this );
 	lua_pushvalue( L, -2 );
 	lua_rawset( L, LUA_REGISTRYINDEX );
@@ -24,12 +24,15 @@ ModulePart::ModulePart()
 
 ModulePart::~ModulePart()
 {
+	// if the Lua module was not torn down yet...
 	lua_State* L = LuaState::getL();
-
-	// clear our registry reference to the module table
-	lua_pushlightuserdata( L, this );
-	lua_pushnil( L );
-	lua_rawset( L, LUA_REGISTRYINDEX );
+	if( L )
+	{
+		// clean our registry entry (i.e. the module table)
+		lua_pushlightuserdata( L, this );
+		lua_pushnil( L );
+		lua_rawset( L, LUA_REGISTRYINDEX );
+	}
 }
 
 void ModulePart::initialize( co::IModule* module )
@@ -52,14 +55,21 @@ void ModulePart::disintegrate( co::IModule* module )
 	callScriptMethod( "disintegrate", module );
 }
 
-void ModulePart::dispose( co::IModule* module )
+void ModulePart::dispose( co::IModule* )
 {
-	callScriptMethod( "dispose", module );
+	/*
+		Ignored. For simplicity, Lua modules don't directly handle 'dispose'
+		events, as it could cause major inter-dependence problems during the
+		system tear-down sequence. Not a real problem since the 'dispose'
+		event is easily replaced by the 'disintegrate' event in combination
+		with the Lua garbage collector.
+	 */
 }
 
 void ModulePart::callScriptMethod( const char* methodName, co::IModule* module )
 {
 	lua_State* L = LuaState::getL();
+	assert( L );
 
 	// reserve stack space for the method function
 	lua_pushnil( L );

@@ -31,10 +31,6 @@ private:
 	static int genericNew( lua_State* L );
 	static int newComponentType( lua_State* L );
 	static int newComponentInstance( lua_State* L );
-
-private:
-	typedef std::vector<co::IComponent*> ComponentTypeList;
-	static ComponentTypeList sm_luaComponentTypes;
 };
 
 /*!

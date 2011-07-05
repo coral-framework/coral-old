@@ -17,8 +17,4 @@ function M:disintegrate( module )
 	print( module.namespace.fullName .. ":disintegrate()" )
 end
 
-function M:dispose( module )
-	print( module.namespace.fullName .. ":dispose()" )
-end
-
 return M

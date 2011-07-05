@@ -65,7 +65,9 @@ static void handleException( lua_State* L )
 /*  Helper class that manages the 'co' package                               */
 /*****************************************************************************/
 
-coPackage::ComponentTypeList coPackage::sm_luaComponentTypes;
+namespace {
+	co::RefVector<LuaComponent> sg_luaComponents;
+}
 
 void coPackage::open( lua_State* L )
 {
@@ -119,10 +121,11 @@ void coPackage::close( lua_State* L )
 	}
 	lua_pop( L, 1 );
 
-	// release all LuaComponent reflectors
-	size_t numComponentTypes = sm_luaComponentTypes.size();
-	for( size_t i = 0; i < numComponentTypes; ++i )
-		sm_luaComponentTypes[i]->setReflector( NULL );
+	// release all LuaComponents
+	size_t numLuaComponents = sg_luaComponents.size();
+	for( size_t i = 0; i < numLuaComponents; ++i )
+		sg_luaComponents[i]->releaseComponent();
+	sg_luaComponents.clear();
 
 	// release all type bindings
 	CompositeTypeBinding::releaseBindings( L );
@@ -227,13 +230,14 @@ int coPackage::newComponentType( lua_State* L )
 	co::Any any;
 	CompositeTypeBinding::getInstance( L, 1, any );
 	co::IComponent* ct = any.get<co::IComponent*>();
-	sm_luaComponentTypes.push_back( ct );
 
 	lua_pushvalue( L, 2 );
 	int tableRef = luaL_ref( L, LUA_REGISTRYINDEX );
 
 	LuaComponent* lc = new LuaComponent;
-	lc->setComponentType( ct, tableRef );
+	lc->setComponent( ct, tableRef );
+
+	sg_luaComponents.push_back( lc );
 
 	LuaState::push( L, static_cast<co::IReflector*>( lc ) );
 
@@ -260,7 +264,7 @@ int coPackage::newComponentInstance( lua_State* L )
 	int tableRef = luaL_ref( L, LUA_REGISTRYINDEX );
 
 	LuaComponent* lc = new LuaComponent;
-	lc->setComponentInstance( static_cast<LuaComponent*>( prototype ), tableRef );
+	lc->setInstance( static_cast<LuaComponent*>( prototype ), tableRef );
 
 	LuaState::push( L, static_cast<co::IObject*>( lc ) );
 

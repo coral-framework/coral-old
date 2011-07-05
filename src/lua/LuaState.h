@@ -31,7 +31,7 @@ public:
 	//! Creates and sets up our Lua universe.
 	static void setup();
 
-	//! Closes our Lua universe.
+	//! Tears down our Lua universe, releasing all memory.
 	static void tearDown();
 
 	//! Debug method: prints the Lua stack to stdout.

@@ -22,8 +22,10 @@ public:
 	virtual ~LuaComponent();
 
 	// internal methods:
-	void setComponentType( co::IComponent* ct, int prototypeTableRef );
-	void setComponentInstance( LuaComponent* prototype, int instanceTableRef );
+	void setComponent( co::IComponent* ct, int prototypeTableRef );
+	void releaseComponent();
+
+	void setInstance( LuaComponent* prototype, int instanceTableRef );
 
 	// co::IObject methods:
 	co::IComponent* getComponent();
@@ -77,9 +79,9 @@ private:
 
 	/*
 		Lua registry reference to the component's table.
-		If this instance is a "Lua component type", _tableRef will be a
+		If this instance is a Lua Component (type), _tableRef will be a
 		reference to the component's prototype table. Otherwise, it will
-		be a reference to the component's instance table.
+		be a reference to an instance table.
 	 */
 	int _tableRef;
 

@@ -43,15 +43,12 @@ LuaComponent::LuaComponent()
 
 LuaComponent::~LuaComponent()
 {
-	lua_State* L = LuaState::getL();
-	if( L )
-		luaL_unref( L, LUA_REGISTRYINDEX, _tableRef );
 	for( int i = 0; i < _numFacets; ++i )
 		delete _facets[i];
 	delete[] _facets;
 }
 
-void LuaComponent::setComponentType( co::IComponent* ct, int prototypeTableRef )
+void LuaComponent::setComponent( co::IComponent* ct, int prototypeTableRef )
 {
 	assert( ct != NULL && _componentType == NULL && _facets == NULL );
 
@@ -62,7 +59,16 @@ void LuaComponent::setComponentType( co::IComponent* ct, int prototypeTableRef )
 	_componentType->setReflector( this );
 }
 
-void LuaComponent::setComponentInstance( LuaComponent* prototype, int instanceTableRef )
+void LuaComponent::releaseComponent()
+{
+	lua_State* L = LuaState::getL();
+	luaL_unref( L, LUA_REGISTRYINDEX, _tableRef );
+	_tableRef = 0;
+
+	_componentType->setReflector( NULL );
+}
+
+void LuaComponent::setInstance( LuaComponent* prototype, int instanceTableRef )
 {
 	assert( prototype && prototype->_facets == NULL );
 

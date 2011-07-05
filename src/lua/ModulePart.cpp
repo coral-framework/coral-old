@@ -77,17 +77,15 @@ public:
 		co::getSystem()->getModules()->uninstallLoader( _luaModulePartLoader.get() );
 
 		/*
-			This is our last chance to call __gc metamethods that require
-			reflectors, since reflectors are no longer available in the
-			dispose() phase.			
-		 */
-		lua_gc( LuaState::getL(), LUA_GCCOLLECT, 0 );
+			Last chance to call anything that needs a reflector, since
+			reflectors are no longer available after the disintegration phase.
+		*/
+		LuaState::tearDown();
 	}
 
 	void dispose( co::IModule* )
 	{
 		lua::ModuleInstaller::instance().uninstall();
-		LuaState::tearDown();
 	}
 
 private:
