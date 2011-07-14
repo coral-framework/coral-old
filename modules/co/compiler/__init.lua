@@ -289,7 +289,7 @@ local function loadCacheFile( filename, cachedTypes )
 	local f = io.open( filename, 'r' )
 	local code = f:read( "*a" )
 	f:close()
-	local chunk, err = loadin( cachedTypes, code, filename, 't' )
+	local chunk, err = load( code, filename, 't', cachedTypes )
 	if not chunk then
 		return print( "Error in cache file '" .. filename .. "': " .. tostring( err ) )
 	end

@@ -83,17 +83,23 @@ pre {
 
 #logotitle {
 	float: left;
-	padding: 15px 0px 0px 20px;
-	width: 75px;
-	height: 75px;
-	background: transparent url('../images/coral-logo.png') no-repeat scroll 15px 10px;
+	top: 10px;
+	left: 15px;
+	z-index: 2;
+	position: absolute;
+	#logo {
+		width: 70px;
+		height: 80px;
+		background: url('../images/logo.png');
+	}
 	a:hover{ text-decoration: none; }
 	h1 {
-		top: 25px;
-		left: 102px;
+		top: 24px;
+		left: 93px;
 		position: absolute;
+		white-space: nowrap;
 		color: $link-color;
-		font-size: 27px;
+		font-size: 30px;
 		font-weight: 600;
 		font-family: $font-family-arial;
 	}

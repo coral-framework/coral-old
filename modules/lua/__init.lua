@@ -34,9 +34,9 @@ local luaPackagesDir = thisModuleDir .. 'packages'
 package.path = luaPackagesDir .. "/?.lua"
 
 -------------------------------------------------------------------------------
--- Install our own loader function into Lua's package.loaders table.
+-- Install our own loader function into Lua's package.searchers table.
 
-table.insert( package.loaders, 2, function( moduleName )
+table.insert( package.searchers, 2, function( moduleName )
 	local filename = coFindScript( moduleName )
 	if filename then
 		local chunk, err = loadfile( filename )
