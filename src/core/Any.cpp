@@ -904,6 +904,7 @@ Any::PseudoVector& Any::createArray( IType* elementType, size_t n )
 
 	_state.objectKind = TK_ARRAY;
 	_object.array.reflector = elementType->getReflector();
+	_object.array.reflector->serviceRetain();
 
 	PseudoVector* res = reinterpret_cast<PseudoVector*>( _object.array.vectorArea );
 
@@ -987,6 +988,8 @@ void* Any::createComplexValue( IType* type )
 	destroyObject();
 
 	_object.complex.reflector = type->getReflector();
+	_object.complex.reflector->serviceRetain();
+
 	size_t size = _object.complex.reflector->getSize();
 
 	void* res;
@@ -1077,16 +1080,19 @@ void Any::destroyObject()
 			default:
 				assert( false );
 			}
+			_object.array.reflector->serviceRelease();
 		}
 		break;
 
 	case TK_STRUCT:
 		_object.complex.reflector->destroyValue( _object.complex.ptr );
+		_object.complex.reflector->serviceRelease();
 		free( _object.complex.ptr );
 		break;
 
 	case TK_NATIVECLASS:
 		_object.complex.reflector->destroyValue( _object.complex.inplaceArea );
+		_object.complex.reflector->serviceRelease();
 		break;
 
 	default:
@@ -1238,6 +1244,7 @@ void Any::copy( const Any& other )
 			{
 				_state.objectKind = TK_ARRAY;
 				_object.array.reflector = other._object.array.reflector;
+				_object.array.reflector->serviceRetain();
 				IType* elementType = _object.array.reflector->getType();
 				switch( elementType->getKind() )
 				{
