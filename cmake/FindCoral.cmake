@@ -147,8 +147,8 @@ FUNCTION( CORAL_GENERATE_MODULE generatedSourceFiles moduleName )
 
 		# Determine if the type is a component (if so, add the extra files)
 		FILE( STRINGS "${${moduleName}_${typeName}_FILENAME}" typeDeclLine LIMIT_COUNT 1
-			REGEX "(component|enum)[ \t]+${typeName}" )
-		STRING(REGEX REPLACE "([a-z]+)[ \t]+${typeName}" "\\1" typeKind "${typeDeclLine}" )
+			REGEX "(component|enum)[ \t]+${typeName}[ \t]?.*" )
+		STRING( REGEX REPLACE "([a-z]+)[ \t]+${typeName}[ \t]?.*" "\\1" typeKind "${typeDeclLine}" )
 
 		IF( typeKind STREQUAL "component" )
 			LIST( APPEND resultList "${outDir}/${typeName}_Base.h" "${outDir}/${typeName}_Base.cpp" )

@@ -29,7 +29,7 @@ struct RangeAdaptor<T, const C>
 {
 	typedef RangeAdaptor<T, C> NCA;
 	static const bool isValid = NCA::isValid;
-	static T* getData( const C& container ) { return NCA::getData( const_cast<C&>( container ) ); }
+	static const T* getData( const C& container ) { return NCA::getData( const_cast<C&>( container ) ); }
 	static size_t getSize( const C& container ) { return NCA::getSize( const_cast<C&>( container ) ); }
 };
 
