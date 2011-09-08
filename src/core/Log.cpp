@@ -4,6 +4,7 @@
  */
 
 #include "Log.h"
+#include <cstdlib>
 #include <iostream>
 
 namespace co {

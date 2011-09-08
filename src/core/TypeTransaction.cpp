@@ -41,7 +41,9 @@ TypeTransaction::TypeTransaction()
 TypeTransaction::~TypeTransaction()
 {
 	if( !_commitSucceeded && !_rolledBack )
+	{
 		CORAL_LOG(ERROR) << "ITypeTransaction not committed nor rolled back.";
+	}
 }
 
 void TypeTransaction::addTypeBuilder( ITypeBuilder* typeBuilder )
