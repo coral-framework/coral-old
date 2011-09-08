@@ -19,6 +19,7 @@
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/OS.h>
 #include <co/reserved/LibraryManager.h>
+#include <cstdio>
 #include <sstream>
 
 namespace co {
