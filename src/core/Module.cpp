@@ -5,6 +5,7 @@
 
 #include "Module.h"
 #include "tools/StringTokenizer.h"
+#include <co/Log.h>
 #include <co/Coral.h>
 #include <co/ISystem.h>
 #include <co/INamespace.h>
@@ -176,8 +177,8 @@ void Module::abort()
 			}
 			catch( std::exception& e )
 			{
-				debug( Dbg_Critical, "Exception ignored while aborting module '%s': %s",
-						_namespace->getFullName().c_str(), e.what() );
+				CORAL_LOG(ERROR) << "Exception ignored while aborting module '" <<
+					_namespace->getFullName() << "': " << e.what();
 			}
 		}
 	}

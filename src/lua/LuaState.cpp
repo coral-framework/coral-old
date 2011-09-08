@@ -5,6 +5,7 @@
 
 #include "LuaState.h"
 #include "LuaBinding.h"
+#include <co/Log.h>
 #include <co/IReflector.h>
 #include <co/reserved/OS.h>
 #include <co/IllegalArgumentException.h>

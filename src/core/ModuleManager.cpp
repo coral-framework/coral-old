@@ -6,6 +6,7 @@
 #include "ModuleManager.h"
 #include "Module.h"
 #include "ModulePartLoader.h"
+#include <co/Log.h>
 #include <co/Coral.h>
 #include <co/ISystem.h>
 #include <co/INamespace.h>
@@ -62,8 +63,9 @@ void ModuleManager::updateModules( ModuleState state )
 		catch( std::exception& e )
 		{
 			module->abort();
-			debug( Dbg_Warning, "module '%s' aborted due to exception: %s",
-				module->getNamespace()->getFullName().c_str(), e.what() );
+
+			CORAL_LOG(WARNING) << "Module '" << module->getNamespace()->getFullName() <<
+				"' aborted due to exception: " << e.what();
 		}
 	}
 }

@@ -5,6 +5,7 @@
 
 #include "ComponentBase.h"
 #include "../BasicReflector.h"
+#include <co/Log.h>
 #include <co/Coral.h>
 #include <co/RefPtr.h>
 #include <co/ISystem.h>
@@ -24,7 +25,10 @@ namespace co {
 ComponentBase::~ComponentBase()
 {
 	if( _refCount != 0 )
-		debug( Dbg_Fatal, "Deleting component %p with a reference count of %i.", this, _refCount );
+	{
+		CORAL_LOG(FATAL) << "Deleting component " << this <<
+			" with a reference count of " << _refCount << ".";
+	}
 }
 
 IInterface* ComponentBase::getInterface()

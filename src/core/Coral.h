@@ -56,56 +56,6 @@ CORAL_EXPORT ISystem* getSystem();
 CORAL_EXPORT void shutdown();
 
 
-// ------ Debug Events ---------------------------------------------------------
-
-/*!
-	\brief The kind of events that can be sent to a DebugEventHandler.
-	\ingroup debugevents
- */
-enum DebugEvent
-{
-	Dbg_Message,	//!< A simple debug message. Not sent in Release builds.
-	Dbg_Warning,	//!< A Warning message. Something worth checking.
-	Dbg_Critical,	//!< A Critical error. Potential data loss and malfunction.
-	Dbg_Fatal		//!< Fatal error. Default action is to abort the application.
-};
-
-/*!
-	\brief Signature of a DebugEventHandler function. See installDebugEventHandler().
-	\ingroup debugevents
- */
-typedef void (*DebugEventHandler)( DebugEvent event, const char* message );
-
-/*!
-	\brief Installs a debug event handler and returns the previous handler (which may be NULL).
-
-	A debug event handler is a function that prints out debug messages, warnings, critical and fatal
-	error messages. The default handler prints all messages to \c stderr, and aborts the application
-	in case of a fatal error. Only a single debug event handler can be defined per application, and
-	it should generally be installed before the framework is initialized.
-	To restore the default handler, call <tt>installDebugEventHandler( NULL )</tt>.
-
-	 \sa debug()
-	 \ingroup debugevents
- */
-CORAL_EXPORT DebugEventHandler installDebugEventHandler( DebugEventHandler handler );
-
-/*!
-	\brief Sends a debug event to the currently-installed debug event handler.
-
-	The debug event API is used as an alternative to exception handling
-	when it is impossible (or it does not make sense) to raise an exception.
-
-	The first parameter specifies the kind of the event (see \ref DebugEvent).
-	The remaining parameters are a format string and an optional list of
-	arguments that will compose the debug message, just like in printf().
-
-	 \sa installDebugEventHandler()
-	 \ingroup debugevents
- */
-CORAL_EXPORT void debug( DebugEvent event, const char* msg, ... );
-
-
 // ------ General Utility Functions --------------------------------------------
 
 /*!

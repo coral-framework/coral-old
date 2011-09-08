@@ -6,8 +6,9 @@
 #include "TypeTransaction.h"
 #include "TypeBuilder.h"
 #include "TypeManager.h"
-#include <co/IType.h>
+#include <co/Log.h>
 #include <co/Coral.h>
+#include <co/IType.h>
 #include <co/ISystem.h>
 #include <co/MissingInputException.h>
 #include <co/NotSupportedException.h>
@@ -22,9 +23,9 @@ TypeTransaction::TypeTransaction()
 {
 	if( sm_activeTransaction )
 	{
-		debug( Dbg_Fatal, "Attempt to instantiate a co.TypeTransaction while another "
+		CORAL_LOG(FATAL) << "Attempt to instantiate a co.TypeTransaction while another "
 			"instance is active. Concurrent type creation is unsafe and disallowed "
-			"in this Coral version." );
+			"in this Coral version.";
 
 		CORAL_THROW( NotSupportedException,
 			"Only a single ITypeTransaction instance may exist at any moment in time" );
@@ -40,7 +41,7 @@ TypeTransaction::TypeTransaction()
 TypeTransaction::~TypeTransaction()
 {
 	if( !_commitSucceeded && !_rolledBack )
-		debug( Dbg_Critical, "ITypeTransaction not committed nor rolled back." );
+		CORAL_LOG(ERROR) << "ITypeTransaction not committed nor rolled back.";
 }
 
 void TypeTransaction::addTypeBuilder( ITypeBuilder* typeBuilder )

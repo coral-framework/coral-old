@@ -4,16 +4,18 @@
  */
 
 #include "RefCounted.h"
+#include <co/Log.h>
 #include <co/Coral.h>
-#include <cassert>
-#include <iostream>
 
 namespace co {
 
 RefCounted::~RefCounted()
 {
 	if( _refCount != 0 )
-		debug( Dbg_Fatal, "Deleting object %p with a reference count of %i.", this, _refCount );
+	{
+		CORAL_LOG(FATAL) << "Deleting object " << this <<
+			" with a reference count of " << _refCount << ".";
+	}
 }
 
 } // namespace co

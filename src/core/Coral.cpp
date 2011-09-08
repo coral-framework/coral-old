@@ -6,14 +6,12 @@
 #include "System.h"
 #include "ModuleInstaller.h"
 #include "tools/StringTokenizer.h"
+#include <co/Log.h>
 #include <co/Coral.h>
 #include <co/RefPtr.h>
 #include <co/IReflector.h>
 #include <co/reserved/OS.h>
 #include <co/reserved/LibraryManager.h>
-#include <cstdio>
-#include <cstdarg>
-#include <cstdlib>
 
 namespace co {
 
@@ -47,7 +45,7 @@ void addPath( const std::string& path )
 
 		if( !OS::isDir( dirPath ) )
 		{
-			debug( Dbg_Warning, "cannot add '%s' to the Coral path (not a dir)", dirPath.c_str() );
+			CORAL_LOG(WARNING) << "cannot add '" << dirPath <<  "' to the Coral path (not a dir)";
 			continue;
 		}
 
@@ -95,41 +93,6 @@ void shutdown()
 
 	// flush all released libraries
 	LibraryManager::flush();
-}
-
-static void defaultDebugEventHandler( DebugEvent ev, const char* message )
-{
-	static const char* s_eventName[] = { "DEBUG", "WARNING", "CRITICAL", "FATAL" };
-
-#ifdef CORAL_NDEBUG
-	if( ev == Dbg_Message )
-		return;
-#endif
-
-	const char* eventName = s_eventName[ev >= 0 && ev <= Dbg_Fatal ? ev : Dbg_Fatal];
-	fprintf( stderr, "[%s] %s\n", eventName, message );
-	if( ev == Dbg_Fatal )
-		abort();
-}
-
-static DebugEventHandler sg_debugEventHandler = defaultDebugEventHandler;
-
-DebugEventHandler installDebugEventHandler( DebugEventHandler handler )
-{
-	DebugEventHandler previous = sg_debugEventHandler;
-	sg_debugEventHandler = handler ? handler : defaultDebugEventHandler;
-	return previous;
-}
-
-void debug( DebugEvent event, const char* msg, ... )
-{
-	char buffer[1024] = { 0 };
-	va_list va;
-	va_start( va, msg );
-	if( msg )
-		vsprintf( buffer, msg, va );
-	va_end( va );
-	sg_debugEventHandler( event, buffer );
 }
 
 IType* getType( const std::string& fullName )

@@ -33,6 +33,7 @@ SET( CORAL_PUBLIC_HEADERS
 	Endian.h
 	Exception.h
 	IService.h
+	Log.h
 	Platform.h
 	Range.h
 	RefPtr.h
