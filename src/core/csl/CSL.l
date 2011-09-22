@@ -35,7 +35,7 @@ typedef co::csl::Parser::token TK;
 %}
 
 %option	8bit reentrant ecs nometa-ecs bison-bridge bison-locations
-%option	warn nodefault nounput noyylineno noyywrap
+%option	warn nodefault nounput noyylineno noyywrap never-interactive
 %option	prefix="csl_" outfile="scanner.cc" header-file="scanner.hh"
 
 /* %option debug */
