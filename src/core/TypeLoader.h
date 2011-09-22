@@ -6,8 +6,7 @@
 #ifndef _CO_TYPELOADER_H_
 #define _CO_TYPELOADER_H_
 
-#include "csl/Error.h"
-#include "csl/Parser.h"
+#include "csl/Loader.h"
 #include <co/RefPtr.h>
 #include <co/TypeKind.h>
 #include <co/Platform.h>
@@ -36,7 +35,7 @@ class TypeManager;
 	All search for dependencies and type creation is done within the context of a given
 	ITypeManager, which should also be passed in the constructor.
  */
-class CORAL_EXPORT TypeLoader : private csl::Parser
+class CORAL_EXPORT TypeLoader : public csl::Loader
 {
 public:
 	/*!
@@ -51,10 +50,6 @@ public:
 	//! Destructor.
 	virtual ~TypeLoader();
 
-	//! Retrieves the error occurred during the loading process.
-	//! Returns NULL if the loading was successful.
-	inline csl::Error* getError() { return _cslError.get(); }
-
 	/*!
 		Effectively loads the type (and its dependencies) from the filesystem.
 
@@ -65,7 +60,6 @@ public:
 
 		\warning If any error occurs while loading a type, this method returns NULL
 			and all partially constructed types are rolled back.
-
 	 */
 	IType* loadType();
 
@@ -89,11 +83,11 @@ private:
 		  1) search for an imported type aliased as 'typeName';
 		  2) search for a type named 'typeName' in the current namespace;
 		  3) search for a type named 'typeName' in the root namespace;
-		  4) try to load the type using the current path and returns NULL in case
-			 of error parsing the CSL file or if the file is not found in the
-			 filesystem (use getError() to access the error stack).
+		  4) try to load the type using the current path.
+		  5) return NULL in case of error parsing the CSL file or if the file
+			 is not found. Use getError() to access the error stack.
 	 */
-	virtual IType* resolveType( const std::string& typeName, bool isArray = false );
+	virtual IType* resolveType( const csl::location& loc, const std::string& typeName, bool isArray = false );
 
 	/*
 		Processes a documentation chunk. If the \a member parameter is not specified, the
@@ -128,8 +122,6 @@ private:
 
 	INamespace* _namespace;
 	RefPtr<ITypeTransaction> _transaction;
-
-	RefPtr<csl::Error> _cslError;
 };
 
 } // namespace co

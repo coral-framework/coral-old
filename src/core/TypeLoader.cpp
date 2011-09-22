@@ -56,49 +56,41 @@ INamespace* getOrCreateChildNamespace( INamespace* parent, const std::string& na
 
 IType* TypeLoader::loadType()
 {
-	std::string fullPath;
-	std::string relativePath;
-	if( !findCSL(_fullTypeName, fullPath, relativePath ) )
-	{
-		if( isRootLoader() )
-			_transaction->rollback();
-
-		return NULL;
-	}
-
-	INamespace* ns = _typeManager->getRootNS();
-
-	// iterate over all subparts
-	StringTokenizer st( relativePath, CORAL_OS_DIR_SEP_STR );
-	st.nextToken();
-	std::string currentToken = st.getToken();
-	while( st.nextToken() )
-	{
-		ns = getOrCreateChildNamespace( ns, currentToken );
-		currentToken = st.getToken();
-	}
-
-	_namespace = ns;
-
 	try
 	{
-		parse( fullPath );
+		std::string fullPath;
+		std::string relativePath;
+		if( findCSL( _fullTypeName, fullPath, relativePath ) )
+		{
+			INamespace* ns = _typeManager->getRootNS();
 
-		setCurrentLine( -1 );
+			// iterate over all subparts
+			StringTokenizer st( relativePath, CORAL_OS_DIR_SEP_STR );
+			st.nextToken();
+			std::string currentToken = st.getToken();
+			while( st.nextToken() )
+			{
+				ns = getOrCreateChildNamespace( ns, currentToken );
+				currentToken = st.getToken();
+			}
 
-	   	if( isRootLoader() )
-			_transaction->commit();
+			_namespace = ns;
 
-		return getType();
+			if( parse( fullPath ) )
+			{
+				if( isRootLoader() )
+					_transaction->commit();
+				return getType();
+			}
+		}
 	}
-	catch( Exception& e )
+	catch( co::Exception& e )
 	{
-		// create a csl error, using the current one as inner error
-		_cslError = new csl::Error( e.getMessage(), fullPath, getCurrentLine(), _cslError.get() );
-
-		if( isRootLoader() )
-			_transaction->rollback();
+		pushError( e.getMessage() );
 	}
+
+	if( isRootLoader() )
+		_transaction->rollback();
 
 	return NULL;
 }
@@ -108,28 +100,40 @@ ITypeBuilder* TypeLoader::createTypeBuilder( const std::string& typeName, TypeKi
 	return _namespace->defineType( typeName, kind, _transaction.get() );
 }
 
-IType* TypeLoader::resolveType( const std::string& typeName, bool isArray )
+IType* TypeLoader::resolveType( const csl::location& loc, const std::string& typeName, bool isArray )
 {
-	if( isArray )
+	try
 	{
-		IType* elementType = resolveType( typeName );
-		if( !elementType )
-			CORAL_THROW( Exception, "error loading array element type '" << typeName << "'" );
-		return _typeManager->getArrayOf( elementType );
+		if( isArray )
+		{
+			IType* elementType = resolveType( loc, typeName );
+			if( !elementType )
+			{
+				assert( getError() != NULL );
+				pushError( loc, "error loading array element type" );
+				return NULL;
+			}
+			return _typeManager->getArrayOf( elementType );
+		}
+
+		// try to find an imported type aliased as 'typeName'
+		IType* type = findImportedType( typeName );
+		if( type )
+			return type;
+
+		// try to find an existing type named 'typeName'
+		type = findDependency( typeName );
+		if( type )
+			return type;
+
+		// try to load a type named 'typeName'
+		return loadDependency( typeName );
 	}
-
-	// try to find an imported type aliased as 'typeName'
-	IType* type = findImportedType( typeName );
-	if( type )
-		return type;
-
-	// try to find an existing type named 'typeName'
-	type = findDependency( typeName );
-	if( type )
-		return type;
-
-	// try to load a type named 'typeName'
-	return loadDependency( typeName );
+	catch( co::Exception& e )
+	{
+		pushError( loc, e.getMessage() );
+		return NULL;
+	}
 }
 
 void TypeLoader::addDocumentation( const std::string& member, const std::string& text )
@@ -197,9 +201,11 @@ IType* TypeLoader::loadDependency( const std::string& typeName )
 	TypeLoader loader( relativePath, this );
 	IType* type = loader.loadType();
 
-	// set the current error as the child loader error (then it will be set as the inner error
-	// when this loader also detects the error)
-	_cslError = loader.getError();
+	/*
+		Set the current error as the child loader error (then it will be
+		set as the inner error when this loader also detects the error).
+	 */
+	setError( loader.getError() );
 
 	return type;
 }
@@ -231,12 +237,7 @@ bool TypeLoader::findCSL( const std::string& typeName, std::string& fullPath, st
 	bool succeeded = OS::searchFile2( _path, Range<const std::string>( names, n ),
 											fullPath, NULL, &relativePath );
 	if( !succeeded )
-	{
-		std::string message( "type '" );
-		message.append( typeName );
-		message.append( "' was not found in the path" );
-		_cslError = new csl::Error( message, "", -1, NULL );
-	}
+		CORAL_THROW( co::Exception, "type '" << typeName << "' was not found in the path" );
 
 	return succeeded;
 }

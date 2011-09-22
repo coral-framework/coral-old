@@ -56,27 +56,27 @@ TEST( TypeLoaderTests, cyclicalImport )
 TEST( TypeLoaderTests, syntaxError )
 {
 	CSL_TEST_BEGIN( "TypeLoaderTests.SyntaxError.struct1" )
-	CSL_EXPECT_SYNTAX_ERROR( "struct1.csl", 1 )
+	CSL_EXPECT_ERROR( "syntax error near 'structt'", "struct1.csl", 1 )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "TypeLoaderTests.SyntaxError.struct2" )
-	CSL_EXPECT_SYNTAX_ERROR( "struct2.csl", 1 )
+	CSL_EXPECT_ERROR( "syntax error near '1'", "struct2.csl", 1 )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "TypeLoaderTests.SyntaxError.struct3" )
-	CSL_EXPECT_SYNTAX_ERROR( "struct3.csl", 4 )
+	CSL_EXPECT_ERROR( "syntax error near ';'", "struct3.csl", 4 )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "TypeLoaderTests.SyntaxError.struct4" )
-	CSL_EXPECT_SYNTAX_ERROR( "struct4.csl", 7 )
+	CSL_EXPECT_ERROR( "syntax error near '// 7th line'", "struct4.csl", 7 )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "TypeLoaderTests.SyntaxError.struct5" )
-	CSL_EXPECT_SYNTAX_ERROR( "struct5.csl", 3)
+	CSL_EXPECT_ERROR( "syntax error near 'string'", "struct5.csl", 3)
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "TypeLoaderTests.SyntaxError.struct6" )
-	CSL_EXPECT_SYNTAX_ERROR( "struct6.csl", 3 )
+	CSL_EXPECT_ERROR( "unknown character '%' (0x25)", "struct6.csl", 3 )
 	CSL_TEST_END()
 }
 
@@ -158,7 +158,7 @@ TEST( TypeLoaderTests, nestedErrors )
 	CSL_EXPECT_ERROR( "error loading dependency 'Struct3'", "Struct2.csl", 3 )
 	CSL_EXPECT_ERROR( "error loading dependency 'Struct4'", "Struct3.csl", 3 )
 	CSL_EXPECT_ERROR( "error loading dependency 'Struct5'", "Struct4.csl", 3 )
-	CSL_EXPECT_ERROR( "was not found", "", -1 )
+	CSL_EXPECT_ERROR( "was not found", "", 3 )
 	CSL_TEST_END()
 }
 
@@ -184,7 +184,7 @@ TEST( TypeLoaderTests, inexistantArrayElementType )
 {
 	CSL_TEST_BEGIN( "TypeLoaderTests.InvalidDeclarationTests.inexistantArrayElementType" )
 	CSL_EXPECT_ERROR( "error loading array element type", "inexistantArrayElementType.csl", 4 )
-	CSL_EXPECT_ERROR( "'IDontExist' was not found", "", -1 )
+	CSL_EXPECT_ERROR( "'IDontExist' was not found", "", 4 )
 	CSL_TEST_END()
 }
 

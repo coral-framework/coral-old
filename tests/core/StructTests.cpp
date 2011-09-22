@@ -33,7 +33,7 @@ TEST( StructTests, conflictingType )
 	// it is handled as a syntax error because the type definition cannot be
 	// completed by the parser: it tries to create the type but it already exists
 	CSL_TEST_BEGIN( "StructTests.struct_valid" )
-	CSL_EXPECT_ERROR( "already contains a type called 'struct_valid'", "struct_valid.csl", 2 )
+	CSL_EXPECT_ERROR( "already contains a type called 'struct_valid'", "struct_valid.csl", -1 )
 	CSL_TEST_END()
 }
 
@@ -41,7 +41,7 @@ TEST( StructTests, inheritance )
 {
 	// structs don't support inheritance syntax
 	CSL_TEST_BEGIN( "StructTests.struct_inheritance" )
-	CSL_EXPECT_SYNTAX_ERROR( "struct_inheritance.csl", 1 )
+	CSL_EXPECT_ERROR( "syntax error near 'extends'", "struct_inheritance.csl", 1 )
 	CSL_TEST_END()
 }
 
@@ -49,22 +49,22 @@ TEST( StructTests, methodDefinition )
 {
 	// structs don't support method definitions
 	CSL_TEST_BEGIN( "StructTests.struct_methods" )
-	CSL_EXPECT_SYNTAX_ERROR( "struct_methods.csl", 7 )
+	CSL_EXPECT_ERROR( "syntax error near '('", "struct_methods.csl", 7 )
 	CSL_TEST_END()
 }
 
 TEST( StructTests, badFieldName )
 {
 	CSL_TEST_BEGIN( "StructTests.struct_badFieldName" )
-	CSL_EXPECT_SYNTAX_ERROR( "struct_badFieldName.csl", 3 )
+	CSL_EXPECT_ERROR( "unknown character '#' (0x23)", "struct_badFieldName.csl", 3 )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "StructTests.struct_badFieldName2" )
-	CSL_EXPECT_SYNTAX_ERROR( "struct_badFieldName2.csl", 3 )
+	CSL_EXPECT_ERROR( "syntax error near '@string'", "struct_badFieldName2.csl", 3 )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "StructTests.struct_badFieldName3" )
-	CSL_EXPECT_SYNTAX_ERROR( "struct_badFieldName3.csl", 3 )
+	CSL_EXPECT_ERROR( "syntax error near 'name'", "struct_badFieldName3.csl", 3 )
 	CSL_TEST_END()
 }
 
@@ -92,7 +92,7 @@ TEST( StructTests, validUsingInvalid )
 {
 	CSL_TEST_BEGIN( "StructTests.struct_validUsingAnInvalid" )
 	CSL_EXPECT_ERROR( "error loading dependency", "struct_validUsingAnInvalid.csl", 4 )
-	CSL_EXPECT_SYNTAX_ERROR( "struct_invalid.csl", 3 )
+	CSL_EXPECT_ERROR( "unknown character '#' (0x23)", "struct_invalid.csl", 3 )
 	CSL_TEST_END()
 }
 

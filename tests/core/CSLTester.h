@@ -7,76 +7,61 @@
 #define _CSLTESTER_H_
 
 #include "TestHelper.h"
-#include <core/TypeLoader.h>
-
-//! Expands to a LocationInfo with info about the line file
-#ifndef CLS_TESTER_LOCATION_INFO
-#define CLS_TESTER_LOCATION_INFO CSLTester::LocationInfo( __FILE__, __LINE__ )
-#endif
 
 /*
-	Utility class used to test CSL file loading.
-	It supports a stack of expected errors that must occur during the loading of a type.
-	If no expected errors are set, then the type is suposed to load successfully (without errors).
-	The test is performed using gtest macros with custom error messages.
+	Utility class for testing errors in CSL files (integrated with GTest).
+	It works with a stack of expected errors that should occur when loading a type.
+	If the stack of expected errors is empty, then the type should load successfully (no errors).
  */
 class CSLTester
 {
 public:
 	struct LocationInfo
 	{
-		LocationInfo()
-			: sourceLine( -1 )
-		{;}
+		std::string file;
+		int line;
 
 		LocationInfo( const std::string file, int line )
-			: sourceFile( file ), sourceLine( line )
-		{;}
-
-		std::string sourceFile;
-		int sourceLine;
+			: file( file ), line( line ) {;}
 	};
 
 public:
 	CSLTester( const std::string& typeName, const LocationInfo& li );
 
-	// Pushes the filename and the line at which the error must occur. In the case of a
-	// expected semantic error, no filename nor line are available.
-	// If an messageSubStr is non-empty, then the tester will search for a match of that string
-	// within the error message
-	CSLTester& expectedError( const std::string& messageSubStr, const std::string& filename, int line );
+	/*
+		Adds an expected error message and location (either can be omitted).
+		Expected errors should be added from outer-most to inner-most.
+		Note that semantic errors don't have a location.
+	 */
+	CSLTester& expectedError( const char* message, const char* filename = NULL, int line = -1 );
 
-	// Runs the test: tries to load the specified type and checks all expected errors
+	// Runs the test by loading the specified type and checking the expected errors.
 	void run();
 
 private:
+	std::string _typeName;
+	LocationInfo _location;
+
 	struct ExpectedError
 	{
-		std::string filename;
+		const char* message;
+		const char* filename;
 		int line;
-		std::string messageSubStr;
+
+		ExpectedError( const char* message, const char* filename, int line )
+			: message( message ), filename( filename ), line( line ) {;}
 	};
 
-	typedef std::vector<ExpectedError> ExpectedErrorList;
-	ExpectedErrorList _expectedErrors;
-
-	std::string _typeName;
-
-	co::TypeLoader _loader;
-	LocationInfo _locationInfo;
+	std::vector<ExpectedError> _expectedErrors;
 };
 
-#ifndef CSL_TEST_BEGIN
-
-// test a CSL file loading, expecting errors that must be specified
-#define CSL_TEST_BEGIN( typeName ) CSLTester( typeName, CLS_TESTER_LOCATION_INFO )
+// Macros to test CSL files that are expected to contain errors:
+#define CSL_TEST_BEGIN( typeName ) CSLTester( typeName, CSLTester::LocationInfo( __FILE__, __LINE__ ) )
 #define CSL_EXPECT_ERROR( message, file, line ) .expectedError( message, file, line )
-#define CSL_EXPECT_SYNTAX_ERROR( file, line ) .expectedError( "syntax error", file, line )
-#define CSL_EXPECT_SEMANTIC_ERROR( messageSubStr ) .expectedError( messageSubStr, "", -1 )
+#define CSL_EXPECT_SEMANTIC_ERROR( message ) .expectedError( message, "", -1 )
 #define CSL_TEST_END() .run();
 
-// test a CSL file loading, expecting no errors
+// Macro to test CSL files that are supposed to load successfully (no errors).
 #define CSL_TEST( typeName ) CSL_TEST_BEGIN( typeName ).run();
-#endif
 
 #endif

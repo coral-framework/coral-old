@@ -75,14 +75,23 @@ GET_PROPERTY( SOURCE_FILES DIRECTORY PROPERTY SOURCE_FILES )
 FILE( GLOB MAPPING_HEADER_FILES generated/co/*.h )
 FILE( GLOB GENERATED_MODULE_FILES generated/*.h generated/*.cpp )
 
-INCLUDE_DIRECTORIES(
-	${ANTLR3C_SOURCE_DIR}/include
-	generated
-)
+INCLUDE_DIRECTORIES( generated )
 
 ADD_DEFINITIONS( -DBUILDING_CORAL_CORE )
 
-ADD_LIBRARY( core SHARED ${MAPPING_HEADER_FILES} ${GENERATED_MODULE_FILES} ${HEADER_FILES} ${SOURCE_FILES} )
+ADD_LIBRARY( core SHARED
+	${MAPPING_HEADER_FILES}
+	${GENERATED_MODULE_FILES}
+	${HEADER_FILES}
+	${SOURCE_FILES}
+	"csl/CSL.l"
+	"csl/CSL.y"
+)
+
+if( NOT MSVC )
+	# Disable warnings for auto-generated code
+	set_property( SOURCE "csl/scanner.cc" APPEND PROPERTY COMPILE_FLAGS "-Wno-unused-parameter" )
+endif()
 
 SET_TARGET_PROPERTIES( core PROPERTIES
 	OUTPUT_NAME   "coral"
@@ -91,12 +100,7 @@ SET_TARGET_PROPERTIES( core PROPERTIES
 
 CORAL_DEFAULT_TARGET_PROPERTIES( core )
 
-IF( NOT MSVC )
-	# Disable warnings for AntLR-generated source files
-	SET_PROPERTY( SOURCE csl/CSLLexer.cpp csl/CSLParser.cpp PROPERTY COMPILE_FLAGS "-Wno-all -Wno-extra -Wno-unused" )
-ENDIF()
-
-TARGET_LINK_LIBRARIES( core	antlr3c )
+TARGET_LINK_LIBRARIES( core )
 
 IF( UNIX )
     TARGET_LINK_LIBRARIES( core dl )
@@ -129,8 +133,8 @@ FILE( GLOB typeFiles *Type*.* Array.* Enum.* Struct.* Component.* Interface.*
 SOURCE_GROUP( "Type" FILES ${typeFiles} )
 
 # CSL Loading Files
-FILE( GLOB cslFiles csl/*.h csl/*.cpp )
-SOURCE_GROUP( "CSL" FILES ${cslFiles} )
+FILE( GLOB cslFiles csl/*.h csl/*.cpp csl/*.hh csl/*.cc )
+SOURCE_GROUP( "CSL" FILES "csl/CSL.l" "csl/CSL.y" ${cslFiles} )
 
 # 'Reserved' Public Classes
 FILE( GLOB reservedFiles reserved/*.h reserved/*.cpp )

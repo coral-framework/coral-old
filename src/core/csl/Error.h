@@ -6,15 +6,15 @@
 #ifndef _CO_CSL_ERROR_H_
 #define _CO_CSL_ERROR_H_
 
-#include <co/Platform.h>
+#include "location.hh"
 #include "../tools/RefCounted.h"
-#include <string>
 
 namespace co {
 namespace csl {
 
 /*!
-	Error stack, with information about an error that occurred while loading a type from a CSL file.
+	Represents an error stack, with information about the errors that occurred
+	while attempting to load a CSL file.
 
 	The error line and filename may not be available in some cases, such as "file not found" and
 	semantic errors. (In this case, the filename will be empty and the line will be -1.)
@@ -22,7 +22,9 @@ namespace csl {
 class CORAL_EXPORT Error : public RefCounted
 {
 public:
-	Error( const std::string& msg, const std::string& filename, int32 line, Error* innerError );
+	Error( const location& loc, const std::string& message, Error* innerError );
+	Error( const std::string& filename, const std::string& message, Error* innerError );
+	Error(const std::string& message, Error* innerError );
 
 	virtual ~Error();
 
@@ -32,12 +34,15 @@ public:
 
 	inline int32 getLine() const { return _line; }
 
+	inline int32 getColumn() const { return _column; }
+
 	inline const Error* getInnerError() const { return _innerError.get(); }
 
 private:
 	std::string _message;
 	std::string _filename;
 	int32 _line;
+	int32 _column;
 	RefPtr<Error> _innerError;
 };
 

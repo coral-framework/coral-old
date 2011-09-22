@@ -9,10 +9,25 @@
 namespace co {
 namespace csl {
 
-Error::Error( const std::string& msg, const std::string& filename, int32 line, Error* innerError )
-	: _message( msg ), _filename( filename ), _line( line ), _innerError( innerError )
+Error::Error( const location& loc, const std::string& message, Error* innerError )
+	: _message( message ), _filename( *loc.begin.filename ), _innerError( innerError )
 {
-	// empty
+	_line = loc.begin.line;
+	_column = loc.begin.column;
+}
+
+Error::Error( const std::string& filename, const std::string& message, Error* innerError )
+	: _message( message ), _filename( filename ), _innerError( innerError )
+{
+	_line = -1;
+	_column = -1;
+}
+
+Error::Error( const std::string& message, Error* innerError )
+	: _message( message ), _innerError( innerError )
+{
+	_line = -1;
+	_column = -1;
 }
 
 Error::~Error()
@@ -44,7 +59,9 @@ std::ostream& operator<<( std::ostream& out, const co::csl::Error& error )
 		bool nextIsNotLast = ( nextError != NULL && nextError->getLine() != -1 );
 
 		out << ( nextIsNotLast ? "From " : "In file " )
-			<< currentError->getFileName() << ":" << currentError->getLine()
+			<< currentError->getFileName()
+			<< ":" << currentError->getLine()
+			<< ":" << currentError->getColumn()
 			<< ": " << currentError->getMessage() << ( nextIsNotLast ? ":\n" : ".\n" );
 
 		++level;

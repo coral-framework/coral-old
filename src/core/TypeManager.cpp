@@ -214,7 +214,7 @@ IType* TypeManager::loadTypeOrThrow( const std::string& fullName )
 	TypeLoader loader( fullName, getPaths(), this );
 
 	IType* type = loader.loadType();
-	if( !type )
+	if( loader.getError() )
 		CORAL_THROW( TypeLoadException, "could not load type '" << fullName << "':\n" << *loader.getError() );
 
 	return type;

@@ -1,0 +1,368 @@
+/* Parser for the Coral Specification Language (CSL) */
+
+/**
+%debug
+%verbose
+/**/
+
+%no-lines
+
+%require "2.5"
+%language "C++"
+%locations
+%defines "parser.hh"
+%output "parser.cc"
+%define namespace "co::csl"
+%define parser_class_name "Parser"
+%define filename_type "const std::string"
+%name-prefix "csl_"
+
+%parse-param { co::csl::Loader& loader }
+%parse-param { void* scanner }
+%lex-param   { co::csl::Loader& loader }
+%lex-param   { void* scanner }
+
+%code requires
+{
+	#include "Loader.h"
+	#include "location.hh"
+	#include <co/Any.h>
+	#include <sstream>
+
+	#define YY_DECL int csl_lex( co::csl::Parser::semantic_type* yylval_param, \
+		YYLTYPE* yylloc_param, co::csl::Loader& loader, yyscan_t yyscanner )
+
+	#define YYLTYPE co::csl::location
+
+	#define PUSH_ERROR( loc, msg ) { std::stringstream errorSS; \
+		errorSS << msg; loader.pushError( loc, errorSS.str() ); }
+
+	namespace co { namespace csl { class Loader; } }
+}
+
+%code {
+	#include "scanner.hh"
+	#include <co/Exception.h>
+
+	#define PARSE_EV( ev ) loader.ev; if( loader.getError() ) YYABORT;
+
+	// declare the scanner function
+	YY_DECL;
+}
+
+%initial-action
+{
+	@$.begin.filename = @$.end.filename = loader.getCurrentFileName();
+}
+
+%union
+{
+	bool b;
+	co::int32 i32;
+	double num;
+	std::string* str;
+	const char* cstr;
+}
+
+%token			END				0 "end of file"
+%token	<str>	ANNOTATION_ID	"annotation identifier"
+%token	<b>		BOOLEAN			"boolean value"
+%token	<str>	COMMENT			"comment"
+%token			COMPONENT		"component"
+%token	<str>	CPP_BLOCK		"C++ block"
+%token	<str>	CPP_TAG			"C++ tag"
+%token	<str>	CPP_TYPE		"C++ type"
+%token			ENUM			"enum"
+%token			EXCEPTION		"exception"
+%token			EXTENDS			"extends"
+%token	<str>	ID				"identifier"
+%token			IMPORT			"import"
+%token			IN				"in"
+%token			INOUT			"inout"
+%token			INTERFACE		"interface"
+%token	<str>	LITERAL			"string literal"
+%token			NATIVECLASS		"native class"
+%token	<num>	NUMBER			"number"
+%token			OUT				"out"
+%token	<cstr>	PRIMITIVE_TYPE	"primitive type"
+%token			PROVIDES		"provides"
+%token	<str>	QUALIFIED_ID	"qualified identifier"
+%token			RAISES			"raises"
+%token			READONLY		"readonly"
+%token			RECEIVES		"receives"
+%token			STRUCT			"struct"
+%token			VOID			"void"
+
+%type <b> opt_array port_kind
+%type <i32> inout
+%type <str> qualified_id identifier cpp_type
+
+%left '-' '+'
+%left '*' '/'
+%left NEG
+
+%start csl_file
+
+%%
+
+csl_file
+	:	specification_list
+	|	error {
+			if( loader.getError() )
+			{
+				// lex error
+			}
+			else
+			{
+				PUSH_ERROR( yylloc, "syntax error near '" << csl_get_text( scanner ) << "'" )
+			}
+			YYABORT;
+		}
+	;
+
+specification_list
+	:	specification
+	|	specification_list specification
+	;
+
+specification
+	: comment
+	| import_clause
+	| enum_spec
+	| exception_spec
+	| struct_spec
+	| nativeclass_spec
+	| interface_spec
+	| component_spec
+	;
+
+comment
+	: COMMENT { PARSE_EV( onComment( @COMMENT, *$COMMENT ) ) }
+	;
+
+comment_list
+	: comment
+	| comment_list comment
+	;
+
+opt_comment_list
+	: /* nothing */
+	| comment_list
+	;
+
+import_clause
+	: IMPORT qualified_id ';'
+		{ PARSE_EV( onImport( @IMPORT, *$qualified_id ) ) }
+	;
+
+identifier
+	: ID			{ $$ = $ID; }
+	| COMPONENT		{ static std::string sComponent( "component" ); $$ = &sComponent; }
+	| INTERFACE		{ static std::string sInterface( "interface" ); $$ = &sInterface; }
+	;
+
+qualified_id
+	: ID
+	| QUALIFIED_ID
+	;
+
+enum_spec
+	: ENUM ID { PARSE_EV( onTypeSpec( @ENUM, @ID, *$ID, co::TK_ENUM ) ) }
+		'{' enum_identifier_list '}' ';'
+	;
+
+enum_identifier
+	: opt_comment_list ID { PARSE_EV( onEnumIdentifier( @ID, *$ID ) ) } opt_comment_list
+	;
+
+enum_identifier_list
+	: enum_identifier
+	| enum_identifier_list ',' enum_identifier
+	;
+
+exception_spec
+	: EXCEPTION ID ';' { PARSE_EV( onTypeSpec( @EXCEPTION, @ID, *$ID, co::TK_EXCEPTION ) ) }
+	;
+
+struct_spec
+	: STRUCT ID { PARSE_EV( onTypeSpec( @STRUCT, @ID, *$ID, co::TK_STRUCT ) ) }
+		'{' opt_record_member_list '}' ';'
+	;
+
+opt_record_member_list
+	: /* nothing */
+	| record_member_list
+	;
+
+record_member_list
+	: record_member
+	| record_member_list record_member
+	;
+
+record_member
+	: comment
+	| field_decl
+	;
+
+field_decl
+	: type_decl identifier ';' { PARSE_EV( onField( @identifier, *$identifier, false ) ) }
+	| READONLY type_decl identifier ';' { PARSE_EV( onField( @identifier, *$identifier, true ) ) }
+	;
+
+nativeclass_spec
+	: NATIVECLASS ID { PARSE_EV( onTypeSpec( @NATIVECLASS, @ID, *$ID, co::TK_NATIVECLASS ) ) }
+		'(' CPP_TAG cpp_type ')' { PARSE_EV( onNativeClass( @4, *$CPP_TAG, *$cpp_type ) ) }
+		'{' opt_class_member_list '}' ';'
+	;
+
+cpp_type
+	: ID		{ $$ = $1; }
+	| CPP_TYPE	{ $$ = $1; }
+	;
+
+opt_class_member_list
+	: /* nothing */
+	| class_member_list
+	;
+
+class_member_list
+	: class_member
+	| class_member_list class_member
+	;
+
+class_member
+	: method_decl
+	| record_member
+	;
+
+method_decl
+	: type_decl identifier method_remaining_parts
+	| VOID { PARSE_EV( onTypeDecl( @VOID, "void", false ) ) } identifier method_remaining_parts
+	;
+
+method_remaining_parts
+	: '(' { PARSE_EV( onMethod( @0, *$<str>0 ) ) } opt_param_list ')'
+		opt_exception_list ';' { PARSE_EV( onEndMethod( @0 ) ) }
+	;
+
+opt_param_list
+	: /* nothing */
+	| param_list
+	;
+
+param_list
+	: param
+	| param_list ',' param
+	;
+
+param
+	: inout type_decl ID { int v = $inout;
+		PARSE_EV( onParameter( @ID, ( v & 1 ) != 0, ( v & 2 ) != 0, *$ID ) ) }
+	;
+
+inout
+	: IN	{ $$ = 1; }
+	| OUT	{ $$ = 2; }
+	| INOUT { $$ = 3; }
+	| error { PUSH_ERROR( @$, "expected 'in', 'out' or 'inout' before '"
+		<< csl_get_text( scanner ) << "'" ); YYABORT; }
+	;
+
+opt_exception_list
+	: /* nothing */
+	| RAISES exception_list
+	;
+
+exception_list
+	: exception
+	| exception_list ',' exception
+	;
+
+exception
+	: qualified_id { PARSE_EV( onRaises( @qualified_id, *$qualified_id ) ) }
+	;
+
+type_decl
+	: PRIMITIVE_TYPE opt_array { PARSE_EV( onTypeDecl( @$, $PRIMITIVE_TYPE, $opt_array ) ) }
+	| qualified_id opt_array { PARSE_EV( onTypeDecl( @$, *$qualified_id, $opt_array ) ) }
+	;
+
+opt_array
+	: /* nothing */ { $$ = false; }
+	| '[' ']'		{ $$ = true; }
+	;
+
+interface_spec
+	: INTERFACE ID { PARSE_EV( onTypeSpec( @INTERFACE, @ID, *$ID, co::TK_INTERFACE ) ) }
+		opt_inheritance_decl '{' opt_interface_member_list '}' ';'
+	;
+
+opt_inheritance_decl
+	: /* nothing */
+	| EXTENDS qualified_id { PARSE_EV( onBaseType( @qualified_id, *$qualified_id ) ) }
+	;
+
+opt_interface_member_list
+	: /* nothing */
+	| interface_member_list
+	;
+
+interface_member_list
+	: interface_member
+	| interface_member_list interface_member
+	;
+
+interface_member
+	: CPP_BLOCK { PARSE_EV( onCppBlock( @CPP_BLOCK, *$CPP_BLOCK ) ) }
+	| class_member
+	;
+
+component_spec
+	: COMPONENT ID { PARSE_EV( onTypeSpec( @COMPONENT, @ID, *$ID, co::TK_COMPONENT ) ) }
+		'{' opt_component_member_list '}' ';'
+	;
+
+opt_component_member_list
+	: /* nothing */
+	| component_member_list
+	;
+
+component_member_list
+	: component_member
+	| component_member_list component_member
+	;
+
+component_member
+	: comment
+	| port_kind qualified_id { PARSE_EV( onTypeDecl( @qualified_id, *$qualified_id, false ) ) }
+		ID ';' { PARSE_EV( onPort( @ID, $port_kind, *$ID ) ) }
+	;
+
+port_kind
+	: PROVIDES	{ $$ = true; }
+	| RECEIVES	{ $$ = false; }
+	;
+
+/*
+expression
+	:	BOOLVALUE
+	|	LITERAL
+	|	num_exp
+	;
+
+num_exp
+	:	NUMBER					{ $$ = $1; }
+	|	'(' num_exp ')'			{ $$ = $2; }
+	|	num_exp '+' num_exp		{ $$.set( $1.get<double>() + $3.get<double>() ); }
+	|	num_exp '-' num_exp		{ $$.set( $1.get<double>() - $3.get<double>() ); }
+	|	num_exp '*' num_exp		{ $$.set( $1.get<double>() * $3.get<double>() ); }
+	|	num_exp '/' num_exp		{ $$.set( $1.get<double>() / $3.get<double>() ); }
+	|	'-' num_exp %prec NEG	{ $$.set( -$2.get<double>() ); }
+	;
+*/
+%%
+
+void co::csl::Parser::error( const location_type&, const std::string& )
+{
+	// ignore
+}

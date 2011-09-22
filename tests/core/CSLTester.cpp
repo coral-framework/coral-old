@@ -5,86 +5,112 @@
 
 #include "CSLTester.h"
 #include <co/ISystem.h>
+#include <co/Exception.h>
+#include <core/TypeLoader.h>
 #include <core/csl/Error.h>
 #include <gtest/gtest.h>
+#include <sstream>
 
 CSLTester::CSLTester( const std::string& typeName, const LocationInfo& li  )
-	: _typeName( typeName ),  _loader( typeName, co::getPaths(), co::getSystem()->getTypes() ), _locationInfo( li )
+	: _typeName( typeName ), _location( li )
 {
 	// empty
 }
 
-CSLTester& CSLTester::expectedError( const std::string& messageSubStr, const std::string& filename, int line )
+CSLTester& CSLTester::expectedError( const char* message, const char* filename, int line )
 {
-	ExpectedError e;
-	e.filename = filename;
-	e.line = line;
-	e.messageSubStr = messageSubStr;
-	_expectedErrors.push_back( e );
-
+	_expectedErrors.push_back( ExpectedError( message, filename, line ) );
 	return *this;
 }
 
+#define CSL_ADD_ERROR( message ) ::testing::internal::AssertHelper( \
+	::testing::TestPartResult::kNonFatalFailure, _location.file.c_str(), \
+	_location.line, heading.c_str() ) = message
+
+#define CSL_FAIL() CSL_ADD_ERROR( ::testing::Message() )
+
 void CSLTester::run()
 {
-	#define CSL_LOCATION "[CSLTester] failed at " << _locationInfo.sourceFile << ":" << _locationInfo.sourceLine << ": "
+	co::TypeLoader loader( _typeName, co::getPaths(), co::getSystem()->getTypes() );
 
-	ASSERT_NO_THROW( _loader.loadType() )
-		<< CSL_LOCATION  << "the CSL file for type '" << _typeName << "' does not exist!";
+	std::stringstream headingSS;
+	headingSS << "CSL test failed for type '" << _typeName << "':";
+	std::string heading( headingSS.str() );
 
-	const co::csl::Error* error = _loader.getError();
-
-	if( _expectedErrors.size() == 0 )
-	{		
-		// no errors were expected
-		ASSERT_TRUE( error == NULL )
-			<< CSL_LOCATION << "no errors were expected at the loading of type '"
-			<< _typeName << "', but the loader has returned errors." << std::endl
-			<< "Actual error stack is: " << *error;
-	}
-	else
+	try
 	{
-		ASSERT_TRUE( error != NULL )
-			<< CSL_LOCATION << _expectedErrors.size()
-			<< " error(s) were expected at the loading of type '"
-			<< _typeName << "', but the loader has returned no errors.";
+		loader.loadType();
+	}
+	catch( co::Exception& e )
+	{
+		CSL_FAIL() << "Loader raised " << e.getTypeName() << ": " << e.getMessage();
+		return;
+	}
 
-		// check the error hierarchy
-		unsigned int i = 0;
-		while( error != NULL )
+	const co::csl::Error* error = loader.getError();
+
+	if( _expectedErrors.empty() )
+	{
+		if( error )
+			CSL_FAIL() << "Got an error, though no error was expected. CSL Error Stack:\n" << *error;
+		return;
+	}
+
+	if( !error )
+	{
+		CSL_FAIL() << "Type was successfully loaded, though " << _expectedErrors.size()
+			<< ( _expectedErrors.size() > 1 ? " errors were" : " error was" ) << " expected.";
+		return;
+	}
+
+	#define CSL_FAIL_MSG() *( errMsg ? errMsg : ( errMsg = new ::testing::Message() ) )
+	#define CSL_FAIL_AT() CSL_FAIL_MSG() << "[error#" << i << "] "
+	::testing::Message* errMsg = NULL;
+
+	// check the error hierarchy
+	size_t i = 0;
+	while( error )
+	{
+		if( i < _expectedErrors.size() )
 		{
-			// assert error line
-			if( error->getLine() != _expectedErrors[i].line )
-				FAIL()
-					<< CSL_LOCATION << "line number mismatch"
-					<< " at level " << i << ". "
-					<< "Expected: " << _expectedErrors[i].line
-					<< ". Actual: " << error->getLine();
+			const ExpectedError& ee = _expectedErrors[i];
 
-			// assert error file
-			if( !TestHelper::stringEndsWith( error->getFileName(), _expectedErrors[i].filename ) )
-				FAIL()
-					<< CSL_LOCATION << "filename mismatch"
-					<< " at level " << i << ". "
-					<< "Expected: '" << _expectedErrors[i].filename
-					<< "'. Actual: '" << error->getFileName();
+			// compare the error file
+			if( !TestHelper::stringEndsWith( error->getFileName(), ee.filename ) )
+				CSL_FAIL_AT() << "filename mismatch ('" << ee.filename << "' expected, got '"
+					<< error->getFileName() << "').\n";
 
-			// assert match of the error message substring
-			std::string::size_type found = error->getMessage().find( _expectedErrors[i].messageSubStr );
-			if( found == std::string::npos )
-				FAIL()
-					<< CSL_LOCATION << "message mismatch"
-					<< " at level " << i << ". "
-					<< "Expected substring: '" << _expectedErrors[i].messageSubStr
-					<< "'. Actual message: " << error->getMessage();
+			// compare the error line
+			if( error->getLine() != ee.line )
+				CSL_FAIL_AT() << "line number mismatch (" << ee.line << " expected, got "
+					<< error->getLine() << ").\n";
 
-			error = error->getInnerError();
-			++i;
+			// check the error message, if an expected substring was provided
+			if( ee.message && *ee.message )
+			{
+				size_t pos = error->getMessage().find( ee.message );
+				if( pos == std::string::npos )
+					CSL_FAIL_AT() << "message mismatch ('" << ee.message << "' expected, got '"
+						<< error->getMessage() << "').\n";
+			}
+		}
+		else
+		{
+			CSL_FAIL_AT() << "unexpected error: " << error->getFileName() << ":"
+				<< error->getLine() << ": " << error->getMessage() << "\n";
 		}
 
-		if( i != _expectedErrors.size() )
-			FAIL()
-				<< CSL_LOCATION << "error count mismatch ("
-				<< _expectedErrors.size() << " expected, got " << i << ")";
+		error = error->getInnerError();
+		++i;
+	}
+
+	if( i != _expectedErrors.size() )
+		CSL_FAIL_MSG() << "Error count mismatch (" << _expectedErrors.size()
+			<< " expected, got " << i << ").";
+
+	if( errMsg )
+	{
+		CSL_ADD_ERROR( *errMsg );
+		delete errMsg;
 	}
 }
