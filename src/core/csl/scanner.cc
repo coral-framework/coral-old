@@ -1,11 +1,15 @@
 #line 3 "CSL.l"
-	#include "parser.hh"
+#include "parser.hh"
 
-	#define YYSTYPE co::csl::Parser::semantic_type
+#define YYSTYPE co::csl::Parser::semantic_type
+
+#ifndef YY_NO_UNISTD_H
+#define YY_NO_UNISTD_H 1
+#endif
 
 
 
-#line 9 "scanner.cc"
+#line 13 "scanner.cc"
 
 #define  YY_INT_ALIGNED short int
 
@@ -1030,8 +1034,7 @@ static yyconst flex_int16_t yy_chk[2247] =
 
 typedef co::csl::Parser::token TK;
 
-#define YY_NO_UNISTD_H 1
-/** %option debug /**/
+/* %option debug */
 
 #define INITIAL 0
 #define CMT 1

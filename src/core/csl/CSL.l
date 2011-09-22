@@ -1,10 +1,13 @@
 /* Scanner for the Coral Specification Language (CSL) */
 %top{
-	#include "parser.hh"
+#include "parser.hh"
 
-	#define YYSTYPE co::csl::Parser::semantic_type
+#define YYSTYPE co::csl::Parser::semantic_type
+
+#ifndef YY_NO_UNISTD_H
+#define YY_NO_UNISTD_H 1
+#endif
 }
-
 %{
 
 #include "Loader.h"
@@ -32,10 +35,10 @@ typedef co::csl::Parser::token TK;
 %}
 
 %option	8bit reentrant ecs nometa-ecs bison-bridge bison-locations
-%option	warn nodefault nounistd nounput noyylineno noyywrap
+%option	warn nodefault nounput noyylineno noyywrap
 %option	prefix="csl_" outfile="scanner.cc" header-file="scanner.hh"
 
-/** %option debug /**/
+/* %option debug */
 
 %x CMT CPP STR
 

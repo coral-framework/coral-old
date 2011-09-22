@@ -3,13 +3,17 @@
 #define csl_IN_HEADER 1
 
 #line 3 "CSL.l"
-	#include "parser.hh"
+#include "parser.hh"
 
-	#define YYSTYPE co::csl::Parser::semantic_type
+#define YYSTYPE co::csl::Parser::semantic_type
+
+#ifndef YY_NO_UNISTD_H
+#define YY_NO_UNISTD_H 1
+#endif
 
 
 
-#line 13 "scanner.hh"
+#line 17 "scanner.hh"
 
 #define  YY_INT_ALIGNED short int
 
@@ -345,6 +349,6 @@ extern int csl_lex \
 #undef YY_DECL
 #endif
 
-#line 349 "scanner.hh"
+#line 353 "scanner.hh"
 #undef csl_IN_HEADER
 #endif /* csl_HEADER_H */
