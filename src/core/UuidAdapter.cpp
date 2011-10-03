@@ -4,7 +4,7 @@
  */
 
 #include "Uuid_Adapter.h"
-#include "tools/CryptoHash.h"
+#include "utils/CryptoHash.h"
 
 namespace co {
 

@@ -14,7 +14,7 @@ namespace co {
 /*!
 	Implements co.IInterface.
  */
-class Interface : public Interface_Base, public ClassTypeImpl
+class Interface : public ClassType<Interface_Base>
 {
 public:
 	Interface();
@@ -26,19 +26,13 @@ public:
 	void updateSuperTypes();
 
 	// ICompositeType methods:
-	Range<IMember* const> getMembers();
 	IMember* getMember( const std::string& name );
 
 	// IInterface methods:
 	IInterface* getBaseType();
 	Range<IInterface* const> getSuperTypes();
 	Range<IInterface* const> getSubTypes();
-	const std::string& getCppBlock();
 	bool isSubTypeOf( IInterface* type );
-
-	DELEGATE_co_IType( ClassTypeImpl:: );
-	DELEGATE_co_IRecordType( ClassTypeImpl:: );
-	DELEGATE_co_IClassType( ClassTypeImpl:: );
 
 private:
 	IInterface* _baseType;

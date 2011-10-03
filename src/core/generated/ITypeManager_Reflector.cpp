@@ -45,22 +45,9 @@ public:
 
 	// co.ITypeManager Methods:
 
-	bool getDocumentationParsing()
-	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 0 ) );
-        return res.get< bool >();
-	}
-
-	void setDocumentationParsing( bool documentationParsing_ )
-	{
-		co::Any arg;
-		arg.set< bool >( documentationParsing_ );
-		_provider->dynamicSetField( _cookie, getField<co::ITypeManager>( 0 ), arg );
-	}
-
 	co::INamespace* getRootNS()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 1 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 0 ) );
         return res.get< co::INamespace* >();
 	}
 
@@ -91,21 +78,12 @@ public:
 		return res.get< co::IArray* >();
 	}
 
-	const std::string& getDocumentation( const std::string& typeOrMemberName_ )
-	{
-		co::Any args[1];
-		args[0].set< const std::string& >( typeOrMemberName_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 3 ), range );
-		return res.get< const std::string& >();
-	}
-
 	co::IType* getType( const std::string& typeName_ )
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( typeName_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 4 ), range );
+		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 3 ), range );
 		return res.get< co::IType* >();
 	}
 
@@ -115,7 +93,7 @@ public:
 		args[0].set< const std::string& >( typeName_ );
 		args[1].set< std::vector<co::CSLError>& >( errorStack_ );
 		co::Range<co::Any const> range( args, 2 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 5 ), range );
+		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 4 ), range );
 		return res.get< co::IType* >();
 	}
 
@@ -173,8 +151,7 @@ public:
 		co::ITypeManager* p = co::checkInstance<co::ITypeManager>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< bool >( p->getDocumentationParsing() ); break;
-		case 1:		value.set< co::INamespace* >( p->getRootNS() ); break;
+		case 0:		value.set< co::INamespace* >( p->getRootNS() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -184,8 +161,7 @@ public:
 		co::ITypeManager* p = co::checkInstance<co::ITypeManager>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		p->setDocumentationParsing( value.get< bool >() ); break;
-		case 1:		raiseFieldIsReadOnly( field ); break;
+		case 0:		raiseFieldIsReadOnly( field ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 		CORAL_UNUSED( p );
@@ -201,42 +177,35 @@ public:
 		{
 			switch( method->getIndex() )
 			{
-			case 2:
+			case 1:
 				{
 					const std::string& fullName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
 					res.set< co::INamespace* >( p->findNamespace( fullName_ ) );
 				}
 				break;
-			case 3:
+			case 2:
 				{
 					const std::string& fullName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
 					res.set< co::IType* >( p->findType( fullName_ ) );
 				}
 				break;
-			case 4:
+			case 3:
 				{
 					co::IType* elementType_ = args[++argIndex].get< co::IType* >();
 					argIndex = -1;
 					res.set< co::IArray* >( p->getArrayOf( elementType_ ) );
 				}
 				break;
-			case 5:
-				{
-					const std::string& typeOrMemberName_ = args[++argIndex].get< const std::string& >();
-					argIndex = -1;
-					res.set< const std::string& >( p->getDocumentation( typeOrMemberName_ ) );
-				}
-				break;
-			case 6:
+			case 4:
 				{
 					const std::string& typeName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
 					res.set< co::IType* >( p->getType( typeName_ ) );
 				}
 				break;
-			case 7:
+			case 5:
 				{
 					const std::string& typeName_ = args[++argIndex].get< const std::string& >();
 					std::vector<co::CSLError>& errorStack_ = args[++argIndex].get< std::vector<co::CSLError>& >();

@@ -14,7 +14,7 @@ namespace co {
 /*!
 	Implements co.IArray.
  */
-class ArrayType : public ArrayType_Base, public TypeImpl
+class ArrayType : public Type<ArrayType_Base>
 {
 public:
 	virtual ~ArrayType();
@@ -24,8 +24,6 @@ public:
 
 	// co::IArray methods:
 	IType* getElementType();
-
-	DELEGATE_co_IType( TypeImpl:: );
 
 private:
 	RefPtr<IType> _elementType;

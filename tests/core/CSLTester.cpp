@@ -31,7 +31,7 @@ CSLTester& CSLTester::expectedError( const char* message, const char* filename, 
 
 void CSLTester::run()
 {
-	co::TypeLoader loader( _typeName, co::getPaths(), co::getSystem()->getTypes() );
+	co::TypeLoader loader( _typeName, co::getSystem()->getTypes() );
 
 	std::stringstream headingSS;
 	headingSS << "CSL test failed for type '" << _typeName << "':";

@@ -5,19 +5,19 @@
 
 #include "TypeBuilder.h"
 
-#include "Type.h"
-#include "Enum.h"
 #include "Namespace.h"
-#include "Method.h"
-#include "Struct.h"
 #include "TypeManager.h"
-#include "Field.h"
 #include "MethodBuilder.h"
-#include "Port.h"
-#include "ExceptionType.h"
-#include "Component.h"
-#include "Interface.h"
-#include "NativeClass.h"
+#include "types/Type.h"
+#include "types/Enum.h"
+#include "types/Method.h"
+#include "types/Struct.h"
+#include "types/Field.h"
+#include "types/Port.h"
+#include "types/ExceptionType.h"
+#include "types/Component.h"
+#include "types/Interface.h"
+#include "types/NativeClass.h"
 #include <co/Coral.h>
 #include <co/IllegalNameException.h>
 #include <co/IllegalStateException.h>

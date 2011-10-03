@@ -6,7 +6,8 @@
 #include "TypeLoader.h"
 #include "TypeManager.h"
 #include "TypeTransaction.h"
-#include "tools/StringTokenizer.h"
+#include "utils/StringTokenizer.h"
+#include <co/Coral.h>
 #include <co/IType.h>
 #include <co/IArray.h>
 #include <co/Exception.h>
@@ -19,10 +20,8 @@
 namespace co {
 
 // Root Loader Contructor:
-TypeLoader::TypeLoader( const std::string& fullTypeName,
-						Range<const std::string> path,
-						ITypeManager* tm )
-	: _fullTypeName( fullTypeName ), _path( path )
+TypeLoader::TypeLoader( const std::string& fullTypeName, ITypeManager* tm )
+	: _fullTypeName( fullTypeName )
 {
 	_typeManager = static_cast<TypeManager*>( tm );
 	_parentLoader = NULL;
@@ -32,7 +31,7 @@ TypeLoader::TypeLoader( const std::string& fullTypeName,
 
 // Non-Root Loader Constructor:
 TypeLoader::TypeLoader( const std::string& fullTypeName, TypeLoader* parent )
-	: _fullTypeName( fullTypeName ), _path( parent->_path )
+	: _fullTypeName( fullTypeName )
 {
 	_typeManager = parent->_typeManager;
 	_parentLoader = parent;
@@ -136,26 +135,6 @@ IType* TypeLoader::resolveType( const csl::location& loc, const std::string& typ
 	}
 }
 
-void TypeLoader::addDocumentation( const std::string& member, const std::string& text )
-{
-	// DocMap keys are like 'name.space.IType:memberName'
-	std::string key;
-	key.reserve( _fullTypeName.length() + member.length() + 1 );
-	key += _fullTypeName;
-	if( !member.empty() )
-	{
-		key += ":";
-		key += member;
-	}
-
-	_typeManager->addDocumentation( key, text );
-}
-
-void TypeLoader::addCppBlock( const std::string& text )
-{
-	_typeManager->addCppBlock( _fullTypeName, text );
-}
-
 inline std::string formatTypeInNamespace( INamespace* ns, const std::string& typeName )
 {
 	const std::string& namespaceName = ns->getFullName();
@@ -234,7 +213,7 @@ bool TypeLoader::findCSL( const std::string& typeName, std::string& fullPath, st
 	names[n].append( ".csl" );
 	++n;
 
-	bool succeeded = OS::searchFile2( _path, Range<const std::string>( names, n ),
+	bool succeeded = OS::searchFile2( getPaths(), Range<const std::string>( names, n ),
 											fullPath, NULL, &relativePath );
 	if( !succeeded )
 		CORAL_THROW( co::Exception, "type '" << typeName << "' was not found in the path" );

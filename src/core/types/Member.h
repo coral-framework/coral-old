@@ -6,6 +6,7 @@
 #ifndef _CO_MEMBER_H_
 #define _CO_MEMBER_H_
 
+#include "Annotated.h"
 #include <co/IMember.h>
 
 namespace co {
@@ -14,7 +15,7 @@ namespace co {
 	Re-usable implementation of co::IMember.
  */
 template<class Base>
-class Member : public Base
+class Member : public Annotated<Base>
 {
 public:
 	Member() : _owner( 0 ), _index( -1 )

@@ -4,8 +4,8 @@
  */
 
 #include "Utils.h"
-#include <core/tools/Properties.h>
-#include <core/tools/StringTokenizer.h>
+#include <core/utils/Properties.h>
+#include <core/utils/StringTokenizer.h>
 
 #if defined(CORAL_OS_WIN)
 	#define EXE_SUFFIX ".exe"

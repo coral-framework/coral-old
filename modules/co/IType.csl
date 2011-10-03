@@ -1,7 +1,7 @@
 /*
 	Basic type interface.
  */
-interface IType
+interface IType extends IAnnotated
 {
 	/*
 		The type's local name (not considering its namespace).

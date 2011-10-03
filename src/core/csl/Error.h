@@ -7,7 +7,7 @@
 #define _CO_CSL_ERROR_H_
 
 #include "location.hh"
-#include "../tools/RefCounted.h"
+#include "../utils/RefCounted.h"
 
 namespace co {
 namespace csl {
@@ -49,19 +49,7 @@ private:
 } // namespace csl
 } // namespace co
 
-/*!
-	Prints a CSL error stack. The message is formatted as follows:
-
-	a) When errors have filenames and lines, the message is formatted like an error stack:
-	\verbatim
-		From file: /home/user/mymodules/MyCSLType.csl:6: cannot load super-type 'mymodules.MyParentType':
-			From file: /home/user/mymodules/MyParentType.csl:2: cannot load dependent type 'tools.ToolType':
-				In file: /home/user/mymodules/tools/ToolType.csl:9: syntax error near '@type' : expected identifier.
-	\endverbatim
-
-	b) In the case of semantic errors, lines and filenames are not available, and since these errors
-		are never nested, the formatted message is just a plain error message.
- */
+//! Prints a CSL error stack.
 CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::csl::Error& error );
 
 #endif // _CO_CSL_ERROR_H_

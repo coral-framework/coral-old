@@ -18,12 +18,11 @@ namespace co {
 /*!
 	Reusable implementation for all class/record types.
  */
-class ClassTypeImpl : public TypeImpl
+class ClassTypeImpl
 {
 public:
-	ClassTypeImpl();
-
-	virtual ~ClassTypeImpl();
+	inline ClassTypeImpl() : _firstMethodPos( -1 )
+	{;}
 
 	/*!
 		Appends the given members range to the members list. After calling this
@@ -35,7 +34,6 @@ public:
 	void sortMembers( ICompositeType* owner );
 
 	// ICompositeType methods:
-	Range<IMember* const> getMembers();
 	IMember* getMember( const std::string& name );
 
 	// IRecordType methods:
@@ -44,21 +42,21 @@ public:
 	// IClassType methods:
 	Range<IMethod* const> getMethods();
 
-private:
+protected:
 	typedef RefVector<IMember> MembersVector;
 	MembersVector _members;	// mixed container: fields first, then methods.
 	size_t _firstMethodPos;	// dividing point: position of the first method in _members.
 };
-
-#define DELEGATE_co_ICompositeType( DELEGATE ) \
-	Range<IMember* const> getMembers() { return DELEGATE getMembers(); } \
-	IMember* getMember( const std::string& name ) { return DELEGATE getMember( name ); }
-
-#define DELEGATE_co_IRecordType( DELEGATE ) \
-	Range<IField* const> getFields() { return DELEGATE getFields(); }
-
-#define DELEGATE_co_IClassType( DELEGATE ) \
-	Range<IMethod* const> getMethods() { return DELEGATE getMethods(); }
+	
+template<class Base>
+class ClassType : public Type<Base>, public ClassTypeImpl
+{
+public:
+	Range<IMember* const> getMembers() { return _members; }
+	IMember* getMember( const std::string& name ) { return ClassTypeImpl::getMember( name ); }
+	Range<IField* const> getFields() { return ClassTypeImpl::getFields(); }
+	Range<IMethod* const> getMethods() { return ClassTypeImpl::getMethods(); }
+};
 
 } // namespace co
 

@@ -1,0 +1,24 @@
+/*
+	Holds documentation for types in CSL.
+
+	Methods addDocFor() and getDocFor() can be used to store and
+	retrieve documentation for elements of the type, such as
+	composite-type \e members or enum \e identifiers.
+ */
+interface IDocumentation extends IAnnotation
+{
+	// The type's main documentation block.
+	string value;
+
+	/*
+		Adds documentation for an \a element.
+		An element could be a member name or an enum identifier.
+	 */
+	void addDocFor( in string element, in string text );
+
+	/*
+		Gets documentation for an \a element.
+		Returns an empty string if no documentation was added for the \a element.
+	*/
+	string getDocFor( in string element );
+};

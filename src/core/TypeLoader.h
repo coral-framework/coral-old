@@ -39,13 +39,10 @@ class CORAL_EXPORT TypeLoader : public csl::Loader
 {
 public:
 	/*!
-		Constructs a loader for the type with the given \a fullTypeName.
-		The type's CSL file is located using the given \a path (a list of type repositories).
-		Types are looked up and created within the context of the specified \a typeManager.
+		Creates a loader for the type with the given \a fullTypeName.
+		Types are looked up and created within the context of a \a typeManager.
 	 */
-	TypeLoader( const std::string& fullTypeName,
-				Range<const std::string> path,
-				ITypeManager* typeManager );
+	TypeLoader( const std::string& fullTypeName, ITypeManager* typeManager );
 
 	//! Destructor.
 	virtual ~TypeLoader();
@@ -66,8 +63,8 @@ public:
 private:
 	/*
 		Private contructor: creates a 'non-root' loader that is used for loading
-		type dependencies recursively. In this case, we re-use the _docMap, _path
-		and _transaction from our parent.
+		type dependencies recursively. In this case, we re-use the _transaction
+		from our parent.
 	 */
 	TypeLoader( const std::string& fullTypeName, TypeLoader* parent );
 
@@ -90,17 +87,9 @@ private:
 	virtual IType* resolveType( const csl::location& loc, const std::string& typeName, bool isArray = false );
 
 	/*
-		Processes a documentation chunk. If the \a member parameter is not specified, the
-		documentation is associated with the type itself. If a member already contains some
-		documentation, the extra docs are appended to previous contents.
+		Searches an existing type with the passed \a typeName. The name can be fully qualified
+		or relative to the current type's location. Returns NULL if the type is not found.
 	 */
-	void addDocumentation( const std::string& member, const std::string& documentation );
-
-	// Appends the passed \a text to the CppBlockMap of our type.
-	void addCppBlock( const std::string& text );
-
-	//	Searches an existing type with the passed \a typeName. The name can be fully qualified
-	//	or relative to the current type's location. Returns NULL if the type is not found.
 	IType* findDependency( const std::string& typeName );
 
 	/*
@@ -116,7 +105,6 @@ private:
 
 private:
 	std::string _fullTypeName;
-	const Range<const std::string> _path;
 	TypeManager* _typeManager;
 	TypeLoader* _parentLoader;
 

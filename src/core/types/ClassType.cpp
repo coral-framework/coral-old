@@ -12,16 +12,6 @@
 
 namespace co {
 
-ClassTypeImpl::ClassTypeImpl() : _firstMethodPos( -1 )
-{
-	// empty
-}
-
-ClassTypeImpl::~ClassTypeImpl()
-{
-	// empty
-}
-
 void ClassTypeImpl::addMembers( Range<IMember* const> members )
 {
 	_members.reserve( _members.size() + members.getSize() );
@@ -70,11 +60,6 @@ void ClassTypeImpl::sortMembers( ICompositeType* owner )
 
 	if( _firstMethodPos == size_t( -1 ) )
 		_firstMethodPos = count;
-}
-
-Range<IMember* const> ClassTypeImpl::getMembers()
-{
-	return _members;
 }
 
 inline int nameComparator( const std::string& name, IMember* memberInfo )

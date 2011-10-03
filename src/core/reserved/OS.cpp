@@ -4,7 +4,7 @@
  */
 
 #include "OS.h"
-#include "../tools/StringTokenizer.h"
+#include "../utils/StringTokenizer.h"
 #include <cstdio>
 #include <cassert>
 #include <cstdlib>

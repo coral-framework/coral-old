@@ -18,14 +18,20 @@ public:
 	{
 		TypeId_ArrayType,
 		TypeId_Component,
+		TypeId_CppBlockAnnotation,
 		TypeId_CSLError,
+		TypeId_DocumentationAnnotation,
 		TypeId_Enum,
 		TypeId_ExceptionType,
 		TypeId_Field,
+		TypeId_IAnnotated,
+		TypeId_IAnnotation,
 		TypeId_IArray,
 		TypeId_IClassType,
 		TypeId_IComponent,
 		TypeId_ICompositeType,
+		TypeId_ICppBlock,
+		TypeId_IDocumentation,
 		TypeId_IDynamicServiceProvider,
 		TypeId_IEnum,
 		TypeId_IException,
@@ -119,14 +125,20 @@ private:
 // Module's reflector creation functions:
 co::IReflector* __createArrayTypeReflector();
 co::IReflector* __createComponentReflector();
+co::IReflector* __createCppBlockAnnotationReflector();
 co::IReflector* __createCSLErrorReflector();
+co::IReflector* __createDocumentationAnnotationReflector();
 co::IReflector* __createEnumReflector();
 co::IReflector* __createExceptionTypeReflector();
 co::IReflector* __createFieldReflector();
+co::IReflector* __createIAnnotatedReflector();
+co::IReflector* __createIAnnotationReflector();
 co::IReflector* __createIArrayReflector();
 co::IReflector* __createIClassTypeReflector();
 co::IReflector* __createIComponentReflector();
 co::IReflector* __createICompositeTypeReflector();
+co::IReflector* __createICppBlockReflector();
+co::IReflector* __createIDocumentationReflector();
 co::IReflector* __createIDynamicServiceProviderReflector();
 co::IReflector* __createIEnumReflector();
 co::IReflector* __createIExceptionReflector();

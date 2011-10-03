@@ -6,13 +6,17 @@
 #include "Loader.h"
 #include "scanner.hh"
 #include "parser.hh"
+#include "../Annotations.h"
+#include <co/IObject.h>
+#include <co/ICppBlock.h>
+#include <co/IException.h>
+#include <co/IInterface.h>
 #include <co/INamespace.h>
 #include <co/ITypeBuilder.h>
+#include <co/IDocumentation.h>
 #include <co/IMethodBuilder.h>
-#include <co/IInterface.h>
-#include <co/IException.h>
-#include <co/TypeLoadException.h>
 #include <co/ITypeTransaction.h>
+#include <co/TypeLoadException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/OS.h>
 
@@ -42,7 +46,7 @@ Loader::~Loader()
 bool Loader::parse( const std::string& filename )
 {
 	_filename = &filename;
-	
+
 	// extract the CSL file's base name
 	size_t startPos = filename.rfind( CORAL_OS_DIR_SEP );
 	startPos = ( startPos == std::string::npos ? 0 : startPos + 1 );
@@ -143,9 +147,8 @@ void Loader::onComment( const location&, const std::string& text )
 	if( text.length() > start && text[start] == '-' )
 		return;
 
-	// discard "blanks" at the end
+	// discard blanks at the end
 	size_t end = text.find_last_not_of( START_END_BLANKS );
-
 	if( start == end )
 		return;
 
@@ -166,8 +169,7 @@ void Loader::onComment( const location&, const std::string& text )
 
 void Loader::onCppBlock( const location&, const std::string& text )
 {
-	// removes the opening and closing c++ tags.
-	addCppBlock( text );
+	_cppBlock.append( text );
 }
 
 void Loader::onTypeSpec( const location& specLoc, const location& nameLoc,
@@ -334,7 +336,19 @@ void Loader::onEndMethod( const location& loc )
 IType* Loader::getType()
 {
 	assert( _typeBuilder.isValid() );
-	return _typeBuilder->createType();
+	IType* type = _typeBuilder->createType();
+
+	if( _doc.isValid() )
+		type->addAnnotation( _doc.get() );
+
+	if( !_cppBlock.empty() )
+	{
+		RefPtr<ICppBlock> cppBlock = new CppBlockAnnotation;
+		cppBlock->setValue( _cppBlock );
+		type->addAnnotation( cppBlock.get() );
+	}
+
+	return type;
 }
 
 IType* Loader::findImportedType( const std::string& alias )
@@ -372,8 +386,18 @@ void Loader::handleDocumentation( const std::string& member )
 		return;
 
 	addDocumentation( member, _docBuffer );
-
 	_docBuffer.clear();
+}
+
+void Loader::addDocumentation( const std::string& member, const std::string& text )
+{
+	if( !_doc.isValid() )
+		_doc = new DocumentationAnnotation;
+
+	if( member.empty() )
+		_doc->setValue( text );
+	else
+		_doc->addDocFor( member, text );
 }
 
 IType* Loader::getLastDeclaredType()

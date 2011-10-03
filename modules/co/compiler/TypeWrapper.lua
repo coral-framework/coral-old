@@ -46,18 +46,27 @@ function GenericWrapper.__tostring( obj )
 end
 
 function TypeWrapper.__index( t, key )
-	-- if key matches an auto field, compute it
-	local v = autoFields[key]
-	if v then
-		v = v( t )
+	local v
+
+	-- if the key is not a string, assume it's a type and get an annotation
+	if type( key ) ~= 'string' then
+		v = t._type:getAnnotation( key )
 	else
-		-- otherwise, if key matches a function in the 'utils' module, use it;
-		v = utils[key]
-		-- otherwise, resolve it as a member of the _type instance;
-		if not v then
-			v = wrapValue( t._type[key] )
+		-- if key matches an auto field, compute it
+		local autoField = autoFields[key]
+		if autoField then
+			v = autoField( t )
+		else
+			-- otherwise, if key matches a function in the 'utils' module, use it;
+			v = utils[key]
+
+			-- otherwise, resolve it as a member of the _type instance;
+			if not v then
+				v = wrapValue( t._type[key] )
+			end
 		end
 	end
+
 	-- cache the value for future accesses
 	t[key] = v
 	return v

@@ -10,6 +10,7 @@
 #include <co/RefPtr.h>
 #include <co/ITypeBuilder.h>
 #include <co/IMethodBuilder.h>
+#include <co/IDocumentation.h>
 #include <map>
 #include <deque>
 #include <string>
@@ -71,15 +72,6 @@ protected:
 	//! \param typeName may be a full or relative type name.
 	virtual IType* resolveType( const location& loc, const std::string& typeName, bool isArray = false ) = 0;
 
-	/*!
-		Template method: adds the passed \a text as documentation for the specified \a member of the
-		parsed type. When \a member is an empty string, documentation is for the parsed type itself.
-	 */
-	virtual void addDocumentation( const std::string& member, const std::string& text ) = 0;
-
-	//!	Template method: adds the passed \a text as a c++ block to be used by the type that is beeing defined.
-	virtual void addCppBlock( const std::string& text ) = 0;
-
 	//! Returns the type created by our ITypeBuilder.
 	//! Notice that onTypeSpecification() should have been called before.
 	IType* getType();
@@ -103,19 +95,16 @@ private:
 	typedef std::map<std::string, ImportInfo> ImportTypeMap;
 	ImportTypeMap _importedTypes;
 
-	//! Resolves all types added to the _importedTypes map. This method should be called
-	//! after the creation of the type builder to avoid problems with cyclic dependencies.
+	// Resolves all types added to the _importedTypes map. This method should be called
+	// after the creation of the type builder to avoid problems with cyclic dependencies.
 	void resolveImports();
 
-	/*
-		Adds any buffered (pre-)documentation to the specified member
-			(or to the type, when a member is not specified).
-		Also updates _lastMember so any post-doc goes to this member from now on.
-	 */
+	// Adds any buffered (pre-)documentation to the specified type/member.
+	// Also updates _lastMember so any post-doc goes to this member from now on.
 	void handleDocumentation( const std::string& member );
 
-	// formats the passed input removing any '\r' character
-	void filterText( const std::string& input, std::string& output );
+	// Adds an co::IDocumentation annotation to the type (if one doesn't exist).
+	void addDocumentation( const std::string& member, const std::string& text );
 
 	IType* getLastDeclaredType();
 
@@ -128,16 +117,22 @@ private:
 
 	RefPtr<ITypeBuilder> _typeBuilder;
 	RefPtr<IMethodBuilder> _methodBuilder;
-	
+
 	bool _lastDeclTypeIsArray;
-	std::string _lastDeclTypeName;
 	location _lastDeclTypeLocation;
+	std::string _lastDeclTypeName;
+
+	// accumulates C++ blocks
+	std::string _cppBlock;
 
 	// keeps track of the last defined member
 	std::string _lastMember;
 
 	// accumulates 'pre'-documentation
 	std::string _docBuffer;
+
+	// documentation annotation
+	RefPtr<IDocumentation> _doc;
 
 	// memory pools
 	std::deque<std::string> _stringPool;

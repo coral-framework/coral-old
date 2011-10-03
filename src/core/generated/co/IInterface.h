@@ -21,8 +21,6 @@ public:
 
 	virtual co::IInterface* getBaseType() = 0;
 
-	virtual const std::string& getCppBlock() = 0;
-
 	virtual co::Range<co::IInterface* const> getSubTypes() = 0;
 
 	virtual co::Range<co::IInterface* const> getSuperTypes() = 0;

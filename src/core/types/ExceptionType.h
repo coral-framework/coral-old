@@ -14,12 +14,10 @@ namespace co {
 /*!
 	Implements co.IException.
  */
-class ExceptionType : public ExceptionType_Base, public TypeImpl
+class ExceptionType : public Type<ExceptionType_Base>
 {
 public:
 	virtual ~ExceptionType();
-
-	DELEGATE_co_IType( TypeImpl:: );
 };
 
 } // namespace co

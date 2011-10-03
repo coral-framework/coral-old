@@ -5,7 +5,7 @@
 
 #include "System.h"
 #include "ModuleInstaller.h"
-#include "tools/StringTokenizer.h"
+#include "utils/StringTokenizer.h"
 #include <co/Log.h>
 #include <co/Coral.h>
 #include <co/RefPtr.h>

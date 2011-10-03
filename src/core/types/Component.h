@@ -16,7 +16,7 @@ namespace co {
 /*!
 	Implements co.IComponent.
  */
-class Component : public Component_Base, public TypeImpl
+class Component : public Type<Component_Base>
 {
 public:
 	Component();
@@ -39,8 +39,6 @@ public:
 	Range<IPort* const> getPorts();
 	Range<IPort* const> getFacets();
 	Range<IPort* const> getReceptacles();
-
-	DELEGATE_co_IType( TypeImpl:: );
 
 private:
 	RefVector<IPort> _ports; // dual sorted vector: facets first, then receptacles.

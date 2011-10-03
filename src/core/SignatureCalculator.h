@@ -7,7 +7,7 @@
 #define _CO_SIGNATURECALCULATOR_H_
 
 #include <co/Platform.h>
-#include "tools/CryptoHash.h"
+#include "utils/CryptoHash.h"
 
 namespace co {
 

@@ -14,14 +14,10 @@ namespace co {
 /*!
 	Implements co.IStruct.
  */
-class Struct : public Struct_Base, public ClassTypeImpl
+class Struct : public ClassType<Struct_Base>
 {
 public:
 	virtual ~Struct();
-
-	DELEGATE_co_IType( ClassTypeImpl:: );
-	DELEGATE_co_ICompositeType( ClassTypeImpl:: );
-	DELEGATE_co_IRecordType( ClassTypeImpl:: );
 };
 
 } // namespace co

@@ -70,10 +70,11 @@ public:
 	inline Log() {;}
 	~Log();
 
-	inline std::ostringstream& init( LogLevel level = LOG_INFO, bool isDebug = false )
+	//! Starts recording a log event.
+	inline std::ostringstream& start( LogLevel level = LOG_INFO, bool isDebug = false )
 	{
-		_level = level;
 		_isDebug = isDebug;
+		_level = level;
 		return _os;
 	}
 
@@ -106,7 +107,7 @@ private:
 #define CORAL_LOG_LEVEL_DEBUG( level, debug ) \
 	if( level < CORAL_LOG_MIN_SEVERITY ) ; \
 	else if( level < co::Log::getReportingLevel() ) ; \
-	else co::Log().init( level, debug )
+	else co::Log().start( level, debug )
 
 /*!
 	\def CORAL_LOG( level )
@@ -126,7 +127,7 @@ private:
 	\ingroup log
  */
 #ifdef CORAL_NDEBUG
-	#define CORAL_DLOG( level ) if( false ) co::Log().init()
+	#define CORAL_DLOG( level ) if( false ) co::Log().start()
 #else
 	#define CORAL_DLOG( level ) CORAL_LOG_LEVEL_DEBUG( co::LOG_##level, true )
 #endif

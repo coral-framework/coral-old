@@ -57,14 +57,20 @@ co::IReflector* co::ModuleInstaller::createReflector( TypeId typeId )
 	{
 	case TypeId_ArrayType: res = co::__createArrayTypeReflector(); break;
 	case TypeId_Component: res = co::__createComponentReflector(); break;
+	case TypeId_CppBlockAnnotation: res = co::__createCppBlockAnnotationReflector(); break;
 	case TypeId_CSLError: res = co::__createCSLErrorReflector(); break;
+	case TypeId_DocumentationAnnotation: res = co::__createDocumentationAnnotationReflector(); break;
 	case TypeId_Enum: res = co::__createEnumReflector(); break;
 	case TypeId_ExceptionType: res = co::__createExceptionTypeReflector(); break;
 	case TypeId_Field: res = co::__createFieldReflector(); break;
+	case TypeId_IAnnotated: res = co::__createIAnnotatedReflector(); break;
+	case TypeId_IAnnotation: res = co::__createIAnnotationReflector(); break;
 	case TypeId_IArray: res = co::__createIArrayReflector(); break;
 	case TypeId_IClassType: res = co::__createIClassTypeReflector(); break;
 	case TypeId_IComponent: res = co::__createIComponentReflector(); break;
 	case TypeId_ICompositeType: res = co::__createICompositeTypeReflector(); break;
+	case TypeId_ICppBlock: res = co::__createICppBlockReflector(); break;
+	case TypeId_IDocumentation: res = co::__createIDocumentationReflector(); break;
 	case TypeId_IDynamicServiceProvider: res = co::__createIDynamicServiceProviderReflector(); break;
 	case TypeId_IEnum: res = co::__createIEnumReflector(); break;
 	case TypeId_IException: res = co::__createIExceptionReflector(); break;

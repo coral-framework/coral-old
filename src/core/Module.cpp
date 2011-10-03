@@ -4,7 +4,7 @@
  */
 
 #include "Module.h"
-#include "tools/StringTokenizer.h"
+#include "utils/StringTokenizer.h"
 #include <co/Log.h>
 #include <co/Coral.h>
 #include <co/ISystem.h>

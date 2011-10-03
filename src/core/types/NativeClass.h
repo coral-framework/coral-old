@@ -14,7 +14,7 @@ namespace co {
 /*!
 	Implements co.INativeClass.
  */
-class NativeClass : public NativeClass_Base, public ClassTypeImpl
+class NativeClass : public ClassType<NativeClass_Base>
 {
 public:
 	virtual ~NativeClass();
@@ -26,11 +26,6 @@ public:
 	// INativeClass methods:
 	const std::string& getNativeName();
 	const std::string& getNativeHeader();
-
-	DELEGATE_co_IType( ClassTypeImpl:: );
-	DELEGATE_co_ICompositeType( ClassTypeImpl:: );
-	DELEGATE_co_IRecordType( ClassTypeImpl:: );
-	DELEGATE_co_IClassType( ClassTypeImpl:: );
 
 private:
 	std::string _nativeName;

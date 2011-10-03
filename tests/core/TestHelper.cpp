@@ -8,7 +8,7 @@
 #include <co/ISystem.h>
 #include <co/INamespace.h>
 #include <co/ITypeManager.h>
-#include <core/tools/StringTokenizer.h>
+#include <core/utils/StringTokenizer.h>
 #include <gtest/gtest.h>
 
 co::ITypeBuilder* TestHelper::createBuilder( co::TypeKind kind, const std::string& fullTypeName, co::ITypeTransaction* tct )

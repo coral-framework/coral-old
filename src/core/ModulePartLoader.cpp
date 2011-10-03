@@ -4,8 +4,8 @@
  */
 
 #include "ModulePartLoader.h"
-#include "tools/Library.h"
-#include "tools/StringTokenizer.h"
+#include "utils/Library.h"
+#include "utils/StringTokenizer.h"
 #include <co/Uuid.h>
 #include <co/Coral.h>
 #include <co/IType.h>

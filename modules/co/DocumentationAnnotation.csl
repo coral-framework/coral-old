@@ -1,0 +1,7 @@
+/*
+	Provides the special "@Documentation" annotation.
+ */
+component DocumentationAnnotation
+{
+	provides IDocumentation annotation;
+};

@@ -4,9 +4,9 @@
  */
 
 #include "Type.h"
-#include "Module.h"
-#include "BasicReflector.h"
-#include "SignatureCalculator.h"
+#include "../Module.h"
+#include "../BasicReflector.h"
+#include "../SignatureCalculator.h"
 #include <co/Coral.h>
 #include <co/ISystem.h>
 #include <co/INamespace.h>
@@ -18,12 +18,6 @@
 namespace co {
 
 // ------ TypeImpl -------------------------------------------------------------
-
-TypeImpl::TypeImpl() : _namespace( NULL ), _kind( TK_NONE )
-{
-	_hasSignatures = false;
-	_isCalculatingSignatures = false;
-}
 
 void TypeImpl::setType( INamespace* parent, const std::string& name, TypeKind kind )
 {
@@ -45,42 +39,6 @@ void TypeImpl::setType( INamespace* parent, const std::string& name, TypeKind ki
 	}
 
 	_fullName.append( name );
-}
-
-const std::string& TypeImpl::getName()
-{
-	return _name;
-}
-
-const std::string& TypeImpl::getFullName()
-{
-	return _fullName;
-}
-
-INamespace* TypeImpl::getNamespace()
-{
-	return _namespace;
-}
-
-TypeKind TypeImpl::getKind()
-{
-	return _kind;
-}
-
-const Uuid& TypeImpl::getFullSignature( IType* myType )
-{
-	if( !_hasSignatures )
-		calculateSignatures( myType );
-
-	return _fullSignature;
-}
-
-const Uuid& TypeImpl::getBinarySignature( IType* myType )
-{
-	if( !_hasSignatures )
-		calculateSignatures( myType );
-
-	return _binarySignature;
 }
 
 IReflector* TypeImpl::getReflector( IType* myType )
@@ -134,11 +92,6 @@ IReflector* TypeImpl::getReflector( IType* myType )
 		<< myType->getFullName() << "' has no reflector" );
 }
 
-void TypeImpl::setReflector( IReflector* reflector )
-{
-	_reflector = reflector;
-}
-
 void TypeImpl::calculateSignatures( IType* myType )
 {
 	assert( !_isCalculatingSignatures );
@@ -154,13 +107,13 @@ void TypeImpl::calculateSignatures( IType* myType )
 	_isCalculatingSignatures = false;
 }
 
-// ------ IType -----------------------------------------------------------------
+// ------ co.Type --------------------------------------------------------------
 
-Type::~Type()
+TypeComponent::~TypeComponent()
 {
 	// empty
 }
 
-CORAL_EXPORT_COMPONENT( Type, Type );
+CORAL_EXPORT_COMPONENT( TypeComponent, Type );
 
 } // namespace co

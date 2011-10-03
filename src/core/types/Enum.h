@@ -15,7 +15,7 @@ namespace co {
 /*!
 	Implements co.IEnum.
  */
-class Enum : public Enum_Base, public TypeImpl
+class Enum : public Type<Enum_Base>
 {
 public:
 	virtual ~Enum();
@@ -26,8 +26,6 @@ public:
 	// IEnum methods:
 	Range<std::string const> getIdentifiers();
 	int32 getValueOf( const std::string& identifier );
-
-	DELEGATE_co_IType( TypeImpl:: );
 
 private:
 	typedef std::vector<std::string> IdentifierVector;

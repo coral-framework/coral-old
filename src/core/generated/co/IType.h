@@ -7,7 +7,7 @@
 #define _CO_ITYPE_H_
 
 #include <co/TypeTraits.h>
-#include <co/IService.h>
+#include <co/IAnnotated.h>
 #include <co/Uuid.h>
 #include <co/TypeKind.h>
 
@@ -21,7 +21,7 @@ namespace co {
 // co.IType Mapping:
 namespace co {
 
-class IType : public co::IService
+class IType : public co::IAnnotated
 {
 public:
 	virtual ~IType() {;}

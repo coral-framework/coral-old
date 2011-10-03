@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _NAMESPACE_H_
-#define _NAMESPACE_H_
+#ifndef _CO_NAMESPACE_H_
+#define _CO_NAMESPACE_H_
 
 #include "Namespace_Base.h"
 #include <co/IType.h>

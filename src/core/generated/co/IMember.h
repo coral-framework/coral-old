@@ -7,7 +7,7 @@
 #define _CO_IMEMBER_H_
 
 #include <co/TypeTraits.h>
-#include <co/IService.h>
+#include <co/IAnnotated.h>
 #include <co/MemberKind.h>
 
 // Forward Declarations:
@@ -19,7 +19,7 @@ namespace co {
 // co.IMember Mapping:
 namespace co {
 
-class IMember : public co::IService
+class IMember : public co::IAnnotated
 {
 public:
 	virtual ~IMember() {;}

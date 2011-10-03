@@ -4,13 +4,13 @@
  */
 
 #include "Interface.h"
-#include "TypeManager.h"
 #include <co/Coral.h>
 #include <co/ISystem.h>
 
 namespace co {
 
-Interface::Interface() : _baseType( NULL ), _numSuperTypes( 0 ), _superTypes( NULL )
+Interface::Interface()
+	: _baseType( NULL ), _numSuperTypes( 0 ), _superTypes( NULL )
 {
 	// empty
 }
@@ -59,11 +59,6 @@ void Interface::updateSuperTypes()
 	assert( _superTypes[_numSuperTypes - 1]->getFullName() == "co.IService" );
 }
 
-Range<IMember* const> Interface::getMembers()
-{
-	return ClassTypeImpl::getMembers();
-}
-
 IMember* Interface::getMember( const std::string& name )
 {
 	IMember* res = ClassTypeImpl::getMember( name );
@@ -87,12 +82,6 @@ Range<IInterface* const> Interface::getSuperTypes()
 Range<IInterface* const> Interface::getSubTypes()
 {
 	return _subTypes;
-}
-
-const std::string& Interface::getCppBlock()
-{
-	TypeManager* tm = static_cast<TypeManager*>( getSystem()->getTypes() );
-	return tm->getCppBlock( getFullName() );
 }
 
 bool Interface::isSubTypeOf( IInterface* type )

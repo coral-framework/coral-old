@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _TYPEBUILDER_H_
-#define _TYPEBUILDER_H_
+#ifndef _CO_TYPEBUILDER_H_
+#define _CO_TYPEBUILDER_H_
 
 #include "Namespace.h"
 #include "TypeBuilder_Base.h"

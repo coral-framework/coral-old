@@ -53,7 +53,8 @@ ENDFOREACH()
 
 ADD_SUBDIRECTORY( csl )
 ADD_SUBDIRECTORY( reserved )
-ADD_SUBDIRECTORY( tools )
+ADD_SUBDIRECTORY( types )
+ADD_SUBDIRECTORY( utils )
 
 ################################################################################
 # Build Library
@@ -110,39 +111,32 @@ ENDIF()
 # Source Groups
 ################################################################################
 
-# Default Source Group
 SOURCE_GROUP( "Core" REGULAR_EXPRESSION ".*" )
 SOURCE_GROUP( "" FILES "CMakeLists.txt" )
 
-# Generated Files
 SOURCE_GROUP( "@Mappings" FILES ${MAPPING_HEADER_FILES} )
 SOURCE_GROUP( "@Generated" FILES ${GENERATED_MODULE_FILES} )
 
-# Module System Files
 FILE( GLOB moduleFiles Module*.* )
-SOURCE_GROUP( "Module" FILES ${moduleFiles} )
+SOURCE_GROUP( "Module System" FILES ${moduleFiles} )
 
-# Reflection System Files
-FILE( GLOB reflectionFiles Any* *Reflector* )
-SOURCE_GROUP( "Reflection" FILES ${reflectionFiles} )
+FILE( GLOB typeFiles Annotations.* *Builder.* Namespace.* Signature* Type* Uuid* )
+SOURCE_GROUP( "Type System" FILES ${typeFiles} )
 
-# Type System Files
-FILE( GLOB typeFiles *Type*.* Array.* Enum.* Struct.* Component.* Interface.*
-	NativeClass.* Member.* Field.* Method.* Port.* Parameter.* MethodBuilder.*
-	Namespace.* SignatureCalculator.* )
-SOURCE_GROUP( "Type" FILES ${typeFiles} )
-
-# CSL Loading Files
 FILE( GLOB cslFiles csl/*.h csl/*.cpp csl/*.hh csl/*.cc )
-SOURCE_GROUP( "CSL" FILES "csl/CSL.l" "csl/CSL.y" ${cslFiles} )
+SOURCE_GROUP( "Type System\\CSL" FILES TypeLoader.h TypeLoader.cpp csl/CSL.l csl/CSL.y ${cslFiles} )
 
-# 'Reserved' Public Classes
+FILE( GLOB reflectionFiles Any.* *Reflector.* )
+SOURCE_GROUP( "Type System\\Reflection" FILES Annotations.cpp ${reflectionFiles} )
+
+FILE( GLOB typesFiles types/*.h types/*.cpp )
+SOURCE_GROUP( "Type System\\Types" FILES ${typesFiles} )
+
 FILE( GLOB reservedFiles reserved/*.h reserved/*.cpp )
-SOURCE_GROUP( "Reserved" FILES ${reservedFiles} )
+SOURCE_GROUP( "Reserved API" FILES ${reservedFiles} )
 
-# Internal Utility Classes (Tools)
-FILE( GLOB toolsFiles tools/*.h tools/*.cpp )
-SOURCE_GROUP( "Tools" FILES ${toolsFiles} )
+FILE( GLOB utilsFiles utils/*.h utils/*.cpp )
+SOURCE_GROUP( "Utility Classes" FILES ${utilsFiles} )
 
 ################################################################################
 # Install Rules

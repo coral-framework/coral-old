@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _TYPECREATIONTRANSACTION_H_
-#define _TYPECREATIONTRANSACTION_H_
+#ifndef _CO_TYPETRANSACTION_H_
+#define _CO_TYPETRANSACTION_H_
 
 #include "TypeTransaction_Base.h"
 #include <co/RefVector.h>
@@ -15,8 +15,7 @@ namespace co {
 /*!
 	Implements co.ITypeTransaction.
  */
-class TypeTransaction
-		: public TypeTransaction_Base
+class TypeTransaction : public TypeTransaction_Base
 {
 public:
 	TypeTransaction();

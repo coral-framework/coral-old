@@ -1,7 +1,7 @@
 /*
 	Interface for the \e members of a composite type.
  */
-interface IMember
+interface IMember extends IAnnotated
 {
 	// Member name, which must be unique within its owner type.
 	readonly string name;

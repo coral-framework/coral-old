@@ -1,9 +1,0 @@
-// Component Declaration
-component DocumentedComponent
-{
-	// provided
-	provides TestInterface providedInterface;
-	provides TestInterface providedInterfaceNotDocumented;
-
-	receives TestInterface requiredInterface; 	//< Required interface
-};

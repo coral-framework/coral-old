@@ -4,10 +4,12 @@
  */
 
 #include "CSLTester.h"
-#include <co/ISystem.h>
-#include <co/ITypeManager.h>
-#include <co/IInterface.h>
 #include <co/IField.h>
+#include <co/ISystem.h>
+#include <co/Exception.h>
+#include <co/ICppBlock.h>
+#include <co/IInterface.h>
+#include <co/IDocumentation.h>
 #include <gtest/gtest.h>
 
 TEST( TypeLoaderTests, windowsLineBreaks )
@@ -80,18 +82,28 @@ TEST( TypeLoaderTests, syntaxError )
 	CSL_TEST_END()
 }
 
-inline const std::string& getDoc( const char* typeOrMemberName )
+const std::string& getDoc( const char* typeName, const char* memberName )
 {
-	return co::getSystem()->getTypes()->getDocumentation( typeOrMemberName );
+	co::IType* t = co::getType( typeName );
+	assert( t );
+
+	co::IDocumentation* doc = t->getAnnotation<co::IDocumentation>();
+	if( !doc )
+		throw co::Exception( "no documentation" );
+
+	if( memberName )
+		return doc->getDocFor( memberName );
+
+	return doc->getValue();
 }
 
 TEST( TypeLoaderTests, interfaceDocs )
 {
-	CSL_TEST( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedInterface" );
+	CSL_TEST( "TypeLoaderTests.Documented.Interface" );
 
-	const std::string& interfaceDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedInterface" );
-	const std::string& nameDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedInterface:name" );
-	const std::string& fooDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedInterface:foo" );
+	const std::string& interfaceDoc = getDoc( "TypeLoaderTests.Documented.Interface", NULL );
+	const std::string& nameDoc = getDoc( "TypeLoaderTests.Documented.Interface", "name" );
+	const std::string& fooDoc = getDoc( "TypeLoaderTests.Documented.Interface", "foo" );
 
 	EXPECT_EQ( "This is the interface Declaration\nThis could be a multi-line comment", interfaceDoc );
 	EXPECT_EQ( "and this is the field doc.", nameDoc );
@@ -100,11 +112,11 @@ TEST( TypeLoaderTests, interfaceDocs )
 
 TEST( TypeLoaderTests, structDocs )
 {
-	CSL_TEST( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedStruct" );
+	CSL_TEST( "TypeLoaderTests.Documented.Struct" );
 
-	const std::string& structDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedStruct" );
-	const std::string& nameDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedStruct:name" );
-	const std::string& fooDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedStruct:foo" );
+	const std::string& structDoc = getDoc( "TypeLoaderTests.Documented.Struct", NULL );
+	const std::string& nameDoc = getDoc( "TypeLoaderTests.Documented.Struct", "name" );
+	const std::string& fooDoc = getDoc( "TypeLoaderTests.Documented.Struct", "foo" );
 
 	EXPECT_EQ( "Struct Declaration", structDoc );
 	EXPECT_EQ( "struct member.\nextra doc.", nameDoc );
@@ -113,42 +125,32 @@ TEST( TypeLoaderTests, structDocs )
 
 TEST( TypeLoaderTests, enumDocs )
 {
-	CSL_TEST( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum" );
+	CSL_TEST( "TypeLoaderTests.Documented.Enum" );
 
-	const std::string& enumDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum" );
-	const std::string& firstDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum:first" );
-	const std::string& secondDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum:second" );
-	const std::string& thirdDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedEnum:third" );
+	const std::string& enumDoc = getDoc( "TypeLoaderTests.Documented.Enum", NULL );
+	const std::string& firstDoc = getDoc( "TypeLoaderTests.Documented.Enum", "first" );
+	const std::string& secondDoc = getDoc( "TypeLoaderTests.Documented.Enum", "second" );
+	const std::string& thirdDoc = getDoc( "TypeLoaderTests.Documented.Enum", "third" );
 
 	EXPECT_EQ( "This is the Enum Declaration", enumDoc );
 	EXPECT_EQ( "doc for first.\nsecond doc for first.", firstDoc );
 	EXPECT_EQ( "doc for second.", secondDoc );
-	EXPECT_TRUE( thirdDoc.empty() );
+	EXPECT_EQ( "", thirdDoc );
 }
 
 TEST( TypeLoaderTests, componentDocs )
 {
-	CSL_TEST( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent" );
+	CSL_TEST( "TypeLoaderTests.Documented.Component" );
 
-	const std::string& componentDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent" );
-	const std::string& providedDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent:providedInterface" );
-	const std::string& requiredDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent:requiredInterface" );
-	const std::string& notDoc = getDoc( "TypeLoaderTests.SingleFileDocMapLoading.DocumentedComponent:providedInterfaceNotDocumented" );
+	const std::string& componentDoc = getDoc( "TypeLoaderTests.Documented.Component", NULL );
+	const std::string& providedDoc = getDoc( "TypeLoaderTests.Documented.Component", "providedInterface" );
+	const std::string& requiredDoc = getDoc( "TypeLoaderTests.Documented.Component", "requiredInterface" );
+	const std::string& notDoc = getDoc( "TypeLoaderTests.Documented.Component", "providedInterfaceNotDocumented" );
 
 	EXPECT_EQ( "Component Declaration", componentDoc );
 	EXPECT_EQ( "provided", providedDoc );
 	EXPECT_EQ( "Required interface", requiredDoc );
-	EXPECT_TRUE( notDoc.empty() );
-}
-
-TEST( TypeLoaderTests, dependencyDocs )
-{
-	CSL_TEST( "TypeLoaderTests.DependencyDocMapLoading.StartingType" );
-
-	EXPECT_FALSE( getDoc( "TypeLoaderTests.DependencyDocMapLoading.StartingType" ).empty() );
-	EXPECT_FALSE( getDoc( "TypeLoaderTests.DependencyDocMapLoading.StartingType:dep" ).empty() );
-	EXPECT_FALSE( getDoc( "TypeLoaderTests.DependencyDocMapLoading.DependencyType" ).empty() );
-	EXPECT_FALSE( getDoc( "TypeLoaderTests.DependencyDocMapLoading.DependencyType:name" ).empty() );
+	EXPECT_EQ( "", notDoc );
 }
 
 TEST( TypeLoaderTests, nestedErrors )
@@ -215,7 +217,10 @@ TEST( TypeLoaderTests, singleCppBlock )
 	co::IInterface* it = co::cast<co::IInterface>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.singleBlockInterface" ) );
 	ASSERT_TRUE( it != NULL );
 
-	const std::string& str = it->getCppBlock();
+	co::ICppBlock* cppBlock = it->getAnnotation<co::ICppBlock>();
+	ASSERT_TRUE( cppBlock != NULL );
+
+	const std::string& str = cppBlock->getValue();
 	EXPECT_TRUE( str.find( "\t//This code block was injected by the compiler using the '<c++' tag" ) != std::string::npos );
 	EXPECT_TRUE( str.find( "\tvoid myInjectedFoo() {;}" ) != std::string::npos );
 }
@@ -227,7 +232,7 @@ TEST( TypeLoaderTests, multipleCppBlocks )
 	co::IInterface* it = co::cast<co::IInterface>( co::getType( "TypeLoaderTests.CppCodeBlocksTests.multipleBlocksInterface" ) );
 	ASSERT_TRUE( it != NULL );
 
-	const std::string& str = it->getCppBlock();
+	const std::string& str = it->getAnnotation<co::ICppBlock>()->getValue();
 	EXPECT_TRUE( str.find( "\tvoid myInjectedFoo() {;}" ) != std::string::npos );
 	EXPECT_TRUE( str.find( "\tvoid myLastInjectedFoo() {;}" ) != std::string::npos );
 }

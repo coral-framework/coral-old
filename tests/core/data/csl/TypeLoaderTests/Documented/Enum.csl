@@ -1,5 +1,5 @@
 // This is the Enum Declaration
-enum DocumentedEnum
+enum Enum
 {
 	// doc for first.
 	first, //< second doc for first.

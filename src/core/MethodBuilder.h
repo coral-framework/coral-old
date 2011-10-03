@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _METHODBUILDER_H_
-#define _METHODBUILDER_H_
+#ifndef _CO_METHODBUILDER_H_
+#define _CO_METHODBUILDER_H_
 
 #include "MethodBuilder_Base.h"
 #include <co/RefVector.h>

@@ -28,10 +28,6 @@ class ITypeManager : public co::IService
 public:
 	virtual ~ITypeManager() {;}
 
-	virtual bool getDocumentationParsing() = 0;
-
-	virtual void setDocumentationParsing( bool documentationParsing ) = 0;
-
 	virtual co::INamespace* getRootNS() = 0;
 
 	virtual co::INamespace* findNamespace( const std::string& fullName ) = 0;
@@ -39,8 +35,6 @@ public:
 	virtual co::IType* findType( const std::string& fullName ) = 0;
 
 	virtual co::IArray* getArrayOf( co::IType* elementType ) = 0;
-
-	virtual const std::string& getDocumentation( const std::string& typeOrMemberName ) = 0;
 
 	virtual co::IType* getType( const std::string& typeName ) = 0;
 
