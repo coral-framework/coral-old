@@ -21,11 +21,12 @@ int main( int argc, char* argv[] )
 	std::string program( rootDir );
 	program += CORAL_OS_DIR_SEP_STR "coral" CORAL_DEBUG_SUFFIX;
 
-	char** args = new char*[argc + 3 + 1];
+	char** args = new char*[argc + 4 + 1];
 
 	int k = 0;
 	args[k++] = const_cast<char*>( program.c_str() );
-	args[k++] = const_cast<char*>( "--csl acd" );
+	args[k++] = const_cast<char*>( "--csl" );
+	args[k++] = const_cast<char*>( "acd" );
 	args[k++] = const_cast<char*>( "lua.Launcher" );
 	args[k++] = const_cast<char*>( "co.compiler.cli" );
 	for( int i = 1; i < argc; ++i )
