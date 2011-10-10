@@ -1,9 +1,0 @@
-import TypeLoaderTests.ImportClauseTests.Office;
-
-interface Designer
-{
-	string name;
-
-	// should be the  TypeLoaderTests.ImportClauseTests.Office type;
-	Office mainOffice;
-};

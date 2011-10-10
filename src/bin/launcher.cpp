@@ -15,6 +15,7 @@
 #include <co/IInterface.h>
 #include <co/IParameter.h>
 #include <co/IModuleManager.h>
+#include <iostream>
 
 /*
 	Helper function to initialize the Coral path.
@@ -36,7 +37,7 @@ static void addDefaultPaths()
 	}
 	else
 	{
-		fprintf( stderr, "Oops! Could not determine the current executable's path.\n" );
+		std::cerr << "Oops! Could not determine the current executable's path.\n";
 	}
 
 	// add the current working dir to the path
@@ -52,7 +53,7 @@ static void addDefaultPaths()
 	}
 	else
 	{
-		fprintf( stderr, "Oops! Could not determine the current working directory.\n" );
+		std::cerr << "Oops! Could not determine the current working directory.\n";
 	}
 
 #if defined(CORAL_PATH)
@@ -145,10 +146,33 @@ int main( int argc, char* argv[] )
 		{
 			if( ++index >= argc )
 			{
-				fprintf( stderr, "Missing dir list after option '-p'." );
+				std::cerr << "Error: expected DIR LIST after option '-p'.";
 				return EXIT_FAILURE;
 			}
 			co::addPath( argv[index] );
+		}
+		else if( strCaseComp( argv[index] + 1, "-csl" ) == 0 )
+		{
+			if( ++index >= argc )
+			{
+				std::cerr << "Error: expected FLAGS after option '--csl'.";
+				return EXIT_FAILURE;
+			}
+			co::uint8 flags = 0;
+			const char* args = argv[index];
+			while( char c = *args++ )
+			{
+				switch( c )
+				{
+				case 'a':	flags |= co::CSL_ANNOTATIONS;	break;
+				case 'c':	flags |= co::CSL_CPPBLOCKS;		break;
+				case 'd':	flags |= co::CSL_DOCUMENTATION;	break;
+				default:
+					std::cerr << "Error: unrecognized CSL flag '" << c << "'.";
+					return EXIT_FAILURE;
+				}
+			}
+			co::setCSLFlags( flags );
 		}
 		else if( strCaseComp( argv[index] + 1, "-no-abi-checks" ) == 0 )
 		{
@@ -156,7 +180,8 @@ int main( int argc, char* argv[] )
 		}
 		else
 		{
-			fprintf( stderr, "Unrecognized flag: %s\n", argv[index] );
+			std::cerr << "Error: unrecognized option '" << argv[index] << "'.";
+			return EXIT_FAILURE;
 		}
 		++index;
 	}
@@ -164,7 +189,7 @@ int main( int argc, char* argv[] )
 	// print help if not enough args were passed
 	if( index >= argc )
 	{
-		printf(
+		std::cout <<
 			"Coral Application Launcher v" CORAL_VERSION_STR " (" CORAL_BUILD_KEY " " CORAL_BUILD_MODE ")\n"
 			"Usage: coral [options] callee [ARG] ...\n"
 			"Description:\n"
@@ -177,9 +202,14 @@ int main( int argc, char* argv[] )
 			"  coral myModule.MyComponent arg1 arg2 arg3\n"
 			"  coral someModule.SomeComponent.someFacet:someMethod arg1 arg2\n"
 			"Available Options:\n"
-			"  -p EXTRA,DIRS    Add a list of repositories to the Coral path.\n"
-			"  --no-abi-checks  Disable ABI compatibility checks when loading modules.\n"
-		);
+			"  -p EXTRA,DIRS   Add a list of repositories to the Coral path.\n"
+			"  --csl FLAGS     Controls optional language features.\n"
+			"                  Flags:  (sample usage: --csl acd)\n"
+			"                    a - Enable annotations (on by default).\n"
+			"                    c - Load C++ code blocks (off by default).\n"
+			"                    d - Load documentation (off by default).\n"
+			"  --no-abi-checks Disable ABI compatibility checks when loading modules.\n"
+		;
 		return EXIT_FAILURE;
 	}
 
@@ -198,7 +228,7 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "System initialization failed.\nException: %s\n", e.what() );
+			std::cerr << "System initialization failed.\nException: " << e.what();
 			throw;
 		}
 
@@ -213,7 +243,7 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "Invalid callee '%s'.\nException: %s\n", argv[index], e.what() );
+			std::cerr << "Invalid callee '" << argv[index] << "'.\nException: " << e.what();
 			throw;
 		}
 
@@ -226,8 +256,8 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "Invalid method '%s:%s'.\nException: %s\n",
-					facet->getType()->getFullName().c_str(), method->getName().c_str(), e.what() );
+			std::cerr << "Invalid method '" << facet->getType()->getFullName()
+					  << ':' << method->getName() << "'.\nException: " << e.what();
 			throw;
 		}
 
@@ -244,7 +274,7 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "Instantiation failed: %s\n", e.what() );
+			std::cerr << "Instantiation failed: " << e.what();
 			throw;
 		}
 
@@ -256,7 +286,7 @@ int main( int argc, char* argv[] )
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "Invocation failed: %s\n", e.what() );
+			std::cerr << "Invocation failed: " << e.what();
 			throw;
 		}
 
@@ -276,20 +306,14 @@ int main( int argc, char* argv[] )
 			if( res.isValid() )
 			{
 				if( res.getKind() >= co::TK_INT8 && res.getKind() <= co::TK_DOUBLE )
-				{
 					exitStatus = res.get<int>();
-				}
 				else
-				{
-					std::stringstream ss;
-					ss << res;
-					printf( "Method returned %s\n", ss.str().c_str() );
-				}
+					std::cout << "Method returned " << res;
 			}
 		}
 		catch( std::exception& e )
 		{
-			fprintf( stderr, "Program terminated with an unhandled exception.\nMessage: %s\n", e.what() );
+			std::cerr << "Program terminated with an unhandled exception.\nMessage: " << e.what();
 			throw;
 		}
 	}

@@ -24,11 +24,10 @@
 #define SET_CSTR( arg )		(yylval)->cstr = arg;
 #define SET_STRING( arg )	(yylval)->str = loader.newString( arg );
 #define STR_NEW()			(yylval)->str = str = loader.newString();
-#define STR_APPEND( aStr )	assert( str ); str->append( aStr );
-#define STR_PUSH( aChr )	assert( str ); str->push_back( aChr );
+#define STR_APPEND( aStr )	{ assert( str ); str->append( aStr ); }
+#define STR_PUSH( aChr )	{ assert( str ); str->push_back( aChr ); }
 
-#define LEX_ERROR( msg ) \
-	PUSH_ERROR( *yylloc, msg ); yyterminate();
+#define LEX_ERROR( msg )	{ PUSH_ERROR( *yylloc, msg ); yyterminate(); }
 
 typedef co::csl::Parser::token TK;
 
@@ -104,7 +103,7 @@ uint8				SET_CSTR( "uint8" ) return TK::PRIMITIVE_TYPE;
 
 {ID}				SET_STRING( yytext ) return TK::ID;
 {QUALID}			SET_STRING( yytext ) return TK::QUALIFIED_ID;
-\@({ID}|{QUALID})	SET_STRING( yytext ) return TK::ANNOTATION_ID;
+\@({ID}|{QUALID})	SET_STRING( yytext + 1 ) return TK::ANNOTATION_ID;
 
 {CPP_TAG}			SET_STRING( yytext ); return TK::CPP_TAG;
 
@@ -117,27 +116,69 @@ uint8				SET_CSTR( "uint8" ) return TK::PRIMITIVE_TYPE;
 {DIGIT}*\.{DIGIT}+{EXP}?	SET_NUMBER( strtod( yytext, NULL ) ) return TK::NUMBER;
 {DIGIT}+\.{DIGIT}*{EXP}?	SET_NUMBER( strtod( yytext, NULL ) ) return TK::NUMBER;
 
-"//".*\n			{	yytext[yyleng - 1] = '\0'; SET_STRING( &yytext[2] )
-						yylloc->lines( 1 ); return TK::COMMENT;
+
+"//".*\n			{	// single-line comments
+						yylloc->lines( 1 );
+						if( loader.hasDoc() )
+						{
+							yytext[yyleng - 1] = '\0';
+							SET_STRING( &yytext[2] )
+							return TK::COMMENT;
+						}
+						yylloc->step();
 					}
 
-"/*"				STR_NEW() caller = YY_START; BEGIN(CMT);
-<CMT>[^*\n]*		/* eat anything that's not an '*' */ STR_APPEND( yytext )
-<CMT>"*"+[^*/\n]*	/* eat up '*'s not followed by '/'s */ STR_APPEND( yytext )
-<CMT>\n				/* eat up newlines */ STR_PUSH( '\n' ) yylloc->lines( 1 );
-<CMT>"*"+"/"		BEGIN(caller); return TK::COMMENT;
+
+"/*"				{	// start of a multi-line comment
+						if( loader.hasDoc() ) STR_NEW()
+						caller = YY_START; BEGIN(CMT);
+					}
+<CMT>[^*\n]*		{	// eat anything that's not an '*'
+						if( loader.hasDoc() ) STR_APPEND( yytext )
+					}
+<CMT>"*"+[^*/\n]*	{	// eat up '*'s not followed by '/'s
+						if( loader.hasDoc() ) STR_APPEND( yytext )
+					}
+<CMT>\n				{	// eat up newlines
+						if( loader.hasDoc() ) STR_PUSH( '\n' )
+						yylloc->lines( 1 );
+					}
+<CMT>"*"+"/"		{	// end of the multi-line comment
+						BEGIN(caller); if( loader.hasDoc() ) return TK::COMMENT;
+					}
 <CMT><<EOF>>		LEX_ERROR( "unclosed comment" );
 
-"<c++"				STR_NEW() caller = YY_START; BEGIN(CPP);
-<CPP>[^c\n]*		/* eat anything that's not a 'c' */ STR_APPEND( yytext )
-<CPP>"c"+[^+\n]*	/* eat up 'c's not followed by '+'s */ STR_APPEND( yytext )
-<CPP>"c+"[^+\n]*	/* eat up 'c+'s not followed by '>'s */ STR_APPEND( yytext )
-<CPP>"c++"[^>\n]*	/* eat up 'c++'s not followed by '>'s */ STR_APPEND( yytext )
-<CPP>\n				/* eat up newlines */ STR_PUSH( '\n' ) yylloc->lines( 1 );
-<CPP>"c++>"			BEGIN(caller); return TK::CPP_BLOCK;
+
+
+"<c++"				{	// start of a C++ code block
+						if( loader.hasCppBlocks() ) STR_NEW()
+						caller = YY_START; BEGIN(CPP);
+					}
+<CPP>[^c\n]*		{	// eat anything that's not a 'c'
+						if( loader.hasCppBlocks() ) STR_APPEND( yytext )
+					}
+<CPP>"c"+[^+\n]*	{	// eat up 'c's not followed by '+'s
+						if( loader.hasCppBlocks() ) STR_APPEND( yytext )
+					}
+<CPP>"c+"[^+\n]*	{	// eat up 'c+'s not followed by '>'s
+						if( loader.hasCppBlocks() ) STR_APPEND( yytext )
+					}
+<CPP>"c++"[^>\n]*	{	// eat up 'c++'s not followed by '>'s
+						if( loader.hasCppBlocks() ) STR_APPEND( yytext )
+					}
+<CPP>\n				{	// eat up newlines
+						if( loader.hasCppBlocks() ) STR_PUSH( '\n' )
+						yylloc->lines( 1 );
+					}
+<CPP>"c++>"			{	// end of the C++ code block
+						BEGIN(caller); if( loader.hasCppBlocks() ) return TK::CPP_BLOCK;
+					}
 <CPP><<EOF>>		LEX_ERROR( "unclosed C++ block" );
 
-"\""				STR_NEW() caller = YY_START; BEGIN(STR);
+
+
+
+"\""				/* string literal */ STR_NEW() caller = YY_START; BEGIN(STR);
 <STR>"\""			BEGIN(caller); return TK::LITERAL;
 <STR>\n				LEX_ERROR( "unterminated string literal" );
 <STR>\\[0-9]+		{	/* decimal escape sequence */
@@ -155,8 +196,9 @@ uint8				SET_CSTR( "uint8" ) return TK::PRIMITIVE_TYPE;
 <STR>\\v			STR_PUSH( '\v' )
 <STR>\\.			STR_PUSH( yytext[1] )
 <STR>\\\n			yylloc->lines( 1 );
-<STR>[^\\\n\"]+		STR_APPEND( yytext )
+<STR>[^\\\n\x22]+	STR_APPEND( yytext )
 <STR>\\				LEX_ERROR( "incomplete escape sequence" );
+
 
 {BLANK}+		/* eat blanks */ yylloc->step();
 \r?\n			yylloc->lines( 1 ); yylloc->step();

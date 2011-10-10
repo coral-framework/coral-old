@@ -1,0 +1,6 @@
+@co.Documentation( "Here goes the documentation" )
+
+enum Documentation
+{
+	zero, one, two, three
+};

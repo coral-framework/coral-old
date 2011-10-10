@@ -62,6 +62,7 @@
 	double num;
 	std::string* str;
 	const char* cstr;
+	co::Any* any;
 }
 
 %token			END				0 "end of file"
@@ -95,7 +96,9 @@
 
 %type <b> opt_array port_kind
 %type <i32> inout
+%type <num> num_exp
 %type <str> qualified_id identifier cpp_type
+%type <any> exp
 
 %left '-' '+'
 %left '*' '/'
@@ -106,11 +109,11 @@
 %%
 
 csl_file
-	:	specification_list
+	:	sentence_list
 	|	error {
 			if( loader.getError() )
 			{
-				// lex error
+				// we must've got a lexical error, so abort...
 			}
 			else
 			{
@@ -120,20 +123,29 @@ csl_file
 		}
 	;
 
-specification_list
-	:	specification
-	|	specification_list specification
+sentence_list
+	:	sentence
+	|	sentence_list sentence
 	;
 
-specification
+sentence
 	: comment
-	| import_clause
+	| annotation
+	| statement ';'
+	;
+
+statement
+	: import_clause
 	| enum_spec
 	| exception_spec
 	| struct_spec
 	| nativeclass_spec
 	| interface_spec
 	| component_spec
+	;
+
+import_clause
+	: IMPORT qualified_id { PARSE_EV( onImport( @IMPORT, *$qualified_id ) ) }
 	;
 
 comment
@@ -150,11 +162,6 @@ opt_comment_list
 	| comment_list
 	;
 
-import_clause
-	: IMPORT qualified_id ';'
-		{ PARSE_EV( onImport( @IMPORT, *$qualified_id ) ) }
-	;
-
 identifier
 	: ID			{ $$ = $ID; }
 	| COMPONENT		{ static std::string sComponent( "component" ); $$ = &sComponent; }
@@ -166,9 +173,37 @@ qualified_id
 	| QUALIFIED_ID
 	;
 
+annotation
+	: ANNOTATION_ID { PARSE_EV( onAnnotation( @1, *$1 ) ) } opt_annotation_data
+	;
+
+opt_annotation_data
+	: /* nothing */
+	| '(' annotation_data ')'
+	;
+
+annotation_data
+	: exp { PARSE_EV( onAnnotationData( @exp, "value", *$exp ) ) } opt_field_value_list
+	| field_value_list
+	;
+
+opt_field_value_list
+	: /* nothing */
+	| ',' field_value_list
+	;
+
+field_value_list
+	: field_value
+	| field_value_list field_value
+	;
+
+field_value
+	: ID '=' exp { PARSE_EV( onAnnotationData( @$, *$ID, *$exp ) ) }
+	;
+
 enum_spec
-	: ENUM ID { PARSE_EV( onTypeSpec( @ENUM, @ID, *$ID, co::TK_ENUM ) ) }
-		'{' enum_identifier_list '}' ';'
+	: ENUM ID { PARSE_EV( onTypeSpec( @ENUM, co::TK_ENUM, @ID, *$ID ) ) }
+		'{' enum_identifier_list '}'
 	;
 
 enum_identifier
@@ -181,12 +216,12 @@ enum_identifier_list
 	;
 
 exception_spec
-	: EXCEPTION ID ';' { PARSE_EV( onTypeSpec( @EXCEPTION, @ID, *$ID, co::TK_EXCEPTION ) ) }
+	: EXCEPTION ID { PARSE_EV( onTypeSpec( @EXCEPTION, co::TK_EXCEPTION, @ID, *$ID ) ) }
 	;
 
 struct_spec
-	: STRUCT ID { PARSE_EV( onTypeSpec( @STRUCT, @ID, *$ID, co::TK_STRUCT ) ) }
-		'{' opt_record_member_list '}' ';'
+	: STRUCT ID { PARSE_EV( onTypeSpec( @STRUCT, co::TK_STRUCT, @ID, *$ID ) ) }
+		'{' opt_record_member_list '}'
 	;
 
 opt_record_member_list
@@ -210,9 +245,9 @@ field_decl
 	;
 
 nativeclass_spec
-	: NATIVECLASS ID { PARSE_EV( onTypeSpec( @NATIVECLASS, @ID, *$ID, co::TK_NATIVECLASS ) ) }
+	: NATIVECLASS ID { PARSE_EV( onTypeSpec( @NATIVECLASS, co::TK_NATIVECLASS, @ID, *$ID ) ) }
 		'(' CPP_TAG cpp_type ')' { PARSE_EV( onNativeClass( @4, *$CPP_TAG, *$cpp_type ) ) }
-		'{' opt_class_member_list '}' ';'
+		'{' opt_class_member_list '}'
 	;
 
 cpp_type
@@ -242,7 +277,7 @@ method_decl
 
 method_remaining_parts
 	: '(' { PARSE_EV( onMethod( @0, *$<str>0 ) ) } opt_param_list ')'
-		opt_exception_list ';' { PARSE_EV( onEndMethod( @0 ) ) }
+			opt_exception_list ';' { PARSE_EV( onMethodEnd( @0) ) }
 	;
 
 opt_param_list
@@ -293,8 +328,8 @@ opt_array
 	;
 
 interface_spec
-	: INTERFACE ID { PARSE_EV( onTypeSpec( @INTERFACE, @ID, *$ID, co::TK_INTERFACE ) ) }
-		opt_inheritance_decl '{' opt_interface_member_list '}' ';'
+	: INTERFACE ID { PARSE_EV( onTypeSpec( @INTERFACE, co::TK_INTERFACE, @ID, *$ID ) ) }
+		opt_inheritance_decl '{' opt_interface_member_list '}'
 	;
 
 opt_inheritance_decl
@@ -318,8 +353,8 @@ interface_member
 	;
 
 component_spec
-	: COMPONENT ID { PARSE_EV( onTypeSpec( @COMPONENT, @ID, *$ID, co::TK_COMPONENT ) ) }
-		'{' opt_component_member_list '}' ';'
+	: COMPONENT ID { PARSE_EV( onTypeSpec( @COMPONENT, co::TK_COMPONENT, @ID, *$ID ) ) }
+		'{' opt_component_member_list '}'
 	;
 
 opt_component_member_list
@@ -334,7 +369,11 @@ component_member_list
 
 component_member
 	: comment
-	| port_kind qualified_id { PARSE_EV( onTypeDecl( @qualified_id, *$qualified_id, false ) ) }
+	| port_decl
+	;
+
+port_decl
+	: port_kind qualified_id { PARSE_EV( onTypeDecl( @qualified_id, *$qualified_id, false ) ) }
 		ID ';' { PARSE_EV( onPort( @ID, $port_kind, *$ID ) ) }
 	;
 
@@ -343,23 +382,22 @@ port_kind
 	| RECEIVES	{ $$ = false; }
 	;
 
-/*
-expression
-	:	BOOLVALUE
-	|	LITERAL
-	|	num_exp
+exp
+	:	BOOLEAN		{ $$ = loader.newAny(); $$->set<bool>( $BOOLEAN ); }
+	|	LITERAL		{ $$ = loader.newAny(); $$->set<const std::string&>( *$LITERAL ); }
+	|	num_exp		{ $$ = loader.newAny(); $$->set<double>( $num_exp ); }
 	;
 
 num_exp
-	:	NUMBER					{ $$ = $1; }
+	:	NUMBER					{ $$ = $NUMBER; }
 	|	'(' num_exp ')'			{ $$ = $2; }
-	|	num_exp '+' num_exp		{ $$.set( $1.get<double>() + $3.get<double>() ); }
-	|	num_exp '-' num_exp		{ $$.set( $1.get<double>() - $3.get<double>() ); }
-	|	num_exp '*' num_exp		{ $$.set( $1.get<double>() * $3.get<double>() ); }
-	|	num_exp '/' num_exp		{ $$.set( $1.get<double>() / $3.get<double>() ); }
-	|	'-' num_exp %prec NEG	{ $$.set( -$2.get<double>() ); }
+	|	num_exp '+' num_exp		{ $$ = $1 + $3; }
+	|	num_exp '-' num_exp		{ $$ = $1 - $3; }
+	|	num_exp '*' num_exp		{ $$ = $1 * $3; }
+	|	num_exp '/' num_exp		{ $$ = $1 / $3; }
+	|	'-' num_exp %prec NEG	{ $$ = -$2; }
 	;
-*/
+
 %%
 
 void co::csl::Parser::error( const location_type&, const std::string& )

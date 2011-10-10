@@ -38,10 +38,10 @@ interface validInterface
 
 	//A method that raises.
 	string Foo5(out string nome1, in string nome2)
-	raises TestExceptions.SameException;
+	raises Global.SameException;
 
 	string Foo6(out string nome1, in string nome2)
-	raises TestExceptions.SameException,  TestExceptions.OtherException, TestExceptions.AnotherException;
+	raises Global.SameException,  Global.OtherException, Global.AnotherException;
 
 	void Foo7(in string[] nomes);
 

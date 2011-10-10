@@ -4,6 +4,4 @@ struct struct4
 	string name;
 }
 
-// 7th line
-
-// 9th line
+import struct1;

@@ -8,7 +8,7 @@
 
 TEST( StructTests, simpleValidStruct )
 {
-	CSL_TEST( "StructTests.struct_valid" )
+	CSL_TEST( "StructTests.struct_valid" );
 }
 
 TEST( StructTests, missingDefinition )
@@ -26,7 +26,7 @@ TEST( StructTests, conflictingType )
 	co::IType* structValid = TestHelper::type( "StructTests.struct_valid" );
 	if( structValid == NULL )
 	{
-		CSL_TEST( "StructTests.struct_valid" )
+		CSL_TEST( "StructTests.struct_valid" );
 	}
 
 	// altough it seems that a conflicting type name is a semantic error,
@@ -71,7 +71,7 @@ TEST( StructTests, badFieldName )
 TEST( StructTests, cyclicDependencies )
 {
 	// cyclic dependencies are naturally handled by the compiler
-	CSL_TEST( "StructTests.struct_valid2" )
+	CSL_TEST( "StructTests.struct_valid2" );
 }
 
 TEST( StructTests, readonlyField )

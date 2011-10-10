@@ -2,6 +2,7 @@
 #define csl_HEADER_H 1
 #define csl_IN_HEADER 1
 
+#line 6 "scanner.hh"
 #line 3 "CSL.l"
 #include "parser.hh"
 
@@ -13,7 +14,7 @@
 
 
 
-#line 17 "scanner.hh"
+#line 18 "scanner.hh"
 
 #define  YY_INT_ALIGNED short int
 
@@ -349,6 +350,9 @@ extern int csl_lex \
 #undef YY_DECL
 #endif
 
-#line 353 "scanner.hh"
+#line 210 "CSL.l"
+
+
+#line 357 "scanner.hh"
 #undef csl_IN_HEADER
 #endif /* csl_HEADER_H */

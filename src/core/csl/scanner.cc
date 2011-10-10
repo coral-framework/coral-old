@@ -1,3 +1,4 @@
+#line 2 "scanner.cc"
 #line 3 "CSL.l"
 #include "parser.hh"
 
@@ -9,7 +10,7 @@
 
 
 
-#line 13 "scanner.cc"
+#line 14 "scanner.cc"
 
 #define  YY_INT_ALIGNED short int
 
@@ -1010,7 +1011,10 @@ static yyconst flex_int16_t yy_chk[2247] =
 #define yymore() yymore_used_but_not_detected
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
+#line 1 "CSL.l"
 /* Scanner for the Coral Specification Language (CSL) */
+
+#line 12 "CSL.l"
 
 #include "Loader.h"
 #include <co/Exception.h>
@@ -1026,15 +1030,16 @@ static yyconst flex_int16_t yy_chk[2247] =
 #define SET_CSTR( arg )		(yylval)->cstr = arg;
 #define SET_STRING( arg )	(yylval)->str = loader.newString( arg );
 #define STR_NEW()			(yylval)->str = str = loader.newString();
-#define STR_APPEND( aStr )	assert( str ); str->append( aStr );
-#define STR_PUSH( aChr )	assert( str ); str->push_back( aChr );
+#define STR_APPEND( aStr )	{ assert( str ); str->append( aStr ); }
+#define STR_PUSH( aChr )	{ assert( str ); str->push_back( aChr ); }
 
-#define LEX_ERROR( msg ) \
-	PUSH_ERROR( *yylloc, msg ); yyterminate();
+#define LEX_ERROR( msg )	{ PUSH_ERROR( *yylloc, msg ); yyterminate(); }
 
 typedef co::csl::Parser::token TK;
 
 /* %option debug */
+
+#line 1043 "scanner.cc"
 
 #define INITIAL 0
 #define CMT 1
@@ -1276,11 +1281,18 @@ YY_DECL
 	register int yy_act;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
+#line 52 "CSL.l"
+
+
+
 	// mark the current location as the start of the next token
 	yylloc_param->step();
 
 	int caller = 0;
 	std::string* str = NULL;
+
+
+#line 1296 "scanner.cc"
 
     yylval = yylval_param;
 
@@ -1363,286 +1375,391 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
+#line 62 "CSL.l"
 return TK::COMPONENT;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
+#line 63 "CSL.l"
 return TK::ENUM;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
+#line 64 "CSL.l"
 return TK::EXCEPTION;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
+#line 65 "CSL.l"
 return TK::EXTENDS;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
+#line 66 "CSL.l"
 SET_BOOL( false ) return TK::BOOLEAN;
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
+#line 67 "CSL.l"
 return TK::IMPORT;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
+#line 68 "CSL.l"
 return TK::IN;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
+#line 69 "CSL.l"
 return TK::INOUT;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
+#line 70 "CSL.l"
 return TK::INTERFACE;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
+#line 71 "CSL.l"
 return TK::NATIVECLASS;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
+#line 72 "CSL.l"
 return TK::OUT;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
+#line 73 "CSL.l"
 return TK::PROVIDES;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
+#line 74 "CSL.l"
 return TK::RAISES;
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
+#line 75 "CSL.l"
 return TK::READONLY;
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
+#line 76 "CSL.l"
 return TK::RECEIVES;
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
+#line 77 "CSL.l"
 return TK::STRUCT;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
+#line 78 "CSL.l"
 SET_BOOL( true ) return TK::BOOLEAN;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
+#line 79 "CSL.l"
 return TK::VOID;
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
+#line 80 "CSL.l"
 return ';';
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
+#line 81 "CSL.l"
 return ',';
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
+#line 82 "CSL.l"
 return '{';
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
+#line 83 "CSL.l"
 return '}';
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
+#line 84 "CSL.l"
 return '[';
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
+#line 85 "CSL.l"
 return ']';
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
+#line 86 "CSL.l"
 return '(';
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
+#line 87 "CSL.l"
 return ')';
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
+#line 88 "CSL.l"
 return '=';
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
+#line 90 "CSL.l"
 SET_CSTR( "any" ) return TK::PRIMITIVE_TYPE;
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
+#line 91 "CSL.l"
 SET_CSTR( "bool" ) return TK::PRIMITIVE_TYPE;
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
+#line 92 "CSL.l"
 SET_CSTR( "double" ) return TK::PRIMITIVE_TYPE;
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
+#line 93 "CSL.l"
 SET_CSTR( "float" ) return TK::PRIMITIVE_TYPE;
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
+#line 94 "CSL.l"
 SET_CSTR( "int16" ) return TK::PRIMITIVE_TYPE;
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
+#line 95 "CSL.l"
 SET_CSTR( "int32" ) return TK::PRIMITIVE_TYPE;
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
+#line 96 "CSL.l"
 SET_CSTR( "int64" ) return TK::PRIMITIVE_TYPE;
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
+#line 97 "CSL.l"
 SET_CSTR( "int8" ) return TK::PRIMITIVE_TYPE;
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
+#line 98 "CSL.l"
 SET_CSTR( "string" ) return TK::PRIMITIVE_TYPE;
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
+#line 99 "CSL.l"
 SET_CSTR( "uint16" ) return TK::PRIMITIVE_TYPE;
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
+#line 100 "CSL.l"
 SET_CSTR( "uint32" ) return TK::PRIMITIVE_TYPE;
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
+#line 101 "CSL.l"
 SET_CSTR( "uint64" ) return TK::PRIMITIVE_TYPE;
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
+#line 102 "CSL.l"
 SET_CSTR( "uint8" ) return TK::PRIMITIVE_TYPE;
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
+#line 104 "CSL.l"
 SET_STRING( yytext ) return TK::ID;
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
+#line 105 "CSL.l"
 SET_STRING( yytext ) return TK::QUALIFIED_ID;
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-SET_STRING( yytext ) return TK::ANNOTATION_ID;
+#line 106 "CSL.l"
+SET_STRING( yytext + 1 ) return TK::ANNOTATION_ID;
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
+#line 108 "CSL.l"
 SET_STRING( yytext ); return TK::CPP_TAG;
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
+#line 110 "CSL.l"
 SET_STRING( yytext ) return TK::CPP_TYPE;
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
+#line 111 "CSL.l"
 SET_STRING( yytext ) return TK::CPP_TYPE;
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
+#line 113 "CSL.l"
 SET_NUMBER( strtol( &yytext[2], NULL, 16 ) ) return TK::NUMBER;
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
+#line 114 "CSL.l"
 SET_NUMBER( strtol( yytext, NULL, 10 ) ) return TK::NUMBER;
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
+#line 115 "CSL.l"
 SET_NUMBER( strtod( yytext, NULL ) ) return TK::NUMBER;
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
+#line 116 "CSL.l"
 SET_NUMBER( strtod( yytext, NULL ) ) return TK::NUMBER;
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
+#line 117 "CSL.l"
 SET_NUMBER( strtod( yytext, NULL ) ) return TK::NUMBER;
 	YY_BREAK
 case 52:
 /* rule 52 can match eol */
 YY_RULE_SETUP
-{	yytext[yyleng - 1] = '\0'; SET_STRING( &yytext[2] )
-						yylloc->lines( 1 ); return TK::COMMENT;
+#line 120 "CSL.l"
+{	// single-line comments
+						yylloc->lines( 1 );
+						if( loader.hasDoc() )
+						{
+							yytext[yyleng - 1] = '\0';
+							SET_STRING( &yytext[2] )
+							return TK::COMMENT;
+						}
+						yylloc->step();
 					}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-STR_NEW() caller = YY_START; BEGIN(CMT);
+#line 132 "CSL.l"
+{	// start of a multi-line comment
+						if( loader.hasDoc() ) STR_NEW()
+						caller = YY_START; BEGIN(CMT);
+					}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-/* eat anything that's not an '*' */ STR_APPEND( yytext )
+#line 136 "CSL.l"
+{	// eat anything that's not an '*'
+						if( loader.hasDoc() ) STR_APPEND( yytext )
+					}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-/* eat up '*'s not followed by '/'s */ STR_APPEND( yytext )
+#line 139 "CSL.l"
+{	// eat up '*'s not followed by '/'s
+						if( loader.hasDoc() ) STR_APPEND( yytext )
+					}
 	YY_BREAK
 case 56:
 /* rule 56 can match eol */
 YY_RULE_SETUP
-/* eat up newlines */ STR_PUSH( '\n' ) yylloc->lines( 1 );
+#line 142 "CSL.l"
+{	// eat up newlines
+						if( loader.hasDoc() ) STR_PUSH( '\n' )
+						yylloc->lines( 1 );
+					}
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-BEGIN(caller); return TK::COMMENT;
+#line 146 "CSL.l"
+{	// end of the multi-line comment
+						BEGIN(caller); if( loader.hasDoc() ) return TK::COMMENT;
+					}
 	YY_BREAK
 case YY_STATE_EOF(CMT):
+#line 149 "CSL.l"
 LEX_ERROR( "unclosed comment" );
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-STR_NEW() caller = YY_START; BEGIN(CPP);
+#line 153 "CSL.l"
+{	// start of a C++ code block
+						if( loader.hasCppBlocks() ) STR_NEW()
+						caller = YY_START; BEGIN(CPP);
+					}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-/* eat anything that's not a 'c' */ STR_APPEND( yytext )
+#line 157 "CSL.l"
+{	// eat anything that's not a 'c'
+						if( loader.hasCppBlocks() ) STR_APPEND( yytext )
+					}
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-/* eat up 'c's not followed by '+'s */ STR_APPEND( yytext )
+#line 160 "CSL.l"
+{	// eat up 'c's not followed by '+'s
+						if( loader.hasCppBlocks() ) STR_APPEND( yytext )
+					}
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-/* eat up 'c+'s not followed by '>'s */ STR_APPEND( yytext )
+#line 163 "CSL.l"
+{	// eat up 'c+'s not followed by '>'s
+						if( loader.hasCppBlocks() ) STR_APPEND( yytext )
+					}
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-/* eat up 'c++'s not followed by '>'s */ STR_APPEND( yytext )
+#line 166 "CSL.l"
+{	// eat up 'c++'s not followed by '>'s
+						if( loader.hasCppBlocks() ) STR_APPEND( yytext )
+					}
 	YY_BREAK
 case 63:
 /* rule 63 can match eol */
 YY_RULE_SETUP
-/* eat up newlines */ STR_PUSH( '\n' ) yylloc->lines( 1 );
+#line 169 "CSL.l"
+{	// eat up newlines
+						if( loader.hasCppBlocks() ) STR_PUSH( '\n' )
+						yylloc->lines( 1 );
+					}
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-BEGIN(caller); return TK::CPP_BLOCK;
+#line 173 "CSL.l"
+{	// end of the C++ code block
+						BEGIN(caller); if( loader.hasCppBlocks() ) return TK::CPP_BLOCK;
+					}
 	YY_BREAK
 case YY_STATE_EOF(CPP):
+#line 176 "CSL.l"
 LEX_ERROR( "unclosed C++ block" );
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-STR_NEW() caller = YY_START; BEGIN(STR);
+#line 181 "CSL.l"
+/* string literal */ STR_NEW() caller = YY_START; BEGIN(STR);
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
+#line 182 "CSL.l"
 BEGIN(caller); return TK::LITERAL;
 	YY_BREAK
 case 67:
 /* rule 67 can match eol */
 YY_RULE_SETUP
+#line 183 "CSL.l"
 LEX_ERROR( "unterminated string literal" );
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
+#line 184 "CSL.l"
 {	/* decimal escape sequence */
 						long value = strtol( yytext + 1, NULL, 10 );
 						if( value > 0xFF )
@@ -1652,60 +1769,74 @@ YY_RULE_SETUP
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
+#line 190 "CSL.l"
 STR_PUSH( '\a' )
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
+#line 191 "CSL.l"
 STR_PUSH( '\b' )
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
+#line 192 "CSL.l"
 STR_PUSH( '\f' )
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
+#line 193 "CSL.l"
 STR_PUSH( '\n' )
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
+#line 194 "CSL.l"
 STR_PUSH( '\r' )
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
+#line 195 "CSL.l"
 STR_PUSH( '\t' )
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
+#line 196 "CSL.l"
 STR_PUSH( '\v' )
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
+#line 197 "CSL.l"
 STR_PUSH( yytext[1] )
 	YY_BREAK
 case 77:
 /* rule 77 can match eol */
 YY_RULE_SETUP
+#line 198 "CSL.l"
 yylloc->lines( 1 );
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
+#line 199 "CSL.l"
 STR_APPEND( yytext )
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
+#line 200 "CSL.l"
 LEX_ERROR( "incomplete escape sequence" );
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
+#line 203 "CSL.l"
 /* eat blanks */ yylloc->step();
 	YY_BREAK
 case 81:
 /* rule 81 can match eol */
 YY_RULE_SETUP
+#line 204 "CSL.l"
 yylloc->lines( 1 ); yylloc->step();
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
+#line 205 "CSL.l"
 {
 					LEX_ERROR( "unknown character '" << yytext[0] << "' (0x"
 						<< std::hex << static_cast<int>( yytext[0] ) << ")" );
@@ -1713,8 +1844,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
+#line 210 "CSL.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
+#line 1851 "scanner.cc"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(STR):
 	yyterminate();
@@ -2847,4 +2980,8 @@ void csl_free (void * ptr , yyscan_t yyscanner)
 }
 
 #define YYTABLES_NAME "yytables"
+
+#line 210 "CSL.l"
+
+
 

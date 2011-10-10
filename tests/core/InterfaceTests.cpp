@@ -20,7 +20,7 @@ TEST( InterfaceTests, fieldAndMethodClashes )
 	CSL_EXPECT_SEMANTIC_ERROR( "name clash" )
 	CSL_TEST_END()
 
-	CSL_TEST( "InterfaceTests.FieldAndMethodClashes.fieldSetterAndMethod_valid" )
+	CSL_TEST( "InterfaceTests.FieldAndMethodClashes.fieldSetterAndMethod_valid" );
 
 	CSL_TEST_BEGIN( "InterfaceTests.FieldAndMethodClashes.methodAndFieldGetter" )
 	CSL_EXPECT_SEMANTIC_ERROR( "name clash" )
@@ -30,7 +30,7 @@ TEST( InterfaceTests, fieldAndMethodClashes )
 	CSL_EXPECT_SEMANTIC_ERROR( "name clash" )
 	CSL_TEST_END()
 
-	CSL_TEST( "InterfaceTests.FieldAndMethodClashes.methodAndFieldSetter_valid" )
+	CSL_TEST( "InterfaceTests.FieldAndMethodClashes.methodAndFieldSetter_valid" );
 }
 
 TEST( InterfaceTests, clashesWithSuperType )
@@ -63,16 +63,16 @@ TEST( InterfaceTests, clashesWithSuperType )
 
 TEST( InterfaceTests, firstOderInheritance )
 {
-	CSL_TEST( "InterfaceTests.FirstOrder.Child" )
+	CSL_TEST( "InterfaceTests.FirstOrder.Child" );
 
-	CSL_TEST( "InterfaceTests.FirstOrder.InheritanceOnly" )
+	CSL_TEST( "InterfaceTests.FirstOrder.InheritanceOnly" );
 
-	CSL_TEST( "InterfaceTests.StartFromParent.Parent" )
+	CSL_TEST( "InterfaceTests.StartFromParent.Parent" );
 }
 
 TEST( InterfaceTests, deepInheritanceTree )
 {
-	CSL_TEST( "InterfaceTests.DeepInheritanceTree.User" )
+	CSL_TEST( "InterfaceTests.DeepInheritanceTree.User" );
 }
 
 TEST( InterfaceTests, invalidDeclarations )
@@ -118,11 +118,11 @@ TEST( InterfaceTests, invalidDeclarations )
 
 TEST( InterfaceTests, validDeclarations )
 {
-	CSL_TEST( "InterfaceTests.ValidDeclarations.validInterface" )
+	CSL_TEST( "InterfaceTests.ValidDeclarations.validInterface" );
 
-	CSL_TEST( "InterfaceTests.ValidDeclarations.emptyDeclaration" )
+	CSL_TEST( "InterfaceTests.ValidDeclarations.emptyDeclaration" );
 
-	CSL_TEST( "InterfaceTests.ValidDeclarations.emptyDeclarationWithComment" )
+	CSL_TEST( "InterfaceTests.ValidDeclarations.emptyDeclarationWithComment" );
 }
 
 TEST( InterfaceTests, cyclicInheritance )

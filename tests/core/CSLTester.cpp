@@ -6,6 +6,7 @@
 #include "CSLTester.h"
 #include <co/ISystem.h>
 #include <co/Exception.h>
+#include <co/ITypeManager.h>
 #include <core/TypeLoader.h>
 #include <core/csl/Error.h>
 #include <gtest/gtest.h>
@@ -29,9 +30,14 @@ CSLTester& CSLTester::expectedError( const char* message, const char* filename, 
 
 #define CSL_FAIL() CSL_ADD_ERROR( ::testing::Message() )
 
-void CSLTester::run()
+co::IType* CSLTester::run()
 {
-	co::TypeLoader loader( _typeName, co::getSystem()->getTypes() );
+	co::ITypeManager* tm = co::getSystem()->getTypes();
+	co::IType* res = tm->findType( _typeName );
+	if( res )
+		return res;
+
+	co::TypeLoader loader( _typeName, tm );
 
 	std::stringstream headingSS;
 	headingSS << "CSL test failed for type '" << _typeName << "':";
@@ -39,12 +45,12 @@ void CSLTester::run()
 
 	try
 	{
-		loader.loadType();
+		res = loader.loadType();
 	}
 	catch( co::Exception& e )
 	{
 		CSL_FAIL() << "Loader raised " << e.getTypeName() << ": " << e.getMessage();
-		return;
+		return res;
 	}
 
 	const co::csl::Error* error = loader.getError();
@@ -53,14 +59,14 @@ void CSLTester::run()
 	{
 		if( error )
 			CSL_FAIL() << "Got an error, though no error was expected. CSL Error Stack:\n" << *error;
-		return;
+		return res;
 	}
 
 	if( !error )
 	{
 		CSL_FAIL() << "Type was successfully loaded, though " << _expectedErrors.size()
 			<< ( _expectedErrors.size() > 1 ? " errors were" : " error was" ) << " expected.";
-		return;
+		return res;
 	}
 
 	#define CSL_FAIL_MSG() *( errMsg ? errMsg : ( errMsg = new ::testing::Message() ) )
@@ -113,4 +119,6 @@ void CSLTester::run()
 		CSL_ADD_ERROR( *errMsg );
 		delete errMsg;
 	}
+
+	return res;
 }

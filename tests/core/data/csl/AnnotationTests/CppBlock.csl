@@ -1,0 +1,6 @@
+@co.CppBlock( "C++ code goes here" )
+
+enum CppBlock
+{
+	zero, one, two, three
+};

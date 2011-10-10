@@ -17,14 +17,15 @@ int main( int argc, char* argv[] )
 	std::string rootDir;
 	co::OS::getApplicationDir( rootDir );
 
-	// call $CORAL_ROOT/coral lua.Launcher co.compiler.cli $@
+	// call $CORAL_ROOT/coral --csl-flags acd lua.Launcher co.compiler.cli $@
 	std::string program( rootDir );
 	program += CORAL_OS_DIR_SEP_STR "coral" CORAL_DEBUG_SUFFIX;
 
-	char** args = new char*[argc + 2 + 1];
+	char** args = new char*[argc + 3 + 1];
 
 	int k = 0;
 	args[k++] = const_cast<char*>( program.c_str() );
+	args[k++] = const_cast<char*>( "--csl acd" );
 	args[k++] = const_cast<char*>( "lua.Launcher" );
 	args[k++] = const_cast<char*>( "co.compiler.cli" );
 	for( int i = 1; i < argc; ++i )

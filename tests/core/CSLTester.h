@@ -36,7 +36,7 @@ public:
 	CSLTester& expectedError( const char* message, const char* filename = NULL, int line = -1 );
 
 	// Runs the test by loading the specified type and checking the expected errors.
-	void run();
+	co::IType* run();
 
 private:
 	std::string _typeName;
@@ -62,6 +62,6 @@ private:
 #define CSL_TEST_END() .run();
 
 // Macro to test CSL files that are supposed to load successfully (no errors).
-#define CSL_TEST( typeName ) CSL_TEST_BEGIN( typeName ).run();
+#define CSL_TEST( typeName ) CSL_TEST_BEGIN( typeName ).run()
 
 #endif

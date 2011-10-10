@@ -19,6 +19,16 @@ template<class Base>
 class Annotated : public Base
 {
 public:
+	co::Range<co::IAnnotation* const> getAnnotations()
+	{
+		return _annotations;
+	}
+
+	void setAnnotations( co::Range<co::IAnnotation* const> annotations )
+	{
+		return co::assign( annotations, _annotations );
+	}
+
 	inline void addAnnotation( co::IAnnotation* annotation )
 	{
 		_annotations.push_back( annotation );
@@ -35,11 +45,6 @@ public:
 				return _annotations[i].get();
 
 		return NULL;
-	}
-
-	co::Range<co::IAnnotation* const> getAnnotations()
-	{
-		return _annotations;
 	}
 
 private:

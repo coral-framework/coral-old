@@ -39,11 +39,13 @@ public:
 	
 	// End Of c++> Block
 
+	virtual co::Range<co::IAnnotation* const> getAnnotations() = 0;
+
+	virtual void setAnnotations( co::Range<co::IAnnotation* const> annotations ) = 0;
+
 	virtual void addAnnotation( co::IAnnotation* annotation ) = 0;
 
 	virtual co::IAnnotation* getAnnotation( co::IInterface* annotationType ) = 0;
-
-	virtual co::Range<co::IAnnotation* const> getAnnotations() = 0;
 };
 
 } // namespace co

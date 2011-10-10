@@ -43,6 +43,19 @@ public:
 
 	// co.IAnnotated Methods:
 
+	co::Range<co::IAnnotation* const> getAnnotations()
+	{
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ) );
+        return res.get< co::Range<co::IAnnotation* const> >();
+	}
+
+	void setAnnotations( co::Range<co::IAnnotation* const> annotations_ )
+	{
+		co::Any arg;
+		arg.set< co::Range<co::IAnnotation* const> >( annotations_ );
+		_provider->dynamicSetField( _cookie, getField<co::IAnnotated>( 0 ), arg );
+	}
+
 	void addAnnotation( co::IAnnotation* annotation_ )
 	{
 		co::Any args[1];
@@ -58,13 +71,6 @@ public:
 		co::Range<co::Any const> range( args, 1 );
 		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
 		return res.get< co::IAnnotation* >();
-	}
-
-	co::Range<co::IAnnotation* const> getAnnotations()
-	{
-		co::Range<co::Any const> range;
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 2 ), range );
-		return res.get< co::Range<co::IAnnotation* const> >();
 	}
 
 protected:
@@ -118,15 +124,23 @@ public:
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		co::checkInstance<co::IAnnotated>( instance, field );
-		raiseUnexpectedMemberIndex();
-		CORAL_UNUSED( value );
+		co::IAnnotated* p = co::checkInstance<co::IAnnotated>( instance, field );
+		switch( field->getIndex() )
+		{
+		case 0:		value.set< co::Range<co::IAnnotation* const> >( p->getAnnotations() ); break;
+		default:	raiseUnexpectedMemberIndex();
+		}
 	}
 
 	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		co::checkInstance<co::IAnnotated>( instance, field );
-		raiseUnexpectedMemberIndex();
+		co::IAnnotated* p = co::checkInstance<co::IAnnotated>( instance, field );
+		switch( field->getIndex() )
+		{
+		case 0:		p->setAnnotations( value.get< co::Range<co::IAnnotation* const> >() ); break;
+		default:	raiseUnexpectedMemberIndex();
+		}
+		CORAL_UNUSED( p );
 		CORAL_UNUSED( value );
 	}
 
@@ -139,23 +153,18 @@ public:
 		{
 			switch( method->getIndex() )
 			{
-			case 0:
+			case 1:
 				{
 					co::IAnnotation* annotation_ = args[++argIndex].get< co::IAnnotation* >();
 					argIndex = -1;
 					p->addAnnotation( annotation_ );
 				}
 				break;
-			case 1:
+			case 2:
 				{
 					co::IInterface* annotationType_ = args[++argIndex].get< co::IInterface* >();
 					argIndex = -1;
 					res.set< co::IAnnotation* >( p->getAnnotation( annotationType_ ) );
-				}
-				break;
-			case 2:
-				{
-					res.set< co::Range<co::IAnnotation* const> >( p->getAnnotations() );
 				}
 				break;
 			default:

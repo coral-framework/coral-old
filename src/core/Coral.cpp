@@ -3,11 +3,11 @@
  * See Copyright Notice in Coral.h
  */
 
+#include "Coral.h"
 #include "System.h"
 #include "ModuleInstaller.h"
 #include "utils/StringTokenizer.h"
 #include <co/Log.h>
-#include <co/Coral.h>
 #include <co/RefPtr.h>
 #include <co/IReflector.h>
 #include <co/reserved/OS.h>
@@ -22,6 +22,7 @@ namespace co {
 #endif
 
 static std::vector<std::string> sg_paths;
+static uint8 sg_cslFlags( CSL_ANNOTATIONS );
 static RefPtr<System> sg_system;
 static ITypeManager* sg_typeManager( NULL );
 static IServiceManager* sg_serviceManager( NULL );
@@ -56,6 +57,16 @@ void addPath( const std::string& path )
 		if( std::find( sg_paths.begin(), sg_paths.end(), dirPath ) == sg_paths.end() )
 			sg_paths.push_back( dirPath );
 	}
+}
+
+uint8 getCSLFlags()
+{
+	return sg_cslFlags;
+}
+
+void setCSLFlags( uint8 flags )
+{
+	sg_cslFlags = flags;
 }
 
 ISystem* getSystem()

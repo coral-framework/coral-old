@@ -8,7 +8,7 @@
 
 TEST( EnumTests, simpleValidEnum )
 {
-	CSL_TEST( "EnumTests.enum_valid" )
+	CSL_TEST( "EnumTests.enum_valid" );
 }
 
 TEST( EnumTests, emptyDeclaration )

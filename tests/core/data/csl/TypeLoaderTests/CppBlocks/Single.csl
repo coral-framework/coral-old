@@ -1,8 +1,8 @@
 // tests if a single block is beeing processed
-interface singleBlockInterface
+interface Single
 {
 	string foo;
-	
+
 	<c++
 	//This code block was injected by the compiler using the '<c++' tag
 	void myInjectedFoo() {;}

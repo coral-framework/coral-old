@@ -33,5 +33,5 @@ TEST( ComponentTests, invalidDefinitions )
 
 TEST( ComponentTests, validDefinitions )
 {
-	CSL_TEST( "ComponentTests.ValidDefinitions.valid" )
+	CSL_TEST( "ComponentTests.ValidDefinitions.valid" );
 }

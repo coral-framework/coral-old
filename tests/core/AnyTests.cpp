@@ -1219,3 +1219,118 @@ TEST( AnyTests, swapTemporaryObjects )
 	EXPECT_EQ( "hello world", b.get<const std::string&>() );
 	EXPECT_EQ( type, c.get<co::IType*>() );
 }
+
+/******************************************************************************
+ *	Tests for Reflective Array Accesses
+ ******************************************************************************/
+
+#include <co/IReflector.h>
+
+co::uint32 getArraySize( const co::Any& array )
+{
+	assert( array.getKind() == co::TK_ARRAY );
+
+	const co::Any::State& s = array.getState();
+	if( s.arrayKind == co::Any::State::AK_Range )
+		return s.arraySize;
+
+	co::Any::PseudoVector& pv = *reinterpret_cast<co::Any::PseudoVector*>( s.data.ptr );
+	return static_cast<co::uint32>( pv.size() ) / array.getType()->getReflector()->getSize();
+}
+
+co::uint8* getArrayPtr( const co::Any& array )
+{
+	assert( array.getKind() == co::TK_ARRAY );
+
+	const co::Any::State& s = array.getState();
+	if( s.arrayKind == co::Any::State::AK_Range )
+		return reinterpret_cast<co::uint8*>( s.data.ptr );
+
+	co::Any::PseudoVector& pv = *reinterpret_cast<co::Any::PseudoVector*>( s.data.ptr );
+	return &pv[0];
+}
+
+void getArrayElement( const co::Any& array, co::uint32 index, co::Any& element )
+{
+	co::IType* elementType = array.getType();
+	co::uint32 elementSize = elementType->getReflector()->getSize();
+
+	co::TypeKind ek = elementType->getKind();
+	bool isPrimitive = ( ( ek >= co::TK_BOOLEAN && ek <= co::TK_DOUBLE ) || ek == co::TK_ENUM );
+	co::uint32 flags = isPrimitive ? co::Any::VarIsValue : co::Any::VarIsConst|co::Any::VarIsReference;
+
+	void* ptr = getArrayPtr( array ) + elementSize * index;
+
+	element.setVariable( elementType, flags, ptr );
+}
+
+TEST( AnyTests, accessRangeOfDoubles )
+{
+	double dblArray[] = { -7.75, 3.14, 1000 };
+	
+	co::Any array, element;
+	array.set( co::Range<double>( dblArray, CORAL_ARRAY_LENGTH(dblArray) ) );
+
+	EXPECT_EQ( 3, getArraySize( array ) );
+	EXPECT_EQ( dblArray, reinterpret_cast<double*>( getArrayPtr( array ) ) );
+
+	for( co::uint32 i = 0; i < CORAL_ARRAY_LENGTH(dblArray); ++i )
+	{
+		getArrayElement( array, i, element );
+		EXPECT_EQ( dblArray[i], element.get<double>() );
+	}
+}
+
+TEST( AnyTests, accessRangeOfStructs )
+{
+	co::CSLError cslErrorArray[2];
+	cslErrorArray[0].filename = "filename1";
+	cslErrorArray[0].message = "message1";
+	cslErrorArray[0].line = 5;
+	cslErrorArray[1].filename = "filename2";
+	cslErrorArray[1].message = "message2";
+	cslErrorArray[1].line = 9;
+
+	co::Any array, element;
+	array.set( co::Range<const co::CSLError>( cslErrorArray, CORAL_ARRAY_LENGTH(cslErrorArray) ) );
+
+	EXPECT_EQ( 2, getArraySize( array ) );
+	EXPECT_EQ( cslErrorArray, reinterpret_cast<co::CSLError*>( getArrayPtr( array ) ) );
+
+	getArrayElement( array, 0, element );
+	EXPECT_EQ( "filename1", element.get<const co::CSLError&>().filename );
+	EXPECT_EQ( "message1", element.get<const co::CSLError&>().message );
+	EXPECT_EQ( 5, element.get<const co::CSLError&>().line );
+
+	getArrayElement( array, 1, element );
+	EXPECT_EQ( "filename2", element.get<const co::CSLError&>().filename );
+	EXPECT_EQ( "message2", element.get<const co::CSLError&>().message );
+	EXPECT_EQ( 9, element.get<const co::CSLError&>().line );
+}
+
+TEST( AnyTests, accessVectorOfStrings )
+{
+	std::vector<std::string> strVector;
+	strVector.push_back( "foo" );
+	strVector.push_back( "bar" );
+	strVector.push_back( "omg" );
+	strVector.push_back( "great" );
+
+	co::Any array, element;
+	array.set( co::Range<const std::string>( strVector ) );
+
+	EXPECT_EQ( 4, getArraySize( array ) );
+	EXPECT_EQ( &strVector[0], reinterpret_cast<std::string*>( getArrayPtr( array ) ) );
+
+	getArrayElement( array, 0, element );
+	EXPECT_EQ( "foo", element.get<const std::string&>() );
+
+	getArrayElement( array, 1, element );
+	EXPECT_EQ( "bar", element.get<const std::string&>() );
+
+	getArrayElement( array, 2, element );
+	EXPECT_EQ( "omg", element.get<const std::string&>() );
+
+	getArrayElement( array, 3, element );
+	EXPECT_EQ( "great", element.get<const std::string&>() );
+}

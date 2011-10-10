@@ -4,6 +4,9 @@
  */
 interface IAnnotated
 {
+	// List of annotations on this service.
+	IAnnotation[] annotations;
+
 	/*
 		Adds an annotation to this service.
 		\throw IllegalArgumentException if the \a annotation is invalid.
@@ -33,7 +36,4 @@ interface IAnnotated
 	 */
 	IAnnotation getAnnotation( in IInterface annotationType )
 		raises IllegalArgumentException;
-
-	// Returns all annotations present on this service.
-	IAnnotation[] getAnnotations();
 };

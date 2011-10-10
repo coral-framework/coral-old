@@ -99,6 +99,7 @@ namespace co { namespace csl {
 	double num;
 	std::string* str;
 	const char* cstr;
+	co::Any* any;
 
 
 
@@ -227,7 +228,7 @@ namespace co { namespace csl {
     typedef unsigned char token_number_type;
     /* Tables.  */
     /// For a state, the index in \a yytable_ of its portion.
-    static const signed char yypact_[];
+    static const short int yypact_[];
     static const signed char yypact_ninf_;
 
     /// For a state, default reduction number.
@@ -235,7 +236,7 @@ namespace co { namespace csl {
     /// Zero means the default is an error.
     static const unsigned char yydefact_[];
 
-    static const signed char yypgoto_[];
+    static const short int yypgoto_[];
     static const short int yydefgoto_[];
 
     /// What to do in a state.
@@ -267,7 +268,7 @@ namespace co { namespace csl {
     /// A `-1'-separated list of the rules' RHS.
     static const rhs_number_type yyrhs_[];
     /// For each rule, the index of the first RHS symbol in \a yyrhs_.
-    static const unsigned char yyprhs_[];
+    static const unsigned short int yyprhs_[];
     /// For each rule, its source line number.
     static const unsigned short int yyrline_[];
     /// For each scanner token number, its symbol number.

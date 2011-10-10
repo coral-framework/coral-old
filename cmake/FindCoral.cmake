@@ -44,6 +44,8 @@ if( APPLE )
 	set( CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_64_BIT)" )
 endif()
 
+set( CORAL_LAUNCH_COMPILER --csl acd lua.Launcher co.compiler.cli --ignoredupes )
+
 ################################################################################
 # Function to get the current CORAL_PATH as a comma-separated string
 ################################################################################
@@ -110,8 +112,7 @@ FUNCTION( CORAL_GENERATE_MAPPINGS generatedHeaders )
 	)
 
 	ADD_CUSTOM_COMMAND( OUTPUT ${resultList}
-		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS}
-			lua.Launcher co.compiler.cli --ignoredupes ${ARGN}
+		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS} ${CORAL_LAUNCH_COMPILER} ${ARGN}
 		DEPENDS ${CORAL_LAUNCHER} "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		COMMENT "Running the Coral Compiler..."
@@ -172,7 +173,7 @@ FUNCTION( CORAL_GENERATE_MODULE generatedSourceFiles moduleName )
 
 	ADD_CUSTOM_COMMAND( OUTPUT ${resultList}
 		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS}
-			lua.Launcher co.compiler.cli --ignoredupes -g ${moduleName} ${ARGN}
+			${CORAL_LAUNCH_COMPILER} -g ${moduleName} ${ARGN}
 		DEPENDS ${CORAL_LAUNCHER} "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		COMMENT "Running the Coral Compiler..."
@@ -192,7 +193,7 @@ FUNCTION( CORAL_GENERATE_DOX targetName moduleName outDir )
 
 	ADD_CUSTOM_TARGET( ${targetName}
 		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS}
-			lua.Launcher co.compiler.cli --ignoredupes --dox -g ${moduleName} -o ${outDir} ${ARGN}
+			${CORAL_LAUNCH_COMPILER} --dox -g ${moduleName} -o ${outDir} ${ARGN}
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		COMMENT "Running the Coral Compiler to extract documentation..."
 	)

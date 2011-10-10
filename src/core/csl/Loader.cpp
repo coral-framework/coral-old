@@ -7,11 +7,13 @@
 #include "scanner.hh"
 #include "parser.hh"
 #include "../Annotations.h"
+#include <co/IField.h>
 #include <co/IObject.h>
 #include <co/ICppBlock.h>
 #include <co/IException.h>
 #include <co/IInterface.h>
 #include <co/INamespace.h>
+#include <co/IReflector.h>
 #include <co/ITypeBuilder.h>
 #include <co/IDocumentation.h>
 #include <co/IMethodBuilder.h>
@@ -35,7 +37,7 @@ namespace csl {
 
 Loader::Loader()
 {
-	// empty
+	_cslFlags = co::getCSLFlags();
 }
 
 Loader::~Loader()
@@ -113,6 +115,12 @@ void Loader::setError( Error* error )
 	_error = error;	
 }
 
+co::Any* Loader::newAny()
+{
+	_anyPool.push_back( co::Any() );
+	return &_anyPool.back();
+}
+
 std::string* Loader::newString()
 {
 	_stringPool.push_back( std::string() );
@@ -128,6 +136,8 @@ std::string* Loader::newString( const char* cstr )
 void Loader::onComment( const location&, const std::string& text )
 {
 	static const char* START_END_BLANKS = " *\t\r\n/";
+
+	assert( hasDoc() );
 
 	bool isRetroactive = false;
 
@@ -162,45 +172,20 @@ void Loader::onComment( const location&, const std::string& text )
 	docText.append( text, start, len );
 
 	if( isRetroactive )
-		addDocumentation( _lastMember, docText );
+		addDocumentation( _lastElement, docText );
 	else
 		_docBuffer.append( docText );
 }
 
 void Loader::onCppBlock( const location&, const std::string& text )
 {
+	assert( hasCppBlocks() );
 	_cppBlock.append( text );
-}
-
-void Loader::onTypeSpec( const location& specLoc, const location& nameLoc,
-							const std::string& typeName, TypeKind kind )
-{
-	if( _typeBuilder.isValid() )
-		pushError( specLoc, "only one type specification is allowed per file" );
-	else if( typeName != _cslFileBaseName )
-		pushError( nameLoc, "the name of the defined type must match its filename" );
-	else
-	{
-		_typeBuilder = createTypeBuilder( typeName, kind );
-
-		handleDocumentation( std::string() );
-		resolveImports();
-	}
-}
-
-void Loader::onTypeDecl( const location& loc, const std::string& name, bool isArray )
-{
-	_lastDeclTypeIsArray = isArray;
-	_lastDeclTypeName = name;
-	_lastDeclTypeLocation = loc;
 }
 
 void Loader::onImport( const location& loc, const std::string& importTypeName )
 {
-	/*
-		Notice: the imported type cannot be loaded at this point because of
-		potential cyclic dependencies.
-	 */
+	// Notice: the type is not loaded now in order to avoid cyclic dependencies.
 
 	if( _typeBuilder.isValid() )
 	{
@@ -227,6 +212,27 @@ void Loader::onImport( const location& loc, const std::string& importTypeName )
 	}
 
 	_importedTypes.insert( ImportTypeMap::value_type( localTypeName, ImportInfo( importTypeName, loc ) ) );
+}
+
+void Loader::onTypeSpec( const location& kLoc, TypeKind kind, const location& nLoc, const std::string& name )
+{
+	if( _typeBuilder.isValid() )
+		pushError( kLoc, "only one type specification is allowed per file" );
+	else if( name != _cslFileBaseName )
+		pushError( nLoc, "the name of the defined type must match its filename" );
+	else
+	{
+		_typeBuilder = createTypeBuilder( name, kind );
+		onElement( std::string() );
+		resolveImports();
+	}
+}
+
+void Loader::onTypeDecl( const location& loc, const std::string& name, bool isArray )
+{
+	_lastDeclTypeIsArray = isArray;
+	_lastDeclTypeName = name;
+	_lastDeclTypeLocation = loc;
 }
 
 void Loader::onNativeClass( const location& loc, const std::string& cppHeader, const std::string& cppType )
@@ -256,7 +262,7 @@ void Loader::onBaseType( const location& loc, const std::string& name )
 void Loader::onEnumIdentifier( const location& loc, const std::string& name )
 {
 	CATCH_ERRORS( loc, _typeBuilder->defineIdentifier( name ) );
-	handleDocumentation( name );
+	onElement( name );
 }
 
 void Loader::onPort( const location& loc, bool isFacet, const std::string& name )
@@ -272,7 +278,7 @@ void Loader::onPort( const location& loc, bool isFacet, const std::string& name 
 	}
 
 	CATCH_ERRORS( loc, _typeBuilder->definePort( name, static_cast<IInterface*>( type ), isFacet ) );
-	handleDocumentation( name );
+	onElement( name );
 }
 
 void Loader::onField( const location& loc, const std::string& name, bool isReadOnly )
@@ -282,7 +288,7 @@ void Loader::onField( const location& loc, const std::string& name, bool isReadO
 		return;
 
 	CATCH_ERRORS( loc, _typeBuilder->defineField( name, type, isReadOnly ) );
-	handleDocumentation( name );
+	onElement( name );
 }
 
 void Loader::onMethod( const location& loc, const std::string& name )
@@ -296,7 +302,7 @@ void Loader::onMethod( const location& loc, const std::string& name )
 	if( returnType != NULL )
 		CATCH_ERRORS( loc, _methodBuilder->defineReturnType( returnType ) );
 
-	handleDocumentation( name );
+	onElement( name );
 }
 
 void Loader::onParameter( const location& loc, bool isIn, bool isOut, const std::string& name )
@@ -328,9 +334,86 @@ void Loader::onRaises( const location& loc, const std::string& name )
 	}
 }
 
-void Loader::onEndMethod( const location& loc )
+void Loader::onMethodEnd( const location& loc )
 {
 	CATCH_ERRORS( loc, _methodBuilder->createMethod() );
+}
+
+void Loader::onAnnotation( const location& loc, const std::string& name )
+{
+	std::string componentName;
+	componentName.reserve( name.size() + 10 );
+	componentName.append( name );
+	componentName.append( "Annotation" );
+
+	IType* type = resolveType( loc, componentName );
+	if( !type )
+	{
+		PUSH_ERROR( loc, "error loading annotation type '" << componentName << "'" );
+		return;
+	}
+
+	if( type->getKind() != co::TK_COMPONENT )
+	{
+		PUSH_ERROR( loc, "annotation type '" << componentName << "' is not a component" );
+		return;
+	}
+
+	try
+	{
+		co::IReflector* reflector = type->getReflector();
+		if( !reflector )
+		{
+			PUSH_ERROR( loc, "annotation type '" << componentName << "' has no reflector" );
+			return;
+		}
+
+		RefPtr<IObject> object( reflector->newInstance() );
+		IAnnotation* annotation = object->getService<IAnnotation>();
+		if( !annotation )
+		{
+			PUSH_ERROR( loc, "component '" << componentName << "' does not provide an annotation" );
+			return;
+		}
+
+		if( _annotations.empty() )
+			_annotations.push_back( AnnotationRecord() );
+		_annotations.back().annotations.push_back( annotation );
+	}
+	catch( co::Exception& e )
+	{
+		pushError( loc, e.getMessage() );
+	}
+}
+
+void Loader::onAnnotationData( const location& loc, const std::string& fieldName, const co::Any& value )
+{
+	IAnnotation* annotation = _annotations.back().annotations.back().get();
+	try
+	{
+		IInterface* itf = annotation->getInterface();
+		IMember* m = itf->getMember( fieldName );
+		if( !m || m->getKind() != MK_FIELD )
+		{
+			PUSH_ERROR( loc, "annotation type '" << itf->getFullName() <<
+							"' has no field named '" << fieldName << "'" );
+			return;
+		}
+
+		ICompositeType* ct = m->getOwner();
+		co::IReflector* reflector = ct->getReflector();
+		if( !reflector )
+		{
+			PUSH_ERROR( loc, "annotation type '" << ct->getFullName() << "' has no reflector" );
+			return;
+		}
+
+		reflector->setField( annotation, static_cast<IField*>( m ), value );
+	}
+	catch( co::Exception& e )
+	{
+		pushError( loc, e.getMessage() );
+	}
 }
 
 IType* Loader::getType()
@@ -346,6 +429,21 @@ IType* Loader::getType()
 		RefPtr<ICppBlock> cppBlock = new CppBlockAnnotation;
 		cppBlock->setValue( _cppBlock );
 		type->addAnnotation( cppBlock.get() );
+	}
+
+	if( !_annotations.empty() )
+	{
+		_annotations.pop_back();
+
+		AnnotationRecList::iterator it = _annotations.begin();
+		type->setAnnotations( it->annotations );
+
+		for( ++it; it != _annotations.end(); ++it )
+		{
+			co::IMember* m = static_cast<ICompositeType*>( type )->getMember( it->element );
+			assert( m );
+			m->setAnnotations( it->annotations );
+		}
 	}
 
 	return type;
@@ -378,26 +476,34 @@ void Loader::resolveImports()
 	}
 }
 
-void Loader::handleDocumentation( const std::string& member )
+void Loader::onElement( const std::string& element )
 {
-	_lastMember = member;
+	if( !_docBuffer.empty() )
+	{
+		addDocumentation( element, _docBuffer );
+		_docBuffer.clear();
+	}
 
-	if( _docBuffer.empty() )
-		return;
+	// if we got new annotations...
+	if( !_annotations.empty() && !_annotations.back().annotations.empty() )
+	{
+		// mark the current annotation record and create a new one
+		_annotations.back().element = element;
+		_annotations.push_back( AnnotationRecord() );
+	}
 
-	addDocumentation( member, _docBuffer );
-	_docBuffer.clear();
+	_lastElement = element;
 }
 
-void Loader::addDocumentation( const std::string& member, const std::string& text )
+void Loader::addDocumentation( const std::string& element, const std::string& text )
 {
 	if( !_doc.isValid() )
 		_doc = new DocumentationAnnotation;
 
-	if( member.empty() )
+	if( element.empty() )
 		_doc->setValue( text );
 	else
-		_doc->addDocFor( member, text );
+		_doc->addDocFor( element, text );
 }
 
 IType* Loader::getLastDeclaredType()
@@ -405,13 +511,11 @@ IType* Loader::getLastDeclaredType()
 	if( _lastDeclTypeName == "void" )
 		return NULL;
 
-	IType* lastDeclaredType = resolveType( _lastDeclTypeLocation, _lastDeclTypeName, _lastDeclTypeIsArray );
-	if( !lastDeclaredType && !_lastDeclTypeIsArray )
-	{
+	IType* type = resolveType( _lastDeclTypeLocation, _lastDeclTypeName, _lastDeclTypeIsArray );
+	if( !type && !_lastDeclTypeIsArray )
 		PUSH_ERROR( _lastDeclTypeLocation, "error loading dependency '" << _lastDeclTypeName << "'" );
-	}
 
-	return lastDeclaredType;
+	return type;
 }
 
 } // namespace csl

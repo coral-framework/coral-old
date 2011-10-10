@@ -36,6 +36,28 @@ CORAL_EXPORT Range<const std::string> getPaths();
  */
 CORAL_EXPORT void addPath( const std::string& path );
 
+	
+// ------ CSL Flags ------------------------------------------------------------
+
+//! Flags for toggling optional language features.
+enum CSLFlags
+{
+	CSL_ANNOTATIONS		= 1, //!< Load and process annotations.
+	CSL_CPPBLOCKS		= 2, //!< Load C++ blocks as '@CppBlock' annotations.
+	CSL_DOCUMENTATION	= 4  //!< Load comments as '@Documentation' annotations.
+};
+
+/*!
+	Returns the current state of the CSL flags.
+	Default is co::CSL_ANNOTATIONS (i.e. comments and C++ blocks are ignored).
+ */
+CORAL_EXPORT uint8 getCSLFlags();
+
+/*!
+	Sets the current state of the CSL flags.
+ */
+CORAL_EXPORT void setCSLFlags( uint8 flags );
+
 
 // ------ Bootstrap and Shutdown -----------------------------------------------
 

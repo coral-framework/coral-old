@@ -46,6 +46,19 @@ public:
 
 	// co.IAnnotated Methods:
 
+	co::Range<co::IAnnotation* const> getAnnotations()
+	{
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ) );
+        return res.get< co::Range<co::IAnnotation* const> >();
+	}
+
+	void setAnnotations( co::Range<co::IAnnotation* const> annotations_ )
+	{
+		co::Any arg;
+		arg.set< co::Range<co::IAnnotation* const> >( annotations_ );
+		_provider->dynamicSetField( _cookie, getField<co::IAnnotated>( 0 ), arg );
+	}
+
 	void addAnnotation( co::IAnnotation* annotation_ )
 	{
 		co::Any args[1];
@@ -61,13 +74,6 @@ public:
 		co::Range<co::Any const> range( args, 1 );
 		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
 		return res.get< co::IAnnotation* >();
-	}
-
-	co::Range<co::IAnnotation* const> getAnnotations()
-	{
-		co::Range<co::Any const> range;
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 2 ), range );
-		return res.get< co::Range<co::IAnnotation* const> >();
 	}
 
 	// co.IMember Methods:

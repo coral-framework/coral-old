@@ -215,7 +215,7 @@ public:
 	}
 };
 
-// ------ RecordTypeBuilder ----------------------------------------------------
+// ------ CompositeTypeBuilder -------------------------------------------------
 
 class CompositeTypeBuilder : public TypeBuilder
 {

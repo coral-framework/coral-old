@@ -7,7 +7,10 @@
 #define _CO_CSL_LOADER_H_
 
 #include "Error.h"
-#include <co/RefPtr.h>
+#include <co/Any.h>
+#include <co/Coral.h>
+#include <co/RefVector.h>
+#include <co/IAnnotation.h>
 #include <co/ITypeBuilder.h>
 #include <co/IMethodBuilder.h>
 #include <co/IDocumentation.h>
@@ -35,6 +38,15 @@ public:
 	 */
 	bool parse( const std::string& filename );
 
+	//! Whether annotations are enabled.
+	inline bool hasAnnotations() { return ( _cslFlags & CSL_ANNOTATIONS ) != 0; }
+
+	//! Whether C++ blocks should be loaded.
+	inline bool hasCppBlocks() { return ( _cslFlags & CSL_CPPBLOCKS ) != 0; }
+
+	//! Whether documentation should be loaded.
+	inline bool hasDoc() { return ( _cslFlags & CSL_DOCUMENTATION ) != 0; }
+
 	//! Error handling:
 	inline Error* getError() { return _error.get(); }
 	inline const std::string* getCurrentFileName() { return _filename; }
@@ -44,16 +56,16 @@ public:
 	void setError( Error* error );
 
 	//! Memory management:
+	co::Any* newAny();
 	std::string* newString();
 	std::string* newString( const char* cstr );
 
 	//! Parser events
 	void onComment( const location& loc, const std::string& text );
 	void onCppBlock( const location& loc, const std::string& text );
-	void onTypeSpec( const location& specLoc, const location& nameLoc,
-						const std::string& typeName, TypeKind kind );
-	void onTypeDecl( const location& loc, const std::string& qualifiedId, bool isArray );
 	void onImport( const location& loc, const std::string& importTypeName );
+	void onTypeSpec( const location& kLoc, TypeKind kind, const location& nLoc, const std::string& name );
+	void onTypeDecl( const location& loc, const std::string& qualifiedId, bool isArray );
 	void onNativeClass( const location& loc, const std::string& cppType, const std::string& cppHeader );
 	void onEnumIdentifier( const location& loc, const std::string& name );
 	void onBaseType( const location& loc, const std::string& typeName );
@@ -62,7 +74,9 @@ public:
 	void onMethod( const location& loc, const std::string& name );
 	void onParameter( const location& loc, bool isIn, bool isOut, const std::string& name );
 	void onRaises( const location& loc, const std::string& name );
-	void onEndMethod( const location& loc );
+	void onMethodEnd( const location& loc );
+	void onAnnotation( const location& loc, const std::string& name );
+	void onAnnotationData( const location& loc, const std::string& fieldName, const co::Any& value );
 
 protected:
 	//! Template method: creates the ITypeBuilder for the type being parsed.
@@ -99,12 +113,14 @@ private:
 	// after the creation of the type builder to avoid problems with cyclic dependencies.
 	void resolveImports();
 
-	// Adds any buffered (pre-)documentation to the specified type/member.
-	// Also updates _lastMember so any post-doc goes to this member from now on.
-	void handleDocumentation( const std::string& member );
+	/*
+		Called when a new element (type, member or enum identifier) is parsed.
+		This decorates the element with annotations and updates _lastElement.
+	 */
+	void onElement( const std::string& element );
 
-	// Adds an co::IDocumentation annotation to the type (if one doesn't exist).
-	void addDocumentation( const std::string& member, const std::string& text );
+	// Creates/populates an co::IDocumentation annotation for the type.
+	void addDocumentation( const std::string& element, const std::string& text );
 
 	IType* getLastDeclaredType();
 
@@ -118,15 +134,17 @@ private:
 	RefPtr<ITypeBuilder> _typeBuilder;
 	RefPtr<IMethodBuilder> _methodBuilder;
 
+	co::uint8 _cslFlags;
+
 	bool _lastDeclTypeIsArray;
 	location _lastDeclTypeLocation;
 	std::string _lastDeclTypeName;
 
+	// keeps track of the last defined element ("" means the type itself)
+	std::string _lastElement;
+
 	// accumulates C++ blocks
 	std::string _cppBlock;
-
-	// keeps track of the last defined member
-	std::string _lastMember;
 
 	// accumulates 'pre'-documentation
 	std::string _docBuffer;
@@ -134,7 +152,17 @@ private:
 	// documentation annotation
 	RefPtr<IDocumentation> _doc;
 
+	// stores annotations until they can be transferred to the type/members
+	struct AnnotationRecord
+	{
+		std::string element;
+		co::RefVector<IAnnotation> annotations;
+	};
+	typedef std::deque<AnnotationRecord> AnnotationRecList;
+	std::deque<AnnotationRecord> _annotations;
+
 	// memory pools
+	std::deque<co::Any> _anyPool;
 	std::deque<std::string> _stringPool;
 };
 
