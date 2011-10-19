@@ -33,12 +33,10 @@ TEST( AnnotationTests, deepNestedErrors )
 	}
 	catch( co::Exception& e )
 	{
-		EXPECT_EQ( "could not load type 'moduleA.tests.DeepErrors':\n"
-			"From /Users/tbastos/Projects/coral/tests/moduleA/moduleA/tests/DeepErrors.csl:1:18:"
-			" error setting annotation field 'value':\n"
-			"\tIn file /Users/tbastos/Projects/coral/tests/moduleA/moduleA/tests/DeepErrors.csl:1:18:"
-			" could not load type 'moduleA.tests.FaultyType':\n"
-			"In file /Users/tbastos/Projects/coral/tests/moduleA/moduleA/tests/FaultyType.csl:1:18:"
-			" annotation type 'co.ICppBlock' has no field named 'raise'", e.getMessage() );
+		const std::string& msg = e.getMessage();
+		std::string msgStart( "could not load type 'moduleA.tests.DeepErrors':" );
+		std::string msgEnd( "FaultyType.csl:1:18: annotation type 'co.ICppBlock' has no field named 'raise'" );
+		EXPECT_EQ( 0, msg.find( msgStart ) );
+		EXPECT_EQ( msg.size() - msgEnd.size(), msg.rfind( msgEnd ) );
 	}
 }

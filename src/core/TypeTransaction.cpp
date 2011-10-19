@@ -26,7 +26,9 @@ TypeTransaction::TypeTransaction()
 TypeTransaction::~TypeTransaction()
 {
 	if( !_builders.empty() )
+	{
 		CORAL_LOG(FATAL) << "co.TypeTransaction not committed nor rolled back.";
+	}
 }
 
 void TypeTransaction::addTypeBuilder( ITypeBuilder* typeBuilder )
