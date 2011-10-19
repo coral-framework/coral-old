@@ -8,10 +8,11 @@
 #include <co/ISystem.h>
 #include <co/INamespace.h>
 #include <co/ITypeManager.h>
+#include <co/ITypeTransaction.h>
 #include <core/utils/StringTokenizer.h>
 #include <gtest/gtest.h>
 
-co::ITypeBuilder* TestHelper::createBuilder( co::TypeKind kind, const std::string& fullTypeName, co::ITypeTransaction* tct )
+co::ITypeBuilder* TestHelper::createBuilder( co::TypeKind kind, const std::string& fullTypeName )
 {
 	co::INamespace* ns = co::getSystem()->getTypes()->getRootNS();
 
@@ -27,7 +28,7 @@ co::ITypeBuilder* TestHelper::createBuilder( co::TypeKind kind, const std::strin
 		currentToken = st.getToken();
 	}
 
-	co::ITypeBuilder* typeBuilder = ns->defineType( currentToken, kind, tct );
+	co::ITypeBuilder* typeBuilder = ns->defineType( currentToken, kind );
 	EXPECT_TRUE( typeBuilder != NULL );
 
 	return typeBuilder;

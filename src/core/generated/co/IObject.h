@@ -52,9 +52,9 @@ public:
 
 	virtual co::IComponent* getComponent() = 0;
 
-	virtual co::IService* getService( co::IPort* port ) = 0;
+	virtual co::IService* getServiceAt( co::IPort* port ) = 0;
 
-	virtual void setService( co::IPort* receptacle, co::IService* service ) = 0;
+	virtual void setServiceAt( co::IPort* receptacle, co::IService* service ) = 0;
 };
 
 } // namespace co
@@ -62,7 +62,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IObject> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IObject> { static const char* get() { return "co.IObject"; } };
-template<> struct typeOf<co::IObject> : public typeOfBase<co::IObject, IInterface> {};
 } // namespace co
 
 #endif // _CO_IOBJECT_H_

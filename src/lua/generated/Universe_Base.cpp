@@ -64,7 +64,7 @@ co::IComponent* Universe_Base::getComponent()
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* Universe_Base::getService( co::IPort* port )
+co::IService* Universe_Base::getServiceAt( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -76,7 +76,7 @@ co::IService* Universe_Base::getService( co::IPort* port )
 	return res;
 }
 
-void Universe_Base::setService( co::IPort* receptacle, co::IService* service )
+void Universe_Base::setServiceAt( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

@@ -4,6 +4,7 @@
  */
 
 #include "TypeTraits.h"
+#include <co/Coral.h>
 #include <co/IPort.h>
 #include <co/IObject.h>
 #include <co/IInterface.h>
@@ -66,6 +67,11 @@ const std::string TK_STRINGS_CPP[] =
 	"<OFF_BY_ONE!>"
 };
 
+IType* getTypeByLiteralName( const char* fullName )
+{
+	return getType( fullName );
+}
+
 TypeKind getKind( IType* type )
 {
 	assert( type );
@@ -79,7 +85,7 @@ IService* getServiceByType( IObject* object, IInterface* type )
 	Range<IPort* const> facets = component->getFacets();
 	for( ; facets; facets.popFirst() )
 		if( facets.getFirst()->getType()->isSubTypeOf( type ) )
-			return object->getService( facets.getFirst() );
+			return object->getServiceAt( facets.getFirst() );
 	CORAL_THROW( NoSuchPortException, "component '" << component->getFullName()
 		<< "' does not provide a facet of type '" << type->getFullName() << "'"  )
 }
@@ -92,7 +98,7 @@ IService* getServiceByName( IObject* object, const std::string& portName )
 	if( !port )
 		CORAL_THROW( NoSuchPortException, "no such port '" << portName
 			<< "' in component '" << component->getFullName() << "'" );
-	return object->getService( static_cast<IPort*>( port ) );
+	return object->getServiceAt( static_cast<IPort*>( port ) );
 }
 
 void setServiceByName( IObject* object, const std::string& receptacleName, IService* service )
@@ -103,7 +109,7 @@ void setServiceByName( IObject* object, const std::string& receptacleName, IServ
 	if( !port )
 		CORAL_THROW( NoSuchPortException, "no such receptacle '" << receptacleName
 			<< "' in component '" << component->getFullName() << "'" );
-	object->setService( static_cast<IPort*>( port ), service );
+	object->setServiceAt( static_cast<IPort*>( port ), service );
 }
 
 bool isA( IService* service, IInterface* type )

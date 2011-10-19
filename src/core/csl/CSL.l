@@ -4,6 +4,8 @@
 
 #define YYSTYPE co::csl::Parser::semantic_type
 
+#define YY_NO_INPUT
+
 #ifndef YY_NO_UNISTD_H
 #define YY_NO_UNISTD_H 1
 #endif
@@ -86,6 +88,10 @@ void				return TK::VOID;
 "("					return '(';
 ")"					return ')';
 "="					return '=';
+"+"					return '+';
+"-"					return '-';
+"*"					return '*';
+"/"					return '/';
 
 any					SET_CSTR( "any" ) return TK::PRIMITIVE_TYPE;
 bool				SET_CSTR( "bool" ) return TK::PRIMITIVE_TYPE;

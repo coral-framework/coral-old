@@ -339,7 +339,7 @@ void Loader::onMethodEnd( const location& loc )
 	CATCH_ERRORS( loc, _methodBuilder->createMethod() );
 }
 
-void Loader::onAnnotation( const location& loc, const std::string& name )
+void Loader::onAnnotation( const location& loc, const std::string& name, bool hasData )
 {
 	std::string componentName;
 	componentName.reserve( name.size() + 10 );
@@ -361,24 +361,20 @@ void Loader::onAnnotation( const location& loc, const std::string& name )
 
 	try
 	{
-		co::IReflector* reflector = type->getReflector();
-		if( !reflector )
+		RefPtr<IAnnotation> annotation;
+		if( hasData )
 		{
-			PUSH_ERROR( loc, "annotation type '" << componentName << "' has no reflector" );
-			return;
+			RefPtr<IObject> object( type->getReflector()->newInstance() );
+			annotation = getAnnotationFrom( object.get() );
 		}
-
-		RefPtr<IObject> object( reflector->newInstance() );
-		IAnnotation* annotation = object->getService<IAnnotation>();
-		if( !annotation )
+		else
 		{
-			PUSH_ERROR( loc, "component '" << componentName << "' does not provide an annotation" );
-			return;
+			annotation = getDefaultAnnotationInstance( type );
 		}
 
 		if( _annotations.empty() )
 			_annotations.push_back( AnnotationRecord() );
-		_annotations.back().annotations.push_back( annotation );
+		_annotations.back().annotations.push_back( annotation.get() );
 	}
 	catch( co::Exception& e )
 	{
@@ -413,7 +409,18 @@ void Loader::onAnnotationData( const location& loc, const std::string& fieldName
 	catch( co::Exception& e )
 	{
 		pushError( loc, e.getMessage() );
+		PUSH_ERROR( loc, "error setting annotation field '" << fieldName << "'" );
 	}
+}
+
+IAnnotation* Loader::getAnnotationFrom( IObject* object )
+{
+	IAnnotation* annotation = object->getService<IAnnotation>();
+	if( !annotation )
+		CORAL_THROW( Exception, "component '" << object->getComponent()->getName()
+						<< "' does not provide an annotation" );
+
+	return annotation;
 }
 
 IType* Loader::getType()

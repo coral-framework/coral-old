@@ -229,7 +229,7 @@ namespace co { namespace csl {
     /* Tables.  */
     /// For a state, the index in \a yytable_ of its portion.
     static const short int yypact_[];
-    static const signed char yypact_ninf_;
+    static const short int yypact_ninf_;
 
     /// For a state, default reduction number.
     /// Unless\a  yytable_ specifies something else to do.

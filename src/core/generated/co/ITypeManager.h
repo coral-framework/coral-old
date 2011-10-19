@@ -17,6 +17,7 @@ namespace co {
 	class IArray;
 	class INamespace;
 	class IType;
+	class ITypeTransaction;
 } // namespace co
 // End Of Forward Declarations
 
@@ -29,6 +30,8 @@ public:
 	virtual ~ITypeManager() {;}
 
 	virtual co::INamespace* getRootNS() = 0;
+
+	virtual co::ITypeTransaction* getTransaction() = 0;
 
 	virtual co::INamespace* findNamespace( const std::string& fullName ) = 0;
 
@@ -46,7 +49,6 @@ public:
 namespace co {
 template<> struct kindOf<co::ITypeManager> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::ITypeManager> { static const char* get() { return "co.ITypeManager"; } };
-template<> struct typeOf<co::ITypeManager> : public typeOfBase<co::ITypeManager, IInterface> {};
 } // namespace co
 
 #endif // _CO_ITYPEMANAGER_H_

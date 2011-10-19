@@ -28,7 +28,6 @@ enum ModuleState
 namespace co {
 template<> struct kindOf<co::ModuleState> : public kindOfBase<TK_ENUM> {};
 template<> struct nameOf<co::ModuleState> { static const char* get() { return "co.ModuleState"; } };
-template<> struct typeOf<co::ModuleState> : public typeOfBase<co::ModuleState, IEnum> {};
 } // namespace co
 
 #endif // _CO_MODULESTATE_H_

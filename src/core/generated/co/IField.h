@@ -33,7 +33,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IField> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IField> { static const char* get() { return "co.IField"; } };
-template<> struct typeOf<co::IField> : public typeOfBase<co::IField, IInterface> {};
 } // namespace co
 
 #endif // _CO_IFIELD_H_

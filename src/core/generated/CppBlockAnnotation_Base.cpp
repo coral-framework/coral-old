@@ -61,7 +61,7 @@ co::IComponent* CppBlockAnnotation_Base::getComponent()
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* CppBlockAnnotation_Base::getService( co::IPort* port )
+co::IService* CppBlockAnnotation_Base::getServiceAt( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -73,7 +73,7 @@ co::IService* CppBlockAnnotation_Base::getService( co::IPort* port )
 	return res;
 }
 
-void CppBlockAnnotation_Base::setService( co::IPort* receptacle, co::IService* service )
+void CppBlockAnnotation_Base::setServiceAt( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

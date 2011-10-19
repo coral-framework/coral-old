@@ -1,4 +1,4 @@
-struct struct_badFieldName2 
+struct struct_badFieldName2
 {
-	@string name;	
+	string apple name;
 };

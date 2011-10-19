@@ -61,7 +61,7 @@ IComponent* ReflectorBase::getComponent()
 	return getOrCreateInternalComponent( "co.ReflectorBase", "co.IReflector", "reflector" );
 }
 
-IService* ReflectorBase::getService( IPort* port )
+IService* ReflectorBase::getServiceAt( IPort* port )
 {
 	checkValidPort( port );
 
@@ -76,7 +76,7 @@ IService* ReflectorBase::getService( IPort* port )
 	return res;
 }
 
-void ReflectorBase::setService( IPort* receptacle, IService* )
+void ReflectorBase::setServiceAt( IPort* receptacle, IService* )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

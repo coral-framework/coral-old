@@ -51,7 +51,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IServiceManager> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IServiceManager> { static const char* get() { return "co.IServiceManager"; } };
-template<> struct typeOf<co::IServiceManager> : public typeOfBase<co::IServiceManager, IInterface> {};
 } // namespace co
 
 #endif // _CO_ISERVICEMANAGER_H_

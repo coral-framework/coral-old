@@ -53,7 +53,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IAnnotated> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IAnnotated> { static const char* get() { return "co.IAnnotated"; } };
-template<> struct typeOf<co::IAnnotated> : public typeOfBase<co::IAnnotated, IInterface> {};
 } // namespace co
 
 #endif // _CO_IANNOTATED_H_

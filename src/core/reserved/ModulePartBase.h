@@ -38,8 +38,8 @@ public:
 
     // co::IObject methods:
     IComponent* getComponent();
-    IService* getService( IPort* );
-    void setService( IPort*, IService* );
+    IService* getServiceAt( IPort* );
+    void setServiceAt( IPort*, IService* );
 
 	// co::IModulePart methods:
 	void initialize( co::IModule* module );

@@ -5,9 +5,8 @@
 
 #include <co/INamespace.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/ITypeTransaction.h>
-#include <co/IType.h>
 #include <co/IModule.h>
+#include <co/IType.h>
 #include <co/ITypeBuilder.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
@@ -90,13 +89,12 @@ public:
 		return res.get< co::INamespace* >();
 	}
 
-	co::ITypeBuilder* defineType( const std::string& name_, co::TypeKind typeKind_, co::ITypeTransaction* transaction_ )
+	co::ITypeBuilder* defineType( const std::string& name_, co::TypeKind typeKind_ )
 	{
-		co::Any args[3];
+		co::Any args[2];
 		args[0].set< const std::string& >( name_ );
 		args[1].set< co::TypeKind >( typeKind_ );
-		args[2].set< co::ITypeTransaction* >( transaction_ );
-		co::Range<co::Any const> range( args, 3 );
+		co::Range<co::Any const> range( args, 2 );
 		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 1 ), range );
 		return res.get< co::ITypeBuilder* >();
 	}
@@ -220,9 +218,8 @@ public:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					co::TypeKind typeKind_ = args[++argIndex].get< co::TypeKind >();
-					co::ITypeTransaction* transaction_ = args[++argIndex].get< co::ITypeTransaction* >();
 					argIndex = -1;
-					res.set< co::ITypeBuilder* >( p->defineType( name_, typeKind_, transaction_ ) );
+					res.set< co::ITypeBuilder* >( p->defineType( name_, typeKind_ ) );
 				}
 				break;
 			case 8:

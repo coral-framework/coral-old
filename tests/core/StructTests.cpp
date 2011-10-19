@@ -60,11 +60,7 @@ TEST( StructTests, badFieldName )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "StructTests.struct_badFieldName2" )
-	CSL_EXPECT_ERROR( "syntax error near '@string'", "struct_badFieldName2.csl", 3 )
-	CSL_TEST_END()
-
-	CSL_TEST_BEGIN( "StructTests.struct_badFieldName3" )
-	CSL_EXPECT_ERROR( "syntax error near 'name'", "struct_badFieldName3.csl", 3 )
+	CSL_EXPECT_ERROR( "syntax error near 'name'", "struct_badFieldName2.csl", 3 )
 	CSL_TEST_END()
 }
 

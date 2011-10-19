@@ -88,9 +88,6 @@ IComponent* ComponentBase::getOrCreateInternalComponent(
 	IType* itfType = getType( interfaceName );
 	assert( itfType->getKind() == TK_INTERFACE );
 
-	RefPtr<ITypeTransaction> transaction =
-			newInstance( "co.TypeTransaction" )->getService<ITypeTransaction>();
-
 	size_t lastDotPos = fullTypeName.rfind( '.' );
 	assert( lastDotPos != std::string::npos ); // componentName must be specified with a namespace
 
@@ -100,16 +97,16 @@ IComponent* ComponentBase::getOrCreateInternalComponent(
 	INamespace* ns = tm->findNamespace( namespaceName );
 	assert( ns ); // the namespace should have been created before
 
-	RefPtr<ITypeBuilder> tb = ns->defineType( localTypeName, TK_COMPONENT, transaction.get() );
+	RefPtr<ITypeBuilder> tb = ns->defineType( localTypeName, TK_COMPONENT );
 	tb->definePort( facetName, static_cast<IInterface*>( itfType ), true );
 
 	try
 	{
-		transaction->commit();
+		tm->getTransaction()->commit();
 	}
 	catch( std::exception& )
 	{
-		transaction->rollback();
+		tm->getTransaction()->rollback();
 		throw;
 	}
 

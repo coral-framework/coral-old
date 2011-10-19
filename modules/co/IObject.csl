@@ -39,7 +39,7 @@ interface IObject
 
 		\throw NoSuchPortException if \a port is invalid.
 	 */
-	IService getService( in IPort port ) raises NoSuchPortException;
+	IService getServiceAt( in IPort port ) raises NoSuchPortException;
 
 	/*
 		Binds a \a service to one of this object's receptacles.
@@ -48,6 +48,6 @@ interface IObject
 		\throw IllegalCastException if \a service is incompatible with the \a receptacle.
 		\throw IllegalStateException if \a receptacle cannot be changed in the current object state.
 	 */
-	void setService( in IPort receptacle, in IService service )
+	void setServiceAt( in IPort receptacle, in IService service )
 		raises NoSuchPortException, IllegalCastException, IllegalStateException;
 };

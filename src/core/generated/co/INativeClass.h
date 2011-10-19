@@ -27,7 +27,6 @@ public:
 namespace co {
 template<> struct kindOf<co::INativeClass> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::INativeClass> { static const char* get() { return "co.INativeClass"; } };
-template<> struct typeOf<co::INativeClass> : public typeOfBase<co::INativeClass, IInterface> {};
 } // namespace co
 
 #endif // _CO_INATIVECLASS_H_

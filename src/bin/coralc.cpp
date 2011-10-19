@@ -17,7 +17,7 @@ int main( int argc, char* argv[] )
 	std::string rootDir;
 	co::OS::getApplicationDir( rootDir );
 
-	// call $CORAL_ROOT/coral --csl-flags acd lua.Launcher co.compiler.cli $@
+	// call $CORAL_ROOT/coral --csl acd lua.Launcher co.compiler.cli $@
 	std::string program( rootDir );
 	program += CORAL_OS_DIR_SEP_STR "coral" CORAL_DEBUG_SUFFIX;
 

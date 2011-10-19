@@ -8,7 +8,6 @@ local function template( writer, c, t )
 namespace co {
 template<> struct kindOf<]], t.cppName, [[> : public kindOfBase<]], t.kind, [[> {};
 template<> struct nameOf<]], t.cppName, [[> { static const char* get() { return "]], t.fullName, [["; } };
-template<> struct typeOf<]], t.cppName, [[> : public typeOfBase<]], t.cppName, [[, ]], t.typeInterfaceName, [[> {};
 } // namespace co
 
 #endif // _]], t.fullNameUpperUnderline, [[_H_

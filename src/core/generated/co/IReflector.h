@@ -80,7 +80,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IReflector> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IReflector> { static const char* get() { return "co.IReflector"; } };
-template<> struct typeOf<co::IReflector> : public typeOfBase<co::IReflector, IInterface> {};
 } // namespace co
 
 #endif // _CO_IREFLECTOR_H_

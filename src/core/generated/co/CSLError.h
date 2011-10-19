@@ -52,7 +52,6 @@ struct CSLError
 namespace co {
 template<> struct kindOf<co::CSLError> : public kindOfBase<TK_STRUCT> {};
 template<> struct nameOf<co::CSLError> { static const char* get() { return "co.CSLError"; } };
-template<> struct typeOf<co::CSLError> : public typeOfBase<co::CSLError, IStruct> {};
 } // namespace co
 
 #endif // _CO_CSLERROR_H_

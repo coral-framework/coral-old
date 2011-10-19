@@ -43,8 +43,8 @@ public:
 
     // co::IObject methods:
     IComponent* getComponent();
-    IService* getService( IPort* );
-    void setService( IPort*, IService* );
+    IService* getServiceAt( IPort* );
+    void setServiceAt( IPort*, IService* );
 
 	// co::IReflector methods:
 	void createValue( void* address );
@@ -149,9 +149,10 @@ template<typename T, typename M>
 T* checkInstance( const Any& any, M* member )
 {
 	typedef typeOf<T> typeOfT;
-	typename typeOfT::Interface* type = typeOfT::get();
+	typedef typename typeOfT::Descriptor Descriptor;
+	Descriptor* type = typeOfT::get();
 	checkMember( type, member );
-	return CheckInstance<T, typename typeOfT::Interface>::check( any, type );
+	return CheckInstance<T, Descriptor>::check( any, type );
 }
 
 #endif

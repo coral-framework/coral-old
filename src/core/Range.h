@@ -50,7 +50,7 @@ struct RangeAdaptor<T, std::vector<ET*> >
 	static T* getData( std::vector<ET*>& v )
 	{
 		// ET must be a subtype of T.
-		CORAL_STATIC_CHECK( ( traits::isSubTypeOf<ET, typename traits::removePointer<T>::Type>::value ), incompatible_pointer_types );
+		static_assert( ( traits::isSubTypeOf<ET, typename traits::removePointer<T>::Type>::value ), "incompatible pointer types" );
 		return v.empty() ? NULL : reinterpret_cast<T*>( &v[0] );
 	}
 	static size_t getSize( std::vector<ET*>& v ) { return v.size(); }
@@ -130,7 +130,7 @@ public:
 	Range( C& container )
 	{
 		typedef RangeAdaptor<T, C> Adaptor;
-		CORAL_STATIC_CHECK( Adaptor::isValid, invalid_Range_container_type );
+		static_assert( Adaptor::isValid, "invalid container type for co::Range" );
 		_start = Adaptor::getData( container );
 		_end = _start + Adaptor::getSize( container );
 	}
@@ -193,23 +193,6 @@ private:
 #ifdef CORAL_CC_MSVC
 #pragma warning (pop)
 #endif
-
-#ifndef DOXYGEN
-
-/******************************************************************************/
-/* Type-traits definitions for co::Range                                      */
-/******************************************************************************/
-
-template<typename T>
-struct kindOf<Range<T> > : public kindOfBase<TK_ARRAY> {};
-
-template<typename T>
-struct nameOf<Range<T> > : public nameOfArrayBase<T> {};
-
-template<typename T>
-struct typeOf<Range<T> > : public typeOfArrayBase<T> {};
-
-#endif // DOXYGEN
 
 /******************************************************************************/
 /* Simple template library based on co::Range                                 */

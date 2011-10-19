@@ -38,7 +38,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IMethod> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IMethod> { static const char* get() { return "co.IMethod"; } };
-template<> struct typeOf<co::IMethod> : public typeOfBase<co::IMethod, IInterface> {};
 } // namespace co
 
 #endif // _CO_IMETHOD_H_

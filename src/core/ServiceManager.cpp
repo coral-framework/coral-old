@@ -151,7 +151,7 @@ IService* ServiceManager::getServiceForInstance( IInterface* serviceType, IServi
 	IComponent* component = object->getComponent();
 	IPort* facet = findServiceFacet( component, serviceType );
 	if( facet )
-		return object->getService( facet );
+		return object->getServiceAt( facet );
 
 	// otherwise, fall back to getCustomService()
 	return getCustomService( fetchServiceRecord( serviceType ), serviceType, clientInstance->getInterface() );
@@ -241,7 +241,7 @@ void ServiceManager::createService( IInterface* serviceType, LazyService& lazy, 
 		IObject* component = reflector->newInstance();
 		IPort* serviceFacet = findServiceFacet( ct, serviceType );
 		assert( serviceFacet );
-		lazy.setService( component->getService( serviceFacet ) );
+		lazy.setService( component->getServiceAt( serviceFacet ) );
 	}
 	catch( std::exception& e )
 	{

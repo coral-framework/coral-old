@@ -6,20 +6,21 @@
 #include "TestHelper.h"
 
 #include <co/Coral.h>
-#include <co/RefPtr.h>
-#include <co/ISystem.h>
 #include <co/IEnum.h>
-#include <co/IArray.h>
-#include <co/INamespace.h>
-#include <co/IStruct.h>
-#include <co/ITypeBuilder.h>
-#include <co/ITypeManager.h>
-#include <co/IField.h>
 #include <co/IPort.h>
+#include <co/RefPtr.h>
+#include <co/IField.h>
+#include <co/IArray.h>
+#include <co/IStruct.h>
+#include <co/ISystem.h>
 #include <co/IComponent.h>
-#include <co/IMethodBuilder.h>
+#include <co/INamespace.h>
 #include <co/IInterface.h>
 #include <co/INativeClass.h>
+#include <co/ITypeBuilder.h>
+#include <co/ITypeManager.h>
+#include <co/IMethodBuilder.h>
+#include <co/ITypeTransaction.h>
 #include <co/IllegalNameException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -31,15 +32,14 @@
 
 TEST( TypeBuilderTests, cyclicDependencies )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> structABuilder = TestHelper::createBuilder( co::TK_STRUCT, "ciclicDepTest.structs.A", tct.get() );
+	co::RefPtr<co::ITypeBuilder> structABuilder = TestHelper::createBuilder( co::TK_STRUCT, "ciclicDepTest.structs.A" );
 
 	// type struct A depends on type struct B, which must be loaded if not loaded yet
 	// check if B exists : B should not exist yet
 	EXPECT_TRUE( TestHelper::type( "ciclicDepTest.structs.B" ) == NULL );
 
 	// create B
-	co::RefPtr<co::ITypeBuilder> structBBuilder = TestHelper::createBuilder( co::TK_STRUCT, "ciclicDepTest.structs.B", tct.get() );
+	co::RefPtr<co::ITypeBuilder> structBBuilder = TestHelper::createBuilder( co::TK_STRUCT, "ciclicDepTest.structs.B" );
 
 	// B struct depends on type A, creating a dependency cycle
 	// check if A exists: although type A hasn't finished being created, it must be
@@ -59,32 +59,27 @@ TEST( TypeBuilderTests, cyclicDependencies )
 
 	EXPECT_TRUE( typeA == createdTypeA );
 
-	EXPECT_NO_THROW( tct->commit() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->commit() );
 }
 
 
 TEST( TypeBuilderTests, typeNameInvalidIdentifier )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	EXPECT_THROW( co::getSystem()->getTypes()->getRootNS()->defineType( "A.Dot.Separated.TypeName", co::TK_STRUCT, tct.get() ), co::IllegalNameException );
-
-	tct->rollback();
+	EXPECT_THROW( co::getSystem()->getTypes()->getRootNS()->defineType( "A.Dot.Separated.TypeName", co::TK_STRUCT ), co::IllegalNameException );
 }
 
 // IComponent:
 
 TEST( TypeBuilderTests, componentInvalidDefinitions )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-
 	// a dummy type to be used in the test
 	co::IType* anyType = co::getSystem()->getTypes()->findType( "any" );
 
 	// create builder
-	co::RefPtr<co::ITypeBuilder> cbuilder = TestHelper::createBuilder( co::TK_COMPONENT, "TypeBuilderTests_aComponent", tct.get() );
+	co::RefPtr<co::ITypeBuilder> cbuilder = TestHelper::createBuilder( co::TK_COMPONENT, "TypeBuilderTests_aComponent" );
 
 	// a dummy interface to be used in the tests
-	co::RefPtr<co::ITypeBuilder> auxbuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_componentInterface", tct.get() );
+	co::RefPtr<co::ITypeBuilder> auxbuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_componentInterface" );
 	auxbuilder->defineField( "test", anyType, true );
 
 	co::IInterface* testInterface = co::cast<co::IInterface>( auxbuilder->createType() );
@@ -97,14 +92,13 @@ TEST( TypeBuilderTests, componentInvalidDefinitions )
 	EXPECT_THROW( cbuilder->defineMethod( "testMethod" ), co::NotSupportedException );
 	EXPECT_THROW( cbuilder->defineNativeClass( "testHeader", "testName" ), co::NotSupportedException );
 
-	EXPECT_NO_THROW( tct->rollback() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
 }
 
 TEST( TypeBuilderTests, componentDefinition )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> componentBuilder = TestHelper::createBuilder( co::TK_COMPONENT, "TypeBuilderTests.IComponent", tct.get() );
-	co::RefPtr<co::ITypeBuilder> interfaceBuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests.TestInterfaceType", tct.get() );
+	co::RefPtr<co::ITypeBuilder> componentBuilder = TestHelper::createBuilder( co::TK_COMPONENT, "TypeBuilderTests.IComponent" );
+	co::RefPtr<co::ITypeBuilder> interfaceBuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests.TestInterfaceType" );
 
 	interfaceBuilder->defineField( "testName", TestHelper::type( "string" ), true);
 
@@ -114,7 +108,7 @@ TEST( TypeBuilderTests, componentDefinition )
 	componentBuilder->definePort( "Facet", interfaceTest, true );
 
 	EXPECT_THROW( componentBuilder->definePort( "NullInterface", NULL, false ), co::IllegalArgumentException );
-	EXPECT_NO_THROW( tct->commit() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->commit() );
 
 	co::IComponent* component = co::cast<co::IComponent>( componentBuilder->createType() );
 	ASSERT_TRUE( component != NULL );
@@ -144,20 +138,18 @@ TEST( TypeBuilderTests, componentDefinition )
 
 TEST( TypeBuilderTests, componentMissingInput )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> componentBuilder = TestHelper::createBuilder( co::TK_COMPONENT, "TypeBuilderTests.InvalidComponentType", tct.get() );
+	co::RefPtr<co::ITypeBuilder> componentBuilder = TestHelper::createBuilder( co::TK_COMPONENT, "TypeBuilderTests.InvalidComponentType" );
 
-	EXPECT_THROW( tct->commit(), co::MissingInputException );
-	EXPECT_NO_THROW( tct->rollback() );
+	EXPECT_THROW( co::getSystem()->getTypes()->getTransaction()->commit(), co::MissingInputException );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
 
 	EXPECT_TRUE( TestHelper::type( "TypeBuilderTests.InvalidComponentType" ) == NULL );
 }
 
 TEST( TypeBuilderTests, componentGetInterfaces )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> componentBuilder = TestHelper::createBuilder( co::TK_COMPONENT, "ComponentTests.secondComponentType", tct.get() );
-	co::RefPtr<co::ITypeBuilder> interfaceBuilder = TestHelper::createBuilder( co::TK_INTERFACE, "ComponentTests.secondTestInterfaceType", tct.get() );
+	co::RefPtr<co::ITypeBuilder> componentBuilder = TestHelper::createBuilder( co::TK_COMPONENT, "ComponentTests.secondComponentType" );
+	co::RefPtr<co::ITypeBuilder> interfaceBuilder = TestHelper::createBuilder( co::TK_INTERFACE, "ComponentTests.secondTestInterfaceType" );
 
 	interfaceBuilder->defineField( "testName",  TestHelper::type( "string" ), true);
 	co::IInterface* interfaceTest = co::cast<co::IInterface>( interfaceBuilder->createType() );
@@ -169,7 +161,7 @@ TEST( TypeBuilderTests, componentGetInterfaces )
 	componentBuilder->definePort( "Provid_3", interfaceTest, true );
 	componentBuilder->definePort( "Client_3", interfaceTest, false );
 
-	EXPECT_NO_THROW( tct->commit() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->commit() );
 
 	co::IComponent* component = co::cast<co::IComponent>( componentBuilder->createType() );
 	ASSERT_TRUE( component != NULL );
@@ -191,14 +183,13 @@ TEST( TypeBuilderTests, componentGetInterfaces )
 
 TEST( TypeBuilderTests, enumInvalidDefinition )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> ebuilder = TestHelper::createBuilder( co::TK_ENUM, "TypeBuilderTests_anEnum", tct.get() );
+	co::RefPtr<co::ITypeBuilder> ebuilder = TestHelper::createBuilder( co::TK_ENUM, "TypeBuilderTests_anEnum" );
 
 	// dummy type to be used in the test
 	co::IType* anyType = co::getSystem()->getTypes()->findType( "any" );
 
 	// a dummy interface to be used in the tests
-	co::RefPtr<co::ITypeBuilder> auxbuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_enumSuperInterface", tct.get() );
+	co::RefPtr<co::ITypeBuilder> auxbuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_enumSuperInterface" );
 	auxbuilder->defineField( "test", anyType, true );
 
 	co::IInterface* testInterface = co::cast<co::IInterface>( auxbuilder->createType() );
@@ -207,20 +198,19 @@ TEST( TypeBuilderTests, enumInvalidDefinition )
 	EXPECT_THROW( ebuilder->defineField( "fieldName", anyType, false ), co::NotSupportedException );
 	EXPECT_THROW( ebuilder->defineBaseType( testInterface ), co::NotSupportedException );
 
-	EXPECT_NO_THROW( tct->rollback() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
 }
 
 TEST( TypeBuilderTests, enumDefinition )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_ENUM, "EnumTests.BuilderTestEnum", tct.get() );
+	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_ENUM, "EnumTests.BuilderTestEnum" );
 
 	EXPECT_THROW( builder->defineIdentifier( "" ), co::IllegalNameException );
 
 	builder->defineIdentifier( "VALUE_0" );
 	builder->defineIdentifier( "VALUE_1" );
 
-	EXPECT_NO_THROW( tct->commit() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->commit() );
 
 	co::IType* type = builder->createType();
 	ASSERT_TRUE( type != NULL );
@@ -235,25 +225,23 @@ TEST( TypeBuilderTests, enumDefinition )
 
 TEST( TypeBuilderTests, enumMissingInput )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_ENUM, "EnumTests.MissingInputEnum", tct.get() );
+	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_ENUM, "EnumTests.MissingInputEnum" );
 
-	EXPECT_THROW( tct->commit(), co::MissingInputException );
-	EXPECT_NO_THROW( tct->rollback() );
+	EXPECT_THROW( co::getSystem()->getTypes()->getTransaction()->commit(), co::MissingInputException );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
 
 	EXPECT_TRUE( TestHelper::type( "EnumTests.MissingInputEnum" )  == NULL );
 }
 
 TEST( TypeBuilderTests, enumCheckIdentifiers )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_ENUM, "EnumTests.CheckIdentifiersTestEnum", tct.get() );
+	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_ENUM, "EnumTests.CheckIdentifiersTestEnum" );
 
 	builder->defineIdentifier( "VALUE_0" );
 	builder->defineIdentifier( "VALUE_1" );
 	builder->defineIdentifier( "VALUE_2" );
 
-	EXPECT_NO_THROW( tct->commit() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->commit() );
 
 	co::IType* type = builder->createType();
 	co::IEnum* enumType = co::cast<co::IEnum>( type );
@@ -267,20 +255,18 @@ TEST( TypeBuilderTests, enumCheckIdentifiers )
 
 TEST( TypeBuilderTests, enumInsertDuplicateIdentifier )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_ENUM, "EnumTests.InsertDuplicateIdentifierTestEnum", tct.get() );
+	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_ENUM, "EnumTests.InsertDuplicateIdentifierTestEnum" );
 
 	builder->defineIdentifier( "VALUE_0" );
 
 	EXPECT_THROW( builder->defineIdentifier( "VALUE_0" ), co::IllegalNameException );
 
-	EXPECT_NO_THROW( tct->commit() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->commit() );
 }
 
 TEST( TypeBuilderTests, enumCheckValidIdentifiers )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_ENUM, "EnumTests.checkValidIdentifiersEnum", tct.get() );
+	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_ENUM, "EnumTests.checkValidIdentifiersEnum" );
 
 	EXPECT_NO_THROW( builder->defineIdentifier( "VALUE" ) );
 	EXPECT_NO_THROW( builder->defineIdentifier( "LALALA_123_FFF" ) );
@@ -292,7 +278,7 @@ TEST( TypeBuilderTests, enumCheckValidIdentifiers )
 	EXPECT_THROW( builder->defineIdentifier( "" ) , co::IllegalNameException );
 	EXPECT_THROW( builder->defineIdentifier( " VAL" ) , co::IllegalNameException );
 
-	EXPECT_NO_THROW( tct->commit() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->commit() );
 }
 
 // IException:
@@ -301,22 +287,20 @@ TEST( TypeBuilderTests, exceptionCreation )
 {
 	co::INamespace* rootNS = co::getSystem()->getTypes()->getRootNS();
 
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> builder = rootNS->defineType( "aTypeName", co::TK_EXCEPTION, tct.get() );
+	co::RefPtr<co::ITypeBuilder> builder = rootNS->defineType( "aTypeName", co::TK_EXCEPTION );
 	ASSERT_TRUE( builder.isValid() );
 	EXPECT_EQ( builder->getNamespace(), rootNS );
 	EXPECT_EQ( builder->getKind(), co::TK_EXCEPTION );
 	EXPECT_EQ( builder->getTypeName(), "aTypeName" );
 
-	EXPECT_NO_THROW( tct->commit() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->commit() );
 }
 
 TEST( TypeBuilderTests, exceptionsAfterCreation )
 {
 	co::INamespace* rootNS = co::getSystem()->getTypes()->getRootNS();
 
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> builder = rootNS->defineType( "exceptionsAfterCreationTestType", co::TK_STRUCT, tct.get() );
+	co::RefPtr<co::ITypeBuilder> builder = rootNS->defineType( "exceptionsAfterCreationTestType", co::TK_STRUCT );
 	builder->defineField( "name", TestHelper::type( "string" ), false );
 
 	EXPECT_NO_THROW( builder->createType() );
@@ -324,21 +308,20 @@ TEST( TypeBuilderTests, exceptionsAfterCreation )
 	// after the creation of the type, no changes can be made to the typeBuilder.
 	EXPECT_THROW( builder->defineField( "fullName", TestHelper::type( "string" ), false ), co::NotSupportedException );
 
-	EXPECT_NO_THROW( tct->commit() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->commit() );
 }
 
 // IInterface:
 
 TEST( TypeBuilderTests, interfaceInvalidDefinition )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> ibuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_anInvalidInterface", tct.get() );
+	co::RefPtr<co::ITypeBuilder> ibuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_anInvalidInterface" );
 
 	// dummy type to be used in the test
 	co::IType* anyType = co::getSystem()->getTypes()->findType( "any" );
 
 	// a dummy interface to be used in the tests
-	co::RefPtr<co::ITypeBuilder> auxbuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_superInterface", tct.get() );
+	co::RefPtr<co::ITypeBuilder> auxbuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_superInterface" );
 	auxbuilder->defineField( "test", anyType, true );
 
 	co::IInterface* testInterface = co::cast<co::IInterface>( auxbuilder->createType() );
@@ -352,13 +335,12 @@ TEST( TypeBuilderTests, interfaceInvalidDefinition )
 	EXPECT_THROW( ibuilder->defineMethod( "" ), co::IllegalNameException );
 	EXPECT_THROW( ibuilder->defineNativeClass( "testHeader", "testName" ), co::NotSupportedException );
 
-	EXPECT_NO_THROW( tct->rollback() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
 }
 
 TEST( TypeBuilderTests, interfaceDefinition )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_INTERFACE, "builderTest.AInterfaceType", tct.get() );
+	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_INTERFACE, "builderTest.AInterfaceType" );
 
 	// define builderTest.AInterfaceType:
 	co::IType* stringType = TestHelper::type( "string" );
@@ -368,7 +350,7 @@ TEST( TypeBuilderTests, interfaceDefinition )
 	EXPECT_NO_THROW( mb->createMethod() );
 
 	// define builderTest.ASuperInterfaceType:
-	co::RefPtr<co::ITypeBuilder> superBuilder = TestHelper::createBuilder( co::TK_INTERFACE, "builderTest.ASuperInterfaceType", tct.get() );
+	co::RefPtr<co::ITypeBuilder> superBuilder = TestHelper::createBuilder( co::TK_INTERFACE, "builderTest.ASuperInterfaceType" );
 	superBuilder->defineField( "name", stringType, false );
 	co::RefPtr<co::IMethodBuilder> mb2;
 	EXPECT_NO_THROW( ( mb2 = superBuilder->defineMethod( "parentMethod" ) ) );
@@ -405,7 +387,7 @@ TEST( TypeBuilderTests, interfaceDefinition )
 	ASSERT_EQ( itf->getSuperTypes().getSize(), 0 );
 	ASSERT_EQ( super->getSubTypes().getSize(), 0 );
 
-	EXPECT_NO_THROW( tct->commit() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->commit() );
 
 	ASSERT_EQ( itf->getSuperTypes().getSize(), 2 );
 	ASSERT_EQ( itf->getSuperTypes().getFirst(), super );
@@ -418,8 +400,7 @@ TEST( TypeBuilderTests, interfaceDefinition )
 
 TEST( TypeBuilderTests, interfaceGetMethods )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_INTERFACE, "interfaceGetMethodsTest.Foo", tct.get() );
+	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_INTERFACE, "interfaceGetMethodsTest.Foo" );
 
 	builder->defineField( "test", TestHelper::type( "string" ), true );
 	co::IInterface* itf = co::cast<co::IInterface>( builder->createType() );
@@ -428,23 +409,21 @@ TEST( TypeBuilderTests, interfaceGetMethods )
 
 	ASSERT_EQ( 0, itf->getMethods().getSize() );
 
-	EXPECT_NO_THROW( tct->commit() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->commit() );
 }
 
 // INativeClass:
 
 TEST( TypeBuilderTests, nativeClassInvalidDefinitions )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-
 	// a dummy type to be used in the test
 	co::IType* anyType = co::getSystem()->getTypes()->findType( "any" );
 
 	// create builder
-	co::RefPtr<co::ITypeBuilder> nbuilder = TestHelper::createBuilder( co::TK_NATIVECLASS, "TypeBuilderTests_anNativeClass", tct.get() );
+	co::RefPtr<co::ITypeBuilder> nbuilder = TestHelper::createBuilder( co::TK_NATIVECLASS, "TypeBuilderTests_anNativeClass" );
 
 	// a dummy interface to be used in the tests
-	co::RefPtr<co::ITypeBuilder> auxbuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_anInterface", tct.get() );
+	co::RefPtr<co::ITypeBuilder> auxbuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_anInterface" );
 	auxbuilder->defineField( "test", anyType, true );
 
 	co::IInterface* testInterface = co::cast<co::IInterface>( auxbuilder->createType() );
@@ -457,13 +436,12 @@ TEST( TypeBuilderTests, nativeClassInvalidDefinitions )
 	EXPECT_THROW( nbuilder->defineMethod( "" ), co::IllegalNameException );
 	EXPECT_THROW( nbuilder->defineNativeClass( "header", "" ), co::IllegalArgumentException );
 
-	EXPECT_NO_THROW( tct->rollback() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
 }
 
 TEST( TypeBuilderTests, nativeClassDefinition )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_NATIVECLASS, "NativeClassbuilderTest.BuilderTestNativeClass", tct.get() );
+	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_NATIVECLASS, "NativeClassbuilderTest.BuilderTestNativeClass" );
 
 	EXPECT_THROW( builder->defineNativeClass( "headerName", "" ), co::IllegalArgumentException );
 	EXPECT_THROW( builder->defineNativeClass( "", "nativeName" ), co::IllegalArgumentException );
@@ -487,13 +465,12 @@ TEST( TypeBuilderTests, nativeClassDefinition )
 	ASSERT_EQ( 1, nativeType->getMethods().getSize() );
 	ASSERT_EQ( 2, nativeType->getFields().getSize() );
 
-	EXPECT_NO_THROW( tct->commit() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->commit() );
 }
 
 TEST( TypeBuilderTests, nativeClassMemberClash )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_NATIVECLASS, "NativeClassbuilderTest.MemberClashTestNativeClass", tct.get() );
+	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_NATIVECLASS, "NativeClassbuilderTest.MemberClashTestNativeClass" );
 
 	builder->defineField( "testName", TestHelper::type( "string" ), true );
 
@@ -501,41 +478,38 @@ TEST( TypeBuilderTests, nativeClassMemberClash )
 	mb->createMethod();
 	builder->defineNativeClass( "MyHeaderName", "myNativeName" );
 
-	EXPECT_THROW( tct->commit(), co::IllegalNameException );
-	EXPECT_NO_THROW( tct->rollback() );
+	EXPECT_THROW( co::getSystem()->getTypes()->getTransaction()->commit(), co::IllegalNameException );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
 }
 
 TEST( TypeBuilderTests, nativeClassMissingInput )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_NATIVECLASS, "NativeClassbuilderTest.MissingInputNativeClass", tct.get() );
+	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_NATIVECLASS, "NativeClassbuilderTest.MissingInputNativeClass" );
 
-	EXPECT_THROW( tct->commit(), co::MissingInputException );
-	EXPECT_NO_THROW( tct->rollback() );
+	EXPECT_THROW( co::getSystem()->getTypes()->getTransaction()->commit(), co::MissingInputException );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
 }
 
 TEST( TypeBuilderTests, nativeClassMissingHeader )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_NATIVECLASS, "NativeClassbuilderTest.MissingHeadersNativeClass", tct.get() );
+	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_NATIVECLASS, "NativeClassbuilderTest.MissingHeadersNativeClass" );
 	builder->defineField( "testName", TestHelper::type( "string" ), true );
 
-	EXPECT_THROW( tct->commit(), co::MissingInputException );
-	EXPECT_NO_THROW( tct->rollback() );
+	EXPECT_THROW( co::getSystem()->getTypes()->getTransaction()->commit(), co::MissingInputException );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
 }
 
 // IStruct:
 
 TEST( TypeBuilderTests, structInvalidDefinition )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> sbuilder = TestHelper::createBuilder( co::TK_STRUCT, "TypeBuilderTests_anStruct", tct.get() );
+	co::RefPtr<co::ITypeBuilder> sbuilder = TestHelper::createBuilder( co::TK_STRUCT, "TypeBuilderTests_anStruct" );
 
 	// dummy type to be used in the test
 	co::IType* anyType = co::getSystem()->getTypes()->findType( "any" );
 
 	// a dummy interface to be used in the tests
-	co::RefPtr<co::ITypeBuilder> auxbuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_anInterface", tct.get() );
+	co::RefPtr<co::ITypeBuilder> auxbuilder = TestHelper::createBuilder( co::TK_INTERFACE, "TypeBuilderTests_anInterface" );
 	auxbuilder->defineField( "test", anyType, true );
 
 	co::IInterface* testInterface = co::cast<co::IInterface>( auxbuilder->createType() );
@@ -548,33 +522,31 @@ TEST( TypeBuilderTests, structInvalidDefinition )
 	EXPECT_THROW( sbuilder->defineMethod( "testMethod" ), co::NotSupportedException );
 	EXPECT_THROW( sbuilder->defineNativeClass( "testHeader", "testName" ), co::NotSupportedException );
 
-	EXPECT_NO_THROW( tct->rollback() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
 }
 
 TEST( TypeBuilderTests, structMissingInput )
 {
-	co::RefPtr<co::ITypeTransaction> transaction = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_STRUCT, "aStructType", transaction.get() );
+	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_STRUCT, "aStructType" );
 
-	EXPECT_THROW( transaction->commit(), co::MissingInputException );
+	EXPECT_THROW( co::getSystem()->getTypes()->getTransaction()->commit(), co::MissingInputException );
 
-	EXPECT_NO_THROW( transaction->rollback() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
 
 	EXPECT_TRUE( TestHelper::type( "aStructType" ) == NULL );
 }
 
 TEST( TypeBuilderTests, structDefinition )
 {
-	co::RefPtr<co::ITypeTransaction> transaction = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_STRUCT, "StructTests.BuidlerTestStruct", transaction.get() );
+	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_STRUCT, "StructTests.BuidlerTestStruct" );
 
 	co::IType* uint32Type = TestHelper::type( "uint32" );
 
 	builder->defineField( "myField", uint32Type, false );
-	
+
 	EXPECT_THROW( builder->defineField( "myNullTypeField", NULL, false ), co::IllegalArgumentException );
 	EXPECT_THROW( builder->defineField( "myReadOnlyField", uint32Type, true ), co::IllegalArgumentException );
-	ASSERT_NO_THROW( transaction->commit() );
+	ASSERT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->commit() );
 
 	co::IStruct* structType = co::cast<co::IStruct>( TestHelper::type( "StructTests.BuidlerTestStruct" ) );
 	ASSERT_TRUE( structType != NULL );

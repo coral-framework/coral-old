@@ -6,8 +6,10 @@
 #include "Namespace.h"
 #include "Module.h"
 #include "TypeBuilder.h"
-#include "TypeTransaction.h"
+#include "TypeManager.h"
+#include <co/Coral.h>
 #include <co/IType.h>
+#include <co/ISystem.h>
 #include <co/IllegalNameException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/LexicalUtils.h>
@@ -111,16 +113,13 @@ INamespace* Namespace::getChildNamespace( const std::string& name )
 	return findChildNamespace( name );
 }
 
-ITypeBuilder* Namespace::defineType( const std::string& name, TypeKind typeKind, ITypeTransaction* transaction )
+ITypeBuilder* Namespace::defineType( const std::string& name, TypeKind typeKind )
 {
 	if( typeKind <= TK_ARRAY || typeKind > TK_COMPONENT )
 		CORAL_THROW( IllegalArgumentException, "'" << typeKind <<  "' is not a user-definable type kind." );
 
 	if( !LexicalUtils::isValidIdentifier( name ) )
 		CORAL_THROW( IllegalNameException, "'" << name << "' is not a valid identifier." );
-
-	if( !transaction )
-		throw IllegalArgumentException( "illegal null transaction" );
 
 	IType* type;
 	if( ( type = findType( name ) ) && type->getFullName() != "co.IService" )
@@ -129,9 +128,9 @@ ITypeBuilder* Namespace::defineType( const std::string& name, TypeKind typeKind,
 	if( findChildNamespace( name ) )
 		throwClashingNamespace( name );
 
+	TypeManager* tm = static_cast<TypeManager*>( getSystem()->getTypes() );
 	ITypeBuilder* tb = TypeBuilder::create( typeKind, this, name );
-
-	static_cast<TypeTransaction*>( transaction )->addTypeBuilder( tb );
+	tm->addTypeBuilder( tb );
 
 	return tb;
 }

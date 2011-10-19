@@ -8,13 +8,15 @@
 
 #define YYSTYPE co::csl::Parser::semantic_type
 
+#define YY_NO_INPUT
+
 #ifndef YY_NO_UNISTD_H
 #define YY_NO_UNISTD_H 1
 #endif
 
 
 
-#line 18 "scanner.hh"
+#line 20 "scanner.hh"
 
 #define  YY_INT_ALIGNED short int
 
@@ -350,9 +352,9 @@ extern int csl_lex \
 #undef YY_DECL
 #endif
 
-#line 210 "CSL.l"
+#line 216 "CSL.l"
 
 
-#line 357 "scanner.hh"
+#line 359 "scanner.hh"
 #undef csl_IN_HEADER
 #endif /* csl_HEADER_H */

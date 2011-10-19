@@ -61,7 +61,7 @@ co::IComponent* Enum_Base::getComponent()
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* Enum_Base::getService( co::IPort* port )
+co::IService* Enum_Base::getServiceAt( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -73,7 +73,7 @@ co::IService* Enum_Base::getService( co::IPort* port )
 	return res;
 }
 
-void Enum_Base::setService( co::IPort* receptacle, co::IService* service )
+void Enum_Base::setServiceAt( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

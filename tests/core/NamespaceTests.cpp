@@ -11,6 +11,7 @@
 #include <co/INamespace.h>
 #include <co/ITypeBuilder.h>
 #include <co/ITypeManager.h>
+#include <co/ITypeTransaction.h>
 #include <co/IllegalNameException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -29,51 +30,51 @@ TEST( NamespaceTests, rootNS )
 
 TEST( NamespaceTests, defineType )
 {
-	co::INamespace* rootNS = co::getSystem()->getTypes()->getRootNS();
+	co::ITypeManager* tm = co::getSystem()->getTypes();
+	co::INamespace* rootNS = tm->getRootNS();
 
 	// make sure these types are not user-definable
 
-	co::RefPtr<co::ITypeTransaction> transaction = createTypeTransaction();
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_NONE, transaction.get() ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_ANY, transaction.get() ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_BOOLEAN, transaction.get() ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_INT8, transaction.get() ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_UINT8, transaction.get() ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_INT16, transaction.get() ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_UINT16, transaction.get() ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_INT32, transaction.get() ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_UINT32, transaction.get() ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_INT64, transaction.get() ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_UINT64, transaction.get() ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_FLOAT, transaction.get() ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_DOUBLE, transaction.get() ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_STRING, transaction.get() ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_ARRAY, transaction.get() ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_NONE ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_ANY ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_BOOLEAN ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_INT8 ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_UINT8 ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_INT16 ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_UINT16 ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_INT32 ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_UINT32 ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_INT64 ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_UINT64 ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_FLOAT ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_DOUBLE ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_STRING ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_ARRAY ), co::IllegalArgumentException );
 
 	// test collision with namespaces
 	rootNS->defineChildNamespace( "DummyNamespace" );
-	EXPECT_THROW( rootNS->defineType( "DummyNamespace", co::TK_ENUM, transaction.get() ), co::IllegalNameException );
+	EXPECT_THROW( rootNS->defineType( "DummyNamespace", co::TK_ENUM ), co::IllegalNameException );
 
 	// test collision with another type
-	co::RefPtr<co::ITypeBuilder> tb = rootNS->defineType( "DummyException", co::TK_EXCEPTION, transaction.get() );
+	co::RefPtr<co::ITypeBuilder> tb = rootNS->defineType( "DummyException", co::TK_EXCEPTION );
 	ASSERT_TRUE( TestHelper::type( "DummyException" ) != NULL );
 
 	ASSERT_TRUE( rootNS->getType( "nonexistent" ) == NULL );
 	ASSERT_TRUE( rootNS->getType( "DummyException" ) != NULL );
-	EXPECT_THROW( rootNS->defineType( "DummyException", co::TK_ENUM, transaction.get() ), co::IllegalNameException );
+	EXPECT_THROW( rootNS->defineType( "DummyException", co::TK_ENUM ), co::IllegalNameException );
 
 	// test definability of remaining types
-	EXPECT_NO_THROW( tb = rootNS->defineType( "missingInput1", co::TK_ENUM, transaction.get() ) );
-	EXPECT_THROW( transaction->commit(), co::MissingInputException );
+	EXPECT_NO_THROW( tb = rootNS->defineType( "missingInput1", co::TK_ENUM ) );
+	EXPECT_THROW( tm->getTransaction()->commit(), co::MissingInputException );
 
-	EXPECT_NO_THROW( tb = rootNS->defineType( "missingInput2", co::TK_STRUCT, transaction.get() ) );
-	EXPECT_THROW( transaction->commit(), co::NotSupportedException );
+	EXPECT_NO_THROW( tb = rootNS->defineType( "missingInput2", co::TK_STRUCT ) );
+	EXPECT_THROW( tm->getTransaction()->commit(), co::NotSupportedException );
 
-	EXPECT_NO_THROW( tb = rootNS->defineType( "missingInput3", co::TK_NATIVECLASS, transaction.get() ) );
-	EXPECT_NO_THROW( tb = rootNS->defineType( "missingInput4", co::TK_INTERFACE, transaction.get() ) );
-	EXPECT_NO_THROW( tb = rootNS->defineType( "missingInput5", co::TK_COMPONENT, transaction.get() ) );
+	EXPECT_NO_THROW( tb = rootNS->defineType( "missingInput3", co::TK_NATIVECLASS ) );
+	EXPECT_NO_THROW( tb = rootNS->defineType( "missingInput4", co::TK_INTERFACE ) );
+	EXPECT_NO_THROW( tb = rootNS->defineType( "missingInput5", co::TK_COMPONENT ) );
 
-	EXPECT_NO_THROW( transaction->rollback() );
+	EXPECT_NO_THROW( tm->getTransaction()->rollback() );
 }
 
 TEST( NamespaceTests, defineChildNamespace )

@@ -5,7 +5,6 @@
 
 #include "TypeTransaction.h"
 #include "TypeBuilder.h"
-#include "TypeManager.h"
 #include <co/Log.h>
 #include <co/Coral.h>
 #include <co/IType.h>
@@ -17,22 +16,8 @@
 
 namespace co {
 
-TypeTransaction* TypeTransaction::sm_activeTransaction( NULL );
-
 TypeTransaction::TypeTransaction()
 {
-	if( sm_activeTransaction )
-	{
-		CORAL_LOG(FATAL) << "Attempt to instantiate a co.TypeTransaction while another "
-			"instance is active. Concurrent type creation is unsafe and disallowed "
-			"in this Coral version.";
-
-		CORAL_THROW( NotSupportedException,
-			"Only a single ITypeTransaction instance may exist at any moment in time" );
-	}
-
-	sm_activeTransaction = this;
-
 	_commitAttempted = false;
 	_commitSucceeded = false;
 	_rolledBack = false;
@@ -40,69 +25,70 @@ TypeTransaction::TypeTransaction()
 
 TypeTransaction::~TypeTransaction()
 {
-	if( !_commitSucceeded && !_rolledBack )
-	{
-		CORAL_LOG(ERROR) << "ITypeTransaction not committed nor rolled back.";
-	}
+	if( !_builders.empty() )
+		CORAL_LOG(FATAL) << "co.TypeTransaction not committed nor rolled back.";
 }
 
 void TypeTransaction::addTypeBuilder( ITypeBuilder* typeBuilder )
 {
-	_typeBuilders.push_back( typeBuilder );
+	_builders.push_back( typeBuilder );
 }
 
 Range<ITypeBuilder* const> TypeTransaction::getTypeBuilders()
 {
-	return _typeBuilders;
+	return _builders;
 }
 
 void TypeTransaction::commit()
 {
-	if( _commitAttempted || _rolledBack )
+	if( _builders.empty() )
+		return;
+
+	if( _commitAttempted )
 	{
-		const char* msg;
-		if( _commitAttempted && ( !_commitSucceeded && !_rolledBack ) )
-			msg = "the last commit has failed, the transaction can only be rolled back now";
-		else if( _commitSucceeded )
-			msg = "the transaction was already committed";
-		else
-			msg = "the transaction was already rolled back";
-		CORAL_THROW( NotSupportedException, msg );
+		assert( !_commitSucceeded && !_rolledBack );
+		throw NotSupportedException( "a commit has failed, the transaction must be rolled back" );
 	}
 
 	_commitAttempted = true;
 
 	// create all types not yet created
-	for( TypeBuilderList::iterator it = _typeBuilders.begin(); it != _typeBuilders.end(); ++it )
+	for( TypeBuilderList::iterator it = _builders.begin(); it != _builders.end(); ++it )
 		it->get()->createType();
 
 	// validate all types
-	for( TypeBuilderList::iterator it = _typeBuilders.begin(); it != _typeBuilders.end(); ++it )
+	for( TypeBuilderList::iterator it = _builders.begin(); it != _builders.end(); ++it )
 		static_cast<TypeBuilder*>( it->get() )->validate();
 
 	// commit all types
-	for( TypeBuilderList::iterator it = _typeBuilders.begin(); it != _typeBuilders.end(); ++it )
+	for( TypeBuilderList::iterator it = _builders.begin(); it != _builders.end(); ++it )
 		static_cast<TypeBuilder*>( it->get() )->commit();
 
 	_commitSucceeded = true;
 
-	assert( sm_activeTransaction == this );
-	sm_activeTransaction = NULL;
+	reset();
 }
 
 void TypeTransaction::rollback()
 {
-	if( _commitSucceeded || _rolledBack )
-		CORAL_THROW( NotSupportedException, "the transaction is already dead (e.g committed or rolled back)" );
-
-	assert( sm_activeTransaction == this );
-	sm_activeTransaction = NULL;
+	assert( !_commitSucceeded && !_rolledBack );
 
 	// destroy all types
-	for( TypeBuilderList::iterator it = _typeBuilders.begin(); it != _typeBuilders.end(); ++it )
+	for( TypeBuilderList::iterator it = _builders.begin(); it != _builders.end(); ++it )
 		static_cast<TypeBuilder*>( it->get() )->rollback();
 
 	_rolledBack = true;
+
+	reset();
+}
+
+void TypeTransaction::reset()
+{
+	// make sure we are in a valid state to reset
+	assert( _commitSucceeded || _rolledBack );
+
+	_builders.clear();
+	_commitAttempted = _commitSucceeded = _rolledBack = false;
 }
 
 CORAL_EXPORT_COMPONENT( TypeTransaction, TypeTransaction );

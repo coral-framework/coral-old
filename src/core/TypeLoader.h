@@ -8,10 +8,6 @@
 
 #include "csl/Loader.h"
 #include <co/RefPtr.h>
-#include <co/TypeKind.h>
-#include <co/Platform.h>
-#include <co/Range.h>
-#include <co/ITypeTransaction.h>
 
 namespace co {
 
@@ -61,18 +57,14 @@ public:
 	IType* loadType();
 
 private:
-	/*
-		Private contructor: creates a 'non-root' loader that is used for loading
-		type dependencies recursively. In this case, we re-use the _transaction
-		from our parent.
-	 */
+	// Creates a 'non-root' loader for loading typeh dependencies recursively.
 	TypeLoader( const std::string& fullTypeName, TypeLoader* parent );
 
 	// Returns whether this is a root loader.
 	inline bool isRootLoader() const { return _parentLoader == NULL; }
 
 	// Template method implementation: instantiates a ITypeBuilder for use by the Parser.
-	virtual ITypeBuilder* createTypeBuilder( const std::string& typeName, TypeKind kind );
+	ITypeBuilder* createTypeBuilder( const std::string& typeName, TypeKind kind );
 
 	/*
 		Template method implementation: finds or loads a type dependency, given the
@@ -84,7 +76,10 @@ private:
 		  5) return NULL in case of error parsing the CSL file or if the file
 			 is not found. Use getError() to access the error stack.
 	 */
-	virtual IType* resolveType( const csl::location& loc, const std::string& typeName, bool isArray = false );
+	IType* resolveType( const csl::location& loc, const std::string& typeName, bool isArray = false );
+
+	// Template method implementation: creates or gets a cached default annotation instance.
+	IAnnotation* getDefaultAnnotationInstance( IType* type );
 
 	/*
 		Searches an existing type with the passed \a typeName. The name can be fully qualified
@@ -107,9 +102,10 @@ private:
 	std::string _fullTypeName;
 	TypeManager* _typeManager;
 	TypeLoader* _parentLoader;
-
 	INamespace* _namespace;
-	RefPtr<ITypeTransaction> _transaction;
+
+	typedef std::map<IType*, RefPtr<IAnnotation> > DefaultAnnotationMap;
+	DefaultAnnotationMap _defaultAnnotationInstances;
 };
 
 } // namespace co

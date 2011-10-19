@@ -1,6 +1,14 @@
-@co.CppBlock( "C++ code goes here" )
+@co.CppBlock( "At the type" )
 
-enum CppBlock
+interface CppBlock
 {
-	zero, one, two, three
+	@co.CppBlock( value = "at fieldOne" )
+	bool fieldOne;
+
+	@co.CppBlock( "at fieldTwo" ) readonly string fieldTwo;
+
+	@co.CppBlock( "at methodOne" ) void methodOne();
+
+	@co.CppBlock( "at methodTwo" )
+	double methodTwo( in bool arg1 );
 };

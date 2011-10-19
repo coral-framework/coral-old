@@ -2,6 +2,11 @@
 # Unit Tests
 ################################################################################
 
+# Disable sign-compare warnings (unavoidable when using GTest)
+if( NOT MSVC )
+	add_definitions( "-Wno-sign-compare" )
+endif()
+
 # We require the GTest Framework
 FIND_PACKAGE( GTest )
 IF( GTEST_FOUND )

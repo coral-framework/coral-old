@@ -6,8 +6,8 @@
 #ifndef _CO_REFVECTOR_H_
 #define _CO_REFVECTOR_H_
 
-#include <co/RefPtr.h>
 #include <co/Range.h>
+#include <co/RefPtr.h>
 
 namespace co {
 
@@ -108,24 +108,11 @@ struct RangeAdaptor<T, RefVector<ET> >
 	static const bool isValid = true;
 	static const T* getData( RefVector<ET>& v )
 	{
-		CORAL_STATIC_CHECK( ( traits::isSubTypeOf<ET, typename traits::removePointer<T>::Type>::value ), incompatible_pointer_types );
+		static_assert( ( traits::isSubTypeOf<ET, typename traits::removePointer<T>::Type>::value ), "incompatible pointer types" );
 		return v.empty() ? NULL : reinterpret_cast<T*>( &v[0] );
 	}
 	static size_t getSize( RefVector<ET>& v ) { return v.size(); }
 };
-
-/****************************************************************************/
-/* All type-traits definitions related to co::RefVector are located below   */
-/****************************************************************************/
-
-template<typename T>
-struct kindOf<RefVector<T> > : public kindOfBase<TK_ARRAY> {};
-
-template<typename T>
-struct nameOf<RefVector<T> > : public nameOfArrayBase<T> {};
-
-template<typename T>
-struct typeOf<RefVector<T> > : public typeOfArrayBase<T> {};
 
 #endif // DOXYGEN
 

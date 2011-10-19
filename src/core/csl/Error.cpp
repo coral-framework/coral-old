@@ -62,7 +62,8 @@ std::ostream& operator<<( std::ostream& out, const co::csl::Error& error )
 			<< currentError->getFileName()
 			<< ":" << currentError->getLine()
 			<< ":" << currentError->getColumn()
-			<< ": " << currentError->getMessage() << ( nextIsNotLast ? ":\n" : ".\n" );
+			<< ": " << currentError->getMessage()
+			<< ( nextIsNotLast ? ":\n" : "" );
 
 		++level;
 

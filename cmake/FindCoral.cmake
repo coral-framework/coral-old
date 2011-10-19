@@ -44,6 +44,17 @@ if( APPLE )
 	set( CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_64_BIT)" )
 endif()
 
+# Require minimal support for C++11 (static_assert, TR1, etc)
+if( MSVC )
+	if( MSVC_VERSION LESS 1600 )
+		message( FATAL_ERROR "Coral currently requires Visual Studio 2010 or greater." )
+	endif()
+else()
+	# Requires GCC 4.3+
+	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" )
+endif()
+
+# Launcher arguments to invoke the coral compiler
 set( CORAL_LAUNCH_COMPILER --csl acd lua.Launcher co.compiler.cli --ignoredupes )
 
 ################################################################################

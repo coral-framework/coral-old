@@ -32,7 +32,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IRecordType> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IRecordType> { static const char* get() { return "co.IRecordType"; } };
-template<> struct typeOf<co::IRecordType> : public typeOfBase<co::IRecordType, IInterface> {};
 } // namespace co
 
 #endif // _CO_IRECORDTYPE_H_

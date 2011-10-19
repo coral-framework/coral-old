@@ -12,6 +12,8 @@
 
 namespace co {
 
+class TypeBuilder;
+
 /*!
 	Implements co.ITypeManager.
  */
@@ -23,9 +25,11 @@ public:
 
 	// internal methods:
 	void initialize();
+	void addTypeBuilder( ITypeBuilder* tb );
 
 	// ITypeManager methods:
 	INamespace* getRootNS();
+	ITypeTransaction* getTransaction();
 	IType* findType( const std::string& fullName );
 	INamespace* findNamespace( const std::string& fullName );
 	IType* getType( const std::string& typeName );
@@ -42,6 +46,7 @@ private:
 
 private:
 	RefPtr<Namespace> _rootNS;
+	RefPtr<ITypeTransaction> _transaction;
 };
 
 } // namespace co

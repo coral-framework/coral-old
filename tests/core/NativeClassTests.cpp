@@ -65,11 +65,11 @@ TEST( NativeClassTests, invalidNativeClasses )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "NativeClassTests.TestNativeClass_invalid10" )
-	CSL_EXPECT_ERROR( "unknown character '*' (0x2a)", "TestNativeClass_invalid10.csl", 7 )
+	CSL_EXPECT_ERROR( "syntax error near '*'", "TestNativeClass_invalid10.csl", 7 )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "NativeClassTests.TestNativeClass_invalid11" )
-	CSL_EXPECT_ERROR( "unknown character '*' (0x2a)", "TestNativeClass_invalid11.csl", 1 )
+	CSL_EXPECT_ERROR( "syntax error near '*'", "TestNativeClass_invalid11.csl", 1 )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "NativeClassTests.TestNativeClass_invalid12" )

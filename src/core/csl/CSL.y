@@ -174,12 +174,8 @@ qualified_id
 	;
 
 annotation
-	: ANNOTATION_ID { PARSE_EV( onAnnotation( @1, *$1 ) ) } opt_annotation_data
-	;
-
-opt_annotation_data
-	: /* nothing */
-	| '(' annotation_data ')'
+	: ANNOTATION_ID { PARSE_EV( onAnnotation( @1, *$1, false ) ) }
+	| ANNOTATION_ID '(' { PARSE_EV( onAnnotation( @1, *$1, true ) ) } annotation_data ')'
 	;
 
 annotation_data
@@ -194,7 +190,7 @@ opt_field_value_list
 
 field_value_list
 	: field_value
-	| field_value_list field_value
+	| field_value_list ',' field_value
 	;
 
 field_value
@@ -236,6 +232,7 @@ record_member_list
 
 record_member
 	: comment
+	| annotation
 	| field_decl
 	;
 
@@ -369,6 +366,7 @@ component_member_list
 
 component_member
 	: comment
+	| annotation
 	| port_decl
 	;
 
@@ -383,9 +381,10 @@ port_kind
 	;
 
 exp
-	:	BOOLEAN		{ $$ = loader.newAny(); $$->set<bool>( $BOOLEAN ); }
-	|	LITERAL		{ $$ = loader.newAny(); $$->set<const std::string&>( *$LITERAL ); }
-	|	num_exp		{ $$ = loader.newAny(); $$->set<double>( $num_exp ); }
+	:	BOOLEAN			{ $$ = loader.newAny(); $$->set<bool>( $1 ); }
+	|	LITERAL			{ $$ = loader.newAny(); $$->set<const std::string&>( *$1 ); }
+	|	qualified_id	{ $$ = loader.newAny(); $$->set<const std::string&>( *$1 ); }
+	|	num_exp			{ $$ = loader.newAny(); $$->set<double>( $1 ); }
 	;
 
 num_exp

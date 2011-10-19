@@ -28,7 +28,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IEnum> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IEnum> { static const char* get() { return "co.IEnum"; } };
-template<> struct typeOf<co::IEnum> : public typeOfBase<co::IEnum, IInterface> {};
 } // namespace co
 
 #endif // _CO_IENUM_H_

@@ -21,7 +21,6 @@ namespace co {
 namespace co {
 template<> struct kindOf<co::Uuid> : public kindOfBase<TK_NATIVECLASS> {};
 template<> struct nameOf<co::Uuid> { static const char* get() { return "co.Uuid"; } };
-template<> struct typeOf<co::Uuid> : public typeOfBase<co::Uuid, INativeClass> {};
 } // namespace co
 
 #endif // _CO_UUID_H_

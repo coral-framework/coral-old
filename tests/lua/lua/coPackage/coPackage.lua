@@ -48,9 +48,9 @@ function M:initialize( module )
 	ASSERT_TRUE( co.findScript( "lua.coPackage.coPackage" ) )
 	ASSERT_TRUE( co.findScript( "lua.coPackage.nonExistingScript" ) == nil )
 
-	-- test findModuleFile
-	ASSERT_TRUE( co.findModuleFile( "lua.coPackage", "coPackage.lua" ) )
-	ASSERT_TRUE( co.findModuleFile( "lua.coPackage", "nonExisting.lua" ) == nil )
+	-- test findFile
+	ASSERT_TRUE( co.findFile( "lua.coPackage", "coPackage.lua" ) )
+	ASSERT_TRUE( co.findFile( "lua.coPackage", "nonExisting.lua" ) == nil )
 end
 
 return M

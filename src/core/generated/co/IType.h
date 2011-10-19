@@ -48,7 +48,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IType> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IType> { static const char* get() { return "co.IType"; } };
-template<> struct typeOf<co::IType> : public typeOfBase<co::IType, IInterface> {};
 } // namespace co
 
 #endif // _CO_ITYPE_H_

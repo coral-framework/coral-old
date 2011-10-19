@@ -96,21 +96,21 @@ co::IComponent* LuaComponent::getComponent()
 	return _componentType ? _componentType : lua::Component_Base::getComponent();
 }
 
-co::IService* LuaComponent::getService( co::IPort* port )
+co::IService* LuaComponent::getServiceAt( co::IPort* port )
 {
 	co::ICompositeType* owner = port->getOwner();
 	if( owner == _componentType )
 		return dynamicGetService( port );
-	return lua::Component_Base::getService( port );
+	return lua::Component_Base::getServiceAt( port );
 }
 
-void LuaComponent::setService( co::IPort* receptacle, co::IService* instance )
+void LuaComponent::setServiceAt( co::IPort* receptacle, co::IService* instance )
 {
 	co::ICompositeType* owner = receptacle->getOwner();
 	if( owner == _componentType )
 		dynamicSetService( receptacle, instance );
 	else
-		lua::Component_Base::setService( receptacle, instance );
+		lua::Component_Base::setServiceAt( receptacle, instance );
 }
 
 co::int32 LuaComponent::dynamicRegisterService( co::IService* proxy )
@@ -119,20 +119,20 @@ co::int32 LuaComponent::dynamicRegisterService( co::IService* proxy )
 	return _numFacets++;
 }
 
-co::IPort* LuaComponent::getFacet( co::int32 cookie )
+co::IPort* LuaComponent::getFacetByCookie( co::int32 cookie )
 {
 	return _componentType->getFacets()[cookie];
 }
 
 co::IPort* LuaComponent::dynamicGetFacet( co::int32 cookie )
 {
-	return getFacet( cookie );
+	return getFacetByCookie( cookie );
 }
 
 void LuaComponent::pushFacetTable( lua_State* L, co::int32 cookie )
 {
 	lua_rawgeti( L, LUA_REGISTRYINDEX, _tableRef );
-	lua_pushstring( L, getFacet( cookie )->getName().c_str() );
+	lua_pushstring( L, getFacetByCookie( cookie )->getName().c_str() );
 	lua_gettable( L, -2 );
 	assert( lua_istable( L, -1 ) );
 }
@@ -163,7 +163,7 @@ void LuaComponent::getMethod( lua_State* L, int t, co::int32 cookie )
 		std::stringstream ss;
 		ss << "missing method '" << methodName << "' in LuaComponent '" << _componentType->getFullName() << "'";
 		if( cookie != -1 )
-			ss << ", facet '" << getFacet( cookie )->getName() << "'";
+			ss << ", facet '" << getFacetByCookie( cookie )->getName() << "'";
 		throw lua::Exception( ss.str() );
 	}
 }

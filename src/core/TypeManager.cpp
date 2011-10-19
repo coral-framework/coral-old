@@ -6,6 +6,7 @@
 #include "TypeManager.h"
 #include "Namespace.h"
 #include "TypeLoader.h"
+#include "TypeTransaction.h"
 #include "types/Type.h"
 #include "types/ArrayType.h"
 #include "types/Interface.h"
@@ -22,6 +23,7 @@ static const std::string sg_emptyString;
 TypeManager::TypeManager()
 {
 	_rootNS = new Namespace;
+	_transaction = new TypeTransaction;
 }
 
 TypeManager::~TypeManager()
@@ -34,9 +36,19 @@ void TypeManager::initialize()
 	defineBuiltInTypes();
 }
 
+void TypeManager::addTypeBuilder( ITypeBuilder* tb )
+{
+	static_cast<TypeTransaction*>( _transaction.get() )->addTypeBuilder( tb );
+}
+
 INamespace* TypeManager::getRootNS()
 {
 	return _rootNS.get();
+}
+
+ITypeTransaction* TypeManager::getTransaction()
+{
+	return _transaction.get();
 }
 
 IType* TypeManager::findType( const std::string& fullName )

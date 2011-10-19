@@ -27,7 +27,6 @@ public:
 namespace co {
 template<> struct kindOf<co::ICppBlock> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::ICppBlock> { static const char* get() { return "co.ICppBlock"; } };
-template<> struct typeOf<co::ICppBlock> : public typeOfBase<co::ICppBlock, IInterface> {};
 } // namespace co
 
 #endif // _CO_ICPPBLOCK_H_

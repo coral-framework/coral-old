@@ -17,6 +17,7 @@ local coNew = co.new
 local coGetType = co.getType
 local coFindScript = co.findScript
 local coRootNS = co.system.types.rootNS
+local coTypeTransaction = co.system.types.transaction
 local coNewComponentType = co.newComponentType
 local coNewComponentInstance = co.newComponentInstance
 
@@ -215,8 +216,8 @@ local function checkComponentInterfaces( provides, receives )
 	end
 end
 
-local function defineComponentType( ns, typeName, tct, provides, receives )
-	local typeBuilder = ns:defineType( typeName, 'TK_COMPONENT', tct )
+local function defineComponentType( ns, typeName, provides, receives )
+	local typeBuilder = ns:defineType( typeName, 'TK_COMPONENT' )
 
 	if provides then
 		for facetName, facetType in pairs( provides ) do
@@ -263,12 +264,11 @@ function co.Component( t )
 		error( "component name '" .. fullName .. "' clashes with an existing type", 2 )
 	end
 
-	local tct = coNew( "co.TypeTransaction" ).transaction
-	local ok, ct = pcall( defineComponentType, ns, typeName, tct, provides, receives )
+	local ok, ct = pcall( defineComponentType, ns, typeName, provides, receives )
 	if ok then
-		tct:commit()
+		coTypeTransaction:commit()
 	else
-		tct:rollback()
+		coTypeTransaction:rollback()
 		error( "could not define a new component type: " .. tostring( ct ), 2 )
 	end
 

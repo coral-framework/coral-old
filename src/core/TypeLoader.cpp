@@ -12,6 +12,7 @@
 #include <co/IArray.h>
 #include <co/Exception.h>
 #include <co/INamespace.h>
+#include <co/IReflector.h>
 #include <co/ITypeBuilder.h>
 #include <co/IMethodBuilder.h>
 #include <co/reserved/OS.h>
@@ -26,7 +27,6 @@ TypeLoader::TypeLoader( const std::string& fullTypeName, ITypeManager* tm )
 	_typeManager = static_cast<TypeManager*>( tm );
 	_parentLoader = NULL;
 	_namespace = NULL;
-	_transaction = new TypeTransaction();
 }
 
 // Non-Root Loader Constructor:
@@ -35,8 +35,7 @@ TypeLoader::TypeLoader( const std::string& fullTypeName, TypeLoader* parent )
 {
 	_typeManager = parent->_typeManager;
 	_parentLoader = parent;
-	_namespace = parent->_namespace;
-	_transaction = parent->_transaction;
+	_namespace = NULL;
 }
 
 TypeLoader::~TypeLoader()
@@ -78,7 +77,7 @@ IType* TypeLoader::loadType()
 			if( parse( fullPath ) )
 			{
 				if( isRootLoader() )
-					_transaction->commit();
+					_typeManager->getTransaction()->commit();
 				return getType();
 			}
 		}
@@ -89,14 +88,14 @@ IType* TypeLoader::loadType()
 	}
 
 	if( isRootLoader() )
-		_transaction->rollback();
+		_typeManager->getTransaction()->rollback();
 
 	return NULL;
 }
 
 ITypeBuilder* TypeLoader::createTypeBuilder( const std::string& typeName, TypeKind kind )
 {
-	return _namespace->defineType( typeName, kind, _transaction.get() );
+	return _namespace->defineType( typeName, kind );
 }
 
 IType* TypeLoader::resolveType( const csl::location& loc, const std::string& typeName, bool isArray )
@@ -133,6 +132,18 @@ IType* TypeLoader::resolveType( const csl::location& loc, const std::string& typ
 		pushError( loc, e.getMessage() );
 		return NULL;
 	}
+}
+
+IAnnotation* TypeLoader::getDefaultAnnotationInstance( IType* type )
+{
+	DefaultAnnotationMap::iterator it = _defaultAnnotationInstances.find( type );
+	if( it != _defaultAnnotationInstances.end() )
+		return it->second.get();
+
+	RefPtr<IObject> object( type->getReflector()->newInstance() );
+	IAnnotation* annotation = getAnnotationFrom( object.get() );
+	_defaultAnnotationInstances[type] = annotation;
+	return annotation;
 }
 
 inline std::string formatTypeInNamespace( INamespace* ns, const std::string& typeName )

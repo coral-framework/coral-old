@@ -25,7 +25,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IArray> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IArray> { static const char* get() { return "co.IArray"; } };
-template<> struct typeOf<co::IArray> : public typeOfBase<co::IArray, IInterface> {};
 } // namespace co
 
 #endif // _CO_IARRAY_H_

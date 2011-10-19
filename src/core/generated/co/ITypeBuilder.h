@@ -53,7 +53,6 @@ public:
 namespace co {
 template<> struct kindOf<co::ITypeBuilder> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::ITypeBuilder> { static const char* get() { return "co.ITypeBuilder"; } };
-template<> struct typeOf<co::ITypeBuilder> : public typeOfBase<co::ITypeBuilder, IInterface> {};
 } // namespace co
 
 #endif // _CO_ITYPEBUILDER_H_

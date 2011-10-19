@@ -61,7 +61,7 @@ co::IComponent* NativeClass_Base::getComponent()
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* NativeClass_Base::getService( co::IPort* port )
+co::IService* NativeClass_Base::getServiceAt( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -73,7 +73,7 @@ co::IService* NativeClass_Base::getService( co::IPort* port )
 	return res;
 }
 
-void NativeClass_Base::setService( co::IPort* receptacle, co::IService* service )
+void NativeClass_Base::setServiceAt( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

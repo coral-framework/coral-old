@@ -64,8 +64,8 @@ public:
 
 	// co::IObject Methods:
 	co::IComponent* getComponent();
-	co::IService* getService( co::IPort* );
-	void setService( co::IPort*, co::IService* );
+	co::IService* getServiceAt( co::IPort* );
+	void setServiceAt( co::IPort*, co::IService* );
 ]] )
 
 	if #receptacles > 0 then

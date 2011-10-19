@@ -189,16 +189,6 @@ const int64		MIN_INT64	= -MAX_INT64 - 1;
 	using co::uint64;
 
 /*!
-	\brief Evaluates a constant expression and, if the result is false,
-	aborts the compilation with an error message.
-	\param[in] const_expr compile-time integral or pointer expression.
-	\param[in] id_msg C++ identifier that describes the error (it does not need to be defined).
-		Something like 'invalid_element_size'.
- */
-#define CORAL_STATIC_CHECK( const_expr, id_msg ) \
-    { co::CompileTimeError<( (const_expr) != 0 )> ERROR_##id_msg; (void)ERROR_##id_msg; }
-
-/*!
 	\brief Returns the number of elements in a statically-allocated array.
 	\param[in] array name of a statically-allocated array.
  */
@@ -239,17 +229,6 @@ const int64		MIN_INT64	= -MAX_INT64 - 1;
 	#define CORAL_NO_INLINE __attribute__((noinline)) 
 #endif 
 
-namespace co {
-
-#ifndef DOXYGEN
-
-// Template trick to yield compile time errors:
-template<int> struct CompileTimeError;
-template<> struct CompileTimeError<true> {};
-
-#endif // DOXYGEN
-
-} // namespace co
 
 //------ Portable shared-library interface attributes --------------------------
 

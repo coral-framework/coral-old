@@ -269,7 +269,7 @@ int main( int argc, char* argv[] )
 			object = ct->getReflector()->newInstance();
 			assert( object.isValid() );
 
-			service = object->getService( facet );
+			service = object->getServiceAt( facet );
 			assert( service );
 		}
 		catch( std::exception& e )

@@ -136,16 +136,16 @@ TEST( OSTests, searchFile2WithAmbiguities )
 	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "innerFolder" CORAL_OS_DIR_SEP_STR "file1.csl" ) );
 }
 
-TEST( OSTests, findModuleFile )
+TEST( OSTests, findFile )
 {
 	std::string path;
 
-	EXPECT_TRUE( co::findModuleFile( "co", "IService.csl", path ) );
+	EXPECT_TRUE( co::findFile( "co", "IService.csl", path ) );
 	EXPECT_TRUE( TestHelper::stringEndsWith( path, "co" CORAL_OS_DIR_SEP_STR "IService.csl" ) );
 
-	EXPECT_FALSE( co::findModuleFile( "co", "NonExistingType.csl", path ) );
+	EXPECT_FALSE( co::findFile( "co", "NonExistingType.csl", path ) );
 
-	EXPECT_TRUE( co::findModuleFile( "TypeLoaderTests.NestedErrors", "Struct1.csl", path ) );
+	EXPECT_TRUE( co::findFile( "TypeLoaderTests.NestedErrors", "Struct1.csl", path ) );
 	EXPECT_TRUE( TestHelper::stringEndsWith( path,
 		"TypeLoaderTests" CORAL_OS_DIR_SEP_STR "NestedErrors" CORAL_OS_DIR_SEP_STR "Struct1.csl" ) );
 }

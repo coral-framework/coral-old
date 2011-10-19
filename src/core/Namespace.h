@@ -21,13 +21,13 @@ class Namespace : public Namespace_Base
 public:
 	Namespace();
 	virtual ~Namespace();
-	
+
 	// internal methods:
 	void setParentAndName( INamespace* parent, const std::string& name );
 	void setModule( IModule* module );
 	void addType( IType* type );
 	void removeType( IType* type );
-	
+
 	// INamespace methods:
 	const std::string& getName();
 	const std::string& getFullName();
@@ -37,8 +37,7 @@ public:
 	IModule* getModule();
 	IType* getType( const std::string& name );
 	INamespace* getChildNamespace( const std::string& name );
-	ITypeBuilder* defineType( const std::string& name, TypeKind typeKind,
-									ITypeTransaction* transaction );
+	ITypeBuilder* defineType( const std::string& name, TypeKind typeKind );
 	INamespace* defineChildNamespace( const std::string& name );
 
 private:

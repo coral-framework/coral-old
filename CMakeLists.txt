@@ -2,7 +2,7 @@
 # Initialization
 ################################################################################
 
-CMAKE_MINIMUM_REQUIRED( VERSION 2.6 )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
 
 PROJECT( CORAL )
 
@@ -18,12 +18,12 @@ INCLUDE( InternalMacros )
 
 # Coral Version
 SET( CORAL_VERSION_MAJOR	"0" )
-SET( CORAL_VERSION_MINOR	"6" )
-SET( CORAL_VERSION_PATCH	"2" )
+SET( CORAL_VERSION_MINOR	"7" )
+SET( CORAL_VERSION_PATCH	"0" )
 SET( CORAL_VERSION "${CORAL_VERSION_MAJOR}.${CORAL_VERSION_MINOR}.${CORAL_VERSION_PATCH}" )
 
 # Code generation rules revision
-SET( CORAL_COMPILER_OUTPUT_REVISION 7 )
+SET( CORAL_COMPILER_OUTPUT_REVISION 8 )
 
 ################################################################################
 # Global Build Settings
@@ -37,17 +37,10 @@ IF( MSVC )
 ELSE()
 
 	# Enable extra GCC warnings for extra-nice code
-	ADD_DEFINITIONS( -Wall -Wextra -Wunused -Wwrite-strings )
-
-	# GCC 4.3 introduced some senseless, annoying unavoidable warnings.
-	INCLUDE( CheckCCompilerFlag )
-	CHECK_C_COMPILER_FLAG( -Wno-ignored-qualifiers usingGCC43OrAbove )
-	IF( usingGCC43OrAbove )
-		ADD_DEFINITIONS( -Wno-ignored-qualifiers )
-	ENDIF()
+	ADD_DEFINITIONS( -Wall -Wextra -Wunused -Wwrite-strings -Wno-ignored-qualifiers )
 
 	# For C++ sources only:
-	SET_PROPERTY( GLOBAL APPEND PROPERTY CMAKE_CXX_FLAGS "-Woverloaded-virtual" )
+	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Woverloaded-virtual" )
 
 ENDIF()
 

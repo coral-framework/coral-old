@@ -23,7 +23,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IAnnotation> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IAnnotation> { static const char* get() { return "co.IAnnotation"; } };
-template<> struct typeOf<co::IAnnotation> : public typeOfBase<co::IAnnotation, IInterface> {};
 } // namespace co
 
 #endif // _CO_IANNOTATION_H_

@@ -142,7 +142,7 @@ IService* getServiceForInstance( IInterface* serviceType, IService* clientInstan
 	return getServices()->getServiceForInstance( serviceType, clientInstance );
 }
 
-bool findModuleFile( const std::string& moduleName, const std::string& fileName, std::string& filePath )
+bool findFile( const std::string& moduleName, const std::string& fileName, std::string& filePath )
 {
 	std::string modulePath( moduleName );
 	OS::convertDotsToDirSeps( modulePath );

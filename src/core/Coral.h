@@ -155,7 +155,7 @@ inline T* getService( co::IService* clientInstance )
 	\param[out] filePath set with the absolute path to the file, if one is found.
 	\return true if a file was found; false if the search failed.
  */
-CORAL_EXPORT bool findModuleFile( const std::string& moduleName, const std::string& fileName, std::string& filePath );
+CORAL_EXPORT bool findFile( const std::string& moduleName, const std::string& fileName, std::string& filePath );
 
 } // namespace co
 

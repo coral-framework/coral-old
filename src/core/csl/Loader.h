@@ -75,23 +75,38 @@ public:
 	void onParameter( const location& loc, bool isIn, bool isOut, const std::string& name );
 	void onRaises( const location& loc, const std::string& name );
 	void onMethodEnd( const location& loc );
-	void onAnnotation( const location& loc, const std::string& name );
+	void onAnnotation( const location& loc, const std::string& name, bool hasData );
 	void onAnnotationData( const location& loc, const std::string& fieldName, const co::Any& value );
 
 protected:
 	//! Template method: creates the ITypeBuilder for the type being parsed.
 	virtual ITypeBuilder* createTypeBuilder( const std::string& typeName, TypeKind kind ) = 0;
 
-	//! Template method: resolves a type given its \a typeName and whether it is an array.
-	//! \param typeName may be a full or relative type name.
+	/*!
+		Template method: resolves a type given its \a typeName and whether it is an array.
+		\param typeName may be a full or relative type name.
+	 */
 	virtual IType* resolveType( const location& loc, const std::string& typeName, bool isArray = false ) = 0;
 
-	//! Returns the type created by our ITypeBuilder.
-	//! Notice that onTypeSpecification() should have been called before.
+	//! Reusable method to extract an annotation from an object.
+	IAnnotation* getAnnotationFrom( IObject* object );
+
+	/*!
+		Creates or gets the default (shared) instance of the given annotation type.
+		This instance can be re-used at places where no annotation data is specified.
+	 */
+	virtual IAnnotation* getDefaultAnnotationInstance( IType* type ) = 0;
+
+	/*!
+		Returns the type created by our ITypeBuilder.
+		Notice that onTypeSpecification() should have been called before.
+	 */
 	IType* getType();
 
-	//! Retrieves an imported IType* given its local type name (i.e. its alias).
-	//! Returns NULL if the alias does not identify an imported type.
+	/*!
+		Retrieves an imported IType* given its local type name (i.e. its alias).
+		Returns NULL if the alias does not identify an imported type.
+	 */
 	IType* findImportedType( const std::string& alias );
 
 private:

@@ -64,7 +64,7 @@ co::IComponent* ModulePartLoader_Base::getComponent()
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* ModulePartLoader_Base::getService( co::IPort* port )
+co::IService* ModulePartLoader_Base::getServiceAt( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -76,7 +76,7 @@ co::IService* ModulePartLoader_Base::getService( co::IPort* port )
 	return res;
 }
 
-void ModulePartLoader_Base::setService( co::IPort* receptacle, co::IService* service )
+void ModulePartLoader_Base::setServiceAt( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

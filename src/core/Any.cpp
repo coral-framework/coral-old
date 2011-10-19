@@ -1205,7 +1205,7 @@ void Any::castFrom( const State& s )
 					return;
 			}
 		}
-		else
+		else if( s.kind != TK_NONE )
 		{
 			// get<value>: s must contain a value
 			if( !s.isReference && !s.isPointer )

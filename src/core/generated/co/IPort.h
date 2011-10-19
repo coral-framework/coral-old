@@ -33,7 +33,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IPort> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IPort> { static const char* get() { return "co.IPort"; } };
-template<> struct typeOf<co::IPort> : public typeOfBase<co::IPort, IInterface> {};
 } // namespace co
 
 #endif // _CO_IPORT_H_
