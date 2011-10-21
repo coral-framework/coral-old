@@ -1,5 +1,5 @@
 /*
-	Provides the special "@CppBlock" annotation.
+	Provides the special @co.CppBlock annotation.
  */
 component CppBlockAnnotation
 {

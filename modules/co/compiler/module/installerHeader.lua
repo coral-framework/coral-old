@@ -3,6 +3,9 @@ local function template( writer, c, t )
 
 	writer( [[
 
+#ifndef _MODULE_INSTALLER_H_
+#define _MODULE_INSTALLER_H_
+
 #include <co/RefPtr.h>
 #include <co/IReflector.h>
 #include <co/IModulePart.h>
@@ -23,7 +26,7 @@ public:
 ]] )
 
 	for i, t in ipairs( c.types ) do
-		if t.kind ~= 'TK_ENUM' then
+		if t.hasReflector then
 			writer( "\t\tTypeId_", t.name, ",\n" )
 		end
 	end
@@ -68,7 +71,7 @@ private:
 ]] )
 
 	for i, t in ipairs( c.types ) do
-		if t.kind ~= 'TK_ENUM' then
+		if t.hasReflector then
 			writer( "co::IReflector* __create", t.name, "Reflector();\n" )
 		end
 	end
@@ -76,6 +79,8 @@ private:
 	writer( "\n" )
 
 	c.utils.closeNamespaces( writer, c.moduleName )
+
+	writer( "\n#endif\n" )
 
 end
 

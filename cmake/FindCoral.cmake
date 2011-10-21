@@ -55,7 +55,7 @@ else()
 endif()
 
 # Launcher arguments to invoke the coral compiler
-set( CORAL_LAUNCH_COMPILER --csl acd lua.Launcher co.compiler.cli --ignoredupes )
+set( CORAL_COMPILER_ARGS --csl acd lua.Launcher co.compiler.cli --ignoredupes )
 
 ################################################################################
 # Function to get the current CORAL_PATH as a comma-separated string
@@ -71,32 +71,6 @@ function( CORAL_GET_PATH_STRING coralPathStr )
 	endforeach()
 	set( ${coralPathStr} ${result} PARENT_SCOPE )
 endfunction()
-
-################################################################################
-# Internal Macro to gather the list of types in a module
-################################################################################
-macro( CORAL_GATHER_MODULE_TYPES _moduleTypeNames _moduleName )
-	set( _resultList )
-	foreach( _repo ${CORAL_PATH} )
-		file( GLOB _cslFiles "${_repo}/${_moduleName}/*.csl" )
-		foreach( _file ${_cslFiles} )
-			# Get the type name and add it to the _resultList
-			get_filename_component( _name ${_file} NAME_WE )
-			list( APPEND _resultList ${_name} )
-
-			# Save the type's filename for later use in CORAL_GENERATE_MODULE.
-			# We issue a warning if the same type is gathered twice from two different files.
-			get_filename_component( _filename ${_file} ABSOLUTE )
-			set( _filenameKey "${_moduleName}_${_name}_FILENAME" )
-			if( DEFINED ${_filenameKey} )
-				MESSAGE( WARNING "Clashing CSL files found: '${${_filenameKey}}' clashes with '${_filename}'." )
-			else()
-				set( ${_filenameKey} "${_filename}" )
-			endif()
-		endforeach()
-	endforeach()
-	set( ${_moduleTypeNames} ${_resultList} )
-endmacro()
 
 ################################################################################
 # Function to generate mappings for a list of types
@@ -123,7 +97,7 @@ FUNCTION( CORAL_GENERATE_MAPPINGS generatedHeaders )
 	)
 
 	ADD_CUSTOM_COMMAND( OUTPUT ${resultList}
-		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS} ${CORAL_LAUNCH_COMPILER} ${ARGN}
+		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS} ${CORAL_COMPILER_ARGS} ${ARGN}
 		DEPENDS ${CORAL_LAUNCHER} "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		COMMENT "Running the Coral Compiler..."
@@ -138,63 +112,46 @@ ENDFUNCTION()
 ################################################################################
 # Function to generate code for a module (all extra args are passed to coralc)
 ################################################################################
-FUNCTION( CORAL_GENERATE_MODULE generatedSourceFiles moduleName )
-	SET( outDir "${CMAKE_CURRENT_BINARY_DIR}/generated" )
-
-	# Initialize the list with files that are always generated.
-	SET( resultList
-		"${outDir}/__Bootstrap.cpp"
-		"${outDir}/ModuleInstaller.h"
-		"${outDir}/ModuleInstaller.cpp"
-	)
-
-	# Gather a list of the module's types.
-	CORAL_GATHER_MODULE_TYPES( moduleTypeNames ${moduleName} )
-
-	SET( hasModulePart FALSE )
-	FOREACH( typeName ${moduleTypeNames} )
-		IF( typeName STREQUAL "${moduleName}" )
-			SET( hasModulePart TRUE )
-		ENDIF()
-
-		# Determine if the type is a component (if so, add the extra files)
-		FILE( STRINGS "${${moduleName}_${typeName}_FILENAME}" typeDeclLine LIMIT_COUNT 1
-			REGEX "(component|enum)[ \t]+${typeName}[ \t]?.*" )
-		STRING( REGEX REPLACE "([a-z]+)[ \t]+${typeName}[ \t]?.*" "\\1" typeKind "${typeDeclLine}" )
-
-		IF( typeKind STREQUAL "component" )
-			LIST( APPEND resultList "${outDir}/${typeName}_Base.h" "${outDir}/${typeName}_Base.cpp" )
-		ENDIF()
-
-		IF( NOT typeKind STREQUAL "enum" )
-			LIST( APPEND resultList "${outDir}/${typeName}_Reflector.cpp" )
-		ENDIF()
-	ENDFOREACH()
-
-	# If a IModulePart type was not declared, add the default one
-	IF( NOT hasModulePart )
-		LIST( APPEND resultList "${outDir}/__ModulePart.cpp" )
-	ENDIF()
+function( CORAL_GENERATE_MODULE generatedSourceFiles moduleName )
+	set( outDir "${CMAKE_CURRENT_BINARY_DIR}/generated" )
 
 	CORAL_GET_PATH_STRING( coralPathStr )
 
-	ADD_CUSTOM_COMMAND( OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
+	# If the Coral Compiler is currently available...
+	if( EXISTS ${CORAL_LAUNCHER} )
+		# Use the Compiler to get the actual list of generated source files
+		execute_process(
+			COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS}
+						${CORAL_COMPILER_ARGS} --list -g ${moduleName} ${ARGN}
+			OUTPUT_VARIABLE resultList
+		)
+		string( REGEX REPLACE "([^\n]+)\n*" "${outDir}/\\1;" resultList ${resultList} )
+		list( LENGTH resultList resultListLen )
+		if( resultListLen LESS 3 )
+			message( FATAL_ERROR "Error using the Coral Compiler to get the list of generated module files." )
+		endif()
+	else()
+		# Fall back to the default all-in-one source file
+		set( resultList "${outDir}/__AllInOne.cpp" )
+	endif()
+
+	add_custom_command( OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
 		COMMAND ${CMAKE_COMMAND} -E echo "Forcing dependency check for Coral..."
 	)
 
-	ADD_CUSTOM_COMMAND( OUTPUT ${resultList}
+	add_custom_command( OUTPUT ${resultList}
 		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS}
-			${CORAL_LAUNCH_COMPILER} -g ${moduleName} ${ARGN}
+					${CORAL_COMPILER_ARGS} -g ${moduleName} ${ARGN}
 		DEPENDS ${CORAL_LAUNCHER} "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		COMMENT "Running the Coral Compiler..."
 	)
 
-	SET( ${generatedSourceFiles} ${resultList} PARENT_SCOPE )
+	set( ${generatedSourceFiles} ${resultList} PARENT_SCOPE )
 
 	# "make clean" should delete the coralc cache file
-	SET_PROPERTY( DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${outDir}/__coralc_cache.lua" )
-ENDFUNCTION()
+	set_property( DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${outDir}/__coralc_cache.lua" )
+endfunction()
 
 ################################################################################
 # Defines a target to generate docs for a module. Passes extra args to coralc.
@@ -204,7 +161,7 @@ FUNCTION( CORAL_GENERATE_DOX targetName moduleName outDir )
 
 	ADD_CUSTOM_TARGET( ${targetName}
 		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS}
-			${CORAL_LAUNCH_COMPILER} --dox -g ${moduleName} -o ${outDir} ${ARGN}
+			${CORAL_COMPILER_ARGS} --dox -g ${moduleName} -o ${outDir} ${ARGN}
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		COMMENT "Running the Coral Compiler to extract documentation..."
 	)

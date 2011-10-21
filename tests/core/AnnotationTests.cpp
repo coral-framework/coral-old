@@ -38,7 +38,7 @@ TEST( AnnotationTests, annotationTypeNotAComponent )
 TEST( AnnotationTests, annotationTypeReflectorError )
 {
 	CSL_TEST_BEGIN( "AnnotationTests.TypeHasNoReflector" )
-	CSL_EXPECT_ERROR( "could not obtain a reflector for 'AnnotationTests.NoReflectorAnnotation'", "TypeHasNoReflector.csl", 1 )
+	CSL_EXPECT_ERROR( "could not load a reflector for 'AnnotationTests.NoReflectorAnnotation'", "TypeHasNoReflector.csl", 1 )
 	CSL_TEST_END()
 }
 

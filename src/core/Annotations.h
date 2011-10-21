@@ -12,7 +12,7 @@
 
 namespace co {
 
-//---------- @CppBlock ---------------------------------------------------------
+//---------- @co.CppBlock ------------------------------------------------------
 
 class CppBlockAnnotation : public CppBlockAnnotation_Base
 {
@@ -28,7 +28,7 @@ private:
 	std::string _value;
 };
 
-//---------- @Documentation ----------------------------------------------------
+//---------- @co.Documentation -------------------------------------------------
 
 class DocumentationAnnotation : public DocumentationAnnotation_Base
 {

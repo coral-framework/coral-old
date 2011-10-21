@@ -79,9 +79,3 @@ IF( VALGRIND_COMMAND )
 		--suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp $<TARGET_FILE:tests_moduleA>
 	)
 ENDIF()
-
-################################################################################
-# Source Groups
-################################################################################
-
-SOURCE_GROUP( "@Generated" FILES ${_GENERATED_FILES} )

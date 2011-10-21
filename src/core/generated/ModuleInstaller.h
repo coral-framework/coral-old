@@ -33,6 +33,7 @@ public:
 		TypeId_ICppBlock,
 		TypeId_IDocumentation,
 		TypeId_IDynamicServiceProvider,
+		TypeId_IDynamicTypeProvider,
 		TypeId_IEnum,
 		TypeId_IException,
 		TypeId_IField,
@@ -140,6 +141,7 @@ co::IReflector* __createICompositeTypeReflector();
 co::IReflector* __createICppBlockReflector();
 co::IReflector* __createIDocumentationReflector();
 co::IReflector* __createIDynamicServiceProviderReflector();
+co::IReflector* __createIDynamicTypeProviderReflector();
 co::IReflector* __createIEnumReflector();
 co::IReflector* __createIExceptionReflector();
 co::IReflector* __createIFieldReflector();

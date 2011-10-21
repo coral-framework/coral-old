@@ -114,8 +114,8 @@ ENDIF()
 SOURCE_GROUP( "Core" REGULAR_EXPRESSION ".*" )
 SOURCE_GROUP( "" FILES "CMakeLists.txt" )
 
-SOURCE_GROUP( "@Mappings" FILES ${MAPPING_HEADER_FILES} )
 SOURCE_GROUP( "@Generated" FILES ${GENERATED_MODULE_FILES} )
+SOURCE_GROUP( "@Generated\\co" FILES ${MAPPING_HEADER_FILES} )
 
 FILE( GLOB moduleFiles Module*.* )
 SOURCE_GROUP( "Module System" FILES ${moduleFiles} )

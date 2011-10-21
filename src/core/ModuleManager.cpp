@@ -207,7 +207,6 @@ IModule* ModuleManager::load( const std::string& moduleName )
 		CORAL_THROW( ModuleLoadException,
 			"none of the module loaders recognized '" << moduleName << "' as a module" );
 
-	verifyModuleIntegrity( module );
 	syncModuleWithSystemState( module );
 
 	return module;
@@ -247,35 +246,6 @@ void ModuleManager::updateModule( IModule* module, ModuleState toState )
 
 	if( toState >= ModuleState_Disposed )
 		module->dispose();
-}
-
-void ModuleManager::verifyModuleIntegrity( IModule* module )
-{
-	// all module types must have their reflectors installed
-	Range<IType* const> types = module->getNamespace()->getTypes();
-	try
-	{
-		for( ; types; types.popFirst() )
-		{
-			if( types.getFirst()->getReflector() == NULL )
-			{
-				/*
-					Actually, if the type has no reflector, getReflector() should
-					raise an exception. But just in case, we'll also check if it's NULL.
-				 */
-				throw std::exception();
-			}
-		}
-	}
-	catch( std::exception& e )
-	{
-		assert( !types.isEmpty() );
-		module->abort();
-		CORAL_THROW( ModuleLoadException, "module '"
-				<< module->getNamespace()->getFullName()
-				<< "' was aborted because it did not provide a reflector for type '"
-				<< types.getFirst()->getFullName() << "' (" << e.what() << ")" );
-	}
 }
 
 void ModuleManager::syncModuleWithSystemState( IModule* module )

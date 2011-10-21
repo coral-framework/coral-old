@@ -19,11 +19,13 @@ public:
 		TypeId_Component,
 		TypeId_Exception,
 		TypeId_ILauncher,
+		TypeId_IScripted,
 		TypeId_IState,
 		TypeId_Launcher,
 		TypeId_lua,
 		TypeId_ModulePart,
 		TypeId_ModulePartLoader,
+		TypeId_ScriptedAnnotation,
 		TypeId_Universe,
 		TypeCount
 	};
@@ -64,11 +66,13 @@ private:
 co::IReflector* __createComponentReflector();
 co::IReflector* __createExceptionReflector();
 co::IReflector* __createILauncherReflector();
+co::IReflector* __createIScriptedReflector();
 co::IReflector* __createIStateReflector();
 co::IReflector* __createLauncherReflector();
 co::IReflector* __createluaReflector();
 co::IReflector* __createModulePartReflector();
 co::IReflector* __createModulePartLoaderReflector();
+co::IReflector* __createScriptedAnnotationReflector();
 co::IReflector* __createUniverseReflector();
 
 } // namespace lua

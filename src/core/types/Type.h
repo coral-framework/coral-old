@@ -73,6 +73,8 @@ public:
 
 	IReflector* getReflector() { return TypeImpl::getReflector( this ); }
 	void setReflector( IReflector* reflector ) { _reflector = reflector; }
+
+	IReflector* getCurrentReflector() { return _reflector.get(); }
 };
 
 /*!

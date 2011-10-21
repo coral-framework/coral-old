@@ -80,6 +80,14 @@ function TestComponent.testItf:testAnyReturn( param )
 end
 
 function M:initialize( module )
+	-- try incorrect usages of co.Component
+	ASSERT_ERROR( function() co.Component( 3 ) end, "illegal argument to co.Component()" )
+	ASSERT_ERROR( function() co.Component( "MyComp", { name = "MyComp" } ) end, "could not load type 'MyComp'" )
+	ASSERT_ERROR( function() co.Component( "lua.Exception" ) end, "type 'lua.Exception' is not a component" )
+	ASSERT_ERROR( function() co.Component( "lua.ModulePart" ) end,
+		"component 'lua.ModulePart' already has a reflector and cannot be re-implemented" )
+	ASSERT_ERROR( function() co.Component{} end, "you must specify a component name" )
+
 	-- BatComponent tests
 	testBatInstance( BatComponent{ bloodsucker = false } )
 	ASSERT_ERROR( function() testBatInstance( BatComponent{ bloodsucker = true } ) end, "true != false" )

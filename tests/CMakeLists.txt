@@ -29,8 +29,10 @@ IF( GTEST_FOUND )
 	ADD_SUBDIRECTORY( moduleB )
 	ADD_SUBDIRECTORY( regen )
 
-	# Add a custom target to build all tests
-	ADD_CUSTOM_TARGET( tests DEPENDS tests_core tests_lua tests_moduleA tests_moduleB tests_regen )
+	# Add a custom target to build all test artifacts
+	ADD_CUSTOM_TARGET( tests DEPENDS launcher coral coralc
+		tests_core tests_lua tests_moduleA tests_moduleB tests_regen
+	)
 
 ELSE()
 	MESSAGE( "WARNING: gtest not found - most tests have been disabled!" )

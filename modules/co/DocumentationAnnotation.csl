@@ -1,5 +1,5 @@
 /*
-	Provides the special "@Documentation" annotation.
+	Provides the special @co.Documentation annotation.
  */
 component DocumentationAnnotation
 {

@@ -7,7 +7,7 @@
 
 namespace co {
 
-//---------- @CppBlock ---------------------------------------------------------
+//---------- @co.CppBlock ------------------------------------------------------
 
 CppBlockAnnotation::CppBlockAnnotation()
 {
@@ -31,7 +31,7 @@ void CppBlockAnnotation::setValue( const std::string& value )
 
 CORAL_EXPORT_COMPONENT( CppBlockAnnotation, CppBlockAnnotation );
 
-//---------- @Documentation ----------------------------------------------------
+//---------- @co.Documentation -------------------------------------------------
 
 DocumentationAnnotation::DocumentationAnnotation()
 {

@@ -1,0 +1,16 @@
+/*
+	Base interface for annotations that enable dynamic types.
+
+	The Coral compiler does not generate code for components annotated with this
+	service. Such components are denominated <em>dynamic components</em>, and their
+	reflectors must be provided by the IDynamicTypeProvider annotation itself.
+ */
+interface IDynamicTypeProvider extends IAnnotation
+{
+	/*
+		Provides a reflector for the given type (or raises an exception if not possible).
+		\pre type.currentReflector == nil
+		\post type.currentReflector ~= nil
+	 */
+	void provideReflectorFor( in co.IType type );
+};

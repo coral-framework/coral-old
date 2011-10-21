@@ -158,7 +158,7 @@ void ModulePartLoader::resolveModuleFunctions( Library* lib, BootstrapFunctions&
 
 	if( !bf.queryVerificationData || !bf.queryDependencies || !bf.modulePartInstance )
 		CORAL_THROW( ModuleLoadException, "incompatible library: '" << lib->getFileName()
-						<< "' does not properly export the module bootstrap functions" );
+			<< "' does not properly export the module bootstrap functions" );
 }
 
 bool ModulePartLoader::checkVerificationData( const std::string& data )

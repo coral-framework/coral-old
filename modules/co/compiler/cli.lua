@@ -15,6 +15,7 @@ collectgarbage( "stop" )
 
 local moduleName = nil
 local askedForDox = false
+local askedForList = false
 local askedForVersion = false
 
 local flags = {
@@ -43,6 +44,10 @@ end
 
 function flags.dox()
 	askedForDox = true
+end
+
+function flags.list()
+	askedForList = true
 end
 
 function flags.outdir( flag, dir )
@@ -79,6 +84,7 @@ Description:
 Available options:
   -p, --path EXTRA,DIRS  Add a list of repositories to the Coral path.
   -g, --generate MODULE  Generate source code for the specified module.
+      --list             Only list the source files that would be generated.
       --dox              Generate input for Doxygen, instead of source code.
   -o, --outdir DIR       Output dir for generated files (default: ./generated).
   -m, --mappingsdir DIR  Separate output dir for mappings (when not specified,
@@ -107,7 +113,12 @@ if askedForVersion then
 	return 0
 end
 
-if askedForDox and not moduleName then
+if askedForDox and askedForList then
+	print( "Error: --dox and --list are mutually exclusive options." )
+	return -2
+end
+
+if not moduleName and ( askedForDox or askedForList ) then
 	print( "Error: use -g to specify the module you want to generate documentation for." )
 	return -2
 end
@@ -116,7 +127,11 @@ end
 -- Main
 -------------------------------------------------------------------------------
 
-compiler.log = print
+if askedForList then
+	compiler.simulation = true
+else
+	compiler.log = print
+end
 
 local ok, err = xpcall( function()
 	for i = 1, #args do
@@ -127,7 +142,12 @@ local ok, err = xpcall( function()
 		if askedForDox then
 			compiler:generateDox( moduleName )
 		else
-			compiler:generateModule( moduleName )
+			local moduleSources = compiler:generateModule( moduleName )
+			if askedForList then
+				for i, sourceFile in ipairs( moduleSources ) do
+					print( sourceFile )
+				end
+			end
 		end
 	else
 		compiler:generateMappings()

@@ -234,19 +234,17 @@ local function defineComponentType( ns, typeName, provides, receives )
 	return typeBuilder:createType()
 end
 
-local ComponentMT = {}
-
-function co.Component( t )
+local function handleComponentSpecification( t )
 	local fullName = t.name
 	if not fullName then
-		error( "you must specify a component name", 2 )
+		error( "you must specify a component name", 3 )
 	end
 
 	local provides = t.provides
 	local receives = t.receives
 	local ok, err = pcall( checkComponentInterfaces, provides, receives )
 	if not ok then
-		error( "invalid component interfaces: " .. tostring( err ), 2 )
+		error( "invalid component interfaces: " .. tostring( err ), 3 )
 	end
 
 	local nsName, typeName = fullName:match( '(.+)%.([^%.]+)$' )
@@ -261,7 +259,7 @@ function co.Component( t )
 	end
 
 	if ns:getType( typeName ) then
-		error( "component name '" .. fullName .. "' clashes with an existing type", 2 )
+		error( "component name '" .. fullName .. "' clashes with an existing type", 3 )
 	end
 
 	local ok, ct = pcall( defineComponentType, ns, typeName, provides, receives )
@@ -269,24 +267,46 @@ function co.Component( t )
 		coTypeTransaction:commit()
 	else
 		coTypeTransaction:rollback()
-		error( "could not define a new component type: " .. tostring( ct ), 2 )
+		error( "could not define a new component type: " .. tostring( ct ), 3 )
 	end
 
-	-- convert 't' into a component prototype table
+	-- we reuse 't' as the component prototype table
 	t.name = nil
 	t.provides = nil
 	t.receives = nil
 
-	t.__provides = provides
-	t.__receives = receives
-	t.__reflector = coNewComponentType( ct, t )
+	return ct
+end
+
+local ComponentMT = {}
+
+function co.Component( t )
+	local componentType
+
+	local argType = type( t )
+	if argType == 'table' then
+		componentType = handleComponentSpecification( t )
+	elseif argType == 'string' then
+		componentType = coType[t]
+		if componentType.kind ~= 'TK_COMPONENT' then
+			error( "type '" .. t .. "' is not a component", 2 )
+		end
+		if componentType.currentReflector ~= nil then
+			error( "component '" .. t .. "' already has a reflector and cannot be re-implemented", 2 )
+		end
+		t = {}
+	else
+		error( "illegal argument to co.Component()", 2 )
+	end
+
+	t.__reflector = coNewComponentType( componentType, t )
 
 	-- a component prototype table is the MT for its facet and object tables
 	t.__index = function( _, k ) return t[k] end
 
 	-- create prototype tables for the facets
-	for k, v in pairs( provides ) do
-		t[k] = setmetatable( {}, t )
+	for i, facet in ipairs( componentType.facets ) do
+		t[facet.name] = setmetatable( {}, t )
 	end
 
 	return setmetatable( t, ComponentMT )

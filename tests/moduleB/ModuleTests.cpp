@@ -18,6 +18,7 @@
 #include <co/IllegalStateException.h>
 #include <co/ITypeTransaction.h>
 #include <co/IllegalArgumentException.h>
+#include <moduleA/IDummy.h>
 #include <moduleA/TestInterface.h>
 
 TEST( ModuleTests, setupSystemThenLoadModuleA )
@@ -233,4 +234,72 @@ TEST( ModuleTests, serviceDependencies )
 	// revert the isLazy option to its default value
 	sm->setIsLazy( true );
 	ASSERT_TRUE( sm->getIsLazy() );
+}
+
+TEST( ModuleTests, luaScriptedNoArg )
+{
+	try
+	{
+		co::RefPtr<co::IObject> obj( co::newInstance( "moduleB.LuaScriptedNoArg" ) );
+		FAIL() << "exception was not raised";
+	}
+	catch( co::Exception& e )
+	{
+		EXPECT_EQ( "error obtaining a reflector for type 'moduleB.LuaScriptedNoArg'"
+			" via provider '@lua.Scripted':"
+			" this annotation requires a script name as argument", e.getMessage() );
+	}
+}
+
+TEST( ModuleTests, luaScriptedMissing )
+{
+	try
+	{
+		co::RefPtr<co::IObject> obj( co::newInstance( "moduleB.LuaScriptedMissing" ) );
+		FAIL() << "exception was not raised";
+	}
+	catch( co::Exception& e )
+	{
+		EXPECT_EQ( 0, e.getMessage().find( "error obtaining a reflector for"
+			" type 'moduleB.LuaScriptedMissing' via provider"
+			" '@lua.Scripted': module 'moduleB.missingScript' not found:" ) );
+	}
+}
+
+TEST( ModuleTests, luaScriptedError )
+{
+	try
+	{
+		co::RefPtr<co::IObject> obj( co::newInstance( "moduleB.LuaScriptedError" ) );
+		FAIL() << "exception was not raised";
+	}
+	catch( co::Exception& e )
+	{
+		EXPECT_EQ( 0, e.getMessage().find( "error obtaining a reflector for type"
+			" 'moduleB.LuaScriptedError' via provider '@lua.Scripted':" ) );
+		EXPECT_NE( std::string::npos, e.getMessage().find( "faulty.lua:1: '=' expected near 'script'" ) );
+	}
+}
+
+TEST( ModuleTests, luaScriptedEmpty )
+{
+	try
+	{
+		co::RefPtr<co::IObject> obj( co::newInstance( "moduleB.LuaScriptedEmpty" ) );
+		FAIL() << "exception was not raised";
+	}
+	catch( co::Exception& e )
+	{
+		EXPECT_EQ( "error obtaining a reflector for type 'moduleB.LuaScriptedEmpty'"
+			" via provider '@lua.Scripted': script 'moduleB.empty' does"
+			" not implement 'moduleB.LuaScriptedEmpty'", e.getMessage() );
+	}
+}
+
+TEST( ModuleTests, luaScripted )
+{
+	co::RefPtr<co::IObject> objA( co::newInstance( "moduleB.LuaScriptedA" ) );
+	co::RefPtr<co::IObject> objB( co::newInstance( "moduleB.LuaScriptedB" ) );
+	EXPECT_EQ( "A's foo", objA->getService<moduleA::IDummy>()->getFoo() );
+	EXPECT_EQ( "B's foo", objB->getService<moduleA::IDummy>()->getFoo() );
 }

@@ -71,4 +71,3 @@ ADD_TEST(
 ################################################################################
 
 SOURCE_GROUP( "@Core" FILES ${CORE_HEADER_FILES} ${CORE_SOURCE_FILES} )
-SOURCE_GROUP( "@Generated" FILES ${_GENERATED_FILES} )

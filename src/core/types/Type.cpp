@@ -12,6 +12,8 @@
 #include <co/INamespace.h>
 #include <co/IModuleManager.h>
 #include <co/ModuleLoadException.h>
+#include <co/IDynamicTypeProvider.h>
+#include <co/NotSupportedException.h>
 #include <cassert>
 #include <sstream>
 
@@ -72,12 +74,12 @@ IReflector* TypeImpl::getReflector( IType* myType )
 			// if an exception was raised, it is fair to expect the reflector was not installed
 			assert( !_reflector.isValid() );
 
-			CORAL_THROW( ModuleLoadException, "could not obtain a reflector for '"
+			CORAL_THROW( ModuleLoadException, "could not load a reflector for '"
 							<< myType->getFullName() << "': " << e.what() );
 		}
 		catch( ... )
 		{
-			CORAL_THROW( ModuleLoadException, "could not obtain a reflector for '"
+			CORAL_THROW( ModuleLoadException, "could not load a reflector for '"
 							<< myType->getFullName() << "': unknown exception" );
 		}
 	}
@@ -87,9 +89,30 @@ IReflector* TypeImpl::getReflector( IType* myType )
 	if( _reflector.isValid() )
 		return _reflector.get();
 
-	CORAL_THROW( ModuleLoadException, "module '" << ns->getFullName() << "' is currently "
-		<< MODULE_STATE_STRINGS[module->getState()] << ", and type '"
-		<< myType->getFullName() << "' has no reflector" );
+	IDynamicTypeProvider* dtp = myType->getAnnotation<IDynamicTypeProvider>();
+	if( dtp )
+	{
+		try
+		{
+			dtp->provideReflectorFor( myType );
+			if( _reflector.isValid() )
+				return _reflector.get();
+
+			throw Exception( "no reflector was provided, though no exception was raised" );
+		}
+		catch( Exception& e )
+		{
+			const std::string& componentName = dtp->getProvider()->getComponent()->getFullName();
+			std::string annotationName( componentName, 0, componentName.size() - 10 );
+			CORAL_THROW( NotSupportedException, "error obtaining a reflector for type '"
+				<< myType->getFullName() << "' via provider '@" << annotationName
+				<< "': " << e.getMessage() );
+		}
+	}
+
+	CORAL_THROW( NotSupportedException, "could not obtain a reflector for type '"
+		<< myType->getFullName() << "' (module " << ns->getFullName()
+		<< " is currently " << MODULE_STATE_STRINGS[module->getState()] << ")" );
 }
 
 void TypeImpl::calculateSignatures( IType* myType )

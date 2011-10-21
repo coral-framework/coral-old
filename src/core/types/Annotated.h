@@ -41,7 +41,7 @@ public:
 
 		size_t count = _annotations.size();
 		for( size_t i = 0; i < count; ++i )
-			if( _annotations[i]->getInterface() == annotationType )
+			if( _annotations[i]->getInterface()->isSubTypeOf( annotationType ) )
 				return _annotations[i].get();
 
 		return NULL;

@@ -28,6 +28,8 @@ public:
 
 	virtual const co::Uuid& getBinarySignature() = 0;
 
+	virtual co::IReflector* getCurrentReflector() = 0;
+
 	virtual const std::string& getFullName() = 0;
 
 	virtual const co::Uuid& getFullSignature() = 0;

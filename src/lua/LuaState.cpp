@@ -35,7 +35,8 @@ LuaState::~LuaState()
 
 void LuaState::setup()
 {
-	assert( !sm_L );
+	assert( sm_L == NULL );
+	assert( sm_instancesTableRegIdx == 0 );
 
 	sm_L = luaL_newstate();
 	assert( sm_L );
@@ -75,7 +76,9 @@ void LuaState::tearDown()
 
 	// close our Lua universe
 	lua_close( sm_L );
+
 	sm_L = NULL;
+	sm_instancesTableRegIdx = 0;
 }
 
 void LuaState::dumpStack( lua_State* L )

@@ -49,7 +49,7 @@ FILE( GLOB TEST_SOURCE_FILES *Tests.cpp )
 
 # Create test executable
 ADD_EXECUTABLE( tests_moduleB EXCLUDE_FROM_ALL Main.cpp ${TEST_SOURCE_FILES} )
-ADD_DEPENDENCIES( tests_moduleB moduleB )
+ADD_DEPENDENCIES( tests_moduleB moduleB lua )
 
 CORAL_DEFAULT_TARGET_PROPERTIES( tests_moduleB )
 
@@ -82,9 +82,3 @@ IF( VALGRIND_COMMAND )
 		--suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp $<TARGET_FILE:tests_moduleB>
 	)
 ENDIF()
-
-################################################################################
-# Source Groups
-################################################################################
-
-SOURCE_GROUP( "@Generated" FILES ${_GENERATED_FILES} )

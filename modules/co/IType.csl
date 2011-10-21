@@ -41,4 +41,10 @@ interface IType extends IAnnotated
 		ModuleLoadException indicating that the reflector could not be obtained.
 	 */
 	IReflector reflector;
+
+	/*
+		Similar to 'reflector', but getting this field never causes a reflector to be loaded.
+		This returns the currently set reflector, which can be null.
+	 */
+	readonly IReflector currentReflector;
 };

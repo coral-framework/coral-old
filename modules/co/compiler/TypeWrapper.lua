@@ -170,6 +170,15 @@ function autoFields.fullSignatureStr( t )
 	return t.fullSignature:getString()
 end
 
+local coIDynamicTypeProvider = co.Type "co.IDynamicTypeProvider"
+function autoFields.isDynamic( t )
+	return t[coIDynamicTypeProvider] ~= nil
+end
+
+function autoFields.hasReflector( t )
+	return not t.isDynamic and t.kind ~= 'TK_ENUM'
+end
+
 function autoFields.includedHeaders( t )
 	autoFields.traverse( t )
 	return rawget( t, 'includedHeaders' )

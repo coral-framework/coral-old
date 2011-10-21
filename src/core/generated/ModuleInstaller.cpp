@@ -72,6 +72,7 @@ co::IReflector* co::ModuleInstaller::createReflector( TypeId typeId )
 	case TypeId_ICppBlock: res = co::__createICppBlockReflector(); break;
 	case TypeId_IDocumentation: res = co::__createIDocumentationReflector(); break;
 	case TypeId_IDynamicServiceProvider: res = co::__createIDynamicServiceProviderReflector(); break;
+	case TypeId_IDynamicTypeProvider: res = co::__createIDynamicTypeProviderReflector(); break;
 	case TypeId_IEnum: res = co::__createIEnumReflector(); break;
 	case TypeId_IException: res = co::__createIExceptionReflector(); break;
 	case TypeId_IField: res = co::__createIFieldReflector(); break;
