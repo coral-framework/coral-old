@@ -19,6 +19,18 @@
 
 namespace co {
 
+IAnnotation* selectAnnotation( Range<IAnnotation* const> annotations, IInterface* requestedType )
+{
+	if( !requestedType )
+		throw IllegalArgumentException( "illegal null requestedType" );
+
+	for( ; annotations; annotations.popFirst() )
+		if( annotations.getFirst()->getInterface()->isSubTypeOf( requestedType ) )
+			return annotations.getFirst();
+
+	return NULL;
+}
+
 // ------ TypeImpl -------------------------------------------------------------
 
 void TypeImpl::setType( INamespace* parent, const std::string& name, TypeKind kind )

@@ -6,14 +6,48 @@
 #ifndef _TYPE_H_
 #define _TYPE_H_
 
-#include "Annotated.h"
 #include "Type_Base.h"
 #include <co/Uuid.h>
-#include <co/RefPtr.h>
+#include <co/RefVector.h>
 #include <co/INamespace.h>
 #include <co/IReflector.h>
+#include <co/IAnnotation.h>
 
 namespace co {
+
+//! Selects an annotation by type, considering generalizations.
+IAnnotation* selectAnnotation( Range<IAnnotation* const> annotations, IInterface* requestedType );
+
+/*!
+	Re-usable implementation of co::IAnnotated.
+ */
+template<class Base>
+class Annotated : public Base
+{
+public:
+	Range<IAnnotation* const> getAnnotations()
+	{
+		return _annotations;
+	}
+
+	void setAnnotations( Range<IAnnotation* const> annotations )
+	{
+		return co::assign( annotations, _annotations );
+	}
+
+	inline void addAnnotation( IAnnotation* annotation )
+	{
+		_annotations.push_back( annotation );
+	}
+
+	IAnnotation* getAnnotation( IInterface* requestedType )
+	{
+		return selectAnnotation( _annotations, requestedType );
+	}
+
+private:
+	RefVector<IAnnotation> _annotations;
+};
 
 /*!
 	Re-usable implementation of IType.

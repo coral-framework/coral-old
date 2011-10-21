@@ -6,7 +6,7 @@
 #ifndef _CO_MEMBER_H_
 #define _CO_MEMBER_H_
 
-#include "Annotated.h"
+#include "Type.h"
 #include <co/IMember.h>
 
 namespace co {

@@ -26,14 +26,11 @@ interface IAnnotated
 	c++>
 
 	/*
-		Returns this service's annotation for the specified type,
+		Returns the first annotation that provides the requested service type,
 		if such an annotation is present; else null.
 
-		When more than one instance of the same annotation type is present,
-		this method will always return the first occurrence.
-
-		\throw co.IllegalArgumentException if \a annotationType is invalid.
+		\throw co.IllegalArgumentException if \a requestedType is invalid.
 	 */
-	IAnnotation getAnnotation( in IInterface annotationType )
+	IAnnotation getAnnotation( in IInterface requestedType )
 		raises IllegalArgumentException;
 };
