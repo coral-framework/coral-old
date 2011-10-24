@@ -203,29 +203,35 @@ ENDMACRO( CORAL_DEFAULT_TARGET_PROPERTIES )
 ################################################################################
 # Utility macro to set common properties for a module target (Coral Module)
 ################################################################################
-MACRO( CORAL_MODULE_TARGET_PROPERTIES moduleName )
+macro( CORAL_MODULE_TARGET_PROPERTIES moduleName )
+	if( ARGV2 )
+		set( targetName ${ARGV2} )
+	else()
+		set( targetName ${moduleName} )
+	endif()
 
-	# Copy or generate the module library into /modules/${moduleName}/
-	IF( XCODE_VERSION OR MSVC_IDE )
+	# Copy or generate the module library into /modules/${modulePath}/
+	string( REPLACE "." "/" modulePath ${moduleName} )
+	if( XCODE_VERSION OR MSVC_IDE )
 		# Copy the library after linking (makes sense for IDE's that create intermediate dirs)
-		FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/modules/${moduleName} )
-		IF( XCODE_VERSION )
-			SET( targetFileName "$(FULL_PRODUCT_NAME)" )
-		ELSE()
-			SET( targetFileName "$(TargetFileName)" ) # MSVC_IDE
-		ENDIF()
-		ADD_CUSTOM_COMMAND( TARGET ${moduleName} POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/${targetFileName}" ${CMAKE_BINARY_DIR}/modules/${moduleName}/
+		file( MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/modules/${modulePath}" )
+		if( XCODE_VERSION )
+			set( targetFileName "$(FULL_PRODUCT_NAME)" )
+		else()
+			set( targetFileName "$(TargetFileName)" ) # MSVC_IDE
+		endif()
+		add_custom_command( TARGET ${targetName} POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/${targetFileName}" "${CMAKE_BINARY_DIR}/modules/${modulePath}/"
 			COMMENT "Copying module '${moduleName}'..."
 		)
-	ELSE()
+	else()
 		# Create the library directly in the output dir
-		SET_TARGET_PROPERTIES( ${moduleName} PROPERTIES
-			LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/modules/${moduleName}
+		set_target_properties( ${targetName} PROPERTIES
+			LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/modules/${modulePath}"
 		)
-	ENDIF()
+	endif()
 
-ENDMACRO( CORAL_MODULE_TARGET_PROPERTIES )
+endmacro( CORAL_MODULE_TARGET_PROPERTIES )
 
 ################################################################################
 # Utility macro to set env vars for a test so it finds the coral library
