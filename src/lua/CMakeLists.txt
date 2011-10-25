@@ -15,9 +15,8 @@ INCLUDE_DIRECTORIES( libs libs/lua generated ${CORE_SOURCE_DIR}/generated )
 
 FILE( GLOB HEADER_FILES *.h )
 FILE( GLOB SOURCE_FILES *.cpp )
-FILE( GLOB GENERATED_LUA_SOURCES generated/*.cpp )
 
-ADD_LIBRARY( lua MODULE ${HEADER_FILES} ${SOURCE_FILES} ${GENERATED_LUA_SOURCES} )
+ADD_LIBRARY( lua MODULE ${HEADER_FILES} ${SOURCE_FILES} "generated/__AllInOne.cpp" )
 
 CORAL_DEFAULT_TARGET_PROPERTIES( lua )
 CORAL_MODULE_TARGET_PROPERTIES( lua )
@@ -39,12 +38,6 @@ ADD_CUSTOM_TARGET( lua_regen
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 	COMMENT "Forcing regeneration of the Lua module files..."
 )
-
-################################################################################
-# Source Groups
-################################################################################
-
-SOURCE_GROUP( "@Generated" FILES ${GENERATED_LUA_SOURCES} )
 
 ################################################################################
 # Install Rules

@@ -94,7 +94,7 @@ public:
 
 	co::uint32 getSize()
 	{
-		return sizeof(lua::ILauncher);
+		return sizeof(void*);
 	}
 
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )

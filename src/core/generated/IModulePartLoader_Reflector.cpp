@@ -100,7 +100,7 @@ public:
 
 	co::uint32 getSize()
 	{
-		return sizeof(co::IModulePartLoader);
+		return sizeof(void*);
 	}
 
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )

@@ -45,7 +45,7 @@ public:
 
 	virtual void addAnnotation( co::IAnnotation* annotation ) = 0;
 
-	virtual co::IAnnotation* getAnnotation( co::IInterface* annotationType ) = 0;
+	virtual co::IAnnotation* getAnnotation( co::IInterface* requestedType ) = 0;
 };
 
 } // namespace co

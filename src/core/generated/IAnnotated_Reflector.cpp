@@ -64,10 +64,10 @@ public:
 		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 0 ), range );
 	}
 
-	co::IAnnotation* getAnnotation( co::IInterface* annotationType_ )
+	co::IAnnotation* getAnnotation( co::IInterface* requestedType_ )
 	{
 		co::Any args[1];
-		args[0].set< co::IInterface* >( annotationType_ );
+		args[0].set< co::IInterface* >( requestedType_ );
 		co::Range<co::Any const> range( args, 1 );
 		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
 		return res.get< co::IAnnotation* >();
@@ -113,7 +113,7 @@ public:
 
 	co::uint32 getSize()
 	{
-		return sizeof(co::IAnnotated);
+		return sizeof(void*);
 	}
 
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
@@ -162,9 +162,9 @@ public:
 				break;
 			case 2:
 				{
-					co::IInterface* annotationType_ = args[++argIndex].get< co::IInterface* >();
+					co::IInterface* requestedType_ = args[++argIndex].get< co::IInterface* >();
 					argIndex = -1;
-					res.set< co::IAnnotation* >( p->getAnnotation( annotationType_ ) );
+					res.set< co::IAnnotation* >( p->getAnnotation( requestedType_ ) );
 				}
 				break;
 			default:

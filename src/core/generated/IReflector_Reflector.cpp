@@ -168,7 +168,7 @@ public:
 
 	co::uint32 getSize()
 	{
-		return sizeof(co::IReflector);
+		return sizeof(void*);
 	}
 
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )

@@ -3,6 +3,9 @@
  * See Copyright Notice in Coral.h
  */
 
+#ifndef _MODULE_INSTALLER_H_
+#define _MODULE_INSTALLER_H_
+
 #include <co/RefPtr.h>
 #include <co/IReflector.h>
 #include <co/IModulePart.h>
@@ -76,3 +79,5 @@ co::IReflector* __createScriptedAnnotationReflector();
 co::IReflector* __createUniverseReflector();
 
 } // namespace lua
+
+#endif

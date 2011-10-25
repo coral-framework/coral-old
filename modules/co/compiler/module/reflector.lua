@@ -260,7 +260,8 @@ public:
 	}
 ]] )
 	else
-		writer( "\tco::uint32 getSize()\n\t{\n\t\treturn sizeof(", t.cppName, ");\n\t}\n" )
+		local sizeofType = ( t.kind == 'TK_INTERFACE' and "void*" or t.cppName )
+		writer( "\tco::uint32 getSize()\n\t{\n\t\treturn sizeof(", sizeofType, ");\n\t}\n" )
 	end
 
 	if t.kind == 'TK_EXCEPTION' then

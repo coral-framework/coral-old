@@ -3,6 +3,9 @@
  * See Copyright Notice in Coral.h
  */
 
+#ifndef _MODULE_INSTALLER_H_
+#define _MODULE_INSTALLER_H_
+
 #include <co/RefPtr.h>
 #include <co/IReflector.h>
 #include <co/IModulePart.h>
@@ -198,3 +201,5 @@ co::IReflector* __createTypeTransactionReflector();
 co::IReflector* __createUuidReflector();
 
 } // namespace co
+
+#endif

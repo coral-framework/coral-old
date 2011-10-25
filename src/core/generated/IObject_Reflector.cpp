@@ -107,7 +107,7 @@ public:
 
 	co::uint32 getSize()
 	{
-		return sizeof(co::IObject);
+		return sizeof(void*);
 	}
 
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
