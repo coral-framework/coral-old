@@ -125,11 +125,11 @@ function( CORAL_GENERATE_MODULE generatedSourceFiles moduleName )
 						${CORAL_COMPILER_ARGS} --list -g ${moduleName} ${ARGN}
 			OUTPUT_VARIABLE resultList
 		)
-		string( REGEX REPLACE "([^\n]+)\n*" "${outDir}/\\1;" resultList ${resultList} )
-		list( LENGTH resultList resultListLen )
-		if( resultListLen LESS 3 )
-			message( FATAL_ERROR "Error using the Coral Compiler to get the list of generated module files." )
+		string( REGEX REPLACE "\\*\\*\\* Error \\*\\*\\*[ \n]*(.*)" "\\1" errorMsg "${resultList}" )
+		if( errorMsg )
+			message( FATAL_ERROR "Error reported by the Coral compiler: ${errorMsg}" )
 		endif()
+		string( REGEX REPLACE "([^\n]+)\n*" "${outDir}/\\1;" resultList ${resultList} )
 	else()
 		# Fall back to the default all-in-one source file
 		set( resultList "${outDir}/__AllInOne.cpp" )

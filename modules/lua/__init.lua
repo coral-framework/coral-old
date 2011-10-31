@@ -8,6 +8,7 @@ local pairs = pairs
 local ipairs = ipairs
 local tostring = tostring
 local setmetatable = setmetatable
+local strMatch = string.match
 
 local debug = require "debug"
 local rawgetmetatable = debug.getmetatable
@@ -100,10 +101,27 @@ co.typeOf = coTypeOf
 
 co.raise( exceptionType, message )
 
+Raises a Coral exception of the given type, with the specified message.
+
 ]]
 
 co.raise = function( exceptionType, message )
 	error( "{" .. exceptionType .. "}" .. message, 0 )
+end
+
+--[[----------------------------------------------------------------------------
+
+exceptionType, message = co.getException( err )
+
+Extracts the type and message of a Coral exception caught from Lua.
+If 'err' is not a Coral exception, returns nil and tostring( err ).
+
+]]
+
+co.getException = function( err )
+	local errStr = tostring( err )
+	local exceptionType, message = strMatch( errStr, "^{(.-)}(.*)$" )
+	return exceptionType, ( message or errStr )
 end
 
 

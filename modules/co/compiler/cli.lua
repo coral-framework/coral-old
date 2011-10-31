@@ -156,7 +156,8 @@ end, debug.traceback )
 
 if not ok then
 	print( "*** Error ***" )
-	print( err )
+	local exceptionType, exceptionMsg = co.getException( err )
+	print( exceptionMsg )
 	return -1
 end
 
