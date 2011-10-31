@@ -125,8 +125,8 @@ function( CORAL_GENERATE_MODULE generatedSourceFiles moduleName )
 						${CORAL_COMPILER_ARGS} --list -g ${moduleName} ${ARGN}
 			OUTPUT_VARIABLE resultList
 		)
-		string( REGEX REPLACE "\\*\\*\\* Error \\*\\*\\*[ \n]*(.*)" "\\1" errorMsg "${resultList}" )
-		if( errorMsg )
+		if( resultList MATCHES "\\*\\*\\* Error \\*\\*\\*" )
+			string( SUBSTRING "${resultList}" 14 -1 errorMsg )
 			message( FATAL_ERROR "Error reported by the Coral compiler: ${errorMsg}" )
 		endif()
 		string( REGEX REPLACE "([^\n]+)\n*" "${outDir}/\\1;" resultList ${resultList} )
