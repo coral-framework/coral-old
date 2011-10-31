@@ -25,7 +25,7 @@ add_dependencies( launcher lua )
 
 target_link_libraries( launcher core )
 
-CORAL_DEFAULT_TARGET_PROPERTIES( launcher )
+CORAL_TARGET( launcher )
 
 set_target_properties( launcher PROPERTIES
 	PROJECT_LABEL "Executable launcher"
@@ -38,7 +38,7 @@ set_target_properties( launcher PROPERTIES
 add_executable( coral coral.cpp ${EXTRA_SOURCES} )
 add_dependencies( coral launcher )
 
-CORAL_DEFAULT_TARGET_PROPERTIES( coral )
+CORAL_TARGET( coral )
 set_property( TARGET coral APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_NO_EXPORT" )
 set_target_properties( coral PROPERTIES	PROJECT_LABEL "Executable coral" )
 
@@ -49,7 +49,7 @@ set_target_properties( coral PROPERTIES	PROJECT_LABEL "Executable coral" )
 add_executable( coralc coralc.cpp ${EXTRA_SOURCES} )
 add_dependencies( coralc launcher )
 
-CORAL_DEFAULT_TARGET_PROPERTIES( coralc )
+CORAL_TARGET( coralc )
 set_property( TARGET coralc APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_NO_EXPORT" )
 set_target_properties( coralc PROPERTIES PROJECT_LABEL "Executable coralc" )
 

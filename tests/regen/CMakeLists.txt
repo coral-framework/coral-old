@@ -40,7 +40,7 @@ ADD_EXECUTABLE( tests_regen EXCLUDE_FROM_ALL ${CORE_HEADER_FILES} ${CORE_SOURCE_
 	../core/ReflectorTests.cpp
 )
 
-CORAL_DEFAULT_TARGET_PROPERTIES( tests_regen )
+CORAL_TARGET( tests_regen )
 
 SET_TARGET_PROPERTIES( tests_regen PROPERTIES
 	PROJECT_LABEL "Tests - Regeneration"

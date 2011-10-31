@@ -168,9 +168,9 @@ FUNCTION( CORAL_GENERATE_DOX targetName moduleName outDir )
 ENDFUNCTION()
 
 ################################################################################
-# Utility macro to set common properties for all targets
+# Utility macro to set common build options for targets that use Coral.
 ################################################################################
-MACRO( CORAL_DEFAULT_TARGET_PROPERTIES targetName )
+MACRO( CORAL_TARGET targetName )
 
 	# Artifacts always get a '_debug' suffix when built in debug mode
 	SET_PROPERTY( TARGET ${targetName} PROPERTY DEBUG_POSTFIX "_debug" )
@@ -198,17 +198,13 @@ MACRO( CORAL_DEFAULT_TARGET_PROPERTIES targetName )
 				"_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE" )
 	ENDIF()
 
-ENDMACRO( CORAL_DEFAULT_TARGET_PROPERTIES )
+ENDMACRO( CORAL_TARGET )
 
 ################################################################################
-# Utility macro to set common properties for a module target (Coral Module)
+# Utility macro to set common build options for Coral Module targets.
 ################################################################################
-macro( CORAL_MODULE_TARGET_PROPERTIES moduleName )
-	if( ARGV2 )
-		set( targetName ${ARGV2} )
-	else()
-		set( targetName ${moduleName} )
-	endif()
+macro( CORAL_MODULE_TARGET moduleName targetName )
+	CORAL_TARGET( ${targetName} )
 
 	# Copy or generate the module library into /modules/${modulePath}/
 	string( REPLACE "." "/" modulePath ${moduleName} )
@@ -231,7 +227,7 @@ macro( CORAL_MODULE_TARGET_PROPERTIES moduleName )
 		)
 	endif()
 
-endmacro( CORAL_MODULE_TARGET_PROPERTIES )
+endmacro( CORAL_MODULE_TARGET )
 
 ################################################################################
 # Utility macro to set env vars for a test so it finds the coral library
@@ -259,8 +255,7 @@ macro( CORAL_BUILD_CSL_MODULE moduleName )
 	CORAL_GENERATE_MODULE( _GENERATED_SOURCES ${moduleName} )
 	include_directories( ${CORAL_INCLUDE_DIRS} "${CMAKE_CURRENT_BINARY_DIR}/generated" )
 	add_library( ${moduleName} MODULE EXCLUDE_FROM_ALL ${_GENERATED_SOURCES} )
-	CORAL_DEFAULT_TARGET_PROPERTIES( ${moduleName} )
-	CORAL_MODULE_TARGET_PROPERTIES( ${moduleName} )
+	CORAL_MODULE_TARGET( ${moduleName} ${moduleName} )
 	target_link_libraries( ${moduleName} ${CORAL_LIBRARIES} )
 	source_group( "@Generated" FILES ${_GENERATED_SOURCES} )
 endmacro( CORAL_BUILD_CSL_MODULE )
