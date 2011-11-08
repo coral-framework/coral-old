@@ -12,7 +12,7 @@
 // co.MissingServiceException Mapping:
 namespace co {
 
-class MissingServiceException : public co::Exception
+class CORAL_EXPORT_EXCEPTION MissingServiceException : public co::Exception
 {
 public:
 	MissingServiceException()

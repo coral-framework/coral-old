@@ -12,7 +12,7 @@
 // co.IllegalNameException Mapping:
 namespace co {
 
-class IllegalNameException : public co::Exception
+class CORAL_EXPORT_EXCEPTION IllegalNameException : public co::Exception
 {
 public:
 	IllegalNameException()

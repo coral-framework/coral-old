@@ -12,7 +12,7 @@
 // co.IllegalStateException Mapping:
 namespace co {
 
-class IllegalStateException : public co::Exception
+class CORAL_EXPORT_EXCEPTION IllegalStateException : public co::Exception
 {
 public:
 	IllegalStateException()

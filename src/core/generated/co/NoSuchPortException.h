@@ -12,7 +12,7 @@
 // co.NoSuchPortException Mapping:
 namespace co {
 
-class NoSuchPortException : public co::Exception
+class CORAL_EXPORT_EXCEPTION NoSuchPortException : public co::Exception
 {
 public:
 	NoSuchPortException()

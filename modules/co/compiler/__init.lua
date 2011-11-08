@@ -325,17 +325,25 @@ local function loadCacheFile( filename, cachedTypes )
 	local f = io.open( filename, 'r' )
 	local code = f:read( "*a" )
 	f:close()
+
 	local chunk, err = load( code, filename, 't', cachedTypes )
 	if not chunk then
 		return print( "Error in cache file '" .. filename .. "': " .. tostring( err ) )
 	end
-	local ok, moreCachedTypes, numModuleFiles = pcall( chunk )
+
+	local ok, moreCachedTypes, numModuleFiles, compilerRevision = pcall( chunk )
 	if not ok then
 		return print( "Error in cache file '" .. filename .. "': " .. tostring( moreCachedTypes ) )
 	end
+
 	if type( moreCachedTypes ) ~= 'table' then
 		return print( "Cache file '" .. filename .. "' returned an invalid result (" .. tostring( moreCachedTypes ) .. ")." )
 	end
+
+	if compilerRevision ~= co.compilerOutputRevision then
+		return print( "Code generation rules have changed - forcing full regen... " )
+	end
+
 	for k, v in pairs( moreCachedTypes ) do
 		local current = cachedTypes[k]
 		if current then
@@ -363,7 +371,7 @@ return {
 	for k, v in pairs( cachedTypes ) do
 		f:write( '\t["', k, '"] = "', v, '",\n' )
 	end
-	f:write( "}, ", numModuleFiles, "\n" )
+	f:write( "}, ", numModuleFiles, ", ", co.compilerOutputRevision, "\n" )
 	f:close()
 end
 
@@ -375,7 +383,7 @@ function Compiler:loadCache()
 
 	-- if one of the standard, compiler-generated files is missing, ignore the cache files and
 	-- force a full update; this is a workaround for IDEs with inflexible 'clean' routines (e.g. MSVC)
-	-- which delete most of the generated source files, but not the cache files.
+	-- which delete most of the generated source files, but not the cache file.
 	local ignoreCache = (
 			( self.mappingsDir and not path.isFile( self.mappingsDir .. '/co/ISystem.h' ) ) or
 			( self.moduleName and not path.isFile( self.outDir .. '/__Bootstrap.cpp' ) )

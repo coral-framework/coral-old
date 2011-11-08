@@ -12,7 +12,7 @@
 // co.MissingInputException Mapping:
 namespace co {
 
-class MissingInputException : public co::Exception
+class CORAL_EXPORT_EXCEPTION MissingInputException : public co::Exception
 {
 public:
 	MissingInputException()

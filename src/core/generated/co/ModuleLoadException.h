@@ -12,7 +12,7 @@
 // co.ModuleLoadException Mapping:
 namespace co {
 
-class ModuleLoadException : public co::Exception
+class CORAL_EXPORT_EXCEPTION ModuleLoadException : public co::Exception
 {
 public:
 	ModuleLoadException()

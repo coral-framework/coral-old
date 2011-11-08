@@ -12,7 +12,7 @@
 // co.IllegalArgumentException Mapping:
 namespace co {
 
-class IllegalArgumentException : public co::Exception
+class CORAL_EXPORT_EXCEPTION IllegalArgumentException : public co::Exception
 {
 public:
 	IllegalArgumentException()

@@ -12,7 +12,7 @@
 // co.IllegalCastException Mapping:
 namespace co {
 
-class IllegalCastException : public co::Exception
+class CORAL_EXPORT_EXCEPTION IllegalCastException : public co::Exception
 {
 public:
 	IllegalCastException()

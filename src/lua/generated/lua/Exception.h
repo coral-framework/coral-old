@@ -12,7 +12,7 @@
 // lua.Exception Mapping:
 namespace lua {
 
-class Exception : public co::Exception
+class CORAL_EXPORT_EXCEPTION Exception : public co::Exception
 {
 public:
 	Exception()

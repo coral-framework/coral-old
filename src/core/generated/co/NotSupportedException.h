@@ -12,7 +12,7 @@
 // co.NotSupportedException Mapping:
 namespace co {
 
-class NotSupportedException : public co::Exception
+class CORAL_EXPORT_EXCEPTION NotSupportedException : public co::Exception
 {
 public:
 	NotSupportedException()

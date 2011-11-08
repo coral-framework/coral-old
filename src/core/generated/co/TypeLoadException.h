@@ -12,7 +12,7 @@
 // co.TypeLoadException Mapping:
 namespace co {
 
-class TypeLoadException : public co::Exception
+class CORAL_EXPORT_EXCEPTION TypeLoadException : public co::Exception
 {
 public:
 	TypeLoadException()
