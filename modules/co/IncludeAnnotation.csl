@@ -1,0 +1,7 @@
+/*
+	Provides the @co.Include annotation, for use with native classes.
+ */
+component IncludeAnnotation
+{
+	provides IInclude annotation;
+};

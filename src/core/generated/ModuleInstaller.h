@@ -40,6 +40,7 @@ public:
 		TypeId_IEnum,
 		TypeId_IException,
 		TypeId_IField,
+		TypeId_IInclude,
 		TypeId_IInterface,
 		TypeId_IllegalArgumentException,
 		TypeId_IllegalCastException,
@@ -54,6 +55,7 @@ public:
 		TypeId_IModulePartLoader,
 		TypeId_INamespace,
 		TypeId_INativeClass,
+		TypeId_IncludeAnnotation,
 		TypeId_Interface,
 		TypeId_IObject,
 		TypeId_IParameter,
@@ -148,6 +150,7 @@ co::IReflector* __createIDynamicTypeProviderReflector();
 co::IReflector* __createIEnumReflector();
 co::IReflector* __createIExceptionReflector();
 co::IReflector* __createIFieldReflector();
+co::IReflector* __createIIncludeReflector();
 co::IReflector* __createIInterfaceReflector();
 co::IReflector* __createIllegalArgumentExceptionReflector();
 co::IReflector* __createIllegalCastExceptionReflector();
@@ -162,6 +165,7 @@ co::IReflector* __createIModulePartReflector();
 co::IReflector* __createIModulePartLoaderReflector();
 co::IReflector* __createINamespaceReflector();
 co::IReflector* __createINativeClassReflector();
+co::IReflector* __createIncludeAnnotationReflector();
 co::IReflector* __createInterfaceReflector();
 co::IReflector* __createIObjectReflector();
 co::IReflector* __createIParameterReflector();

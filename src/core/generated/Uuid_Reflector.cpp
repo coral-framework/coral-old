@@ -3,7 +3,7 @@
  * See Copyright Notice in Coral.h
  */
 
-#include <Uuid_Adapter.h>
+#include "Uuid_Adapter.h"
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>

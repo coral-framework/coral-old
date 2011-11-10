@@ -108,11 +108,6 @@ IMethodBuilder* TypeBuilder::defineMethod( const std::string& )
 	CORAL_THROW( NotSupportedException, "the builder's type is not a class type" );
 }
 
-void TypeBuilder::defineNativeClass( const std::string&, const std::string& )
-{
-	CORAL_THROW( NotSupportedException, "the builder's type is not a native class" );
-}
-
 IType* TypeBuilder::createType()
 {
 	if( _typeWasCreated )
@@ -399,39 +394,12 @@ protected:
 class NativeClassBuilder : public TemplateBuilder<ClassTypeBuilder, NativeClass, TK_NATIVECLASS>
 {
 public:
-	void defineNativeClass( const std::string& nativeHeader, const std::string& nativeName )
-	{
-		assertNotCreated();
-
-		if( nativeHeader.empty() )
-			CORAL_THROW( IllegalArgumentException, "illegal empty header name" );
-
-		if( nativeName.empty() )
-			CORAL_THROW( IllegalArgumentException, "illegal empty native type name" );
-
-		_nativeHeader = nativeHeader;
-		_nativeName = nativeName;
-	}
-
 	void fillType()
 	{
-		if( _nativeHeader.empty() )
-			CORAL_THROW( MissingInputException, "missing native header" );
-
-		if( _nativeName.empty() )
-			CORAL_THROW( MissingInputException, "missing native name" );
-
-		_myType->setNativeHeader( _nativeHeader );
-		_myType->setNativeName( _nativeName );
-
 		_myType->addMembers( _fields );
 		_myType->addMembers( _methods );
 		_myType->sortMembers( _myType );
 	}
-
-private:
-	std::string _nativeHeader;
-	std::string _nativeName;
 };
 
 // ------ InterfaceBuilder -------------------------------------------------

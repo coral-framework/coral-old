@@ -76,6 +76,7 @@ co::IReflector* co::ModuleInstaller::createReflector( TypeId typeId )
 	case TypeId_IEnum: res = co::__createIEnumReflector(); break;
 	case TypeId_IException: res = co::__createIExceptionReflector(); break;
 	case TypeId_IField: res = co::__createIFieldReflector(); break;
+	case TypeId_IInclude: res = co::__createIIncludeReflector(); break;
 	case TypeId_IInterface: res = co::__createIInterfaceReflector(); break;
 	case TypeId_IllegalArgumentException: res = co::__createIllegalArgumentExceptionReflector(); break;
 	case TypeId_IllegalCastException: res = co::__createIllegalCastExceptionReflector(); break;
@@ -90,6 +91,7 @@ co::IReflector* co::ModuleInstaller::createReflector( TypeId typeId )
 	case TypeId_IModulePartLoader: res = co::__createIModulePartLoaderReflector(); break;
 	case TypeId_INamespace: res = co::__createINamespaceReflector(); break;
 	case TypeId_INativeClass: res = co::__createINativeClassReflector(); break;
+	case TypeId_IncludeAnnotation: res = co::__createIncludeAnnotationReflector(); break;
 	case TypeId_Interface: res = co::__createInterfaceReflector(); break;
 	case TypeId_IObject: res = co::__createIObjectReflector(); break;
 	case TypeId_IParameter: res = co::__createIParameterReflector(); break;

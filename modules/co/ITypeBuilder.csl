@@ -65,15 +65,6 @@ interface ITypeBuilder
 		raises NotSupportedException, IllegalArgumentException;
 
 	/*
-		Fills required information about a native class.
-
-		\throw NotSupportedException if the builder's type was already created, or is not a native class.
-		\throw IllegalArgumentException if any arguments are empty.
-	 */
-	void defineNativeClass( in string nativeHeader,  in string nativeName )
-		raises NotSupportedException, IllegalNameException;
-
-	/*
 		Finishes building the type and returns it.
 		This method must be called only once, after all definitions have been set.
 

@@ -169,18 +169,6 @@ public:
 
 	// co.INativeClass Methods:
 
-	const std::string& getNativeHeader()
-	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::INativeClass>( 0 ) );
-        return res.get< const std::string& >();
-	}
-
-	const std::string& getNativeName()
-	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::INativeClass>( 1 ) );
-        return res.get< const std::string& >();
-	}
-
 protected:
 	template<typename T>
 	co::IField* getField( co::uint32 index )
@@ -232,25 +220,15 @@ public:
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )
 	{
-		co::INativeClass* p = co::checkInstance<co::INativeClass>( instance, field );
-		switch( field->getIndex() )
-		{
-		case 0:		value.set< const std::string& >( p->getNativeHeader() ); break;
-		case 1:		value.set< const std::string& >( p->getNativeName() ); break;
-		default:	raiseUnexpectedMemberIndex();
-		}
+		co::checkInstance<co::INativeClass>( instance, field );
+		raiseUnexpectedMemberIndex();
+		CORAL_UNUSED( value );
 	}
 
 	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
-		co::INativeClass* p = co::checkInstance<co::INativeClass>( instance, field );
-		switch( field->getIndex() )
-		{
-		case 0:		raiseFieldIsReadOnly( field ); break;
-		case 1:		raiseFieldIsReadOnly( field ); break;
-		default:	raiseUnexpectedMemberIndex();
-		}
-		CORAL_UNUSED( p );
+		co::checkInstance<co::INativeClass>( instance, field );
+		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 

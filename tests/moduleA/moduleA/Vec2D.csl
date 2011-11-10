@@ -1,8 +1,19 @@
 /*
 	Proof-of-concept native class that wraps a std::pair<double,double>.
  */
-native class Vec2D ( <utility> std::pair<double, double> )
+@co.Include( "utility" )
+native class Vec2D
 {
+	<c++
+		namespace moduleA {
+			struct Vec2D
+			{
+				double x, y;
+				Vec2D() : x( 0 ), y ( 0 ) {;}
+			};
+		} // namespace moduleA
+	c++>
+
 	// X coordinate.
 	double x;
 

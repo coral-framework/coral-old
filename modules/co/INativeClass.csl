@@ -1,11 +1,6 @@
 /*
-	Type representing a native class (a C++ class wrapped as a Coral value).
+	Type representing a native class (a value type defined in C++).
  */
 interface INativeClass extends IClassType
 {
-	// Name of the header file where the native C++ type is defined.
-	readonly string nativeHeader;
-
-	// Fully-qualified name of the native C++ type.
-	readonly string nativeName;
 };

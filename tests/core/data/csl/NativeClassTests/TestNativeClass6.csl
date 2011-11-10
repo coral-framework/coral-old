@@ -1,5 +1,0 @@
-native class TestNativeClass6 ( <a> a::_ )
-{
-string[] a;
-
-};

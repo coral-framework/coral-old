@@ -1,8 +1,10 @@
+local coICppBlock = co.Type "co.ICppBlock"
+
 local function template( writer, c, t )
-	writer( [[
-	// This is a native class mapping.
-	// You may use type ']], t.nativeName, [[' directly, or through the typedef below.
-	typedef ]], t.nativeName, " ", t.name, ";\n" )
+	local cppBlock = t[coICppBlock]
+	if cppBlock then
+		writer( cppBlock.value )
+	end
 end
 
 return template

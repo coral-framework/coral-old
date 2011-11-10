@@ -9,17 +9,12 @@ local function template( writer, c, t )
 #include <co/TypeTraits.h>
 ]] )
 
-	if t.kind == 'TK_NATIVECLASS' then
-		writer( "#include <", t.nativeHeader, ">\n" )
-	else
+	if t.kind ~= 'TK_NATIVECLASS' then
 		t:writeIncludesAndFwdDecls( writer )
+		writer( "\n// ", t.fullName, " Mapping:\n" )
+		c.utils.openNamespaces( writer, t.namespace.fullName )
+		writer( "\n" )
 	end
-
-	writer( "\n// ", t.fullName, " Mapping:\n" )
-
-	c.utils.openNamespaces( writer, t.namespace.fullName )
-
-	writer( "\n" )
 end
 
 return template

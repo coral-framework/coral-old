@@ -66,7 +66,6 @@ public:
 	void defineBaseType( IType* superType );
 	void definePort( const std::string& name, IInterface* type, bool isFacet );
 	IMethodBuilder* defineMethod( const std::string& name );
-	void defineNativeClass( const std::string& nativeHeader, const std::string& nativeName );
 	IType* createType();
 
 protected:

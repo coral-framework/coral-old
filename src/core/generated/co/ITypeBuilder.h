@@ -43,8 +43,6 @@ public:
 
 	virtual co::IMethodBuilder* defineMethod( const std::string& name ) = 0;
 
-	virtual void defineNativeClass( const std::string& nativeHeader, const std::string& nativeName ) = 0;
-
 	virtual void definePort( const std::string& name, co::IInterface* type, bool isFacet ) = 0;
 };
 

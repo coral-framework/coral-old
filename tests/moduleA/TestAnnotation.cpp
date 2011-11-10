@@ -4,6 +4,7 @@
  */
 
 #include "TestAnnotation_Base.h"
+#include <moduleA/Vec2D.h>
 #include <co/Any.h>
 #include <co/IType.h>
 #include <co/CSLError.h>
@@ -91,6 +92,9 @@ public:
 	const co::Uuid& getUuid() { return _uuid; }
 	void setUuid( const co::Uuid& uuid ) { _uuid = uuid; }
 
+	const Vec2D& getVec2D() { return _vec2d; }
+	void setVec2D( const Vec2D& vec2d ) { _vec2d = vec2d; }
+
 	double getValue() { return _value; }
 	void setValue( double value ) { _value = value; }
 
@@ -117,6 +121,7 @@ private:
 	co::TypeKind _typeKind;
 	co::CSLError _cslError;
 	co::Uuid _uuid;
+	Vec2D _vec2d;
 	
 	co::IType* _type;
 };

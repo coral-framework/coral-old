@@ -1,4 +1,4 @@
-native class TestNativeClass_invalid4 ( ) a::_a <ba>
+native class TestNativeClass_invalid4 ( )
 {
 string[] a;
 

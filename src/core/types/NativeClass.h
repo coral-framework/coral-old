@@ -18,18 +18,6 @@ class NativeClass : public ClassType<NativeClass_Base>
 {
 public:
 	virtual ~NativeClass();
-
-	// internal methods:
-	void setNativeName( const std::string& nativeName );
-	void setNativeHeader( const std::string& nativeHeaderFile );
-
-	// INativeClass methods:
-	const std::string& getNativeName();
-	const std::string& getNativeHeader();
-
-private:
-	std::string _nativeName;
-	std::string _nativeHeaderFile;
 };
 
 } // namespace co

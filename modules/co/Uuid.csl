@@ -1,8 +1,17 @@
 /*
 	A 128-bit Universally Unique IDentifier (UUID).
  */
-native class Uuid ( <co/reserved/Uuid.h> Uuid )
+native class Uuid
 {
+	<c++
+		/*
+			Note: only ubiquitous header files can be included from within
+			a native class. The preferred solution is to forward declare the
+			type and use the @co.Include( "headername.h" ) annotation.
+		 */
+		#include <co/reserved/Uuid.h>
+	c++>
+
 	// True if this is the null UUID (that is, "00000000-0000-0000-0000000000000000").
 	readonly bool isNull;
 

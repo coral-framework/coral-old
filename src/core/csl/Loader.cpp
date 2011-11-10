@@ -235,14 +235,6 @@ void Loader::onTypeDecl( const location& loc, const std::string& name, bool isAr
 	_lastDeclTypeLocation = loc;
 }
 
-void Loader::onNativeClass( const location& loc, const std::string& cppHeader, const std::string& cppType )
-{
-	// cppHeader comes wrapped between <>'s
-	assert( cppHeader.length() >= 2 );
-	CATCH_ERRORS( loc, _typeBuilder->defineNativeClass(
-		cppHeader.substr( 1, cppHeader.length() - 2 ), cppType ) );
-}
-
 void Loader::onBaseType( const location& loc, const std::string& name )
 {
 	IType* type = resolveType( loc, name );
@@ -428,16 +420,6 @@ IType* Loader::getType()
 	assert( _typeBuilder.isValid() );
 	IType* type = _typeBuilder->createType();
 
-	if( _doc.isValid() )
-		type->addAnnotation( _doc.get() );
-
-	if( !_cppBlock.empty() )
-	{
-		RefPtr<ICppBlock> cppBlock = new CppBlockAnnotation;
-		cppBlock->setValue( _cppBlock );
-		type->addAnnotation( cppBlock.get() );
-	}
-
 	if( !_annotations.empty() )
 	{
 		_annotations.pop_back();
@@ -451,6 +433,16 @@ IType* Loader::getType()
 			assert( m );
 			m->setAnnotations( it->annotations );
 		}
+	}
+
+	if( _doc.isValid() )
+		type->addAnnotation( _doc.get() );
+
+	if( !_cppBlock.empty() )
+	{
+		RefPtr<ICppBlock> cppBlock = new CppBlockAnnotation;
+		cppBlock->setValue( _cppBlock );
+		type->addAnnotation( cppBlock.get() );
 	}
 
 	return type;

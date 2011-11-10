@@ -1,3 +1,5 @@
+local coIInclude = co.Type "co.IInclude"
+
 local function template( writer, c, t )
 	c.header( writer, c, "Adapter generated for native class '", t.fullName, "'" )
 
@@ -7,6 +9,11 @@ local function template( writer, c, t )
 #define _]], t.fullNameUpperUnderline, [[_ADAPTER_H_
 
 ]] )
+
+	local include = t[coIInclude]
+	if include then
+		writer( "#include <", include.value, "> // added by co.Include()\n\n" )
+	end
 
 	t:writeIncludesAndFwdDecls( writer )
 

@@ -8,22 +8,22 @@
 
 double moduleA::Vec2D_Adapter::getX( moduleA::Vec2D& self )
 {
-	return self.first;
+	return self.x;
 }
 
 void moduleA::Vec2D_Adapter::setX( moduleA::Vec2D& self, double x )
 {
-	self.first = x;
+	self.x = x;
 }
 
 double moduleA::Vec2D_Adapter::getY( moduleA::Vec2D& self )
 {
-	return self.second;
+	return self.y;
 }
 
 void moduleA::Vec2D_Adapter::setY( moduleA::Vec2D& self, double y )
 {
-	self.second = y;
+	self.y = y;
 }
 
 double moduleA::Vec2D_Adapter::getLength( moduleA::Vec2D& self )
@@ -33,29 +33,29 @@ double moduleA::Vec2D_Adapter::getLength( moduleA::Vec2D& self )
 
 double moduleA::Vec2D_Adapter::getLength2( moduleA::Vec2D& self )
 {
-	return self.first * self.first + self.second * self.second;
+	return self.x * self.x + self.y * self.y;
 }
 
 void moduleA::Vec2D_Adapter::set( moduleA::Vec2D& self, double x, double y )
 {
-	self.first = x;
-	self.second = y;
+	self.x = x;
+	self.y = y;
 }
 
 void moduleA::Vec2D_Adapter::get( moduleA::Vec2D& self, double& x, double& y )
 {
-	x = self.first;
-	y = self.second;
+	x = self.x;
+	y = self.y;
 }
 
 double moduleA::Vec2D_Adapter::dot( moduleA::Vec2D& self, const moduleA::Vec2D& other )
 {
-	return self.first * other.first + self.second * other.second;
+	return self.x * other.x + self.y * other.y;
 }
 
 bool moduleA::Vec2D_Adapter::equals( moduleA::Vec2D& self, const moduleA::Vec2D& other )
 {
-	return self.first == other.first && self.second == other.second;
+	return self.x == other.x && self.y == other.y;
 }
 
 const moduleA::Vec2D& moduleA::Vec2D_Adapter::testInOut( moduleA::Vec2D& self,

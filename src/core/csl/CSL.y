@@ -71,8 +71,6 @@
 %token	<str>	COMMENT			"comment"
 %token			COMPONENT		"component"
 %token	<str>	CPP_BLOCK		"C++ block"
-%token	<str>	CPP_TAG			"C++ tag"
-%token	<str>	CPP_TYPE		"C++ type"
 %token			ENUM			"enum"
 %token			EXCEPTION		"exception"
 %token			EXTENDS			"extends"
@@ -97,7 +95,7 @@
 %type <b> opt_array port_kind
 %type <i32> inout
 %type <num> num_exp
-%type <str> qualified_id identifier cpp_type
+%type <str> qualified_id identifier
 %type <any> exp
 
 %left '-' '+'
@@ -243,13 +241,7 @@ field_decl
 
 nativeclass_spec
 	: NATIVECLASS ID { PARSE_EV( onTypeSpec( @NATIVECLASS, co::TK_NATIVECLASS, @ID, *$ID ) ) }
-		'(' CPP_TAG cpp_type ')' { PARSE_EV( onNativeClass( @4, *$CPP_TAG, *$cpp_type ) ) }
 		'{' opt_class_member_list '}'
-	;
-
-cpp_type
-	: ID		{ $$ = $1; }
-	| CPP_TYPE	{ $$ = $1; }
 	;
 
 opt_class_member_list
@@ -263,7 +255,8 @@ class_member_list
 	;
 
 class_member
-	: method_decl
+	: CPP_BLOCK { PARSE_EV( onCppBlock( @CPP_BLOCK, *$CPP_BLOCK ) ) }
+	| method_decl
 	| record_member
 	;
 
@@ -326,27 +319,12 @@ opt_array
 
 interface_spec
 	: INTERFACE ID { PARSE_EV( onTypeSpec( @INTERFACE, co::TK_INTERFACE, @ID, *$ID ) ) }
-		opt_inheritance_decl '{' opt_interface_member_list '}'
+		opt_inheritance_decl '{' opt_class_member_list '}'
 	;
 
 opt_inheritance_decl
 	: /* nothing */
 	| EXTENDS qualified_id { PARSE_EV( onBaseType( @qualified_id, *$qualified_id ) ) }
-	;
-
-opt_interface_member_list
-	: /* nothing */
-	| interface_member_list
-	;
-
-interface_member_list
-	: interface_member
-	| interface_member_list interface_member
-	;
-
-interface_member
-	: CPP_BLOCK { PARSE_EV( onCppBlock( @CPP_BLOCK, *$CPP_BLOCK ) ) }
-	| class_member
 	;
 
 component_spec

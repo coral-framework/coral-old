@@ -1,4 +1,4 @@
-native	class TestNativeClass3 ( <ba> a::a )
+native	 class TestNativeClass3
 {
 string[] a;
 

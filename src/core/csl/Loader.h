@@ -66,7 +66,6 @@ public:
 	void onImport( const location& loc, const std::string& importTypeName );
 	void onTypeSpec( const location& kLoc, TypeKind kind, const location& nLoc, const std::string& name );
 	void onTypeDecl( const location& loc, const std::string& qualifiedId, bool isArray );
-	void onNativeClass( const location& loc, const std::string& cppType, const std::string& cppHeader );
 	void onEnumIdentifier( const location& loc, const std::string& name );
 	void onBaseType( const location& loc, const std::string& typeName );
 	void onPort( const location& loc, bool isFacet, const std::string& name );

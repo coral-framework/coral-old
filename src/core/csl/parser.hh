@@ -120,29 +120,27 @@ namespace co { namespace csl {
      COMMENT = 260,
      COMPONENT = 261,
      CPP_BLOCK = 262,
-     CPP_TAG = 263,
-     CPP_TYPE = 264,
-     ENUM = 265,
-     EXCEPTION = 266,
-     EXTENDS = 267,
-     ID = 268,
-     IMPORT = 269,
-     IN = 270,
-     INOUT = 271,
-     INTERFACE = 272,
-     LITERAL = 273,
-     NATIVECLASS = 274,
-     NUMBER = 275,
-     OUT = 276,
-     PRIMITIVE_TYPE = 277,
-     PROVIDES = 278,
-     QUALIFIED_ID = 279,
-     RAISES = 280,
-     READONLY = 281,
-     RECEIVES = 282,
-     STRUCT = 283,
-     VOID = 284,
-     NEG = 285
+     ENUM = 263,
+     EXCEPTION = 264,
+     EXTENDS = 265,
+     ID = 266,
+     IMPORT = 267,
+     IN = 268,
+     INOUT = 269,
+     INTERFACE = 270,
+     LITERAL = 271,
+     NATIVECLASS = 272,
+     NUMBER = 273,
+     OUT = 274,
+     PRIMITIVE_TYPE = 275,
+     PROVIDES = 276,
+     QUALIFIED_ID = 277,
+     RAISES = 278,
+     READONLY = 279,
+     RECEIVES = 280,
+     STRUCT = 281,
+     VOID = 282,
+     NEG = 283
    };
 
     };
@@ -229,7 +227,7 @@ namespace co { namespace csl {
     /* Tables.  */
     /// For a state, the index in \a yytable_ of its portion.
     static const short int yypact_[];
-    static const short int yypact_ninf_;
+    static const signed char yypact_ninf_;
 
     /// For a state, default reduction number.
     /// Unless\a  yytable_ specifies something else to do.
@@ -247,7 +245,7 @@ namespace co { namespace csl {
     static const short int yytable_[];
     static const signed char yytable_ninf_;
 
-    static const short int yycheck_[];
+    static const unsigned char yycheck_[];
 
     /// For a state, its accessing symbol.
     static const unsigned char yystos_[];

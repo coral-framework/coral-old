@@ -4,6 +4,7 @@
  */
 
 #include "Annotations.h"
+#include "IncludeAnnotation_Base.h"
 
 namespace co {
 
@@ -81,5 +82,26 @@ const std::string& DocumentationAnnotation::getDocFor( const std::string& elemen
 }
 
 CORAL_EXPORT_COMPONENT( DocumentationAnnotation, DocumentationAnnotation );
+
+//---------- @co.Include -------------------------------------------------------
+
+class IncludeAnnotation : public IncludeAnnotation_Base
+{
+public:
+	const std::string& getValue()
+	{
+		return _value;
+	}
+
+	void setValue( const std::string& value )
+	{
+		_value = value;
+	}
+
+private:
+	std::string _value;
+};
+	
+CORAL_EXPORT_COMPONENT( IncludeAnnotation, IncludeAnnotation );
 
 } // namespace co

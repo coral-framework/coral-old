@@ -46,7 +46,6 @@ typedef co::csl::Parser::token TK;
 BLANK		[ \t]
 ID			[a-zA-Z_][a-zA-Z0-9_]*
 QUALID		{ID}(\.{ID})+
-CPP_TAG		"<"[a-zA-Z0-9_:.,/ ]*">"
 DIGIT		[0-9]
 HEXDIGIT	[0-9a-fA-F]
 EXP			[Ee][+-]?{DIGIT}+
@@ -111,17 +110,11 @@ uint8				SET_CSTR( "uint8" ) return TK::PRIMITIVE_TYPE;
 {QUALID}			SET_STRING( yytext ) return TK::QUALIFIED_ID;
 \@({ID}|{QUALID})	SET_STRING( yytext + 1 ) return TK::ANNOTATION_ID;
 
-{CPP_TAG}			SET_STRING( yytext ); return TK::CPP_TAG;
-
-{ID}("::"{ID})+				SET_STRING( yytext ) return TK::CPP_TYPE;
-{ID}("::"{ID})*{CPP_TAG}	SET_STRING( yytext ) return TK::CPP_TYPE;
-
 0[xX]{HEXDIGIT}+			SET_NUMBER( strtol( &yytext[2], NULL, 16 ) ) return TK::NUMBER;
 {DIGIT}+					SET_NUMBER( strtol( yytext, NULL, 10 ) ) return TK::NUMBER;
 {DIGIT}+{EXP}				SET_NUMBER( strtod( yytext, NULL ) ) return TK::NUMBER;
 {DIGIT}*\.{DIGIT}+{EXP}?	SET_NUMBER( strtod( yytext, NULL ) ) return TK::NUMBER;
 {DIGIT}+\.{DIGIT}*{EXP}?	SET_NUMBER( strtod( yytext, NULL ) ) return TK::NUMBER;
-
 
 "//".*\n			{	// single-line comments
 						yylloc->lines( 1 );
@@ -155,7 +148,6 @@ uint8				SET_CSTR( "uint8" ) return TK::PRIMITIVE_TYPE;
 <CMT><<EOF>>		LEX_ERROR( "unclosed comment" );
 
 
-
 "<c++"				{	// start of a C++ code block
 						if( loader.hasCppBlocks() ) STR_NEW()
 						caller = YY_START; BEGIN(CPP);
@@ -163,7 +155,7 @@ uint8				SET_CSTR( "uint8" ) return TK::PRIMITIVE_TYPE;
 <CPP>[^c\n]*		{	// eat anything that's not a 'c'
 						if( loader.hasCppBlocks() ) STR_APPEND( yytext )
 					}
-<CPP>"c"+[^+\n]*	{	// eat up 'c's not followed by '+'s
+<CPP>"c"+[^c+\n]*	{	// eat up 'c's not followed by '+'s
 						if( loader.hasCppBlocks() ) STR_APPEND( yytext )
 					}
 <CPP>"c+"[^+\n]*	{	// eat up 'c+'s not followed by '>'s
@@ -180,8 +172,6 @@ uint8				SET_CSTR( "uint8" ) return TK::PRIMITIVE_TYPE;
 						BEGIN(caller); if( loader.hasCppBlocks() ) return TK::CPP_BLOCK;
 					}
 <CPP><<EOF>>		LEX_ERROR( "unclosed C++ block" );
-
-
 
 
 "\""				/* string literal */ STR_NEW() caller = YY_START; BEGIN(STR);

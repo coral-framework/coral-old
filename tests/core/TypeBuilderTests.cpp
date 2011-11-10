@@ -90,7 +90,6 @@ TEST( TypeBuilderTests, componentInvalidDefinitions )
 	EXPECT_THROW( cbuilder->defineBaseType( testInterface ), co::NotSupportedException );
 	EXPECT_THROW( cbuilder->definePort( "testIntMember", NULL, false ), co::IllegalArgumentException );
 	EXPECT_THROW( cbuilder->defineMethod( "testMethod" ), co::NotSupportedException );
-	EXPECT_THROW( cbuilder->defineNativeClass( "testHeader", "testName" ), co::NotSupportedException );
 
 	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
 }
@@ -333,7 +332,6 @@ TEST( TypeBuilderTests, interfaceInvalidDefinition )
 	EXPECT_THROW( ibuilder->definePort( "testIntMember", testInterface, false ), co::NotSupportedException );
 	EXPECT_THROW( ibuilder->defineMethod( "$testMethod" ), co::IllegalNameException );
 	EXPECT_THROW( ibuilder->defineMethod( "" ), co::IllegalNameException );
-	EXPECT_THROW( ibuilder->defineNativeClass( "testHeader", "testName" ), co::NotSupportedException );
 
 	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
 }
@@ -434,7 +432,6 @@ TEST( TypeBuilderTests, nativeClassInvalidDefinitions )
 	EXPECT_THROW( nbuilder->defineBaseType( testInterface ), co::NotSupportedException );
 	EXPECT_THROW( nbuilder->definePort( "testIntMember", testInterface, false ), co::NotSupportedException );
 	EXPECT_THROW( nbuilder->defineMethod( "" ), co::IllegalNameException );
-	EXPECT_THROW( nbuilder->defineNativeClass( "header", "" ), co::IllegalArgumentException );
 
 	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
 }
@@ -443,25 +440,17 @@ TEST( TypeBuilderTests, nativeClassDefinition )
 {
 	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_NATIVECLASS, "NativeClassbuilderTest.BuilderTestNativeClass" );
 
-	EXPECT_THROW( builder->defineNativeClass( "headerName", "" ), co::IllegalArgumentException );
-	EXPECT_THROW( builder->defineNativeClass( "", "nativeName" ), co::IllegalArgumentException );
-
 	builder->defineField( "testName", TestHelper::type( "string" ), true );
-
 	builder->defineField( "age", TestHelper::type( "uint32" ), false );
 
 	co::RefPtr<co::IMethodBuilder> mb = builder->defineMethod( "childMethod" );
 	mb->createMethod();
-
-	builder->defineNativeClass( "MyHeaderName", "myNativeName" );
 
 	co::INativeClass* nativeType = co::cast<co::INativeClass>( builder->createType() );
 
 	ASSERT_TRUE( nativeType->getMember( "testName" ) != NULL );
 	ASSERT_TRUE( nativeType->getMember( "age" ) != NULL );
 	ASSERT_TRUE( nativeType->getMember( "childMethod" ) != NULL );
-	ASSERT_EQ( "myNativeName", nativeType->getNativeName() );
-	ASSERT_EQ( "MyHeaderName", nativeType->getNativeHeader() );
 	ASSERT_EQ( 1, nativeType->getMethods().getSize() );
 	ASSERT_EQ( 2, nativeType->getFields().getSize() );
 
@@ -476,26 +465,8 @@ TEST( TypeBuilderTests, nativeClassMemberClash )
 
 	co::RefPtr<co::IMethodBuilder> mb = builder->defineMethod( "getTestName" );
 	mb->createMethod();
-	builder->defineNativeClass( "MyHeaderName", "myNativeName" );
 
 	EXPECT_THROW( co::getSystem()->getTypes()->getTransaction()->commit(), co::IllegalNameException );
-	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
-}
-
-TEST( TypeBuilderTests, nativeClassMissingInput )
-{
-	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_NATIVECLASS, "NativeClassbuilderTest.MissingInputNativeClass" );
-
-	EXPECT_THROW( co::getSystem()->getTypes()->getTransaction()->commit(), co::MissingInputException );
-	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
-}
-
-TEST( TypeBuilderTests, nativeClassMissingHeader )
-{
-	co::RefPtr<co::ITypeBuilder> builder = TestHelper::createBuilder( co::TK_NATIVECLASS, "NativeClassbuilderTest.MissingHeadersNativeClass" );
-	builder->defineField( "testName", TestHelper::type( "string" ), true );
-
-	EXPECT_THROW( co::getSystem()->getTypes()->getTransaction()->commit(), co::MissingInputException );
 	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
 }
 
@@ -520,7 +491,6 @@ TEST( TypeBuilderTests, structInvalidDefinition )
 	EXPECT_THROW( sbuilder->defineBaseType( testInterface ), co::NotSupportedException );
 	EXPECT_THROW( sbuilder->definePort( "testIntMember", testInterface, false ), co::NotSupportedException );
 	EXPECT_THROW( sbuilder->defineMethod( "testMethod" ), co::NotSupportedException );
-	EXPECT_THROW( sbuilder->defineNativeClass( "testHeader", "testName" ), co::NotSupportedException );
 
 	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->rollback() );
 }

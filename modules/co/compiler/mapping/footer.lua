@@ -1,7 +1,9 @@
 local function template( writer, c, t )
-	writer( "\n" )
 
-	c.utils.closeNamespaces( writer, t.namespace.fullName )
+	if t.kind ~= 'TK_NATIVECLASS' then
+		writer( "\n" )
+		c.utils.closeNamespaces( writer, t.namespace.fullName )
+	end
 
 	writer( [[
 

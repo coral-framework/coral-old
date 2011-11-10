@@ -1,5 +1,6 @@
-native class TestNativeClass2 ( <ba> _a::a )
+native class TestNativeClass2
 {
-string[] a;
-
+	<c++ should support c++>
+	string[] a;
+	<c++ C++ blocks c++>
 };

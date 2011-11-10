@@ -7,17 +7,14 @@
 #define _CO_UUID_H_
 
 #include <co/TypeTraits.h>
-#include <co/reserved/Uuid.h>
 
-// co.Uuid Mapping:
-namespace co {
-
-	// This is a native class mapping.
-	// You may use type 'Uuid' directly, or through the typedef below.
-	typedef Uuid Uuid;
-
-} // namespace co
-
+		/*
+			Note: only ubiquitous header files can be included from within
+			a native class. The preferred solution is to forward declare the
+			type and use the @co.Include( "headername.h" ) annotation.
+		 */
+		#include <co/reserved/Uuid.h>
+	
 namespace co {
 template<> struct kindOf<co::Uuid> : public kindOfBase<TK_NATIVECLASS> {};
 template<> struct nameOf<co::Uuid> { static const char* get() { return "co.Uuid"; } };
