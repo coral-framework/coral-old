@@ -8,8 +8,9 @@ local function template( writer, c, t )
 
 ]] )
 
-	for header in pairs( t.includedHeaders ) do
-		writer( "#include <", header, ">\n" )
+	local headers = t.includedHeaders
+	for i = 1, #headers do
+		writer( "#include <", headers[i], ">\n" )
 	end
 
 	for fullName, type in pairs( t.forwardDeclTypes ) do

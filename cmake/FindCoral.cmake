@@ -55,7 +55,7 @@ else()
 endif()
 
 # Launcher arguments to invoke the coral compiler
-set( CORAL_COMPILER_ARGS --csl acd lua.Launcher co.compiler.cli --ignoredupes )
+set( CORAL_COMPILER_ARGS --csl acd lua.Launcher co.compiler.cli )
 
 ################################################################################
 # Function to get the current CORAL_PATH as a comma-separated string

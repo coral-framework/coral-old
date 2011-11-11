@@ -62,10 +62,6 @@ function flags.mappingsdir( flag, dir )
 	return 1
 end
 
-function flags.ignoredupes()
-	compiler.ignoreDupesInPath = true
-end
-
 function flags.version()
 	print( "Coral Compiler v" .. co.version .. " (" .. co.buildKey .. ")" )
 	askedForVersion = true
@@ -89,7 +85,6 @@ Available options:
   -o, --outdir DIR       Output dir for generated files (default: ./generated).
   -m, --mappingsdir DIR  Separate output dir for mappings (when not specified,
                          mappings are generated in the 'outdir').
-      --ignoredupes      Supresses warnings about clashing CSL files.
   -v, --version          Show version information.]]
 end
 

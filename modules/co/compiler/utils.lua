@@ -96,11 +96,15 @@ function M.formatField( t )
 	end
 end
 
-function M.includeHeader( t, headerOrType )
-	if type( headerOrType ) ~= 'string' then
-		headerOrType = toHeaderName( headerOrType.fullName )
+function M.includeHeader( t, header )
+	if type( header ) ~= 'string' then
+		header = toHeaderName( header.fullName )
 	end
-	t.includedHeaders[headerOrType] = true
+	local included = t.includedHeaders
+	if not included[header] then
+		included[header] = true
+		included[#included + 1] = header
+	end
 end
 
 function M.addForwardDecl( t, type )
@@ -150,7 +154,17 @@ function include.TK_STRUCT( t, type )
 	end
 end
 
-include.TK_NATIVECLASS = include.TK_ENUM
+local coIInclude = co.Type "co.IInclude"
+
+function include.TK_NATIVECLASS( t, type )
+	if t.kind == 'TK_STRUCT' then
+		local include = type[coIInclude]
+		if include then
+			t:includeHeader( include.value )
+		end
+	end
+	t:includeHeader( type )
+end
 
 function include.TK_INTERFACE( t, type )
 	if t.kind == 'TK_STRUCT' then
@@ -165,8 +179,9 @@ end
 ------ writeIncludesAndFwdDecls() ----------------------------------------------------------
 
 function M.writeIncludesAndFwdDecls( t, writer )
-	for header in pairs( t.includedHeaders ) do
-		writer( "#include <", header, ">\n" )
+	local headers = t.includedHeaders
+	for i = 1, #headers do
+		writer( "#include <", headers[i], ">\n" )
 	end
 
 	if next( t.forwardDeclTypes ) then
