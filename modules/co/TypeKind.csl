@@ -1,5 +1,5 @@
 /*
-	The kinds of types available in the Coral type system.
+	Kinds of types available in the Coral type system.
  */
 enum TypeKind
 {
@@ -16,12 +16,12 @@ enum TypeKind
 	TK_UINT64,			//< 64-bit unsigned integer.
 	TK_FLOAT,			//< 32-bit (single-precision) IEEE 754 floating-point number.
 	TK_DOUBLE,			//< 64-bit (double-precision) IEEE 754 floating-point number.
-	TK_STRING,			//< 8-bit-clean string, encoded in ISO Latin-1.
+	TK_STRING,			//< 8-bit-clean string.
 	TK_ARRAY,			//< Unidimensional array of elements.
 	TK_ENUM,			//< Enumeration of constant identifiers.
 	TK_EXCEPTION,		//< Named exception that can be thrown by methods.
-	TK_STRUCT,			//< A set of named fields of various types.
+	TK_STRUCT,			//< Set of named fields of various types.
 	TK_NATIVECLASS,		//< Native class type.
 	TK_INTERFACE,		//< Interface type.
-	TK_COMPONENT		//< A concrete component type.
+	TK_COMPONENT		//< Component type.
 };

@@ -557,7 +557,7 @@ public:
 	{;}
 
 	/*!
-		Template constructor that stores any variable supported by the Coral type system.
+		\brief Template constructor that stores any variable supported by the Coral type system.
 
 		\warning Since the template variable \a T must be inferred by the compiler, this constructor
 			is subject to language limitations that will make it miss the fact that a variable's type
@@ -571,7 +571,7 @@ public:
 	}
 
 	/*!
-		Constructor corresponding to a setService() call.
+		\brief Constructor corresponding to a setService() call.
 		Please, see setService()'s documentation for more info.
 	 */
 	inline Any( IService* instance, IInterface* type ) : _state()
@@ -580,7 +580,7 @@ public:
 	}
 
 	/*!
-		Constructor corresponding to a setVariable() call.
+		\brief Constructor corresponding to a setVariable() call.
 		Please, see setVariable()'s documentation for more info.
 	 */
 	inline Any( IType* type, uint32 flags, void* ptr ) : _state()
@@ -589,7 +589,7 @@ public:
 	}
 
 	/*!
-		Constructor corresponding to a setBasic() call.
+		\brief Constructor corresponding to a setBasic() call.
 		Please, see setBasic()'s documentation for more info.
 	 */
 	inline Any( TypeKind kind, uint32 flags, void* ptr ) : _state()
@@ -598,7 +598,7 @@ public:
 	}
 
 	/*!
-		Constructor corresponding to a setArray() call.
+		\brief Constructor corresponding to a setArray() call.
 		Please, see setArray()'s documentation for more info.
 	 */
 	inline Any( ArrayKind arrayKind, IType* elementType, uint32 flags, void* ptr, size_t arraySize = 0 )

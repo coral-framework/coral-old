@@ -1,5 +1,5 @@
 /*
-	The life-cycle stages of the system.
+	Life-cycle stages of the Coral framework.
  */
 enum SystemState
 {

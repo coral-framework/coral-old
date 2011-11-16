@@ -70,7 +70,7 @@ function M.process( args, handlers )
 	local i = 1
 	while args[i] do
 		local v = args[i]
-		local _, _, flag = sfind( v, "%-+(.+)" )
+		local _, _, flag = sfind( v, "^%-+(.+)$" )
 
 		if not flag then
 			leftOvers[#leftOvers + 1] = v

@@ -1,9 +1,9 @@
 /*
-	The kinds of members in a composite type.
+	Kinds of members in a composite type.
  */
 enum MemberKind
 {
-	MK_FIELD,	//< A struct field / interface property.
+	MK_FIELD,	//< A member field.
 	MK_METHOD,	//< A member method.
 	MK_PORT		//< A component port (either a facet or receptacle).
 };

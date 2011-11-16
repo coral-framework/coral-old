@@ -43,8 +43,8 @@ CORAL_EXPORT void addPath( const std::string& path );
 enum CSLFlags
 {
 	CSL_ANNOTATIONS		= 1, //!< Load and process annotations.
-	CSL_CPPBLOCKS		= 2, //!< Load C++ blocks as '@CppBlock' annotations.
-	CSL_DOCUMENTATION	= 4  //!< Load comments as '@Documentation' annotations.
+	CSL_CPPBLOCKS		= 2, //!< Load C++ blocks as 'co.CppBlock' annotations.
+	CSL_DOCUMENTATION	= 4  //!< Load comments as 'co.Documentation' annotations.
 };
 
 /*!

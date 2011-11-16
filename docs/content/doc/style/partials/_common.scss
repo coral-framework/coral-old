@@ -1,7 +1,6 @@
 @import "compass/css3";
-@import "compass/utilities/lists/horizontal-list";
-@import "compass/utilities/links/hover-link";
-@import "compass/utilities/tables/alternating-rows-and-columns";
+@import "compass/typography/links/hover-link";
+@import "compass/typography/lists/horizontal-list";
 
 body {
 	background: #E6E7E8;
@@ -9,10 +8,16 @@ body {
 	@include blueprint-typography-body( 13px );
 	@include blueprint-typography-defaults;
 
-	// reset 'tr.even', introduced by blueprint-typography-defaults (doh)
-	tr.even td { background: transparent; }
+	p { margin-bottom: 1em; }
+	ul, ol { margin: 0 0 1em 1.5em; }
 
 	a { @include hover-link; }
+
+	// reset 'tr.even', introduced by blueprint-typography-defaults (doh)
+	table.striped tr:nth-child(even) td,
+	  table tr.even td {
+		background: transparent;
+	}
 }
 
 .error {
@@ -169,8 +174,8 @@ pre {
 }
 
 #sidebar {
-	font-size: 11px;
-	line-height: 13px;
+	font-size: 12px;
+	line-height: 14px;
 	h1 {
 		margin: 0;
 		padding: 0;

@@ -6,15 +6,15 @@ layout: standalone
 %center
 	%h1 #{@item[:title]}
 
-%div.sectionlist{:style => "width: 210px; margin: auto;"}
+%div.sectionlist{:style => "width: 240px; margin: auto;"}
 	%h3 Latest version:
-	%big
-		%ul
-			%li
-				%a(href="/#{@config[:version]}/") Coral #{@config[:version]}
+	%ul{:style => "font-size: 120%;"}
+		%li
+			%a(href="/#{@config[:version]}/") Coral #{@config[:version]}
 
 	%h3 Previous versions:
-	%big
-		%ul
-			%li
-				%a(href="/0.5/") Coral 0.5
+	%ul{:style => "font-size: 120%;"}
+		%li
+			%a(href="/0.6/") Coral 0.6
+		%li
+			%a(href="/0.5/") Coral 0.5

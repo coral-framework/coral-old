@@ -11,7 +11,7 @@
 namespace co {
 
 /*!
-	\brief A smart-pointer that implements reference counting for Coral services.
+	\brief A smart-pointer that provides reference counting for Coral services.
 	\tparam T a service type (co::IService).
  */
 template<class T>

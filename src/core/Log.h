@@ -13,6 +13,7 @@ namespace co {
 
 /*!
 	\brief Log severity levels, in increasing order of severity.
+
 	\ingroup log
  */
 enum LogLevel
@@ -24,7 +25,9 @@ enum LogLevel
 };
 
 /*!
-	\brief Contains information about a log event. See LogEventHandler.
+	\brief Contains information about a log event.
+
+	\ingroup log
  */
 struct LogEvent
 {
@@ -35,6 +38,7 @@ struct LogEvent
 
 /*!
 	\brief Signature of a LogEventHandler function. See installLogEventHandler().
+
 	\ingroup log
  */
 typedef void (*LogEventHandler)( const LogEvent& event );
@@ -49,13 +53,17 @@ typedef void (*LogEventHandler)( const LogEvent& event );
 
 	To restore the default handler, call <tt>installLogEventHandler( NULL )</tt>.
 
-	\sa debug()
 	\ingroup log
  */
 CORAL_EXPORT LogEventHandler installLogEventHandler( LogEventHandler handler );
 
 /*!
-	Class responsible for recording and dispatching log events.
+	\brief Class responsible for recording and dispatching log events.
+ 
+	This class is not meant to be used directly. You should use the macros
+ 	CORAL_LOG( level ) or CORAL_DLOG( level ) instead.
+
+	\ingroup log
  */
 class CORAL_EXPORT Log
 {
@@ -70,7 +78,7 @@ public:
 	inline Log() {;}
 	~Log();
 
-	//! Starts recording a log event.
+	// Starts recording a log event.
 	inline std::ostringstream& start( LogLevel level = LOG_INFO, bool isDebug = false )
 	{
 		_isDebug = isDebug;
@@ -114,7 +122,7 @@ private:
 	Generates a log event with the given severity level.
 	The macro returns an output stream for recording the log message.
 
-	\sa installDebugEventHandler()
+	\sa installLogEventHandler()
 	\ingroup log
  */
 #define CORAL_LOG( level ) CORAL_LOG_LEVEL_DEBUG( co::LOG_##level, false )

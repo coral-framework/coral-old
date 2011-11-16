@@ -1,13 +1,26 @@
 /*
-	The life-cycle stages of a module.
+	Life-cycle stages of a module.
  */
 enum ModuleState
 {
+	// Pre-initialization state.
 	ModuleState_None,
+
+	// The module has registered/published its services.
 	ModuleState_Initialized,
+
+	// The module is now consuming services from other modules.
 	ModuleState_Integrated,
+
+	// The module has integrated its UI elements into the application.
 	ModuleState_PresentationIntegrated,
+
+	// The module has released all external resources.
 	ModuleState_Disintegrated,
+
+	// The module itself has been released.
 	ModuleState_Disposed,
+
+	// The module was aborted due to an error.
 	ModuleState_Aborted
 };

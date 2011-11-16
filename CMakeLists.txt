@@ -45,8 +45,8 @@ ELSE()
 ENDIF()
 
 # Include our own package, so we can use the CORAL_GENERATE_*() macros.
-SET( CORAL_ROOT ${CMAKE_SOURCE_DIR} )
-SET( CORAL_LAUNCHER launcher )
+SET( CORAL_ROOT "${CMAKE_SOURCE_DIR}" )
+SET( CORAL_LAUNCHER "launcher" )
 FIND_PACKAGE( Coral QUIET )
 
 # Shared include paths for all subprojects
@@ -60,7 +60,7 @@ SET( CPACK_PACKAGE_NAME					"coral" )
 SET( CPACK_PACKAGE_VERSION_MAJOR		"${CORAL_VERSION_MAJOR}" )
 SET( CPACK_PACKAGE_VERSION_MINOR		"${CORAL_VERSION_MINOR}" )
 SET( CPACK_PACKAGE_VERSION_PATCH		"${CORAL_VERSION_PATCH}" )
-SET( CPACK_PACKAGE_DESCRIPTION_SUMMARY	"A lightweight C++ component framework for soft real-time systems." )
+SET( CPACK_PACKAGE_DESCRIPTION_SUMMARY	"Lightweight C++ component framework for soft real-time systems." )
 
 IF( HUDSON_JOBNAME )
 	STRING( REPLACE "/label=" "-" _CPACK_PACKAGE_FILE_NAME "${HUDSON_JOBNAME}_$ENV{BUILD_ID}" )

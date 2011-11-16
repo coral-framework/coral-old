@@ -64,7 +64,7 @@ struct RangeAdaptor<T, std::vector<ET*> >
 #endif
 
 /*!
-	\brief A higher-level iterator for one-dimensional arrays.
+	\brief A generic iterator for one-dimensional arrays.
 	\tparam T any acceptable element type for a C++ array.
 
 	The range [start, end) is represented by two pointers.

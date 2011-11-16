@@ -3,7 +3,7 @@
 -------------------------------------------------------------------------------
 
 local lfs = require "lfs"
-local path = require "path"
+local path = require "lua.path"
 local utils = require "co.compiler.utils"
 local dependencies = require "co.compiler.dependencies"
 local TypeWrapper = require "co.compiler.TypeWrapper"
@@ -42,7 +42,7 @@ local Compiler = {
 Compiler.__index = Compiler
 
 -- Creates a new Compiler instance.
-function Compiler:new()
+function Compiler.new()
 	local self = setmetatable( {}, Compiler )
 
 	-- setting to true disables the use of caches and the writing of files

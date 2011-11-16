@@ -17,9 +17,9 @@
 <div class="sectionlist" style="float: left; width: 33%; font-weight: bold;">
 <h3>Groups of Related Classes</h3>
 <ul>
-	<li><a href="group__setup.html">System Setup and Shutdown</a></li>
+	<li><a href="group__setup.html">Setup and Shutdown Functions</a></li>
 	<li><a href="group__convenience.html">Convenience Functions and Macros</a></li>
-	<li><a href="group__debugevents.html">Debug Events API</a></li>
+	<li><a href="group__log.html">Logging API</a></li>
 	<li><a href="group__platform.html">Platform Utilities</a></li>
 </ul>
 </div>
@@ -28,7 +28,7 @@
 <h3>Other</h3>
 <ul>
 	<li><a href="namespaces.html">List of Namespaces</a></li>
-	<li><a href="namespacemembers.html">All INamespace Members</a></li>
+	<li><a href="namespacemembers.html">All Namespace Members</a></li>
 	<li><a href="group__coral__types.html">Coral Type Groups</a></li>
 </ul>
 </div>

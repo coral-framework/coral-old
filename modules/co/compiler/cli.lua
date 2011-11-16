@@ -3,8 +3,8 @@
 -------------------------------------------------------------------------------
 
 local debug = require "debug"
-local cmdline = require "cmdline"
-local compiler = require( "co.compiler" ):new()
+local cmdline = require "lua.cmdline"
+local compiler = require( "co.compiler" ).new()
 
 -- garbage collection is unnecessary for a compiler
 collectgarbage( "stop" )

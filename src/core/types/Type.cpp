@@ -67,6 +67,28 @@ IReflector* TypeImpl::getReflector( IType* myType )
 		return _reflector.get();
 	}
 
+	// is this a dynamic type?
+	IDynamicTypeProvider* dtp = myType->getAnnotation<IDynamicTypeProvider>();
+	if( dtp )
+	{
+		try
+		{
+			dtp->provideReflectorFor( myType );
+			if( _reflector.isValid() )
+				return _reflector.get();
+
+			throw Exception( "no reflector was provided, though no exception was raised" );
+		}
+		catch( Exception& e )
+		{
+			const std::string& componentName = dtp->getProvider()->getComponent()->getFullName();
+			std::string annotationName( componentName, 0, componentName.size() - 10 );
+			CORAL_THROW( NotSupportedException, "error obtaining a reflector for type '"
+				<< myType->getFullName() << "' via provider '@" << annotationName
+				<< "': " << e.getMessage() );
+		}
+	}
+
 	// is the type's module already loaded?
 	INamespace* ns = myType->getNamespace();
 	IModule* module = ns->getModule();
@@ -100,27 +122,6 @@ IReflector* TypeImpl::getReflector( IType* myType )
 
 	if( _reflector.isValid() )
 		return _reflector.get();
-
-	IDynamicTypeProvider* dtp = myType->getAnnotation<IDynamicTypeProvider>();
-	if( dtp )
-	{
-		try
-		{
-			dtp->provideReflectorFor( myType );
-			if( _reflector.isValid() )
-				return _reflector.get();
-
-			throw Exception( "no reflector was provided, though no exception was raised" );
-		}
-		catch( Exception& e )
-		{
-			const std::string& componentName = dtp->getProvider()->getComponent()->getFullName();
-			std::string annotationName( componentName, 0, componentName.size() - 10 );
-			CORAL_THROW( NotSupportedException, "error obtaining a reflector for type '"
-				<< myType->getFullName() << "' via provider '@" << annotationName
-				<< "': " << e.getMessage() );
-		}
-	}
 
 	CORAL_THROW( NotSupportedException, "could not obtain a reflector for type '"
 		<< myType->getFullName() << "' (module " << ns->getFullName()

@@ -37,8 +37,8 @@ public:
 	//! Enumerates the kind of field accessors.
 	enum Accessor
 	{
-		Getter  = 1,
-		Setter  = 2
+		Getter  = 1, //!< Getter method.
+		Setter  = 2	 //!< Setter method.
 	};
 
 	/*!

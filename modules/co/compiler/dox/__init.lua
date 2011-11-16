@@ -5,6 +5,14 @@ local wordSubstitutions = {
 	["Service"] = "%Service",
 }
 
+local function wordFilter( word )
+	-- escape @annotation.names so they're not interpretted as Doxygen commands
+	if word:sub( 1, 1 ) == '@' then
+		return '\\' .. word
+	end
+	return wordSubstitutions[word]
+end
+
 local coICppBlock = co.Type "co.ICppBlock"
 local coIDocumentation = co.Type "co.IDocumentation"
 
@@ -23,7 +31,7 @@ local function addDoc( writer, t, memberName )
 		writer( "//! Not documented.\n" )
 	else
 		-- filter the text, escaping common words that could be turned into links
-		text = text:gsub( "(%p?[%w]+)", wordSubstitutions )
+		text = text:gsub( "(%p?[%w]+)", wordFilter )
 
 		-- generate a \brief with the following criteria: if the first line contains a dot,
 		-- the brief is up to the last dot in the first line. Otherwise, the brief is up to

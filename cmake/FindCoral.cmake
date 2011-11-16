@@ -158,7 +158,6 @@ endfunction()
 ################################################################################
 function( CORAL_GENERATE_DOX targetName moduleName outDir )
 	CORAL_GET_PATH_STRING( coralPathStr )
-
 	add_custom_target( ${targetName}
 		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS}
 			${CORAL_COMPILER_ARGS} --dox -g ${moduleName} -o ${outDir} ${ARGN}
@@ -168,7 +167,7 @@ function( CORAL_GENERATE_DOX targetName moduleName outDir )
 endfunction()
 
 ################################################################################
-# Utility macro to set common build options for targets that use Coral.
+# Macro to set common build options for targets that use Coral.
 ################################################################################
 macro( CORAL_TARGET targetName )
 	# Artifacts always get a '_debug' suffix when built in debug mode
@@ -202,7 +201,7 @@ macro( CORAL_TARGET targetName )
 endmacro( CORAL_TARGET )
 
 ################################################################################
-# Utility macro to set common build options for Coral Module targets.
+# Macro to set common build options for Coral Module targets.
 ################################################################################
 macro( CORAL_MODULE_TARGET moduleName targetName )
 	CORAL_TARGET( ${targetName} )
@@ -230,13 +229,25 @@ macro( CORAL_MODULE_TARGET moduleName targetName )
 endmacro( CORAL_MODULE_TARGET )
 
 ################################################################################
-# Utility macro to set env vars for a test so it finds the coral library
+# Macro to add a test target that invokes the Coral Launcher passing arguments.
+################################################################################
+macro( CORAL_ADD_TEST testName )
+	if( CORAL_LAUNCHER STREQUAL "launcher" )
+		set( coralLauncherMode ${CORAL_LAUNCHER} )
+	else()
+		set( coralLauncherMode ${CORAL_LAUNCHER} --mode $<CONFIGURATION> )
+	endif()
+	CORAL_GET_PATH_STRING( coralPathStr )
+	add_test( NAME ${testName} COMMAND ${coralLauncherMode} -p "${coralPathStr}" ${ARGN} )
+endmacro( CORAL_ADD_TEST )
+
+################################################################################
+# Macro to set env vars for a test executable so it finds the Coral library.
 ################################################################################
 macro( CORAL_TEST_ENVIRONMENT testName )
 	if( NOT CORAL_ROOT )
 		set( CORAL_ROOT $ENV{CORAL_ROOT} )
 	endif()
-
 	set_property( TEST ${testName} APPEND PROPERTY ENVIRONMENT
 		PATH=${CORAL_ROOT}/lib
 		LD_LIBRARY_PATH=${CORAL_ROOT}/lib
@@ -245,7 +256,7 @@ macro( CORAL_TEST_ENVIRONMENT testName )
 endmacro( CORAL_TEST_ENVIRONMENT )
 
 ################################################################################
-# Macro to build a Coral module that *only* contains CSL types
+# Macro to build Coral modules comprised only of CSL types (no implementations).
 ################################################################################
 macro( CORAL_BUILD_CSL_MODULE moduleName )
 	CORAL_GENERATE_MODULE( _GENERATED_SOURCES ${moduleName} )

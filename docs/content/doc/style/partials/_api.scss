@@ -4,7 +4,7 @@
 
 .api {
 
-	line-height: 20px;
+	dl { margin: 0 0 1em 0; }
 
 	div.navpath {
 		position: absolute;
@@ -67,10 +67,9 @@
 	// top-level tables have 100% width
 	div.contents > table {
 		width: 100%;
-		font-size: 11px;
 		border: 1px solid #E6E6E6;
 		@include border-radius( 6px );
-		td, th { padding: 8px 10px; }
+		td, th { padding: 6px 8px; }
 		tr.odd td { background: #F6F6F6; }
 	}
 
@@ -230,7 +229,6 @@
 
 	.memproto {
 		color: #333;
-		margin: 1em 0px;
 		padding: 0.3em 0.2em;
 		border: 1px solid #DEDEDE;
 		background: #F6F6F6;
