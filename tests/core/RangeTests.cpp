@@ -101,7 +101,7 @@ struct IncompleteType { double d; IncompleteType( double d ) : d( d ) {} };
 
 static co::Range<IncompleteType> create()
 {
-	static IncompleteType array[3] { IncompleteType( 1 ), IncompleteType( 2 ), IncompleteType( 3 ) };
+	static IncompleteType array[] = { IncompleteType( 1 ), IncompleteType( 2 ), IncompleteType( 3 ) };
 	return co::Range<IncompleteType>( array, 3 );
 }
 
