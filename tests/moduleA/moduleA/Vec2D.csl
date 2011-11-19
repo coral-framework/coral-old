@@ -4,7 +4,6 @@
 native class Vec2D
 {
 	<c++
-		#define MODULEA_VEC2_INCLUDED
 		namespace moduleA {
 			struct Vec2D
 			{

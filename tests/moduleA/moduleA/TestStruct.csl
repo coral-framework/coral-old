@@ -6,7 +6,7 @@ struct TestStruct
 	TestEnum testEnum;
 	co.IType aType;
 
-	Vec2FwdDecl vec2d;
+	Vec2D vec2d;
 
 	co.CSLError innerStruct;
 
