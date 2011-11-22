@@ -1,5 +1,5 @@
 /*
-	Proof-of-concept native class that wraps a std::pair<double,double>.
+	Proof-of-concept native class that implements a trivial 2D vector.
  */
 native class Vec2D
 {
