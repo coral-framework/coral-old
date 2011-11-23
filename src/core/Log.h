@@ -25,60 +25,60 @@ enum LogLevel
 };
 
 /*!
-	\brief Contains information about a log event.
+	\brief A log record.
 
 	\ingroup log
  */
-struct LogEvent
+struct Log
 {
 	std::string message;	//!< Log message.
-	LogLevel level;			//!< Severity level of this event.
-	bool isDebug;			//!< Whether this is a \e debug event.
+	LogLevel level;			//!< Log severity level.
+	bool isDebug;			//!< Whether this is for \e debugging.
 };
 
 /*!
-	\brief Signature of a LogEventHandler function. See installLogEventHandler().
+	\brief Signature of a LogHandler function. See setLogHandler().
 
 	\ingroup log
  */
-typedef void (*LogEventHandler)( const LogEvent& event );
+typedef void (*LogHandler)( const Log& log );
 
 /*!
-	\brief Installs a log event handler and returns the previous handler.
+	\brief Sets the log handler function and returns the previous handler.
 
-	A log event handler is a function that reports log events. The default
-	handler prints all events to \c stderr, and aborts the application in case
-	of a fatal error. Only a single log event handler can be defined, and it
-	should generally be installed before the framework is initialized.
+	A log handler is the function that receives all logs. The default handler
+	prints all logs to \c stderr and aborts the application in case of a fatal
+	error. Only a single handler can be in effect, and it should generally be
+	set before the framework is initialized.
 
-	To restore the default handler, call <tt>installLogEventHandler( NULL )</tt>.
+	To restore the default handler, call <tt>setLogHandler( NULL )</tt>.
 
 	\ingroup log
  */
-CORAL_EXPORT LogEventHandler installLogEventHandler( LogEventHandler handler );
+CORAL_EXPORT LogHandler setLogHandler( LogHandler handler );
 
 /*!
-	\brief Class responsible for recording and dispatching log events.
+	\brief Class responsible for recording and dispatching log records.
  
 	This class is not meant to be used directly. You should use the macros
  	CORAL_LOG( level ) or CORAL_DLOG( level ) instead.
 
 	\ingroup log
  */
-class CORAL_EXPORT Log
+class CORAL_EXPORT Logger
 {
 public:
-	//! Returns the minimum level needed for a log event to be reported.
-	inline static LogLevel getReportingLevel() { return sm_reportingLevel; }
+	//! Returns the minimum severity level needed for a log to be recorded.
+	inline static LogLevel getMinSeverity() { return sm_minSeverity; }
 
-	//! Sets the minimum severity level needed for a log event to be reported.
-	static void setReportingLevel( LogLevel level );
+	//! Sets the minimum severity level needed for a log to be recorded.
+	static void setMinSeverity( LogLevel level );
 
 public:
-	inline Log() {;}
-	~Log();
+	inline Logger() {;}
+	~Logger();
 
-	// Starts recording a log event.
+	// Starts recording a log message.
 	inline std::ostringstream& start( LogLevel level = LOG_INFO, bool isDebug = false )
 	{
 		_isDebug = isDebug;
@@ -88,10 +88,10 @@ public:
 
 private:
 	// forbid copies
-	Log( const Log& );
-	Log& operator=( const Log& );
+	Logger( const Logger& );
+	Logger& operator=( const Logger& );
 
-	static LogLevel sm_reportingLevel;
+	static LogLevel sm_minSeverity;
 
 private:
 	bool _isDebug;
@@ -103,7 +103,7 @@ private:
 
 /*!
 	\def CORAL_LOG_MIN_SEVERITY
-	Log events below this severity level are disabled at compile time.
+	\brief Logs below this severity level are disabled at compile time.
 	Defaults to LOG_INFO.
 
 	\ingroup log
@@ -114,28 +114,28 @@ private:
 
 #define CORAL_LOG_LEVEL_DEBUG( level, debug ) \
 	if( level < CORAL_LOG_MIN_SEVERITY ) ; \
-	else if( level < co::Log::getReportingLevel() ) ; \
-	else co::Log().start( level, debug )
+	else if( level < co::Logger::getMinSeverity() ) ; \
+	else co::Logger().start( level, debug )
 
 /*!
 	\def CORAL_LOG( level )
-	Generates a log event with the given severity level.
+	\brief Records a log with the specified severity level.
 	The macro returns an output stream for recording the log message.
 
-	\sa installLogEventHandler()
+	\sa setLogHandler()
 	\ingroup log
  */
 #define CORAL_LOG( level ) CORAL_LOG_LEVEL_DEBUG( co::LOG_##level, false )
 
 /*!
 	\def CORAL_DLOG( level )
-	Just like CORAL_LOG(), but meant for debugging.
-	This macro has no effect in release builds.
+	\brief Just like CORAL_LOG(), but meant for debugging.
+	This kind of log is removed from release builds.
 
 	\ingroup log
  */
 #ifdef CORAL_NDEBUG
-	#define CORAL_DLOG( level ) if( false ) co::Log().start()
+	#define CORAL_DLOG( level ) if( false ) co::Logger().start()
 #else
 	#define CORAL_DLOG( level ) CORAL_LOG_LEVEL_DEBUG( co::LOG_##level, true )
 #endif

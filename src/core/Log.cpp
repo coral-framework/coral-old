@@ -9,46 +9,46 @@
 
 namespace co {
 
-static void defaultLogEventHandler( const LogEvent& event )
+static void defaultLogHandler( const Log& log )
 {
-	static const char* s_eventName[] = { "INFO", "WARNING", "ERROR", "FATAL" };
-	
-	LogLevel level = event.level;
-	if( event.level < LOG_INFO || event.level > LOG_FATAL )
+	static const char* s_levelName[] = { "INFO", "WARNING", "ERROR", "FATAL" };
+
+	LogLevel level = log.level;
+	if( level < LOG_INFO || level > LOG_FATAL )
 		level = LOG_FATAL;
 
-	const char* eventName = s_eventName[level];
-	const char* debugPrefix = event.isDebug ? "D" : "";
+	const char* levelName = s_levelName[level];
+	const char* debugPrefix = log.isDebug ? "D" : "";
 
-	std::cerr << '[' << debugPrefix << eventName << "] " << event.message << ::std::endl;
+	std::cerr << '[' << debugPrefix << levelName << "] " << log.message << ::std::endl;
 
-	if( event.level == LOG_FATAL )
+	if( level == LOG_FATAL )
 		abort();
 }
 
-static LogEventHandler sg_logEventHandler( defaultLogEventHandler );
+static LogHandler sg_logHandler( defaultLogHandler );
 
-LogEventHandler installLogEventHandler( LogEventHandler handler )
+LogHandler setLogHandler( LogHandler handler )
 {
-	LogEventHandler previous = sg_logEventHandler;
-	sg_logEventHandler = handler ? handler : defaultLogEventHandler;
+	LogHandler previous = sg_logHandler;
+	sg_logHandler = handler ? handler : defaultLogHandler;
 	return previous;
 }
 
-LogLevel Log::sm_reportingLevel( LOG_INFO );
+LogLevel Logger::sm_minSeverity( LOG_INFO );
 
-void Log::setReportingLevel( LogLevel level )
+void Logger::setMinSeverity( LogLevel level )
 {
-	sm_reportingLevel = level;
+	sm_minSeverity = level;
 }
 
-Log::~Log()
+Logger::~Logger()
 {
-	LogEvent event;
-	event.message = _os.str();
-	event.level = _level;
-	event.isDebug = _isDebug;
-	sg_logEventHandler( event );
+	Log log;
+	log.message = _os.str();
+	log.level = _level;
+	log.isDebug = _isDebug;
+	sg_logHandler( log );
 }
 
 } // namespace co
