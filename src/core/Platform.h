@@ -255,8 +255,7 @@ const int64		MIN_INT64	= -MAX_INT64 - 1;
 		#define CORAL_EXPORT __declspec(dllimport)
 	#endif
 #else // assumes the compiler is GCC-compatible
-	//#define CORAL_DLL_EXPORT __attribute__((visibility("default")))
-	#define CORAL_DLL_EXPORT
+	#define CORAL_DLL_EXPORT __attribute__((visibility("default")))
 	#define CORAL_EXPORT CORAL_DLL_EXPORT
 #endif
 

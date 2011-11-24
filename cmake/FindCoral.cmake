@@ -196,7 +196,7 @@ macro( CORAL_TARGET targetName )
 				"_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE" )
 	else()
 		# Hide all DSO symbols by default (Ref: http://gcc.gnu.org/wiki/Visibility)
-		#set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_FLAGS "-fvisibility=hidden" )
+		set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_FLAGS "-fvisibility=hidden" )
 	endif()
 endmacro( CORAL_TARGET )
 
