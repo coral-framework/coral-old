@@ -9,7 +9,7 @@ body {
 	@include blueprint-typography-defaults;
 
 	p { margin-bottom: 1em; }
-	ul, ol { margin: 0 0 1em 1.5em; }
+	ul, ol { padding-left: 3.333em; }
 
 	a { @include hover-link; }
 
