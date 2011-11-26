@@ -7,8 +7,8 @@
 #define _CO_ICLASSTYPE_H_
 
 #include <co/TypeTraits.h>
-#include <co/IRecordType.h>
 #include <co/Range.h>
+#include <co/IRecordType.h>
 
 // Forward Declarations:
 namespace co {

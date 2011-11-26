@@ -6,19 +6,19 @@
 #include "TypeManager.h"
 #include "Namespace.h"
 #include "TypeLoader.h"
+#include "ModuleInstaller.h"
 #include "TypeTransaction.h"
 #include "types/Type.h"
 #include "types/ArrayType.h"
 #include "types/Interface.h"
 #include "utils/StringTokenizer.h"
 #include <co/CSLError.h>
+#include <co/IInclude.h>
 #include <co/TypeLoadException.h>
 #include <co/IllegalArgumentException.h>
 #include <sstream>
 
 namespace co {
-
-static const std::string sg_emptyString;
 
 TypeManager::TypeManager()
 {
@@ -34,6 +34,25 @@ TypeManager::~TypeManager()
 void TypeManager::initialize()
 {
 	defineBuiltInTypes();
+
+	// install the 'co' module
+	ModuleInstaller::instance().install();
+
+	/*
+		Manually add the necessary annotations to core types.
+		In the future we shall revamp reflectors to allow their use before any
+		type is created, thus enabling core types to use the core annotations.
+	 */
+	RefPtr<IObject> annotationObject = newInstance( "co.IncludeAnnotation" );
+	IInclude* include = annotationObject->getService<IInclude>();
+	include->setValue( "co/reserved/Uuid.h" );
+	getType( "co.Uuid" )->addAnnotation( include );
+}
+
+void TypeManager::tearDown()
+{
+	// uninstall the 'co' module
+	ModuleInstaller::instance().uninstall();
 }
 
 void TypeManager::addTypeBuilder( ITypeBuilder* tb )

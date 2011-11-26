@@ -7,8 +7,8 @@
 #define _CO_ITYPEBUILDER_H_
 
 #include <co/TypeTraits.h>
-#include <co/IService.h>
 #include <co/TypeKind.h>
+#include <co/IService.h>
 
 // Forward Declarations:
 namespace co {

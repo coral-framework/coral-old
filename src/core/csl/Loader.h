@@ -96,10 +96,7 @@ protected:
 	 */
 	virtual IAnnotation* getDefaultAnnotationInstance( IType* type ) = 0;
 
-	/*!
-		Returns the type created by our ITypeBuilder.
-		Notice that onTypeSpecification() should have been called before.
-	 */
+	//! Returns the type created by our ITypeBuilder.
 	IType* getType();
 
 	/*!
@@ -123,8 +120,10 @@ private:
 	typedef std::map<std::string, ImportInfo> ImportTypeMap;
 	ImportTypeMap _importedTypes;
 
-	// Resolves all types added to the _importedTypes map. This method should be called
-	// after the creation of the type builder to avoid problems with cyclic dependencies.
+	/*
+		Resolves all types added to _importedTypes. This should be called after
+		the type builder is created to avoid problems with cyclic dependencies.
+	 */
 	void resolveImports();
 
 	/*

@@ -7,8 +7,8 @@
 #define _CO_IMEMBER_H_
 
 #include <co/TypeTraits.h>
-#include <co/IAnnotated.h>
 #include <co/MemberKind.h>
+#include <co/IAnnotated.h>
 
 // Forward Declarations:
 namespace co {

@@ -6,8 +6,8 @@
 #ifndef _CO_CRYPTOHASH_H_
 #define _CO_CRYPTOHASH_H_
 
-#include <co/Uuid.h>
 #include <co/Platform.h>
+#include <co/reserved/Uuid.h>
 #include <string>
 #include <cstring>
 

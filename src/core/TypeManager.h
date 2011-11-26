@@ -25,6 +25,7 @@ public:
 
 	// internal methods:
 	void initialize();
+	void tearDown();
 	void addTypeBuilder( ITypeBuilder* tb );
 
 	// ITypeManager methods:

@@ -7,8 +7,8 @@
 #define _CO_IENUM_H_
 
 #include <co/TypeTraits.h>
-#include <co/IType.h>
 #include <co/Range.h>
+#include <co/IType.h>
 
 // co.IEnum Mapping:
 namespace co {

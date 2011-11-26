@@ -6,7 +6,6 @@
 #include "ModulePartLoader.h"
 #include "utils/Library.h"
 #include "utils/StringTokenizer.h"
-#include <co/Uuid.h>
 #include <co/Coral.h>
 #include <co/IType.h>
 #include <co/IModule.h>
@@ -18,6 +17,7 @@
 #include <co/ModuleLoadException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/OS.h>
+#include <co/reserved/Uuid.h>
 #include <co/reserved/LibraryManager.h>
 #include <cstdio>
 #include <sstream>

@@ -7,10 +7,10 @@
 #define _CO_INAMESPACE_H_
 
 #include <co/TypeTraits.h>
-#include <co/IService.h>
-#include <co/TypeKind.h>
-#include <co/INamespace.h>
 #include <co/Range.h>
+#include <co/INamespace.h>
+#include <co/TypeKind.h>
+#include <co/IService.h>
 
 // Forward Declarations:
 namespace co {

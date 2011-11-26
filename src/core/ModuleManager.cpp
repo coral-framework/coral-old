@@ -36,6 +36,11 @@ void ModuleManager::initialize()
 	_loaders.push_back( new ModulePartLoader );
 }
 
+void ModuleManager::tearDown()
+{
+	// empty
+}
+
 static bool sortByIncreasingRank( IModule* a, IModule* b )
 {
 	return a->getRank() < b->getRank();

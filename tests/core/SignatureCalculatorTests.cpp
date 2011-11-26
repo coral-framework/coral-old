@@ -4,7 +4,6 @@
  */
 
 #include "TestHelper.h"
-#include <co/Uuid.h>
 #include <co/IType.h>
 #include <co/Coral.h>
 #include <co/RefPtr.h>
@@ -19,6 +18,7 @@
 #include <co/IllegalNameException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/MissingInputException.h>
+#include <co/reserved/Uuid.h>
 #include <gtest/gtest.h>
 
 static co::IInterface* createDummyInterface( const std::string& name )

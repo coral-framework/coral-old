@@ -27,6 +27,7 @@ public:
 
 	// internal methods:
 	void initialize();
+	void tearDown();
 	void updateModules( ModuleState toState );
 
 	// IModuleManager methods:

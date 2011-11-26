@@ -7,8 +7,8 @@
 #define _CO_IMODULEMANAGER_H_
 
 #include <co/TypeTraits.h>
-#include <co/IService.h>
 #include <co/Range.h>
+#include <co/IService.h>
 
 // Forward Declarations:
 namespace co {

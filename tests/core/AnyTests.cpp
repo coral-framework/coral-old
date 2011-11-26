@@ -5,7 +5,6 @@
 
 #include <gtest/gtest.h>
 
-#include <co/Uuid.h>
 #include <co/Any.h>
 #include <co/Coral.h>
 #include <co/IType.h>
@@ -21,6 +20,7 @@
 #include <co/INativeClass.h>
 #include <co/IRecordType.h>
 #include <co/IllegalCastException.h>
+#include <co/reserved/Uuid.h>
 
 /******************************************************************************
  *	Performance / Portability Tests

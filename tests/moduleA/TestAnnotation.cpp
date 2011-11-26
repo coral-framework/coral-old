@@ -8,6 +8,7 @@
 #include <co/Any.h>
 #include <co/IType.h>
 #include <co/CSLError.h>
+#include <co/reserved/Uuid.h>
 
 namespace moduleA {
 

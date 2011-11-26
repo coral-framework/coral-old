@@ -7,9 +7,9 @@
 #define _CO_ITYPE_H_
 
 #include <co/TypeTraits.h>
-#include <co/IAnnotated.h>
 #include <co/Uuid.h>
 #include <co/TypeKind.h>
+#include <co/IAnnotated.h>
 
 // Forward Declarations:
 namespace co {

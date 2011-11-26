@@ -4,7 +4,6 @@
  */
 
 #include "TestHelper.h"
-#include <co/Uuid.h>
 #include <co/Coral.h>
 #include <co/IPort.h>
 #include <co/IField.h>
@@ -22,6 +21,7 @@
 #include <co/ITypeTransaction.h>
 #include <co/IllegalArgumentException.h>
 #include <co/NotSupportedException.h>
+#include <co/reserved/Uuid.h>
 #include <gtest/gtest.h>
 
 TEST( ReflectorTests, basicReflectors )

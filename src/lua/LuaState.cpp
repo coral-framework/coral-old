@@ -127,7 +127,7 @@ bool LuaState::findScript( lua_State*, const std::string& name, std::string& fil
 
 void LuaState::loadFile( lua_State* L, const std::string& filename )
 {
-	int res = luaL_loadfile( L, filename.c_str() );
+	int res = luaL_loadfilex( L, filename.c_str(), "t" );
 	if( res != LUA_OK )
 		raiseException( L, res );
 }

@@ -7,9 +7,9 @@
 #define _CO_IINTERFACE_H_
 
 #include <co/TypeTraits.h>
-#include <co/IClassType.h>
 #include <co/IInterface.h>
 #include <co/Range.h>
+#include <co/IClassType.h>
 
 // co.IInterface Mapping:
 namespace co {

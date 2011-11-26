@@ -7,9 +7,9 @@
 #define _CO_ITYPEMANAGER_H_
 
 #include <co/TypeTraits.h>
-#include <co/IService.h>
-#include <vector>
 #include <co/Range.h>
+#include <vector>
+#include <co/IService.h>
 
 // Forward Declarations:
 namespace co {

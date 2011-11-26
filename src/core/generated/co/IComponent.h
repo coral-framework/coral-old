@@ -7,8 +7,8 @@
 #define _CO_ICOMPONENT_H_
 
 #include <co/TypeTraits.h>
-#include <co/ICompositeType.h>
 #include <co/Range.h>
+#include <co/ICompositeType.h>
 
 // Forward Declarations:
 namespace co {

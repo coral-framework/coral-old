@@ -7,10 +7,10 @@
 #define _CO_ISYSTEM_H_
 
 #include <co/TypeTraits.h>
-#include <co/IService.h>
+#include <co/SystemState.h>
 #include <co/Range.h>
 #include <vector>
-#include <co/SystemState.h>
+#include <co/IService.h>
 
 // Forward Declarations:
 namespace co {

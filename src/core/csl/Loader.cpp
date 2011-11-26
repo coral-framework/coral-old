@@ -30,14 +30,14 @@
 	errorSS << msg; pushError( loc, errorSS.str() ); }
 
 #define CATCH_ERRORS( loc, code ) try { code; } \
-	catch( co::Exception& e ) { pushError( loc, e.getMessage() ); return; }
+	catch( Exception& e ) { pushError( loc, e.getMessage() ); return; }
 
 namespace co {
 namespace csl {
 
 Loader::Loader()
 {
-	_cslFlags = co::getCSLFlags();
+	_cslFlags = getCSLFlags();
 }
 
 Loader::~Loader()
@@ -115,9 +115,9 @@ void Loader::setError( Error* error )
 	_error = error;	
 }
 
-co::Any* Loader::newAny()
+Any* Loader::newAny()
 {
-	_anyPool.push_back( co::Any() );
+	_anyPool.push_back( Any() );
 	return &_anyPool.back();
 }
 
@@ -345,7 +345,7 @@ void Loader::onAnnotation( const location& loc, const std::string& name, bool ha
 		return;
 	}
 
-	if( type->getKind() != co::TK_COMPONENT )
+	if( type->getKind() != TK_COMPONENT )
 	{
 		PUSH_ERROR( loc, "annotation type '" << componentName << "' is not a component" );
 		return;
@@ -368,13 +368,13 @@ void Loader::onAnnotation( const location& loc, const std::string& name, bool ha
 			_annotations.push_back( AnnotationRecord() );
 		_annotations.back().annotations.push_back( annotation.get() );
 	}
-	catch( co::Exception& e )
+	catch( Exception& e )
 	{
 		pushError( loc, e.getMessage() );
 	}
 }
 
-void Loader::onAnnotationData( const location& loc, const std::string& fieldName, const co::Any& value )
+void Loader::onAnnotationData( const location& loc, const std::string& fieldName, const Any& value )
 {
 	IAnnotation* annotation = _annotations.back().annotations.back().get();
 	try
@@ -389,7 +389,7 @@ void Loader::onAnnotationData( const location& loc, const std::string& fieldName
 		}
 
 		ICompositeType* ct = m->getOwner();
-		co::IReflector* reflector = ct->getReflector();
+		IReflector* reflector = ct->getReflector();
 		if( !reflector )
 		{
 			PUSH_ERROR( loc, "annotation type '" << ct->getFullName() << "' has no reflector" );
@@ -398,7 +398,7 @@ void Loader::onAnnotationData( const location& loc, const std::string& fieldName
 
 		reflector->setField( annotation, static_cast<IField*>( m ), value );
 	}
-	catch( co::Exception& e )
+	catch( Exception& e )
 	{
 		pushError( loc, e.getMessage() );
 		PUSH_ERROR( loc, "error setting annotation field '" << fieldName << "'" );
@@ -429,7 +429,7 @@ IType* Loader::getType()
 
 		for( ++it; it != _annotations.end(); ++it )
 		{
-			co::IMember* m = static_cast<ICompositeType*>( type )->getMember( it->element );
+			IMember* m = static_cast<ICompositeType*>( type )->getMember( it->element );
 			assert( m );
 			m->setAnnotations( it->annotations );
 		}

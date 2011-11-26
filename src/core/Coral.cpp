@@ -5,7 +5,6 @@
 
 #include "Coral.h"
 #include "System.h"
-#include "ModuleInstaller.h"
 #include "utils/StringTokenizer.h"
 #include <co/Log.h>
 #include <co/RefPtr.h>
@@ -75,7 +74,6 @@ ISystem* getSystem()
 	{
 		sg_system = new System;
 		sg_system->initialize();
-		ModuleInstaller::instance().install();
 	}
 	return sg_system.get();
 }
@@ -93,9 +91,6 @@ void shutdown()
 	// tear down the system if it's still running
 	if( systemState == SystemState_Running )
 		sg_system->tearDown();
-
-	// uninstall the 'core' module
-	ModuleInstaller::instance().uninstall();
 
 	// release the main system interfaces
 	sg_serviceManager = NULL;

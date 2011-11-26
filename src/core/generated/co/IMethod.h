@@ -7,8 +7,8 @@
 #define _CO_IMETHOD_H_
 
 #include <co/TypeTraits.h>
-#include <co/IMember.h>
 #include <co/Range.h>
+#include <co/IMember.h>
 
 // Forward Declarations:
 namespace co {

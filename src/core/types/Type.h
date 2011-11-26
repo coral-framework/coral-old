@@ -7,11 +7,11 @@
 #define _TYPE_H_
 
 #include "Type_Base.h"
-#include <co/Uuid.h>
 #include <co/RefVector.h>
 #include <co/INamespace.h>
 #include <co/IReflector.h>
 #include <co/IAnnotation.h>
+#include <co/reserved/Uuid.h>
 
 namespace co {
 

@@ -6,6 +6,8 @@
 #ifndef _CO_UUID_ADAPTER_H_
 #define _CO_UUID_ADAPTER_H_
 
+#include <co/reserved/Uuid.h> // added by co.Include()
+
 #include <co/Uuid.h>
 
 namespace co {
