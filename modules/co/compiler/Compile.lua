@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- Coral CSL Compiler CLI Program
+-- Coral Compiler Command-Line Front End
 -------------------------------------------------------------------------------
 
 local debug = require "debug"
@@ -89,71 +89,70 @@ Available options:
 end
 
 -------------------------------------------------------------------------------
--- Command-Line Processing
+-- Launcher Component
 -------------------------------------------------------------------------------
 
-local allArgs = {...}
-if #allArgs == 0 then
-	flags.help()
-	return 0
-end
+local Component = co.Component( "co.compiler.Compile" )
 
-local args, errorString = cmdline.process( allArgs, flags )
-if not args then
-	print( errorString )
-	return -2
-end
-
-if askedForVersion then
-	return 0
-end
-
-if askedForDox and askedForList then
-	print( "Error: --dox and --list are mutually exclusive options." )
-	return -2
-end
-
-if not moduleName and ( askedForDox or askedForList ) then
-	print( "Error: use -g to specify the module you want to generate documentation for." )
-	return -2
-end
-
--------------------------------------------------------------------------------
--- Main
--------------------------------------------------------------------------------
-
-if askedForList then
-	compiler.simulation = true
-else
-	compiler.log = print
-end
-
-local ok, err = xpcall( function()
-	for i = 1, #args do
-		compiler:addType( args[i] )
+function Component:main( args )
+	if #args == 0 then
+		flags.help()
+		return 0
 	end
 
-	if moduleName then
-		if askedForDox then
-			compiler:generateDox( moduleName )
-		else
-			local moduleSources = compiler:generateModule( moduleName )
-			if askedForList then
-				for i, sourceFile in ipairs( moduleSources ) do
-					print( sourceFile )
+	local types, errorString = cmdline.process( args, flags )
+	if not types then
+		print( errorString )
+		return -2
+	end
+
+	if askedForVersion then
+		return 0
+	end
+
+	if askedForDox and askedForList then
+		print( "Error: --dox and --list are mutually exclusive options." )
+		return -2
+	end
+
+	if not moduleName and ( askedForDox or askedForList ) then
+		print( "Error: use -g to specify the module you want to generate documentation for." )
+		return -2
+	end
+
+	if askedForList then
+		compiler.simulation = true
+	else
+		compiler.log = print
+	end
+
+	local ok, err = xpcall( function()
+		for i = 1, #types do
+			compiler:addType( types[i] )
+		end
+
+		if moduleName then
+			if askedForDox then
+				compiler:generateDox( moduleName )
+			else
+				local moduleSources = compiler:generateModule( moduleName )
+				if askedForList then
+					for i, sourceFile in ipairs( moduleSources ) do
+						print( sourceFile )
+					end
 				end
 			end
+		else
+			compiler:generateMappings()
 		end
-	else
-		compiler:generateMappings()
+	end, debug.traceback )
+
+	if not ok then
+		print( "*** Error ***" )
+		local exceptionType, exceptionMsg = co.getException( err )
+		print( exceptionMsg )
+		return -1
 	end
-end, debug.traceback )
 
-if not ok then
-	print( "*** Error ***" )
-	local exceptionType, exceptionMsg = co.getException( err )
-	print( exceptionMsg )
-	return -1
+	return 0
 end
-
-return 0
