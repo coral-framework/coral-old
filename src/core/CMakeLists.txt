@@ -33,6 +33,7 @@ SET( CORAL_PUBLIC_HEADERS
 	Endian.h
 	Exception.h
 	IService.h
+	Log.h
 	Platform.h
 	Range.h
 	RefPtr.h
@@ -52,7 +53,8 @@ ENDFOREACH()
 
 ADD_SUBDIRECTORY( csl )
 ADD_SUBDIRECTORY( reserved )
-ADD_SUBDIRECTORY( tools )
+ADD_SUBDIRECTORY( types )
+ADD_SUBDIRECTORY( utils )
 
 ################################################################################
 # Build Library
@@ -74,28 +76,32 @@ GET_PROPERTY( SOURCE_FILES DIRECTORY PROPERTY SOURCE_FILES )
 FILE( GLOB MAPPING_HEADER_FILES generated/co/*.h )
 FILE( GLOB GENERATED_MODULE_FILES generated/*.h generated/*.cpp )
 
-INCLUDE_DIRECTORIES(
-	${ANTLR3C_SOURCE_DIR}/include
-	generated
-)
+INCLUDE_DIRECTORIES( generated )
 
 ADD_DEFINITIONS( -DBUILDING_CORAL_CORE )
 
-ADD_LIBRARY( core SHARED ${MAPPING_HEADER_FILES} ${GENERATED_MODULE_FILES} ${HEADER_FILES} ${SOURCE_FILES} )
+ADD_LIBRARY( core SHARED
+	${MAPPING_HEADER_FILES}
+	${GENERATED_MODULE_FILES}
+	${HEADER_FILES}
+	${SOURCE_FILES}
+	"csl/CSL.l"
+	"csl/CSL.y"
+)
+
+if( NOT MSVC )
+	# Disable warnings for auto-generated code
+	set_property( SOURCE "csl/scanner.cc" APPEND PROPERTY COMPILE_FLAGS "-Wno-unused-parameter" )
+endif()
 
 SET_TARGET_PROPERTIES( core PROPERTIES
 	OUTPUT_NAME   "coral"
 	PROJECT_LABEL "Coral Library"
 )
 
-CORAL_DEFAULT_TARGET_PROPERTIES( core )
+CORAL_TARGET( core )
 
-IF( NOT MSVC )
-	# Disable warnings for AntLR-generated source files
-	SET_PROPERTY( SOURCE csl/CSLLexer.cpp csl/CSLParser.cpp PROPERTY COMPILE_FLAGS "-Wno-all -Wno-extra -Wno-unused" )
-ENDIF()
-
-TARGET_LINK_LIBRARIES( core	antlr3c )
+TARGET_LINK_LIBRARIES( core )
 
 IF( UNIX )
     TARGET_LINK_LIBRARIES( core dl )
@@ -105,39 +111,32 @@ ENDIF()
 # Source Groups
 ################################################################################
 
-# Default Source Group
 SOURCE_GROUP( "Core" REGULAR_EXPRESSION ".*" )
 SOURCE_GROUP( "" FILES "CMakeLists.txt" )
 
-# Generated Files
-SOURCE_GROUP( "@Mappings" FILES ${MAPPING_HEADER_FILES} )
 SOURCE_GROUP( "@Generated" FILES ${GENERATED_MODULE_FILES} )
+SOURCE_GROUP( "@Generated\\co" FILES ${MAPPING_HEADER_FILES} )
 
-# Module System Files
 FILE( GLOB moduleFiles Module*.* )
-SOURCE_GROUP( "Module" FILES ${moduleFiles} )
+SOURCE_GROUP( "Module System" FILES ${moduleFiles} )
 
-# Reflection System Files
-FILE( GLOB reflectionFiles Any* *Reflector* )
-SOURCE_GROUP( "Reflection" FILES ${reflectionFiles} )
+FILE( GLOB typeFiles Annotations.* *Builder.* Namespace.* Signature* Type* Uuid* )
+SOURCE_GROUP( "Type System" FILES ${typeFiles} )
 
-# Type System Files
-FILE( GLOB typeFiles *Type*.* Array.* Enum.* Struct.* Component.* Interface.*
-	NativeClass.* Member.* Field.* Method.* Port.* Parameter.* MethodBuilder.*
-	Namespace.* SignatureCalculator.* )
-SOURCE_GROUP( "Type" FILES ${typeFiles} )
+FILE( GLOB cslFiles csl/*.h csl/*.cpp csl/*.hh csl/*.cc )
+SOURCE_GROUP( "Type System\\CSL" FILES TypeLoader.h TypeLoader.cpp csl/CSL.l csl/CSL.y ${cslFiles} )
 
-# CSL Loading Files
-FILE( GLOB cslFiles csl/*.h csl/*.cpp )
-SOURCE_GROUP( "CSL" FILES ${cslFiles} )
+FILE( GLOB reflectionFiles Any.* *Reflector.* )
+SOURCE_GROUP( "Type System\\Reflection" FILES Annotations.cpp ${reflectionFiles} )
 
-# 'Reserved' Public Classes
+FILE( GLOB typesFiles types/*.h types/*.cpp )
+SOURCE_GROUP( "Type System\\Types" FILES ${typesFiles} )
+
 FILE( GLOB reservedFiles reserved/*.h reserved/*.cpp )
-SOURCE_GROUP( "Reserved" FILES ${reservedFiles} )
+SOURCE_GROUP( "Reserved API" FILES ${reservedFiles} )
 
-# Internal Utility Classes (Tools)
-FILE( GLOB toolsFiles tools/*.h tools/*.cpp )
-SOURCE_GROUP( "Tools" FILES ${toolsFiles} )
+FILE( GLOB utilsFiles utils/*.h utils/*.cpp )
+SOURCE_GROUP( "Utility Classes" FILES ${utilsFiles} )
 
 ################################################################################
 # Install Rules

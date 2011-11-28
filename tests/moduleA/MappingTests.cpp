@@ -153,7 +153,7 @@ TEST( MappingTests, interface )
 
 TEST( MappingTests, nativeClass )
 {
- 	EXPECT_STREQ( "moduleA.Vec2D", ( co::nameOf< std::pair<double, double> >::get() ) );
+ 	EXPECT_STREQ( "moduleA.Vec2D", ( co::nameOf<moduleA::Vec2D>::get() ) );
 }
 
 TEST( MappingTests, namespaces )

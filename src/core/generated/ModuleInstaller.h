@@ -3,6 +3,9 @@
  * See Copyright Notice in Coral.h
  */
 
+#ifndef _MODULE_INSTALLER_H_
+#define _MODULE_INSTALLER_H_
+
 #include <co/RefPtr.h>
 #include <co/IReflector.h>
 #include <co/IModulePart.h>
@@ -18,18 +21,26 @@ public:
 	{
 		TypeId_ArrayType,
 		TypeId_Component,
+		TypeId_CppBlockAnnotation,
 		TypeId_CSLError,
+		TypeId_DocumentationAnnotation,
 		TypeId_Enum,
 		TypeId_ExceptionType,
 		TypeId_Field,
+		TypeId_IAnnotated,
+		TypeId_IAnnotation,
 		TypeId_IArray,
 		TypeId_IClassType,
 		TypeId_IComponent,
 		TypeId_ICompositeType,
+		TypeId_ICppBlock,
+		TypeId_IDocumentation,
 		TypeId_IDynamicServiceProvider,
+		TypeId_IDynamicTypeProvider,
 		TypeId_IEnum,
 		TypeId_IException,
 		TypeId_IField,
+		TypeId_IInclude,
 		TypeId_IInterface,
 		TypeId_IllegalArgumentException,
 		TypeId_IllegalCastException,
@@ -44,6 +55,7 @@ public:
 		TypeId_IModulePartLoader,
 		TypeId_INamespace,
 		TypeId_INativeClass,
+		TypeId_IncludeAnnotation,
 		TypeId_Interface,
 		TypeId_IObject,
 		TypeId_IParameter,
@@ -119,18 +131,26 @@ private:
 // Module's reflector creation functions:
 co::IReflector* __createArrayTypeReflector();
 co::IReflector* __createComponentReflector();
+co::IReflector* __createCppBlockAnnotationReflector();
 co::IReflector* __createCSLErrorReflector();
+co::IReflector* __createDocumentationAnnotationReflector();
 co::IReflector* __createEnumReflector();
 co::IReflector* __createExceptionTypeReflector();
 co::IReflector* __createFieldReflector();
+co::IReflector* __createIAnnotatedReflector();
+co::IReflector* __createIAnnotationReflector();
 co::IReflector* __createIArrayReflector();
 co::IReflector* __createIClassTypeReflector();
 co::IReflector* __createIComponentReflector();
 co::IReflector* __createICompositeTypeReflector();
+co::IReflector* __createICppBlockReflector();
+co::IReflector* __createIDocumentationReflector();
 co::IReflector* __createIDynamicServiceProviderReflector();
+co::IReflector* __createIDynamicTypeProviderReflector();
 co::IReflector* __createIEnumReflector();
 co::IReflector* __createIExceptionReflector();
 co::IReflector* __createIFieldReflector();
+co::IReflector* __createIIncludeReflector();
 co::IReflector* __createIInterfaceReflector();
 co::IReflector* __createIllegalArgumentExceptionReflector();
 co::IReflector* __createIllegalCastExceptionReflector();
@@ -145,6 +165,7 @@ co::IReflector* __createIModulePartReflector();
 co::IReflector* __createIModulePartLoaderReflector();
 co::IReflector* __createINamespaceReflector();
 co::IReflector* __createINativeClassReflector();
+co::IReflector* __createIncludeAnnotationReflector();
 co::IReflector* __createInterfaceReflector();
 co::IReflector* __createIObjectReflector();
 co::IReflector* __createIParameterReflector();
@@ -184,3 +205,5 @@ co::IReflector* __createTypeTransactionReflector();
 co::IReflector* __createUuidReflector();
 
 } // namespace co
+
+#endif

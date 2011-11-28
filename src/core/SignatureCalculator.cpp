@@ -149,8 +149,7 @@ void SignatureCalculator::fillStructSignatureData()
 void SignatureCalculator::fillNativeClassSignatureData()
 {
 	INativeClass* nativeType = static_cast<INativeClass*>( _type );
-	_fullSignatureHash.addData( nativeType->getNativeName() );
-	_fullSignatureHash.addData( nativeType->getNativeHeader() );
+	CORAL_UNUSED( nativeType );
 	fillClassTypeData();
 }
 

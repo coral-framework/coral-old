@@ -58,11 +58,13 @@ co::IReflector* lua::ModuleInstaller::createReflector( TypeId typeId )
 	case TypeId_Component: res = lua::__createComponentReflector(); break;
 	case TypeId_Exception: res = lua::__createExceptionReflector(); break;
 	case TypeId_ILauncher: res = lua::__createILauncherReflector(); break;
+	case TypeId_IScripted: res = lua::__createIScriptedReflector(); break;
 	case TypeId_IState: res = lua::__createIStateReflector(); break;
 	case TypeId_Launcher: res = lua::__createLauncherReflector(); break;
 	case TypeId_lua: res = lua::__createluaReflector(); break;
 	case TypeId_ModulePart: res = lua::__createModulePartReflector(); break;
 	case TypeId_ModulePartLoader: res = lua::__createModulePartLoaderReflector(); break;
+	case TypeId_ScriptedAnnotation: res = lua::__createScriptedAnnotationReflector(); break;
 	case TypeId_Universe: res = lua::__createUniverseReflector(); break;
 	default: assert( false );
 	};

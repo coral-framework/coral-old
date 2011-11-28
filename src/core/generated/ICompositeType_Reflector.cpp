@@ -5,9 +5,11 @@
 
 #include <co/ICompositeType.h>
 #include <co/IDynamicServiceProvider.h>
+#include <co/IAnnotation.h>
+#include <co/IReflector.h>
 #include <co/INamespace.h>
 #include <co/IMember.h>
-#include <co/IReflector.h>
+#include <co/IInterface.h>
 #include <co/Uuid.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
@@ -43,6 +45,38 @@ public:
 	void serviceRetain() { _provider->serviceRetain(); }
 	void serviceRelease() { _provider->serviceRelease(); }
 
+	// co.IAnnotated Methods:
+
+	co::Range<co::IAnnotation* const> getAnnotations()
+	{
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ) );
+        return res.get< co::Range<co::IAnnotation* const> >();
+	}
+
+	void setAnnotations( co::Range<co::IAnnotation* const> annotations_ )
+	{
+		co::Any arg;
+		arg.set< co::Range<co::IAnnotation* const> >( annotations_ );
+		_provider->dynamicSetField( _cookie, getField<co::IAnnotated>( 0 ), arg );
+	}
+
+	void addAnnotation( co::IAnnotation* annotation_ )
+	{
+		co::Any args[1];
+		args[0].set< co::IAnnotation* >( annotation_ );
+		co::Range<co::Any const> range( args, 1 );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 0 ), range );
+	}
+
+	co::IAnnotation* getAnnotation( co::IInterface* requestedType_ )
+	{
+		co::Any args[1];
+		args[0].set< co::IInterface* >( requestedType_ );
+		co::Range<co::Any const> range( args, 1 );
+		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
+		return res.get< co::IAnnotation* >();
+	}
+
 	// co.IType Methods:
 
 	const co::Uuid& getBinarySignature()
@@ -51,39 +85,45 @@ public:
         return res.get< const co::Uuid& >();
 	}
 
-	const std::string& getFullName()
+	co::IReflector* getCurrentReflector()
 	{
 		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 1 ) );
+        return res.get< co::IReflector* >();
+	}
+
+	const std::string& getFullName()
+	{
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 2 ) );
         return res.get< const std::string& >();
 	}
 
 	const co::Uuid& getFullSignature()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 2 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 3 ) );
         return res.get< const co::Uuid& >();
 	}
 
 	co::TypeKind getKind()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 3 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 4 ) );
         return res.get< co::TypeKind >();
 	}
 
 	const std::string& getName()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 4 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 5 ) );
         return res.get< const std::string& >();
 	}
 
 	co::INamespace* getNamespace()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 5 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 6 ) );
         return res.get< co::INamespace* >();
 	}
 
 	co::IReflector* getReflector()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 6 ) );
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 7 ) );
         return res.get< co::IReflector* >();
 	}
 
@@ -91,7 +131,7 @@ public:
 	{
 		co::Any arg;
 		arg.set< co::IReflector* >( reflector_ );
-		_provider->dynamicSetField( _cookie, getField<co::IType>( 6 ), arg );
+		_provider->dynamicSetField( _cookie, getField<co::IType>( 7 ), arg );
 	}
 
 	// co.ICompositeType Methods:
@@ -151,7 +191,7 @@ public:
 
 	co::uint32 getSize()
 	{
-		return sizeof(co::ICompositeType);
+		return sizeof(void*);
 	}
 
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )

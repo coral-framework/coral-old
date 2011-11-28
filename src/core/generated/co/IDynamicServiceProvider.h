@@ -8,9 +8,9 @@
 
 #include <co/TypeTraits.h>
 #include <co/Any.h>
-#include <co/IService.h>
-#include <vector>
 #include <co/Range.h>
+#include <vector>
+#include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
@@ -44,7 +44,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IDynamicServiceProvider> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IDynamicServiceProvider> { static const char* get() { return "co.IDynamicServiceProvider"; } };
-template<> struct typeOf<co::IDynamicServiceProvider> : public typeOfBase<co::IDynamicServiceProvider, IInterface> {};
 } // namespace co
 
 #endif // _CO_IDYNAMICSERVICEPROVIDER_H_

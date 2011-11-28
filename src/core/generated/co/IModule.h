@@ -7,9 +7,9 @@
 #define _CO_IMODULE_H_
 
 #include <co/TypeTraits.h>
-#include <co/IService.h>
-#include <co/ModuleState.h>
 #include <co/Range.h>
+#include <co/ModuleState.h>
+#include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
@@ -54,7 +54,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IModule> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IModule> { static const char* get() { return "co.IModule"; } };
-template<> struct typeOf<co::IModule> : public typeOfBase<co::IModule, IInterface> {};
 } // namespace co
 
 #endif // _CO_IMODULE_H_

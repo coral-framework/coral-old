@@ -3,5 +3,5 @@
  */
 interface invalidExceptionArray
 {
-	TestExceptions.AnotherException[] comp;
+	Global.AnotherException[] comp;
 };

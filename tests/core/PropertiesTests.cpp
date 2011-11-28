@@ -4,7 +4,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <core/tools/Properties.h>
+#include <core/utils/Properties.h>
 #include <sstream>
 
 TEST( PropertiesTests, parsing )

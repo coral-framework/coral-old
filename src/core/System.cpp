@@ -97,6 +97,8 @@ void System::tearDown()
 
 	// release the remaining service instances
 	_services->tearDown();
+	_modules->tearDown();
+	_types->tearDown();
 
 	// make sure all released library instances are unloaded
 	LibraryManager::flush();

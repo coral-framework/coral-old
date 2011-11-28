@@ -7,8 +7,8 @@
 #define _CO_ICOMPOSITETYPE_H_
 
 #include <co/TypeTraits.h>
-#include <co/IType.h>
 #include <co/Range.h>
+#include <co/IType.h>
 
 // Forward Declarations:
 namespace co {
@@ -34,7 +34,6 @@ public:
 namespace co {
 template<> struct kindOf<co::ICompositeType> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::ICompositeType> { static const char* get() { return "co.ICompositeType"; } };
-template<> struct typeOf<co::ICompositeType> : public typeOfBase<co::ICompositeType, IInterface> {};
 } // namespace co
 
 #endif // _CO_ICOMPOSITETYPE_H_

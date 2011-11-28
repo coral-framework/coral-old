@@ -5,19 +5,19 @@
 
 #include "TypeBuilder.h"
 
-#include "Type.h"
-#include "Enum.h"
 #include "Namespace.h"
-#include "Method.h"
-#include "Struct.h"
 #include "TypeManager.h"
-#include "Field.h"
 #include "MethodBuilder.h"
-#include "Port.h"
-#include "ExceptionType.h"
-#include "Component.h"
-#include "Interface.h"
-#include "NativeClass.h"
+#include "types/Type.h"
+#include "types/Enum.h"
+#include "types/Method.h"
+#include "types/Struct.h"
+#include "types/Field.h"
+#include "types/Port.h"
+#include "types/ExceptionType.h"
+#include "types/Component.h"
+#include "types/Interface.h"
+#include "types/NativeClass.h"
 #include <co/Coral.h>
 #include <co/IllegalNameException.h>
 #include <co/IllegalStateException.h>
@@ -106,11 +106,6 @@ void TypeBuilder::definePort( const std::string&, IInterface*, bool )
 IMethodBuilder* TypeBuilder::defineMethod( const std::string& )
 {
 	CORAL_THROW( NotSupportedException, "the builder's type is not a class type" );
-}
-
-void TypeBuilder::defineNativeClass( const std::string&, const std::string& )
-{
-	CORAL_THROW( NotSupportedException, "the builder's type is not a native class" );
 }
 
 IType* TypeBuilder::createType()
@@ -215,7 +210,7 @@ public:
 	}
 };
 
-// ------ RecordTypeBuilder ----------------------------------------------------
+// ------ CompositeTypeBuilder -------------------------------------------------
 
 class CompositeTypeBuilder : public TypeBuilder
 {
@@ -399,39 +394,12 @@ protected:
 class NativeClassBuilder : public TemplateBuilder<ClassTypeBuilder, NativeClass, TK_NATIVECLASS>
 {
 public:
-	void defineNativeClass( const std::string& nativeHeader, const std::string& nativeName )
-	{
-		assertNotCreated();
-
-		if( nativeHeader.empty() )
-			CORAL_THROW( IllegalArgumentException, "illegal empty header name" );
-
-		if( nativeName.empty() )
-			CORAL_THROW( IllegalArgumentException, "illegal empty native type name" );
-
-		_nativeHeader = nativeHeader;
-		_nativeName = nativeName;
-	}
-
 	void fillType()
 	{
-		if( _nativeHeader.empty() )
-			CORAL_THROW( MissingInputException, "missing native header" );
-
-		if( _nativeName.empty() )
-			CORAL_THROW( MissingInputException, "missing native name" );
-
-		_myType->setNativeHeader( _nativeHeader );
-		_myType->setNativeName( _nativeName );
-
 		_myType->addMembers( _fields );
 		_myType->addMembers( _methods );
 		_myType->sortMembers( _myType );
 	}
-
-private:
-	std::string _nativeHeader;
-	std::string _nativeName;
 };
 
 // ------ InterfaceBuilder -------------------------------------------------

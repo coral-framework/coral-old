@@ -37,7 +37,12 @@ private:
 
 } // anonymous namespace
 
-TEST( RefPtrTests, refPtrValidity )
+TEST( RefPtrTests, size )
+{
+	EXPECT_EQ( sizeof(void*), sizeof(co::RefPtr<PseudoInterface>) );
+}
+
+TEST( RefPtrTests, validity )
 {
 	co::RefPtr<PseudoInterface> ptr;
 	EXPECT_TRUE( !ptr );
@@ -52,7 +57,7 @@ TEST( RefPtrTests, refPtrValidity )
 	EXPECT_FALSE( ptr.isValid() );
 }
 
-TEST( RefPtrTests, refPtrRelease )
+TEST( RefPtrTests, release )
 {
 	bool objDestroyed = false;
 	PseudoInterface *obj = new PseudoInterface( &objDestroyed );
@@ -73,7 +78,7 @@ TEST( RefPtrTests, refPtrRelease )
 
 }
 
-TEST( RefPtrTests, refPtrSwap )
+TEST( RefPtrTests, swap )
 {
 	bool objDestroyed = false;
 	PseudoInterface *obj = new PseudoInterface( &objDestroyed );
@@ -99,7 +104,7 @@ struct TripleRefs
 	co::RefPtr<PseudoInterface> ref3;
 };
 
-TEST( RefPtrTests, refPtrsInStruct )
+TEST( RefPtrTests, structFields )
 {
 	bool destroyedA = false;
 	PseudoInterface *objA = new PseudoInterface( &destroyedA );

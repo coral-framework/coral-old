@@ -4,9 +4,8 @@
  */
 
 #include "ModulePartLoader.h"
-#include "tools/Library.h"
-#include "tools/StringTokenizer.h"
-#include <co/Uuid.h>
+#include "utils/Library.h"
+#include "utils/StringTokenizer.h"
 #include <co/Coral.h>
 #include <co/IType.h>
 #include <co/IModule.h>
@@ -18,6 +17,7 @@
 #include <co/ModuleLoadException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/OS.h>
+#include <co/reserved/Uuid.h>
 #include <co/reserved/LibraryManager.h>
 #include <cstdio>
 #include <sstream>
@@ -158,7 +158,7 @@ void ModulePartLoader::resolveModuleFunctions( Library* lib, BootstrapFunctions&
 
 	if( !bf.queryVerificationData || !bf.queryDependencies || !bf.modulePartInstance )
 		CORAL_THROW( ModuleLoadException, "incompatible library: '" << lib->getFileName()
-						<< "' does not properly export the module bootstrap functions" );
+			<< "' does not properly export the module bootstrap functions" );
 }
 
 bool ModulePartLoader::checkVerificationData( const std::string& data )

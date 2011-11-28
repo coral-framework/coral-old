@@ -1,7 +1,0 @@
-// This class should be loaded indirectlly
-// and its documentations lines should be stored
-interface DependencyType
-{
-	//name field;
-	string name;
-};

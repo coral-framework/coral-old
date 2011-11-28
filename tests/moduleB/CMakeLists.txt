@@ -25,8 +25,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR}/generated )
 
 ADD_LIBRARY( moduleB MODULE EXCLUDE_FROM_ALL ModulePart.cpp ${_GENERATED_FILES} )
 
-CORAL_DEFAULT_TARGET_PROPERTIES( moduleB )
-CORAL_MODULE_TARGET_PROPERTIES( moduleB )
+CORAL_MODULE_TARGET( "moduleB" moduleB )
 
 SET_TARGET_PROPERTIES( moduleB PROPERTIES
 	PROJECT_LABEL "Module B"
@@ -49,9 +48,9 @@ FILE( GLOB TEST_SOURCE_FILES *Tests.cpp )
 
 # Create test executable
 ADD_EXECUTABLE( tests_moduleB EXCLUDE_FROM_ALL Main.cpp ${TEST_SOURCE_FILES} )
-ADD_DEPENDENCIES( tests_moduleB moduleB )
+ADD_DEPENDENCIES( tests_moduleB moduleB lua )
 
-CORAL_DEFAULT_TARGET_PROPERTIES( tests_moduleB )
+CORAL_TARGET( tests_moduleB )
 
 SET_TARGET_PROPERTIES( tests_moduleB PROPERTIES
 	PROJECT_LABEL "Tests - Module B"
@@ -82,9 +81,3 @@ IF( VALGRIND_COMMAND )
 		--suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp $<TARGET_FILE:tests_moduleB>
 	)
 ENDIF()
-
-################################################################################
-# Source Groups
-################################################################################
-
-SOURCE_GROUP( "@Generated" FILES ${_GENERATED_FILES} )

@@ -38,7 +38,7 @@ public:
 
 template<> struct kindOf<IService> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<IService> { static const char* get() { return "co.IService"; } };
-template<> struct typeOf<IService> : public typeOfBase<IService, IInterface> {};
+
 
 } // namespace co
 

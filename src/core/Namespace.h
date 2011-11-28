@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _NAMESPACE_H_
-#define _NAMESPACE_H_
+#ifndef _CO_NAMESPACE_H_
+#define _CO_NAMESPACE_H_
 
 #include "Namespace_Base.h"
 #include <co/IType.h>
@@ -21,13 +21,13 @@ class Namespace : public Namespace_Base
 public:
 	Namespace();
 	virtual ~Namespace();
-	
+
 	// internal methods:
 	void setParentAndName( INamespace* parent, const std::string& name );
 	void setModule( IModule* module );
 	void addType( IType* type );
 	void removeType( IType* type );
-	
+
 	// INamespace methods:
 	const std::string& getName();
 	const std::string& getFullName();
@@ -37,8 +37,7 @@ public:
 	IModule* getModule();
 	IType* getType( const std::string& name );
 	INamespace* getChildNamespace( const std::string& name );
-	ITypeBuilder* defineType( const std::string& name, TypeKind typeKind,
-									ITypeTransaction* transaction );
+	ITypeBuilder* defineType( const std::string& name, TypeKind typeKind );
 	INamespace* defineChildNamespace( const std::string& name );
 
 private:
@@ -54,7 +53,7 @@ private:
 	inline IType* findType( const std::string& name )
 	{
 		size_t pos;
-		if( binarySearch( Range<IType*>( _types ), name, typeComparator, pos ) )
+		if( binarySearch( Range<IType* const>( _types ), name, typeComparator, pos ) )
 			return _types[pos].get();
 		return NULL;
 	}
@@ -67,7 +66,7 @@ private:
 	inline INamespace* findChildNamespace( const std::string& name )
 	{
 		size_t pos;
-		if( binarySearch( Range<INamespace*>( _childNamespaces ), name, namespaceComparator, pos ) )
+		if( binarySearch( Range<INamespace* const>( _childNamespaces ), name, namespaceComparator, pos ) )
 			return _childNamespaces[pos].get();
 		return NULL;
 	}

@@ -99,7 +99,7 @@ co::IComponent* ]], t.name, [[_Base::getComponent()
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* ]], t.name, [[_Base::getService( co::IPort* port )
+co::IService* ]], t.name, [[_Base::getServiceAt( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -121,7 +121,7 @@ co::IService* ]], t.name, [[_Base::getService( co::IPort* port )
 	return res;
 }
 
-void ]], t.name, [[_Base::setService( co::IPort* receptacle, co::IService* service )
+void ]], t.name, [[_Base::setServiceAt( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 ]] )

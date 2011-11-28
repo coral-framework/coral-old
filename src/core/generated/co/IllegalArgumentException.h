@@ -12,7 +12,7 @@
 // co.IllegalArgumentException Mapping:
 namespace co {
 
-class IllegalArgumentException : public co::Exception
+class CORAL_EXPORT_EXCEPTION IllegalArgumentException : public co::Exception
 {
 public:
 	IllegalArgumentException()
@@ -33,7 +33,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IllegalArgumentException> : public kindOfBase<TK_EXCEPTION> {};
 template<> struct nameOf<co::IllegalArgumentException> { static const char* get() { return "co.IllegalArgumentException"; } };
-template<> struct typeOf<co::IllegalArgumentException> : public typeOfBase<co::IllegalArgumentException, IException> {};
 } // namespace co
 
 #endif // _CO_ILLEGALARGUMENTEXCEPTION_H_

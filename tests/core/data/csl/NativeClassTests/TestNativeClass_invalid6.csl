@@ -1,5 +1,0 @@
-native class TestNativeClass_invalid6 ( :: )
-{
-string[] a;
-
-};

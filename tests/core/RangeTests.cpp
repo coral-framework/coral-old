@@ -83,3 +83,34 @@ TEST( RangeTests, stringStdVector )
 
 	EXPECT_TRUE( r.isEmpty() );
 }
+
+/*
+	Test the use of Ranges with incomplete types.
+ */
+struct IncompleteType;
+static co::Range<IncompleteType> create();
+static co::Range<IncompleteType> passthrough( co::Range<IncompleteType> range );
+static void test( co::Range<IncompleteType> res );
+
+TEST( RangeTests, incompleteType )
+{
+	test( passthrough( create() ) );
+}
+
+struct IncompleteType { double d; IncompleteType( double d ) : d( d ) {} };
+
+static co::Range<IncompleteType> create()
+{
+	static IncompleteType array[] = { IncompleteType( 1 ), IncompleteType( 2 ), IncompleteType( 3 ) };
+	return co::Range<IncompleteType>( array, 3 );
+}
+
+static co::Range<IncompleteType> passthrough( co::Range<IncompleteType> input )
+{
+	return input;
+}
+
+static void test( co::Range<IncompleteType> res )
+{
+	EXPECT_EQ( 3, res.getSize() );
+}

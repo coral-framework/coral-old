@@ -4,26 +4,26 @@
  */
 
 #include "TypeManager.h"
-#include "Type.h"
-#include "Coral.h"
 #include "Namespace.h"
-#include "ArrayType.h"
 #include "TypeLoader.h"
-#include "Interface.h"
-#include "tools/StringTokenizer.h"
+#include "ModuleInstaller.h"
+#include "TypeTransaction.h"
+#include "types/Type.h"
+#include "types/ArrayType.h"
+#include "types/Interface.h"
+#include "utils/StringTokenizer.h"
 #include <co/CSLError.h>
+#include <co/IInclude.h>
 #include <co/TypeLoadException.h>
 #include <co/IllegalArgumentException.h>
 #include <sstream>
 
 namespace co {
 
-static const std::string sg_emptyString;
-
 TypeManager::TypeManager()
 {
 	_rootNS = new Namespace;
-	_docParsing = true;
+	_transaction = new TypeTransaction;
 }
 
 TypeManager::~TypeManager()
@@ -34,40 +34,30 @@ TypeManager::~TypeManager()
 void TypeManager::initialize()
 {
 	defineBuiltInTypes();
+
+	// install the 'co' module
+	ModuleInstaller::instance().install();
+
+	/*
+		Manually add the necessary annotations to core types.
+		In the future we shall revamp reflectors to allow their use before any
+		type is created, thus enabling core types to use the core annotations.
+	 */
+	RefPtr<IObject> annotationObject = newInstance( "co.IncludeAnnotation" );
+	IInclude* include = annotationObject->getService<IInclude>();
+	include->setValue( "co/reserved/Uuid.h" );
+	getType( "co.Uuid" )->addAnnotation( include );
 }
 
-void TypeManager::addDocumentation( const std::string& typeOrMemberName, const std::string& text )
+void TypeManager::tearDown()
 {
-	DocMap::iterator it = _docMap.find( typeOrMemberName );
-	if( it != _docMap.end() )
-	{
-		std::string& str = it->second;
-		str.reserve( str.length() + 1 + text.length() );
-		str.push_back( '\n' );
-		str.append( text );
-	}
-	else
-	{
-		_docMap.insert( DocMap::value_type( typeOrMemberName, text ) );
-	}
+	// uninstall the 'co' module
+	ModuleInstaller::instance().uninstall();
 }
 
-void TypeManager::addCppBlock( const std::string& interfaceName, const std::string& text )
+void TypeManager::addTypeBuilder( ITypeBuilder* tb )
 {
-	CppBlockMap::iterator it = _cppBlockMap.find( interfaceName );
-	if( it != _cppBlockMap.end() )
-		it->second.append( text );
-	else
-		_cppBlockMap.insert( CppBlockMap::value_type( interfaceName, text) );
-}
-
-const std::string& TypeManager::getCppBlock( const std::string& interfaceName )
-{
-	CppBlockMap::iterator it = _cppBlockMap.find( interfaceName );
-	if( it == _cppBlockMap.end() )
-		return sg_emptyString;
-
-	return it->second;
+	static_cast<TypeTransaction*>( _transaction.get() )->addTypeBuilder( tb );
 }
 
 INamespace* TypeManager::getRootNS()
@@ -75,14 +65,9 @@ INamespace* TypeManager::getRootNS()
 	return _rootNS.get();
 }
 
-bool TypeManager::getDocumentationParsing()
+ITypeTransaction* TypeManager::getTransaction()
 {
-	return _docParsing;
-}
-
-void TypeManager::setDocumentationParsing( bool documentationParsing )
-{
-	_docParsing = documentationParsing;
+	return _transaction.get();
 }
 
 IType* TypeManager::findType( const std::string& fullName )
@@ -187,7 +172,7 @@ IType* TypeManager::loadType( const std::string& typeName, std::vector<CSLError>
 	if( type )
 		return type;
 
-	TypeLoader loader( typeName, getPaths(), this );
+	TypeLoader loader( typeName, this );
 
 	type = loader.loadType();
 	if( !type )
@@ -211,10 +196,10 @@ IType* TypeManager::loadType( const std::string& typeName, std::vector<CSLError>
 
 IType* TypeManager::loadTypeOrThrow( const std::string& fullName )
 {
-	TypeLoader loader( fullName, getPaths(), this );
+	TypeLoader loader( fullName, this );
 
 	IType* type = loader.loadType();
-	if( !type )
+	if( loader.getError() )
 		CORAL_THROW( TypeLoadException, "could not load type '" << fullName << "':\n" << *loader.getError() );
 
 	return type;
@@ -222,7 +207,7 @@ IType* TypeManager::loadTypeOrThrow( const std::string& fullName )
 
 void TypeManager::definePrimitiveType( Namespace* ns, const std::string& name, TypeKind kind )
 {
-	RefPtr<Type> type = new Type;
+	RefPtr<TypeComponent> type = new TypeComponent;
 	type->setType( ns, name, kind );
 	ns->addType( type.get() );
 }
@@ -246,15 +231,6 @@ void TypeManager::defineBuiltInTypes()
 	castNS->addType( serviceType.get() );
 
 	loadTypeOrThrow( "co.IService" );
-}
-
-const std::string& TypeManager::getDocumentation( const std::string& typeOrMemberName )
-{
-	DocMap::iterator it = _docMap.find( typeOrMemberName );
-	if( it == _docMap.end() )
-		return sg_emptyString;
-
-	return it->second;
 }
 
 CORAL_EXPORT_COMPONENT( TypeManager, TypeManager );

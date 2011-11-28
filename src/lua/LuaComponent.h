@@ -29,8 +29,8 @@ public:
 
 	// co::IObject methods:
 	co::IComponent* getComponent();
-	co::IService* getService( co::IPort* port );
-	void setService( co::IPort* receptacle, co::IService* instance );
+	co::IService* getServiceAt( co::IPort* port );
+	void setServiceAt( co::IPort* receptacle, co::IService* instance );
 
 	// co::IDynamicServiceProvider methods:
 	co::int32 dynamicRegisterService( co::IService* proxy );
@@ -53,7 +53,7 @@ public:
 	void raise( const std::string& message );
 
 private:
-	inline co::IPort* getFacet( co::int32 cookie );
+	inline co::IPort* getFacetByCookie( co::int32 cookie );
 	void pushFacetTable( lua_State* L, co::int32 cookie );
 	void pushAccessorName( lua_State* L, const char* prefix,
 			const std::string& fieldName, const char* suffix = NULL );

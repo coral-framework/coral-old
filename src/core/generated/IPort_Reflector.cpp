@@ -5,8 +5,9 @@
 
 #include <co/IPort.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/ICompositeType.h>
 #include <co/IInterface.h>
+#include <co/ICompositeType.h>
+#include <co/IAnnotation.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -40,6 +41,38 @@ public:
 	co::IPort* getFacet() { return _provider->dynamicGetFacet( _cookie ); }
 	void serviceRetain() { _provider->serviceRetain(); }
 	void serviceRelease() { _provider->serviceRelease(); }
+
+	// co.IAnnotated Methods:
+
+	co::Range<co::IAnnotation* const> getAnnotations()
+	{
+		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ) );
+        return res.get< co::Range<co::IAnnotation* const> >();
+	}
+
+	void setAnnotations( co::Range<co::IAnnotation* const> annotations_ )
+	{
+		co::Any arg;
+		arg.set< co::Range<co::IAnnotation* const> >( annotations_ );
+		_provider->dynamicSetField( _cookie, getField<co::IAnnotated>( 0 ), arg );
+	}
+
+	void addAnnotation( co::IAnnotation* annotation_ )
+	{
+		co::Any args[1];
+		args[0].set< co::IAnnotation* >( annotation_ );
+		co::Range<co::Any const> range( args, 1 );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 0 ), range );
+	}
+
+	co::IAnnotation* getAnnotation( co::IInterface* requestedType_ )
+	{
+		co::Any args[1];
+		args[0].set< co::IInterface* >( requestedType_ );
+		co::Range<co::Any const> range( args, 1 );
+		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
+		return res.get< co::IAnnotation* >();
+	}
 
 	// co.IMember Methods:
 
@@ -121,7 +154,7 @@ public:
 
 	co::uint32 getSize()
 	{
-		return sizeof(co::IPort);
+		return sizeof(void*);
 	}
 
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )

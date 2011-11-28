@@ -10,15 +10,12 @@ local function template( writer, c, t )
 ]] )
 
 	if t.kind == 'TK_NATIVECLASS' then
-		writer( "#include <", t.nativeHeader, ">\n" )
-	else
-		t:writeIncludesAndFwdDecls( writer )
+		return
 	end
 
+	t:writeIncludesAndFwdDecls( writer )
 	writer( "\n// ", t.fullName, " Mapping:\n" )
-
 	c.utils.openNamespaces( writer, t.namespace.fullName )
-
 	writer( "\n" )
 end
 

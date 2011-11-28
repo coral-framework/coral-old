@@ -32,7 +32,6 @@ public:
 namespace co {
 template<> struct kindOf<lua::IState> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<lua::IState> { static const char* get() { return "lua.IState"; } };
-template<> struct typeOf<lua::IState> : public typeOfBase<lua::IState, IInterface> {};
 } // namespace co
 
 #endif // _LUA_ISTATE_H_

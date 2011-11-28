@@ -1,0 +1,36 @@
+/*
+	Interface for services that can be \e annotated.
+	This interface allows annotations to be read reflectively.
+ */
+interface IAnnotated
+{
+	// List of annotations on this service.
+	IAnnotation[] annotations;
+
+	/*
+		Adds an annotation to this service.
+		\throw IllegalArgumentException if the \a annotation is invalid.
+	 */
+	void addAnnotation( in IAnnotation annotation ) raises IllegalArgumentException;
+
+	<c++
+		/*!
+			Returns this service's annotation for the specified type,
+			if such an annotation is present; else null.
+			\tparam T any interface that extends co.IAnnotation.
+		 */
+		template<typename T> inline T* getAnnotation()
+		{
+			return static_cast<T*>( getAnnotation( co::typeOf<T>::get() ) );
+		}
+	c++>
+
+	/*
+		Returns the first annotation that provides the requested service type,
+		if such an annotation is present; else null.
+
+		\throw co.IllegalArgumentException if \a requestedType is invalid.
+	 */
+	IAnnotation getAnnotation( in IInterface requestedType )
+		raises IllegalArgumentException;
+};

@@ -10,16 +10,16 @@
 TEST( ComponentTests, invalidDefinitions )
 {
 	CSL_TEST_BEGIN( "ComponentTests.InvalidDefinitions.interfaceArrayMember" )
-	CSL_EXPECT_SYNTAX_ERROR( "interfaceArrayMember.csl", 4 )
+	CSL_EXPECT_ERROR( "syntax error near '['", "interfaceArrayMember.csl", 4 )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "ComponentTests.InvalidDefinitions.withoutInterfaceRole" )
-	CSL_EXPECT_SYNTAX_ERROR( "withoutInterfaceRole.csl", 4 )
+	CSL_EXPECT_ERROR( "syntax error near 'testInterface'", "withoutInterfaceRole.csl", 4 )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "ComponentTests.InvalidDefinitions.interfaceNotFound" )
-	CSL_EXPECT_ERROR( "error loading dependency", "interfaceNotFound.csl", 4 )
-	CSL_EXPECT_ERROR( "was not found", "", -1 )
+	CSL_EXPECT_ERROR( "error loading dependency 'IDontExist'", "interfaceNotFound.csl", 4 )
+	CSL_EXPECT_ERROR( "type 'IDontExist' was not found in the path", "interfaceNotFound.csl", 4 )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "ComponentTests.InvalidDefinitions.memberClash" )
@@ -33,5 +33,5 @@ TEST( ComponentTests, invalidDefinitions )
 
 TEST( ComponentTests, validDefinitions )
 {
-	CSL_TEST( "ComponentTests.ValidDefinitions.valid" )
+	CSL_TEST( "ComponentTests.ValidDefinitions.valid" );
 }

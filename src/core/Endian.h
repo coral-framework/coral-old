@@ -6,7 +6,6 @@
 #ifndef _CO_ENDIAN_H_
 #define _CO_ENDIAN_H_
 
-#include <co/Config.h>
 #include <co/Platform.h>
 
 namespace co {

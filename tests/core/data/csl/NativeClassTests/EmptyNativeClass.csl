@@ -1,4 +1,4 @@
-native class EmptyNativeClass ( <co/Coral.h> int )
+native class EmptyNativeClass
 {
 	// empty native classes are valid
 };

@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#include <core/tools/Library.h>
-#include <core/tools/RefCounted.h>
+#include <core/utils/Library.h>
+#include <core/utils/RefCounted.h>
 #include <co/ModuleLoadException.h>
 #include <gtest/gtest.h>
 

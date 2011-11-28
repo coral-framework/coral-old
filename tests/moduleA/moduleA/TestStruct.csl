@@ -6,6 +6,8 @@ struct TestStruct
 	TestEnum testEnum;
 	co.IType aType;
 
+	Vec2D vec2d;
+
 	co.CSLError innerStruct;
 
 	float[] floatArray;

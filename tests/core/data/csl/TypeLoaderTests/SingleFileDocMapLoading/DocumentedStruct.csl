@@ -1,8 +1,0 @@
-//Struct Declaration
-struct DocumentedStruct
-{
-	// struct member.
-	string name; //< extra doc.
-
-	string foo; //< postDoc.
-};

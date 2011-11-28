@@ -6,13 +6,8 @@
 #ifndef _CO_TYPELOADER_H_
 #define _CO_TYPELOADER_H_
 
-#include "csl/Error.h"
-#include "csl/Parser.h"
+#include "csl/Loader.h"
 #include <co/RefPtr.h>
-#include <co/TypeKind.h>
-#include <co/Platform.h>
-#include <co/Range.h>
-#include <co/ITypeTransaction.h>
 
 namespace co {
 
@@ -36,24 +31,17 @@ class TypeManager;
 	All search for dependencies and type creation is done within the context of a given
 	ITypeManager, which should also be passed in the constructor.
  */
-class CORAL_EXPORT TypeLoader : private csl::Parser
+class CORAL_EXPORT TypeLoader : public csl::Loader
 {
 public:
 	/*!
-		Constructs a loader for the type with the given \a fullTypeName.
-		The type's CSL file is located using the given \a path (a list of type repositories).
-		Types are looked up and created within the context of the specified \a typeManager.
+		Creates a loader for the type with the given \a fullTypeName.
+		Types are looked up and created within the context of a \a typeManager.
 	 */
-	TypeLoader( const std::string& fullTypeName,
-				Range<const std::string> path,
-				ITypeManager* typeManager );
+	TypeLoader( const std::string& fullTypeName, ITypeManager* typeManager );
 
 	//! Destructor.
 	virtual ~TypeLoader();
-
-	//! Retrieves the error occurred during the loading process.
-	//! Returns NULL if the loading was successful.
-	inline csl::Error* getError() { return _cslError.get(); }
 
 	/*!
 		Effectively loads the type (and its dependencies) from the filesystem.
@@ -65,23 +53,18 @@ public:
 
 		\warning If any error occurs while loading a type, this method returns NULL
 			and all partially constructed types are rolled back.
-
 	 */
 	IType* loadType();
 
 private:
-	/*
-		Private contructor: creates a 'non-root' loader that is used for loading
-		type dependencies recursively. In this case, we re-use the _docMap, _path
-		and _transaction from our parent.
-	 */
+	// Creates a 'non-root' loader for loading typeh dependencies recursively.
 	TypeLoader( const std::string& fullTypeName, TypeLoader* parent );
 
 	// Returns whether this is a root loader.
 	inline bool isRootLoader() const { return _parentLoader == NULL; }
 
 	// Template method implementation: instantiates a ITypeBuilder for use by the Parser.
-	virtual ITypeBuilder* createTypeBuilder( const std::string& typeName, TypeKind kind );
+	ITypeBuilder* createTypeBuilder( const std::string& typeName, TypeKind kind );
 
 	/*
 		Template method implementation: finds or loads a type dependency, given the
@@ -89,24 +72,19 @@ private:
 		  1) search for an imported type aliased as 'typeName';
 		  2) search for a type named 'typeName' in the current namespace;
 		  3) search for a type named 'typeName' in the root namespace;
-		  4) try to load the type using the current path and returns NULL in case
-			 of error parsing the CSL file or if the file is not found in the
-			 filesystem (use getError() to access the error stack).
+		  4) try to load the type using the current path.
+		  5) return NULL in case of error parsing the CSL file or if the file
+			 is not found. Use getError() to access the error stack.
 	 */
-	virtual IType* resolveType( const std::string& typeName, bool isArray = false );
+	IType* resolveType( const csl::location& loc, const std::string& typeName, bool isArray = false );
+
+	// Template method implementation: creates or gets a cached default annotation instance.
+	IAnnotation* getDefaultAnnotationInstance( IType* type );
 
 	/*
-		Processes a documentation chunk. If the \a member parameter is not specified, the
-		documentation is associated with the type itself. If a member already contains some
-		documentation, the extra docs are appended to previous contents.
+		Searches an existing type with the passed \a typeName. The name can be fully qualified
+		or relative to the current type's location. Returns NULL if the type is not found.
 	 */
-	void addDocumentation( const std::string& member, const std::string& documentation );
-
-	// Appends the passed \a text to the CppBlockMap of our type.
-	void addCppBlock( const std::string& text );
-
-	//	Searches an existing type with the passed \a typeName. The name can be fully qualified
-	//	or relative to the current type's location. Returns NULL if the type is not found.
 	IType* findDependency( const std::string& typeName );
 
 	/*
@@ -122,14 +100,12 @@ private:
 
 private:
 	std::string _fullTypeName;
-	const Range<const std::string> _path;
 	TypeManager* _typeManager;
 	TypeLoader* _parentLoader;
-
 	INamespace* _namespace;
-	RefPtr<ITypeTransaction> _transaction;
 
-	RefPtr<csl::Error> _cslError;
+	typedef std::map<IType*, RefPtr<IAnnotation> > DefaultAnnotationMap;
+	DefaultAnnotationMap _defaultAnnotationInstances;
 };
 
 } // namespace co

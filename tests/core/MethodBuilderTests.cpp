@@ -5,16 +5,18 @@
 
 #include "TestHelper.h"
 
-
 #include <co/Coral.h>
 #include <co/RefPtr.h>
-#include <co/ISystem.h>
-#include <co/INamespace.h>
 #include <co/IMethod.h>
-#include <co/ITypeBuilder.h>
+#include <co/ISystem.h>
+#include <co/IException.h>
+#include <co/INamespace.h>
 #include <co/IInterface.h>
-#include <co/IMethodBuilder.h>
 #include <co/IParameter.h>
+#include <co/ITypeBuilder.h>
+#include <co/ITypeManager.h>
+#include <co/IMethodBuilder.h>
+#include <co/ITypeTransaction.h>
 #include <co/IllegalNameException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -24,12 +26,11 @@
 
 TEST( MethodBuilderTests, theTest )
 {
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	co::RefPtr<co::ITypeBuilder> typeBuilder = TestHelper::createBuilder( co::TK_INTERFACE, "MethodBuilderbuilderTest.NewInterface", tct.get() );
+	co::RefPtr<co::ITypeBuilder> typeBuilder = TestHelper::createBuilder( co::TK_INTERFACE, "MethodBuilderbuilderTest.NewInterface" );
 
-	co::IType* stringType = 	TestHelper::type( "string" );
+	co::IType* stringType = TestHelper::type( "string" );
 
-	co::RefPtr<co::ITypeBuilder> exbuilder = TestHelper::createBuilder( co::TK_EXCEPTION, "MethodBuilderbuilderTest.NewException", tct.get() );
+	co::RefPtr<co::ITypeBuilder> exbuilder = TestHelper::createBuilder( co::TK_EXCEPTION, "MethodBuilderbuilderTest.NewException" );
 	co::IException* testException = co::cast<co::IException>( exbuilder->createType() );
 
 	co::RefPtr<co::IMethodBuilder> mb = typeBuilder->defineMethod( "testMethod" );
@@ -84,7 +85,7 @@ TEST( MethodBuilderTests, theTest )
 
 	ASSERT_EQ( testException , mInfo->getExceptions().getFirst() );
 
-	EXPECT_NO_THROW( tct->commit() );
+	EXPECT_NO_THROW( co::getSystem()->getTypes()->getTransaction()->commit() );
 
 	EXPECT_THROW( mb->createMethod(), co::NotSupportedException );
 }

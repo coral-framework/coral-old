@@ -1,12 +1,8 @@
 /*
-	Describes a field/property as a member of an IRecordType.
+	Describes a field as a member of an IRecordType.
 
-	\note The word \e field usually means "member variable". In Coral, this term
-		is right for structs, but not really accurate for interfaces and native
-		classes, since their fields are mapped to \e accessors, not variables.
-		The most accurate term in this case would be "property", but since both
-		fields and properties are nearly identical in the meta-level, we decided
-		to keep things simple and call everything a "field".
+	\note The term \e field usually denotes a <em>member variable</em>, but in Coral
+		this term has been generalized to also refer to <em>interface properties</em>.
  */
 interface IField extends IMember
 {

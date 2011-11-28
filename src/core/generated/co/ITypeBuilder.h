@@ -7,8 +7,8 @@
 #define _CO_ITYPEBUILDER_H_
 
 #include <co/TypeTraits.h>
-#include <co/IService.h>
 #include <co/TypeKind.h>
+#include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
@@ -43,8 +43,6 @@ public:
 
 	virtual co::IMethodBuilder* defineMethod( const std::string& name ) = 0;
 
-	virtual void defineNativeClass( const std::string& nativeHeader, const std::string& nativeName ) = 0;
-
 	virtual void definePort( const std::string& name, co::IInterface* type, bool isFacet ) = 0;
 };
 
@@ -53,7 +51,6 @@ public:
 namespace co {
 template<> struct kindOf<co::ITypeBuilder> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::ITypeBuilder> { static const char* get() { return "co.ITypeBuilder"; } };
-template<> struct typeOf<co::ITypeBuilder> : public typeOfBase<co::ITypeBuilder, IInterface> {};
 } // namespace co
 
 #endif // _CO_ITYPEBUILDER_H_

@@ -64,7 +64,7 @@ co::IComponent* lua_Base::getComponent()
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* lua_Base::getService( co::IPort* port )
+co::IService* lua_Base::getServiceAt( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -76,7 +76,7 @@ co::IService* lua_Base::getService( co::IPort* port )
 	return res;
 }
 
-void lua_Base::setService( co::IPort* receptacle, co::IService* service )
+void lua_Base::setServiceAt( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

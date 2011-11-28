@@ -117,7 +117,7 @@ TEST( ReflectionTests, getAndBindComponentInterfaces )
 	co::RefPtr<co::IObject> instance = co::newInstance( "moduleA.TestComponent" );
 	ASSERT_TRUE( instance.isValid() );
 
-	EXPECT_THROW( instance->getService( NULL ), co::NoSuchPortException );
+	EXPECT_THROW( instance->getServiceAt( NULL ), co::NoSuchPortException );
 
 	co::IComponent* type = instance->getComponent();
 
@@ -126,11 +126,11 @@ TEST( ReflectionTests, getAndBindComponentInterfaces )
 	ASSERT_TRUE( testInterfaceInfo != NULL );
 
 	// get the 'testInterface' instance
-	co::IService* service = instance->getService( testInterfaceInfo );
+	co::IService* service = instance->getServiceAt( testInterfaceInfo );
 	EXPECT_EQ( instance->getService<moduleA::TestInterface>(), service );
 
 	// cannot 'bind' to a facet
-	EXPECT_THROW( instance->setService( testInterfaceInfo, service ), co::NoSuchPortException );
+	EXPECT_THROW( instance->setServiceAt( testInterfaceInfo, service ), co::NoSuchPortException );
 
 	// get IPort's for the receptacles
 	co::IPort* typePort = co::cast<co::IPort>( type->getMember( "type" ) );
@@ -138,28 +138,28 @@ TEST( ReflectionTests, getAndBindComponentInterfaces )
 	ASSERT_TRUE( typePort && itfTypePort );
 
 	// get the service currently bound to the 'type' receptacle (should be null)
-	EXPECT_EQ( NULL, instance->getService( typePort ) );
+	EXPECT_EQ( NULL, instance->getServiceAt( typePort ) );
 
 	// attempting to bind a IStruct to 'itf' should produce an exception (it expects an IInterface)
 	co::IType* structType = co::getType( "moduleA.TestStruct" );
-	EXPECT_THROW( instance->setService( itfTypePort, structType ), co::IllegalCastException );
+	EXPECT_THROW( instance->setServiceAt( itfTypePort, structType ), co::IllegalCastException );
 
 	// bind an IInterface to both receptacles
 	co::IType* itf = co::getType( "moduleA.TestInterface" );
 
-	instance->setService( typePort, itf );
-	service = instance->getService( typePort );
+	instance->setServiceAt( typePort, itf );
+	service = instance->getServiceAt( typePort );
 	EXPECT_EQ( itf->getProvider(), service->getProvider() );
 	EXPECT_EQ( itf->getFacet(), service->getFacet() );
 
-	instance->setService( itfTypePort, itf );
-	service = instance->getService( itfTypePort );
+	instance->setServiceAt( itfTypePort, itf );
+	service = instance->getServiceAt( itfTypePort );
 	EXPECT_EQ( itf->getProvider(), service->getProvider() );
 	EXPECT_EQ( itf->getFacet(), service->getFacet() );
 
 	// try getting/setting a receptacle by name
 	EXPECT_EQ( itf, instance->getService( "type" ) );
 	instance->setService( "type", NULL );
-	EXPECT_EQ( NULL, instance->getService( typePort ) );
+	EXPECT_EQ( NULL, instance->getServiceAt( typePort ) );
 	EXPECT_THROW( instance->setService( "noReceptacle", NULL ), co::NoSuchPortException );
 }

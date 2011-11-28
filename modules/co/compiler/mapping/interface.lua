@@ -1,11 +1,13 @@
+local coICppBlock = co.Type "co.ICppBlock"
+
 local function template( writer, c, t )
 	writer( "class ", t.name, " : public ", t.baseType.cppName )
 	writer( "\n{\npublic:\n\tvirtual ~", t.name, "() {;}" )
 
-	local cppBlock = t.cppBlock
-	if #cppBlock > 0 then
+	local cppBlock = t[coICppBlock]
+	if cppBlock then
 		writer( "\n\n\t// Code From <c++ Block:\n" )
-		writer( "\t", cppBlock, "\n" )
+		writer( "\t", cppBlock.value, "\n" )
 		writer( "\t// End Of c++> Block" )
 	end
 

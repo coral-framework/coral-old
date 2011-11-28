@@ -12,7 +12,7 @@ local function template( writer, c, t )
 	end
 
 	if t.kind == 'TK_NATIVECLASS' then
-		writer( "#include <", t.name, "_Adapter.h>\n" )
+		writer( "#include \"", t.name, "_Adapter.h\"\n" )
 	elseif t.kind ~= 'TK_COMPONENT' then
 		writer( "#include <", t.headerName, ">\n" )
 	end
@@ -260,7 +260,8 @@ public:
 	}
 ]] )
 	else
-		writer( "\tco::uint32 getSize()\n\t{\n\t\treturn sizeof(", t.cppName, ");\n\t}\n" )
+		local sizeofType = ( t.kind == 'TK_INTERFACE' and "void*" or t.cppName )
+		writer( "\tco::uint32 getSize()\n\t{\n\t\treturn sizeof(", sizeofType, ");\n\t}\n" )
 	end
 
 	if t.kind == 'TK_EXCEPTION' then

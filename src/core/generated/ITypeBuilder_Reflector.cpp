@@ -105,15 +105,6 @@ public:
 		return res.get< co::IMethodBuilder* >();
 	}
 
-	void defineNativeClass( const std::string& nativeHeader_, const std::string& nativeName_ )
-	{
-		co::Any args[2];
-		args[0].set< const std::string& >( nativeHeader_ );
-		args[1].set< const std::string& >( nativeName_ );
-		co::Range<co::Any const> range( args, 2 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 5 ), range );
-	}
-
 	void definePort( const std::string& name_, co::IInterface* type_, bool isFacet_ )
 	{
 		co::Any args[3];
@@ -121,7 +112,7 @@ public:
 		args[1].set< co::IInterface* >( type_ );
 		args[2].set< bool >( isFacet_ );
 		co::Range<co::Any const> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 6 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 5 ), range );
 	}
 
 protected:
@@ -164,7 +155,7 @@ public:
 
 	co::uint32 getSize()
 	{
-		return sizeof(co::ITypeBuilder);
+		return sizeof(void*);
 	}
 
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
@@ -244,14 +235,6 @@ public:
 				}
 				break;
 			case 8:
-				{
-					const std::string& nativeHeader_ = args[++argIndex].get< const std::string& >();
-					const std::string& nativeName_ = args[++argIndex].get< const std::string& >();
-					argIndex = -1;
-					p->defineNativeClass( nativeHeader_, nativeName_ );
-				}
-				break;
-			case 9:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					co::IInterface* type_ = args[++argIndex].get< co::IInterface* >();

@@ -3,7 +3,7 @@
  * See Copyright Notice in Coral.h
  */
 
-#include <core/tools/CryptoHash.h>
+#include <core/utils/CryptoHash.h>
 #include <gtest/gtest.h>
 
 using namespace co;

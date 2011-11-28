@@ -1,5 +1,4 @@
-component TestComponent
-{
+component TestComponent { // formatted in a single line for test purposes
 	provides TestInterface testInterface;
 
 	// dummy co.ITypeTransaction implementation, just to test cross-module inheritance

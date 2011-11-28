@@ -1,0 +1,7 @@
+/*
+	Base interface for all annotation types.
+ */
+interface IAnnotation
+{
+	// empty
+};

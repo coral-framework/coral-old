@@ -5,6 +5,7 @@
 
 #include "LuaState.h"
 #include "LuaBinding.h"
+#include <co/Log.h>
 #include <co/IReflector.h>
 #include <co/reserved/OS.h>
 #include <co/IllegalArgumentException.h>
@@ -34,7 +35,8 @@ LuaState::~LuaState()
 
 void LuaState::setup()
 {
-	assert( !sm_L );
+	assert( sm_L == NULL );
+	assert( sm_instancesTableRegIdx == 0 );
 
 	sm_L = luaL_newstate();
 	assert( sm_L );
@@ -74,7 +76,9 @@ void LuaState::tearDown()
 
 	// close our Lua universe
 	lua_close( sm_L );
+
 	sm_L = NULL;
+	sm_instancesTableRegIdx = 0;
 }
 
 void LuaState::dumpStack( lua_State* L )
@@ -123,7 +127,7 @@ bool LuaState::findScript( lua_State*, const std::string& name, std::string& fil
 
 void LuaState::loadFile( lua_State* L, const std::string& filename )
 {
-	int res = luaL_loadfile( L, filename.c_str() );
+	int res = luaL_loadfilex( L, filename.c_str(), "t" );
 	if( res != LUA_OK )
 		raiseException( L, res );
 }

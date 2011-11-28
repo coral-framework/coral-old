@@ -33,7 +33,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IModulePartLoader> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IModulePartLoader> { static const char* get() { return "co.IModulePartLoader"; } };
-template<> struct typeOf<co::IModulePartLoader> : public typeOfBase<co::IModulePartLoader, IInterface> {};
 } // namespace co
 
 #endif // _CO_IMODULEPARTLOADER_H_

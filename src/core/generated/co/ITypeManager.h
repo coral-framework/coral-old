@@ -7,9 +7,9 @@
 #define _CO_ITYPEMANAGER_H_
 
 #include <co/TypeTraits.h>
-#include <co/IService.h>
-#include <vector>
 #include <co/Range.h>
+#include <vector>
+#include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
@@ -17,6 +17,7 @@ namespace co {
 	class IArray;
 	class INamespace;
 	class IType;
+	class ITypeTransaction;
 } // namespace co
 // End Of Forward Declarations
 
@@ -28,19 +29,15 @@ class ITypeManager : public co::IService
 public:
 	virtual ~ITypeManager() {;}
 
-	virtual bool getDocumentationParsing() = 0;
-
-	virtual void setDocumentationParsing( bool documentationParsing ) = 0;
-
 	virtual co::INamespace* getRootNS() = 0;
+
+	virtual co::ITypeTransaction* getTransaction() = 0;
 
 	virtual co::INamespace* findNamespace( const std::string& fullName ) = 0;
 
 	virtual co::IType* findType( const std::string& fullName ) = 0;
 
 	virtual co::IArray* getArrayOf( co::IType* elementType ) = 0;
-
-	virtual const std::string& getDocumentation( const std::string& typeOrMemberName ) = 0;
 
 	virtual co::IType* getType( const std::string& typeName ) = 0;
 
@@ -52,7 +49,6 @@ public:
 namespace co {
 template<> struct kindOf<co::ITypeManager> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::ITypeManager> { static const char* get() { return "co.ITypeManager"; } };
-template<> struct typeOf<co::ITypeManager> : public typeOfBase<co::ITypeManager, IInterface> {};
 } // namespace co
 
 #endif // _CO_ITYPEMANAGER_H_

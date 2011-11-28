@@ -8,9 +8,9 @@
 
 #include <co/TypeTraits.h>
 #include <co/Any.h>
-#include <co/IService.h>
-#include <vector>
 #include <co/Range.h>
+#include <vector>
+#include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
@@ -80,7 +80,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IReflector> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IReflector> { static const char* get() { return "co.IReflector"; } };
-template<> struct typeOf<co::IReflector> : public typeOfBase<co::IReflector, IInterface> {};
 } // namespace co
 
 #endif // _CO_IREFLECTOR_H_

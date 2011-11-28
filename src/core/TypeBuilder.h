@@ -3,8 +3,8 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _TYPEBUILDER_H_
-#define _TYPEBUILDER_H_
+#ifndef _CO_TYPEBUILDER_H_
+#define _CO_TYPEBUILDER_H_
 
 #include "Namespace.h"
 #include "TypeBuilder_Base.h"
@@ -66,7 +66,6 @@ public:
 	void defineBaseType( IType* superType );
 	void definePort( const std::string& name, IInterface* type, bool isFacet );
 	IMethodBuilder* defineMethod( const std::string& name );
-	void defineNativeClass( const std::string& nativeHeader, const std::string& nativeName );
 	IType* createType();
 
 protected:

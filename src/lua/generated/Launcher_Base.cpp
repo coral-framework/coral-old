@@ -64,7 +64,7 @@ co::IComponent* Launcher_Base::getComponent()
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* Launcher_Base::getService( co::IPort* port )
+co::IService* Launcher_Base::getServiceAt( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -76,7 +76,7 @@ co::IService* Launcher_Base::getService( co::IPort* port )
 	return res;
 }
 
-void Launcher_Base::setService( co::IPort* receptacle, co::IService* service )
+void Launcher_Base::setServiceAt( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

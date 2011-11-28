@@ -7,8 +7,8 @@
 #define _CO_IMEMBER_H_
 
 #include <co/TypeTraits.h>
-#include <co/IService.h>
 #include <co/MemberKind.h>
+#include <co/IAnnotated.h>
 
 // Forward Declarations:
 namespace co {
@@ -19,7 +19,7 @@ namespace co {
 // co.IMember Mapping:
 namespace co {
 
-class IMember : public co::IService
+class IMember : public co::IAnnotated
 {
 public:
 	virtual ~IMember() {;}
@@ -38,7 +38,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IMember> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IMember> { static const char* get() { return "co.IMember"; } };
-template<> struct typeOf<co::IMember> : public typeOfBase<co::IMember, IInterface> {};
 } // namespace co
 
 #endif // _CO_IMEMBER_H_

@@ -4,23 +4,24 @@
  */
 
 #include "TestHelper.h"
-#include <co/Uuid.h>
 #include <co/Coral.h>
+#include <co/IPort.h>
+#include <co/IField.h>
+#include <co/IMethod.h>
 #include <co/ISystem.h>
+#include <co/IObject.h>
 #include <co/CSLError.h>
 #include <co/INamespace.h>
 #include <co/IReflector.h>
-#include <co/IMethod.h>
 #include <co/ITypeBuilder.h>
 #include <co/ITypeManager.h>
 #include <co/ICompositeType.h>
-#include <co/IField.h>
-#include <co/IPort.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/ITypeTransaction.h>
 #include <co/IllegalArgumentException.h>
 #include <co/NotSupportedException.h>
+#include <co/reserved/Uuid.h>
 #include <gtest/gtest.h>
 
 TEST( ReflectorTests, basicReflectors )
@@ -111,7 +112,7 @@ TEST( ReflectorTests, reflectorComponent )
 	EXPECT_EQ( "reflector", component->getPorts().getFirst()->getName() );
 
 	// test the reflector component's facet
-	EXPECT_EQ( reflector, reflectorObject->getService( component->getPorts().getFirst() ) );
+	EXPECT_EQ( reflector, reflectorObject->getServiceAt( component->getPorts().getFirst() ) );
 }
 
 TEST( ReflectorTests, exceptions )
@@ -324,39 +325,35 @@ TEST( ReflectorTests, interfaceNamespace )
 	}
 
 	// --- calling method defineType():
-	co::Any args[4];
-
+	co::Any args[3];
 	str = "MyTypeName";
-	args[0].set<std::string&>( str );
-	args[1].set( co::TK_STRUCT );
 
-	// passing only 2 args, when the method requires 3
-	EXPECT_THROW( reflector->invoke( coNS, defineTypeMethod, co::Range<co::Any const>( args, 2 ), res ),
+	// passing only 1 arg, when the method requires 2
+	args[0].set<std::string&>( str );
+	EXPECT_THROW( reflector->invoke( coNS, defineTypeMethod, co::Range<co::Any const>( args, 1 ), res ),
 				 co::MissingInputException );
 
-	// passing 3 args, but the third one is a null co::Any
+	// passing 2 args, but the second one is a null co::Any
 	try
 	{
-		reflector->invoke( coNS, defineTypeMethod, co::Range<co::Any const>( args, 3 ), res );
+		reflector->invoke( coNS, defineTypeMethod, co::Range<co::Any const>( args, 2 ), res );
 	}
 	catch( co::IllegalCastException& e )
 	{
-		EXPECT_EQ( "invalid argument #3 to method defineType(): illegal cast from '<NONE>' to 'co::ITypeTransaction*'", e.getMessage() );
+		EXPECT_EQ( "invalid argument #2 to method defineType(): illegal cast from '<NONE>' to 'co::TypeKind'", e.getMessage() );
 	}
 
-	// ok, now we call the method properly, but with a 4th, unecessary argument (it should work)
-	co::RefPtr<co::ITypeTransaction> tct = createTypeTransaction();
-	args[2].set( tct.get() );
-	args[3].set( "dummy arg" );
-
-	reflector->invoke( coNS, defineTypeMethod, co::Range<co::Any const>( args, 4 ), res );
+	// ok, now we call the method properly, but with a 3rd, unecessary argument (it should work)
+	args[1].set( co::TK_STRUCT );
+	args[2].set( "dummy arg" );
+	reflector->invoke( coNS, defineTypeMethod, co::Range<co::Any const>( args, 3 ), res );
 
 	// alright, we should be able to retrieve a ITypeBuilder from res
 	co::RefPtr<co::ITypeBuilder> builder = res.get<co::ITypeBuilder*>();
 	EXPECT_TRUE( builder.isValid() );
 
 	// cleanup
-	tct->rollback();
+	co::getSystem()->getTypes()->getTransaction()->rollback();
 }
 
 TEST( ReflectorTests, nativeClass )

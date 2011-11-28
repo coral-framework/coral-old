@@ -1,9 +1,0 @@
-*/
-native class TestNativeClass_invalid11 ( <a> a::_ )
-{
-string[] a;
-
-};
-
-
-

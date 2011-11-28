@@ -21,9 +21,6 @@ interface IInterface extends IClassType
 	// List of interfaces that directly inherit from this interface.
 	readonly IInterface[] subTypes;
 
-	// Block of C++ code loaded from the interface's CSL file. May be empty.
-	readonly string cppBlock;
-
 	// Returns whether this interface descends from (or is equal to) another interface.
 	bool isSubTypeOf( in IInterface type );
 };

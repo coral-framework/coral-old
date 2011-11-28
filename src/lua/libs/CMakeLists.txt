@@ -28,7 +28,7 @@ IF( WIN32 )
 	TARGET_LINK_LIBRARIES( lualibs ws2_32.lib )
 ENDIF()
 
-CORAL_DEFAULT_TARGET_PROPERTIES( lualibs )
+CORAL_TARGET( lualibs )
 
 ################################################################################
 # Source Groups

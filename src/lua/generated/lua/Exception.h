@@ -12,7 +12,7 @@
 // lua.Exception Mapping:
 namespace lua {
 
-class Exception : public co::Exception
+class CORAL_EXPORT_EXCEPTION Exception : public co::Exception
 {
 public:
 	Exception()
@@ -33,7 +33,6 @@ public:
 namespace co {
 template<> struct kindOf<lua::Exception> : public kindOfBase<TK_EXCEPTION> {};
 template<> struct nameOf<lua::Exception> { static const char* get() { return "lua.Exception"; } };
-template<> struct typeOf<lua::Exception> : public typeOfBase<lua::Exception, IException> {};
 } // namespace co
 
 #endif // _LUA_EXCEPTION_H_

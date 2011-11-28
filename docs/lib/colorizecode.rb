@@ -4,14 +4,12 @@ class ColorizeCode < Nanoc3::Filter
 	type :text
 
 	def run( content, params = {} )
-		while content =~ %r{(<code lang="(\w+)">(.+?[^(</code>)])</code>)}m
-			orginal, lang, code = $1, $2, $3
-			content.gsub!( orginal, highlight( code, lang ) )
-		end
-		content
+		content.gsub( %r{<code lang="(\w+)">(.+?[^(</code>)])</code>}m ) { |m|
+			highlight( $1, $2 )
+		}
 	end
 
-	def highlight( code, language, params = {} )
+	def highlight( language, code, params = {} )
 		extras = ""
 		configDir = File.dirname(__FILE__) + "/highlight"
 		case language

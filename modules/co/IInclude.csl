@@ -1,0 +1,7 @@
+/*
+	Annotation type for native classes that require a header file to be used.
+ */
+interface IInclude extends IAnnotation
+{
+	string value;
+};

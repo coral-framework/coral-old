@@ -3,20 +3,22 @@
  * See Copyright Notice in Coral.h
  */
 
-#ifndef _TYPECREATIONTRANSACTION_H_
-#define _TYPECREATIONTRANSACTION_H_
+#ifndef _CO_TYPETRANSACTION_H_
+#define _CO_TYPETRANSACTION_H_
 
 #include "TypeTransaction_Base.h"
 #include <co/RefVector.h>
 #include <co/ITypeBuilder.h>
 
 namespace co {
+	
+class TypeBuilder;
+class TypeManager;
 
 /*!
 	Implements co.ITypeTransaction.
  */
-class TypeTransaction
-		: public TypeTransaction_Base
+class TypeTransaction : public TypeTransaction_Base
 {
 public:
 	TypeTransaction();
@@ -29,9 +31,9 @@ public:
 	Range<ITypeBuilder* const> getTypeBuilders();
 	void commit();
 	void rollback();
-	
+
 private:
-	static TypeTransaction* sm_activeTransaction;
+	void reset();
 
 private:
 	bool _commitAttempted;
@@ -39,7 +41,7 @@ private:
 	bool _rolledBack;
 
 	typedef RefVector<ITypeBuilder> TypeBuilderList;
-	TypeBuilderList _typeBuilders;
+	TypeBuilderList _builders;
 };
 
 } // namespace co

@@ -3,7 +3,7 @@
  * See Copyright Notice in Coral.h
  */
 
-#include <core/tools/StringTokenizer.h>
+#include <core/utils/StringTokenizer.h>
 #include <co/Exception.h>
 
 #include <string>

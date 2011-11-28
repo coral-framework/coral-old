@@ -12,7 +12,7 @@ At least the following groups are still missing:
 - Services
 
 @{
-	\defgroup setup System Setup and Shutdown
+	\defgroup setup Setup and Shutdown Functions
 	\brief Functions to setup and teardown the Coral framework.
 
 	The framework is initialized when getSystem() is called for the first time.
@@ -31,13 +31,36 @@ At least the following groups are still missing:
 	@{
 	@}
 
-	\defgroup debugevents Debug Events API
-	\brief A very simple API to send debug messages in a portable and non-intrusive way.
+	\defgroup log Logging API
+	\brief API for sending log output.
 
-	This API is intended for situations where it is impossible (or it does not make sense) to throw an exception.
+	\par Recording Logs
+	Logs are recorded with a call to either CORAL_LOG( level ) or CORAL_DLOG( level ).
+	The former is for production logging, while the latter is for debugging.
+	In either case, these macros return an output stream for recording the log message,
+	and the \c level argument indicates the <em>log severity level</em> (see co::LogLevel).
 
-	Messages are sent using the debug() function, and can be handled by a user-defined callback function
-	(see installDebugEventHandler()). By default, all messages are printed to <tt>stderr</tt>.
+	\par Filtering out logs at Compile Time
+	Logs are filtered out at compile time if their severity is lesser than the value of
+	the preprocessor constant CORAL_LOG_MIN_SEVERITY, which defaults to co::LOG_INFO.
+
+	\par Filtering out logs at Run Time
+	Logs can be filtered out at run time by setting a minimum severity level for the
+	co::Logger class (see co::Logger::setMinSeverity()).
+
+	\par Sample Logging
+	\code
+// Logged both in Release/Debug, if CORAL_LOG_MIN_SEVERITY is at least co::LOG_INFO
+CORAL_LOG(INFO) << "Loading file '" << filename << "'";
+
+// Only logged if in Debug and CORAL_LOG_MIN_SEVERITY is at least co::LOG_WARNING
+CORAL_DLOG(WARNING) << "Using new multi-threaded code path";
+	\endcode
+
+	\par Reporting Logs in Applications
+	All logs are dispatched to a user-defined callback function (see setLogHandler()).
+	The default log handler prints all logs to <tt>stderr</tt> and aborts the application
+	in case of a fatal error.
 
 	@{
 	@}

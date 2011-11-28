@@ -7,9 +7,9 @@
 #define _CO_ITYPE_H_
 
 #include <co/TypeTraits.h>
-#include <co/IService.h>
 #include <co/Uuid.h>
 #include <co/TypeKind.h>
+#include <co/IAnnotated.h>
 
 // Forward Declarations:
 namespace co {
@@ -21,12 +21,14 @@ namespace co {
 // co.IType Mapping:
 namespace co {
 
-class IType : public co::IService
+class IType : public co::IAnnotated
 {
 public:
 	virtual ~IType() {;}
 
 	virtual const co::Uuid& getBinarySignature() = 0;
+
+	virtual co::IReflector* getCurrentReflector() = 0;
 
 	virtual const std::string& getFullName() = 0;
 
@@ -48,7 +50,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IType> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IType> { static const char* get() { return "co.IType"; } };
-template<> struct typeOf<co::IType> : public typeOfBase<co::IType, IInterface> {};
 } // namespace co
 
 #endif // _CO_ITYPE_H_

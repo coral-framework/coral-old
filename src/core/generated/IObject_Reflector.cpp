@@ -49,7 +49,7 @@ public:
         return res.get< co::IComponent* >();
 	}
 
-	co::IService* getService( co::IPort* port_ )
+	co::IService* getServiceAt( co::IPort* port_ )
 	{
 		co::Any args[1];
 		args[0].set< co::IPort* >( port_ );
@@ -58,7 +58,7 @@ public:
 		return res.get< co::IService* >();
 	}
 
-	void setService( co::IPort* receptacle_, co::IService* service_ )
+	void setServiceAt( co::IPort* receptacle_, co::IService* service_ )
 	{
 		co::Any args[2];
 		args[0].set< co::IPort* >( receptacle_ );
@@ -107,7 +107,7 @@ public:
 
 	co::uint32 getSize()
 	{
-		return sizeof(co::IObject);
+		return sizeof(void*);
 	}
 
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )
@@ -151,7 +151,7 @@ public:
 				{
 					co::IPort* port_ = args[++argIndex].get< co::IPort* >();
 					argIndex = -1;
-					res.set< co::IService* >( p->getService( port_ ) );
+					res.set< co::IService* >( p->getServiceAt( port_ ) );
 				}
 				break;
 			case 2:
@@ -159,7 +159,7 @@ public:
 					co::IPort* receptacle_ = args[++argIndex].get< co::IPort* >();
 					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					argIndex = -1;
-					p->setService( receptacle_, service_ );
+					p->setServiceAt( receptacle_, service_ );
 				}
 				break;
 			default:

@@ -124,10 +124,7 @@ struct PrepareStateFor<TK_INTERFACE, TT> : public PrepareWithType<TT> {};
 template<typename T, typename ATT>
 struct PrepareStateForArray
 {
-	inline static void prepare( State& )
-	{
-		CORAL_STATIC_CHECK( false, unsupported_array_representation );
-	}
+	static_assert( sizeof(T)<0, "unsupported array representation" );
 };
 
 template<typename T, typename ATT>
@@ -136,8 +133,8 @@ struct PrepareStateForArray<std::vector<T>, ATT>
 	typedef traits::get<T> ETT; // traits for the array element type
 	inline static void prepare( State& s )
 	{
-		CORAL_STATIC_CHECK( ETT::kind != TK_ARRAY, arrays_of_arrays_are_not_supported );
-		CORAL_STATIC_CHECK( ATT::isReference && !ATT::isPointer, vectors_must_be_passed_by_reference );
+		static_assert( ETT::kind != TK_ARRAY, "arrays of arrays are not supported" );
+		static_assert( ATT::isReference && !ATT::isPointer, "std::vectors must be passed by reference" );
 		s.type = typeOf<typename ETT::CoreType>::get();
 		s.isConst = ETT::isConst;
 		s.isPointer = ETT::isPointer;
@@ -152,7 +149,7 @@ struct PrepareStateForArray<RefVector<T>, ATT>
 {
 	inline static void prepare( State& s )
 	{
-		CORAL_STATIC_CHECK( ATT::isReference && !ATT::isPointer, RefVectors_must_be_passed_by_reference );
+		static_assert( ATT::isReference && !ATT::isPointer, "co::RefVectors must be passed by reference" );
 		s.type = typeOf<T>::get();
 		s.isConst = false;
 		s.isPointer = true;
@@ -168,8 +165,8 @@ struct PrepareStateForArray<Range<T>, ATT>
 	typedef traits::get<T> ETT; // traits for the array element type
 	inline static void prepare( State& s )
 	{
-		CORAL_STATIC_CHECK( ETT::kind != TK_ARRAY, arrays_of_arrays_are_not_supported );
-		CORAL_STATIC_CHECK( !ATT::isPointer && !ATT::isReference, ArrayRanges_must_be_passed_by_value );
+		static_assert( ETT::kind != TK_ARRAY, "arrays of arrays are not supported" );
+		static_assert( !ATT::isPointer && !ATT::isReference, "co::Ranges must be passed by value" );
 		s.type = typeOf<typename ETT::CoreType>::get();
 		s.isConst = ETT::isConst;
 		s.isPointer = ETT::isPointer;
@@ -222,16 +219,16 @@ template<TypeKind kind, typename T>
 struct ValueHelper
 {
 	// this is the final destination of all unrecognized values
-	static void store( State&, T ) { CORAL_STATIC_CHECK( false, you_must_pass_that_variable_by_reference ); }
-	static T retrieve( State& ) { CORAL_STATIC_CHECK( false, you_must_retrieve_that_variable_by_reference ); }
+	static void store( State&, T ) { static_assert( sizeof(T)<0, "variable must be passed by reference" ); }
+	static T retrieve( State& ) { static_assert( sizeof(T)<0, "variable must be retrieved by reference" ); }
 };
 
 template<typename T>
 struct ValueHelper<TK_ARRAY, T>
 {
 	// std::vectors and co::RefVectors are handled by this case
-	static void store( State&, T ) { CORAL_STATIC_CHECK( false, arrays_must_be_passed_by_reference ); }
-	static T retrieve( State& ) { CORAL_STATIC_CHECK( false, that_array_type_must_be_retrieved_by_reference ); }
+	static void store( State&, T ) { static_assert( sizeof(T)<0, "array type must be passed by reference" ); }
+	static T retrieve( State& ) { static_assert( sizeof(T)<0, "array type must be retrieved by reference" ); }
 };
 
 template<typename T>
@@ -560,7 +557,7 @@ public:
 	{;}
 
 	/*!
-		Template constructor that stores any variable supported by the Coral type system.
+		\brief Template constructor that stores any variable supported by the Coral type system.
 
 		\warning Since the template variable \a T must be inferred by the compiler, this constructor
 			is subject to language limitations that will make it miss the fact that a variable's type
@@ -574,7 +571,7 @@ public:
 	}
 
 	/*!
-		Constructor corresponding to a setService() call.
+		\brief Constructor corresponding to a setService() call.
 		Please, see setService()'s documentation for more info.
 	 */
 	inline Any( IService* instance, IInterface* type ) : _state()
@@ -583,7 +580,7 @@ public:
 	}
 
 	/*!
-		Constructor corresponding to a setVariable() call.
+		\brief Constructor corresponding to a setVariable() call.
 		Please, see setVariable()'s documentation for more info.
 	 */
 	inline Any( IType* type, uint32 flags, void* ptr ) : _state()
@@ -592,7 +589,7 @@ public:
 	}
 
 	/*!
-		Constructor corresponding to a setBasic() call.
+		\brief Constructor corresponding to a setBasic() call.
 		Please, see setBasic()'s documentation for more info.
 	 */
 	inline Any( TypeKind kind, uint32 flags, void* ptr ) : _state()
@@ -601,7 +598,7 @@ public:
 	}
 
 	/*!
-		Constructor corresponding to a setArray() call.
+		\brief Constructor corresponding to a setArray() call.
 		Please, see setArray()'s documentation for more info.
 	 */
 	inline Any( ArrayKind arrayKind, IType* elementType, uint32 flags, void* ptr, size_t arraySize = 0 )
@@ -683,8 +680,8 @@ public:
 	{
 		typedef traits::get<T> TT;
 
-		CORAL_STATIC_CHECK( TT::kind != TK_NONE, T_is_not_a_valid_Coral_type );
-		CORAL_STATIC_CHECK( TT::kind != TK_EXCEPTION, cannot_retrieve_exceptions );
+		static_assert( TT::kind != TK_NONE, "T is not a valid Coral type" );
+		static_assert( TT::kind != TK_EXCEPTION, "cannot retrieve exceptions" );
 
 		Any temp;
 		__any::PrepareStateFor<TT::kind, TT>::prepare( temp._state );
@@ -718,8 +715,8 @@ public:
 	{
 		typedef traits::get<T> TT;
 
-		CORAL_STATIC_CHECK( TT::kind != TK_NONE, T_is_not_a_valid_Coral_type );
-		CORAL_STATIC_CHECK( TT::kind != TK_EXCEPTION, cannot_store_exceptions );
+		static_assert( TT::kind != TK_NONE, "T is not a valid Coral type" );
+		static_assert( TT::kind != TK_EXCEPTION, "cannot store exceptions" );
 
 		__any::PrepareStateForStorageOf<TT::kind, TT, T>::prepare( _state, var );
 		__any::VariableHelper<T>::store( _state, var );

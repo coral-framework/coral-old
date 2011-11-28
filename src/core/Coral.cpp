@@ -3,17 +3,14 @@
  * See Copyright Notice in Coral.h
  */
 
+#include "Coral.h"
 #include "System.h"
-#include "ModuleInstaller.h"
-#include "tools/StringTokenizer.h"
-#include <co/Coral.h>
+#include "utils/StringTokenizer.h"
+#include <co/Log.h>
 #include <co/RefPtr.h>
 #include <co/IReflector.h>
 #include <co/reserved/OS.h>
 #include <co/reserved/LibraryManager.h>
-#include <cstdio>
-#include <cstdarg>
-#include <cstdlib>
 
 namespace co {
 
@@ -24,6 +21,7 @@ namespace co {
 #endif
 
 static std::vector<std::string> sg_paths;
+static uint8 sg_cslFlags( CSL_ANNOTATIONS );
 static RefPtr<System> sg_system;
 static ITypeManager* sg_typeManager( NULL );
 static IServiceManager* sg_serviceManager( NULL );
@@ -47,7 +45,7 @@ void addPath( const std::string& path )
 
 		if( !OS::isDir( dirPath ) )
 		{
-			debug( Dbg_Warning, "cannot add '%s' to the Coral path (not a dir)", dirPath.c_str() );
+			CORAL_LOG(WARNING) << "cannot add '" << dirPath <<  "' to the Coral path (not a dir)";
 			continue;
 		}
 
@@ -60,13 +58,22 @@ void addPath( const std::string& path )
 	}
 }
 
+uint8 getCSLFlags()
+{
+	return sg_cslFlags;
+}
+
+void setCSLFlags( uint8 flags )
+{
+	sg_cslFlags = flags;
+}
+
 ISystem* getSystem()
 {
 	if( !sg_system )
 	{
 		sg_system = new System;
 		sg_system->initialize();
-		ModuleInstaller::instance().install();
 	}
 	return sg_system.get();
 }
@@ -85,9 +92,6 @@ void shutdown()
 	if( systemState == SystemState_Running )
 		sg_system->tearDown();
 
-	// uninstall the 'core' module
-	ModuleInstaller::instance().uninstall();
-
 	// release the main system interfaces
 	sg_serviceManager = NULL;
 	sg_typeManager = NULL;
@@ -95,41 +99,6 @@ void shutdown()
 
 	// flush all released libraries
 	LibraryManager::flush();
-}
-
-static void defaultDebugEventHandler( DebugEvent ev, const char* message )
-{
-	static const char* s_eventName[] = { "DEBUG", "WARNING", "CRITICAL", "FATAL" };
-
-#ifdef CORAL_NDEBUG
-	if( ev == Dbg_Message )
-		return;
-#endif
-
-	const char* eventName = s_eventName[ev >= 0 && ev <= Dbg_Fatal ? ev : Dbg_Fatal];
-	fprintf( stderr, "[%s] %s\n", eventName, message );
-	if( ev == Dbg_Fatal )
-		abort();
-}
-
-static DebugEventHandler sg_debugEventHandler = defaultDebugEventHandler;
-
-DebugEventHandler installDebugEventHandler( DebugEventHandler handler )
-{
-	DebugEventHandler previous = sg_debugEventHandler;
-	sg_debugEventHandler = handler ? handler : defaultDebugEventHandler;
-	return previous;
-}
-
-void debug( DebugEvent event, const char* msg, ... )
-{
-	char buffer[1024] = { 0 };
-	va_list va;
-	va_start( va, msg );
-	if( msg )
-		vsprintf( buffer, msg, va );
-	va_end( va );
-	sg_debugEventHandler( event, buffer );
 }
 
 IType* getType( const std::string& fullName )
@@ -168,7 +137,7 @@ IService* getServiceForInstance( IInterface* serviceType, IService* clientInstan
 	return getServices()->getServiceForInstance( serviceType, clientInstance );
 }
 
-bool findModuleFile( const std::string& moduleName, const std::string& fileName, std::string& filePath )
+bool findFile( const std::string& moduleName, const std::string& fileName, std::string& filePath )
 {
 	std::string modulePath( moduleName );
 	OS::convertDotsToDirSeps( modulePath );

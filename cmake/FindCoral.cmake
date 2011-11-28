@@ -44,6 +44,19 @@ if( APPLE )
 	set( CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_64_BIT)" )
 endif()
 
+# Require minimal support for C++11 (static_assert, TR1, etc)
+if( MSVC )
+	if( MSVC_VERSION LESS 1600 )
+		message( FATAL_ERROR "Coral currently requires Visual Studio 2010 or greater." )
+	endif()
+else()
+	# Requires GCC 4.3+
+	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" )
+endif()
+
+# Launcher arguments to invoke the coral compiler
+set( CORAL_COMPILER_ARGS --csl acd co.compiler.Compile )
+
 ################################################################################
 # Function to get the current CORAL_PATH as a comma-separated string
 ################################################################################
@@ -60,232 +73,196 @@ function( CORAL_GET_PATH_STRING coralPathStr )
 endfunction()
 
 ################################################################################
-# Internal Macro to gather the list of types in a module
-################################################################################
-macro( CORAL_GATHER_MODULE_TYPES _moduleTypeNames _moduleName )
-	set( _resultList )
-	foreach( _repo ${CORAL_PATH} )
-		file( GLOB _cslFiles "${_repo}/${_moduleName}/*.csl" )
-		foreach( _file ${_cslFiles} )
-			# Get the type name and add it to the _resultList
-			get_filename_component( _name ${_file} NAME_WE )
-			list( APPEND _resultList ${_name} )
-
-			# Save the type's filename for later use in CORAL_GENERATE_MODULE.
-			# We issue a warning if the same type is gathered twice from two different files.
-			get_filename_component( _filename ${_file} ABSOLUTE )
-			set( _filenameKey "${_moduleName}_${_name}_FILENAME" )
-			if( DEFINED ${_filenameKey} )
-				MESSAGE( WARNING "Clashing CSL files found: '${${_filenameKey}}' clashes with '${_filename}'." )
-			else()
-				set( ${_filenameKey} "${_filename}" )
-			endif()
-		endforeach()
-	endforeach()
-	set( ${_moduleTypeNames} ${_resultList} )
-endmacro()
-
-################################################################################
 # Function to generate mappings for a list of types
 ################################################################################
-FUNCTION( CORAL_GENERATE_MAPPINGS generatedHeaders )
-	SET( outDir "${CMAKE_CURRENT_BINARY_DIR}/generated" )
+function( CORAL_GENERATE_MAPPINGS generatedHeaders )
+	set( outDir "${CMAKE_CURRENT_BINARY_DIR}/generated" )
 
 	# Initialize the list with important files that are always generated.
-	SET( resultList
+	set( resultList
 		"${outDir}/co/ISystem.h"
 	)
 
-	FOREACH( typeName ${ARGN} )
-		STRING( REPLACE "." "/" typePath ${typeName} )
-		LIST( APPEND resultList "${outDir}/${typePath}.h" )
-	ENDFOREACH()
+	foreach( typeName ${ARGN} )
+		string( REPLACE "." "/" typePath ${typeName} )
+		list( APPEND resultList "${outDir}/${typePath}.h" )
+	endforeach()
 
-	LIST( REMOVE_DUPLICATES resultList )
+	list( REMOVE_DUPLICATES resultList )
 
 	CORAL_GET_PATH_STRING( coralPathStr )
 
-	ADD_CUSTOM_COMMAND( OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
+	add_custom_command( OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
 		COMMAND ${CMAKE_COMMAND} -E echo "Forcing dependency check for Coral..."
 	)
 
-	ADD_CUSTOM_COMMAND( OUTPUT ${resultList}
-		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS}
-			lua.Launcher co.compiler.cli --ignoredupes ${ARGN}
+	add_custom_command( OUTPUT ${resultList}
+		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS} ${CORAL_COMPILER_ARGS} ${ARGN}
 		DEPENDS ${CORAL_LAUNCHER} "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		COMMENT "Running the Coral Compiler..."
 	)
 
-	SET( ${generatedHeaders} ${resultList} PARENT_SCOPE )
+	set( ${generatedHeaders} ${resultList} PARENT_SCOPE )
 
 	# "make clean" should delete the coralc cache file
-	SET_PROPERTY( DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${outDir}/__coralc_cache.lua" )
-ENDFUNCTION()
+	set_property( DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${outDir}/__coralc_cache.lua" )
+endfunction()
 
 ################################################################################
 # Function to generate code for a module (all extra args are passed to coralc)
 ################################################################################
-FUNCTION( CORAL_GENERATE_MODULE generatedSourceFiles moduleName )
-	SET( outDir "${CMAKE_CURRENT_BINARY_DIR}/generated" )
-
-	# Initialize the list with files that are always generated.
-	SET( resultList
-		"${outDir}/__Bootstrap.cpp"
-		"${outDir}/ModuleInstaller.h"
-		"${outDir}/ModuleInstaller.cpp"
-	)
-
-	# Gather a list of the module's types.
-	CORAL_GATHER_MODULE_TYPES( moduleTypeNames ${moduleName} )
-
-	SET( hasModulePart FALSE )
-	FOREACH( typeName ${moduleTypeNames} )
-		IF( typeName STREQUAL "${moduleName}" )
-			SET( hasModulePart TRUE )
-		ENDIF()
-
-		# Determine if the type is a component (if so, add the extra files)
-		FILE( STRINGS "${${moduleName}_${typeName}_FILENAME}" typeDeclLine LIMIT_COUNT 1
-			REGEX "(component|enum)[ \t]+${typeName}" )
-		STRING(REGEX REPLACE "([a-z]+)[ \t]+${typeName}" "\\1" typeKind "${typeDeclLine}" )
-
-		IF( typeKind STREQUAL "component" )
-			LIST( APPEND resultList "${outDir}/${typeName}_Base.h" "${outDir}/${typeName}_Base.cpp" )
-		ENDIF()
-
-		IF( NOT typeKind STREQUAL "enum" )
-			LIST( APPEND resultList "${outDir}/${typeName}_Reflector.cpp" )
-		ENDIF()
-	ENDFOREACH()
-
-	# If a IModulePart type was not declared, add the default one
-	IF( NOT hasModulePart )
-		LIST( APPEND resultList "${outDir}/__ModulePart.cpp" )
-	ENDIF()
+function( CORAL_GENERATE_MODULE generatedSourceFiles moduleName )
+	set( outDir "${CMAKE_CURRENT_BINARY_DIR}/generated" )
 
 	CORAL_GET_PATH_STRING( coralPathStr )
 
-	ADD_CUSTOM_COMMAND( OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
+	# If the Coral Compiler is currently available...
+	if( EXISTS ${CORAL_LAUNCHER} )
+		# Use the Compiler to get the actual list of generated source files
+		execute_process(
+			COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS}
+						${CORAL_COMPILER_ARGS} --list -g ${moduleName} ${ARGN}
+			OUTPUT_VARIABLE resultList
+		)
+		if( resultList MATCHES "\\*\\*\\* Error \\*\\*\\*" )
+			string( SUBSTRING "${resultList}" 14 -1 errorMsg )
+			message( FATAL_ERROR "Error reported by the Coral compiler: ${errorMsg}" )
+		endif()
+		string( REGEX REPLACE "([^\n]+)\n*" "${outDir}/\\1;" resultList ${resultList} )
+	else()
+		# Fall back to the default all-in-one source file
+		set( resultList "${outDir}/__AllInOne.cpp" )
+	endif()
+
+	add_custom_command( OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
 		COMMAND ${CMAKE_COMMAND} -E echo "Forcing dependency check for Coral..."
 	)
 
-	ADD_CUSTOM_COMMAND( OUTPUT ${resultList}
+	add_custom_command( OUTPUT ${resultList}
 		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS}
-			lua.Launcher co.compiler.cli --ignoredupes -g ${moduleName} ${ARGN}
+					${CORAL_COMPILER_ARGS} -g ${moduleName} ${ARGN}
 		DEPENDS ${CORAL_LAUNCHER} "${CMAKE_CURRENT_BINARY_DIR}/force_out_of_date"
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		COMMENT "Running the Coral Compiler..."
 	)
 
-	SET( ${generatedSourceFiles} ${resultList} PARENT_SCOPE )
+	set( ${generatedSourceFiles} ${resultList} PARENT_SCOPE )
 
 	# "make clean" should delete the coralc cache file
-	SET_PROPERTY( DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${outDir}/__coralc_cache.lua" )
-ENDFUNCTION()
+	set_property( DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${outDir}/__coralc_cache.lua" )
+endfunction()
 
 ################################################################################
 # Defines a target to generate docs for a module. Passes extra args to coralc.
 ################################################################################
-FUNCTION( CORAL_GENERATE_DOX targetName moduleName outDir )
+function( CORAL_GENERATE_DOX targetName moduleName outDir )
 	CORAL_GET_PATH_STRING( coralPathStr )
-
-	ADD_CUSTOM_TARGET( ${targetName}
+	add_custom_target( ${targetName}
 		COMMAND ${CORAL_LAUNCHER} -p "${coralPathStr}" ${CORAL_LAUNCHER_FLAGS}
-			lua.Launcher co.compiler.cli --ignoredupes --dox -g ${moduleName} -o ${outDir} ${ARGN}
+			${CORAL_COMPILER_ARGS} --dox -g ${moduleName} -o ${outDir} ${ARGN}
 		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 		COMMENT "Running the Coral Compiler to extract documentation..."
 	)
-ENDFUNCTION()
+endfunction()
 
 ################################################################################
-# Utility macro to set common properties for all targets
+# Macro to set common build options for targets that use Coral.
 ################################################################################
-MACRO( CORAL_DEFAULT_TARGET_PROPERTIES targetName )
-
+macro( CORAL_TARGET targetName )
 	# Artifacts always get a '_debug' suffix when built in debug mode
-	SET_PROPERTY( TARGET ${targetName} PROPERTY DEBUG_POSTFIX "_debug" )
+	set_property( TARGET ${targetName} PROPERTY DEBUG_POSTFIX "_debug" )
 
 	# Targets built in 'RelWithDebInfo' mode are considered in 'release' mode
-	SET_PROPERTY( TARGET ${targetName} APPEND PROPERTY COMPILE_DEFINITIONS_RELWITHDEBINFO "NDEBUG" )
+	set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_DEFINITIONS_RELWITHDEBINFO "NDEBUG" )
 
-	IF( WIN32 )
+	if( WIN32 )
 		# Generate executables in /bin and shared libs (but not module libs) in /lib
-		GET_TARGET_PROPERTY( _targetType ${targetName} TYPE )
-		IF( NOT _targetType STREQUAL "MODULE_LIBRARY" )
-			SET_TARGET_PROPERTIES( ${targetName} PROPERTIES
+		get_target_property( _targetType ${targetName} TYPE )
+		if( NOT _targetType STREQUAL "MODULE_LIBRARY" )
+			set_target_properties( ${targetName} PROPERTIES
 				RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 				LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 				ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 			)
-		ENDIF()
-	ENDIF()
+		endif()
+	endif()
 
-	# Disable unavoidable MSVC warnings
-	IF( MSVC )
-		ADD_DEFINITIONS( "/wd4251" ) # type needs to have dll-interface to be used by clients
-		ADD_DEFINITIONS( "/wd4275" ) # non dll-interface class used as base for dll-interface class
-		SET_PROPERTY( TARGET ${targetName} APPEND PROPERTY COMPILE_DEFINITIONS
+	if( MSVC )
+		# Disable unavoidable MSVC warnings
+		add_definitions( "/wd4251" ) # type needs to have dll-interface to be used by clients
+		add_definitions( "/wd4275" ) # non dll-interface class used as base for dll-interface class
+		set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_DEFINITIONS
 				"_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE" )
-	ENDIF()
-
-ENDMACRO( CORAL_DEFAULT_TARGET_PROPERTIES )
+	else()
+		# Hide all DSO symbols by default (Ref: http://gcc.gnu.org/wiki/Visibility)
+		set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_FLAGS "-fvisibility=hidden" )
+	endif()
+endmacro( CORAL_TARGET )
 
 ################################################################################
-# Utility macro to set common properties for a module target (Coral Module)
+# Macro to set common build options for Coral Module targets.
 ################################################################################
-MACRO( CORAL_MODULE_TARGET_PROPERTIES moduleName )
+macro( CORAL_MODULE_TARGET moduleName targetName )
+	CORAL_TARGET( ${targetName} )
 
-	# Copy or generate the module library into /modules/${moduleName}/
-	IF( XCODE_VERSION OR MSVC_IDE )
+	# Copy or generate the module library into /modules/${modulePath}/
+	string( REPLACE "." "/" modulePath ${moduleName} )
+	if( XCODE_VERSION OR MSVC_IDE )
 		# Copy the library after linking (makes sense for IDE's that create intermediate dirs)
-		FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/modules/${moduleName} )
-		IF( XCODE_VERSION )
-			SET( targetFileName "$(FULL_PRODUCT_NAME)" )
-		ELSE()
-			SET( targetFileName "$(TargetFileName)" ) # MSVC_IDE
-		ENDIF()
-		ADD_CUSTOM_COMMAND( TARGET ${moduleName} POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/${targetFileName}" ${CMAKE_BINARY_DIR}/modules/${moduleName}/
+		file( MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/modules/${modulePath}" )
+		if( XCODE_VERSION )
+			set( targetFileName "$(FULL_PRODUCT_NAME)" )
+		else()
+			set( targetFileName "$(TargetFileName)" ) # MSVC_IDE
+		endif()
+		add_custom_command( TARGET ${targetName} POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/${targetFileName}" "${CMAKE_BINARY_DIR}/modules/${modulePath}/"
 			COMMENT "Copying module '${moduleName}'..."
 		)
-	ELSE()
+	else()
 		# Create the library directly in the output dir
-		SET_TARGET_PROPERTIES( ${moduleName} PROPERTIES
-			LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/modules/${moduleName}
+		set_target_properties( ${targetName} PROPERTIES
+			LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/modules/${modulePath}"
 		)
-	ENDIF()
-
-ENDMACRO( CORAL_MODULE_TARGET_PROPERTIES )
+	endif()
+endmacro( CORAL_MODULE_TARGET )
 
 ################################################################################
-# Utility macro to set env vars for a test so it finds the coral library
+# Macro to add a test target that invokes the Coral Launcher passing arguments.
 ################################################################################
-MACRO( CORAL_TEST_ENVIRONMENT testName )
+macro( CORAL_ADD_TEST testName )
+	if( CORAL_LAUNCHER STREQUAL "launcher" )
+		set( coralLauncherMode ${CORAL_LAUNCHER} )
+	else()
+		set( coralLauncherMode ${CORAL_LAUNCHER} --mode $<CONFIGURATION> )
+	endif()
+	CORAL_GET_PATH_STRING( coralPathStr )
+	add_test( NAME ${testName} COMMAND ${coralLauncherMode} -p "${coralPathStr}" ${ARGN} )
+endmacro( CORAL_ADD_TEST )
 
-	IF( NOT CORAL_ROOT )
-		SET( CORAL_ROOT $ENV{CORAL_ROOT} )
-	ENDIF()
-
-	SET_PROPERTY(
-		TEST ${testName}
-		APPEND PROPERTY ENVIRONMENT
-			PATH=${CORAL_ROOT}/lib
-			LD_LIBRARY_PATH=${CORAL_ROOT}/lib
-			DYLD_LIBRARY_PATH=${CORAL_ROOT}/lib
+################################################################################
+# Macro to set env vars for a test executable so it finds the Coral library.
+################################################################################
+macro( CORAL_TEST_ENVIRONMENT testName )
+	if( NOT CORAL_ROOT )
+		set( CORAL_ROOT $ENV{CORAL_ROOT} )
+	endif()
+	set_property( TEST ${testName} APPEND PROPERTY ENVIRONMENT
+		PATH=${CORAL_ROOT}/lib
+		LD_LIBRARY_PATH=${CORAL_ROOT}/lib
+		DYLD_LIBRARY_PATH=${CORAL_ROOT}/lib
 	)
-
-ENDMACRO( CORAL_TEST_ENVIRONMENT )
+endmacro( CORAL_TEST_ENVIRONMENT )
 
 ################################################################################
-# Macro to build a Coral module that *only* contains CSL types
+# Macro to build Coral modules comprised only of CSL types (no implementations).
 ################################################################################
 macro( CORAL_BUILD_CSL_MODULE moduleName )
 	CORAL_GENERATE_MODULE( _GENERATED_SOURCES ${moduleName} )
 	include_directories( ${CORAL_INCLUDE_DIRS} "${CMAKE_CURRENT_BINARY_DIR}/generated" )
 	add_library( ${moduleName} MODULE EXCLUDE_FROM_ALL ${_GENERATED_SOURCES} )
-	CORAL_DEFAULT_TARGET_PROPERTIES( ${moduleName} )
-	CORAL_MODULE_TARGET_PROPERTIES( ${moduleName} )
+	CORAL_MODULE_TARGET( ${moduleName} ${moduleName} )
 	target_link_libraries( ${moduleName} ${CORAL_LIBRARIES} )
 	source_group( "@Generated" FILES ${_GENERATED_SOURCES} )
 endmacro( CORAL_BUILD_CSL_MODULE )

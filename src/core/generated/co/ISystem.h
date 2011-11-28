@@ -7,10 +7,10 @@
 #define _CO_ISYSTEM_H_
 
 #include <co/TypeTraits.h>
-#include <co/IService.h>
+#include <co/SystemState.h>
 #include <co/Range.h>
 #include <vector>
-#include <co/SystemState.h>
+#include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
@@ -62,7 +62,6 @@ public:
 namespace co {
 template<> struct kindOf<co::ISystem> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::ISystem> { static const char* get() { return "co.ISystem"; } };
-template<> struct typeOf<co::ISystem> : public typeOfBase<co::ISystem, IInterface> {};
 } // namespace co
 
 #endif // _CO_ISYSTEM_H_

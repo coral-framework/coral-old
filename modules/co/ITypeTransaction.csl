@@ -3,7 +3,7 @@
  */
 interface ITypeTransaction
 {
-	// List of TypeBuilders participating in the transaction.
+	// List of types (builders) in the transaction.
 	readonly ITypeBuilder[] typeBuilders;
 
 	/*
@@ -15,13 +15,12 @@ interface ITypeTransaction
 		\throw MissingInputException if any type is missing required data.
 		\throw IllegalNameException if a composite type contains clashing members.
 		\throw IllegalStateException if a cycle is detected in a inheritance hierarchy.
-		\throw NotSupportedException if a commit was already attempted, or if the transaction was rolled back.
+		\throw NotSupportedException if a commit was already attempted, or the transaction is empty.
 	 */
 	void commit() raises MissingInputException, IllegalNameException, IllegalStateException, NotSupportedException;
 
 	/*
-		Destroys and removes all references to partially created types associated with this transaction.
-		\throw NotSupportedException if the transaction is already dead (i.e. committed or rolled back).
+		Destroys and removes all references to the types in this transaction.
 	 */
-	void rollback() raises NotSupportedException;
+	void rollback();
 };

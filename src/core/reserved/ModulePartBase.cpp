@@ -62,7 +62,7 @@ IComponent* ModulePartBase::getComponent()
 	return getOrCreateInternalComponent( "co.ModulePartBase", "co.IModulePart", "part" );
 }
 
-IService* ModulePartBase::getService( IPort* port )
+IService* ModulePartBase::getServiceAt( IPort* port )
 {
 	checkValidPort( port );
 
@@ -77,7 +77,7 @@ IService* ModulePartBase::getService( IPort* port )
 	return res;
 }
 
-void ModulePartBase::setService( IPort* receptacle, IService* )
+void ModulePartBase::setServiceAt( IPort* receptacle, IService* )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

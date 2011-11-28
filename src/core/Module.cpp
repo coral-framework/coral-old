@@ -4,7 +4,8 @@
  */
 
 #include "Module.h"
-#include "tools/StringTokenizer.h"
+#include "utils/StringTokenizer.h"
+#include <co/Log.h>
 #include <co/Coral.h>
 #include <co/ISystem.h>
 #include <co/INamespace.h>
@@ -114,7 +115,7 @@ void Module::integrate()
 	if( _state != ModuleState_Initialized )
 		throw IllegalStateException( "the module's state is not ModuleState_Initialized" );
 
-	for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
+	for( Range<IModulePart* const> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->integrate( this );
 
 	_state = ModuleState_Integrated;
@@ -125,7 +126,7 @@ void Module::integratePresentation()
 	if( _state != ModuleState_Integrated )
 		throw IllegalStateException( "the module's state is not ModuleState_Integrated" );
 
-	for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
+	for( Range<IModulePart* const> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->integratePresentation( this );
 
 	_state = ModuleState_PresentationIntegrated;
@@ -136,7 +137,7 @@ void Module::disintegrate()
 	if( _state != ModuleState_PresentationIntegrated )
 		throw IllegalStateException( "the module's state is not ModuleState_PresentationIntegrated" );
 
-	for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
+	for( Range<IModulePart* const> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->disintegrate( this );
 
 	_state = ModuleState_Disintegrated;
@@ -147,7 +148,7 @@ void Module::dispose()
 	if( _state != ModuleState_Disintegrated )
 		throw IllegalStateException( "the module's state is not ModuleState_Disintegrated" );
 
-	for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
+	for( Range<IModulePart* const> ar( _parts ); ar; ar.popFirst() )
 		ar.getFirst()->dispose( this );
 
 	_parts.clear();
@@ -164,7 +165,7 @@ void Module::abort()
 	// just ignore exceptions raised by ModuleParts from this point on
 	for( int i = 0; i < 2; ++i ) // this loop is just to avoid duplicating the 'catch' code
 	{
-		for( Range<IModulePart*> ar( _parts ); ar; ar.popFirst() )
+		for( Range<IModulePart* const> ar( _parts ); ar; ar.popFirst() )
 		{
 			try
 			{
@@ -176,8 +177,8 @@ void Module::abort()
 			}
 			catch( std::exception& e )
 			{
-				debug( Dbg_Critical, "Exception ignored while aborting module '%s': %s",
-						_namespace->getFullName().c_str(), e.what() );
+				CORAL_LOG(ERROR) << "Exception ignored while aborting module '" <<
+					_namespace->getFullName() << "': " << e.what();
 			}
 		}
 	}

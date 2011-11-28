@@ -7,8 +7,8 @@
 #define _CO_ITYPETRANSACTION_H_
 
 #include <co/TypeTraits.h>
-#include <co/IService.h>
 #include <co/Range.h>
+#include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
@@ -36,7 +36,6 @@ public:
 namespace co {
 template<> struct kindOf<co::ITypeTransaction> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::ITypeTransaction> { static const char* get() { return "co.ITypeTransaction"; } };
-template<> struct typeOf<co::ITypeTransaction> : public typeOfBase<co::ITypeTransaction, IInterface> {};
 } // namespace co
 
 #endif // _CO_ITYPETRANSACTION_H_

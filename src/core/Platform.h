@@ -52,6 +52,11 @@
 	#define CORAL_CC_GNU
 	#if defined(__MINGW32__)
 		#define CORAL_CC_MINGW
+	#elif defined(__llvm__)
+		#define CORAL_CC_LLVM
+		#if defined(__clang__)
+			#define CORAL_CC_CLANG
+		#endif
 	#endif
 #endif
 
@@ -93,15 +98,20 @@
 	#else
 		#error "Coral requires Visual Studio 8 (2005) or newer."
 	#endif
+#elif defined(CORAL_CC_CLANG)
+	#define CORAL_CC_NAME "clang"
+	#define CORAL_CC_VERSION CORAL_STRINGIFY(__clang_major__) "." CORAL_STRINGIFY(__clang_minor__)
 #elif defined(CORAL_CC_GNU)
 	#if defined(CORAL_CC_MINGW)
 		#define CORAL_CC_NAME "mingw"
+	#elif defined(CORAL_CC_LLVM)
+		#define CORAL_CC_NAME "llvm-gcc"
 	#else
-		#define CORAL_CC_NAME "g++"
+		#define CORAL_CC_NAME "gcc"
 	#endif
 	#define CORAL_CC_VERSION CORAL_STRINGIFY(__GNUC__) "." CORAL_STRINGIFY(__GNUC_MINOR__)
 #else
-	#error "Unsupported compiler! Coral requires GCC or MSVC."
+	#error "Unknown compiler! Coral requires one compatible with GCC or MSVC."
 #endif
 
 #define CORAL_BUILD_KEY		CORAL_OS_NAME " " CORAL_ARCH_NAME " " CORAL_CC_NAME "-" CORAL_CC_VERSION
@@ -189,16 +199,6 @@ const int64		MIN_INT64	= -MAX_INT64 - 1;
 	using co::uint64;
 
 /*!
-	\brief Evaluates a constant expression and, if the result is false,
-	aborts the compilation with an error message.
-	\param[in] const_expr compile-time integral or pointer expression.
-	\param[in] id_msg C++ identifier that describes the error (it does not need to be defined).
-		Something like 'invalid_element_size'.
- */
-#define CORAL_STATIC_CHECK( const_expr, id_msg ) \
-    { co::CompileTimeError<( (const_expr) != 0 )> ERROR_##id_msg; (void)ERROR_##id_msg; }
-
-/*!
 	\brief Returns the number of elements in a statically-allocated array.
 	\param[in] array name of a statically-allocated array.
  */
@@ -239,33 +239,30 @@ const int64		MIN_INT64	= -MAX_INT64 - 1;
 	#define CORAL_NO_INLINE __attribute__((noinline)) 
 #endif 
 
-namespace co {
-
-#ifndef DOXYGEN
-
-// Template trick to yield compile time errors:
-template<int> struct CompileTimeError;
-template<> struct CompileTimeError<true> {};
-
-#endif // DOXYGEN
-
-} // namespace co
 
 //------ Portable shared-library interface attributes --------------------------
 
 #ifndef DOXYGEN
 
-#if defined(CORAL_OS_WIN) && !defined(CORAL_NO_EXPORT)
+#if defined(CORAL_NO_EXPORT)
+	#define CORAL_EXPORT
+	#define CORAL_DLL_EXPORT
+#elif defined(CORAL_OS_WIN)
 	#define CORAL_DLL_EXPORT __declspec(dllexport)
-	#define CORAL_DLL_IMPORT __declspec(dllimport)
 	#if defined(BUILDING_CORAL_CORE)
 		#define CORAL_EXPORT CORAL_DLL_EXPORT
 	#else
-		#define CORAL_EXPORT CORAL_DLL_IMPORT
+		#define CORAL_EXPORT __declspec(dllimport)
 	#endif
+#else // assumes the compiler is GCC-compatible
+	#define CORAL_DLL_EXPORT __attribute__((visibility("default")))
+	#define CORAL_EXPORT CORAL_DLL_EXPORT
+#endif
+
+#if defined(CORAL_OS_WIN)
+	#define CORAL_EXPORT_EXCEPTION
 #else
-	#define CORAL_EXPORT
-	#define CORAL_DLL_EXPORT
+	#define CORAL_EXPORT_EXCEPTION CORAL_DLL_EXPORT
 #endif
 
 #endif // DOXYGEN

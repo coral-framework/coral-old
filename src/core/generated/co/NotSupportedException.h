@@ -12,7 +12,7 @@
 // co.NotSupportedException Mapping:
 namespace co {
 
-class NotSupportedException : public co::Exception
+class CORAL_EXPORT_EXCEPTION NotSupportedException : public co::Exception
 {
 public:
 	NotSupportedException()
@@ -33,7 +33,6 @@ public:
 namespace co {
 template<> struct kindOf<co::NotSupportedException> : public kindOfBase<TK_EXCEPTION> {};
 template<> struct nameOf<co::NotSupportedException> { static const char* get() { return "co.NotSupportedException"; } };
-template<> struct typeOf<co::NotSupportedException> : public typeOfBase<co::NotSupportedException, IException> {};
 } // namespace co
 
 #endif // _CO_NOTSUPPORTEDEXCEPTION_H_

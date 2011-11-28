@@ -3,7 +3,7 @@
  */
 interface invalidInterfaceWithExceptionAsParameter
 {
-	void beta( in TestExceptions.AnotherException ex );
+	void beta( in Global.AnotherException ex );
 };
 
 

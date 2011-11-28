@@ -1,0 +1,7 @@
+/*
+	Annotation type for C++ blocks in CSL.
+ */
+interface ICppBlock extends IAnnotation
+{
+	string value;
+};

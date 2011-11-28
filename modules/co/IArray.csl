@@ -1,5 +1,5 @@
 /*
-	Type representing a unidimensional array of elements.
+	Type representing a one-dimensional array of elements.
  */
 interface IArray extends IType
 {

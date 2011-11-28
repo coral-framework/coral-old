@@ -21,12 +21,11 @@ CORAL_GENERATE_MODULE( _GENERATED_FILES moduleA )
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR}/generated )
 
 FILE( GLOB _HEADERS *.h )
-FILE( GLOB _SOURCES *Adapter.cpp *Component.cpp )
+FILE( GLOB _SOURCES *Adapter.cpp Test*.cpp *Annotation.cpp )
 
 ADD_LIBRARY( moduleA MODULE EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} ${_GENERATED_FILES} )
 
-CORAL_DEFAULT_TARGET_PROPERTIES( moduleA )
-CORAL_MODULE_TARGET_PROPERTIES( moduleA )
+CORAL_MODULE_TARGET( "moduleA" moduleA )
 
 SET_TARGET_PROPERTIES( moduleA PROPERTIES
 	PROJECT_LABEL "Module A"
@@ -51,7 +50,7 @@ FILE( GLOB _TESTS *Tests.cpp )
 ADD_EXECUTABLE( tests_moduleA EXCLUDE_FROM_ALL Main.cpp ${_TESTS} )
 ADD_DEPENDENCIES( tests_moduleA moduleA )
 
-CORAL_DEFAULT_TARGET_PROPERTIES( tests_moduleA )
+CORAL_TARGET( tests_moduleA )
 
 SET_TARGET_PROPERTIES( tests_moduleA PROPERTIES
 	PROJECT_LABEL "Tests - Module A"
@@ -79,9 +78,3 @@ IF( VALGRIND_COMMAND )
 		--suppressions=${CMAKE_SOURCE_DIR}/tests/valgrind.supp $<TARGET_FILE:tests_moduleA>
 	)
 ENDIF()
-
-################################################################################
-# Source Groups
-################################################################################
-
-SOURCE_GROUP( "@Generated" FILES ${_GENERATED_FILES} )

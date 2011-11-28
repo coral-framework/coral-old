@@ -8,8 +8,9 @@ local function template( writer, c, t )
 
 ]] )
 
-	for header in pairs( t.includedHeaders ) do
-		writer( "#include <", header, ">\n" )
+	local headers = t.includedHeaders
+	for i = 1, #headers do
+		writer( "#include <", headers[i], ">\n" )
 	end
 
 	for fullName, type in pairs( t.forwardDeclTypes ) do
@@ -64,8 +65,8 @@ public:
 
 	// co::IObject Methods:
 	co::IComponent* getComponent();
-	co::IService* getService( co::IPort* );
-	void setService( co::IPort*, co::IService* );
+	co::IService* getServiceAt( co::IPort* );
+	void setServiceAt( co::IPort*, co::IService* );
 ]] )
 
 	if #receptacles > 0 then

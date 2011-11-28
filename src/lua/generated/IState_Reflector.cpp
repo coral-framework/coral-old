@@ -113,7 +113,7 @@ public:
 
 	co::uint32 getSize()
 	{
-		return sizeof(lua::IState);
+		return sizeof(void*);
 	}
 
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider )

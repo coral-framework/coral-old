@@ -1,0 +1,7 @@
+/*
+	Provides the special @co.CppBlock annotation.
+ */
+component CppBlockAnnotation
+{
+	provides ICppBlock annotation;
+};

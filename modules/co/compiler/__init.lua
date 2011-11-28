@@ -3,7 +3,7 @@
 -------------------------------------------------------------------------------
 
 local lfs = require "lfs"
-local path = require "path"
+local path = require "lua.path"
 local utils = require "co.compiler.utils"
 local dependencies = require "co.compiler.dependencies"
 local TypeWrapper = require "co.compiler.TypeWrapper"
@@ -21,6 +21,7 @@ local nativeClassAdapter = require "co.compiler.module.nativeClassAdapter"
 local nativeClassTemplate = require "co.compiler.module.nativeClassTemplate"
 local reflector = require "co.compiler.module.reflector"
 
+local moduleAllInOne = require "co.compiler.module.allInOne"
 local moduleBootstrap = require "co.compiler.module.bootstrap"
 local moduleInstallerHeader = require "co.compiler.module.installerHeader"
 local moduleInstallerSource = require "co.compiler.module.installerSource"
@@ -41,17 +42,17 @@ local Compiler = {
 Compiler.__index = Compiler
 
 -- Creates a new Compiler instance.
-function Compiler:new()
+function Compiler.new()
 	local self = setmetatable( {}, Compiler )
 
-	-- default is to print warnings about duplicate CSL files in the path
-	self.ignoreDupesInPath = false
+	-- setting to true disables the use of caches and the writing of files
+	self.simulation = false
 
 	-- array of module types
 	self.types = {}
 
 	-- map of direct type dependencies for the module
-	-- includes all module types and all explicitly-specified dependencies
+	-- includes all static module types and all explicitly-specified dependencies
 	-- these are the types for which we should generate mappings
 	self.dependencies = {} -- map[type] = distance
 
@@ -62,7 +63,9 @@ end
 -- It will also be considered a module dependency, if we're generating a module.
 function Compiler:addType( typeName )
 	local t = TypeWrapper:wrap( co.Type[typeName] )
-	self.dependencies[t] = 1
+	if t.kind ~= 'TK_COMPONENT' or not t.isDynamic then
+		self.dependencies[t] = 1
+	end
 end
 
 local numExpandedFiles = 0
@@ -168,10 +171,13 @@ function Compiler:generateModule( moduleName )
 	self.moduleName = moduleName
 	self.moduleNS = self.utils.toCppName( moduleName )
 
-	self:loadCache()
+	if not self.simulation then
+		self:loadCache()
+	end
+
 	self:loadModuleTypes()
 
-	local doing = ( next( self.cachedTypes ) and "Updating" or "Generating" )
+	local doing = ( ( not self.simulation and next( self.cachedTypes ) ) and "Updating" or "Generating" )
 	self.log(  doing .. " code for module '" .. self.moduleName .. "' (" .. #self.types .. " types)..." )
 
 	-- add implicit dependencies of the generated module code
@@ -180,56 +186,83 @@ function Compiler:generateModule( moduleName )
 	self:addType( "co.IReflector" )
 	self:addType( "co.IModulePart" )
 
-	-- generateMappings() also adds entries to self.dependencies
-	self:generateMappings()
+	if not self.simulation then
+		-- generateMappings() also adds entries to self.dependencies
+		self:generateMappings()
+	end
 
 	local cachedTypes = self.cachedTypes
 	local updatedTypes = self.updatedTypes
 	local numFiles = 0
 	numExpandedFiles = 0
 
-	local function cachedExpand( ... ) numFiles = numFiles + 1 end
+	local function cachedExpand( dir, filename ) numFiles = numFiles + 1 end
 	local function updateExpand( dir, filename, template, c, t )
 		numFiles = numFiles + 1
-		if t then
+		if t and t.fullName then
 			updatedTypes[t.fullName] = t.fullSignatureStr
 		end
 		expand( dir, filename, template, c, t )
 	end
 
+	local expand -- set to either cachedExpand or updateExpand
+
 	local outDir = self.outDir
 	local templatesDir = outDir .. "/@templates"
+
+	-- list of all .cpp files that must be compiled into the module
+	local moduleSources = {}
+	local function expandModuleSource( dir, filename, ... )
+		expand( dir, filename, ... )
+		moduleSources[#moduleSources + 1] = filename
+	end
 
 	-- Generate per-type files
 	for i, t in ipairs( self.types ) do
 		-- only regenerate out-of-date files
-		local expand = ( cachedTypes[t.fullName] == t.fullSignatureStr and cachedExpand or updateExpand )
-		if t.kind == 'TK_NATIVECLASS' then
-			expand( outDir, t.name .. "_Adapter.h", nativeClassAdapter, self, t )
-			expand( templatesDir, t.name .. ".cpp", nativeClassTemplate, self, t )
-		elseif t.kind == 'TK_COMPONENT' then
-			expand( outDir, t.name .. "_Base.h", componentBaseHeader, self, t )
-			expand( outDir, t.name .. "_Base.cpp", componentBaseSource, self, t )
-			expand( templatesDir, t.name .. ".cpp", componentTemplate, self, t )
+		if self.simulation or cachedTypes[t.fullName] == t.fullSignatureStr then
+			expand = cachedExpand
+		else
+			expand = updateExpand
 		end
-		if t.kind ~= 'TK_ENUM' then
-			expand( outDir, t.name .. "_Reflector.cpp", reflector, self, t )
+
+		if not t.isDynamic then
+			if t.kind == 'TK_NATIVECLASS' then
+				expand( outDir, t.name .. "_Adapter.h", nativeClassAdapter, self, t )
+				expand( templatesDir, t.name .. ".cpp", nativeClassTemplate, self, t )
+			elseif t.kind == 'TK_COMPONENT' then
+				expand( outDir, t.name .. "_Base.h", componentBaseHeader, self, t )
+				expandModuleSource( outDir, t.name .. "_Base.cpp", componentBaseSource, self, t )
+				expand( templatesDir, t.name .. ".cpp", componentTemplate, self, t )
+			end
+			if t.kind ~= 'TK_ENUM' then
+				expandModuleSource( outDir, t.name .. "_Reflector.cpp", reflector, self, t )
+			end
 		end
 	end
 
 	-- Generate per-module files (only if at least one file was out of date)
-	local shouldUpdateModuleFiles = ( numExpandedFiles > 0 or self.cachedNumModuleFiles > #self.types )
-	local expand = ( shouldUpdateModuleFiles and updateExpand or cachedExpand )
-	expand( self.outDir, "__Bootstrap.cpp", moduleBootstrap, self )
-	expand( self.outDir, "ModuleInstaller.h", moduleInstallerHeader, self )
-	expand( self.outDir, "ModuleInstaller.cpp", moduleInstallerSource, self )
-	if not self:hasCustomModulePart() then
-		expand( self.outDir, "__ModulePart.cpp", moduleDefaultPart, self )
+	if not self.simulation then
+		local shouldUpdateModuleFiles = ( numExpandedFiles > 0 or self.cachedNumModuleFiles > #self.types )
+		expand = ( shouldUpdateModuleFiles and updateExpand or cachedExpand )
 	end
+	expandModuleSource( outDir, "__Bootstrap.cpp", moduleBootstrap, self )
+	expand( outDir, "ModuleInstaller.h", moduleInstallerHeader, self )
+	expandModuleSource( outDir, "ModuleInstaller.cpp", moduleInstallerSource, self )
+	if not self:hasCustomModulePart() then
+		expandModuleSource( outDir, "__ModulePart.cpp", moduleDefaultPart, self )
+	end
+
+	-- Generate the special "all-in-one" source file
+	expand( outDir, "__AllInOne.cpp", moduleAllInOne, self, moduleSources )
 
 	self.log( reportChanges( "Generated", "module file", numExpandedFiles, numFiles ) )
 
-	self:saveCache()
+	if not self.simulation then
+		self:saveCache()
+	end
+
+	return moduleSources
 end
 
 -- Loads all module types by locating CSL files in the module's namespace
@@ -245,20 +278,12 @@ function Compiler:loadModuleTypes()
 				local typeName = filename:match( "(.+)%.csl$" )
 				if typeName then
 					local moduleType = TypeWrapper:wrap( co.Type[self.moduleName .. '.' .. typeName] )
-					if self.dependencies[moduleType] == 0 then
-						if not self.ignoreDupesInPath then
-							local msg = "Type '" .. moduleType.fullName .. "' has a duplicate definition in "
-										.. "one of the following dirs:\n"
-							for k = 1, i do
-								msg = msg .. "  [" .. k .. "] " .. coralPaths[k] .. "/" .. moduleDirPath .. "\n"
-							end
-							print( msg )
-						end
-					else
-						self.types[#self.types + 1] = moduleType
-						self.dependencies[moduleType] = 0
-					end
+					self.types[#self.types + 1] = moduleType
+					self.dependencies[moduleType] = 0
 				end
+			end
+			if #self.types > 0 then
+				break -- already got our module types
 			end
 		end
 	end
@@ -289,17 +314,25 @@ local function loadCacheFile( filename, cachedTypes )
 	local f = io.open( filename, 'r' )
 	local code = f:read( "*a" )
 	f:close()
+
 	local chunk, err = load( code, filename, 't', cachedTypes )
 	if not chunk then
 		return print( "Error in cache file '" .. filename .. "': " .. tostring( err ) )
 	end
-	local ok, moreCachedTypes, numModuleFiles = pcall( chunk )
+
+	local ok, moreCachedTypes, numModuleFiles, compilerRevision = pcall( chunk )
 	if not ok then
 		return print( "Error in cache file '" .. filename .. "': " .. tostring( moreCachedTypes ) )
 	end
+
 	if type( moreCachedTypes ) ~= 'table' then
 		return print( "Cache file '" .. filename .. "' returned an invalid result (" .. tostring( moreCachedTypes ) .. ")." )
 	end
+
+	if compilerRevision ~= co.compilerOutputRevision then
+		return print( "Code generation rules have changed - forcing full regen... " )
+	end
+
 	for k, v in pairs( moreCachedTypes ) do
 		local current = cachedTypes[k]
 		if current then
@@ -327,7 +360,7 @@ return {
 	for k, v in pairs( cachedTypes ) do
 		f:write( '\t["', k, '"] = "', v, '",\n' )
 	end
-	f:write( "}, ", numModuleFiles, "\n" )
+	f:write( "}, ", numModuleFiles, ", ", co.compilerOutputRevision, "\n" )
 	f:close()
 end
 
@@ -339,7 +372,7 @@ function Compiler:loadCache()
 
 	-- if one of the standard, compiler-generated files is missing, ignore the cache files and
 	-- force a full update; this is a workaround for IDEs with inflexible 'clean' routines (e.g. MSVC)
-	-- which delete most of the generated source files, but not the cache files.
+	-- which delete most of the generated source files, but not the cache file.
 	local ignoreCache = (
 			( self.mappingsDir and not path.isFile( self.mappingsDir .. '/co/ISystem.h' ) ) or
 			( self.moduleName and not path.isFile( self.outDir .. '/__Bootstrap.cpp' ) )

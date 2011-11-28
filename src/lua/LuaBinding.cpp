@@ -75,7 +75,7 @@ void coPackage::open( lua_State* L )
 		{ "addPath", addPath },
 		{ "getPaths", getPaths },
 		{ "findScript", findScript },
-		{ "findModuleFile", findModuleFile },
+		{ "findFile", findFile },
 		{ "getType", getType },
 		{ "new", genericNew },
 		{ "newComponentType", newComponentType },
@@ -164,12 +164,12 @@ int coPackage::findScript( lua_State* L )
 	return 1;
 }
 
-int coPackage::findModuleFile( lua_State* L )
+int coPackage::findFile( lua_State* L )
 {
 	const char* moduleName = luaL_checkstring( L, 1 );
 	const char* fileName = luaL_checkstring( L, 2 );
 	std::string path;
-	if( co::findModuleFile( moduleName, fileName, path ) )
+	if( co::findFile( moduleName, fileName, path ) )
 		lua_pushlstring( L, path.data(), path.length() );
 	else
 		lua_pushnil( L );
@@ -664,7 +664,7 @@ int ObjectBinding::index( lua_State* L )
 	{
 		assert( lua_islightuserdata( L, -1 ) );
 		co::IPort* port = checkPort( L, -1 );
-		co::IService* service = object->getService( port );
+		co::IService* service = object->getServiceAt( port );
 		LuaState::push( L, service );
 	}
 
@@ -701,7 +701,7 @@ int ObjectBinding::newIndex( lua_State* L )
 		co::Any any;
 		any.setVariable( port->getType(), co::Any::VarIsPointer|co::Any::VarIsReference, &service );
 		LuaState::getValue( L, 3, any );
-		object->setService( port, service );
+		object->setServiceAt( port, service );
 	}
 
 	return 0;

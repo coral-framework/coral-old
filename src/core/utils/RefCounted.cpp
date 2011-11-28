@@ -1,0 +1,21 @@
+/*
+ * Coral - Lightweight C++ Component Framework
+ * See Copyright Notice in Coral.h
+ */
+
+#include "RefCounted.h"
+#include <co/Log.h>
+#include <co/Coral.h>
+
+namespace co {
+
+RefCounted::~RefCounted()
+{
+	if( _refCount != 0 )
+	{
+		CORAL_LOG(FATAL) << "Deleting object " << this <<
+			" with a reference count of " << _refCount << ".";
+	}
+}
+
+} // namespace co

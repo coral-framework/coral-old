@@ -12,7 +12,7 @@
 // co.NoSuchPortException Mapping:
 namespace co {
 
-class NoSuchPortException : public co::Exception
+class CORAL_EXPORT_EXCEPTION NoSuchPortException : public co::Exception
 {
 public:
 	NoSuchPortException()
@@ -33,7 +33,6 @@ public:
 namespace co {
 template<> struct kindOf<co::NoSuchPortException> : public kindOfBase<TK_EXCEPTION> {};
 template<> struct nameOf<co::NoSuchPortException> { static const char* get() { return "co.NoSuchPortException"; } };
-template<> struct typeOf<co::NoSuchPortException> : public typeOfBase<co::NoSuchPortException, IException> {};
 } // namespace co
 
 #endif // _CO_NOSUCHPORTEXCEPTION_H_

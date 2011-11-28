@@ -1,5 +1,0 @@
-native class TestNativeClass_invalid8 ( <a> ::a )
-{
-string[] a;
-
-};

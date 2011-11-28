@@ -6,11 +6,8 @@ interface ITypeManager
 	// The root namespace. Provides hierarchical access to all types, namespaces and modules.
 	readonly INamespace rootNS;
 
-	/*
-		If true, newly parsed CSL files will populate the documentation database.
-		See getDocumentation(). Default is true. Can be set to false in order to save memory.
-	 */
-	bool documentationParsing;
+	// Transaction that must be used to create new types and add to this manager.
+	readonly ITypeTransaction transaction;
 
 	/*
 		Searches the database of loaded types for a type with the given fully-qualified name.
@@ -54,11 +51,4 @@ interface ITypeManager
 		\note This method does NOT create arrays, but can retrieve existing array types.
 	 */
 	IType loadType( in string typeName, out CSLError[] errorStack );
-
-	/*
-		Gets the documentation associated with either a type or a member.
-		Returns an empty string if the type/member has no documentation, or if the type has not been
-		loaded yet. Member names are formatted like the following: <tt>"name.space.TypeName:memberName"</tt>.
-	 */
-	string getDocumentation( in string typeOrMemberName );
 };

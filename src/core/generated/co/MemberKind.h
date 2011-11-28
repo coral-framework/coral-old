@@ -24,7 +24,6 @@ enum MemberKind
 namespace co {
 template<> struct kindOf<co::MemberKind> : public kindOfBase<TK_ENUM> {};
 template<> struct nameOf<co::MemberKind> { static const char* get() { return "co.MemberKind"; } };
-template<> struct typeOf<co::MemberKind> : public typeOfBase<co::MemberKind, IEnum> {};
 } // namespace co
 
 #endif // _CO_MEMBERKIND_H_

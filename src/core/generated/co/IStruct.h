@@ -23,7 +23,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IStruct> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IStruct> { static const char* get() { return "co.IStruct"; } };
-template<> struct typeOf<co::IStruct> : public typeOfBase<co::IStruct, IInterface> {};
 } // namespace co
 
 #endif // _CO_ISTRUCT_H_

@@ -12,7 +12,7 @@
 // co.MissingServiceException Mapping:
 namespace co {
 
-class MissingServiceException : public co::Exception
+class CORAL_EXPORT_EXCEPTION MissingServiceException : public co::Exception
 {
 public:
 	MissingServiceException()
@@ -33,7 +33,6 @@ public:
 namespace co {
 template<> struct kindOf<co::MissingServiceException> : public kindOfBase<TK_EXCEPTION> {};
 template<> struct nameOf<co::MissingServiceException> { static const char* get() { return "co.MissingServiceException"; } };
-template<> struct typeOf<co::MissingServiceException> : public typeOfBase<co::MissingServiceException, IException> {};
 } // namespace co
 
 #endif // _CO_MISSINGSERVICEEXCEPTION_H_

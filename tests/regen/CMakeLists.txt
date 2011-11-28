@@ -27,7 +27,6 @@ GET_PROPERTY( CORE_HEADER_FILES DIRECTORY ${CORE_SOURCE_DIR} PROPERTY HEADER_FIL
 GET_PROPERTY( CORE_SOURCE_FILES DIRECTORY ${CORE_SOURCE_DIR} PROPERTY SOURCE_FILES )
 
 INCLUDE_DIRECTORIES(
-	${ANTLR3C_SOURCE_DIR}/include
 	${CMAKE_SOURCE_DIR}/src
 	${CMAKE_CURRENT_BINARY_DIR}/generated
 	${GTEST_INCLUDE_DIRS}
@@ -41,24 +40,18 @@ ADD_EXECUTABLE( tests_regen EXCLUDE_FROM_ALL ${CORE_HEADER_FILES} ${CORE_SOURCE_
 	../core/ReflectorTests.cpp
 )
 
-CORAL_DEFAULT_TARGET_PROPERTIES( tests_regen )
+CORAL_TARGET( tests_regen )
 
 SET_TARGET_PROPERTIES( tests_regen PROPERTIES
 	PROJECT_LABEL "Tests - Regeneration"
 )
 
-TARGET_LINK_LIBRARIES( tests_regen
-	antlr3c
-	${GTEST_LIBRARIES}
-)
+TARGET_LINK_LIBRARIES( tests_regen ${GTEST_LIBRARIES} )
 
-# Disable warnings for AntLR-generated source files
-IF( NOT MSVC )
-	SET_PROPERTY(
-		SOURCE ${CORE_SOURCE_DIR}/csl/CSLLexer.cpp ${CORE_SOURCE_DIR}/csl/CSLParser.cpp
-		PROPERTY COMPILE_FLAGS "-Wno-all -Wno-extra -Wno-unused"
-	)
-ENDIF()
+if( NOT MSVC )
+	# Disable warnings for auto-generated code
+	set_property( SOURCE "${CORE_SOURCE_DIR}/csl/scanner.cc" APPEND PROPERTY COMPILE_FLAGS "-Wno-unused-parameter" )
+endif()
 
 IF( UNIX )
     TARGET_LINK_LIBRARIES( tests_regen dl )
@@ -78,4 +71,3 @@ ADD_TEST(
 ################################################################################
 
 SOURCE_GROUP( "@Core" FILES ${CORE_HEADER_FILES} ${CORE_SOURCE_FILES} )
-SOURCE_GROUP( "@Generated" FILES ${_GENERATED_FILES} )

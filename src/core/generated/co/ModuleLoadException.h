@@ -12,7 +12,7 @@
 // co.ModuleLoadException Mapping:
 namespace co {
 
-class ModuleLoadException : public co::Exception
+class CORAL_EXPORT_EXCEPTION ModuleLoadException : public co::Exception
 {
 public:
 	ModuleLoadException()
@@ -33,7 +33,6 @@ public:
 namespace co {
 template<> struct kindOf<co::ModuleLoadException> : public kindOfBase<TK_EXCEPTION> {};
 template<> struct nameOf<co::ModuleLoadException> { static const char* get() { return "co.ModuleLoadException"; } };
-template<> struct typeOf<co::ModuleLoadException> : public typeOfBase<co::ModuleLoadException, IException> {};
 } // namespace co
 
 #endif // _CO_MODULELOADEXCEPTION_H_

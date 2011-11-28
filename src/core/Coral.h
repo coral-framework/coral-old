@@ -36,6 +36,28 @@ CORAL_EXPORT Range<const std::string> getPaths();
  */
 CORAL_EXPORT void addPath( const std::string& path );
 
+	
+// ------ CSL Flags ------------------------------------------------------------
+
+//! Flags for toggling optional language features.
+enum CSLFlags
+{
+	CSL_ANNOTATIONS		= 1, //!< Load and process annotations.
+	CSL_CPPBLOCKS		= 2, //!< Load C++ blocks as 'co.CppBlock' annotations.
+	CSL_DOCUMENTATION	= 4  //!< Load comments as 'co.Documentation' annotations.
+};
+
+/*!
+	Returns the current state of the CSL flags.
+	Default is co::CSL_ANNOTATIONS (i.e. comments and C++ blocks are ignored).
+ */
+CORAL_EXPORT uint8 getCSLFlags();
+
+/*!
+	Sets the current state of the CSL flags.
+ */
+CORAL_EXPORT void setCSLFlags( uint8 flags );
+
 
 // ------ Bootstrap and Shutdown -----------------------------------------------
 
@@ -54,56 +76,6 @@ CORAL_EXPORT ISystem* getSystem();
 	\ingroup setup
  */
 CORAL_EXPORT void shutdown();
-
-
-// ------ Debug Events ---------------------------------------------------------
-
-/*!
-	\brief The kind of events that can be sent to a DebugEventHandler.
-	\ingroup debugevents
- */
-enum DebugEvent
-{
-	Dbg_Message,	//!< A simple debug message. Not sent in Release builds.
-	Dbg_Warning,	//!< A Warning message. Something worth checking.
-	Dbg_Critical,	//!< A Critical error. Potential data loss and malfunction.
-	Dbg_Fatal		//!< Fatal error. Default action is to abort the application.
-};
-
-/*!
-	\brief Signature of a DebugEventHandler function. See installDebugEventHandler().
-	\ingroup debugevents
- */
-typedef void (*DebugEventHandler)( DebugEvent event, const char* message );
-
-/*!
-	\brief Installs a debug event handler and returns the previous handler (which may be NULL).
-
-	A debug event handler is a function that prints out debug messages, warnings, critical and fatal
-	error messages. The default handler prints all messages to \c stderr, and aborts the application
-	in case of a fatal error. Only a single debug event handler can be defined per application, and
-	it should generally be installed before the framework is initialized.
-	To restore the default handler, call <tt>installDebugEventHandler( NULL )</tt>.
-
-	 \sa debug()
-	 \ingroup debugevents
- */
-CORAL_EXPORT DebugEventHandler installDebugEventHandler( DebugEventHandler handler );
-
-/*!
-	\brief Sends a debug event to the currently-installed debug event handler.
-
-	The debug event API is used as an alternative to exception handling
-	when it is impossible (or it does not make sense) to raise an exception.
-
-	The first parameter specifies the kind of the event (see \ref DebugEvent).
-	The remaining parameters are a format string and an optional list of
-	arguments that will compose the debug message, just like in printf().
-
-	 \sa installDebugEventHandler()
-	 \ingroup debugevents
- */
-CORAL_EXPORT void debug( DebugEvent event, const char* msg, ... );
 
 
 // ------ General Utility Functions --------------------------------------------
@@ -183,7 +155,7 @@ inline T* getService( co::IService* clientInstance )
 	\param[out] filePath set with the absolute path to the file, if one is found.
 	\return true if a file was found; false if the search failed.
  */
-CORAL_EXPORT bool findModuleFile( const std::string& moduleName, const std::string& fileName, std::string& filePath );
+CORAL_EXPORT bool findFile( const std::string& moduleName, const std::string& fileName, std::string& filePath );
 
 } // namespace co
 

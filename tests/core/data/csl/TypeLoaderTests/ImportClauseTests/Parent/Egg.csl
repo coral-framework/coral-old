@@ -1,6 +1,0 @@
-import TypeLoaderTests.ImportClauseTests.Chicken;
-
-interface Egg
-{
-	string eggName;
-};

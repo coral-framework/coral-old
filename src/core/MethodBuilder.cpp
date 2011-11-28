@@ -4,9 +4,9 @@
  */
 
 #include "MethodBuilder.h"
-#include "Method.h"
 #include "TypeBuilder.h"
-#include "Parameter.h"
+#include "types/Method.h"
+#include "types/Parameter.h"
 #include <co/Coral.h>
 #include <co/ISystem.h>
 #include <co/Range.h>

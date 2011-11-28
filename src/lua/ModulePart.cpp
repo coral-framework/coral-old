@@ -6,41 +6,45 @@
 #include "lua_Base.h"
 #include "LuaState.h"
 #include "ModuleInstaller.h"
-#include "LuaModulePartLoader.h"
 #include <co/RefPtr.h>
 #include <co/ISystem.h>
 #include <co/IModule.h>
 #include <co/IModuleManager.h>
 #include <co/IServiceManager.h>
+#include <co/IModulePartLoader.h>
 #include <lua/Exception.h>
+#include <sstream>
 
 namespace lua {
 
 /*!
 	The Lua module's co.IModulePart.
  */
-class ModulePartComponent : public lua::lua_Base
+class ModulePart : public lua::lua_Base
 {
 public:
-    ModulePartComponent()
+    ModulePart()
 	{
-		LuaState::setup();
+		// empty
 	}
 
-	virtual ~ModulePartComponent()
+	virtual ~ModulePart()
 	{
 		// empty
 	}
 
 	void initialize( co::IModule* module )
 	{
-		lua::ModuleInstaller::instance().install();
-
 		// generally update this module AFTER all other modules
 		module->setRank( 100000 );
 
+		lua::ModuleInstaller::instance().install();
+
+		LuaState::setup();
+
 		// install our LuaModulePartLoader
-		_luaModulePartLoader = new IModulePartLoader;
+		co::RefPtr<co::IObject> loaderObj = co::newInstance( "lua.ModulePartLoader" );
+		_luaModulePartLoader = loaderObj->getService<co::IModulePartLoader>();
 		co::getSystem()->getModules()->installLoader( _luaModulePartLoader.get() );
 
 		/*
@@ -89,10 +93,10 @@ public:
 	}
 
 private:
-	co::RefPtr<IModulePartLoader> _luaModulePartLoader;
+	co::RefPtr<co::IModulePartLoader> _luaModulePartLoader;
 };
 	
-CORAL_EXPORT_COMPONENT( ModulePartComponent, lua );
-CORAL_EXPORT_MODULE_PART( ModulePartComponent );
+CORAL_EXPORT_COMPONENT( ModulePart, lua );
+CORAL_EXPORT_MODULE_PART( ModulePart );
 
 } // namespace lua

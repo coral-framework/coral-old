@@ -12,7 +12,7 @@
 // co.MissingInputException Mapping:
 namespace co {
 
-class MissingInputException : public co::Exception
+class CORAL_EXPORT_EXCEPTION MissingInputException : public co::Exception
 {
 public:
 	MissingInputException()
@@ -33,7 +33,6 @@ public:
 namespace co {
 template<> struct kindOf<co::MissingInputException> : public kindOfBase<TK_EXCEPTION> {};
 template<> struct nameOf<co::MissingInputException> { static const char* get() { return "co.MissingInputException"; } };
-template<> struct typeOf<co::MissingInputException> : public typeOfBase<co::MissingInputException, IException> {};
 } // namespace co
 
 #endif // _CO_MISSINGINPUTEXCEPTION_H_

@@ -7,17 +7,16 @@
 #define _CO_INAMESPACE_H_
 
 #include <co/TypeTraits.h>
-#include <co/IService.h>
-#include <co/TypeKind.h>
-#include <co/INamespace.h>
 #include <co/Range.h>
+#include <co/INamespace.h>
+#include <co/TypeKind.h>
+#include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
 	class IModule;
 	class IType;
 	class ITypeBuilder;
-	class ITypeTransaction;
 } // namespace co
 // End Of Forward Declarations
 
@@ -43,7 +42,7 @@ public:
 
 	virtual co::INamespace* defineChildNamespace( const std::string& name ) = 0;
 
-	virtual co::ITypeBuilder* defineType( const std::string& name, co::TypeKind typeKind, co::ITypeTransaction* transaction ) = 0;
+	virtual co::ITypeBuilder* defineType( const std::string& name, co::TypeKind typeKind ) = 0;
 
 	virtual co::INamespace* getChildNamespace( const std::string& name ) = 0;
 
@@ -55,7 +54,6 @@ public:
 namespace co {
 template<> struct kindOf<co::INamespace> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::INamespace> { static const char* get() { return "co.INamespace"; } };
-template<> struct typeOf<co::INamespace> : public typeOfBase<co::INamespace, IInterface> {};
 } // namespace co
 
 #endif // _CO_INAMESPACE_H_

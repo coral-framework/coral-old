@@ -25,6 +25,8 @@ class IException;
 class IInterface;
 class IComponent;
 class INativeClass;
+template<typename T> class Range;
+template<typename T> class RefVector;
 
 /*!
 	Array that maps a TypeKind to its Coral-style string representation.
@@ -41,6 +43,9 @@ extern CORAL_EXPORT const std::string TK_STRINGS_CPP[];
 /****************************************************************************/
 
 #ifndef DOXYGEN
+
+// Just like co::getType() but takes a C-string instead of a std::string.
+CORAL_EXPORT IType* getTypeByLiteralName( const char* fullName );
 
 // Returns the kind of a 'type'.
 CORAL_EXPORT TypeKind getKind( IType* type );
@@ -89,46 +94,27 @@ template<> struct kindOf<float> : public kindOfBase<TK_FLOAT> {};
 template<> struct kindOf<double> : public kindOfBase<TK_DOUBLE> {};
 template<> struct kindOf<std::string> : public kindOfBase<TK_STRING> {};
 
-// the specialization for co::TypeKind must go here to avoid mutual dependencies
+// specialization for array types:
+template<typename T> struct kindOf<Range<T> > : public kindOfBase<TK_ARRAY> {};
+template<typename T> struct kindOf<RefVector<T> > : public kindOfBase<TK_ARRAY> {};
+template<typename T> struct kindOf<std::vector<T> > : public kindOfBase<TK_ARRAY> {};
+
+// specialization for co::TypeKind (must go here to avoid cyclic dependencies)
 template<> struct kindOf<TypeKind> : public kindOfBase<TK_ENUM> {};
 
-
+	
 /****************************************************************************/
-/* co::nameOf<T>::get() returns the full name of a Coral type.              */
-/****************************************************************************/
-
-template<typename T>
-struct nameOf
-{
-	static const char* get()
-	{
-		return TK_STRINGS[kindOf<T>::kind].c_str();
-	}
-};
-
-// this specialization must go here to avoid mutual dependencies
-template<> struct nameOf<TypeKind> { static const char* get() { return "co.TypeKind"; } };
-
-
-/****************************************************************************/
-/* co::typeOf<T>::get() returns the co::IType instance of a Coral type.      */
+/* Template mapping of each TypeKind to its descriptor interface            */
 /****************************************************************************/
 
-//! Common implementation of co::typeOf<T>:
-template<typename T, typename R>
-struct typeOfBase
-{
-	typedef R Interface;
-	static Interface* get()
-	{
-		IType* type = getType( nameOf<T>::get() );
-		assert( getKind( type ) == kindOf<T>::kind );
-		return static_cast<R*>( type );
-	}
-};
-
-template<typename T>
-struct typeOf : public typeOfBase<T, IType> {};
+template<TypeKind> struct typeDescriptorFor { typedef IType Type; };
+template<> struct typeDescriptorFor<TK_ARRAY> { typedef IArray Type; };
+template<> struct typeDescriptorFor<TK_ENUM> { typedef IEnum Type; };
+template<> struct typeDescriptorFor<TK_EXCEPTION> { typedef IException Type; };
+template<> struct typeDescriptorFor<TK_STRUCT> { typedef IStruct Type; };
+template<> struct typeDescriptorFor<TK_NATIVECLASS> { typedef INativeClass Type; };
+template<> struct typeDescriptorFor<TK_INTERFACE> { typedef IInterface Type; };
+template<> struct typeDescriptorFor<TK_COMPONENT> { typedef IComponent Type; };
 
 
 /****************************************************************************/
@@ -203,11 +189,17 @@ struct get
 
 
 /****************************************************************************/
-/* All type-traits definitions related to std::vector are located below     */
+/* co::nameOf<T>::get() returns the full name of a Coral type.              */
 /****************************************************************************/
 
 template<typename T>
-struct kindOf<std::vector<T> > : public kindOfBase<TK_ARRAY> {};
+struct nameOf
+{
+	static const char* get()
+	{
+		return TK_STRINGS[kindOf<T>::kind].c_str();
+	}
+};
 
 //! Common implementation of co::nameOf<T> for arrays:
 template<typename ET>
@@ -221,23 +213,32 @@ struct nameOfArrayBase
 	}
 };
 
-template<typename T>
-struct nameOf<std::vector<T> > : public nameOfArrayBase<T> {};
+// specialization for array types:
+template<typename T> struct nameOf<Range<T> > : public nameOfArrayBase<T> {};
+template<typename T> struct nameOf<RefVector<T> > : public nameOfArrayBase<T> {};
+template<typename T> struct nameOf<std::vector<T> > : public nameOfArrayBase<T> {};
 
-//! Common implementation of co::typeOf<T> for arrays:
-template<typename ET>
-struct typeOfArrayBase
+// specialization for co::TypeKind (must go here to avoid cyclic dependencies)
+template<> struct nameOf<TypeKind> { static const char* get() { return "co.TypeKind"; } };
+
+
+/****************************************************************************/
+/* co::typeOf<T>::get() returns the co::IType instance of a Coral type      */
+/****************************************************************************/
+
+template<typename T>
+struct typeOf
 {
-	static IArray* get()
+	static const TypeKind kind = kindOf<T>::kind;
+	typedef typename typeDescriptorFor<kind>::Type Descriptor;
+
+	static Descriptor* get()
 	{
-		IType* type = getType( nameOf<std::vector<ET> >::get() );
-		assert( getKind( type ) == TK_ARRAY );
-		return static_cast<IArray*>( type );
+		IType* type = getTypeByLiteralName( nameOf<T>::get() );
+		assert( getKind( type ) == kind );
+		return static_cast<Descriptor*>( type );
 	}
 };
-
-template<typename T>
-struct typeOf<std::vector<T> > : public typeOfArrayBase<T> {};
 
 
 /****************************************************************************/

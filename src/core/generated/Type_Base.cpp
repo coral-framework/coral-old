@@ -61,7 +61,7 @@ co::IComponent* Type_Base::getComponent()
 	return static_cast<co::IComponent*>( type );
 }
 
-co::IService* Type_Base::getService( co::IPort* port )
+co::IService* Type_Base::getServiceAt( co::IPort* port )
 {
 	checkValidPort( port );
 	co::IService* res = NULL;
@@ -73,7 +73,7 @@ co::IService* Type_Base::getService( co::IPort* port )
 	return res;
 }
 
-void Type_Base::setService( co::IPort* receptacle, co::IService* service )
+void Type_Base::setServiceAt( co::IPort* receptacle, co::IService* service )
 {
 	checkValidReceptacle( receptacle );
 	raiseUnexpectedPortIndex();

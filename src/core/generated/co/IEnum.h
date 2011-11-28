@@ -7,8 +7,8 @@
 #define _CO_IENUM_H_
 
 #include <co/TypeTraits.h>
-#include <co/IType.h>
 #include <co/Range.h>
+#include <co/IType.h>
 
 // co.IEnum Mapping:
 namespace co {
@@ -28,7 +28,6 @@ public:
 namespace co {
 template<> struct kindOf<co::IEnum> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<co::IEnum> { static const char* get() { return "co.IEnum"; } };
-template<> struct typeOf<co::IEnum> : public typeOfBase<co::IEnum, IInterface> {};
 } // namespace co
 
 #endif // _CO_IENUM_H_

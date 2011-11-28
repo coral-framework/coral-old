@@ -15,7 +15,7 @@ SET( CORAL_PATH
 	"${CMAKE_SOURCE_DIR}/tests/moduleA"
 	"${CMAKE_SOURCE_DIR}/tests/moduleB"
 	"${CMAKE_SOURCE_DIR}/tests/core/data/csl"
-	"${CMAKE_CURRENT_SOURCE_DIR}"
+	"${CMAKE_CURRENT_SOURCE_DIR}/modules"
 )
 
 CORAL_GENERATE_MAPPINGS( _GENERATED_FILES co.ISystem lua.IState moduleA.IHuman )
@@ -29,11 +29,11 @@ INCLUDE_DIRECTORIES(
 	${GTEST_INCLUDE_DIRS}
 )
 
-# Create test executable
+# Create the test executable
 ADD_EXECUTABLE( tests_lua EXCLUDE_FROM_ALL Main.cpp LuaTests.cpp ${_GENERATED_FILES} )
 ADD_DEPENDENCIES( tests_lua lua moduleA )
 
-CORAL_DEFAULT_TARGET_PROPERTIES( tests_lua )
+CORAL_TARGET( tests_lua )
 
 SET_TARGET_PROPERTIES( tests_lua PROPERTIES
 	PROJECT_LABEL "Tests - Lua"
@@ -45,12 +45,17 @@ TARGET_LINK_LIBRARIES( tests_lua
 )
 
 ################################################################################
-# Register the test with CTest
+# Register tests with CTest
 ################################################################################
 FILE( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/output )
 ADD_TEST(
 	NAME tests_lua
 	COMMAND $<TARGET_FILE:tests_lua> --gtest_output=xml:../output/TestsLua$<CONFIGURATION>.xml
+)
+
+CORAL_ADD_TEST( launch_lua_component lua.launcher.Component one two three )
+set_tests_properties( launch_lua_component PROPERTIES
+	PASS_REGULAR_EXPRESSION "ARGS:	one two three"
 )
 
 ################################################################################
