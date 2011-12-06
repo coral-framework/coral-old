@@ -31,8 +31,6 @@ SET_TARGET_PROPERTIES( moduleB PROPERTIES
 	PROJECT_LABEL "Module B"
 )
 
-TARGET_LINK_LIBRARIES( moduleB core )
-
 ################################################################################
 # Build the 'tests_moduleB' executable
 ################################################################################
@@ -56,10 +54,7 @@ SET_TARGET_PROPERTIES( tests_moduleB PROPERTIES
 	PROJECT_LABEL "Tests - Module B"
 )
 
-TARGET_LINK_LIBRARIES( tests_moduleB
-	core
-	${GTEST_LIBRARIES}
-)
+TARGET_LINK_LIBRARIES( tests_moduleB ${GTEST_LIBRARIES} )
 
 ################################################################################
 # Register the test with CTest

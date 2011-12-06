@@ -128,6 +128,9 @@ function( CORAL_GENERATE_MODULE generatedSourceFiles moduleName )
 						${CORAL_COMPILER_ARGS} --list -g ${moduleName} ${ARGN}
 			OUTPUT_VARIABLE resultList
 		)
+		if( NOT resultList )
+			message( FATAL_ERROR "Unexpected error invoking the Coral Compiler." )
+		endif()
 		if( resultList MATCHES "\\*\\*\\* Error \\*\\*\\*" )
 			string( SUBSTRING "${resultList}" 14 -1 errorMsg )
 			message( FATAL_ERROR "Error reported by the Coral compiler: ${errorMsg}" )
@@ -170,9 +173,9 @@ function( CORAL_GENERATE_DOX targetName moduleName outDir )
 endfunction()
 
 ################################################################################
-# Macro to set common build options for targets that use Coral.
+# Macro to set common properties for all targets.
 ################################################################################
-macro( CORAL_TARGET targetName )
+macro( CORAL_TARGET_PROPERTIES targetName )
 	# Artifacts always get a '_debug' suffix when built in debug mode
 	set_property( TARGET ${targetName} PROPERTY DEBUG_POSTFIX "_debug" )
 
@@ -201,6 +204,16 @@ macro( CORAL_TARGET targetName )
 		# Hide all DSO symbols by default (Ref: http://gcc.gnu.org/wiki/Visibility)
 		set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_FLAGS "-fvisibility=hidden" )
 	endif()
+endmacro( CORAL_TARGET_PROPERTIES )
+
+################################################################################
+# Macro to set common build options for targets that use Coral.
+################################################################################
+macro( CORAL_TARGET targetName )
+	CORAL_TARGET_PROPERTIES( ${targetName} )
+
+	# Link with the Coral library
+	target_link_libraries( ${targetName} ${CORAL_LIBRARIES} )
 endmacro( CORAL_TARGET )
 
 ################################################################################
@@ -266,7 +279,6 @@ macro( CORAL_BUILD_CSL_MODULE moduleName )
 	include_directories( ${CORAL_INCLUDE_DIRS} "${CMAKE_CURRENT_BINARY_DIR}/generated" )
 	add_library( ${moduleName} MODULE EXCLUDE_FROM_ALL ${_GENERATED_SOURCES} )
 	CORAL_MODULE_TARGET( ${moduleName} ${moduleName} )
-	target_link_libraries( ${moduleName} ${CORAL_LIBRARIES} )
 	source_group( "@Generated" FILES ${_GENERATED_SOURCES} )
 endmacro( CORAL_BUILD_CSL_MODULE )
 
@@ -306,7 +318,9 @@ endif()
 _coral_find_library( CORAL_LIBRARY "coral" )
 _coral_find_library( CORAL_LIBRARY_DEBUG "coral_debug" )
 
-if( CORAL_LIBRARY AND CORAL_LIBRARY_DEBUG )
+if( CORAL_LIBRARIES )
+	# a custom CORAL_LIBRARIES was provided
+elseif( CORAL_LIBRARY AND CORAL_LIBRARY_DEBUG )
 	set( CORAL_LIBRARIES optimized ${CORAL_LIBRARY} debug ${CORAL_LIBRARY_DEBUG} )
 elseif( CORAL_LIBRARY )
 	set( CORAL_LIBRARIES optimized ${CORAL_LIBRARY} )

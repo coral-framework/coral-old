@@ -39,10 +39,7 @@ SET_TARGET_PROPERTIES( tests_lua PROPERTIES
 	PROJECT_LABEL "Tests - Lua"
 )
 
-TARGET_LINK_LIBRARIES( tests_lua
-	core
-	${GTEST_LIBRARIES}
-)
+TARGET_LINK_LIBRARIES( tests_lua ${GTEST_LIBRARIES} )
 
 ################################################################################
 # Register tests with CTest

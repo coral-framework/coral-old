@@ -32,10 +32,7 @@ SET_TARGET_PROPERTIES( tests_core PROPERTIES
 	PROJECT_LABEL "Tests - Core"
 )
 
-TARGET_LINK_LIBRARIES( tests_core
-	core
-	${GTEST_LIBRARIES}
-)
+TARGET_LINK_LIBRARIES( tests_core ${GTEST_LIBRARIES} )
 
 ################################################################################
 # Register the test with CTest
