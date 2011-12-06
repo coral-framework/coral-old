@@ -26,9 +26,12 @@
 #		list variable indicated as the first parameter.
 #
 
+cmake_minimum_required( VERSION 2.8.5 )
+
 ################################################################################
 # Initialization
 ################################################################################
+
 if( NOT CORAL_PATH )
 	if( ENV{CORAL_PATH} )
 		set( CORAL_PATH $ENV{CORAL_PATH} )

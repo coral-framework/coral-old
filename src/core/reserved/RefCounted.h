@@ -9,13 +9,11 @@
 #include <co/Platform.h>
 #include <co/RefPtr.h>
 
-#include <ostream>
-
 namespace co {
 
 /*!
-	General-purpose classes that need reference counting should inherit from this class.
-	Should be used in conjunction with co::RefPtr.
+	\brief Reusable base class for objects that should be reference counted.
+	For use in conjunction with co::RefPtr.
  */
 class CORAL_EXPORT RefCounted
 {

@@ -7,7 +7,7 @@
 #define _CO_CSL_ERROR_H_
 
 #include "location.hh"
-#include "../utils/RefCounted.h"
+#include <co/reserved/RefCounted.h>
 
 namespace co {
 namespace csl {
