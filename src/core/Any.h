@@ -386,12 +386,6 @@ struct VariableHelper<uint32>
 	inline static uint32 retrieve( State& s ) { return s.data.u32; }
 };
 
-#if CORAL_POINTER_SIZE == 4
-	// co::int32 is a 'long' on 32-bit systems, so we must also handle int's
-	template<> struct VariableHelper<int> : public VariableHelper<int32> {};
-	template<> struct VariableHelper<unsigned int> : public VariableHelper<uint32> {};
-#endif
-
 template<>
 struct VariableHelper<int64>
 {
