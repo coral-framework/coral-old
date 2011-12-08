@@ -83,11 +83,6 @@ template<> struct kindOf<int16> : public kindOfBase<TK_INT16> {};
 template<> struct kindOf<uint16> : public kindOfBase<TK_UINT16> {};
 template<> struct kindOf<int32> : public kindOfBase<TK_INT32> {};
 template<> struct kindOf<uint32> : public kindOfBase<TK_UINT32> {};
-#if CORAL_POINTER_SIZE == 4
-	// co::int32 is a 'long' on 32-bit systems, so we must also handle int's
-	template<> struct kindOf<int> : public kindOfBase<TK_INT32> {};
-	template<> struct kindOf<unsigned int> : public kindOfBase<TK_UINT32> {};
-#endif
 template<> struct kindOf<int64> : public kindOfBase<TK_INT64> {};
 template<> struct kindOf<uint64>  : public kindOfBase<TK_UINT64> {};
 template<> struct kindOf<float> : public kindOfBase<TK_FLOAT> {};
