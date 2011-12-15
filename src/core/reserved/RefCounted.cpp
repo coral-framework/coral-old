@@ -5,7 +5,6 @@
 
 #include "RefCounted.h"
 #include <co/Log.h>
-#include <co/Coral.h>
 
 namespace co {
 

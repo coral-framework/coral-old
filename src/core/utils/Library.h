@@ -6,8 +6,7 @@
 #ifndef _CO_LIBRARY_H_
 #define _CO_LIBRARY_H_
 
-#include "RefCounted.h"
-#include <co/Platform.h>
+#include <co/reserved/RefCounted.h>
 #include <string>
 
 namespace co {

@@ -19,7 +19,7 @@ INCLUDE( InternalMacros )
 # Coral Version
 SET( CORAL_VERSION_MAJOR	"0" )
 SET( CORAL_VERSION_MINOR	"7" )
-SET( CORAL_VERSION_PATCH	"0" )
+SET( CORAL_VERSION_PATCH	"1" )
 SET( CORAL_VERSION "${CORAL_VERSION_MAJOR}.${CORAL_VERSION_MINOR}.${CORAL_VERSION_PATCH}" )
 
 # Code generation rules revision
@@ -45,9 +45,10 @@ ELSE()
 ENDIF()
 
 # Include our own package, so we can use the CORAL_GENERATE_*() macros.
-SET( CORAL_ROOT "${CMAKE_SOURCE_DIR}" )
-SET( CORAL_LAUNCHER "launcher" )
-FIND_PACKAGE( Coral QUIET )
+set( CORAL_ROOT "${CMAKE_SOURCE_DIR}" )
+set( CORAL_LAUNCHER launcher )
+set( CORAL_LIBRARIES core )
+find_package( Coral QUIET )
 
 # Shared include paths for all subprojects
 INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/include )

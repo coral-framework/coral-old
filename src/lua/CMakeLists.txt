@@ -24,7 +24,7 @@ SET_TARGET_PROPERTIES( lua PROPERTIES
 	PROJECT_LABEL "Module Lua"
 )
 
-TARGET_LINK_LIBRARIES( lua lualibs core )
+TARGET_LINK_LIBRARIES( lua lualibs )
 
 ################################################################################
 # Custom target to re-generate the Lua module files using the Coral compiler

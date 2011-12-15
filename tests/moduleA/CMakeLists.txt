@@ -31,8 +31,6 @@ SET_TARGET_PROPERTIES( moduleA PROPERTIES
 	PROJECT_LABEL "Module A"
 )
 
-TARGET_LINK_LIBRARIES( moduleA core )
-
 ################################################################################
 # Build the test executable
 ################################################################################
@@ -56,7 +54,7 @@ SET_TARGET_PROPERTIES( tests_moduleA PROPERTIES
 	PROJECT_LABEL "Tests - Module A"
 )
 
-TARGET_LINK_LIBRARIES( tests_moduleA core ${GTEST_LIBRARIES} )
+TARGET_LINK_LIBRARIES( tests_moduleA ${GTEST_LIBRARIES} )
 
 ################################################################################
 # Register the test

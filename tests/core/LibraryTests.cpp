@@ -4,7 +4,6 @@
  */
 
 #include <core/utils/Library.h>
-#include <core/utils/RefCounted.h>
 #include <co/ModuleLoadException.h>
 #include <gtest/gtest.h>
 
