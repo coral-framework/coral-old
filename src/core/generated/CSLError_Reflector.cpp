@@ -38,19 +38,22 @@ public:
 		return sizeof(co::CSLError);
 	}
 
-	void createValue( void* address )
+	void createValues( void* ptr, size_t numValues )
 	{
-		new( address ) co::CSLError;
+		for( size_t i = 0; i < numValues; ++i )
+			new( reinterpret_cast<co::CSLError*>( ptr ) + i ) co::CSLError;
     }
 
-	void copyValue( const void* fromAddress, void* toAddress )
+	void copyValues( const void* fromPtr, void* toPtr, size_t numValues )
 	{
-		*reinterpret_cast<co::CSLError*>( toAddress ) = *reinterpret_cast<const co::CSLError*>( fromAddress );
+		for( size_t i = 0; i < numValues; ++i )
+			reinterpret_cast<co::CSLError*>( toPtr )[i] = reinterpret_cast<const co::CSLError*>( fromPtr )[i];
     }
 
-	void destroyValue( void* address )
+	void destroyValues( void* ptr, size_t numValues )
 	{
-		callDestructor( reinterpret_cast<co::CSLError*>( address ) );
+		for( size_t i = 0; i < numValues; ++i )
+			callDestructor( reinterpret_cast<co::CSLError*>( ptr ) + i );
 	}
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )

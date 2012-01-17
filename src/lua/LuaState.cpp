@@ -509,7 +509,7 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 			if( actual != expected )
 				CORAL_THROW( lua::Exception, expected->getFullName() << " expected, got " <<
 					( actual ? actual->getFullName().c_str() : lua_typename( L, lua_type( L, index ) ) ) );
-			expected->getReflector()->copyValue( ComplexValueBinding::getInstance( L, index ), var.getState().data.ptr );
+			expected->getReflector()->copyValues( ComplexValueBinding::getInstance( L, index ), var.getState().data.ptr, 1 );
 		}
 		break;
 	case co::TK_INTERFACE:

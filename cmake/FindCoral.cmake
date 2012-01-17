@@ -245,6 +245,17 @@ macro( CORAL_MODULE_TARGET moduleName targetName )
 endmacro( CORAL_MODULE_TARGET )
 
 ################################################################################
+# Macro to build Coral modules comprised only of CSL types (no implementations).
+################################################################################
+macro( CORAL_BUILD_CSL_MODULE moduleName )
+	CORAL_GENERATE_MODULE( _GENERATED_SOURCES ${moduleName} )
+	include_directories( ${CORAL_INCLUDE_DIRS} "${CMAKE_CURRENT_BINARY_DIR}/generated" )
+	add_library( ${moduleName} MODULE EXCLUDE_FROM_ALL ${_GENERATED_SOURCES} )
+	CORAL_MODULE_TARGET( ${moduleName} ${moduleName} )
+	source_group( "@Generated" FILES ${_GENERATED_SOURCES} )
+endmacro( CORAL_BUILD_CSL_MODULE )
+
+################################################################################
 # Macro to add a test target that invokes the Coral Launcher passing arguments.
 ################################################################################
 macro( CORAL_ADD_TEST testName )
@@ -272,15 +283,72 @@ macro( CORAL_TEST_ENVIRONMENT testName )
 endmacro( CORAL_TEST_ENVIRONMENT )
 
 ################################################################################
-# Macro to build Coral modules comprised only of CSL types (no implementations).
+# Macro to enable generation of 'test coverage' data for a target.
+# Only works on UNIX, and only if the CMake var 'TEST_COVERAGE' is enabled.
 ################################################################################
-macro( CORAL_BUILD_CSL_MODULE moduleName )
-	CORAL_GENERATE_MODULE( _GENERATED_SOURCES ${moduleName} )
-	include_directories( ${CORAL_INCLUDE_DIRS} "${CMAKE_CURRENT_BINARY_DIR}/generated" )
-	add_library( ${moduleName} MODULE EXCLUDE_FROM_ALL ${_GENERATED_SOURCES} )
-	CORAL_MODULE_TARGET( ${moduleName} ${moduleName} )
-	source_group( "@Generated" FILES ${_GENERATED_SOURCES} )
-endmacro( CORAL_BUILD_CSL_MODULE )
+macro( CORAL_ENABLE_TEST_COVERAGE targetName )
+	if( UNIX AND TEST_COVERAGE )
+		set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_FLAGS "-fprofile-arcs;-ftest-coverage" )
+		set_property( TARGET ${targetName} APPEND PROPERTY LINK_FLAGS "-fprofile-arcs;-ftest-coverage" )
+	endif()
+endmacro( CORAL_ENABLE_TEST_COVERAGE )
+
+################################################################################
+# Adds a file to the list of files to be cleaned in a directory
+################################################################################
+macro( CORAL_ADD_TO_MAKE_CLEAN filename )
+	set_property( DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${filename}" )
+endmacro( CORAL_ADD_TO_MAKE_CLEAN )
+
+################################################################################
+# Macro to create a custom target that generates documentation using Doxygen.
+# The target will configure_file() "${CMAKE_CURRENT_SOURCE_DIR}/${doxyfileName}"
+# then run Doxygen on the resulting file from within the current binary dir.
+# All extra macro arguments (${ARGN}) will be passed along to Doxygen.
+################################################################################
+macro( CORAL_GENERATE_DOXYGEN targetName doxyfileName )
+	find_package( Doxygen )
+	if( DOXYGEN_FOUND )
+		set( DOXYFILE_FOUND false )
+		if( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${doxyfileName}" )
+			set( DOXYFILE_FOUND true )
+		endif()
+		if( DOXYFILE_FOUND )
+			message( STATUS "Setting up Doxygen target '${targetName}'..." )
+			configure_file( "${doxyfileName}" "${doxyfileName}.configured" )
+			add_custom_target( ${targetName}
+				COMMENT "Running Doxygen..."
+				WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+				COMMAND ${DOXYGEN_EXECUTABLE} "${doxyfileName}.configured" ${ARGN}
+			)
+			set_target_properties( ${targetName} PROPERTIES PROJECT_LABEL "Doxygen" )
+			# Read doxygen configuration file
+			file( READ "${CMAKE_CURRENT_BINARY_DIR}/${doxyfileName}.configured" DOXYFILE_CONTENTS )
+			string( REGEX REPLACE "\n" ";" DOXYFILE_LINES ${DOXYFILE_CONTENTS} )
+			# Parse .tag filename and add to list of files to delete if it exists
+			set( DOXYGEN_TAG_FILE )
+			set( DOXYGEN_OUTPUT_DIRECTORY )
+			set( DOXYGEN_HTML_OUTPUT )
+			foreach( DOXYLINE ${DOXYFILE_LINES} )
+				string( REGEX REPLACE ".*GENERATE_TAGFILE *= *([^^\n]+).*" "\\1" DOXYGEN_TAG_FILE "${DOXYLINE}" )
+				string( REGEX REPLACE ".*OUTPUT_DIRECTORY *= *([^^\n]+).*" "\\1" DOXYGEN_OUTPUT_DIRECTORY "${DOXYLINE}" )
+				string( REGEX REPLACE ".*HTML_OUTPUT *= *([^^\n]+).*" "\\1" DOXYGEN_HTML_OUTPUT "${DOXYLINE}" )
+			endforeach()
+			file( TO_CMAKE_PATH "${DOXYGEN_OUTPUT_DIRECTORY}" DOXYGEN_OUTPUT_DIRECTORY )
+			file( TO_CMAKE_PATH "${DOXYGEN_HTML_OUTPUT}" DOXYGEN_HTML_OUTPUT )
+			if( DOXYGEN_TAG_FILE )
+				CORAL_ADD_TO_MAKE_CLEAN( "${CMAKE_CURRENT_BINARY_DIR}/${DOXYGEN_TAG_FILE}" )
+			endif()
+			if( DOXYGEN_OUTPUT_DIRECTORY AND DOXYGEN_HTML_OUTPUT )
+				CORAL_ADD_TO_MAKE_CLEAN( "${DOXYGEN_OUTPUT_DIRECTORY}/${DOXYGEN_HTML_OUTPUT}" )
+			endif()
+		else( DOXYFILE_FOUND )
+			message( SEND_ERROR "Doxyfile not found - configuration error." )
+		endif( DOXYFILE_FOUND )
+	else( DOXYGEN_FOUND )
+		message( "Doxygen not found - documentation will not be generated." )
+	endif( DOXYGEN_FOUND )
+endmacro( CORAL_GENERATE_DOXYGEN )
 
 ################################################################################
 # Find the Coral Framework

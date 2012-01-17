@@ -152,7 +152,7 @@ TEST( ModuleTests, crossModuleReflection )
 	void* instancePtr = &instanceMemory.front();
 	co::Any instanceAny( type, co::Any::VarIsPointer, instancePtr );
 
-	EXPECT_NO_THROW( reflector->createValue( instancePtr ) );
+	EXPECT_NO_THROW( reflector->createValues( instancePtr, 1 ) );
 
 	// get an IField
 	co::ICompositeType* ct = co::cast<co::ICompositeType>( type );
@@ -186,7 +186,7 @@ TEST( ModuleTests, crossModuleReflection )
 		EXPECT_EQ( "illegal instance type (moduleA.TestStruct expected, got (co::int32)-1)", e.getMessage() );
 	}
 
-	reflector->destroyValue( instancePtr );
+	reflector->destroyValues( instancePtr, 1 );
 }
 
 TEST( ModuleTests, serviceDependencies )

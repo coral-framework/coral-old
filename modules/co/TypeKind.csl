@@ -19,7 +19,7 @@ enum TypeKind
 	TK_STRING,			//< 8-bit-clean string.
 	TK_ARRAY,			//< Unidimensional array of elements.
 	TK_ENUM,			//< Enumeration of constant identifiers.
-	TK_EXCEPTION,		//< Named exception that can be thrown by methods.
+	TK_EXCEPTION,		//< Named exception that can be raised by methods.
 	TK_STRUCT,			//< Set of named fields of various types.
 	TK_NATIVECLASS,		//< Native class type.
 	TK_INTERFACE,		//< Interface type.

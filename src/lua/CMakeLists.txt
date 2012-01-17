@@ -32,7 +32,7 @@ TARGET_LINK_LIBRARIES( lua lualibs )
 
 ADD_CUSTOM_TARGET( lua_regen
 	COMMAND ${CORAL_LAUNCHER} -p "${CMAKE_SOURCE_DIR}/modules,${CMAKE_BINARY_DIR}/modules"
-		--no-abi-checks lua.Launcher co.compiler.cli -g lua
+		--no-abi-checks co.compiler.Compile -g lua
 	DEPENDS ${CORAL_LAUNCHER}
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 	COMMENT "Forcing regeneration of the Lua module files..."

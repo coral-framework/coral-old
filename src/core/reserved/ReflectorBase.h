@@ -47,9 +47,9 @@ public:
     void setServiceAt( IPort*, IService* );
 
 	// co::IReflector methods:
-	void createValue( void* address );
-    void copyValue( const void* fromAddress, void* toAddress );
-    void destroyValue( void* address );
+	void createValues( void* ptr, size_t numValues );
+    void copyValues( const void* fromPtr, void* toPtr, size_t numValues );
+    void destroyValues( void* ptr, size_t numValues );
     IObject* newInstance();
     IService* newDynamicProxy( IDynamicServiceProvider* handler );
     void getField( const Any& instance, IField* ai, Any& value );

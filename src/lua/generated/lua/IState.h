@@ -7,10 +7,10 @@
 #define _LUA_ISTATE_H_
 
 #include <co/TypeTraits.h>
-#include <co/Any.h>
-#include <co/IService.h>
-#include <vector>
 #include <co/Range.h>
+#include <co/Any.h>
+#include <vector>
+#include <co/IService.h>
 
 // lua.IState Mapping:
 namespace lua {

@@ -10,34 +10,34 @@ interface IReflector
 	readonly uint32 size;
 
 	<c++
-		//------ Manipulation of complex value instances (only available from C++) ------//
+		//------ Manipulation of Values (only available from C++) ------//
 
 		/*!
-			Constructs an instance of a struct or native class in the specified memory area.
-			\param[in] address memory address where the instance is to be constructed.
-			\throw NotSupportedException if the \a type is neither a struct nor a native class.
+			Constructs an array of values in the memory area starting at \a ptr.
+			\pre The memory area at \a ptr should be at least \a numValues * \a size bytes big.
+			\throw NotSupportedException if this \a type does not have a value form.
 		 */
-		virtual void createValue( void* address ) = 0;
+		virtual void createValues( void* ptr, size_t numValues ) = 0;
 
 		/*!
-			Sets the complex value at \a toAddress with a copy of the complex value at \a fromAddress.
-			The copy is done using the type's assignment operator.
-			\warning Both pointers must point to instances of this exact type.
+			Copies an array of \a numValues values from \a fromPtr to \a toPtr.
+			\note Each copy is done using the value's assignment operator.
+			\pre Both arrays must contain at least \a numValues properly constructed values of this type.
+			\throw NotSupportedException if this \a type does not have a value form.
 		 */
-		virtual void copyValue( const void* fromAddress, void* toAddress ) = 0;
+		virtual void copyValues( const void* fromPtr, void* toPtr, size_t numValues ) = 0;
 
 		/*!
-			Destroys the struct or native class instance located at \a address.
-			The instance should have been constructed using createValue().
-			\warning Expect the worst if \a address does not point to an instance of this type.
-			\throw NotSupportedException if the \a type is neither a struct nor a native class.
+			Destructs an array of \a numValues values starting at \a ptr.
+			\pre The array must contain at least \a numValues values constructed with createValues().
+			\throw NotSupportedException if this \a type does not have a value form.
 		 */
-		virtual void destroyValue( void* address ) = 0;
+		virtual void destroyValues( void* ptr, size_t numValues ) = 0;
 	c++>
 
 	/*
 		Instantiates a component.
-		\throw NotSupportedException if the \a type is not component.
+		\throw NotSupportedException if \a type is not component.
 	 */
 	IObject newInstance() raises NotSupportedException;
 
@@ -47,7 +47,7 @@ interface IReflector
 		A dynamic service proxy is a lightweight object (i.e. it is \e not a full component
 		instance) that forwards all its calls to a \a dynamicProvider.
 
-		\throw NotSupportedException if the \a type is not an interface.
+		\throw NotSupportedException if \a type is not an interface.
 		\throw IllegalArgumentException if the \a dynamicProvider is invalid (e.g. null).
 	 */
 	IService newDynamicProxy( in IDynamicServiceProvider dynamicProvider )
@@ -55,7 +55,7 @@ interface IReflector
 
 	/*
 		Gets the value of a field from a struct, interface or native class instance.
-		\throw NotSupportedException if the \a type is not a record type.
+		\throw NotSupportedException if \a type is not a record type.
 		\throw IllegalArgumentException if \a instance is not an instance of \a type.
 		\throw IllegalArgumentException if the \a field does not belong to this \a type.
 	 */
@@ -64,7 +64,7 @@ interface IReflector
 
 	/*
 		Sets the value of a field in a struct, interface or native class instance.
-		\throw NotSupportedException if the \a type is not a record type.
+		\throw NotSupportedException if \a type is not a record type.
 		\throw IllegalArgumentException if \a instance is not an instance of \a type.
 		\throw IllegalArgumentException if the \a field does not belong to this \a type.
 		\throw IllegalArgumentException if the \a field is read-only.
@@ -86,7 +86,7 @@ interface IReflector
 		you must \e always pass a co::Any at this parameter, even when the callee is a \c void
 		method (in this case, the \a returnValue parameter will return unmodified).
 
-		\throw NotSupportedException if the \a type is not a class type.
+		\throw NotSupportedException if \a type is not a class type.
 		\throw IllegalArgumentException if \a instance is not an instance of \a type.
 		\throw IllegalArgumentException if the \a method does not belong to this \a type.
 		\throw MissingInputException if \a args contains fewer elements than the number of method parameters.
@@ -98,7 +98,7 @@ interface IReflector
 
 	/*
 		Raises an exception with the given \a message.
-		\throw NotSupportedException if the \a type is not an exception.
+		\throw NotSupportedException if \a type is not an exception.
 	 */
 	void raise( in string message ) raises NotSupportedException;
 };

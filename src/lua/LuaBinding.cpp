@@ -834,11 +834,11 @@ void ComplexValueBinding::push( lua_State* L, co::IType* type, void* instancePtr
 
 	// create the userdata
 	void* ud = lua_newuserdata( L, reflector->getSize() );
-	reflector->createValue( ud );
+	reflector->createValues( ud, 1 );
 
 	// if an instance was provided, copy it
 	if( instancePtr )
-		reflector->copyValue( instancePtr, ud );
+		reflector->copyValues( instancePtr, ud, 1 );
 
 	// set the userdata's metatable
 	pushMetatable( L, static_cast<co::ICompositeType*>( type ), reflector );
@@ -854,7 +854,7 @@ int ComplexValueBinding::gc( lua_State* L )
 	assert( lua_islightuserdata( L, -1 ) );
 
 	co::IReflector* reflector = reinterpret_cast<co::IReflector*>( lua_touserdata( L, -1 ) );
-	reflector->destroyValue( lua_touserdata( L, 1 ) );
+	reflector->destroyValues( lua_touserdata( L, 1 ), 1 );
 	reflector->serviceRelease();
 
 	return 0;
