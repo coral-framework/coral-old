@@ -48,7 +48,7 @@ public:
 
 	co::Range<co::IAnnotation* const> getAnnotations()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ) );
         return res.get< co::Range<co::IAnnotation* const> >();
 	}
 
@@ -72,7 +72,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::IInterface* >( requestedType_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
 		return res.get< co::IAnnotation* >();
 	}
 
@@ -80,49 +80,49 @@ public:
 
 	const co::Uuid& getBinarySignature()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 0 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IType>( 0 ) );
         return res.get< const co::Uuid& >();
 	}
 
 	co::IReflector* getCurrentReflector()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 1 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IType>( 1 ) );
         return res.get< co::IReflector* >();
 	}
 
 	const std::string& getFullName()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 2 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IType>( 2 ) );
         return res.get< const std::string& >();
 	}
 
 	const co::Uuid& getFullSignature()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 3 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IType>( 3 ) );
         return res.get< const co::Uuid& >();
 	}
 
 	co::TypeKind getKind()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 4 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IType>( 4 ) );
         return res.get< co::TypeKind >();
 	}
 
 	const std::string& getName()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 5 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IType>( 5 ) );
         return res.get< const std::string& >();
 	}
 
 	co::INamespace* getNamespace()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 6 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IType>( 6 ) );
         return res.get< co::INamespace* >();
 	}
 
 	co::IReflector* getReflector()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IType>( 7 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IType>( 7 ) );
         return res.get< co::IReflector* >();
 	}
 
@@ -184,21 +184,21 @@ public:
 		return new co::IException_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
 	{
 		co::checkInstance<co::IException>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
-	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
+	void setField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::checkInstance<co::IException>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
 	{
 		co::checkInstance<co::IException>( instance, method );
 		raiseUnexpectedMemberIndex();

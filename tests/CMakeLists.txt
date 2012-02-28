@@ -8,35 +8,39 @@ if( NOT MSVC )
 endif()
 
 # We require the GTest Framework
-FIND_PACKAGE( GTest )
-IF( GTEST_FOUND )
+find_package( GTest )
+if( GTEST_FOUND )
 
-	# On UNIX, GTest generally depends on pthreads, but CMake does not
-	# add pthreads to GTEST_LIBRARIES. So we do it...
-	IF( UNIX )
-		LIST( APPEND GTEST_LIBRARIES pthread )
-	ENDIF()
+	# On UNIX, GTest generally depends on pthreads
+	# Since CMake does not add pthreads to GTEST_LIBRARIE, we do it...
+	if( UNIX )
+		list( APPEND GTEST_LIBRARIES pthread )
+	endif()
+
+	# Auto-include GTest in all test projects
+	include_directories( ${GTEST_INCLUDE_DIRS} )
 
 	# Check if Valgrind is available for the memory check tests
-	FIND_PROGRAM( VALGRIND_COMMAND valgrind )
-	IF( NOT VALGRIND_COMMAND )
-		MESSAGE( "WARNING: valgrind not found - all memory tests have been disabled!" )
-	ENDIF()
+	find_program( VALGRIND_COMMAND valgrind )
+	if( NOT VALGRIND_COMMAND )
+		message( "WARNING: valgrind not found - all memory tests have been disabled!" )
+	endif()
 
-	ADD_SUBDIRECTORY( core )
-	ADD_SUBDIRECTORY( lua )
-	ADD_SUBDIRECTORY( moduleA )
-	ADD_SUBDIRECTORY( moduleB )
-	ADD_SUBDIRECTORY( regen )
+	add_subdirectory( core )
+	add_subdirectory( lua )
+	add_subdirectory( moduleA )
+	add_subdirectory( moduleB )
+	add_subdirectory( regen )
+	add_subdirectory( performance )
 
 	# Add a custom target to build all test artifacts
-	ADD_CUSTOM_TARGET( tests DEPENDS launcher coral coralc
-		tests_core tests_lua tests_moduleA tests_moduleB tests_regen
+	add_custom_target( tests DEPENDS launcher coral coralc
+		tests_core tests_lua tests_moduleA tests_moduleB tests_regen tests_performance
 	)
 
-ELSE()
-	MESSAGE( "WARNING: gtest not found - most tests have been disabled!" )
-ENDIF()
+else()
+	message( "WARNING: gtest not found - most tests have been disabled!" )
+endif()
 
 ################################################################################
 # Smoke test the deployed executables

@@ -308,7 +308,7 @@ public:
 
 		writer( [[
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
 	{
 		]], t.cppName, [[* p = co::checkInstance<]], t.cppName, [[>( instance, field );
 		switch( field->getIndex() )
@@ -325,7 +325,7 @@ public:
 		}
 	}
 
-	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
+	void setField( co::Any instance, co::IField* field, co::Any value )
 	{
 		]], t.cppName, [[* p = co::checkInstance<]], t.cppName, [[>( instance, field );
 		switch( field->getIndex() )
@@ -350,7 +350,7 @@ public:
 
 		local callPrefix = ( t.kind == 'TK_NATIVECLASS' and t.cppName .. "_Adapter::" or "p->" )
 
-		writer( "\n\tvoid getField( const co::Any& instance, co::IField* field, co::Any& value )\n\t{\n" )
+		writer( "\n\tvoid getField( co::Any instance, co::IField* field, co::AnyValue& value )\n\t{\n" )
 
 		if #t.fields > 0 then
 			writer( "\t\t", t.cppName, [[* p = co::checkInstance<]], t.cppName, [[>( instance, field );
@@ -377,7 +377,7 @@ public:
 		writer [[
 	}
 
-	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
+	void setField( co::Any instance, co::IField* field, co::Any value )
 	{
 ]]
 		if #t.fields > 0 then
@@ -411,7 +411,7 @@ public:
 		writer [[
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
 	{
 ]]
 		if #t.methods > 0 then

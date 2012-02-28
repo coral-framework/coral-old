@@ -44,7 +44,7 @@ public:
 
 	bool getIsLazy()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IServiceManager>( 0 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IServiceManager>( 0 ) );
         return res.get< bool >();
 	}
 
@@ -98,7 +98,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::IInterface* >( serviceType_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 4 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 4 ), range );
 		return res.get< co::IService* >();
 	}
 
@@ -108,7 +108,7 @@ public:
 		args[0].set< co::IInterface* >( serviceType_ );
 		args[1].set< co::IService* >( client_ );
 		co::Range<co::Any const> range( args, 2 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 5 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 5 ), range );
 		return res.get< co::IService* >();
 	}
 
@@ -118,7 +118,7 @@ public:
 		args[0].set< co::IInterface* >( serviceType_ );
 		args[1].set< co::IInterface* >( clientType_ );
 		co::Range<co::Any const> range( args, 2 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 6 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 6 ), range );
 		return res.get< co::IService* >();
 	}
 
@@ -188,7 +188,7 @@ public:
 		return new co::IServiceManager_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
 	{
 		co::IServiceManager* p = co::checkInstance<co::IServiceManager>( instance, field );
 		switch( field->getIndex() )
@@ -198,7 +198,7 @@ public:
 		}
 	}
 
-	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
+	void setField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::IServiceManager* p = co::checkInstance<co::IServiceManager>( instance, field );
 		switch( field->getIndex() )
@@ -210,7 +210,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
 	{
 		co::IServiceManager* p = co::checkInstance<co::IServiceManager>( instance, method );
 		checkNumArguments( method, args.getSize() );

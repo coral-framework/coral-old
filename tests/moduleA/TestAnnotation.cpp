@@ -15,8 +15,8 @@ namespace moduleA {
 class TestAnnotation : public TestAnnotation_Base
 {
 public:
-	const co::Any& getA() { return _any; }
-	void setA( const co::Any& a ) { _any = a; }
+	co::Any getA() { return _any; }
+	void setA( co::Any a ) { _any = a; }
 
 	bool getB() { return _b; }
 	void setB( bool b ) { _b = b; }

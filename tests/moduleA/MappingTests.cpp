@@ -139,7 +139,7 @@ TEST( MappingTests, interface )
 	ASSERT_EQ( moduleA::Second, enumValue );
 	ASSERT_EQ( 42, testStruct.anInt16 );
 
-	moduleA::IDummy* dummyPtr = NULL;
+	co::RefPtr<moduleA::IDummy> dummyPtr;
 
 	// Callling this method should modify the parameters
 	ti->testOutParameters( size, enumValue, text, testStruct, dummyPtr, intVector, interfaceRefVector );

@@ -44,25 +44,25 @@ public:
 
 	bool getIsIn()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 0 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 0 ) );
         return res.get< bool >();
 	}
 
 	bool getIsOut()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 1 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 1 ) );
         return res.get< bool >();
 	}
 
 	const std::string& getName()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 2 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 2 ) );
         return res.get< const std::string& >();
 	}
 
 	co::IType* getType()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 3 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 3 ) );
         return res.get< co::IType* >();
 	}
 
@@ -115,7 +115,7 @@ public:
 		return new co::IParameter_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
 	{
 		co::IParameter* p = co::checkInstance<co::IParameter>( instance, field );
 		switch( field->getIndex() )
@@ -128,7 +128,7 @@ public:
 		}
 	}
 
-	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
+	void setField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::IParameter* p = co::checkInstance<co::IParameter>( instance, field );
 		switch( field->getIndex() )
@@ -143,7 +143,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
 	{
 		co::checkInstance<co::IParameter>( instance, method );
 		raiseUnexpectedMemberIndex();

@@ -47,7 +47,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 0 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 0 ), range );
 		return res.get< bool >();
 	}
 
@@ -56,7 +56,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 1 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 1 ), range );
 		return res.get< co::IModulePart* >();
 	}
 
@@ -109,21 +109,21 @@ public:
 		return new co::IModulePartLoader_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
 	{
 		co::checkInstance<co::IModulePartLoader>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
-	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
+	void setField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::checkInstance<co::IModulePartLoader>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
 	{
 		co::IModulePartLoader* p = co::checkInstance<co::IModulePartLoader>( instance, method );
 		checkNumArguments( method, args.getSize() );

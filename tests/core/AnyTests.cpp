@@ -146,17 +146,6 @@ void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::IType* exp
 	EXPECT_EQ( expectedType, a3.getType() );
 	EXPECT_EQ( p, a3.get<T*>() );
 
-	const T* cp = sampleValue;
-	co::Any a4( cp );
-	EXPECT_TRUE( a4.getKind() == kind );
-	EXPECT_TRUE( a4.isConst() );
-	EXPECT_TRUE( a4.isPointer() );
-	EXPECT_FALSE( a4.isPointerConst() );
-	EXPECT_FALSE( a4.isReference() );
-	EXPECT_EQ( sizeof(void*), a4.getSize() );
-	EXPECT_EQ( expectedType, a4.getType() );
-	EXPECT_EQ( cp, a4.get<const T*>() );
-
 	T* const pc = sampleValue;
 	co::Any a5;
 	a5.set<T* const>( pc );
@@ -169,18 +158,6 @@ void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::IType* exp
 	EXPECT_EQ( expectedType, a5.getType() );
 	EXPECT_EQ( pc, a5.get<T* const>() );
 
-	const T* const cpc = sampleValue;
-	co::Any a6;
-	a6.set<const T* const>( cpc );
-	EXPECT_TRUE( a6.getKind() == kind );
-	EXPECT_TRUE( a6.isConst() );
-	EXPECT_TRUE( a6.isPointer() );
-	EXPECT_TRUE( a6.isPointerConst() );
-	EXPECT_FALSE( a6.isReference() );
-	EXPECT_EQ( sizeof(void*), a6.getSize() );
-	EXPECT_EQ( expectedType, a6.getType() );
-	EXPECT_EQ( cpc, a6.get<const T* const>() );
-
 	T*& pr = p;
 	co::Any a9;
 	a9.set<T*&>( pr );
@@ -192,18 +169,6 @@ void constructorPtrTest( const co::TypeKind kind, T* sampleValue, co::IType* exp
 	EXPECT_EQ( sizeof(void*), a9.getSize() );
 	EXPECT_EQ( expectedType, a9.getType() );
 	EXPECT_EQ( pr, a9.get<T*&>() );
-
-	const T*& cpr = cp;
-	co::Any a10;
-	a10.set<const T*&>( cpr );
-	EXPECT_TRUE( a10.getKind() == kind );
-	EXPECT_TRUE( a10.isConst() );
-	EXPECT_TRUE( a10.isPointer() );
-	EXPECT_FALSE( a10.isPointerConst() );
-	EXPECT_TRUE( a10.isReference() );
-	EXPECT_EQ( sizeof(void*), a10.getSize() );
-	EXPECT_EQ( expectedType, a10.getType() );
-	EXPECT_EQ( cpr, a10.get<const T*&>() );
 }
 
 template<typename T>

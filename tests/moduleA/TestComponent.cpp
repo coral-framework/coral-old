@@ -143,7 +143,7 @@ public:
 
 	void testOutParameters( float& size, TestEnum& enumValue,
 		std::string& text, TestStruct& testStruct,
-		IDummy*& dummyInterface, std::vector<co::int32>& intList,
+		co::RefPtr<IDummy>& dummyInterface, std::vector<co::int32>& intList,
 		co::RefVector<IDummy>& interfaces )
 	{
 		size = -1;
@@ -166,7 +166,7 @@ public:
 		CORAL_UNUSED( interfaces );
 	}
 
-	const co::Any& testAnyReturn( const co::Any& param )
+	co::Any testAnyReturn( co::Any param )
 	{
 		return param;
 	}

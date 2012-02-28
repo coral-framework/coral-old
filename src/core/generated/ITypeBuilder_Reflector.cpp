@@ -47,26 +47,26 @@ public:
 
 	co::TypeKind getKind()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 0 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 0 ) );
         return res.get< co::TypeKind >();
 	}
 
 	co::INamespace* getNamespace()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 1 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 1 ) );
         return res.get< co::INamespace* >();
 	}
 
 	const std::string& getTypeName()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 2 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 2 ) );
         return res.get< const std::string& >();
 	}
 
 	co::IType* createType()
 	{
 		co::Range<co::Any const> range;
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 0 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 0 ), range );
 		return res.get< co::IType* >();
 	}
 
@@ -101,7 +101,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 4 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 4 ), range );
 		return res.get< co::IMethodBuilder* >();
 	}
 
@@ -164,7 +164,7 @@ public:
 		return new co::ITypeBuilder_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
 	{
 		co::ITypeBuilder* p = co::checkInstance<co::ITypeBuilder>( instance, field );
 		switch( field->getIndex() )
@@ -176,7 +176,7 @@ public:
 		}
 	}
 
-	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
+	void setField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::ITypeBuilder* p = co::checkInstance<co::ITypeBuilder>( instance, field );
 		switch( field->getIndex() )
@@ -190,7 +190,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
 	{
 		co::ITypeBuilder* p = co::checkInstance<co::ITypeBuilder>( instance, method );
 		checkNumArguments( method, args.getSize() );

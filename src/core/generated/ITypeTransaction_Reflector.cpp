@@ -44,7 +44,7 @@ public:
 
 	co::Range<co::ITypeBuilder* const> getTypeBuilders()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeTransaction>( 0 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ITypeTransaction>( 0 ) );
         return res.get< co::Range<co::ITypeBuilder* const> >();
 	}
 
@@ -109,7 +109,7 @@ public:
 		return new co::ITypeTransaction_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
 	{
 		co::ITypeTransaction* p = co::checkInstance<co::ITypeTransaction>( instance, field );
 		switch( field->getIndex() )
@@ -119,7 +119,7 @@ public:
 		}
 	}
 
-	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
+	void setField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::ITypeTransaction* p = co::checkInstance<co::ITypeTransaction>( instance, field );
 		switch( field->getIndex() )
@@ -131,7 +131,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
 	{
 		co::ITypeTransaction* p = co::checkInstance<co::ITypeTransaction>( instance, method );
 		checkNumArguments( method, args.getSize() );

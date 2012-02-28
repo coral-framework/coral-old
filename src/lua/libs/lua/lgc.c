@@ -1,5 +1,5 @@
 /*
-** $Id: lgc.c,v 2.114 2011/10/03 17:54:25 roberto Exp $
+** $Id: lgc.c,v 2.116 2011/12/02 13:18:41 roberto Exp $
 ** Garbage Collector
 ** See Copyright Notice in lua.h
 */
@@ -91,6 +91,12 @@ static void reallymarkobject (global_State *g, GCObject *o);
 ** Generic functions
 ** =======================================================
 */
+
+
+/*
+** one after last element in a hash array
+*/
+#define gnodelast(h)	gnode(h, cast(size_t, sizenode(h)))
 
 
 /*
@@ -285,7 +291,7 @@ static void reallymarkobject (global_State *g, GCObject *o) {
 
 
 /*
-** mark tag methods for basic types
+** mark metamethods for basic types
 */
 static void markmt (global_State *g) {
   int i;
@@ -342,7 +348,7 @@ static void markroot (global_State *g) {
 */
 
 static void traverseweakvalue (global_State *g, Table *h) {
-  Node *n, *limit = gnode(h, sizenode(h));
+  Node *n, *limit = gnodelast(h);
   /* if there is array part, assume it may have white values (do not
      traverse it just to check) */
   int hasclears = (h->sizearray > 0);
@@ -368,7 +374,7 @@ static int traverseephemeron (global_State *g, Table *h) {
   int marked = 0;  /* true if an object is marked in this traversal */
   int hasclears = 0;  /* true if table has white keys */
   int prop = 0;  /* true if table has entry "white-key -> white-value" */
-  Node *n, *limit = gnode(h, sizenode(h));
+  Node *n, *limit = gnodelast(h);
   int i;
   /* traverse array part (numeric keys are 'strong') */
   for (i = 0; i < h->sizearray; i++) {
@@ -403,7 +409,7 @@ static int traverseephemeron (global_State *g, Table *h) {
 
 
 static void traversestrongtable (global_State *g, Table *h) {
-  Node *n, *limit = gnode(h, sizenode(h));
+  Node *n, *limit = gnodelast(h);
   int i;
   for (i = 0; i < h->sizearray; i++)  /* traverse array part */
     markvalue(g, &h->array[i]);
@@ -596,7 +602,7 @@ static void convergeephemerons (global_State *g) {
 static void clearkeys (GCObject *l, GCObject *f) {
   for (; l != f; l = gco2t(l)->gclist) {
     Table *h = gco2t(l);
-    Node *n, *limit = gnode(h, sizenode(h));
+    Node *n, *limit = gnodelast(h);
     for (n = gnode(h, 0); n < limit; n++) {
       if (!ttisnil(gval(n)) && (iscleared(gkey(n)))) {
         setnilvalue(gval(n));  /* remove value ... */
@@ -614,7 +620,7 @@ static void clearkeys (GCObject *l, GCObject *f) {
 static void clearvalues (GCObject *l, GCObject *f) {
   for (; l != f; l = gco2t(l)->gclist) {
     Table *h = gco2t(l);
-    Node *n, *limit = gnode(h, sizenode(h));
+    Node *n, *limit = gnodelast(h);
     int i;
     for (i = 0; i < h->sizearray; i++) {
       TValue *o = &h->array[i];
@@ -768,7 +774,7 @@ static void GCTM (lua_State *L, int propagateerrors) {
     int status;
     lu_byte oldah = L->allowhook;
     int running  = g->gcrunning;
-    L->allowhook = 0;  /* stop debug hooks during GC tag method */
+    L->allowhook = 0;  /* stop debug hooks during GC metamethod */
     g->gcrunning = 0;  /* avoid GC steps */
     setobj2s(L, L->top, tm);  /* push finalizer... */
     setobj2s(L, L->top + 1, &v);  /* ... and its argument */
@@ -778,7 +784,7 @@ static void GCTM (lua_State *L, int propagateerrors) {
     g->gcrunning = running;  /* restore state */
     if (status != LUA_OK && propagateerrors) {  /* error while running __gc? */
       if (status == LUA_ERRRUN) {  /* is there an error msg.? */
-        luaO_pushfstring(L, "error in __gc tag method (%s)",
+        luaO_pushfstring(L, "error in __gc metamethod (%s)",
                                         lua_tostring(L, -1));
         status = LUA_ERRGCMM;  /* error in __gc metamethod */
       }

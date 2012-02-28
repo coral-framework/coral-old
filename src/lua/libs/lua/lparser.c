@@ -1,5 +1,5 @@
 /*
-** $Id: lparser.c,v 2.122 2011/10/31 17:46:04 roberto Exp $
+** $Id: lparser.c,v 2.124 2011/12/02 13:23:56 roberto Exp $
 ** Lua Parser
 ** See Copyright Notice in lua.h
 */
@@ -68,19 +68,19 @@ static void anchor_token (LexState *ls) {
 
 
 /* semantic error */
-static void semerror (LexState *ls, const char *msg) {
+static l_noret semerror (LexState *ls, const char *msg) {
   ls->t.token = 0;  /* remove 'near to' from final message */
   luaX_syntaxerror(ls, msg);
 }
 
 
-static void error_expected (LexState *ls, int token) {
+static l_noret error_expected (LexState *ls, int token) {
   luaX_syntaxerror(ls,
       luaO_pushfstring(ls->L, "%s expected", luaX_token2str(ls, token)));
 }
 
 
-static void errorlimit (FuncState *fs, int limit, const char *what) {
+static l_noret errorlimit (FuncState *fs, int limit, const char *what) {
   lua_State *L = fs->ls->L;
   const char *msg;
   int line = fs->f->linedefined;
@@ -330,7 +330,7 @@ static void adjust_assign (LexState *ls, int nvars, int nexps, expdesc *e) {
 static void enterlevel (LexState *ls) {
   lua_State *L = ls->L;
   ++L->nCcalls;
-  checklimit(ls->fs, L->nCcalls, LUAI_MAXCCALLS, "syntax levels");
+  checklimit(ls->fs, L->nCcalls, LUAI_MAXCCALLS, "C levels");
 }
 
 
@@ -460,7 +460,7 @@ static void breaklabel (LexState *ls) {
 ** generates an error for an undefined 'goto'; choose appropriate
 ** message when label name is a reserved word (which can only be 'break')
 */
-static void undefgoto (LexState *ls, Labeldesc *gt) {
+static l_noret undefgoto (LexState *ls, Labeldesc *gt) {
   const char *msg = (gt->name->tsv.reserved > 0)
                     ? "<%s> at line %d not inside a loop"
                     : "no visible label " LUA_QS " for <goto> at line %d";
@@ -852,7 +852,6 @@ static void funcargs (LexState *ls, expdesc *f, int line) {
     }
     default: {
       luaX_syntaxerror(ls, "function arguments expected");
-      return;
     }
   }
   lua_assert(f->k == VNONRELOC);
@@ -897,7 +896,6 @@ static void prefixexp (LexState *ls, expdesc *v) {
     }
     default: {
       luaX_syntaxerror(ls, "unexpected symbol");
-      return;
     }
   }
 }
@@ -1149,8 +1147,8 @@ static void assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
     primaryexp(ls, &nv.v);
     if (nv.v.k != VINDEXED)
       check_conflict(ls, lh, &nv.v);
-    checklimit(ls->fs, nvars, LUAI_MAXCCALLS - ls->L->nCcalls,
-                    "variable names");
+    checklimit(ls->fs, nvars + ls->L->nCcalls, LUAI_MAXCCALLS,
+                    "C levels");
     assignment(ls, &nv, nvars+1);
   }
   else {  /* assignment -> `=' explist */

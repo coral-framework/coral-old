@@ -48,13 +48,13 @@ public:
 
 	co::INamespace* getRootNS()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 0 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 0 ) );
         return res.get< co::INamespace* >();
 	}
 
 	co::ITypeTransaction* getTransaction()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 1 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 1 ) );
         return res.get< co::ITypeTransaction* >();
 	}
 
@@ -63,7 +63,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( fullName_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 0 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 0 ), range );
 		return res.get< co::INamespace* >();
 	}
 
@@ -72,7 +72,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( fullName_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 1 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 1 ), range );
 		return res.get< co::IType* >();
 	}
 
@@ -81,7 +81,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::IType* >( elementType_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 2 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 2 ), range );
 		return res.get< co::IArray* >();
 	}
 
@@ -90,7 +90,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( typeName_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 3 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 3 ), range );
 		return res.get< co::IType* >();
 	}
 
@@ -100,7 +100,7 @@ public:
 		args[0].set< const std::string& >( typeName_ );
 		args[1].set< std::vector<co::CSLError>& >( errorStack_ );
 		co::Range<co::Any const> range( args, 2 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 4 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 4 ), range );
 		return res.get< co::IType* >();
 	}
 
@@ -153,7 +153,7 @@ public:
 		return new co::ITypeManager_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
 	{
 		co::ITypeManager* p = co::checkInstance<co::ITypeManager>( instance, field );
 		switch( field->getIndex() )
@@ -164,7 +164,7 @@ public:
 		}
 	}
 
-	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
+	void setField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::ITypeManager* p = co::checkInstance<co::ITypeManager>( instance, field );
 		switch( field->getIndex() )
@@ -177,7 +177,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
 	{
 		co::ITypeManager* p = co::checkInstance<co::ITypeManager>( instance, method );
 		checkNumArguments( method, args.getSize() );

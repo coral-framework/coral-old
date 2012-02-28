@@ -109,17 +109,17 @@ IService* ReflectorBase::newDynamicProxy( IDynamicServiceProvider* )
 	return NULL;
 }
 
-void ReflectorBase::getField( const Any&, IField*, Any& )
+void ReflectorBase::getField( Any, IField*, AnyValue& )
 {
 	raiseNotSupportedException();
 }
 
-void ReflectorBase::setField( const Any&, IField*, const Any& )
+void ReflectorBase::setField( Any, IField*, Any )
 {
 	raiseNotSupportedException();
 }
 
-void ReflectorBase::invoke( const Any&, IMethod*, Range<Any const>, Any& )
+void ReflectorBase::invoke( Any, IMethod*, Range<Any const>, AnyValue& )
 {
 	raiseNotSupportedException();
 }

@@ -46,37 +46,37 @@ public:
 
 	co::Range<co::INamespace* const> getChildNamespaces()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 0 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 0 ) );
         return res.get< co::Range<co::INamespace* const> >();
 	}
 
 	const std::string& getFullName()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 1 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 1 ) );
         return res.get< const std::string& >();
 	}
 
 	co::IModule* getModule()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 2 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 2 ) );
         return res.get< co::IModule* >();
 	}
 
 	const std::string& getName()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 3 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 3 ) );
         return res.get< const std::string& >();
 	}
 
 	co::INamespace* getParentNamespace()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 4 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 4 ) );
         return res.get< co::INamespace* >();
 	}
 
 	co::Range<co::IType* const> getTypes()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 5 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 5 ) );
         return res.get< co::Range<co::IType* const> >();
 	}
 
@@ -85,7 +85,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 0 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 0 ), range );
 		return res.get< co::INamespace* >();
 	}
 
@@ -95,7 +95,7 @@ public:
 		args[0].set< const std::string& >( name_ );
 		args[1].set< co::TypeKind >( typeKind_ );
 		co::Range<co::Any const> range( args, 2 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 1 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 1 ), range );
 		return res.get< co::ITypeBuilder* >();
 	}
 
@@ -104,7 +104,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 2 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 2 ), range );
 		return res.get< co::INamespace* >();
 	}
 
@@ -113,7 +113,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 3 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 3 ), range );
 		return res.get< co::IType* >();
 	}
 
@@ -166,7 +166,7 @@ public:
 		return new co::INamespace_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
 	{
 		co::INamespace* p = co::checkInstance<co::INamespace>( instance, field );
 		switch( field->getIndex() )
@@ -181,7 +181,7 @@ public:
 		}
 	}
 
-	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
+	void setField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::INamespace* p = co::checkInstance<co::INamespace>( instance, field );
 		switch( field->getIndex() )
@@ -198,7 +198,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
 	{
 		co::INamespace* p = co::checkInstance<co::INamespace>( instance, method );
 		checkNumArguments( method, args.getSize() );

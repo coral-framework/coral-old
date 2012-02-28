@@ -51,6 +51,25 @@ function M.formatAccessor( prefix, fieldName, suffix )
 	return prefix .. fieldName:sub( 1, 1 ):upper() .. fieldName:sub( 2 ) .. ( suffix or "" )
 end
 
+local function formatField( t )
+	local kind = t.kind
+	if kind == 'TK_ANY' then
+		return "co::AnyValue"
+	elseif kind == 'TK_ARRAY' then
+		if t.elementType.kind == 'TK_INTERFACE' then
+			return "co::RefVector<" .. t.elementType.cppName .. ">"
+		else
+			return "std::vector<" .. formatField( t.elementType ) .. ">"
+		end
+	elseif kind == 'TK_INTERFACE' then
+		return "co::RefPtr<" .. t.cppName .. ">"
+	else
+		return t.cppName
+	end
+end
+
+M.formatField = formatField
+
 function M.formatInput( t )
 	if not t then return "void" end
 	local kind = t.kind
@@ -59,7 +78,7 @@ function M.formatInput( t )
 		return "co::Range<" .. elem.cppName .. ( elem.kind == 'TK_INTERFACE' and '*' or '' ) .. " const>"
 	elseif kind == 'TK_INTERFACE' then
 		return t.cppName .. "*"
-	elseif kind == 'TK_STRING' or kind == 'TK_ANY' or kind == 'TK_STRUCT' or kind == 'TK_NATIVECLASS' then
+	elseif kind == 'TK_STRING' or kind == 'TK_STRUCT' or kind == 'TK_NATIVECLASS' then
 		return "const " .. t.cppName .. "&"
 	else -- ( kind >= co::TK_BOOLEAN && kind <= co::TK_DOUBLE ) || kind == co::TK_ENUM
 		return t.cppName
@@ -67,33 +86,7 @@ function M.formatInput( t )
 end
 
 function M.formatOutput( t )
-	local kind = t.kind
-	if kind == 'TK_ARRAY' then
-		if t.elementType.kind == 'TK_INTERFACE' then
-			return "co::RefVector<" .. t.elementType.cppName .. ">&"
-		else
-			return "std::vector<" .. t.elementType.cppName .. ">&"
-		end
-	elseif kind == 'TK_INTERFACE' then
-		return t.cppName .. "*&"
-	else
-		return t.cppName .. "&"
-	end
-end
-
-function M.formatField( t )
-	local kind = t.kind
-	if kind == 'TK_ARRAY' then
-		if t.elementType.kind == 'TK_INTERFACE' then
-			return "co::RefVector<" .. t.elementType.cppName .. ">"
-		else
-			return "std::vector<" .. t.elementType.cppName .. ">"
-		end
-	elseif kind == 'TK_INTERFACE' then
-		return "co::RefPtr<" .. t.cppName .. ">"
-	else
-		return t.cppName
-	end
+	return formatField( t ) .. "&"
 end
 
 function M.includeHeader( t, header )

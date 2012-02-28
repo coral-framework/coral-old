@@ -46,33 +46,33 @@ public:
 
 	co::uint32 getSize()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IReflector>( 0 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IReflector>( 0 ) );
         return res.get< co::uint32 >();
 	}
 
 	co::IType* getType()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IReflector>( 1 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IReflector>( 1 ) );
         return res.get< co::IType* >();
 	}
 
-	void getField( const co::Any& instance_, co::IField* field_, co::Any& value_ )
+	void getField( co::Any instance_, co::IField* field_, co::AnyValue& value_ )
 	{
 		co::Any args[3];
 		args[0].set< const co::Any& >( instance_ );
 		args[1].set< co::IField* >( field_ );
-		args[2].set< co::Any& >( value_ );
+		args[2].set< co::AnyValue& >( value_ );
 		co::Range<co::Any const> range( args, 3 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 0 ), range );
 	}
 
-	void invoke( const co::Any& instance_, co::IMethod* method_, co::Range<co::Any const> args_, co::Any& returnValue_ )
+	void invoke( co::Any instance_, co::IMethod* method_, co::Range<co::Any const> args_, co::AnyValue& returnValue_ )
 	{
 		co::Any args[4];
 		args[0].set< const co::Any& >( instance_ );
 		args[1].set< co::IMethod* >( method_ );
 		args[2].set< co::Range<co::Any const> >( args_ );
-		args[3].set< co::Any& >( returnValue_ );
+		args[3].set< co::AnyValue& >( returnValue_ );
 		co::Range<co::Any const> range( args, 4 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 1 ), range );
 	}
@@ -82,14 +82,14 @@ public:
 		co::Any args[1];
 		args[0].set< co::IDynamicServiceProvider* >( dynamicProvider_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 2 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 2 ), range );
 		return res.get< co::IService* >();
 	}
 
 	co::IObject* newInstance()
 	{
 		co::Range<co::Any const> range;
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 3 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 3 ), range );
 		return res.get< co::IObject* >();
 	}
 
@@ -101,7 +101,7 @@ public:
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 4 ), range );
 	}
 
-	void setField( const co::Any& instance_, co::IField* field_, const co::Any& value_ )
+	void setField( co::Any instance_, co::IField* field_, co::Any value_ )
 	{
 		co::Any args[3];
 		args[0].set< const co::Any& >( instance_ );
@@ -177,7 +177,7 @@ public:
 		return new co::IReflector_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
 	{
 		co::IReflector* p = co::checkInstance<co::IReflector>( instance, field );
 		switch( field->getIndex() )
@@ -188,7 +188,7 @@ public:
 		}
 	}
 
-	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
+	void setField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::IReflector* p = co::checkInstance<co::IReflector>( instance, field );
 		switch( field->getIndex() )
@@ -201,7 +201,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
 	{
 		co::IReflector* p = co::checkInstance<co::IReflector>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -214,7 +214,7 @@ public:
 				{
 					const co::Any& instance_ = args[++argIndex].get< const co::Any& >();
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
-					co::Any& value_ = args[++argIndex].get< co::Any& >();
+					co::AnyValue& value_ = args[++argIndex].get< co::AnyValue& >();
 					argIndex = -1;
 					p->getField( instance_, field_, value_ );
 				}
@@ -224,7 +224,7 @@ public:
 					const co::Any& instance_ = args[++argIndex].get< const co::Any& >();
 					co::IMethod* method_ = args[++argIndex].get< co::IMethod* >();
 					co::Range<co::Any const> args_ = args[++argIndex].get< co::Range<co::Any const> >();
-					co::Any& returnValue_ = args[++argIndex].get< co::Any& >();
+					co::AnyValue& returnValue_ = args[++argIndex].get< co::AnyValue& >();
 					argIndex = -1;
 					p->invoke( instance_, method_, args_, returnValue_ );
 				}

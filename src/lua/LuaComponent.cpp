@@ -168,7 +168,7 @@ void LuaComponent::getMethod( lua_State* L, int t, co::int32 cookie )
 	}
 }
 
-const co::Any& LuaComponent::dynamicGetField( co::int32 cookie, co::IField* ai )
+co::Any LuaComponent::dynamicGetField( co::int32 cookie, co::IField* ai )
 {
 	__BEGIN_LUA_API_CODE__
 
@@ -184,7 +184,7 @@ const co::Any& LuaComponent::dynamicGetField( co::int32 cookie, co::IField* ai )
 	return _res;
 }
 
-void LuaComponent::dynamicSetField( co::int32 cookie, co::IField* ai, const co::Any& value )
+void LuaComponent::dynamicSetField( co::int32 cookie, co::IField* ai, co::Any value )
 {
 	__BEGIN_LUA_API_CODE__
 
@@ -198,8 +198,7 @@ void LuaComponent::dynamicSetField( co::int32 cookie, co::IField* ai, const co::
 	__END_LUA_API_CODE__
 }
 
-const co::Any& LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi,
-											co::Range<co::Any const> args )
+co::Any LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<co::Any const> args )
 {
 	__BEGIN_LUA_API_CODE__
 
@@ -325,17 +324,17 @@ co::IService* LuaComponent::newDynamicProxy( co::IDynamicServiceProvider* )
 	return NULL;
 }
 
-void LuaComponent::getField( const co::Any&, co::IField*, co::Any& )
+void LuaComponent::getField( co::Any, co::IField*, co::AnyValue& )
 {
 	raiseNotSupportedException();
 }
 
-void LuaComponent::setField( const co::Any&, co::IField*, const co::Any& )
+void LuaComponent::setField( co::Any, co::IField*, co::Any )
 {
 	raiseNotSupportedException();
 }
 
-void LuaComponent::invoke( const co::Any&, co::IMethod*, co::Range<co::Any const>, co::Any& )
+void LuaComponent::invoke( co::Any, co::IMethod*, co::Range<co::Any const>, co::AnyValue& )
 {
 	raiseNotSupportedException();
 }

@@ -26,6 +26,7 @@ class IInterface;
 class IComponent;
 class INativeClass;
 template<typename T> class Range;
+template<typename T> class RefPtr;
 template<typename T> class RefVector;
 
 /*!
@@ -89,8 +90,9 @@ template<> struct kindOf<float> : public kindOfBase<TK_FLOAT> {};
 template<> struct kindOf<double> : public kindOfBase<TK_DOUBLE> {};
 template<> struct kindOf<std::string> : public kindOfBase<TK_STRING> {};
 
-// specialization for array types:
+// specialization for container types:
 template<typename T> struct kindOf<Range<T> > : public kindOfBase<TK_ARRAY> {};
+template<typename T> struct kindOf<RefPtr<T> > : public kindOf<T> {};
 template<typename T> struct kindOf<RefVector<T> > : public kindOfBase<TK_ARRAY> {};
 template<typename T> struct kindOf<std::vector<T> > : public kindOfBase<TK_ARRAY> {};
 

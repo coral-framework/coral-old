@@ -1,5 +1,5 @@
 /*
-** $Id: loadlib.c,v 1.105 2011/11/25 12:52:03 roberto Exp $
+** $Id: loadlib.c,v 1.108 2011/12/12 16:34:03 roberto Exp $
 ** Dynamic library loader for Lua
 ** See Copyright Notice in lua.h
 **
@@ -132,7 +132,7 @@ static void ll_unloadlib (void *lib) {
 
 
 static void *ll_load (lua_State *L, const char *path, int seeglb) {
-  void *lib = dlopen(path, RTLD_NOW | (seeglb ? RTLD_GLOBAL : 0));
+  void *lib = dlopen(path, RTLD_NOW | (seeglb ? RTLD_GLOBAL : RTLD_LOCAL));
   if (lib == NULL) lua_pushstring(L, dlerror());
   return lib;
 }
@@ -197,7 +197,7 @@ static void ll_unloadlib (void *lib) {
 
 static void *ll_load (lua_State *L, const char *path, int seeglb) {
   HMODULE lib = LoadLibraryExA(path, NULL, LUA_LLE_FLAGS);
-  (void)(seeglb);  /* symbols are 'global' by default */
+  (void)(seeglb);  /* not used: symbols are 'global' by default */
   if (lib == NULL) pusherror(L);
   return lib;
 }
@@ -227,19 +227,19 @@ static lua_CFunction ll_sym (lua_State *L, void *lib, const char *sym) {
 
 
 static void ll_unloadlib (void *lib) {
-  (void)(lib);  /* to avoid warnings */
+  (void)(lib);  /* not used */
 }
 
 
 static void *ll_load (lua_State *L, const char *path, int seeglb) {
-  (void)(path); (void)(seeglb);  /* to avoid warnings */
+  (void)(path); (void)(seeglb);  /* not used */
   lua_pushliteral(L, DLMSG);
   return NULL;
 }
 
 
 static lua_CFunction ll_sym (lua_State *L, void *lib, const char *sym) {
-  (void)(lib); (void)(sym);  /* to avoid warnings */
+  (void)(lib); (void)(sym);  /* not used */
   lua_pushliteral(L, DLMSG);
   return NULL;
 }
@@ -615,12 +615,25 @@ static int ll_seeall (lua_State *L) {
 /* auxiliary mark (for internal use) */
 #define AUXMARK		"\1"
 
+
+/*
+** return registry.LUA_NOENV as a boolean
+*/
+static int noenv (lua_State *L) {
+  int b;
+  lua_getfield(L, LUA_REGISTRYINDEX, "LUA_NOENV");
+  b = lua_toboolean(L, -1);
+  lua_pop(L, 1);  /* remove value */
+  return b;
+}
+
+
 static void setpath (lua_State *L, const char *fieldname, const char *envname1,
                                    const char *envname2, const char *def) {
   const char *path = getenv(envname1);
   if (path == NULL)  /* no environment variable? */
     path = getenv(envname2);  /* try alternative name */
-  if (path == NULL)  /* no environment variable? */
+  if (path == NULL || noenv(L))  /* no environment variable? */
     lua_pushstring(L, def);  /* use default */
   else {
     /* replace ";;" by ";AUXMARK;" and then AUXMARK by default path */

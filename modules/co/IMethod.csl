@@ -3,7 +3,7 @@
  */
 interface IMethod extends IMember
 {
-	// The method's return type.
+	// The method's return type, or NULL if void.
 	readonly IType returnType;
 
 	// The list of parameters that this method takes.

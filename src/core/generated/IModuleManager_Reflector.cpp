@@ -45,7 +45,7 @@ public:
 
 	bool getBinaryCompatibilityChecking()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 0 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 0 ) );
         return res.get< bool >();
 	}
 
@@ -58,13 +58,13 @@ public:
 
 	co::Range<co::IModulePartLoader* const> getLoaders()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 1 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 1 ) );
         return res.get< co::Range<co::IModulePartLoader* const> >();
 	}
 
 	co::Range<co::IModule* const> getModules()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 2 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 2 ) );
         return res.get< co::Range<co::IModule* const> >();
 	}
 
@@ -73,7 +73,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 0 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 0 ), range );
 		return res.get< co::IModule* >();
 	}
 
@@ -90,7 +90,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 2 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 2 ), range );
 		return res.get< bool >();
 	}
 
@@ -99,7 +99,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 3 ), range );
+		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 3 ), range );
 		return res.get< co::IModule* >();
 	}
 
@@ -160,7 +160,7 @@ public:
 		return new co::IModuleManager_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
 	{
 		co::IModuleManager* p = co::checkInstance<co::IModuleManager>( instance, field );
 		switch( field->getIndex() )
@@ -172,7 +172,7 @@ public:
 		}
 	}
 
-	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
+	void setField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::IModuleManager* p = co::checkInstance<co::IModuleManager>( instance, field );
 		switch( field->getIndex() )
@@ -186,7 +186,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
 	{
 		co::IModuleManager* p = co::checkInstance<co::IModuleManager>( instance, method );
 		checkNumArguments( method, args.getSize() );

@@ -1,5 +1,5 @@
 /*
-** $Id: lapi.c,v 2.157 2011/11/16 18:51:36 roberto Exp $
+** $Id: lapi.c,v 2.159 2011/11/30 12:32:05 roberto Exp $
 ** Lua API
 ** See Copyright Notice in lua.h
 */
@@ -968,13 +968,13 @@ LUA_API int lua_pcallk (lua_State *L, int nargs, int nresults, int errfunc,
 
 
 LUA_API int lua_load (lua_State *L, lua_Reader reader, void *data,
-                      const char *chunkname) {
+                      const char *chunkname, const char *mode) {
   ZIO z;
   int status;
   lua_lock(L);
   if (!chunkname) chunkname = "?";
   luaZ_init(L, &z, reader, data);
-  status = luaD_protectedparser(L, &z, chunkname);
+  status = luaD_protectedparser(L, &z, chunkname, mode);
   if (status == LUA_OK) {  /* no errors? */
     LClosure *f = clLvalue(L->top - 1);  /* get newly created function */
     if (f->nupvalues == 1) {  /* does it have one upvalue? */
@@ -1209,7 +1209,7 @@ static const char *aux_upvalue (StkId fi, int n, TValue **val,
 
 LUA_API const char *lua_getupvalue (lua_State *L, int funcindex, int n) {
   const char *name;
-  TValue *val = NULL;  /* initialized to avoid warnings */
+  TValue *val = NULL;  /* to avoid warnings */
   lua_lock(L);
   name = aux_upvalue(index2addr(L, funcindex), n, &val, NULL);
   if (name) {
@@ -1223,8 +1223,8 @@ LUA_API const char *lua_getupvalue (lua_State *L, int funcindex, int n) {
 
 LUA_API const char *lua_setupvalue (lua_State *L, int funcindex, int n) {
   const char *name;
-  TValue *val = NULL;  /* initialized to avoid warnings */
-  GCObject *owner = NULL;  /* initialized to avoid warnings */
+  TValue *val = NULL;  /* to avoid warnings */
+  GCObject *owner = NULL;  /* to avoid warnings */
   StkId fi;
   lua_lock(L);
   fi = index2addr(L, funcindex);

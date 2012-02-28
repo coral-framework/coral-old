@@ -91,7 +91,7 @@ public:
 		return new co::IService_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
 	{
 		co::IService* p = co::checkInstance<co::IService>( instance, field );
 		switch( field->getIndex() )
@@ -103,7 +103,7 @@ public:
 		}
 	}
 
-	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
+	void setField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::IService* p = co::checkInstance<co::IService>( instance, field );
 		switch( field->getIndex() )
@@ -117,7 +117,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
 	{
 		co::IService* p = co::checkInstance<co::IService>( instance, method );
 		checkNumArguments( method, args.getSize() );

@@ -45,19 +45,19 @@ public:
 
 	co::INamespace* getNamespace()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 0 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 0 ) );
         return res.get< co::INamespace* >();
 	}
 
 	co::Range<co::IModulePart* const> getParts()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 1 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 1 ) );
         return res.get< co::Range<co::IModulePart* const> >();
 	}
 
 	co::int32 getRank()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 2 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 2 ) );
         return res.get< co::int32 >();
 	}
 
@@ -70,7 +70,7 @@ public:
 
 	co::ModuleState getState()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 3 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 3 ) );
         return res.get< co::ModuleState >();
 	}
 
@@ -159,7 +159,7 @@ public:
 		return new co::IModule_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
 	{
 		co::IModule* p = co::checkInstance<co::IModule>( instance, field );
 		switch( field->getIndex() )
@@ -172,7 +172,7 @@ public:
 		}
 	}
 
-	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
+	void setField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::IModule* p = co::checkInstance<co::IModule>( instance, field );
 		switch( field->getIndex() )
@@ -187,7 +187,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
 	{
 		co::IModule* p = co::checkInstance<co::IModule>( instance, method );
 		checkNumArguments( method, args.getSize() );

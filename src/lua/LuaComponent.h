@@ -35,9 +35,9 @@ public:
 	// co::IDynamicServiceProvider methods:
 	co::int32 dynamicRegisterService( co::IService* proxy );
 	co::IPort* dynamicGetFacet( co::int32 cookie );
-	const co::Any& dynamicGetField( co::int32 cookie, co::IField* ai );
-	void dynamicSetField( co::int32 cookie, co::IField* ai, const co::Any& value );
-	const co::Any& dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<co::Any const> args );
+	co::Any dynamicGetField( co::int32 cookie, co::IField* ai );
+	void dynamicSetField( co::int32 cookie, co::IField* ai, co::Any value );
+	co::Any dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<co::Any const> args );
 
 	// co::IReflector methods:
 	co::uint32 getSize();
@@ -47,9 +47,9 @@ public:
     void destroyValues( void* ptr, size_t numValues );
 	co::IObject* newInstance();
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider );
-    void getField( const co::Any& instance, co::IField* ai, co::Any& value );
-    void setField( const co::Any& instance, co::IField* ai, const co::Any& value );
-    void invoke( const co::Any& instance, co::IMethod* mi, co::Range<co::Any const> args, co::Any& returnValue );
+    void getField( co::Any instance, co::IField* ai, co::AnyValue& value );
+    void setField( co::Any instance, co::IField* ai, co::Any value );
+    void invoke( co::Any instance, co::IMethod* mi, co::Range<co::Any const> args, co::AnyValue& returnValue );
 	void raise( const std::string& message );
 
 private:

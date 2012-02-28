@@ -206,12 +206,12 @@ struct PrepareStateForStorageOf<TK_INTERFACE, TT, T*>
 };
 
 template<typename TT, typename T>
-struct PrepareStateForStorageOf<TK_INTERFACE, TT, const T*>
+struct PrepareStateForStorageOf<TK_INTERFACE, TT, RefPtr<T>&>
 {
-	inline static void prepare( State& s, const T* v )
+	inline static void prepare( State& s, RefPtr<T>& v )
 	{
 		PrepareBasic<TT>::prepare( s );
-		s.type = v ? const_cast<T*>( v )->getInterface() : typeOf<T>::get();
+		s.type = v.isValid() ? v->getInterface() : typeOf<T>::get();
 	}
 };
 
@@ -920,6 +920,8 @@ private:
 	}
 	_object;
 };
+
+typedef Any AnyValue;
 
 #ifndef DOXYGEN
 template<> struct kindOf<Any> { static const TypeKind kind = TK_ANY; };

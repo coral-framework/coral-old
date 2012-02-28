@@ -46,25 +46,25 @@ public:
 
 	co::IModuleManager* getModules()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 0 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 0 ) );
         return res.get< co::IModuleManager* >();
 	}
 
 	co::IServiceManager* getServices()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 1 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 1 ) );
         return res.get< co::IServiceManager* >();
 	}
 
 	co::SystemState getState()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 2 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 2 ) );
         return res.get< co::SystemState >();
 	}
 
 	co::ITypeManager* getTypes()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 3 ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 3 ) );
         return res.get< co::ITypeManager* >();
 	}
 
@@ -137,7 +137,7 @@ public:
 		return new co::ISystem_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
 	{
 		co::ISystem* p = co::checkInstance<co::ISystem>( instance, field );
 		switch( field->getIndex() )
@@ -150,7 +150,7 @@ public:
 		}
 	}
 
-	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
+	void setField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::ISystem* p = co::checkInstance<co::ISystem>( instance, field );
 		switch( field->getIndex() )
@@ -165,7 +165,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
 	{
 		co::ISystem* p = co::checkInstance<co::ISystem>( instance, method );
 		checkNumArguments( method, args.getSize() );
