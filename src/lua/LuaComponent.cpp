@@ -181,7 +181,10 @@ co::Any LuaComponent::dynamicGetField( co::int32 cookie, co::IField* ai )
 
 	__END_LUA_API_CODE__
 
-	return _res;
+	co::Any resRef;
+	resRef.getState() = _res.getState();
+
+	return resRef;
 }
 
 void LuaComponent::dynamicSetField( co::int32 cookie, co::IField* ai, co::Any value )
