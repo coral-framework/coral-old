@@ -276,7 +276,7 @@ TEST( ReflectorTests, interfaceNamespace )
 	ASSERT_TRUE( typesField != NULL );
 
 	// IType getType( in string name );
-	co::IMethod* getTypeMethod = getMethod( type, "getType" );
+	co::IMethod* getTypeMethod = getMethod( type, "findType" );
 	ASSERT_TRUE( getTypeMethod != NULL );
 
 	// ITypeBuilder defineType( in string name, in TypeKind typeKind, in ITypeTransaction transaction )
@@ -321,7 +321,7 @@ TEST( ReflectorTests, interfaceNamespace )
 	}
 	catch( co::IllegalCastException& e )
 	{
-		EXPECT_EQ( "invalid argument #1 to method getType(): illegal cast from 'bool' to 'const std::string&'", e.getMessage() );
+		EXPECT_EQ( "invalid argument #1 to method findType(): illegal cast from 'bool' to 'const std::string&'", e.getMessage() );
 	}
 
 	// --- calling method defineType():

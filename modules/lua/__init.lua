@@ -17,8 +17,8 @@ local co = co
 local coNew = co.new
 local coGetType = co.getType
 local coFindScript = co.findScript
-local coRootNS = co.system.types.rootNS
-local coTypeTransaction = co.system.types.transaction
+local coTypeManager = co.system.types
+local coTypeTransaction = coTypeManager.transaction
 local coNewComponentType = co.newComponentType
 local coNewComponentInstance = co.newComponentInstance
 
@@ -271,12 +271,8 @@ local function handleComponentSpecification( t )
 		typeName = fullName
 	end
 
-	local ns = coRootNS
-	for name in nsName:gmatch( "([^%.]+)%.?" ) do
-		ns = ns:getChildNamespace( name ) or ns:defineChildNamespace( name )
-	end
-
-	if ns:getType( typeName ) then
+	local ns = coTypeManager:getNamespace( nsName )
+	if ns:findType( typeName ) then
 		error( "component name '" .. fullName .. "' clashes with an existing type", 3 )
 	end
 

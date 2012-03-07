@@ -59,8 +59,8 @@ TEST( NamespaceTests, defineType )
 	co::RefPtr<co::ITypeBuilder> tb = rootNS->defineType( "DummyException", co::TK_EXCEPTION );
 	ASSERT_TRUE( TestHelper::type( "DummyException" ) != NULL );
 
-	ASSERT_TRUE( rootNS->getType( "nonexistent" ) == NULL );
-	ASSERT_TRUE( rootNS->getType( "DummyException" ) != NULL );
+	ASSERT_TRUE( rootNS->findType( "nonexistent" ) == NULL );
+	ASSERT_TRUE( rootNS->findType( "DummyException" ) != NULL );
 	EXPECT_THROW( rootNS->defineType( "DummyException", co::TK_ENUM ), co::IllegalNameException );
 
 	// test definability of remaining types
@@ -99,12 +99,12 @@ TEST( NamespaceTests, defineChildNamespace )
 
 	EXPECT_EQ( levelOneNS->getTypes().getSize(), 0 );
 	EXPECT_EQ( levelOneNS->getChildNamespaces().getSize(), 1 );
-	EXPECT_EQ( levelOneNS->getType( "levelTwo" ), reinterpret_cast<co::IType*>( NULL ) );
-	EXPECT_EQ( levelOneNS->getChildNamespace( "levelTwo" ), levelTwoNS );
+	EXPECT_EQ( levelOneNS->findType( "levelTwo" ), reinterpret_cast<co::IType*>( NULL ) );
+	EXPECT_EQ( levelOneNS->findChildNamespace( "levelTwo" ), levelTwoNS );
 
 	EXPECT_EQ( co::getSystem()->getTypes()->findNamespace( "levelOne.levelTwo" ), levelTwoNS );
 
-	EXPECT_NO_THROW( rootNS->getChildNamespace( "lalala" ) );
+	EXPECT_NO_THROW( rootNS->findChildNamespace( "lalala" ) );
 
 	EXPECT_THROW( rootNS->defineChildNamespace( "levelOne" ), co::IllegalNameException );
 }

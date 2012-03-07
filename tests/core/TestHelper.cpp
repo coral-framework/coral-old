@@ -21,7 +21,7 @@ co::ITypeBuilder* TestHelper::createBuilder( co::TypeKind kind, const std::strin
 	std::string currentToken = st.getToken();
 	while( st.nextToken() )
 	{
-		co::INamespace* childNS = ns->getChildNamespace( currentToken );
+		co::INamespace* childNS = ns->findChildNamespace( currentToken );
 		if( !childNS )
 			childNS = ns->defineChildNamespace( currentToken );
 		ns = childNS;

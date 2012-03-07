@@ -31,17 +31,16 @@ public:
 	// ITypeManager methods:
 	INamespace* getRootNS();
 	ITypeTransaction* getTransaction();
-	IType* findType( const std::string& fullName );
+	INamespace* getNamespace( const std::string& fullName );
 	INamespace* findNamespace( const std::string& fullName );
 	IType* getType( const std::string& typeName );
+	IType* findType( const std::string& fullName );
 	IArray* getArrayOf( IType* elementType );
 	IType* loadType( const std::string& typeName, std::vector<CSLError>& errorStack );
 
 private:
 	IType* loadTypeOrThrow( const std::string& fullName );
-
 	IArray* defineArrayType( IType* elementType );
-
 	void definePrimitiveType( Namespace* ns, const std::string& name, TypeKind kind );
 	void defineBuiltInTypes();
 

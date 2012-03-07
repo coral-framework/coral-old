@@ -99,7 +99,7 @@ public:
 		return res.get< co::ITypeBuilder* >();
 	}
 
-	co::INamespace* getChildNamespace( const std::string& name_ )
+	co::INamespace* findChildNamespace( const std::string& name_ )
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
@@ -108,7 +108,7 @@ public:
 		return res.get< co::INamespace* >();
 	}
 
-	co::IType* getType( const std::string& name_ )
+	co::IType* findType( const std::string& name_ )
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
@@ -226,14 +226,14 @@ public:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::INamespace* >( p->getChildNamespace( name_ ) );
+					res.set< co::INamespace* >( p->findChildNamespace( name_ ) );
 				}
 				break;
 			case 9:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::IType* >( p->getType( name_ ) );
+					res.set< co::IType* >( p->findType( name_ ) );
 				}
 				break;
 			default:
