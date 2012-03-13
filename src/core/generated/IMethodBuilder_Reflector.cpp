@@ -58,7 +58,7 @@ public:
 
 	void createMethod()
 	{
-		co::Range<co::Any const> range;
+		co::Range<co::Any> range;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 0 ), range );
 	}
 
@@ -66,7 +66,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IException* >( exceptionType_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 1 ), range );
 	}
 
@@ -77,7 +77,7 @@ public:
 		args[1].set< co::IType* >( type_ );
 		args[2].set< bool >( input_ );
 		args[3].set< bool >( output_ );
-		co::Range<co::Any const> range( args, 4 );
+		co::Range<co::Any> range( args, 4 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 2 ), range );
 	}
 
@@ -85,7 +85,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IType* >( type_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 3 ), range );
 	}
 
@@ -162,7 +162,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
 		co::IMethodBuilder* p = co::checkInstance<co::IMethodBuilder>( instance, method );
 		checkNumArguments( method, args.getSize() );

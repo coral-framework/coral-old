@@ -46,7 +46,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IModule* >( module_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 0 ), range );
 	}
 
@@ -54,7 +54,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IModule* >( module_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 1 ), range );
 	}
 
@@ -62,7 +62,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IModule* >( module_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 2 ), range );
 	}
 
@@ -70,7 +70,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IModule* >( module_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 3 ), range );
 	}
 
@@ -78,7 +78,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IModule* >( module_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 4 ), range );
 	}
 
@@ -145,7 +145,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
 		co::IModulePart* p = co::checkInstance<co::IModulePart>( instance, method );
 		checkNumArguments( method, args.getSize() );

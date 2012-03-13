@@ -12,7 +12,7 @@
 
 namespace co {
 
-void ClassTypeImpl::addMembers( Range<IMember* const> members )
+void ClassTypeImpl::addMembers( Range<IMember*> members )
 {
 	_members.reserve( _members.size() + members.getSize() );
 	for( ; members; members.popFirst() )
@@ -91,29 +91,29 @@ IMember* ClassTypeImpl::getMember( const std::string& name )
 	return NULL;
 }
 
-Range<IField* const> ClassTypeImpl::getFields()
+Range<IField*> ClassTypeImpl::getFields()
 {
 	assert( _firstMethodPos != size_t( -1 ) );
 
 	if( _firstMethodPos < 1 )
-		return Range<IField* const>();
+		return Range<IField*>();
 
 	// create an array range downcasting IMember* to IField*
-	return Range<IField* const>(
+	return Range<IField*>(
 		reinterpret_cast<IField**>( &_members.front() ), _firstMethodPos );
 }
 
-Range<IMethod* const> ClassTypeImpl::getMethods()
+Range<IMethod*> ClassTypeImpl::getMethods()
 {
 	assert( _firstMethodPos != size_t( -1 ) );
 
 	size_t membersSize = _members.size();
 	if( _firstMethodPos >= membersSize )
-		return Range<IMethod* const>();
+		return Range<IMethod*>();
 
 	// create an array range downcasting IMember* to IMethod*
-	return Range<IMethod* const>(
-		reinterpret_cast<IMethod**>( &_members.front() + _firstMethodPos ), membersSize - _firstMethodPos );
+	return Range<IMethod*>( reinterpret_cast<IMethod**>(
+		&_members.front() + _firstMethodPos ), membersSize - _firstMethodPos );
 }
 
 } // namespace co

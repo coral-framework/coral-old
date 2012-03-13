@@ -119,7 +119,7 @@ void SignatureCalculator::fillArraySignatureData()
 void SignatureCalculator::fillEnumSignatureData()
 {
 	IEnum* enumType = static_cast<IEnum*>( _type );
-	Range<std::string const> range = enumType->getIdentifiers();
+	Range<std::string> range = enumType->getIdentifiers();
 	for( ; range; range.popFirst() )
 	{
 		addDataToSignatures( range.getFirst() );
@@ -132,7 +132,7 @@ void SignatureCalculator::fillEnumSignatureData()
 void SignatureCalculator::fillStructSignatureData()
 {
 	IStruct* structType = static_cast<IStruct*>( _type );
-	Range<IField* const> fields = structType->getFields();
+	Range<IField*> fields = structType->getFields();
 	for( ; fields; fields.popFirst() )
 	{
 		IField* ai = fields.getFirst();
@@ -172,7 +172,7 @@ void SignatureCalculator::fillComponentSignatureData()
 {
 	IComponent* component = static_cast<IComponent*>( _type );
 
-	Range<IPort* const> interfaces = component->getPorts();
+	Range<IPort*> interfaces = component->getPorts();
 	for( ; interfaces; interfaces.popFirst() )
 	{
 		IPort* itf = interfaces.getFirst();
@@ -192,7 +192,7 @@ void SignatureCalculator::fillClassTypeData()
 {
 	IClassType* classType = static_cast<IClassType*>( _type );
 
-	Range<IField* const> fields = classType->getFields();
+	Range<IField*> fields = classType->getFields();
 	for( ; fields; fields.popFirst() )
 	{
 		IField* ai = fields.getFirst();
@@ -204,7 +204,7 @@ void SignatureCalculator::fillClassTypeData()
 		addDataToSignatures( ai->getName() );
 	}
 
-	Range<IMethod* const> methods = classType->getMethods();
+	Range<IMethod*> methods = classType->getMethods();
 	for( ; methods; methods.popFirst() )
 	{
 		IMethod* mi = methods.getFirst();
@@ -217,7 +217,7 @@ void SignatureCalculator::fillClassTypeData()
 
 		addDataToSignatures( mi->getName() );
 
-		Range<IParameter* const> parameters = mi->getParameters();
+		Range<IParameter*> parameters = mi->getParameters();
 		for( ; parameters; parameters.popFirst() )
 		{
 			IParameter* pi = parameters.getFirst();

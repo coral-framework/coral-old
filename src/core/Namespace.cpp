@@ -88,12 +88,12 @@ INamespace* Namespace::getParentNamespace()
 	return _parent;
 }
 
-Range<IType* const> Namespace::getTypes()
+Range<IType*> Namespace::getTypes()
 {
 	return _types;
 }
 
-Range<INamespace* const> Namespace::getChildNamespaces()
+Range<INamespace*> Namespace::getChildNamespaces()
 {
 	return _childNamespaces;
 }

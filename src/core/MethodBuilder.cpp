@@ -64,7 +64,7 @@ void MethodBuilder::defineParameter( const std::string& name, IType* type, bool 
 	if( !LexicalUtils::isValidIdentifier( name ) )
 		CORAL_THROW( IllegalNameException, "parameter name '" << name << "' is not a valid identifier" );
 
-	for( Range<IParameter* const> r( _parameters ); r; r.popFirst() )
+	for( Range<IParameter*> r( _parameters ); r; r.popFirst() )
 		if( r.getFirst()->getName() == name )
 			CORAL_THROW( IllegalNameException, "parameter '" << name << "' defined twice in method '" << _name << "()'" );
 

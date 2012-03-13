@@ -60,7 +60,7 @@ public:
 		co::Any args[2];
 		args[0].set< co::IInterface* >( serviceType_ );
 		args[1].set< co::IService* >( service_ );
-		co::Range<co::Any const> range( args, 2 );
+		co::Range<co::Any> range( args, 2 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 0 ), range );
 	}
 
@@ -70,7 +70,7 @@ public:
 		args[0].set< co::IInterface* >( serviceType_ );
 		args[1].set< co::IInterface* >( clientType_ );
 		args[2].set< co::IService* >( service_ );
-		co::Range<co::Any const> range( args, 3 );
+		co::Range<co::Any> range( args, 3 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 1 ), range );
 	}
 
@@ -79,7 +79,7 @@ public:
 		co::Any args[2];
 		args[0].set< co::IInterface* >( serviceType_ );
 		args[1].set< const std::string& >( componentName_ );
-		co::Range<co::Any const> range( args, 2 );
+		co::Range<co::Any> range( args, 2 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 2 ), range );
 	}
 
@@ -89,7 +89,7 @@ public:
 		args[0].set< co::IInterface* >( serviceType_ );
 		args[1].set< co::IInterface* >( clientType_ );
 		args[2].set< const std::string& >( componentName_ );
-		co::Range<co::Any const> range( args, 3 );
+		co::Range<co::Any> range( args, 3 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 3 ), range );
 	}
 
@@ -97,7 +97,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IInterface* >( serviceType_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 4 ), range );
 		return res.get< co::IService* >();
 	}
@@ -107,7 +107,7 @@ public:
 		co::Any args[2];
 		args[0].set< co::IInterface* >( serviceType_ );
 		args[1].set< co::IService* >( client_ );
-		co::Range<co::Any const> range( args, 2 );
+		co::Range<co::Any> range( args, 2 );
 		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 5 ), range );
 		return res.get< co::IService* >();
 	}
@@ -117,7 +117,7 @@ public:
 		co::Any args[2];
 		args[0].set< co::IInterface* >( serviceType_ );
 		args[1].set< co::IInterface* >( clientType_ );
-		co::Range<co::Any const> range( args, 2 );
+		co::Range<co::Any> range( args, 2 );
 		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 6 ), range );
 		return res.get< co::IService* >();
 	}
@@ -126,7 +126,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IInterface* >( serviceType_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 7 ), range );
 	}
 
@@ -135,7 +135,7 @@ public:
 		co::Any args[2];
 		args[0].set< co::IInterface* >( serviceType_ );
 		args[1].set< co::IInterface* >( clientType_ );
-		co::Range<co::Any const> range( args, 2 );
+		co::Range<co::Any> range( args, 2 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 8 ), range );
 	}
 
@@ -210,7 +210,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
 		co::IServiceManager* p = co::checkInstance<co::IServiceManager>( instance, method );
 		checkNumArguments( method, args.getSize() );

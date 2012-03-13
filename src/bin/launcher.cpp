@@ -76,7 +76,7 @@ static void resolveCallee( const std::string& calleeName, co::IComponent*& compo
 		component = static_cast<co::IComponent*>( type );
 
 		// search the component's list of facets
-		co::Range<co::IPort* const> facets = component->getFacets();
+		co::Range<co::IPort*> facets = component->getFacets();
 		for( ; facets; facets.popFirst() )
 		{
 			facet = facets.getFirst();
@@ -250,7 +250,7 @@ int main( int argc, char* argv[] )
 		// check the method signature
 		try
 		{
-			co::Range<co::IParameter* const> params = method->getParameters();
+			co::Range<co::IParameter*> params = method->getParameters();
 			if( !params.isEmpty() && ( params.getSize() > 1 || params[0]->getType()->getFullName() != "string[]" ) )
 				throw co::Exception( "method can only have a single parameter, of type 'string[]'" );
 		}
@@ -300,7 +300,7 @@ int main( int argc, char* argv[] )
 			co::Any res;
 			co::Any arg;
 			arg.set<std::vector<std::string>&>( args );
-			reflector->invoke( service, method, co::Range<co::Any const>( &arg, 1 ), res );
+			reflector->invoke( service, method, co::Range<co::Any>( &arg, 1 ), res );
 
 			// if the result is a number, use it as the return status; otherwise, print it
 			if( res.isValid() )

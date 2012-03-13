@@ -55,7 +55,7 @@ TEST( ModuleTests, setupSystemRequiringModuleB )
 
 	// setup the system requiring moduleB
 	std::string requiredModule( "moduleB" );
-	system->setup( co::Range<std::string const>( &requiredModule, 1 ) );
+	system->setup( co::Range<std::string>( &requiredModule, 1 ) );
 
 	// now moduleA should have been loaded, as a dependency of moduleB
 	ASSERT_TRUE( system->getModules()->findModule( "moduleA" ) != NULL );
@@ -79,7 +79,7 @@ TEST( ModuleTests, systemAndModuleLifeCycles )
 
 	// setupBase() requiring moduleA
 	std::string requiredModule( "moduleA" );
-	system->setupBase( co::Range<std::string const>( &requiredModule, 1 ) );
+	system->setupBase( co::Range<std::string>( &requiredModule, 1 ) );
 
 	// moduleA should have been loaded, but not moduleB
 	co::IModule* moduleA = system->getModules()->findModule( "moduleA" );

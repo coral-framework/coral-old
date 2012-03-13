@@ -53,8 +53,8 @@ TEST( PerformanceTests, callLuaFunction )
 	for( int i = 0; i < 1000; ++i )
 	{
 		state->callFunction( moduleName, functionName,
-				co::Range<const co::Any>( args, NUM_ARGS ),
-				co::Range<const co::Any>( results, NUM_ARGS ) );
+				co::Range<co::Any>( args, NUM_ARGS ),
+				co::Range<co::Any>( results, NUM_ARGS ) );
 	}
 }
 

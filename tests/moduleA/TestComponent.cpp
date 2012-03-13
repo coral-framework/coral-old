@@ -35,12 +35,12 @@ public:
 		_dummyInterface = dummyInterfaceField;
 	}
 
-	co::Range<IDummy* const> getDummyInterfaces()
+	co::Range<IDummy*> getDummyInterfaces()
 	{
 		return _dummyInterfaces;
 	}
 
-	void setDummyInterfaces( co::Range<IDummy* const> dummyInterfaces )
+	void setDummyInterfaces( co::Range<IDummy*> dummyInterfaces )
 	{
 		_dummyInterfaces.clear();
 		for( ; dummyInterfaces; dummyInterfaces.popFirst() )
@@ -62,12 +62,12 @@ public:
 		return _readOnlyString;
 	}
 
-	co::Range<std::string const> getNames()
+	co::Range<std::string> getNames()
 	{
-		return co::Range<std::string const>( _names );
+		return co::Range<std::string>( _names );
 	}
 
-	void setNames( co::Range<std::string const> names )
+	void setNames( co::Range<std::string> names )
 	{
 		_names.clear();
 		for( ; names; names.popFirst() )
@@ -99,12 +99,12 @@ public:
 		_testStruct = value;
 	}
 
-	co::Range<TestStruct const> getTestStructArray()
+	co::Range<TestStruct> getTestStructArray()
 	{
 		return _testStructArray;
 	}
 
-	void setTestStructArray( co::Range<TestStruct const> range )
+	void setTestStructArray( co::Range<TestStruct> range )
 	{
 		_testStructArray.clear();
 		_testStructArray.reserve( range.getSize() );
@@ -114,8 +114,8 @@ public:
 
 	void testInParameters( float size, TestEnum enumValue,
 		const std::string& text, const TestStruct& testStruct,
-		IDummy* dummyInterface, co::Range<co::int32 const> intList,
-		co::Range<IDummy* const> interfaces )
+		IDummy* dummyInterface, co::Range<co::int32> intList,
+		co::Range<IDummy*> interfaces )
 	{
 		size = -1;
 		enumValue = First;
@@ -173,9 +173,9 @@ public:
 
 	// co::ITypeTransaction methods:
 
-	co::Range<co::ITypeBuilder* const> getTypeBuilders()
+	co::Range<co::ITypeBuilder*> getTypeBuilders()
 	{
-		return co::Range<co::ITypeBuilder* const>();
+		return co::Range<co::ITypeBuilder*>();
 	}
 
 	void commit()

@@ -24,7 +24,7 @@ class ITypeTransaction : public co::IService
 public:
 	virtual ~ITypeTransaction() {;}
 
-	virtual co::Range<co::ITypeBuilder* const> getTypeBuilders() = 0;
+	virtual co::Range<co::ITypeBuilder*> getTypeBuilders() = 0;
 
 	virtual void commit() = 0;
 

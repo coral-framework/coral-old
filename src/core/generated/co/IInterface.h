@@ -21,9 +21,9 @@ public:
 
 	virtual co::IInterface* getBaseType() = 0;
 
-	virtual co::Range<co::IInterface* const> getSubTypes() = 0;
+	virtual co::Range<co::IInterface*> getSubTypes() = 0;
 
-	virtual co::Range<co::IInterface* const> getSuperTypes() = 0;
+	virtual co::Range<co::IInterface*> getSuperTypes() = 0;
 
 	virtual bool isSubTypeOf( co::IInterface* type ) = 0;
 };

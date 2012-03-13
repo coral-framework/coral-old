@@ -53,7 +53,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IPort* >( port_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 0 ), range );
 		return res.get< co::IService* >();
 	}
@@ -63,7 +63,7 @@ public:
 		co::Any args[2];
 		args[0].set< co::IPort* >( receptacle_ );
 		args[1].set< co::IService* >( service_ );
-		co::Range<co::Any const> range( args, 2 );
+		co::Range<co::Any> range( args, 2 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 1 ), range );
 	}
 
@@ -138,7 +138,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
 		co::IObject* p = co::checkInstance<co::IObject>( instance, method );
 		checkNumArguments( method, args.getSize() );

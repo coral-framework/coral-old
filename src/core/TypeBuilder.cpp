@@ -258,7 +258,7 @@ public:
 
 	void validate()
 	{
-		Range<IMember* const> members = static_cast<ICompositeType*>( _type.get() )->getMembers();
+		Range<IMember*> members = static_cast<ICompositeType*>( _type.get() )->getMembers();
 		for( ; members; members.popFirst() )
 			checkForMemberClashes( members.getFirst() );
 	}
@@ -472,10 +472,10 @@ public:
 
 		// check for member clashes, considering all super types
 		IInterface* type = _myType;
-		Range<IInterface* const> superTypes = type->getSuperTypes();
+		Range<IInterface*> superTypes = type->getSuperTypes();
 		while( 1 )
 		{
-			Range<IMember* const> members = type->getMembers();
+			Range<IMember*> members = type->getMembers();
 			for( ; members; members.popFirst() )
 				checkForMemberClashes( members.getFirst() );
 
@@ -531,7 +531,7 @@ public:
 
 	void validate()
 	{
-		Range<IPort* const> ports = _myType->getPorts();
+		Range<IPort*> ports = _myType->getPorts();
 		IPort* lastPort = ports.getFirst();
 		for( ports.popFirst(); ports; ports.popFirst() )
 		{

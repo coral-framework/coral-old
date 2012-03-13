@@ -27,12 +27,12 @@ public:
 	double getDbl() { return _dbl; }
 	void setDbl( double dbl ) { _dbl = dbl; }
 
-	co::Range<double const> getDblArray()
+	co::Range<double> getDblArray()
 	{
 		return _dblArray;
 	}
 
-	void setDblArray( co::Range<double const> dblArray )
+	void setDblArray( co::Range<double> dblArray )
 	{
 		co::assign( dblArray, _dblArray );
 	}
@@ -62,12 +62,12 @@ public:
 	const std::string& getStr() { return _str; }
 	void setStr( const std::string& str ) { _str = str; }
 
-	co::Range<std::string const> getStrArray()
+	co::Range<std::string> getStrArray()
 	{
 		return _strArray;
 	}
 
-	void setStrArray( co::Range<std::string const> strArray )
+	void setStrArray( co::Range<std::string> strArray )
 	{
 		co::assign( strArray, _strArray );
 	}

@@ -94,7 +94,7 @@ TEST( AnnotationTests, documentation )
 
 	EXPECT_EQ( "First annotation", doc->getValue() );
 
-	co::Range<co::IAnnotation* const> annotations = t->getAnnotations();
+	co::Range<co::IAnnotation*> annotations = t->getAnnotations();
 	ASSERT_EQ( 3, annotations.getSize() );
 	ASSERT_EQ( "co.IDocumentation", annotations[0]->getInterface()->getFullName() );
 	ASSERT_EQ( "co.IDocumentation", annotations[1]->getInterface()->getFullName() );

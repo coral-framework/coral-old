@@ -110,7 +110,7 @@ struct TypeStatistics
 	{
 		++numNamespaces;
 
-		for( co::Range<co::IType* const> r( ns->getTypes() ); r; r.popFirst() )
+		for( co::Range<co::IType*> r( ns->getTypes() ); r; r.popFirst() )
 		{
 			++numTypes;
 
@@ -122,7 +122,7 @@ struct TypeStatistics
 			   ++numTypesWithReflector;
 		}
 
-		for( co::Range<co::INamespace* const> r( ns->getChildNamespaces() ); r; r.popFirst() )
+		for( co::Range<co::INamespace*> r( ns->getChildNamespaces() ); r; r.popFirst() )
 			traverse( r.getFirst() );
 	}
 };

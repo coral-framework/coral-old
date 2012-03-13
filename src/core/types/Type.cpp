@@ -19,7 +19,7 @@
 
 namespace co {
 
-IAnnotation* selectAnnotation( Range<IAnnotation* const> annotations, IInterface* requestedType )
+IAnnotation* selectAnnotation( Range<IAnnotation*> annotations, IInterface* requestedType )
 {
 	if( !requestedType )
 		throw IllegalArgumentException( "illegal null requestedType" );

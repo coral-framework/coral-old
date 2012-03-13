@@ -41,32 +41,6 @@ const std::string TK_STRINGS[] =
 	"<off by one!>"
 };
 
-const std::string TK_STRINGS_CPP[] =
-{
-	"<NONE>",
-	"co::Any",
-	"bool",
-	"co::int8",
-	"co::uint8",
-	"co::int16",
-	"co::uint16",
-	"co::int32",
-	"co::uint32",
-	"co::int64",
-	"co::uint64",
-	"float",
-	"double",
-	"std::string",
-	"<ARRAY>",
-	"<ENUM>",
-	"<EXCEPTION>",
-	"<STRUCT>",
-	"<NATIVE_CLASS>",
-	"<INTERFACE>",
-	"<COMPONENT>",
-	"<OFF_BY_ONE!>"
-};
-
 IType* getTypeByLiteralName( const char* fullName )
 {
 	return getType( fullName );
@@ -82,7 +56,7 @@ IService* getServiceByType( IObject* object, IInterface* type )
 {
 	assert( object && type );
 	IComponent* component = object->getComponent();
-	Range<IPort* const> facets = component->getFacets();
+	Range<IPort*> facets = component->getFacets();
 	for( ; facets; facets.popFirst() )
 		if( facets.getFirst()->getType()->isSubTypeOf( type ) )
 			return object->getServiceAt( facets.getFirst() );

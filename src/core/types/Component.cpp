@@ -18,7 +18,7 @@ Component::~Component()
 	// empty
 }
 
-void Component::addPorts( Range<IPort* const> ports )
+void Component::addPorts( Range<IPort*> ports )
 {
 	_ports.reserve( _ports.size() + ports.getSize() );
 	for( ; ports; ports.popFirst() )
@@ -58,7 +58,7 @@ void Component::sortPorts()
 		_firstReceptacle = count;
 }
 
-Range<IMember* const> Component::getMembers()
+Range<IMember*> Component::getMembers()
 {
 	return _ports;
 }
@@ -92,32 +92,31 @@ IMember* Component::getMember( const std::string& name )
 	return NULL;
 }
 
-Range<IPort* const> Component::getPorts()
+Range<IPort*> Component::getPorts()
 {
 	return _ports;
 }
 
-Range<IPort* const> Component::getFacets()
+Range<IPort*> Component::getFacets()
 {
 	assert( _firstReceptacle != size_t( -1 ) );
 
 	if( _firstReceptacle < 1 )
-		return Range<IPort* const>();
+		return Range<IPort*>();
 
-	return Range<IPort* const>( reinterpret_cast<IPort**>(
-				&_ports.front() ), _firstReceptacle );
+	return Range<IPort*>( reinterpret_cast<IPort**>( &_ports.front() ), _firstReceptacle );
 }
 
-Range<IPort* const> Component::getReceptacles()
+Range<IPort*> Component::getReceptacles()
 {
 	assert( _firstReceptacle != size_t( -1 ) );
 
 	size_t numItfs = _ports.size();
 	if( _firstReceptacle >= numItfs )
-		return Range<IPort* const>();
+		return Range<IPort*>();
 
-	return Range<IPort* const>( reinterpret_cast<IPort**>(
-				&_ports.front() + _firstReceptacle ), numItfs - _firstReceptacle );
+	return Range<IPort*>( reinterpret_cast<IPort**>(
+		&_ports.front() + _firstReceptacle ), numItfs - _firstReceptacle );
 }
 
 CORAL_EXPORT_COMPONENT( Component, Component );

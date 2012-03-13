@@ -36,7 +36,7 @@ void TypeTransaction::addTypeBuilder( ITypeBuilder* typeBuilder )
 	_builders.push_back( typeBuilder );
 }
 
-Range<ITypeBuilder* const> TypeTransaction::getTypeBuilders()
+Range<ITypeBuilder*> TypeTransaction::getTypeBuilders()
 {
 	return _builders;
 }

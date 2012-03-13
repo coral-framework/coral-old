@@ -49,10 +49,10 @@ interface ISystem
 
 	<c++
 		//! Convenience method to setup the entire system without requiring any module.
-		inline void setup() { setup( Range<std::string const>() ); }
+		inline void setup() { setup( Range<std::string>() ); }
 
 		//! Convenience method to setup the entire system.
-		inline void setup( Range<std::string const> requiredModules )
+		inline void setup( Range<std::string> requiredModules )
 		{
 			setupBase( requiredModules );
 			setupPresentation();

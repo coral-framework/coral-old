@@ -61,7 +61,7 @@ public:
 		co::Any args[2];
 		args[0].set< const std::string& >( element_ );
 		args[1].set< const std::string& >( text_ );
-		co::Range<co::Any const> range( args, 2 );
+		co::Range<co::Any> range( args, 2 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 0 ), range );
 	}
 
@@ -69,7 +69,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( element_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 1 ), range );
 		return res.get< const std::string& >();
 	}
@@ -145,7 +145,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
 		co::IDocumentation* p = co::checkInstance<co::IDocumentation>( instance, method );
 		checkNumArguments( method, args.getSize() );

@@ -68,23 +68,23 @@ public:
         return res.get< co::ITypeManager* >();
 	}
 
-	void setupBase( co::Range<std::string const> requiredModules_ )
+	void setupBase( co::Range<std::string> requiredModules_ )
 	{
 		co::Any args[1];
-		args[0].set< co::Range<std::string const> >( requiredModules_ );
-		co::Range<co::Any const> range( args, 1 );
+		args[0].set< co::Range<std::string> >( requiredModules_ );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 0 ), range );
 	}
 
 	void setupPresentation()
 	{
-		co::Range<co::Any const> range;
+		co::Range<co::Any> range;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 1 ), range );
 	}
 
 	void tearDown()
 	{
-		co::Range<co::Any const> range;
+		co::Range<co::Any> range;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 2 ), range );
 	}
 
@@ -165,7 +165,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
 		co::ISystem* p = co::checkInstance<co::ISystem>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -176,7 +176,7 @@ public:
 			{
 			case 4:
 				{
-					co::Range<std::string const> requiredModules_ = args[++argIndex].get< co::Range<std::string const> >();
+					co::Range<std::string> requiredModules_ = args[++argIndex].get< co::Range<std::string> >();
 					argIndex = -1;
 					p->setupBase( requiredModules_ );
 				}

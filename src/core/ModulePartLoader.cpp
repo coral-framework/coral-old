@@ -142,8 +142,8 @@ bool ModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::
 	OS::convertDotsToDirSeps( modulePath );
 
 	return OS::searchFile3( getPaths(),
-							Range<const std::string>( &modulePath, 1 ),
-							Range<const std::string>( fileNames, n ),
+							Range<std::string>( &modulePath, 1 ),
+							Range<std::string>( fileNames, n ),
 							filename ? *filename : modulePath );
 }
 

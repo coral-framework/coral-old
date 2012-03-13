@@ -28,7 +28,7 @@ public:
 	void addTypeBuilder( ITypeBuilder* typeBuilder );
 
 	// ITypeTransaction methods:
-	Range<ITypeBuilder* const> getTypeBuilders();
+	Range<ITypeBuilder*> getTypeBuilders();
 	void commit();
 	void rollback();
 

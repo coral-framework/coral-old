@@ -24,11 +24,11 @@ class IComponent : public co::ICompositeType
 public:
 	virtual ~IComponent() {;}
 
-	virtual co::Range<co::IPort* const> getFacets() = 0;
+	virtual co::Range<co::IPort*> getFacets() = 0;
 
-	virtual co::Range<co::IPort* const> getPorts() = 0;
+	virtual co::Range<co::IPort*> getPorts() = 0;
 
-	virtual co::Range<co::IPort* const> getReceptacles() = 0;
+	virtual co::Range<co::IPort*> getReceptacles() = 0;
 };
 
 } // namespace co

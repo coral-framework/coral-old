@@ -512,7 +512,7 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 								lua_touserdata( L, lua_upvalueindex( 1 ) ) ) );
 
 	// get the method's list of parameters
-	co::Range<co::IParameter* const> paramList = method->getParameters();
+	co::Range<co::IParameter*> paramList = method->getParameters();
 
 	/*
 		We currently set a hardcoded limit on the number of method parameters.
@@ -587,7 +587,7 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 	co::Any instance, returnValue;
 	tryGetInstance( L, 1, instance );
 	co::IReflector* reflector = method->getOwner()->getReflector();
-	reflector->invoke( instance, method, co::Range<co::Any const>( args, numParams ), returnValue );
+	reflector->invoke( instance, method, co::Range<co::Any>( args, numParams ), returnValue );
 
 	// return result and output parameters
 

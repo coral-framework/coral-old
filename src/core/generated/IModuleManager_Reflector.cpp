@@ -56,23 +56,23 @@ public:
 		_provider->dynamicSetField( _cookie, getField<co::IModuleManager>( 0 ), arg );
 	}
 
-	co::Range<co::IModulePartLoader* const> getLoaders()
+	co::Range<co::IModulePartLoader*> getLoaders()
 	{
 		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 1 ) );
-        return res.get< co::Range<co::IModulePartLoader* const> >();
+        return res.get< co::Range<co::IModulePartLoader*> >();
 	}
 
-	co::Range<co::IModule* const> getModules()
+	co::Range<co::IModule*> getModules()
 	{
 		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 2 ) );
-        return res.get< co::Range<co::IModule* const> >();
+        return res.get< co::Range<co::IModule*> >();
 	}
 
 	co::IModule* findModule( const std::string& moduleName_ )
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 0 ), range );
 		return res.get< co::IModule* >();
 	}
@@ -81,7 +81,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IModulePartLoader* >( loader_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 1 ), range );
 	}
 
@@ -89,7 +89,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 2 ), range );
 		return res.get< bool >();
 	}
@@ -98,7 +98,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 3 ), range );
 		return res.get< co::IModule* >();
 	}
@@ -107,7 +107,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IModulePartLoader* >( loader_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 4 ), range );
 	}
 
@@ -166,8 +166,8 @@ public:
 		switch( field->getIndex() )
 		{
 		case 0:		value.set< bool >( p->getBinaryCompatibilityChecking() ); break;
-		case 1:		value.set< co::Range<co::IModulePartLoader* const> >( p->getLoaders() ); break;
-		case 2:		value.set< co::Range<co::IModule* const> >( p->getModules() ); break;
+		case 1:		value.set< co::Range<co::IModulePartLoader*> >( p->getLoaders() ); break;
+		case 2:		value.set< co::Range<co::IModule*> >( p->getModules() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -186,7 +186,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
 		co::IModuleManager* p = co::checkInstance<co::IModuleManager>( instance, method );
 		checkNumArguments( method, args.getSize() );

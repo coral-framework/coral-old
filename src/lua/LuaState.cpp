@@ -122,7 +122,7 @@ bool LuaState::findScript( lua_State*, const std::string& name, std::string& fil
 	filePaths[0].append( ".lua" );
 	filePaths[1].append( CORAL_OS_DIR_SEP_STR "__init.lua" );
 
-	return co::OS::searchFile2( co::getPaths(), co::Range<const std::string>( filePaths, 2 ), filename );
+	return co::OS::searchFile2( co::getPaths(), co::Range<std::string>( filePaths, 2 ), filename );
 }
 
 void LuaState::loadFile( lua_State* L, const std::string& filename )
@@ -246,7 +246,7 @@ void LuaState::push( lua_State* L, const co::Any& var, int depth )
 		break;
 	case co::TK_ENUM:
 		{
-			co::Range<std::string const> ids = static_cast<co::IEnum*>( s.type )->getIdentifiers();
+			co::Range<std::string> ids = static_cast<co::IEnum*>( s.type )->getIdentifiers();
 			co::uint32 id = d->u32;
 			if( id < ids.getSize() )
 				push( L, ids[id] );
@@ -562,7 +562,7 @@ bool LuaState::findScript( const std::string& name, std::string& filename )
 }
 
 co::int32 LuaState::callFunction( const std::string& moduleName, const std::string& functionName,
-									co::Range<const co::Any> args, co::Range<const co::Any> results )
+									co::Range<co::Any> args, co::Range<co::Any> results )
 {
 	lua_State* L = getL();
 	int top = lua_gettop( L );

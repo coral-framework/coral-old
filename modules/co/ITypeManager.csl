@@ -9,6 +9,12 @@ interface ITypeManager
 	// Transaction that must be used to create new types and add to this manager.
 	readonly ITypeTransaction transaction;
 
+ 	/*
+ 		Searches the namespace hierarchy for a namespace with the given fully-qualified name.
+ 		Returns null if the namespace does not exist (i.e. has not been created yet).
+ 	 */
+ 	INamespace findNamespace( in string fullName );
+
 	/*
 		Searches the database of loaded types for a type with the given fully-qualified name.
 		A suffix "[]" may be added to the name of a type to search for its corresponding IArray.
@@ -17,10 +23,10 @@ interface ITypeManager
  	IType findType( in string fullName );
 
  	/*
- 		Searches the namespace hierarchy for a namespace with the given fully-qualified name.
- 		Returns null if the namespace does not exist (i.e. has not been created yet).
+ 		Either retrieves or creates a namespace with the given fully-qualified name.
+ 		\throw IllegalNameException if \a name contains invalid identifiers or clashes with an existing type.
  	 */
- 	INamespace findNamespace( in string fullName );
+ 	INamespace getNamespace( in string fullName );
 
 	/*
 		Either retrieves or tries to load the type with the given fully-qualified \a typeName.

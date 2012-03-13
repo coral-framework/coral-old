@@ -167,12 +167,12 @@ TEST( TypeBuilderTests, componentGetInterfaces )
 
 	ASSERT_TRUE( component->getPorts().getSize() == 6 );
 
-	co::Range<co::IPort* const> facets = component->getFacets();
+	co::Range<co::IPort*> facets = component->getFacets();
 	ASSERT_TRUE( facets.getSize() == 3 );
 	for( ; facets; facets.popFirst() )
 		ASSERT_TRUE( facets.getFirst()->getIsFacet() );
 
-	co::Range<co::IPort* const> receptacles = component->getReceptacles();
+	co::Range<co::IPort*> receptacles = component->getReceptacles();
 	ASSERT_TRUE( receptacles.getSize() == 3 );
 	for( ; receptacles; receptacles.popFirst() )
 		ASSERT_FALSE( receptacles.getFirst()->getIsFacet() );
@@ -521,7 +521,7 @@ TEST( TypeBuilderTests, structDefinition )
 	co::IStruct* structType = co::cast<co::IStruct>( TestHelper::type( "StructTests.BuidlerTestStruct" ) );
 	ASSERT_TRUE( structType != NULL );
 
-	co::Range<co::IField* const> attibutes = structType->getFields();
+	co::Range<co::IField*> attibutes = structType->getFields();
 	ASSERT_TRUE( attibutes.getSize() == 1 );
 
 	co::IField* attr = attibutes.getFirst() ;

@@ -39,9 +39,9 @@ public:
 	
 	// End Of c++> Block
 
-	virtual co::Range<co::IAnnotation* const> getAnnotations() = 0;
+	virtual co::Range<co::IAnnotation*> getAnnotations() = 0;
 
-	virtual void setAnnotations( co::Range<co::IAnnotation* const> annotations ) = 0;
+	virtual void setAnnotations( co::Range<co::IAnnotation*> annotations ) = 0;
 
 	virtual void addAnnotation( co::IAnnotation* annotation ) = 0;
 

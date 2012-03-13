@@ -74,7 +74,7 @@ private:
 		filePath.append( ".lua" );
 
 		return co::OS::searchFile2( co::getPaths(),
-									co::Range<const std::string>( &filePath, 1 ),
+									co::Range<std::string>( &filePath, 1 ),
 									filename ? *filename : filePath );
 	}
 };

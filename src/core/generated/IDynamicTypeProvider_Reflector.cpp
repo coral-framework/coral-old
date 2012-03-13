@@ -48,7 +48,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IType* >( type_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicTypeProvider>( 0 ), range );
 	}
 
@@ -115,7 +115,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
 		co::IDynamicTypeProvider* p = co::checkInstance<co::IDynamicTypeProvider>( instance, method );
 		checkNumArguments( method, args.getSize() );

@@ -18,7 +18,7 @@ class IEnum : public co::IType
 public:
 	virtual ~IEnum() {;}
 
-	virtual co::Range<std::string const> getIdentifiers() = 0;
+	virtual co::Range<std::string> getIdentifiers() = 0;
 
 	virtual co::int32 getValueOf( const std::string& identifier ) = 0;
 };

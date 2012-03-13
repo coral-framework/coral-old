@@ -65,7 +65,7 @@ public:
 
 	co::IType* createType()
 	{
-		co::Range<co::Any const> range;
+		co::Range<co::Any> range;
 		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 0 ), range );
 		return res.get< co::IType* >();
 	}
@@ -74,7 +74,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IType* >( baseType_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 1 ), range );
 	}
 
@@ -84,7 +84,7 @@ public:
 		args[0].set< const std::string& >( name_ );
 		args[1].set< co::IType* >( type_ );
 		args[2].set< bool >( isReadOnly_ );
-		co::Range<co::Any const> range( args, 3 );
+		co::Range<co::Any> range( args, 3 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 2 ), range );
 	}
 
@@ -92,7 +92,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 3 ), range );
 	}
 
@@ -100,7 +100,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 4 ), range );
 		return res.get< co::IMethodBuilder* >();
 	}
@@ -111,7 +111,7 @@ public:
 		args[0].set< const std::string& >( name_ );
 		args[1].set< co::IInterface* >( type_ );
 		args[2].set< bool >( isFacet_ );
-		co::Range<co::Any const> range( args, 3 );
+		co::Range<co::Any> range( args, 3 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 5 ), range );
 	}
 
@@ -190,7 +190,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
 		co::ITypeBuilder* p = co::checkInstance<co::ITypeBuilder>( instance, method );
 		checkNumArguments( method, args.getSize() );

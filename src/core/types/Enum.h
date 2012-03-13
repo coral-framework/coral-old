@@ -24,7 +24,7 @@ public:
 	void addIdentifier( const std::string& identifier );
 
 	// IEnum methods:
-	Range<std::string const> getIdentifiers();
+	Range<std::string> getIdentifiers();
 	int32 getValueOf( const std::string& identifier );
 
 private:

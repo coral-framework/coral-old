@@ -24,16 +24,16 @@ public:
 
 	// internal methods:
 	void setReturnType( IType* returnType );
-	void setParameters( Range<IParameter* const> parameters );
-	void setExceptions( Range<IException* const> exceptions );
+	void setParameters( Range<IParameter*> parameters );
+	void setExceptions( Range<IException*> exceptions );
 
 	// IMember methods:
 	MemberKind getKind();
 
 	// IMethod methods:
 	IType* getReturnType();
-	Range<IParameter* const> getParameters();
-	Range<IException* const> getExceptions();
+	Range<IParameter*> getParameters();
+	Range<IException*> getExceptions();
 
 private:
 	IType* _returnType;

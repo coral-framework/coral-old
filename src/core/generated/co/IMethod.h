@@ -26,9 +26,9 @@ class IMethod : public co::IMember
 public:
 	virtual ~IMethod() {;}
 
-	virtual co::Range<co::IException* const> getExceptions() = 0;
+	virtual co::Range<co::IException*> getExceptions() = 0;
 
-	virtual co::Range<co::IParameter* const> getParameters() = 0;
+	virtual co::Range<co::IParameter*> getParameters() = 0;
 
 	virtual co::IType* getReturnType() = 0;
 };

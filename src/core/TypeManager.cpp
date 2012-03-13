@@ -70,40 +70,34 @@ ITypeTransaction* TypeManager::getTransaction()
 	return _transaction.get();
 }
 
-IType* TypeManager::findType( const std::string& fullName )
+template<bool create>
+INamespace* getOrCreateNS( INamespace* ns, const std::string& fullName )
 {
-	INamespace* ns = _rootNS.get();
 	assert( ns );
-
 	StringTokenizer st( fullName, "." );
-	st.nextToken();
-	std::string currentToken = st.getToken();
 	while( st.nextToken() )
 	{
-		ns = ns->getChildNamespace( currentToken );
-		if( !ns )
-			return NULL;
-
-		currentToken = st.getToken();
+		INamespace* childNS = ns->findChildNamespace( st.getToken() );
+		if( !childNS )
+		{
+			if( create )
+				childNS = ns->defineChildNamespace( st.getToken() );
+			else
+				return NULL;
+		}
+		ns = childNS;
 	}
+	return ns;
+}
 
-	return ns->getType( currentToken );
+INamespace* TypeManager::getNamespace( const std::string& fullName )
+{
+	return getOrCreateNS<true>( _rootNS.get(), fullName );
 }
 
 INamespace* TypeManager::findNamespace( const std::string& fullName )
 {
-	INamespace* ns = _rootNS.get();
-	assert( ns );
-
-	StringTokenizer st( fullName, "." );
-	while( st.nextToken() )
-	{
-		ns = ns->getChildNamespace( st.getToken() );
-		if( !ns )
-			return NULL;
-	}
-
-	return ns;
+	return getOrCreateNS<false>( _rootNS.get(), fullName );
 }
 
 IType* TypeManager::getType( const std::string& typeName )
@@ -124,6 +118,26 @@ IType* TypeManager::getType( const std::string& typeName )
 		return type;
 
 	return loadTypeOrThrow( typeName );
+}
+
+IType* TypeManager::findType( const std::string& fullName )
+{
+	INamespace* ns = _rootNS.get();
+	assert( ns );
+
+	StringTokenizer st( fullName, "." );
+	st.nextToken();
+	std::string currentToken = st.getToken();
+	while( st.nextToken() )
+	{
+		ns = ns->findChildNamespace( currentToken );
+		if( !ns )
+			return NULL;
+
+		currentToken = st.getToken();
+	}
+
+	return ns->findType( currentToken );
 }
 
 IArray* TypeManager::getArrayOf( IType* elementType )

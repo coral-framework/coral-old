@@ -16,7 +16,7 @@
 namespace co {
 
 //! Selects an annotation by type, considering generalizations.
-IAnnotation* selectAnnotation( Range<IAnnotation* const> annotations, IInterface* requestedType );
+IAnnotation* selectAnnotation( Range<IAnnotation*> annotations, IInterface* requestedType );
 
 /*!
 	Re-usable implementation of co::IAnnotated.
@@ -25,12 +25,12 @@ template<class Base>
 class Annotated : public Base
 {
 public:
-	Range<IAnnotation* const> getAnnotations()
+	Range<IAnnotation*> getAnnotations()
 	{
 		return _annotations;
 	}
 
-	void setAnnotations( Range<IAnnotation* const> annotations )
+	void setAnnotations( Range<IAnnotation*> annotations )
 	{
 		return co::assign( annotations, _annotations );
 	}

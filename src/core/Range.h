@@ -18,42 +18,42 @@ namespace co {
 template<typename T, typename C>
 struct RangeAdaptor
 {
-	static const bool isValid = false;
-	static T* getData( C& ) { return 0; }
-	static size_t getSize( C& ) { return 0; }
+	typedef RangeAdaptor<T, const C> CA;
+	static const bool isValid = CA::isValid;
+	static const T* getData( const C& container ) { return CA::getData( container ); }
+	static size_t getSize( const C& container ) { return CA::getSize( container ); }
 };
 
 // We should always be able to create Ranges out of const containers.
 template<typename T, typename C>
 struct RangeAdaptor<T, const C>
 {
-	typedef RangeAdaptor<T, C> NCA;
-	static const bool isValid = NCA::isValid;
-	static const T* getData( const C& container ) { return NCA::getData( const_cast<C&>( container ) ); }
-	static size_t getSize( const C& container ) { return NCA::getSize( const_cast<C&>( container ) ); }
+	static const bool isValid = false;
+	static const T* getData( const C& ) { return 0; }
+	static size_t getSize( const C& ) { return 0; }
 };
 
 // Specialization for std::vectors of values.
 template<typename T, typename ET>
-struct RangeAdaptor<T, std::vector<ET> >
+struct RangeAdaptor<T, const std::vector<ET> >
 {
 	static const bool isValid = true;
-	static T* getData( std::vector<ET>& v ) { return v.empty() ? NULL : &v[0]; }
-	static size_t getSize( std::vector<ET>& v ) { return v.size(); }
+	static const T* getData( const std::vector<ET>& v ) { return v.empty() ? NULL : &v[0]; }
+	static size_t getSize( const std::vector<ET>& v ) { return v.size(); }
 };
 
-// Specialization for std::vectors of pointers (allows coercions).
+// Specialization for std::vectors of pointers (allows upcasts).
 template<typename T, typename ET>
 struct RangeAdaptor<T, std::vector<ET*> >
 {
 	static const bool isValid = true;
-	static T* getData( std::vector<ET*>& v )
+	static const T* getData( const std::vector<ET*>& v )
 	{
 		// ET must be a subtype of T.
 		static_assert( ( traits::isSubTypeOf<ET, typename traits::removePointer<T>::Type>::value ), "incompatible pointer types" );
-		return v.empty() ? NULL : reinterpret_cast<T*>( &v[0] );
+		return v.empty() ? NULL : static_cast<const T*>( &v[0] );
 	}
-	static size_t getSize( std::vector<ET*>& v ) { return v.size(); }
+	static size_t getSize( const std::vector<ET*>& v ) { return v.size(); }
 };
 
 #endif // DOXYGEN
@@ -64,8 +64,8 @@ struct RangeAdaptor<T, std::vector<ET*> >
 #endif
 
 /*!
-	\brief A generic iterator for one-dimensional arrays.
-	\tparam T any acceptable element type for a C++ array.
+	\brief A generic const iterator for one-dimensional arrays.
+	\tparam T any valid C++ element type.
 
 	The range [start, end) is represented by two pointers.
 	The first and the last elements can be obtained by getFirst() and getLast(), respectively.
@@ -90,7 +90,7 @@ struct RangeAdaptor<T, std::vector<ET*> >
 	\par Reference
 		The concept of \e range as an alternative to \e iterators was proposed by Andrei
 		Alexandrescu in his talk <em>"Iterators Must Go"</em>. Since arrays are Coral's
-		only native collection type, we provide only this very simple Range class.
+		only built-in collection type, we provide only this very simple Range class.
  */
 template<typename T>
 class Range
@@ -105,13 +105,13 @@ public:
 		\param[in] start pointer to the first element in the range.
 		\param[in] end the address right after the last element in the range.
 	 */
-	Range( T* start, T* end ) : _start( start ), _end( end )
+	Range( const T* start, const T* end ) : _start( start ), _end( end )
 	{
 		assert( _start <= _end );
 	}
 
 	//! Creates a range starting at \a array and containing \a size elements.
-	Range( T* array, size_t size ) : _start( array ), _end( array + size )
+	Range( const T* array, size_t size ) : _start( array ), _end( array + size )
 	{;}
 
 	//! Non-const copy constructor.
@@ -139,10 +139,10 @@ public:
 	inline ~Range() {;}
 
 	//! Returns a pointer to the start of the array.
-	inline T* getStart() const { return _start; }
+	inline const T* getStart() const { return _start; }
 
 	//! Returns the address right after the last element in the array.
-	inline T* getEnd() const { return _end; }
+	inline const T* getEnd() const { return _end; }
 
 	//! Returns true if the range is empty.
 	inline bool isEmpty() const { return _start == _end; }
@@ -154,40 +154,23 @@ public:
 	inline operator bool() const { return _start != _end; }
 
 	//! Returns the first element in the range.
-	inline T& getFirst() { return *_start; }
-
-	//! Returns the first element in the range (const version).
 	inline const T& getFirst() const { return *_start; }
 
 	//! Returns the last element in the range.
-	inline T& getLast() { return *( _end - 1 ); }
-
-	//! Returns the last element in the range (const version).
 	inline const T& getLast() const { return *( _end - 1 ); }
 
 	//! Removes the first element from the range, if it is nonempty.
-	inline void popFirst()
-	{
-		if( _start < _end )
-			++_start;
-	}
+	inline void popFirst() { if( _start < _end ) ++_start; }
 
 	//! Removes the last element from the range, if it is nonempty.
-	inline void popLast()
-	{
-		if( _start < _end )
-			--_end;
-	}
+	inline void popLast() { if( _start < _end ) --_end; }
 
 	//! Unchecked random access to range elements.
-	inline T& operator[]( size_t index ) { return *( _start + index ); }
-
-	//! Unchecked random access to range elements (const version).
 	inline const T& operator[]( size_t index ) const { return *( _start + index ); }
 
 private:
-	T* _start;
-	T* _end;
+	const T* _start;
+	const T* _end;
 };
 
 #ifdef CORAL_CC_MSVC
@@ -195,20 +178,8 @@ private:
 #endif
 
 /******************************************************************************/
-/* Simple template library based on co::Range                                 */
+/* Simple template library for co::Range                                      */
 /******************************************************************************/
-
-/*!
-	Copies the elements in \a source into the given \a destination range.
- */
-template<typename T>
-void copy( Range<T> source, Range<T> destination )
-{
-	size_t size = source.getSize();
-	assert( size <= destination.getSize() );
-	for( size_t i = 0; i < size; ++i )
-		destination[i] = source[i];
-}
 
 /*!
 	Assigns the contents of a \a source range to a
@@ -257,14 +228,12 @@ bool binarySearch( Range<T> range, const Key& key, Comparator compare, size_t& p
 		{
 			// repeat search in right half
 			first = pos + 1;
-			if( pos == last )
-				break;
+			if( pos == last ) break;
 		}		
 		else if( comp < 0 )
 		{
 			// repeat search in left half
-			if( pos == 0 )
-				break;
+			if( pos == 0 ) break;
 			last = pos - 1;
 		}
 		else return true;

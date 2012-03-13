@@ -32,8 +32,8 @@ public:
 	const std::string& getName();
 	const std::string& getFullName();
 	INamespace* getParentNamespace();
-	Range<IType* const> getTypes();
-	Range<INamespace* const> getChildNamespaces();
+	Range<IType*> getTypes();
+	Range<INamespace*> getChildNamespaces();
 	IModule* getModule();
 	IType* getType( const std::string& name );
 	INamespace* getChildNamespace( const std::string& name );
@@ -53,7 +53,7 @@ private:
 	inline IType* findType( const std::string& name )
 	{
 		size_t pos;
-		if( binarySearch( Range<IType* const>( _types ), name, typeComparator, pos ) )
+		if( binarySearch( Range<IType*>( _types ), name, typeComparator, pos ) )
 			return _types[pos].get();
 		return NULL;
 	}
@@ -66,7 +66,7 @@ private:
 	inline INamespace* findChildNamespace( const std::string& name )
 	{
 		size_t pos;
-		if( binarySearch( Range<INamespace* const>( _childNamespaces ), name, namespaceComparator, pos ) )
+		if( binarySearch( Range<INamespace*>( _childNamespaces ), name, namespaceComparator, pos ) )
 			return _childNamespaces[pos].get();
 		return NULL;
 	}

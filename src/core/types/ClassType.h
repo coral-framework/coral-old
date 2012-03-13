@@ -28,7 +28,7 @@ public:
 		Appends the given members range to the members list. After calling this
 		method the members list must be re-sorted by calling sortMembers().
 	 */
-	void addMembers( Range<IMember* const> members );
+	void addMembers( Range<IMember*> members );
 
 	//! Sorts the members list by (type, name) and updates _firstMethodPos.
 	void sortMembers( ICompositeType* owner );
@@ -37,10 +37,10 @@ public:
 	IMember* getMember( const std::string& name );
 
 	// IRecordType methods:
-	Range<IField* const> getFields();
+	Range<IField*> getFields();
 
 	// IClassType methods:
-	Range<IMethod* const> getMethods();
+	Range<IMethod*> getMethods();
 
 protected:
 	typedef RefVector<IMember> MembersVector;
@@ -52,10 +52,10 @@ template<class Base>
 class ClassType : public Type<Base>, public ClassTypeImpl
 {
 public:
-	Range<IMember* const> getMembers() { return _members; }
+	Range<IMember*> getMembers() { return _members; }
 	IMember* getMember( const std::string& name ) { return ClassTypeImpl::getMember( name ); }
-	Range<IField* const> getFields() { return ClassTypeImpl::getFields(); }
-	Range<IMethod* const> getMethods() { return ClassTypeImpl::getMethods(); }
+	Range<IField*> getFields() { return ClassTypeImpl::getFields(); }
+	Range<IMethod*> getMethods() { return ClassTypeImpl::getMethods(); }
 };
 
 } // namespace co

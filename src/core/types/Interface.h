@@ -30,8 +30,8 @@ public:
 
 	// IInterface methods:
 	IInterface* getBaseType();
-	Range<IInterface* const> getSuperTypes();
-	Range<IInterface* const> getSubTypes();
+	Range<IInterface*> getSuperTypes();
+	Range<IInterface*> getSubTypes();
 	bool isSubTypeOf( IInterface* type );
 
 private:

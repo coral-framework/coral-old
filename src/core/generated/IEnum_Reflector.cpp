@@ -46,16 +46,16 @@ public:
 
 	// co.IAnnotated Methods:
 
-	co::Range<co::IAnnotation* const> getAnnotations()
+	co::Range<co::IAnnotation*> getAnnotations()
 	{
 		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ) );
-        return res.get< co::Range<co::IAnnotation* const> >();
+        return res.get< co::Range<co::IAnnotation*> >();
 	}
 
-	void setAnnotations( co::Range<co::IAnnotation* const> annotations_ )
+	void setAnnotations( co::Range<co::IAnnotation*> annotations_ )
 	{
 		co::Any arg;
-		arg.set< co::Range<co::IAnnotation* const> >( annotations_ );
+		arg.set< co::Range<co::IAnnotation*> >( annotations_ );
 		_provider->dynamicSetField( _cookie, getField<co::IAnnotated>( 0 ), arg );
 	}
 
@@ -63,7 +63,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IAnnotation* >( annotation_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 0 ), range );
 	}
 
@@ -71,7 +71,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IInterface* >( requestedType_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
 		return res.get< co::IAnnotation* >();
 	}
@@ -135,17 +135,17 @@ public:
 
 	// co.IEnum Methods:
 
-	co::Range<std::string const> getIdentifiers()
+	co::Range<std::string> getIdentifiers()
 	{
 		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IEnum>( 0 ) );
-        return res.get< co::Range<std::string const> >();
+        return res.get< co::Range<std::string> >();
 	}
 
 	co::int32 getValueOf( const std::string& identifier_ )
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( identifier_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IEnum>( 0 ), range );
 		return res.get< co::int32 >();
 	}
@@ -204,7 +204,7 @@ public:
 		co::IEnum* p = co::checkInstance<co::IEnum>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::Range<std::string const> >( p->getIdentifiers() ); break;
+		case 0:		value.set< co::Range<std::string> >( p->getIdentifiers() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -221,7 +221,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
 		co::IEnum* p = co::checkInstance<co::IEnum>( instance, method );
 		checkNumArguments( method, args.getSize() );

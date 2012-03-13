@@ -28,7 +28,7 @@ public:
 
 	virtual co::INamespace* getNamespace() = 0;
 
-	virtual co::Range<co::IModulePart* const> getParts() = 0;
+	virtual co::Range<co::IModulePart*> getParts() = 0;
 
 	virtual co::int32 getRank() = 0;
 

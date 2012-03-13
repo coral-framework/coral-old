@@ -30,13 +30,10 @@ template<typename T> class RefPtr;
 template<typename T> class RefVector;
 
 /*!
-	Array that maps a TypeKind to its Coral-style string representation.
-	Use with caution, always make sure ( index >= 0 && index <= co::TK_COMPONENT ).
+	Array that maps a TypeKind to a human-friendly string.
+	\warning always make sure ( index >= 0 && index <= co::TK_COMPONENT ).
  */
 extern CORAL_EXPORT const std::string TK_STRINGS[];
-
-//! Just like co::TK_STRINGS, but contains C++ style strings (e.g. 'co::Any' instead of 'any').
-extern CORAL_EXPORT const std::string TK_STRINGS_CPP[];
 
 
 /****************************************************************************/
@@ -61,6 +58,35 @@ CORAL_EXPORT IService* getServiceByName( IObject* object, const std::string& por
 CORAL_EXPORT void setServiceByName( IObject* object, const std::string& receptacleName, IService* service );
 
 #endif
+
+
+/****************************************************************************/
+/* Kind Trait Operators (to distinguish all kinds of types)                 */
+/****************************************************************************/
+
+//! Returns true for integer types.
+inline bool isIntegral( TypeKind k ) { return k >= TK_BOOLEAN && k <= TK_UINT64; }
+
+//! Returns true for floating-point types.
+inline bool isFloating( TypeKind k ) { return k >= TK_FLOAT && k <= TK_DOUBLE; }
+ 
+//! Returns true for integer and floating-point types.
+inline bool isArithmetic( TypeKind k ) { return isIntegral( k ) || isFloating( k ); }
+
+//! Returns true for arithmetic and enumeration types.
+inline bool isScalar( TypeKind k ) { return isArithmetic( k ) || k == TK_ENUM; }
+
+//! Returns true for reference types.
+inline bool isReference( TypeKind k ) { return k == TK_INTERFACE; }
+
+//! Returns true for value types.
+inline bool isValue( TypeKind k ) { return k > TK_NONE && k < TK_INTERFACE && k != TK_EXCEPTION; }
+
+//! Returns true if the type can be stored as a variable.
+inline bool isVariable( TypeKind k ) { return k > TK_NONE && k < TK_COMPONENT && k != TK_EXCEPTION; }
+
+//! Returns true for types that support inheritance.
+inline bool hasInheritance( TypeKind k ) { return k == TK_INTERFACE; }
 
 
 /****************************************************************************/
@@ -179,7 +205,7 @@ struct get
 							&& co::traits::isConst<ReferencedType>::value;
 	static const bool isReference = co::traits::isReference<T>::value;
 
-	static const TypeKind kind = kindOf<CoreType>::kind;
+	static const TypeKind kind = co::kindOf<CoreType>::kind;
 };
 
 } // namespace traits

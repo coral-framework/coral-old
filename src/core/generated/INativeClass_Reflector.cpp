@@ -47,16 +47,16 @@ public:
 
 	// co.IAnnotated Methods:
 
-	co::Range<co::IAnnotation* const> getAnnotations()
+	co::Range<co::IAnnotation*> getAnnotations()
 	{
 		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ) );
-        return res.get< co::Range<co::IAnnotation* const> >();
+        return res.get< co::Range<co::IAnnotation*> >();
 	}
 
-	void setAnnotations( co::Range<co::IAnnotation* const> annotations_ )
+	void setAnnotations( co::Range<co::IAnnotation*> annotations_ )
 	{
 		co::Any arg;
-		arg.set< co::Range<co::IAnnotation* const> >( annotations_ );
+		arg.set< co::Range<co::IAnnotation*> >( annotations_ );
 		_provider->dynamicSetField( _cookie, getField<co::IAnnotated>( 0 ), arg );
 	}
 
@@ -64,7 +64,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IAnnotation* >( annotation_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 0 ), range );
 	}
 
@@ -72,7 +72,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IInterface* >( requestedType_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
 		return res.get< co::IAnnotation* >();
 	}
@@ -136,35 +136,35 @@ public:
 
 	// co.ICompositeType Methods:
 
-	co::Range<co::IMember* const> getMembers()
+	co::Range<co::IMember*> getMembers()
 	{
 		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ICompositeType>( 0 ) );
-        return res.get< co::Range<co::IMember* const> >();
+        return res.get< co::Range<co::IMember*> >();
 	}
 
 	co::IMember* getMember( const std::string& name_ )
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ICompositeType>( 0 ), range );
 		return res.get< co::IMember* >();
 	}
 
 	// co.IRecordType Methods:
 
-	co::Range<co::IField* const> getFields()
+	co::Range<co::IField*> getFields()
 	{
 		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IRecordType>( 0 ) );
-        return res.get< co::Range<co::IField* const> >();
+        return res.get< co::Range<co::IField*> >();
 	}
 
 	// co.IClassType Methods:
 
-	co::Range<co::IMethod* const> getMethods()
+	co::Range<co::IMethod*> getMethods()
 	{
 		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IClassType>( 0 ) );
-        return res.get< co::Range<co::IMethod* const> >();
+        return res.get< co::Range<co::IMethod*> >();
 	}
 
 	// co.INativeClass Methods:
@@ -232,7 +232,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
 		co::checkInstance<co::INativeClass>( instance, method );
 		raiseUnexpectedMemberIndex();

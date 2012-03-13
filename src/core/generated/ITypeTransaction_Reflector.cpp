@@ -42,21 +42,21 @@ public:
 
 	// co.ITypeTransaction Methods:
 
-	co::Range<co::ITypeBuilder* const> getTypeBuilders()
+	co::Range<co::ITypeBuilder*> getTypeBuilders()
 	{
 		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ITypeTransaction>( 0 ) );
-        return res.get< co::Range<co::ITypeBuilder* const> >();
+        return res.get< co::Range<co::ITypeBuilder*> >();
 	}
 
 	void commit()
 	{
-		co::Range<co::Any const> range;
+		co::Range<co::Any> range;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeTransaction>( 0 ), range );
 	}
 
 	void rollback()
 	{
-		co::Range<co::Any const> range;
+		co::Range<co::Any> range;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeTransaction>( 1 ), range );
 	}
 
@@ -114,7 +114,7 @@ public:
 		co::ITypeTransaction* p = co::checkInstance<co::ITypeTransaction>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::Range<co::ITypeBuilder* const> >( p->getTypeBuilders() ); break;
+		case 0:		value.set< co::Range<co::ITypeBuilder*> >( p->getTypeBuilders() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -131,7 +131,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
 		co::ITypeTransaction* p = co::checkInstance<co::ITypeTransaction>( instance, method );
 		checkNumArguments( method, args.getSize() );

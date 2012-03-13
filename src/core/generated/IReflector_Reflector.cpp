@@ -62,18 +62,18 @@ public:
 		args[0].set< const co::Any& >( instance_ );
 		args[1].set< co::IField* >( field_ );
 		args[2].set< co::AnyValue& >( value_ );
-		co::Range<co::Any const> range( args, 3 );
+		co::Range<co::Any> range( args, 3 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 0 ), range );
 	}
 
-	void invoke( co::Any instance_, co::IMethod* method_, co::Range<co::Any const> args_, co::AnyValue& returnValue_ )
+	void invoke( co::Any instance_, co::IMethod* method_, co::Range<co::Any> args_, co::AnyValue& returnValue_ )
 	{
 		co::Any args[4];
 		args[0].set< const co::Any& >( instance_ );
 		args[1].set< co::IMethod* >( method_ );
-		args[2].set< co::Range<co::Any const> >( args_ );
+		args[2].set< co::Range<co::Any> >( args_ );
 		args[3].set< co::AnyValue& >( returnValue_ );
-		co::Range<co::Any const> range( args, 4 );
+		co::Range<co::Any> range( args, 4 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 1 ), range );
 	}
 
@@ -81,14 +81,14 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< co::IDynamicServiceProvider* >( dynamicProvider_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 2 ), range );
 		return res.get< co::IService* >();
 	}
 
 	co::IObject* newInstance()
 	{
-		co::Range<co::Any const> range;
+		co::Range<co::Any> range;
 		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 3 ), range );
 		return res.get< co::IObject* >();
 	}
@@ -97,7 +97,7 @@ public:
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( message_ );
-		co::Range<co::Any const> range( args, 1 );
+		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 4 ), range );
 	}
 
@@ -107,7 +107,7 @@ public:
 		args[0].set< const co::Any& >( instance_ );
 		args[1].set< co::IField* >( field_ );
 		args[2].set< const co::Any& >( value_ );
-		co::Range<co::Any const> range( args, 3 );
+		co::Range<co::Any> range( args, 3 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 5 ), range );
 	}
 
@@ -201,7 +201,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
 		co::IReflector* p = co::checkInstance<co::IReflector>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -223,7 +223,7 @@ public:
 				{
 					const co::Any& instance_ = args[++argIndex].get< const co::Any& >();
 					co::IMethod* method_ = args[++argIndex].get< co::IMethod* >();
-					co::Range<co::Any const> args_ = args[++argIndex].get< co::Range<co::Any const> >();
+					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
 					co::AnyValue& returnValue_ = args[++argIndex].get< co::AnyValue& >();
 					argIndex = -1;
 					p->invoke( instance_, method_, args_, returnValue_ );

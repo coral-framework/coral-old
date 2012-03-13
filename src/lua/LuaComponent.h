@@ -37,7 +37,7 @@ public:
 	co::IPort* dynamicGetFacet( co::int32 cookie );
 	co::Any dynamicGetField( co::int32 cookie, co::IField* ai );
 	void dynamicSetField( co::int32 cookie, co::IField* ai, co::Any value );
-	co::Any dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<co::Any const> args );
+	co::Any dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<co::Any> args );
 
 	// co::IReflector methods:
 	co::uint32 getSize();
@@ -49,7 +49,7 @@ public:
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider );
     void getField( co::Any instance, co::IField* ai, co::AnyValue& value );
     void setField( co::Any instance, co::IField* ai, co::Any value );
-    void invoke( co::Any instance, co::IMethod* mi, co::Range<co::Any const> args, co::AnyValue& returnValue );
+    void invoke( co::Any instance, co::IMethod* mi, co::Range<co::Any> args, co::AnyValue& returnValue );
 	void raise( const std::string& message );
 
 private:

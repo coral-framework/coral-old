@@ -49,10 +49,10 @@ public:
         return res.get< co::INamespace* >();
 	}
 
-	co::Range<co::IModulePart* const> getParts()
+	co::Range<co::IModulePart*> getParts()
 	{
 		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 1 ) );
-        return res.get< co::Range<co::IModulePart* const> >();
+        return res.get< co::Range<co::IModulePart*> >();
 	}
 
 	co::int32 getRank()
@@ -76,37 +76,37 @@ public:
 
 	void abort()
 	{
-		co::Range<co::Any const> range;
+		co::Range<co::Any> range;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 0 ), range );
 	}
 
 	void disintegrate()
 	{
-		co::Range<co::Any const> range;
+		co::Range<co::Any> range;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 1 ), range );
 	}
 
 	void dispose()
 	{
-		co::Range<co::Any const> range;
+		co::Range<co::Any> range;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 2 ), range );
 	}
 
 	void initialize()
 	{
-		co::Range<co::Any const> range;
+		co::Range<co::Any> range;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 3 ), range );
 	}
 
 	void integrate()
 	{
-		co::Range<co::Any const> range;
+		co::Range<co::Any> range;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 4 ), range );
 	}
 
 	void integratePresentation()
 	{
-		co::Range<co::Any const> range;
+		co::Range<co::Any> range;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 5 ), range );
 	}
 
@@ -165,7 +165,7 @@ public:
 		switch( field->getIndex() )
 		{
 		case 0:		value.set< co::INamespace* >( p->getNamespace() ); break;
-		case 1:		value.set< co::Range<co::IModulePart* const> >( p->getParts() ); break;
+		case 1:		value.set< co::Range<co::IModulePart*> >( p->getParts() ); break;
 		case 2:		value.set< co::int32 >( p->getRank() ); break;
 		case 3:		value.set< co::ModuleState >( p->getState() ); break;
 		default:	raiseUnexpectedMemberIndex();
@@ -187,7 +187,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
 		co::IModule* p = co::checkInstance<co::IModule>( instance, method );
 		checkNumArguments( method, args.getSize() );
