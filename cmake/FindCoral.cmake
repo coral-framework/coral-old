@@ -1,16 +1,18 @@
 #	Find the Coral framework.
 #
-#	This module defines the following variables:
-#		CORAL_FOUND - Whether the Coral framework was found.
-#		CORAL_INCLUDE_DIRS - Directories for including the Coral headers.
-#		CORAL_LIBRARIES - Coral's optimized and debug libraries (whichever are available).
-#		CORAL_LAUNCHER - Path to the 'coral' executable.
-#
 #	The following variables are accepted as input:
 #		CORAL_ROOT (as a CMake or environment variable)
 #			- Directory where Coral was installed (the "install prefix").
 #		CORAL_PATH (as a CMake or environment variable)
-#			- List of extra Coral repositories that should be passed to the Coral Compiler.
+#			- List of extra module repositories that should be passed to the Coral Compiler.
+#
+#	This module defines the following variables:
+#		CORAL_FOUND - Whether the Coral framework was found.
+#		CORAL_ROOT - Absolute path to the Coral SDK root.
+#		CORAL_PATH - By default, contains "${CORAL_ROOT}/modules".
+#		CORAL_LIBRARIES - Coral's optimized and debug libraries (whichever are available).
+#		CORAL_INCLUDE_DIRS - Directories for including the Coral headers.
+#		CORAL_LAUNCHER - Path to the 'coral' executable.
 #
 #	The following utility functions simplify the task of invoking the Coral Compiler.
 #
@@ -32,13 +34,19 @@ cmake_minimum_required( VERSION 2.8.5 )
 # Initialization
 ################################################################################
 
+if( NOT CORAL_ROOT )
+	if( ENV{CORAL_ROOT} )
+		file( TO_CMAKE_PATH "$ENV{CORAL_ROOT}" CORAL_ROOT )
+	else()
+		find_path( CORAL_ROOT coralc PATH_SUFFIXES .. PATHS ${CMAKE_MODULE_PATH} )
+	endif()
+endif()
+
 if( NOT CORAL_PATH )
 	if( ENV{CORAL_PATH} )
-		set( CORAL_PATH $ENV{CORAL_PATH} )
-	elseif( CORAL_ROOT )
+		file( TO_CMAKE_PATH "$ENV{CORAL_PATH}" CORAL_PATH )
+	else()
 		set( CORAL_PATH "${CORAL_ROOT}/modules" )
-	elseif( ENV{CORAL_ROOT} )
-		set( CORAL_PATH "$ENV{CORAL_ROOT}/modules" )
 	endif()
 endif()
 
@@ -222,24 +230,33 @@ endmacro( CORAL_TARGET )
 macro( CORAL_MODULE_TARGET moduleName targetName )
 	CORAL_TARGET( ${targetName} )
 
+	set_target_properties( ${targetName} PROPERTIES
+		PREFIX ""
+		OUTPUT_NAME "${moduleName}"
+	)
+
+	if( NOT CORAL_MODULE_OUTPUT_DIR )
+		set( CORAL_MODULE_OUTPUT_DIR "${CMAKE_BINARY_DIR}/modules" )
+	endif()
+
 	# Copy or generate the module library into /modules/${modulePath}/
 	string( REPLACE "." "/" modulePath ${moduleName} )
 	if( XCODE_VERSION OR MSVC_IDE )
 		# Copy the library after linking (makes sense for IDE's that create intermediate dirs)
-		file( MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/modules/${modulePath}" )
+		file( MAKE_DIRECTORY "${CORAL_MODULE_OUTPUT_DIR}/${modulePath}" )
 		if( XCODE_VERSION )
 			set( targetFileName "$(FULL_PRODUCT_NAME)" )
 		else()
 			set( targetFileName "$(TargetFileName)" ) # MSVC_IDE
 		endif()
 		add_custom_command( TARGET ${targetName} POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/${targetFileName}" "${CMAKE_BINARY_DIR}/modules/${modulePath}/"
+			COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/${targetFileName}" "${CORAL_MODULE_OUTPUT_DIR}/${modulePath}/"
 			COMMENT "Copying module '${moduleName}'..."
 		)
 	else()
 		# Create the library directly in the output dir
 		set_target_properties( ${targetName} PROPERTIES
-			LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/modules/${modulePath}"
+			LIBRARY_OUTPUT_DIRECTORY "${CORAL_MODULE_OUTPUT_DIR}/${modulePath}"
 		)
 	endif()
 endmacro( CORAL_MODULE_TARGET )

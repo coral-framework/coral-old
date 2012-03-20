@@ -99,42 +99,20 @@ IModulePart* ModulePartLoader::loadModulePart( const std::string& moduleName )
 
 bool ModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::string* filename )
 {
-	const char* moduleBaseName = moduleName.c_str();
-	size_t lastDotPos = moduleName.rfind( '.' );
-	if( lastDotPos != std::string::npos )
-		moduleBaseName += ( lastDotPos + 1 );
-
 	int n = 0;
-	std::string fileNames[4];
-
-	// avoid string re-alocations
-	const int PADDING = 3 + 6 + 4; // for 'lib', '_debug' and '.dll'
-	size_t reserveLen = ( moduleName.length() + ( moduleBaseName - moduleName.c_str() ) + PADDING );
+	std::string fileNames[2];
 
 #ifndef CORAL_NDEBUG
-	// moduleName/moduleName_debug
-	fileNames[n].reserve( reserveLen );
-	fileNames[n].assign( moduleBaseName );
-	fileNames[n].append( "_debug" MODULE_LIB_EXT );
-	++n;
-
-	// moduleName/libmoduleName_debug
-	fileNames[n].reserve( reserveLen );
-	fileNames[n].assign( "lib" );
-	fileNames[n].append( moduleBaseName );
+	// 'module.name' => 'module/name/module.name_debug.dll'
+	fileNames[n].reserve( moduleName.length() + 6 + 4 );
+	fileNames[n].assign( moduleName );
 	fileNames[n].append( "_debug" MODULE_LIB_EXT );
 	++n;
 #endif
 
-	// moduleName/moduleName
-	fileNames[n].assign( moduleBaseName );
-	fileNames[n].append( MODULE_LIB_EXT );
-	++n;
-
-	// moduleName/libmoduleName
-	fileNames[n].reserve( reserveLen );
-	fileNames[n].assign( "lib" );
-	fileNames[n].append( moduleBaseName );
+	// 'module.name' => 'module/name/module.name.dll'
+	fileNames[n].reserve( moduleName.length() + 4 );
+	fileNames[n].assign( moduleName );
 	fileNames[n].append( MODULE_LIB_EXT );
 	++n;
 
