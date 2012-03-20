@@ -55,23 +55,7 @@ set( CPACK_PACKAGE_VERSION_MINOR		"${CORAL_VERSION_MINOR}" )
 set( CPACK_PACKAGE_VERSION_PATCH		"${CORAL_VERSION_PATCH}" )
 set( CPACK_PACKAGE_DESCRIPTION_SUMMARY	"Lightweight C++ component framework for soft real-time systems." )
 
-if( HUDSON_JOBNAME )
-	string( REPLACE "/label=" "-" _CPACK_PACKAGE_FILE_NAME "${HUDSON_JOBNAME}_$ENV{BUILD_ID}" )
-	set( CPACK_PACKAGE_FILE_NAME ${_CPACK_PACKAGE_FILE_NAME} )
-endif()
-
-if( WIN32 )
-	set( CPACK_GENERATOR "ZIP" )
-else()
-	set( CPACK_GENERATOR "TBZ2" )
-endif()
-
 include( CPack )
-
-# Force a safe default CMAKE_INSTALL_PREFIX
-if( NOT CMAKE_INSTALL_PREFIX MATCHES "coral" )
-	set( CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/coral" )
-endif()
 
 ################################################################################
 # Subdirectories
