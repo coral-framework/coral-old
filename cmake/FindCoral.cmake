@@ -373,8 +373,7 @@ endmacro( CORAL_GENERATE_DOXYGEN )
 function( _coral_find_program _name )
 	find_program( ${_name}
 		NAMES ${ARGN}
-		HINTS ".."
-		PATHS "${CORAL_ROOT}" ENV CORAL_ROOT
+		HINTS ${CORAL_ROOT} ".."
 		PATH_SUFFIXES "." "bin"
 	)
 	mark_as_advanced( ${_name} )
@@ -383,16 +382,14 @@ endfunction()
 function( _coral_find_library _name )
 	find_library( ${_name}
 		NAMES ${ARGN}
-		HINTS ".."
-		PATHS "${CORAL_ROOT}" ENV CORAL_ROOT
+		HINTS ${CORAL_ROOT} ".."
 		PATH_SUFFIXES "lib"
 	)
 	mark_as_advanced( ${_name} )
 endfunction()
 
 find_path( CORAL_INCLUDE_DIRS "co/Coral.h"
-	HINTS ".."
-	PATHS "${CORAL_ROOT}" ENV CORAL_ROOT
+	HINTS ${CORAL_ROOT} ".."
 	PATH_SUFFIXES "include"
 )
 
