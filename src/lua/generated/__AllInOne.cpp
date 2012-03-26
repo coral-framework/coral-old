@@ -6,6 +6,7 @@
 #include "Component_Base.cpp"
 #include "Component_Reflector.cpp"
 #include "Exception_Reflector.cpp"
+#include "IInterceptor_Reflector.cpp"
 #include "ILauncher_Reflector.cpp"
 #include "IScripted_Reflector.cpp"
 #include "IState_Reflector.cpp"

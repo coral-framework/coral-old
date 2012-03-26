@@ -5,8 +5,11 @@
 
 #include <gtest/gtest.h>
 #include <co/Coral.h>
+#include <co/IField.h>
+#include <co/IMethod.h>
 #include <co/IObject.h>
 #include <co/ISystem.h>
+#include <co/ITypeManager.h>
 #include <co/IModuleManager.h>
 #include <co/ModuleLoadException.h>
 #include <co/MissingInputException.h>
@@ -14,6 +17,7 @@
 #include <co/IllegalArgumentException.h>
 #include <lua/IState.h>
 #include <lua/Exception.h>
+#include <lua/IInterceptor.h>
 
 #include <moduleA/IHuman.h>
 
@@ -60,7 +64,7 @@ TEST( LuaTests, setup )
 TEST( LuaTests, moduleInvalidScriptName )
 {
 	ASSERT_ERROR( "lua.moduleInvalidScriptName",
-					"none of the module loaders recognized 'lua.moduleInvalidScriptName' as a module" );
+					"no module loader recognized 'lua.moduleInvalidScriptName' as a module" );
 }
 
 TEST( LuaTests, moduleInvalidReturn )
@@ -328,4 +332,74 @@ TEST( LuaTests, preserveExceptionType )
 
 	ASSERT_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions",
 		"causeIllegalStateException", empty, empty ), co::IllegalStateException, "not SystemState_None" );
+}
+
+class PseudoInterceptor : public co::IService, public lua::IInterceptor
+{
+public:
+	PseudoInterceptor()
+	{;}
+	
+	co::IInterface* getInterface() { return 0; }
+	co::IObject* getProvider() { return 0; }
+	co::IPort* getFacet() { return 0; }
+	void serviceRetain() {;}
+	void serviceRelease() {;}
+
+	struct CallInfo
+	{
+		co::IService* service;
+		co::IMember* member;
+		CallInfo( co::IService* service, co::IMember* member )
+			: service( service ), member( member ) {;}
+	};
+
+	std::vector<CallInfo> calls;
+
+	void postGetField( co::IService* service, co::IField* field, const co::Any& )
+	{
+		calls.push_back( CallInfo( service, field ) );
+	}
+
+	void postSetField( co::IService* service, co::IField* field, const co::Any& )
+	{
+		calls.push_back( CallInfo( service, field ) );
+	}
+
+	void postInvoke( co::IService* service, co::IMethod* method,
+						co::Range<co::Any const>, const co::Any& )
+	{
+		calls.push_back( CallInfo( service, method ) );
+	}
+}
+sg_interceptor;
+
+TEST( LuaTests, interceptor )
+{
+	lua::IState* luaState = co::getService<lua::IState>();
+	luaState->addInterceptor( &sg_interceptor );
+
+	luaState->callFunction( "lua.interceptor", "basic",
+		co::Range<const co::Any>(), co::Range<const co::Any>() );
+
+	ASSERT_GE( sg_interceptor.calls.size(), 1 );
+	EXPECT_EQ( sg_interceptor.calls[0].service, co::getSystem() );
+	EXPECT_EQ( sg_interceptor.calls[0].member, co::typeOf<co::ISystem>::get()->getMember( "types" ) );
+
+	ASSERT_GE( sg_interceptor.calls.size(), 2 );
+	EXPECT_EQ( sg_interceptor.calls[1].service, co::getSystem()->getTypes() );
+	EXPECT_EQ( sg_interceptor.calls[1].member, co::typeOf<co::ITypeManager>::get()->getMember( "getType" ) );
+
+	ASSERT_GE( sg_interceptor.calls.size(), 3 );
+	EXPECT_EQ( sg_interceptor.calls[2].service, co::getType( "int32[]" ) );
+	EXPECT_EQ( sg_interceptor.calls[2].member, co::typeOf<co::IType>::get()->getMember( "reflector" ) );
+
+	luaState->removeInterceptor( &sg_interceptor );
+
+	sg_interceptor.calls.clear();
+
+	luaState->callFunction( "lua.interceptor", "extra",
+		co::Range<const co::Any>(), co::Range<const co::Any>() );
+
+	EXPECT_EQ( 0, sg_interceptor.calls.size() );
 }

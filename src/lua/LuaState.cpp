@@ -110,6 +110,21 @@ void LuaState::dumpStack( lua_State* L )
 	printf( "dumpStack -- END\n" );
 }
 
+co::Range<lua::IInterceptor* const> LuaState::getInterceptors()
+{
+	return CompositeTypeBinding::sm_interceptors;
+}
+
+void LuaState::addInterceptor( lua::IInterceptor* interceptor )
+{
+	return CompositeTypeBinding::addInterceptor( interceptor );
+}
+
+void LuaState::removeInterceptor( lua::IInterceptor* interceptor )
+{
+	return CompositeTypeBinding::removeInterceptor( interceptor );
+}
+
 bool LuaState::findScript( lua_State*, const std::string& name, std::string& filename )
 {
 	static const std::string s_extension( "lua" );

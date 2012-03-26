@@ -278,6 +278,7 @@ int coPackage::newComponentInstance( lua_State* L )
 /*****************************************************************************/
 
 CompositeTypeBinding::CompositeTypeList CompositeTypeBinding::sm_boundTypes;
+CompositeTypeBinding::InterceptorList CompositeTypeBinding::sm_interceptors;
 
 co::ICompositeType* CompositeTypeBinding::getType( lua_State* L, int udataIdx )
 {
@@ -333,6 +334,27 @@ void CompositeTypeBinding::releaseBindings( lua_State* L )
 		lua_rawset( L, LUA_REGISTRYINDEX );
 	}
 	sm_boundTypes.clear();
+}
+
+void CompositeTypeBinding::addInterceptor( IInterceptor* interceptor )
+{
+	if( !interceptor )
+		throw co::IllegalArgumentException( "illegal null loader" );
+
+	// assert there are no duplicates
+	assert( std::find( sm_interceptors.begin(), sm_interceptors.end(), interceptor ) == sm_interceptors.end() );
+
+	sm_interceptors.push_back( interceptor );
+}
+
+void CompositeTypeBinding::removeInterceptor( IInterceptor* interceptor )
+{
+	InterceptorList::iterator newEnd = std::remove( sm_interceptors.begin(), sm_interceptors.end(), interceptor );
+
+	if( newEnd == sm_interceptors.end() )
+		throw co::IllegalArgumentException( "the specified loader was not found" );
+
+	sm_interceptors.erase( newEnd, sm_interceptors.end() );
 }
 
 struct Metamethods
@@ -493,6 +515,13 @@ void CompositeTypeBinding::getField( lua_State* L, const co::Any& instance )
 	reflector->getField( instance, field, value );
 	lua_pop( L, 1 );
 	LuaState::push( L, value );
+
+	if( instance.getKind() == co::TK_INTERFACE )
+	{
+		size_t size = sm_interceptors.size();
+		for( size_t i = 0; i < size; ++i )
+			sm_interceptors[i]->postGetField( instance.getState().data.service, field, value );
+	}
 }
 
 void CompositeTypeBinding::setField( lua_State* L, const co::Any& instance )
@@ -503,6 +532,13 @@ void CompositeTypeBinding::setField( lua_State* L, const co::Any& instance )
 	LuaState::getAny( L, -1, field->getType(), value );
 	reflector->setField( instance, field, value );
 	lua_pop( L, 2 );
+
+	if( instance.getKind() == co::TK_INTERFACE )
+	{
+		size_t size = sm_interceptors.size();
+		for( size_t i = 0; i < size; ++i )
+			sm_interceptors[i]->postSetField( instance.getState().data.service, field, value );
+	}
 }
 
 int CompositeTypeBinding::callMethod( lua_State* L )
@@ -587,7 +623,16 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 	co::Any instance, returnValue;
 	tryGetInstance( L, 1, instance );
 	co::IReflector* reflector = method->getOwner()->getReflector();
-	reflector->invoke( instance, method, co::Range<co::Any const>( args, numParams ), returnValue );
+	co::Range<co::Any const> argsRange( args, numParams );
+	reflector->invoke( instance, method, argsRange, returnValue );
+
+	if( instance.getKind() == co::TK_INTERFACE )
+	{
+		size_t size = sm_interceptors.size();
+		for( size_t i = 0; i < size; ++i )
+			sm_interceptors[i]->postInvoke( instance.getState().data.service,
+										method, argsRange, returnValue );
+	}
 
 	// return result and output parameters
 

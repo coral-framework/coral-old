@@ -1,0 +1,17 @@
+/*
+	For receiving notifications whenever Lua interacts with Coral services.
+
+	Currently all notifications take place after the interaction is completed
+	successfully (i.e. if no exception is raised).
+ */
+interface IInterceptor
+{
+	// Called after Lua retrieves the value of a service field.
+	void postGetField( in co.IService service, in co.IField field, in any value );
+
+	// Called after Lua modifies the value of a service field.
+	void postSetField( in co.IService service, in co.IField field, in any value );
+
+	// Called after a service method called from Lua returns.
+	void postInvoke( in co.IService service, in co.IMethod method, in any[] args, in any returnValue );
+};

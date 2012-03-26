@@ -99,29 +99,26 @@ IModulePart* ModulePartLoader::loadModulePart( const std::string& moduleName )
 
 bool ModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::string* filename )
 {
-	int n = 0;
-	std::string fileNames[2];
+	std::string fileName;
 
 #ifndef CORAL_NDEBUG
 	// 'module.name' => 'module/name/module.name_debug.dll'
-	fileNames[n].reserve( moduleName.length() + 6 + 4 );
-	fileNames[n].assign( moduleName );
-	fileNames[n].append( "_debug" MODULE_LIB_EXT );
-	++n;
-#endif
-
+	fileName.reserve( moduleName.length() + 6 + 4 );
+	fileName.assign( moduleName );
+	fileName.append( "_debug" MODULE_LIB_EXT );
+#else
 	// 'module.name' => 'module/name/module.name.dll'
-	fileNames[n].reserve( moduleName.length() + 4 );
-	fileNames[n].assign( moduleName );
-	fileNames[n].append( MODULE_LIB_EXT );
-	++n;
+	fileName.reserve( moduleName.length() + 4 );
+	fileName.assign( moduleName );
+	fileName.append( MODULE_LIB_EXT );
+#endif
 
 	std::string modulePath( moduleName );
 	OS::convertDotsToDirSeps( modulePath );
 
 	return OS::searchFile3( getPaths(),
 							Range<const std::string>( &modulePath, 1 ),
-							Range<const std::string>( fileNames, n ),
+							Range<const std::string>( &fileName, 1 ),
 							filename ? *filename : modulePath );
 }
 
