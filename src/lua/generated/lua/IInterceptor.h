@@ -32,6 +32,10 @@ public:
 	virtual void postInvoke( co::IService* service, co::IMethod* method, co::Range<co::Any const> args, const co::Any& returnValue ) = 0;
 
 	virtual void postSetField( co::IService* service, co::IField* field, const co::Any& value ) = 0;
+
+	virtual void serviceReleased( co::IService* service ) = 0;
+
+	virtual void serviceRetained( co::IService* service ) = 0;
 };
 
 } // namespace lua

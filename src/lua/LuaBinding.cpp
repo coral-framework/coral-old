@@ -516,11 +516,11 @@ void CompositeTypeBinding::getField( lua_State* L, const co::Any& instance )
 	lua_pop( L, 1 );
 	LuaState::push( L, value );
 
+	// notify interceptors
 	if( instance.getKind() == co::TK_INTERFACE )
 	{
-		size_t size = sm_interceptors.size();
-		for( size_t i = 0; i < size; ++i )
-			sm_interceptors[i]->postGetField( instance.getState().data.service, field, value );
+		for( co::Range<IInterceptor* const> r( sm_interceptors ); r; r.popFirst() )
+			r.getFirst()->postGetField( instance.getState().data.service, field, value );
 	}
 }
 
@@ -532,12 +532,12 @@ void CompositeTypeBinding::setField( lua_State* L, const co::Any& instance )
 	LuaState::getAny( L, -1, field->getType(), value );
 	reflector->setField( instance, field, value );
 	lua_pop( L, 2 );
-
+	
+	// notify interceptors
 	if( instance.getKind() == co::TK_INTERFACE )
 	{
-		size_t size = sm_interceptors.size();
-		for( size_t i = 0; i < size; ++i )
-			sm_interceptors[i]->postSetField( instance.getState().data.service, field, value );
+		for( co::Range<IInterceptor* const> r( sm_interceptors ); r; r.popFirst() )
+			r.getFirst()->postSetField( instance.getState().data.service, field, value );
 	}
 }
 
@@ -628,9 +628,8 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 
 	if( instance.getKind() == co::TK_INTERFACE )
 	{
-		size_t size = sm_interceptors.size();
-		for( size_t i = 0; i < size; ++i )
-			sm_interceptors[i]->postInvoke( instance.getState().data.service,
+		for( co::Range<IInterceptor* const> r( sm_interceptors ); r; r.popFirst() )
+			r.getFirst()->postInvoke( instance.getState().data.service,
 										method, argsRange, returnValue );
 	}
 
@@ -673,6 +672,10 @@ void ObjectBinding::create( lua_State* L, co::IObject* object )
 	// set the userdata's metatable
 	pushMetatable( L, object->getComponent() );
 	lua_setmetatable( L, -2 );
+
+	// notify interceptors
+	for( co::Range<IInterceptor* const> r( sm_interceptors ); r; r.popFirst() )
+		r.getFirst()->serviceRetained( object );
 }
 
 inline co::IPort* checkPort( lua_State* L, int index )
@@ -759,9 +762,15 @@ int ObjectBinding::gc( lua_State* L )
 	co::IObject** ud = reinterpret_cast<co::IObject**>( lua_touserdata( L, 1 ) );
 	assert( ud );
 
+	co::IObject* object = *ud;
+
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	( *ud )->serviceRelease();
+	object->serviceRelease();
+
+	// notify interceptors
+	for( co::Range<IInterceptor* const> r( sm_interceptors ); r; r.popFirst() )
+		r.getFirst()->serviceReleased( object );
 
 	return 0;
 
@@ -794,6 +803,10 @@ void ServiceBinding::create( lua_State* L, co::IService* service )
 	// set the userdata's metatable
 	pushMetatable( L, service->getInterface() );
 	lua_setmetatable( L, -2 );
+
+	// notify interceptors
+	for( co::Range<IInterceptor* const> r( sm_interceptors ); r; r.popFirst() )
+		r.getFirst()->serviceRetained( service );
 }
 
 int ServiceBinding::index( lua_State* L )
@@ -846,9 +859,15 @@ int ServiceBinding::gc( lua_State* L )
 	co::IService** ud = reinterpret_cast<co::IService**>( lua_touserdata( L, 1 ) );
 	assert( ud );
 
+	co::IService* service = *ud;
+
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	( *ud )->serviceRelease();
+	// notify interceptors
+	for( co::Range<IInterceptor* const> r( sm_interceptors ); r; r.popFirst() )
+		r.getFirst()->serviceReleased( service );
+
+	service->serviceRelease();
 
 	return 0;
 

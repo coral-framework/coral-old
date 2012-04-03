@@ -76,6 +76,22 @@ public:
 		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 2 ), range );
 	}
 
+	void serviceReleased( co::IService* service_ )
+	{
+		co::Any args[1];
+		args[0].set< co::IService* >( service_ );
+		co::Range<co::Any const> range( args, 1 );
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 3 ), range );
+	}
+
+	void serviceRetained( co::IService* service_ )
+	{
+		co::Any args[1];
+		args[0].set< co::IService* >( service_ );
+		co::Range<co::Any const> range( args, 1 );
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 4 ), range );
+	}
+
 protected:
 	template<typename T>
 	co::IField* getField( co::uint32 index )
@@ -174,6 +190,20 @@ public:
 					const co::Any& value_ = args[++argIndex].get< const co::Any& >();
 					argIndex = -1;
 					p->postSetField( service_, field_, value_ );
+				}
+				break;
+			case 3:
+				{
+					co::IService* service_ = args[++argIndex].get< co::IService* >();
+					argIndex = -1;
+					p->serviceReleased( service_ );
+				}
+				break;
+			case 4:
+				{
+					co::IService* service_ = args[++argIndex].get< co::IService* >();
+					argIndex = -1;
+					p->serviceRetained( service_ );
 				}
 				break;
 			default:

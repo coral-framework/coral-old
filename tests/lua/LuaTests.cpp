@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 #include <co/Coral.h>
+#include <co/IPort.h>
 #include <co/IField.h>
 #include <co/IMethod.h>
 #include <co/IObject.h>
@@ -18,7 +19,6 @@
 #include <lua/IState.h>
 #include <lua/Exception.h>
 #include <lua/IInterceptor.h>
-
 #include <moduleA/IHuman.h>
 
 #define ASSERT_SUCCESS( moduleName ) \
@@ -355,6 +355,18 @@ public:
 	};
 
 	std::vector<CallInfo> calls;
+	std::vector<co::IService*> retained;
+	std::vector<co::IService*> released;
+
+	void serviceRetained( co::IService* service )
+	{
+		retained.push_back( service );
+	}
+
+	void serviceReleased( co::IService* service )
+	{
+		released.push_back( service );
+	}
 
 	void postGetField( co::IService* service, co::IField* field, const co::Any& )
 	{
@@ -376,10 +388,38 @@ sg_interceptor;
 
 TEST( LuaTests, interceptor )
 {
+	// install the interceptor
 	lua::IState* luaState = co::getService<lua::IState>();
+	luaState->collectGarbage();
 	luaState->addInterceptor( &sg_interceptor );
 
-	luaState->callFunction( "lua.interceptor", "basic",
+	// test the serviceRetained() notifications
+	co::RefPtr<co::IObject> obj = co::newInstance( "moduleA.TestAnnotation" );
+	co::IService* annotation = obj->getService( "annotation" );
+
+	ASSERT_EQ( 0, sg_interceptor.retained.size() );
+	ASSERT_EQ( 0, sg_interceptor.released.size() );
+
+	co::Any args[2];
+	args[0] = obj.get();
+	args[1].set<const std::string&>( annotation->getFacet()->getName() );
+	luaState->callFunction( "lua.interceptor", "get",
+		co::Range<const co::Any>( args, 2 ), co::Range<const co::Any>() );
+
+	ASSERT_GE( sg_interceptor.retained.size(), 2 );
+	EXPECT_EQ( sg_interceptor.retained[0], obj.get() );
+	EXPECT_EQ( sg_interceptor.retained[1], annotation );
+
+	// test the serviceReleased() notifications
+	ASSERT_EQ( sg_interceptor.released.size(), 0 );
+	luaState->collectGarbage();
+	ASSERT_GE( sg_interceptor.released.size(), 2 );
+	EXPECT_EQ( sg_interceptor.released[0], annotation );
+	EXPECT_EQ( sg_interceptor.released[1], obj.get() );
+
+	// test the service call notifications
+	sg_interceptor.calls.clear();
+	luaState->callFunction( "lua.interceptor", "basicCalls",
 		co::Range<const co::Any>(), co::Range<const co::Any>() );
 
 	ASSERT_GE( sg_interceptor.calls.size(), 1 );
@@ -394,12 +434,17 @@ TEST( LuaTests, interceptor )
 	EXPECT_EQ( sg_interceptor.calls[2].service, co::getType( "int32[]" ) );
 	EXPECT_EQ( sg_interceptor.calls[2].member, co::typeOf<co::IType>::get()->getMember( "reflector" ) );
 
+	// remove the interceptor
 	luaState->removeInterceptor( &sg_interceptor );
-
 	sg_interceptor.calls.clear();
+	sg_interceptor.retained.clear();
+	sg_interceptor.released.clear();
 
-	luaState->callFunction( "lua.interceptor", "extra",
+	// make sure it is not intercepting anything anymore
+	luaState->callFunction( "lua.interceptor", "extraCalls",
 		co::Range<const co::Any>(), co::Range<const co::Any>() );
 
 	EXPECT_EQ( 0, sg_interceptor.calls.size() );
+	EXPECT_EQ( 0, sg_interceptor.retained.size() );
+	EXPECT_EQ( 0, sg_interceptor.released.size() );
 }
