@@ -99,6 +99,13 @@ TEST( LuaTests, assertTrue )
 	ASSERT_ERROR( "lua.assertTrue", "ASSERT_TRUE failed (nil value)" );
 }
 
+// --- Log Tests --- //
+
+TEST( LuaTests, log )
+{
+	ASSERT_SUCCESS( "lua.log" );
+}
+
 // --- Package Tests --- //
 
 TEST( LuaTests, coPackage )

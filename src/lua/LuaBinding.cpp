@@ -6,6 +6,7 @@
 #include "LuaBinding.h"
 #include "LuaState.h"
 #include "LuaComponent.h"
+#include <co/Log.h>
 #include <co/ISystem.h>
 #include <co/IObject.h>
 #include <co/IReflector.h>
@@ -72,6 +73,8 @@ namespace {
 void coPackage::open( lua_State* L )
 {
 	static luaL_Reg libFunctions[] = {
+		{ "logLM", logLM },
+		{ "setLogHandler", setLogHandler },
 		{ "addPath", addPath },
 		{ "getPaths", getPaths },
 		{ "findScript", findScript },
@@ -129,6 +132,46 @@ void coPackage::close( lua_State* L )
 
 	// release all type bindings
 	CompositeTypeBinding::releaseBindings( L );
+}
+
+int coPackage::logLM( lua_State* L )
+{
+	int level = luaL_checkint( L, 1 ) - 1;
+	if( level < co::LOG_INFO || level > co::LOG_FATAL )
+		return luaL_error( L, "level %d is out of range", level );
+
+	const char* message = luaL_checkstring( L, 2 );
+	CORAL_LOG_LEVEL_DEBUG( static_cast<co::LogLevel>( level ), false ) << message;
+
+	return 0;
+}
+
+void logHandler( const co::Log& log )
+{
+	lua_State* L = LuaState::getL();
+	lua_pushlightuserdata( L, reinterpret_cast<void*>( &logHandler ) );
+	lua_rawget( L, LUA_REGISTRYINDEX );
+	assert( lua_isfunction( L, -1 ) );
+	lua_pushlstring( L, log.message.c_str(), log.message.length() );
+	lua_pushinteger( L, log.level + 1 );
+	lua_pushboolean( L, log.isDebug );
+	LuaState::call( L, 3, 0 );
+}
+
+int coPackage::setLogHandler( lua_State* L )
+{
+	assert( L == LuaState::getL() );
+	co::LogHandler handler = NULL;
+	if( !lua_isnil( L, 1 ) )
+	{
+		luaL_checktype( L, 1, LUA_TFUNCTION );
+		lua_pushlightuserdata( L, reinterpret_cast<void*>( &logHandler ) );
+		lua_pushvalue( L, 1 );
+		lua_rawset( L, LUA_REGISTRYINDEX );
+		handler = logHandler;
+	}
+	co::setLogHandler( handler );
+	return 0;
 }
 
 int coPackage::addPath( lua_State* L )

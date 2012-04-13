@@ -24,6 +24,8 @@ public:
 	static void close( lua_State* L );
 
 private:
+	static int logLM( lua_State* L );
+	static int setLogHandler( lua_State* L );
 	static int addPath( lua_State* L );
 	static int getPaths( lua_State* L );
 	static int findScript( lua_State* L );
