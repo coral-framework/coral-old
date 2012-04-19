@@ -10,6 +10,7 @@
 #include <co/IMethod.h>
 #include <co/IObject.h>
 #include <co/ISystem.h>
+#include <co/IComponent.h>
 #include <co/ITypeManager.h>
 #include <co/IModuleManager.h>
 #include <co/ModuleLoadException.h>
@@ -390,6 +391,16 @@ public:
 	{
 		calls.push_back( CallInfo( service, method ) );
 	}
+
+	void postGetService( co::IObject* object, co::IPort* port, co::IService* )
+	{
+		calls.push_back( CallInfo( object, port ) );
+	}
+
+	void postSetService( co::IObject* object, co::IPort* port, co::IService* )
+	{
+		calls.push_back( CallInfo( object, port ) );
+	}
 }
 sg_interceptor;
 
@@ -426,7 +437,7 @@ TEST( LuaTests, interceptor )
 
 	// test the service call notifications
 	sg_interceptor.calls.clear();
-	luaState->callFunction( "lua.interceptor", "basicCalls",
+	luaState->callFunction( "lua.interceptor", "serviceCalls",
 		co::Range<const co::Any>(), co::Range<const co::Any>() );
 
 	ASSERT_GE( sg_interceptor.calls.size(), 1 );
@@ -441,6 +452,18 @@ TEST( LuaTests, interceptor )
 	EXPECT_EQ( sg_interceptor.calls[2].service, co::getType( "int32[]" ) );
 	EXPECT_EQ( sg_interceptor.calls[2].member, co::typeOf<co::IType>::get()->getMember( "reflector" ) );
 
+	// test the object call notifications
+	sg_interceptor.calls.clear();
+	luaState->callFunction( "lua.interceptor", "objectCalls",
+		co::Range<const co::Any>(), co::Range<const co::Any>() );
+
+	ASSERT_GE( sg_interceptor.calls.size(), 3 );
+	EXPECT_EQ( sg_interceptor.calls[0].service, sg_interceptor.calls[2].service );
+
+	co::IComponent* ct = static_cast<co::IComponent*>( co::getType( "moduleA.TestComponent" ) );
+	EXPECT_EQ( sg_interceptor.calls[0].member, ct->getMember( "transaction" ) );
+	EXPECT_EQ( sg_interceptor.calls[2].member, ct->getMember( "itf" ) );
+
 	// remove the interceptor
 	luaState->removeInterceptor( &sg_interceptor );
 	sg_interceptor.calls.clear();
@@ -448,7 +471,7 @@ TEST( LuaTests, interceptor )
 	sg_interceptor.released.clear();
 
 	// make sure it is not intercepting anything anymore
-	luaState->callFunction( "lua.interceptor", "extraCalls",
+	luaState->callFunction( "lua.interceptor", "moreCalls",
 		co::Range<const co::Any>(), co::Range<const co::Any>() );
 
 	EXPECT_EQ( 0, sg_interceptor.calls.size() );

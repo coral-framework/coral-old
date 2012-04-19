@@ -5,6 +5,7 @@
 local type = type
 local pairs = pairs
 local assert = assert
+local select = select
 local tostring = tostring
 local tsort = table.sort
 local tconcat = table.concat
@@ -96,11 +97,16 @@ local function longDump( buffer, name, key, var, tp )
 	else
 		res = formatScalar( tp, var )
 	end
-	local n = #buffer
-	buffer[n+1] = name
-	buffer[n+2] = ' = '
-	buffer[n+3] = res
-	buffer[n+4] = '\n'
+	local n = #buffer + 1
+	if name ~= '' then
+		buffer[n] = name
+		n = n + 1
+		buffer[n] = ' = '
+		n = n + 1
+	end
+	buffer[n] = res
+	n = n + 1
+	buffer[n] = '\n'
 end
 
 --------------------------------------------------------------------------------
@@ -114,17 +120,26 @@ local M = {}
  Returns a full human-readable string dump of the passed variable.
  Useful for debugging. Properly deals with tables and cycles.
 --]]
-local function dump( name, var )
-	if not var then
-		name, var = '', assert( name )
+local function dump( name, ... )
+	local hasName = ( select( '#', ... ) > 0 )
+	if hasName then
+		var = select( 1, ... )
+	else
+		name, var = '', name
 	end
+
 	local tp = type( var )
 	if tp == 'table' then
 		local stringBuffer = {}
 		longDump( stringBuffer, name, name, var, tp )
-		return tconcat( stringBuffer )
+		return tconcat( stringBuffer, '', 1, #stringBuffer - 1 )
 	else
-		return formatScalar( tp, var )
+		local res = formatScalar( tp, var )
+		if name ~= '' then
+			return name .. ' = ' .. res
+		else
+			return res
+		end
 	end
 end
 

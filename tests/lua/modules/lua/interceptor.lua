@@ -6,7 +6,7 @@ function M.get( obj, index )
 	return obj[index]
 end
 
-function M.basicCalls()
+function M.serviceCalls()
 	-- one getField() and one invoke()
 	local arrayType = co.system.types:getType( "int32[]" )
 
@@ -14,7 +14,17 @@ function M.basicCalls()
 	arrayType.reflector = nil
 end
 
-function M.extraCalls()
+function M.objectCalls()
+	local object = co.new( "moduleA.TestComponent" )
+
+	-- one getService()
+	local service = object.transaction
+
+	-- one getField() and one setService()
+	object.itf = service.interface
+end
+
+function M.moreCalls()
 	co.Type.uint64.reflector = co.Type.uint64.currentReflector
 end
 

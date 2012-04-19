@@ -757,6 +757,10 @@ int ObjectBinding::index( lua_State* L )
 		co::IPort* port = checkPort( L, -1 );
 		co::IService* service = object->getServiceAt( port );
 		LuaState::push( L, service );
+
+		// notify interceptors
+		for( co::Range<IInterceptor* const> r( sm_interceptors ); r; r.popFirst() )
+			r.getFirst()->postGetService( object, port, service );
 	}
 
 	return 1;
@@ -793,6 +797,10 @@ int ObjectBinding::newIndex( lua_State* L )
 		any.setVariable( port->getType(), co::Any::VarIsPointer|co::Any::VarIsReference, &service );
 		LuaState::getValue( L, 3, any );
 		object->setServiceAt( port, service );
+
+		// notify interceptors
+		for( co::Range<IInterceptor* const> r( sm_interceptors ); r; r.popFirst() )
+			r.getFirst()->postSetService( object, port, service );
 	}
 
 	return 0;

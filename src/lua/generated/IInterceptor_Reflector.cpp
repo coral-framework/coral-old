@@ -5,7 +5,9 @@
 
 #include <lua/IInterceptor.h>
 #include <co/IDynamicServiceProvider.h>
+#include <co/IPort.h>
 #include <co/IField.h>
+#include <co/IObject.h>
 #include <co/IMethod.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
@@ -55,6 +57,16 @@ public:
 		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 0 ), range );
 	}
 
+	void postGetService( co::IObject* object_, co::IPort* port_, co::IService* service_ )
+	{
+		co::Any args[3];
+		args[0].set< co::IObject* >( object_ );
+		args[1].set< co::IPort* >( port_ );
+		args[2].set< co::IService* >( service_ );
+		co::Range<co::Any const> range( args, 3 );
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 1 ), range );
+	}
+
 	void postInvoke( co::IService* service_, co::IMethod* method_, co::Range<co::Any const> args_, const co::Any& returnValue_ )
 	{
 		co::Any args[4];
@@ -63,7 +75,7 @@ public:
 		args[2].set< co::Range<co::Any const> >( args_ );
 		args[3].set< const co::Any& >( returnValue_ );
 		co::Range<co::Any const> range( args, 4 );
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 1 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 2 ), range );
 	}
 
 	void postSetField( co::IService* service_, co::IField* field_, const co::Any& value_ )
@@ -73,7 +85,17 @@ public:
 		args[1].set< co::IField* >( field_ );
 		args[2].set< const co::Any& >( value_ );
 		co::Range<co::Any const> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 2 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 3 ), range );
+	}
+
+	void postSetService( co::IObject* object_, co::IPort* receptable_, co::IService* service_ )
+	{
+		co::Any args[3];
+		args[0].set< co::IObject* >( object_ );
+		args[1].set< co::IPort* >( receptable_ );
+		args[2].set< co::IService* >( service_ );
+		co::Range<co::Any const> range( args, 3 );
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 4 ), range );
 	}
 
 	void serviceReleased( co::IService* service_ )
@@ -81,7 +103,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::IService* >( service_ );
 		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 3 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 5 ), range );
 	}
 
 	void serviceRetained( co::IService* service_ )
@@ -89,7 +111,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::IService* >( service_ );
 		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 4 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 6 ), range );
 	}
 
 protected:
@@ -175,6 +197,15 @@ public:
 				break;
 			case 1:
 				{
+					co::IObject* object_ = args[++argIndex].get< co::IObject* >();
+					co::IPort* port_ = args[++argIndex].get< co::IPort* >();
+					co::IService* service_ = args[++argIndex].get< co::IService* >();
+					argIndex = -1;
+					p->postGetService( object_, port_, service_ );
+				}
+				break;
+			case 2:
+				{
 					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					co::IMethod* method_ = args[++argIndex].get< co::IMethod* >();
 					co::Range<co::Any const> args_ = args[++argIndex].get< co::Range<co::Any const> >();
@@ -183,7 +214,7 @@ public:
 					p->postInvoke( service_, method_, args_, returnValue_ );
 				}
 				break;
-			case 2:
+			case 3:
 				{
 					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
@@ -192,14 +223,23 @@ public:
 					p->postSetField( service_, field_, value_ );
 				}
 				break;
-			case 3:
+			case 4:
+				{
+					co::IObject* object_ = args[++argIndex].get< co::IObject* >();
+					co::IPort* receptable_ = args[++argIndex].get< co::IPort* >();
+					co::IService* service_ = args[++argIndex].get< co::IService* >();
+					argIndex = -1;
+					p->postSetService( object_, receptable_, service_ );
+				}
+				break;
+			case 5:
 				{
 					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					argIndex = -1;
 					p->serviceReleased( service_ );
 				}
 				break;
-			case 4:
+			case 6:
 				{
 					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					argIndex = -1;
