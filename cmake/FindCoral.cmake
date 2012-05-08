@@ -19,7 +19,7 @@
 #	function CORAL_GENERATE_MODULE( generatedSourceFiles moduleName [extraDependency ...] )
 #		Generates source code, plus all required mappings, to implement the Coral module specified
 #		by moduleName. All files are generated in a dir named "generated", relative to the current
-#		CMake binary dir. Generated source files that should be added to the module's project are
+#		CMake binary dir. Generated source files that should be added to the module's target are
 #		added to the list variable indicated as the first parameter.
 #
 #	function CORAL_GENERATE_MAPPINGS( generatedHeaderFiles [typeName ...] )

@@ -663,11 +663,6 @@ void LuaState::pushArray( lua_State* L, const co::Any& var )
 	const co::Any::State& s = var.getState();
 	assert( s.kind == co::TK_ARRAY );
 
-	if( s.data.ptr == NULL )
-	{
-		lua_pushnil( L );
-	}
-
 	co::TypeKind kind = static_cast<co::TypeKind>( s.type->getKind() );
 	assert( !s.isPointer || s.type->getKind() == co::TK_INTERFACE );
 

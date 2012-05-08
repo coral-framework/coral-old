@@ -166,6 +166,7 @@ void LuaComponent::getMethod( lua_State* L, int t, co::int32 cookie )
 			ss << ", facet '" << getFacetByCookie( cookie )->getName() << "'";
 		throw lua::Exception( ss.str() );
 	}
+	assert( lua_isfunction( L, -1 ) );
 }
 
 const co::Any& LuaComponent::dynamicGetField( co::int32 cookie, co::IField* ai )
