@@ -16,8 +16,8 @@ local function writeMethod( writer, t, methodName, parameters, returnType, code 
 	writer( ")\n\t{\n\t\t", code, "\n\t}\n" )
 end
 
-local function formatGetterCode( fieldName )
-	return "return _" .. fieldName .. ";"
+local function formatGetterCode( fieldName, fieldType )
+	return "return _" .. fieldName .. ( fieldType.kind == 'TK_INTERFACE' and ".get();" or ";" )
 end
 
 local function formatSetterCode( fieldName, fieldType )
@@ -93,7 +93,7 @@ public:
 		-- Field Accessors
 		for _, field in ipairs( itf.fields ) do
 			writeMethod( writer, t, t.formatAccessor( "get", field.name ), nil,
-				field.type, formatGetterCode( field.name ) )
+				field.type, formatGetterCode( field.name, field.type ) )
 			if not field.isReadOnly then
 				writeMethod( writer, t, t.formatAccessor( "set", field.name ), { field },
 					nil, formatSetterCode( field.name, field.type ) )
@@ -118,10 +118,11 @@ public:
 
 	// ------ Receptacle ']], receptacle.name, [[' (]], receptacle.type.fullName, [[) ------ //
 ]] )
+			local fieldName = receptacle.name .. "Service"
 			writeMethod( writer, t, t.formatAccessor( "get", receptacle.name, "Service" ), nil,
-				receptacle.type, formatGetterCode( receptacle.name .. "Service" ) )
+				receptacle.type, formatGetterCode( fieldName, receptable.type ) )
 			writeMethod( writer, t, t.formatAccessor( "set", receptacle.name, "Service" ), { receptacle },
-				nil, formatSetterCode( receptacle.name, receptacle.type ) )
+				nil, formatSetterCode( fieldName, receptacle.type ) )
 		end
 	end
 
