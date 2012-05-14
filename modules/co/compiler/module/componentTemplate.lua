@@ -120,7 +120,7 @@ public:
 ]] )
 			local fieldName = receptacle.name .. "Service"
 			writeMethod( writer, t, t.formatAccessor( "get", receptacle.name, "Service" ), nil,
-				receptacle.type, formatGetterCode( fieldName, receptable.type ) )
+				receptacle.type, formatGetterCode( fieldName, receptacle.type ) )
 			writeMethod( writer, t, t.formatAccessor( "set", receptacle.name, "Service" ), { receptacle },
 				nil, formatSetterCode( fieldName, receptacle.type ) )
 		end
