@@ -20,7 +20,8 @@ static void defaultLogHandler( const Log& log )
 	const char* levelName = s_levelName[level];
 	const char* debugPrefix = log.isDebug ? "D" : "";
 
-	std::cerr << '[' << debugPrefix << levelName << "] " << log.message << ::std::endl;
+	std::ostream& os = ( level == LOG_INFO ? std::cout : std::cerr );
+	os << '[' << debugPrefix << levelName << "] " << log.message << ::std::endl;
 
 	if( level == LOG_FATAL )
 		abort();
