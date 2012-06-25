@@ -19,11 +19,11 @@ namespace co {
 
 const char* MODULE_STATE_STRINGS[] = {
 	"at an unknown state",
-	"initialized",
-	"integrated",
-	"running",
-	"disintegrated",
-	"disposed",
+	"loading [initialized]",
+	"loading [integrated]",
+	"loaded [running]",
+	"unloading [disintegrated]",
+	"unloaded [disposed]",
 	"aborted"
 };
 
