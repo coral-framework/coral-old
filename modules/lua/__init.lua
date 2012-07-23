@@ -1,20 +1,23 @@
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- The Lua module's initialization script
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 -- localize commonly used functions
+local type = type
 local error = error
 local pairs = pairs
 local ipairs = ipairs
 local tostring = tostring
 local setmetatable = setmetatable
 local strMatch = string.match
+local tconcat = table.concat
 
 local debug = require "debug"
 local rawgetmetatable = debug.getmetatable
 
 local co = co
 local coNew = co.new
+local coLogLM = co.logLM
 local coGetType = co.getType
 local coFindScript = co.findScript
 local coTypeManager = co.system.types
@@ -22,21 +25,24 @@ local coTypeTransaction = coTypeManager.transaction
 local coNewComponentType = co.newComponentType
 local coNewComponentInstance = co.newComponentInstance
 
--------------------------------------------------------------------------------
--- Because this module script is manually executed, it must register itself.
+--------------------------------------------------------------------------------
+-- Because this module script is executed manually, it must register itself.
+--------------------------------------------------------------------------------
 
 package.loaded.lua = true
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Set the Lua search path to our 'lua/packages' dir.
+--------------------------------------------------------------------------------
 
 local thisScriptFileName = ...
 local thisModuleDir = thisScriptFileName:match( "(.+)__init%.lua$" )
 local luaPackagesDir = thisModuleDir .. 'packages'
 package.path = luaPackagesDir .. "/?.lua"
 
--------------------------------------------------------------------------------
--- Install our own loader function into Lua's package.searchers table.
+--------------------------------------------------------------------------------
+-- Install our own loader function into Lua's package.searchers table
+--------------------------------------------------------------------------------
 
 table.insert( package.searchers, 2, function( moduleName )
 	local filename = coFindScript( moduleName )
@@ -49,6 +55,27 @@ table.insert( package.searchers, 2, function( moduleName )
 	end
 end )
 
+--------------------------------------------------------------------------------
+-- co.log( [level,] arg1, arg2, ... )
+--------------------------------------------------------------------------------
+
+local LogLevel = { 'INFO', 'WARNING', 'ERROR', 'FATAL' }
+
+-- reverse mapping
+for i, v in ipairs( LogLevel ) do
+	LogLevel[v] = i
+end
+
+co.LogLevel = LogLevel
+
+function co.log( level, message, catchExtras )
+	if level == nil then error( "nothing to log", 2 ) end
+	if catchExtras ~= nil then error( "co.log() takes only 2 arguments", 2 ) end
+	if not message then
+		level, message = 'WARNING', level
+	end
+	coLogLM( assert( LogLevel[level], "invalid log level" ), message )
+end
 
 --[[----------------------------------------------------------------------------
 

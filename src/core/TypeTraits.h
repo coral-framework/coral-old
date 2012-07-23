@@ -65,28 +65,31 @@ CORAL_EXPORT void setServiceByName( IObject* object, const std::string& receptac
 /****************************************************************************/
 
 //! Returns true for integer types.
-inline bool isIntegral( TypeKind k ) { return k >= TK_BOOLEAN && k <= TK_UINT64; }
+inline bool isIntegerType( TypeKind k ) { return k >= TK_BOOLEAN && k <= TK_UINT64; }
 
 //! Returns true for floating-point types.
-inline bool isFloating( TypeKind k ) { return k >= TK_FLOAT && k <= TK_DOUBLE; }
- 
+inline bool isFloatType( TypeKind k ) { return k >= TK_FLOAT && k <= TK_DOUBLE; }
+
 //! Returns true for integer and floating-point types.
-inline bool isArithmetic( TypeKind k ) { return isIntegral( k ) || isFloating( k ); }
+inline bool isNumericType( TypeKind k ) { return k >= TK_BOOLEAN && k <= TK_DOUBLE; }
 
-//! Returns true for arithmetic and enumeration types.
-inline bool isScalar( TypeKind k ) { return isArithmetic( k ) || k == TK_ENUM; }
+//! Returns true for numeric and enumeration types.
+inline bool isScalarType( TypeKind k ) { return isNumericType( k ) || k == TK_ENUM; }
 
-//! Returns true for reference types.
-inline bool isReference( TypeKind k ) { return k == TK_INTERFACE; }
+//! Returns true for value types (with deep copy semantics).
+inline bool isValueType( TypeKind k ) { return k > TK_NONE && k < TK_INTERFACE && k != TK_EXCEPTION; }
 
-//! Returns true for value types.
-inline bool isValue( TypeKind k ) { return k > TK_NONE && k < TK_INTERFACE && k != TK_EXCEPTION; }
+//! Returns true for reference types (with shallow copy semantics).
+inline bool isReferenceType( TypeKind k ) { return k == TK_INTERFACE; }
 
-//! Returns true if the type can be stored as a variable.
-inline bool isVariable( TypeKind k ) { return k > TK_NONE && k < TK_COMPONENT && k != TK_EXCEPTION; }
+//! Returns whether it is possible to declare variables and fields of this type.
+inline bool isDataType( TypeKind k ) { return k > TK_NONE && k < TK_COMPONENT && k != TK_EXCEPTION; }
 
-//! Returns true for types that support inheritance.
-inline bool hasInheritance( TypeKind k ) { return k == TK_INTERFACE; }
+//! Returns true for types that support subtyping (subtype polymorphism).
+inline bool isPolymorphicType( TypeKind k ) { return k == TK_INTERFACE; }
+
+//! Returns true for types whose variable is a scalar.
+inline bool isScalarOrRefType( TypeKind k ) { return isScalarType( k ) || isReferenceType( k ); }
 
 
 /****************************************************************************/

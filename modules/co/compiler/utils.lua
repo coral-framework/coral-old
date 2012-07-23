@@ -75,7 +75,7 @@ function M.formatInput( t )
 	local kind = t.kind
 	if kind == 'TK_ARRAY' then
 		local elem = t.elementType
-		return "co::Range<" .. elem.cppName .. ( elem.kind == 'TK_INTERFACE' and '*' or '' ) .. " const>"
+		return "co::Range<" .. elem.cppName .. ( elem.kind == 'TK_INTERFACE' and '*' or '' ) .. ">"
 	elseif kind == 'TK_INTERFACE' then
 		return t.cppName .. "*"
 	elseif kind == 'TK_STRING' or kind == 'TK_STRUCT' or kind == 'TK_NATIVECLASS' then

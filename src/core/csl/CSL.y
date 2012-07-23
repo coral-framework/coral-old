@@ -359,10 +359,10 @@ port_kind
 	;
 
 exp
-	:	BOOLEAN			{ $$ = loader.newAny(); $$->set<bool>( $1 ); }
-	|	LITERAL			{ $$ = loader.newAny(); $$->set<const std::string&>( *$1 ); }
-	|	qualified_id	{ $$ = loader.newAny(); $$->set<const std::string&>( *$1 ); }
-	|	num_exp			{ $$ = loader.newAny(); $$->set<double>( $1 ); }
+	:	BOOLEAN			{ $$ = loader.newAny(); $$->setIn<bool>( $1 ); }
+	|	LITERAL			{ $$ = loader.newAny(); $$->setIn<std::string>( *$1 ); }
+	|	qualified_id	{ $$ = loader.newAny(); $$->setIn<std::string>( *$1 ); }
+	|	num_exp			{ $$ = loader.newAny(); $$->setIn<double>( $1 ); }
 	;
 
 num_exp

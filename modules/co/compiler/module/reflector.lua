@@ -108,7 +108,7 @@ public:
 				local inputType = itf.formatInput( a.type )
 				writer( "\t", inputType, " ", itf.formatAccessor( "get", a.name ), "()\n", [[
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<]], itf.cppName, [[>( ]], i - 1, [[ ) );
+		co::Any res = _provider->dynamicGetField( _cookie, getField<]], itf.cppName, [[>( ]], i - 1, [[ ) );
         return res.get< ]], inputType, [[ >();
 	}
 
@@ -145,13 +145,13 @@ public:
 						local paramType = ( p.isOut and itf.formatOutput or itf.formatInput )( p.type )
 						writer( "\t\targs[", i - 1, "].set< ", paramType, " >( ", p.name, "_ );\n" )
 					end
-					writer( "\t\tco::Range<co::Any const> range( args, ", #params, " );\n" )
+					writer( "\t\tco::Range<co::Any> range( args, ", #params, " );\n" )
 				else
-					writer( "\t\tco::Range<co::Any const> range;\n" )
+					writer( "\t\tco::Range<co::Any> range;\n" )
 				end
 				writer( "\t\t" )
 				if m.returnType then
-					writer( "const co::Any& res = " )
+					writer( "co::Any res = " )
 				end
 				writer( "_provider->dynamicInvoke( _cookie, getMethod<", itf.cppName, ">( ", i - 1, " ), range );\n" )
 				if m.returnType then
@@ -411,7 +411,7 @@ public:
 		writer [[
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
 ]]
 		if #t.methods > 0 then

@@ -84,9 +84,6 @@ private:
 		be a reference to an instance table.
 	 */
 	int _tableRef;
-
-	// for the co::IDynamicServiceProvider methods to return values
-	co::Any _res;
 };
 
 } // namespace lua

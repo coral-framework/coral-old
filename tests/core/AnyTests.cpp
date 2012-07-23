@@ -903,7 +903,7 @@ TEST( AnyTests, setService )
 	co::IInterface* nsType = co::typeOf<co::INamespace>::get();
 
 	co::Any automatic( nsType );
-	co::Any manual( true, nsType->getInterface(), nsType );
+	co::Any manual( true, nsType->getInterface(), &nsType );
 	EXPECT_EQ( automatic, manual );
 }
 

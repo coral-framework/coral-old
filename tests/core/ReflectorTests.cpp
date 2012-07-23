@@ -207,7 +207,7 @@ TEST( ReflectorTests, structSimple )
 	}
 	catch( co::IllegalCastException& e )
 	{
-		EXPECT_EQ( "illegal cast from 'co::int32' to 'const std::string&'", e.getMessage() );
+		EXPECT_EQ( "illegal cast from 'in int32' to 'in string'", e.getMessage() );
 	}
 
 	co::Any a1;
@@ -321,7 +321,7 @@ TEST( ReflectorTests, interfaceNamespace )
 	}
 	catch( co::IllegalCastException& e )
 	{
-		EXPECT_EQ( "invalid argument #1 to method findType(): illegal cast from 'bool' to 'const std::string&'", e.getMessage() );
+		EXPECT_EQ( "invalid argument #1 to method findType(): illegal cast from 'in bool' to 'in string'", e.getMessage() );
 	}
 
 	// --- calling method defineType():
@@ -332,16 +332,6 @@ TEST( ReflectorTests, interfaceNamespace )
 	args[0].set<std::string&>( str );
 	EXPECT_THROW( reflector->invoke( coNS, defineTypeMethod, co::Range<co::Any>( args, 1 ), res ),
 				 co::MissingInputException );
-
-	// passing 2 args, but the second one is a null co::Any
-	try
-	{
-		reflector->invoke( coNS, defineTypeMethod, co::Range<co::Any>( args, 2 ), res );
-	}
-	catch( co::IllegalCastException& e )
-	{
-		EXPECT_EQ( "invalid argument #2 to method defineType(): illegal cast from '<NONE>' to 'co::TypeKind'", e.getMessage() );
-	}
 
 	// ok, now we call the method properly, but with a 3rd, unecessary argument (it should work)
 	args[1].set( co::TK_STRUCT );

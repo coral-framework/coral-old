@@ -611,22 +611,22 @@ namespace co { namespace csl {
 
   case 105:
 
-    { (yyval.any) = loader.newAny(); (yyval.any)->set<bool>( (yysemantic_stack_[(1) - (1)].b) ); }
+    { (yyval.any) = loader.newAny(); (yyval.any)->setIn<bool>( (yysemantic_stack_[(1) - (1)].b) ); }
     break;
 
   case 106:
 
-    { (yyval.any) = loader.newAny(); (yyval.any)->set<const std::string&>( *(yysemantic_stack_[(1) - (1)].str) ); }
+    { (yyval.any) = loader.newAny(); (yyval.any)->setIn<std::string>( *(yysemantic_stack_[(1) - (1)].str) ); }
     break;
 
   case 107:
 
-    { (yyval.any) = loader.newAny(); (yyval.any)->set<const std::string&>( *(yysemantic_stack_[(1) - (1)].str) ); }
+    { (yyval.any) = loader.newAny(); (yyval.any)->setIn<std::string>( *(yysemantic_stack_[(1) - (1)].str) ); }
     break;
 
   case 108:
 
-    { (yyval.any) = loader.newAny(); (yyval.any)->set<double>( (yysemantic_stack_[(1) - (1)].num) ); }
+    { (yyval.any) = loader.newAny(); (yyval.any)->setIn<double>( (yysemantic_stack_[(1) - (1)].num) ); }
     break;
 
   case 109:

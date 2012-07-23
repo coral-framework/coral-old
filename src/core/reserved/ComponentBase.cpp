@@ -38,9 +38,8 @@ IInterface* ComponentBase::getInterface()
 
 IPort* ComponentBase::getFacet()
 {
-	IPort* facet = static_cast<IPort*>( typeOf<IObject>::get()->getMember( "object" ) );
-	assert( facet );
-	return facet;
+	// the 'object' facet is implicit and has no IPort
+	return NULL;
 }
 
 void ComponentBase::checkValidPort( IPort* port )

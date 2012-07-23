@@ -132,6 +132,6 @@ TEST( AnnotationTests, invalidValueType )
 {
 	CSL_TEST_BEGIN( "AnnotationTests.InvalidValueType1" )
 	CSL_EXPECT_ERROR( "error setting annotation field 'value'", "InvalidValueType1.csl", 1 )
-	CSL_EXPECT_ERROR( "illegal cast from 'double' to 'const std::string&'", "InvalidValueType1.csl", 1 )
+	CSL_EXPECT_ERROR( "illegal cast from 'in double' to 'in string'", "InvalidValueType1.csl", 1 )
 	CSL_TEST_END()
 }

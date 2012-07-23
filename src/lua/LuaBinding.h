@@ -9,6 +9,7 @@
 #include <lua.hpp>
 #include <co/Any.h>
 #include <co/IObject.h>
+#include <lua/IInterceptor.h>
 
 namespace lua {
 
@@ -23,6 +24,8 @@ public:
 	static void close( lua_State* L );
 
 private:
+	static int logLM( lua_State* L );
+	static int setLogHandler( lua_State* L );
 	static int addPath( lua_State* L );
 	static int getPaths( lua_State* L );
 	static int findScript( lua_State* L );
@@ -63,6 +66,12 @@ public:
 		Removes all references to ICompositeType metatables from the Lua registry.
 	 */
 	static void releaseBindings( lua_State* L );
+	
+	// TODO: refactor by moving all state into LuaState
+	typedef co::RefVector<IInterceptor> InterceptorList;
+	static InterceptorList sm_interceptors;
+	static void addInterceptor( IInterceptor* interceptor );
+	static void removeInterceptor( IInterceptor* interceptor );
 
 protected:
 	/*!

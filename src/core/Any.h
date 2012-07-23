@@ -46,6 +46,7 @@ struct State
 		// Multipurpose pointers:
 		void* ptr;
 		const void* cptr;
+		co::uint8* bytes;
 		IService* service;
 	}
 	data;
@@ -385,7 +386,7 @@ public:
 	inline bool isValid() const { return _state.kind != TK_NONE; }
 
 	//! Returns the kind of variable stored in this object.
-	inline TypeKind getKind() const { return static_cast<TypeKind>( _state.kind ); }
+	inline TypeKind getKind() const { return _state.kind; }
 
 	//! Whether the stored variable is in the 'input' format.
 	inline bool isIn() const { return _state.isIn; }
@@ -462,6 +463,14 @@ public:
 		\warning If you don't specify the template variable \a T explicitly, due to language limitations
 			the compiler will generally miss the fact that a variable's type is 'const' and/or a reference.
 	 */
+
+	template<typename T>
+	inline void setIn( const T& var )
+	{
+		__any::Variable<const T&>::tag( _state );
+		__any::Variable<const T&>::set( _state, var );
+	}
+
 	template<typename T>
 	inline void set( T& var )
 	{
@@ -472,8 +481,7 @@ public:
 	template<typename T>
 	inline void set( const T& var )
 	{
-		__any::Variable<const T&>::tag( _state );
-		__any::Variable<const T&>::set( _state, var );
+		setIn<T>( var );
 	}
 
 	//@}
@@ -490,19 +498,23 @@ public:
 
 	/*!
 		Stores any variable supported by the Coral type system.
-
-		\param isIn True if the variable is in the 'input' form, false if it's in the 'output' form.
+		\param isIn Whether the variable is in the 'input' or 'output' form.
 		\param type Type of the variable.
-		\param ptr Address of the variable.
-		\param size Only used if the variable is an 'in array' or a C-string.
+		\param addr Address of the value associated with the variable.
+		\param size Only used if the variable is an input array or a C-string.
 	 */
-	void set( bool isIn, IType* type, const void* ptr, size_t size = 0 );
-
-	//@}
+	void set( bool isIn, IType* type, const void* addr, size_t size = 0 );
 
 	//@}
 	//! \name Output Arguments
 	//@{
+
+	/*!
+		Moves the given value into an output variable, making conversions when possible.
+		\throw IllegalStateException if this any does not contain an output variable.
+		\throw IllegalCastException if the value has no conversion to our variable type.
+	 */
+	void put( const Any& value ) const;
 
 	/*!
 		Prepares a co::Any for use as an 'out' argument of the specified type.
@@ -546,7 +558,7 @@ public:
 	std::string& createString();
 
 	/*!
-		Creates a std::vector (or a co::RefVector, if \a elementType is an interface)
+		Creates a std::vector (or co::RefVector, if \a elementType is a ref-type)
 		with \a n default-constructed elements of type \a elementType, and sets this
 		co::Any with a reference to the array.
 	 */
@@ -598,6 +610,9 @@ public:
 		copy( other );
 		return *this;
 	}
+
+	//! Index operator for reflective access to array elements.
+	Any operator[]( uint32 index ) const;
 
 private:
 	//! Used by setVariable()/setArray().

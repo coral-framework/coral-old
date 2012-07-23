@@ -45,11 +45,11 @@ public:
 
 	// lua.ILauncher Methods:
 
-	co::int32 main( co::Range<std::string const> args_ )
+	co::int32 main( co::Range<std::string> args_ )
 	{
 		co::Any args[1];
-		args[0].set< co::Range<std::string const> >( args_ );
-		co::Range<co::Any const> range( args, 1 );
+		args[0].set< co::Range<std::string> >( args_ );
+		co::Range<co::Any> range( args, 1 );
 		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<lua::ILauncher>( 0 ), range );
 		return res.get< co::int32 >();
 	}
@@ -117,7 +117,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any const> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
 		lua::ILauncher* p = co::checkInstance<lua::ILauncher>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -128,7 +128,7 @@ public:
 			{
 			case 0:
 				{
-					co::Range<std::string const> args_ = args[++argIndex].get< co::Range<std::string const> >();
+					co::Range<std::string> args_ = args[++argIndex].get< co::Range<std::string> >();
 					argIndex = -1;
 					res.set< co::int32 >( p->main( args_ ) );
 				}

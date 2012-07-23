@@ -10,8 +10,8 @@
 #include <co/IReflector.h>
 #include <co/IInterface.h>
 #include <co/IllegalCastException.h>
+#include <co/IllegalStateException.h>
 #include <cstdlib>
-#include <iomanip>
 #include <sstream>
 
 /****************************************************************************/
@@ -20,7 +20,7 @@
 
 namespace co {
 
-inline void* getVectorData( const __any::State& s )
+inline co::uint8* getVectorData( const __any::State& s )
 {
 	std::vector<uint8>& pv = *reinterpret_cast<std::vector<uint8>*>( s.data.ptr );
 	return &pv[0];
@@ -77,7 +77,7 @@ std::ostream& operator<<( std::ostream& out, const co::Any& a )
 	assert( s.kind != co::TK_EXCEPTION && s.kind != co::TK_COMPONENT );
 
 	// print pointer
-	if( !s.isIn || !co::isScalar( s.kind ) )
+	if( !s.isIn || !co::isScalarType( s.kind ) )
 	{
 		if( s.data.ptr == NULL )
 		{
@@ -147,12 +147,12 @@ uint32 Any::getSize() const
 	return _state.type ? _state.type->getReflector()->getSize() : 0;
 }
 
-void Any::set( bool isIn, IType* type, const void* ptr, size_t size )
+void Any::set( bool isIn, IType* type, const void* addr, size_t size )
 {
 	assert( type );
 
 	TypeKind kind = type->getKind();
-	assert( isVariable( kind ) );
+	assert( isDataType( kind ) );
 
 	if( kind == TK_ARRAY )
 		type = static_cast<IArray*>( type )->getElementType();
@@ -162,10 +162,62 @@ void Any::set( bool isIn, IType* type, const void* ptr, size_t size )
 	_state.kind = kind;
 	_state.isIn = isIn;
 
-	if( !isIn || !isScalar( kind ) )
-		_state.data.cptr = ptr;
+	if( isIn && isScalarOrRefType( kind ) && addr )
+		_state.data = *reinterpret_cast<const State::Data*>( addr );
 	else
-		_state.data.u64 = *reinterpret_cast<const uint64*>( ptr );
+		_state.data.cptr = addr;
+}
+
+template<typename T>
+inline void putValue( void* ptr, const Any& value  )
+{
+	*reinterpret_cast<T*>( ptr ) = value.get<const T&>();
+}
+
+void Any::put( const Any& value ) const
+{
+	if( !isValid() || !isOut() )
+		throw IllegalStateException( "co::Any::put() requires a valid output variable" );
+
+	switch( _state.kind )
+	{
+	case TK_ANY:			putValue<Any>( _state.data.ptr, value ); break;
+	case TK_BOOLEAN:		putValue<bool>( _state.data.ptr, value ); break;
+	case TK_INT8:			putValue<int8>( _state.data.ptr, value ); break;
+	case TK_UINT8:			putValue<uint8>( _state.data.ptr, value ); break;
+	case TK_INT16:			putValue<int16>( _state.data.ptr, value ); break;
+	case TK_UINT16:			putValue<uint16>( _state.data.ptr, value ); break;
+	case TK_INT32:			putValue<int32>( _state.data.ptr, value ); break;
+	case TK_UINT32:			putValue<uint32>( _state.data.ptr, value ); break;
+	case TK_INT64:			putValue<int64>( _state.data.ptr, value ); break;
+	case TK_UINT64:			putValue<uint64>( _state.data.ptr, value ); break;
+	case TK_FLOAT:			putValue<float>( _state.data.ptr, value ); break;
+	case TK_DOUBLE:			putValue<double>( _state.data.ptr, value ); break;
+	case TK_STRING:			putValue<std::string>( _state.data.ptr, value ); break;
+
+	case TK_ARRAY:
+		throw Exception( "Any::put() NYI for arrays" );
+		break;
+
+	case TK_ENUM:			putValue<uint32>( _state.data.ptr, value ); break;
+	case TK_STRUCT:
+	case TK_NATIVECLASS:
+		if( value.getType() != getType() )
+			THROW_ILLEGAL_CAST( value._state, _state, );
+		getType()->getReflector()->copyValues( value._state.data.ptr,
+													_state.data.ptr, 1 );
+		break;
+		
+	case TK_INTERFACE:
+		if( !getInterface()->isSubTypeOf( value.getInterface() ) )
+			THROW_ILLEGAL_CAST( value._state, _state, );
+
+		*reinterpret_cast<RefPtr<IService>*>( _state.data.ptr ) = value.get<IService*>();
+		break;
+
+	default:
+		assert( false );
+	}
 }
 
 void Any::makeOut( IType* paramType )
@@ -319,11 +371,7 @@ void Any::makeIn()
 		_state = get<const Any&>().getState();
 		_state.objectKind = objectKind;
 	}
-	else if( _state.kind == TK_INTERFACE )
-	{
-		set( true, _state.type, *reinterpret_cast<IService**>( _state.data.ptr ) );
-	}
-	else if( isScalar( _state.kind ) )
+	else if( isScalarOrRefType( _state.kind ) )
 	{
 		set( true, _state.type, _state.data.cptr );		
 	}
@@ -339,7 +387,7 @@ Any& Any::createAny()
 	}
 
 	if( _state.objectKind != TK_NONE )
-		throw Exception( "co::Any::createAny() called while a co::Any contains an object" );
+		throw IllegalStateException( "co::Any::createAny() called while a co::Any contains an object" );
 
 	Any* res = new Any();
 
@@ -582,7 +630,7 @@ bool Any::operator==( const Any& other ) const
 		return false;
 
 	// pointer comparison
-	if( isOut() || !isScalar( _state.kind ) )
+	if( isOut() || !isScalarType( _state.kind ) )
 		return ( _state.data.ptr == other._state.data.ptr );
 
 	// value comparison
@@ -606,6 +654,15 @@ bool Any::operator==( const Any& other ) const
 	}
 
 	return res;
+}
+
+Any Any::operator[]( uint32 index ) const
+{
+	assert( _state.kind == TK_ARRAY );
+	assert( index < getSize() );
+	co::uint8* ptr = _state.isIn ? _state.data.bytes : getVectorData( _state );
+	ptr += index * _state.type->getReflector()->getSize();
+	return Any( _state.isIn, _state.type, ptr );
 }
 
 void Any::cast( const State& from, State& to )
@@ -633,9 +690,9 @@ void Any::cast( const State& from, State& to )
 			return;
 		}
 	}
-	else if( isScalar( to.kind ) )
+	else if( isScalarType( to.kind ) )
 	{
-		if( isScalar( from.kind ) )
+		if( isScalarType( from.kind ) )
 		{
 			if( to.isIn )
 			{
@@ -671,7 +728,7 @@ void Any::cast( const State& from, State& to )
 		{
 			if( to.isIn )
 			{
-				if( to.type == from.type || ( hasInheritance( to.type->getKind() )
+				if( to.type == from.type || ( isPolymorphicType( to.type->getKind() )
 					&& to.type->getKind() == from.type->getKind()
 					&& from.getInterface()->isSubTypeOf( to.getInterface() ) ) )
 				{
@@ -834,8 +891,7 @@ inline void castScalar( TypeKind fromKind, const void* from, void* to )
 
 void castScalar( TypeKind fromKind, const void* from, TypeKind toKind, void* to )
 {
-	assert( isScalar( toKind ) && isScalar( fromKind ) );
-
+	assert( isScalarType( toKind ) && isScalarType( fromKind ) );
 	switch( toKind )
 	{
 	case TK_BOOLEAN:	castScalar<bool>( fromKind, from, to );		break;

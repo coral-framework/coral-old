@@ -45,11 +45,11 @@ function M:initialize( module )
 	ASSERT_TRUE( co.typeOf( co.typeOf ) == nil )
 
 	-- test findScript()
-	ASSERT_TRUE( co.findScript( "lua.coPackage.coPackage" ) )
-	ASSERT_TRUE( co.findScript( "lua.coPackage.nonExistingScript" ) == nil )
+	ASSERT_TRUE( co.findScript( "lua.scripts.sum" ) )
+	ASSERT_TRUE( co.findScript( "lua.scripts.nonExistingScript" ) == nil )
 
 	-- test findFile
-	ASSERT_TRUE( co.findFile( "lua.coPackage", "coPackage.lua" ) )
+	ASSERT_TRUE( co.findFile( "lua.coPackage", "lua.coPackage.lua" ) )
 	ASSERT_TRUE( co.findFile( "lua.coPackage", "nonExisting.lua" ) == nil )
 end
 

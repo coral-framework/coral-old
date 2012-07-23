@@ -99,52 +99,27 @@ IModulePart* ModulePartLoader::loadModulePart( const std::string& moduleName )
 
 bool ModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::string* filename )
 {
-	const char* moduleBaseName = moduleName.c_str();
-	size_t lastDotPos = moduleName.rfind( '.' );
-	if( lastDotPos != std::string::npos )
-		moduleBaseName += ( lastDotPos + 1 );
-
-	int n = 0;
-	std::string fileNames[4];
-
-	// avoid string re-alocations
-	const int PADDING = 3 + 6 + 4; // for 'lib', '_debug' and '.dll'
-	size_t reserveLen = ( moduleName.length() + ( moduleBaseName - moduleName.c_str() ) + PADDING );
+	std::string fileName;
 
 #ifndef CORAL_NDEBUG
-	// moduleName/moduleName_debug
-	fileNames[n].reserve( reserveLen );
-	fileNames[n].assign( moduleBaseName );
-	fileNames[n].append( "_debug" MODULE_LIB_EXT );
-	++n;
-
-	// moduleName/libmoduleName_debug
-	fileNames[n].reserve( reserveLen );
-	fileNames[n].assign( "lib" );
-	fileNames[n].append( moduleBaseName );
-	fileNames[n].append( "_debug" MODULE_LIB_EXT );
-	++n;
+	// 'module.name' => 'module/name/module.name_debug.dll'
+	fileName.reserve( moduleName.length() + 6 + 4 );
+	fileName.assign( moduleName );
+	fileName.append( "_debug" MODULE_LIB_EXT );
+#else
+	// 'module.name' => 'module/name/module.name.dll'
+	fileName.reserve( moduleName.length() + 4 );
+	fileName.assign( moduleName );
+	fileName.append( MODULE_LIB_EXT );
 #endif
-
-	// moduleName/moduleName
-	fileNames[n].assign( moduleBaseName );
-	fileNames[n].append( MODULE_LIB_EXT );
-	++n;
-
-	// moduleName/libmoduleName
-	fileNames[n].reserve( reserveLen );
-	fileNames[n].assign( "lib" );
-	fileNames[n].append( moduleBaseName );
-	fileNames[n].append( MODULE_LIB_EXT );
-	++n;
 
 	std::string modulePath( moduleName );
 	OS::convertDotsToDirSeps( modulePath );
 
 	return OS::searchFile3( getPaths(),
-							Range<std::string>( &modulePath, 1 ),
-							Range<std::string>( fileNames, n ),
-							filename ? *filename : modulePath );
+				Range<std::string>( &modulePath, 1 ),
+				Range<std::string>( &fileName, 1 ),
+				filename ? *filename : modulePath );
 }
 
 void ModulePartLoader::resolveModuleFunctions( Library* lib, BootstrapFunctions& bf )

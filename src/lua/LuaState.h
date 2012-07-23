@@ -88,6 +88,10 @@ public:
     LuaState();
 	virtual ~LuaState();
 
+	co::Range<lua::IInterceptor* const> getInterceptors();
+	void addInterceptor( lua::IInterceptor* interceptor );
+	void removeInterceptor( lua::IInterceptor* interceptor );
+
 	bool findScript( const std::string& name, std::string& filename );
 
 	co::int32 callFunction( const std::string& moduleName, const std::string& functionName,

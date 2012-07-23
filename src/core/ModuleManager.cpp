@@ -206,12 +206,13 @@ IModule* ModuleManager::load( const std::string& moduleName )
 		throw ModuleLoadException( ss.str() );
 	}
 
-	if( module )
-		module->initialize();
-	else
-		CORAL_THROW( ModuleLoadException,
-			"none of the module loaders recognized '" << moduleName << "' as a module" );
+	if( !module )
+	{
+		CORAL_THROW( ModuleLoadException, "no module loader recognized '" << moduleName <<
+			"' as a module (perhaps it was not compiled in " CORAL_BUILD_MODE " mode?)" );
+	}
 
+	module->initialize();
 	syncModuleWithSystemState( module );
 
 	return module;

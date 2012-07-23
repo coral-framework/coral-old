@@ -17,7 +17,7 @@ enum TypeKind
 	TK_FLOAT,			//< 32-bit (single-precision) IEEE 754 floating-point number.
 	TK_DOUBLE,			//< 64-bit (double-precision) IEEE 754 floating-point number.
 	TK_STRING,			//< 8-bit-clean string.
-	TK_ARRAY,			//< Unidimensional array of elements.
+	TK_ARRAY,			//< One-dimensional array of elements.
 	TK_ENUM,			//< Enumeration of constant identifiers.
 	TK_EXCEPTION,		//< Named exception that can be raised by methods.
 	TK_STRUCT,			//< Set of named fields of various types.

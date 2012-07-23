@@ -12,6 +12,12 @@
 #include <vector>
 #include <co/IService.h>
 
+// Forward Declarations:
+namespace lua {
+	class IInterceptor;
+} // namespace lua
+// End Of Forward Declarations
+
 // lua.IState Mapping:
 namespace lua {
 
@@ -20,11 +26,17 @@ class IState : public co::IService
 public:
 	virtual ~IState() {;}
 
-	virtual co::int32 callFunction( const std::string& moduleName, const std::string& functionName, co::Range<co::Any const> args, co::Range<co::Any const> results ) = 0;
+	virtual co::Range<lua::IInterceptor* const> getInterceptors() = 0;
+
+	virtual void addInterceptor( lua::IInterceptor* interceptor ) = 0;
+
+	virtual co::int32 callFunction( const std::string& moduleName, const std::string& functionName, co::Range<co::Any> args, co::Range<co::Any> results ) = 0;
 
 	virtual void collectGarbage() = 0;
 
 	virtual bool findScript( const std::string& name, std::string& filename ) = 0;
+
+	virtual void removeInterceptor( lua::IInterceptor* interceptor ) = 0;
 };
 
 } // namespace lua
