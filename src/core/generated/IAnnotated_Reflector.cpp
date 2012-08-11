@@ -45,7 +45,7 @@ public:
 
 	co::Range<co::IAnnotation*> getAnnotations()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ) );
         return res.get< co::Range<co::IAnnotation*> >();
 	}
 
@@ -69,7 +69,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::IInterface* >( requestedType_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
 		return res.get< co::IAnnotation* >();
 	}
 
@@ -127,7 +127,7 @@ public:
 		co::IAnnotated* p = co::checkInstance<co::IAnnotated>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::Range<co::IAnnotation*> >( p->getAnnotations() ); break;
+		case 0:		value = p->getAnnotations(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

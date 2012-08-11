@@ -181,7 +181,6 @@ void constructorRefTest( const co::TypeKind kind, const T& sampleValue, const ch
 	EXPECT_FALSE( a8.isOut() );
 	EXPECT_EQ( sizeof(T), a8.getSize() );
 	EXPECT_EQ( a8.getType()->getFullName(), expectedTypeName );
-	EXPECT_TRUE( v == a8.get<const T&>() );
 	EXPECT_EQ( v, a8.get<T>() );
 
 	// shouldn't be able to get a non-const ref

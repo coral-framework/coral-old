@@ -58,7 +58,7 @@ void Parameter::setIsOut( bool isOut )
 	_isOut = isOut;
 }
 
-const std::string& Parameter::getName()
+std::string Parameter::getName()
 {
 	return _name;
 }

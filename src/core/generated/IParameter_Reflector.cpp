@@ -44,25 +44,25 @@ public:
 
 	bool getIsIn()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 0 ) );
         return res.get< bool >();
 	}
 
 	bool getIsOut()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 1 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 1 ) );
         return res.get< bool >();
 	}
 
-	const std::string& getName()
+	std::string getName()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 2 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 2 ) );
         return res.get< const std::string& >();
 	}
 
 	co::IType* getType()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 3 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 3 ) );
         return res.get< co::IType* >();
 	}
 
@@ -120,10 +120,10 @@ public:
 		co::IParameter* p = co::checkInstance<co::IParameter>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< bool >( p->getIsIn() ); break;
-		case 1:		value.set< bool >( p->getIsOut() ); break;
-		case 2:		value.set< const std::string& >( p->getName() ); break;
-		case 3:		value.set< co::IType* >( p->getType() ); break;
+		case 0:		value = p->getIsIn(); break;
+		case 1:		value = p->getIsOut(); break;
+		case 2:		value = p->getName(); break;
+		case 3:		value = p->getType(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

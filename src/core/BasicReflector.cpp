@@ -45,7 +45,7 @@ public:
 	}
 };
 
-// ------ ClassReflector ---------------------------------------------------------
+// ------ ClassReflector -------------------------------------------------------
 
 template<typename T>
 class ClassReflector : public BasicReflector
@@ -79,9 +79,71 @@ public:
 class ArrayReflector : public BasicReflector
 {
 public:
-	ArrayReflector( IType* t ) : BasicReflector( t ) {;}
+	typedef std::vector<uint8> PseudoVector;
 
-	uint32 getSize() { return sizeof(std::vector<int>); }
+	ArrayReflector( IType* t ) : BasicReflector( t )
+	{
+		IType* elemType = static_cast<IArray*>( t )->getElementType();
+		_elemReflector = elemType->getReflector();
+		_elemSize = _elemReflector->getSize();
+	}
+
+	uint32 getSize() { return sizeof(PseudoVector); }
+
+	void createValues( void* ptr, size_t numValues )
+	{
+		createVector( ptr, numValues );
+	}
+
+	void copyValues( const void* fromPtr, void* toPtr, size_t numValues )
+	{
+		assert( numValues == 0 ); // not meaningful
+
+		destroyVector( toPtr );
+		const PseudoVector* fromV = reinterpret_cast<const PseudoVector*>( fromPtr );
+		size_t numElements = sizeToElements( fromV->size() );
+		PseudoVector* toV = createVector( toPtr, numElements );
+		if( numElements > 0 )
+			_elemReflector->copyValues( &fromV->front(), &toV->front(), numElements );
+	}
+
+	void destroyValues( void* ptr, size_t numValues )
+	{
+		assert( numValues == 0 ); // not meaningful
+		destroyVector( ptr );
+	}
+
+private:
+	inline size_t sizeToElements( size_t totalSize )
+	{
+		assert( totalSize % _elemSize == 0 );
+		return totalSize / _elemSize;
+	}
+
+	PseudoVector* createVector( void* ptr, size_t numElements )
+	{
+		PseudoVector* vec = new( ptr ) PseudoVector( numElements * _elemSize );
+		if( numElements > 0 )
+			_elemReflector->createValues( &vec->front(), numElements );
+		return vec;
+	}
+
+	void destroyVector( void* ptr )
+	{
+		PseudoVector* vec = reinterpret_cast<PseudoVector*>( ptr );
+		size_t totalSize = vec->size();
+		if( totalSize > 0 )
+		{
+			size_t numElements = sizeToElements( totalSize );
+			_elemReflector->destroyValues( &vec->front(), numElements );
+		}
+		
+		vec->~vector();
+	}
+
+private:
+	size_t _elemSize;
+	RefPtr<IReflector> _elemReflector;
 };
 
 // ------ InternalComponentReflector -------------------------------------------
@@ -104,7 +166,7 @@ public:
 IReflector* BasicReflector::create( IType* t )
 {
 	assert( t );
-	
+
 	IReflector* r = NULL;
 	switch( t->getKind() )
 	{

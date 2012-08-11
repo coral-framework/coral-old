@@ -25,14 +25,14 @@ static void fillArgs( co::Any* any, size_t count, size_t dim )
 
 	assert( count <= MAX_ARGS && dim < NUM_DIMS );
 
-	if( count-- ) any++->set( 3.14 );
-	if( count-- ) any++->set( true );
-	if( count-- ) any++->set<short>( -8 );
-	if( count-- ) any++->set<std::string&>( sStrings[dim] );
-	if( count-- ) any++->set( co::getSystem()->getTypes() );
-	if( count-- ) any++->set<co::CSLError&>( sCSLErrors[dim] );
-	if( count-- ) any++->set( co::getPaths() );
-	if( count-- ) any++->set<co::Uuid&>( sUuids[dim] );
+	if( count-- ) *any++ = 3.14;
+	if( count-- ) *any++ = true;
+	if( count-- ) *any++ = -8;
+	if( count-- ) *any++ = sStrings[dim];
+	if( count-- ) *any++ = co::getSystem()->getTypes();
+	if( count-- ) *any++ = sCSLErrors[dim];
+	if( count-- ) *any++ = co::getPaths();
+	if( count-- ) *any++ = sUuids[dim];
 }
 
 TEST( PerformanceTests, callLuaFunction )

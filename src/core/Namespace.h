@@ -29,8 +29,8 @@ public:
 	void removeType( IType* type );
 
 	// INamespace methods:
-	const std::string& getName();
-	const std::string& getFullName();
+	std::string getName();
+	std::string getFullName();
 	INamespace* getParentNamespace();
 	Range<IType*> getTypes();
 	Range<INamespace*> getChildNamespaces();

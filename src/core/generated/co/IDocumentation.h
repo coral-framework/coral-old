@@ -17,13 +17,13 @@ class IDocumentation : public co::IAnnotation
 public:
 	virtual ~IDocumentation() {;}
 
-	virtual const std::string& getValue() = 0;
+	virtual std::string getValue() = 0;
 
 	virtual void setValue( const std::string& value ) = 0;
 
 	virtual void addDocFor( const std::string& element, const std::string& text ) = 0;
 
-	virtual const std::string& getDocFor( const std::string& element ) = 0;
+	virtual std::string getDocFor( const std::string& element ) = 0;
 };
 
 } // namespace co

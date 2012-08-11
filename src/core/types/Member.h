@@ -36,7 +36,7 @@ public:
 	}
 
 	// co::IMember methods:
-	const std::string& getName() { return _name; }
+	std::string getName() { return _name; }
 	ICompositeType* getOwner() { return _owner; }
 	uint16 getIndex() { return _index; }
 

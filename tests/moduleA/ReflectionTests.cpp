@@ -51,12 +51,12 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 
 	// --- in-place allocation:
 	co::uint8 memoryArea[sizeof(moduleA::TestStruct)];
-	moduleA::TestStruct* ts = reinterpret_cast<moduleA::TestStruct*>( memoryArea );
-	reflector->createValues( ts, 1 );
+	moduleA::TestStruct& ts = *reinterpret_cast<moduleA::TestStruct*>( memoryArea );
+	reflector->createValues( &ts, 1 );
 
-	EXPECT_FALSE( ts->aType.isValid() );
-	EXPECT_EQ( 0, ts->floatArray.size() );
-	EXPECT_EQ( 0, ts->typeArray.size() );
+	EXPECT_FALSE( ts.aType.isValid() );
+	EXPECT_EQ( 0, ts.floatArray.size() );
+	EXPECT_EQ( 0, ts.typeArray.size() );
 
 	// --- obtain the necessary fields:
 	co::IField* aTypeField = getField( type, "aType" );
@@ -70,8 +70,8 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 
 	// --- field setting:
 	reflector->setField( ts, aTypeField, co::getType( "co.IArray" ) );
-	ASSERT_TRUE( ts->aType.isValid() );
-	EXPECT_EQ( "co.IArray", ts->aType->getFullName() );
+	ASSERT_TRUE( ts.aType.isValid() );
+	EXPECT_EQ( "co.IArray", ts.aType->getFullName() );
 
 	std::vector<co::IType*> typeVec;
 	typeVec.push_back( co::getType( "co.IMember" ) );
@@ -84,10 +84,10 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 	EXPECT_THROW( reflector->setField( ts, floatArrayField, typeVecAny ), co::IllegalCastException );
 	EXPECT_NO_THROW( reflector->setField( ts, typeArrayField, typeVecAny ) );
 
-	ASSERT_EQ( 3, ts->typeArray.size() );
-	EXPECT_EQ( "co.IMember", ts->typeArray[0]->getFullName() );
-	EXPECT_EQ( "co.IField", ts->typeArray[1]->getFullName() );
-	EXPECT_EQ( "co.IMethod", ts->typeArray[2]->getFullName() );
+	ASSERT_EQ( 3, ts.typeArray.size() );
+	EXPECT_EQ( "co.IMember", ts.typeArray[0]->getFullName() );
+	EXPECT_EQ( "co.IField", ts.typeArray[1]->getFullName() );
+	EXPECT_EQ( "co.IMethod", ts.typeArray[2]->getFullName() );
 
 	// --- field getting:
 	co::Any res;
@@ -98,9 +98,9 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 	reflector->getField( ts, floatArrayField, res );
 	EXPECT_EQ( 0, res.get< co::Range<float> >().getSize() );
 
-	ts->floatArray.push_back( 1.1f );
-	ts->floatArray.push_back( 2.2f );
-	ts->floatArray.push_back( 3.3f );
+	ts.floatArray.push_back( 1.1f );
+	ts.floatArray.push_back( 2.2f );
+	ts.floatArray.push_back( 3.3f );
 
 	reflector->getField( ts, floatArrayField, res );
 	ASSERT_EQ( 3, res.get< co::Range<float> >().getSize() );
@@ -109,7 +109,7 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 	EXPECT_EQ( 3.3f, res.get< co::Range<float> >()[2] );
 
 	// --- in-place destruction:
-	reflector->destroyValues( ts, 1 );
+	reflector->destroyValues( &ts, 1 );
 }
 
 TEST( ReflectionTests, getAndBindComponentInterfaces )

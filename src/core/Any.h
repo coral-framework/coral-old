@@ -611,6 +611,28 @@ public:
 		return *this;
 	}
 
+	inline Any& operator=( Any& other )
+	{
+		copy( other );
+		return *this;
+	}
+
+	template<typename T>
+	inline Any& operator=( const T& v )
+	{
+		set<T>( v );
+		makeOut( NULL );
+		return *this;
+	}
+
+	template<typename T>
+	inline Any& operator=( T& v )
+	{
+		set<T>( v );
+		makeOut( NULL );
+		return *this;
+	}
+
 	//! Index operator for reflective access to array elements.
 	Any operator[]( uint32 index ) const;
 

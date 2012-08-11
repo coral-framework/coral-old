@@ -28,19 +28,15 @@ class ISystem : public co::IService
 public:
 	virtual ~ISystem() {;}
 
-	// Code From <c++ Block:
+	//! Convenience method to setup the entire system without requiring any module.
+	inline void setup() { setup( Range<std::string>() ); }
 	
-		//! Convenience method to setup the entire system without requiring any module.
-		inline void setup() { setup( Range<std::string>() ); }
-
-		//! Convenience method to setup the entire system.
-		inline void setup( Range<std::string> requiredModules )
-		{
-			setupBase( requiredModules );
-			setupPresentation();
-		}
-	
-	// End Of c++> Block
+	//! Convenience method to setup the entire system.
+	inline void setup( Range<std::string> requiredModules )
+	{
+		setupBase( requiredModules );
+		setupPresentation();
+	}
 
 	virtual co::IModuleManager* getModules() = 0;
 

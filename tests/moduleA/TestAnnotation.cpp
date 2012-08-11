@@ -21,7 +21,7 @@ public:
 	bool getB() { return _b; }
 	void setB( bool b ) { _b = b; }
 
-	const co::CSLError& getCslError() { return _cslError; }
+	co::CSLError getCslError() { return _cslError; }
 	void setCslError( const co::CSLError& cslError ) { _cslError = cslError; }
 
 	double getDbl() { return _dbl; }
@@ -53,13 +53,13 @@ public:
 	void setI8( co::int8 i8 ) { _i8 = i8; }
 
 	double getReadOnlyDbl() { return 3.14; }
-	const std::string& getReadOnlyStr()
+	std::string getReadOnlyStr()
 	{
 		static std::string s_str( "My read-only string" );
 		return s_str;
 	}
 
-	const std::string& getStr() { return _str; }
+	std::string getStr() { return _str; }
 	void setStr( const std::string& str ) { _str = str; }
 
 	co::Range<std::string> getStrArray()
@@ -90,10 +90,10 @@ public:
 	co::uint8 getU8() { return _u8; }
 	void setU8( co::uint8 u8 ) { _u8 = u8; }
 
-	const co::Uuid& getUuid() { return _uuid; }
+	co::Uuid getUuid() { return _uuid; }
 	void setUuid( const co::Uuid& uuid ) { _uuid = uuid; }
 
-	const Vec2D& getVec2D() { return _vec2d; }
+	Vec2D getVec2D() { return _vec2d; }
 	void setVec2D( const Vec2D& vec2d ) { _vec2d = vec2d; }
 
 	double getValue() { return _value; }

@@ -271,13 +271,13 @@ void LuaState::push( lua_State* L, const co::Any& var, int depth )
 		}
 		break;
 	case co::TK_STRUCT:
-		StructBinding::push( L, static_cast<co::IStruct*>( s.type ), s.data.ptr );
+		StructBinding::push( L, static_cast<co::IStruct*>( s.type ), d->ptr );
 		break;
 	case co::TK_NATIVECLASS:
-		NativeClassBinding::push( L, static_cast<co::INativeClass*>( s.type ), s.data.ptr );
+		NativeClassBinding::push( L, static_cast<co::INativeClass*>( s.type ), d->ptr );
 		break;
 	case co::TK_INTERFACE:
-		push( L, s.data.service );
+		push( L, d->service );
 		break;
 	default:
 		assert( false );
@@ -322,12 +322,12 @@ inline void LuaState::pushInstance( lua_State* L, InstanceType* ptr )
 	lua_remove( L, -2 );
 }
 
-void LuaState::push( lua_State* L, co::IService* itf )
+void LuaState::push( lua_State* L, co::IService* service )
 {
-	if( itf && itf->getInterface()->getFullName() == "co.IObject" )
-		push( L, static_cast<co::IObject*>( itf ) );
+	if( service && service->getInterface()->getFullName() == "co.IObject" )
+		push( L, static_cast<co::IObject*>( service ) );
 	else
-		pushInstance<ServiceBinding, co::IService>( L, itf );
+		pushInstance<ServiceBinding, co::IService>( L, service );
 }
 
 void LuaState::push( lua_State* L, co::IObject* object )

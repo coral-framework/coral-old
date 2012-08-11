@@ -17,7 +17,7 @@ class IInclude : public co::IAnnotation
 public:
 	virtual ~IInclude() {;}
 
-	virtual const std::string& getValue() = 0;
+	virtual std::string getValue() = 0;
 
 	virtual void setValue( const std::string& value ) = 0;
 };

@@ -43,7 +43,7 @@ ITypeBuilder* MethodBuilder::getTypeBuilder()
 	return _typeBuilder.get();
 }
 
-const std::string& MethodBuilder::getMethodName()
+std::string MethodBuilder::getMethodName()
 {
 	return _name;
 }

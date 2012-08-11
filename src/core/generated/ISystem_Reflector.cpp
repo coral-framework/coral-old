@@ -46,25 +46,25 @@ public:
 
 	co::IModuleManager* getModules()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 0 ) );
         return res.get< co::IModuleManager* >();
 	}
 
 	co::IServiceManager* getServices()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 1 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 1 ) );
         return res.get< co::IServiceManager* >();
 	}
 
 	co::SystemState getState()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 2 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 2 ) );
         return res.get< co::SystemState >();
 	}
 
 	co::ITypeManager* getTypes()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 3 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 3 ) );
         return res.get< co::ITypeManager* >();
 	}
 
@@ -142,10 +142,10 @@ public:
 		co::ISystem* p = co::checkInstance<co::ISystem>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::IModuleManager* >( p->getModules() ); break;
-		case 1:		value.set< co::IServiceManager* >( p->getServices() ); break;
-		case 2:		value.set< co::SystemState >( p->getState() ); break;
-		case 3:		value.set< co::ITypeManager* >( p->getTypes() ); break;
+		case 0:		value = p->getModules(); break;
+		case 1:		value = p->getServices(); break;
+		case 2:		value = p->getState(); break;
+		case 3:		value = p->getTypes(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

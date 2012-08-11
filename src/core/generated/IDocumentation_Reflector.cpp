@@ -43,9 +43,9 @@ public:
 
 	// co.IDocumentation Methods:
 
-	const std::string& getValue()
+	std::string getValue()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IDocumentation>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IDocumentation>( 0 ) );
         return res.get< const std::string& >();
 	}
 
@@ -65,12 +65,12 @@ public:
 		_provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 0 ), range );
 	}
 
-	const std::string& getDocFor( const std::string& element_ )
+	std::string getDocFor( const std::string& element_ )
 	{
 		co::Any args[1];
 		args[0].set< const std::string& >( element_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 1 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 1 ), range );
 		return res.get< const std::string& >();
 	}
 
@@ -128,7 +128,7 @@ public:
 		co::IDocumentation* p = co::checkInstance<co::IDocumentation>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< const std::string& >( p->getValue() ); break;
+		case 0:		value = p->getValue(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

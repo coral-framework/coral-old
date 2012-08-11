@@ -63,7 +63,7 @@ public:
 		co::Uuid* p = co::checkInstance<co::Uuid>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< bool >( co::Uuid_Adapter::getIsNull( *p ) ); break;
+		case 0:		value = co::Uuid_Adapter::getIsNull( *p ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

@@ -14,6 +14,9 @@
 #include <cstdlib>
 #include <sstream>
 
+#include <co/ISystem.h>
+#include <co/ITypeManager.h>
+
 /****************************************************************************/
 /* General Utility Functions                                                */
 /****************************************************************************/
@@ -163,9 +166,20 @@ void Any::set( bool isIn, IType* type, const void* addr, size_t size )
 	_state.isIn = isIn;
 
 	if( isIn && isScalarOrRefType( kind ) && addr )
-		_state.data = *reinterpret_cast<const State::Data*>( addr );
+	{
+		if( kind <= TK_UINT8 )
+			_state.data.u8 = *reinterpret_cast<const uint8*>( addr );
+		else if( kind <= TK_UINT16 )
+			_state.data.u16 = *reinterpret_cast<const uint16*>( addr );
+		else if( kind <= TK_UINT32 || kind == TK_FLOAT || kind == TK_ENUM )
+			_state.data.u32 = *reinterpret_cast<const uint32*>( addr );
+		else
+			_state.data = *reinterpret_cast<const State::Data*>( addr );
+	}
 	else
+	{
 		_state.data.cptr = addr;
+	}
 }
 
 template<typename T>
@@ -222,6 +236,14 @@ void Any::put( const Any& value ) const
 
 void Any::makeOut( IType* paramType )
 {
+	if( !paramType )
+	{
+		paramType = getType();
+		TypeKind kind = getKind();
+		if( kind == co::TK_ARRAY )
+			paramType = co::getSystem()->getTypes()->getArrayOf( paramType );
+	}
+
 	TypeKind paramKind = paramType->getKind();
 	switch( paramKind )
 	{
@@ -325,9 +347,18 @@ void Any::makeOut( IType* paramType )
 
 	case TK_ARRAY:
 		if( isValid() )
-			assert( getKind() == TK_ARRAY && isOut() );
+		{
+			size_t size = getSize();
+			void* prevData = _state.isIn ? _state.data.bytes : getVectorData( _state );
+			co::IType* elemType = static_cast<IArray*>( paramType )->getElementType();
+			set( false, paramType, &createArray( elemType, size ) );
+			void* newData = getVectorData( _state );
+			elemType->getReflector()->copyValues( prevData, newData, size );
+		}
 		else
+		{
 			set( false, paramType, &createArray( static_cast<IArray*>( paramType )->getElementType() ) );
+		}
 		break;
 
 	case TK_ENUM:
@@ -342,7 +373,9 @@ void Any::makeOut( IType* paramType )
 		if( isValid() )
 		{
 			assert( paramType == _state.type );
-			_state.isIn = false;
+			void* prev = _state.data.ptr;
+			createComplexValue( paramType );
+			_object.complex.reflector->copyValues( prev, _state.data.ptr, 1 );
 		}
 		else
 		{
@@ -352,8 +385,10 @@ void Any::makeOut( IType* paramType )
 
 	case TK_INTERFACE:
 		_state.objectKind = TK_INTERFACE;
-		_object.data.ptr = _state.data.ptr;
-		set( false, paramType, &_object.data.ptr );
+		_object.data.service = _state.data.service;
+		if( !_state.isIn && _object.data.service )
+			_object.data.service = *reinterpret_cast<IService**>( _object.data.service );
+		set( false, paramType, &_object.data.service );
 		break;
 
 	default:
@@ -660,7 +695,11 @@ Any Any::operator[]( uint32 index ) const
 {
 	assert( _state.kind == TK_ARRAY );
 	assert( index < getSize() );
-	co::uint8* ptr = _state.isIn ? _state.data.bytes : getVectorData( _state );
+	co::uint8* ptr;
+	if( _state.isIn )
+		ptr = _state.data.bytes;
+	else
+		ptr = getVectorData( _state );
 	ptr += index * _state.type->getReflector()->getSize();
 	return Any( _state.isIn, _state.type, ptr );
 }
@@ -775,6 +814,23 @@ void Any::copy( const Any& other )
 		case TK_ANY:
 			createAny() = *reinterpret_cast<Any*>( other._object.data.ptr );
 			break;
+		
+		case TK_BOOLEAN:
+		case TK_INT8:
+		case TK_UINT8:
+		case TK_INT16:
+		case TK_UINT16:
+		case TK_INT32:
+		case TK_UINT32:
+		case TK_INT64:
+		case TK_UINT64:
+		case TK_FLOAT:
+		case TK_DOUBLE:
+		case TK_ENUM:
+			_object.data = _state.data;
+			_state.data.ptr = &_object.data;
+			_state.objectKind = other._state.objectKind;
+			break;
 
 		case TK_STRING:
 			createString() = *reinterpretPtr<const std::string>( other._object.stringArea );
@@ -852,6 +908,12 @@ void Any::copy( const Any& other )
 		case TK_NATIVECLASS:
 			other._object.complex.reflector->copyValues( other._object.complex.inplaceArea,
 					createComplexValue( other._object.complex.reflector->getType() ), 1 );
+			break;
+
+		case TK_INTERFACE:
+			_object.data.service = other._object.data.service;
+			_state.data.ptr = &_object.data.service;
+			_state.objectKind = TK_INTERFACE;
 			break;
 
 		default:

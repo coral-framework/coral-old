@@ -83,7 +83,7 @@ TEST( TypeLoaderTests, syntaxError )
 	CSL_TEST_END()
 }
 
-const std::string& getDoc( const char* typeName, const char* memberName )
+std::string getDoc( const char* typeName, const char* memberName )
 {
 	co::IType* t = co::getType( typeName );
 	assert( t );
@@ -109,10 +109,10 @@ TEST( TypeLoaderTests, enumDocs )
 
 	CSL_TEST( "TypeLoaderTests.Documented.Enum" );
 	
-	const std::string& enumDoc = getDoc( "TypeLoaderTests.Documented.Enum", NULL );
-	const std::string& firstDoc = getDoc( "TypeLoaderTests.Documented.Enum", "first" );
-	const std::string& secondDoc = getDoc( "TypeLoaderTests.Documented.Enum", "second" );
-	const std::string& thirdDoc = getDoc( "TypeLoaderTests.Documented.Enum", "third" );
+	std::string enumDoc = getDoc( "TypeLoaderTests.Documented.Enum", NULL );
+	std::string firstDoc = getDoc( "TypeLoaderTests.Documented.Enum", "first" );
+	std::string secondDoc = getDoc( "TypeLoaderTests.Documented.Enum", "second" );
+	std::string thirdDoc = getDoc( "TypeLoaderTests.Documented.Enum", "third" );
 	
 	EXPECT_EQ( "This is the Enum Declaration", enumDoc );
 	EXPECT_EQ( "doc for first.\nsecond doc for first.", firstDoc );

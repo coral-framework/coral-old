@@ -44,7 +44,7 @@ public:
 
 	co::Range<co::ITypeBuilder*> getTypeBuilders()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ITypeTransaction>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ITypeTransaction>( 0 ) );
         return res.get< co::Range<co::ITypeBuilder*> >();
 	}
 
@@ -114,7 +114,7 @@ public:
 		co::ITypeTransaction* p = co::checkInstance<co::ITypeTransaction>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::Range<co::ITypeBuilder*> >( p->getTypeBuilders() ); break;
+		case 0:		value = p->getTypeBuilders(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

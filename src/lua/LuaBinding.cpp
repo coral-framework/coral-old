@@ -548,7 +548,7 @@ void CompositeTypeBinding::getField( lua_State* L, const co::Any& instance )
 {
 	co::IField* field = checkField( L, -1 );
 	co::IReflector* reflector = field->getOwner()->getReflector();
-	co::Any value;
+	co::AnyValue value;
 	reflector->getField( instance, field, value );
 	lua_pop( L, 1 );
 	LuaState::push( L, value );
@@ -657,7 +657,8 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 	}
 
 	// invoke the method
-	co::Any instance, returnValue;
+	co::Any instance;
+	co::AnyValue returnValue;
 	tryGetInstance( L, 1, instance );
 	co::IReflector* reflector = method->getOwner()->getReflector();
 

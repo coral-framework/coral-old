@@ -32,7 +32,7 @@ public:
 
 	// IMethodBuilder methods:
 	ITypeBuilder* getTypeBuilder();
-	const std::string& getMethodName();
+	std::string getMethodName();
 	void defineReturnType( IType* type );
 	void defineParameter( const std::string& name, IType* type, bool input, bool output );
 	void defineException( IException* exception );

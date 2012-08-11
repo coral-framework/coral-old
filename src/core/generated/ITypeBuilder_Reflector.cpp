@@ -47,26 +47,26 @@ public:
 
 	co::TypeKind getKind()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 0 ) );
         return res.get< co::TypeKind >();
 	}
 
 	co::INamespace* getNamespace()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 1 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 1 ) );
         return res.get< co::INamespace* >();
 	}
 
-	const std::string& getTypeName()
+	std::string getTypeName()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 2 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 2 ) );
         return res.get< const std::string& >();
 	}
 
 	co::IType* createType()
 	{
 		co::Range<co::Any> range;
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 0 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 0 ), range );
 		return res.get< co::IType* >();
 	}
 
@@ -101,7 +101,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 4 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 4 ), range );
 		return res.get< co::IMethodBuilder* >();
 	}
 
@@ -169,9 +169,9 @@ public:
 		co::ITypeBuilder* p = co::checkInstance<co::ITypeBuilder>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::TypeKind >( p->getKind() ); break;
-		case 1:		value.set< co::INamespace* >( p->getNamespace() ); break;
-		case 2:		value.set< const std::string& >( p->getTypeName() ); break;
+		case 0:		value = p->getKind(); break;
+		case 1:		value = p->getNamespace(); break;
+		case 2:		value = p->getTypeName(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

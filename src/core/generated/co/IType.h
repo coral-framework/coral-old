@@ -26,17 +26,17 @@ class IType : public co::IAnnotated
 public:
 	virtual ~IType() {;}
 
-	virtual const co::Uuid& getBinarySignature() = 0;
+	virtual co::Uuid getBinarySignature() = 0;
 
 	virtual co::IReflector* getCurrentReflector() = 0;
 
-	virtual const std::string& getFullName() = 0;
+	virtual std::string getFullName() = 0;
 
-	virtual const co::Uuid& getFullSignature() = 0;
+	virtual co::Uuid getFullSignature() = 0;
 
 	virtual co::TypeKind getKind() = 0;
 
-	virtual const std::string& getName() = 0;
+	virtual std::string getName() = 0;
 
 	virtual co::INamespace* getNamespace() = 0;
 

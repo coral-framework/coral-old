@@ -30,33 +30,29 @@ class IReflector : public co::IService
 public:
 	virtual ~IReflector() {;}
 
-	// Code From <c++ Block:
+	//------ Manipulation of Values (only available from C++) ------//
 	
-		//------ Manipulation of Values (only available from C++) ------//
-
-		/*!
-			Constructs an array of values in the memory area starting at \a ptr.
-			\pre The memory area at \a ptr should be at least \a numValues * \a size bytes big.
-			\throw NotSupportedException if this \a type does not have a value form.
-		 */
-		virtual void createValues( void* ptr, size_t numValues ) = 0;
-
-		/*!
-			Copies an array of \a numValues values from \a fromPtr to \a toPtr.
-			\note Each copy is done using the value's assignment operator.
-			\pre Both arrays must contain at least \a numValues properly constructed values of this type.
-			\throw NotSupportedException if this \a type does not have a value form.
-		 */
-		virtual void copyValues( const void* fromPtr, void* toPtr, size_t numValues ) = 0;
-
-		/*!
-			Destructs an array of \a numValues values starting at \a ptr.
-			\pre The array must contain at least \a numValues values constructed with createValues().
-			\throw NotSupportedException if this \a type does not have a value form.
-		 */
-		virtual void destroyValues( void* ptr, size_t numValues ) = 0;
+	/*!
+	 Constructs an array of values in the memory area starting at \a ptr.
+	 \pre The memory area at \a ptr should be at least \a numValues * \a size bytes big.
+	 \throw NotSupportedException if this \a type does not have a value form.
+	 */
+	virtual void createValues( void* ptr, size_t numValues ) = 0;
 	
-	// End Of c++> Block
+	/*!
+	 Copies an array of \a numValues values from \a fromPtr to \a toPtr.
+	 \note Each copy is done using the value's assignment operator.
+	 \pre Both arrays must contain at least \a numValues properly constructed values of this type.
+	 \throw NotSupportedException if this \a type does not have a value form.
+	 */
+	virtual void copyValues( const void* fromPtr, void* toPtr, size_t numValues ) = 0;
+	
+	/*!
+	 Destructs an array of \a numValues values starting at \a ptr.
+	 \pre The array must contain at least \a numValues values constructed with createValues().
+	 \throw NotSupportedException if this \a type does not have a value form.
+	 */
+	virtual void destroyValues( void* ptr, size_t numValues ) = 0;
 
 	virtual co::uint32 getSize() = 0;
 

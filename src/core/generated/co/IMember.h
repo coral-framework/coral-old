@@ -28,7 +28,7 @@ public:
 
 	virtual co::MemberKind getKind() = 0;
 
-	virtual const std::string& getName() = 0;
+	virtual std::string getName() = 0;
 
 	virtual co::ICompositeType* getOwner() = 0;
 };

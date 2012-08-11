@@ -105,10 +105,11 @@ public:
 
 			-- Field Accessors
 			for i, a in ipairs( itf.fields ) do
+				local at = a.type
 				local inputType = itf.formatInput( a.type )
-				writer( "\t", inputType, " ", itf.formatAccessor( "get", a.name ), "()\n", [[
+				writer( "\t", itf.formatResult( at ), " ", itf.formatAccessor( "get", a.name ), "()\n", [[
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<]], itf.cppName, [[>( ]], i - 1, [[ ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<]], itf.cppName, [[>( ]], i - 1, [[ ) );
         return res.get< ]], inputType, [[ >();
 	}
 
@@ -127,8 +128,7 @@ public:
 
 			-- Methods
 			for i, m in ipairs( itf.methods ) do
-				local formattedReturnType = itf.formatInput( m.returnType )
-				writer( "\t", formattedReturnType, " ", m.name, "(" )
+				writer( "\t", itf.formatResult( m.returnType ), " ", m.name, "(" )
 				local params = m.parameters
 				if #params > 0 then
 					writer( " " )
@@ -151,11 +151,11 @@ public:
 				end
 				writer( "\t\t" )
 				if m.returnType then
-					writer( "co::Any res = " )
+					writer( "co::AnyValue res = " )
 				end
 				writer( "_provider->dynamicInvoke( _cookie, getMethod<", itf.cppName, ">( ", i - 1, " ), range );\n" )
 				if m.returnType then
-					writer( "\t\treturn res.get< ", formattedReturnType, " >();\n" )
+					writer( "\t\treturn res.get< ", itf.formatInput( m.returnType ), " >();\n" )
 				end
 				writer( "\t}\n\n" )
 			end
@@ -315,9 +315,7 @@ public:
 		{
 ]] )
 		for i, a in ipairs( t.fields ) do
-			local inputType = t.formatInput( a.type )
-			local optionalGet = ( a.type.kind == 'TK_INTERFACE' and ".get()" or "" )
-			writer( "\t\tcase ", a.index, ":\t\tvalue.set< ", inputType, " >( p->", a.name, optionalGet, " ); break;\n" )
+			writer( "\t\tcase ", a.index, ":\t\tvalue = p->", a.name, "; break;\n" )
 		end
 
 		writer( [[
@@ -358,8 +356,8 @@ public:
 		{
 ]] )
 			for i, a in ipairs( t.fields ) do
-				writer( "\t\tcase ", a.index, ":\t\tvalue.set< ", t.formatInput( a.type ), " >( ", callPrefix,
-					t.formatAccessor( "get", a.name ), "(", ( t.kind == 'TK_NATIVECLASS' and " *p " or "" ), ") ); break;\n" )
+				writer( "\t\tcase ", a.index, ":\t\tvalue = ", callPrefix,
+					t.formatAccessor( "get", a.name ), "(", ( t.kind == 'TK_NATIVECLASS' and " *p " or "" ), "); break;\n" )
 			end
 
 			writer [[
@@ -434,7 +432,7 @@ public:
 				end
 				writer( "\t\t\t\t\t" )
 				if m.returnType then
-					writer( "res.set< ", t.formatInput( m.returnType ), " >( " )
+					writer( "res = " )
 				end
 				writer( callPrefix, m.name )
 				if #m.parameters > 0 then
@@ -450,9 +448,6 @@ public:
 					writer( "( *p )" )
 				else
 					writer( "()" )
-				end
-				if m.returnType then
-					writer( " )" )
 				end
 				writer( ";\n\t\t\t\t}\n\t\t\t\tbreak;\n" )
 			end

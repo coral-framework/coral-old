@@ -48,13 +48,13 @@ public:
 
 	co::INamespace* getRootNS()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 0 ) );
         return res.get< co::INamespace* >();
 	}
 
 	co::ITypeTransaction* getTransaction()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 1 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 1 ) );
         return res.get< co::ITypeTransaction* >();
 	}
 
@@ -63,7 +63,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( fullName_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 0 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 0 ), range );
 		return res.get< co::INamespace* >();
 	}
 
@@ -72,7 +72,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( fullName_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 1 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 1 ), range );
 		return res.get< co::IType* >();
 	}
 
@@ -81,7 +81,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::IType* >( elementType_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 2 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 2 ), range );
 		return res.get< co::IArray* >();
 	}
 
@@ -90,7 +90,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( fullName_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 3 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 3 ), range );
 		return res.get< co::INamespace* >();
 	}
 
@@ -99,7 +99,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( typeName_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 4 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 4 ), range );
 		return res.get< co::IType* >();
 	}
 
@@ -109,7 +109,7 @@ public:
 		args[0].set< const std::string& >( typeName_ );
 		args[1].set< std::vector<co::CSLError>& >( errorStack_ );
 		co::Range<co::Any> range( args, 2 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 5 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 5 ), range );
 		return res.get< co::IType* >();
 	}
 
@@ -167,8 +167,8 @@ public:
 		co::ITypeManager* p = co::checkInstance<co::ITypeManager>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::INamespace* >( p->getRootNS() ); break;
-		case 1:		value.set< co::ITypeTransaction* >( p->getTransaction() ); break;
+		case 0:		value = p->getRootNS(); break;
+		case 1:		value = p->getTransaction(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -225,7 +225,6 @@ public:
 				break;
 			case 6:
 				{
-
 					const std::string& typeName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
 					res.set< co::IType* >( p->getType( typeName_ ) );

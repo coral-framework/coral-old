@@ -47,7 +47,7 @@ public:
 			_dummyInterfaces.push_back( dummyInterfaces.getFirst() );
 	}
 
-	const std::string& getName()
+	std::string getName()
 	{
 		return _name;
 	}
@@ -57,7 +57,7 @@ public:
 		_name = name;
 	}
 
-	const std::string& getNameReadonly()
+	std::string getNameReadonly()
 	{
 		return _readOnlyString;
 	}
@@ -89,7 +89,7 @@ public:
 		_testEnum = value;
 	}
 
-	const TestStruct& getTestStruct()
+	TestStruct getTestStruct()
 	{
 		return _testStruct;
 	}

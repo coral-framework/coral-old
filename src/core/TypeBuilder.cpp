@@ -78,7 +78,7 @@ TypeKind TypeBuilder::getKind()
 	return _kind;
 }
 
-const std::string& TypeBuilder::getTypeName()
+std::string TypeBuilder::getTypeName()
 {
 	return _name;
 }
@@ -156,8 +156,8 @@ public:
 	{
 		assert( _myType == NULL );
 		_myType = new Type;
-		_myType->setType( this->_namespace.get(), this->_name, this->_kind );
 		this->_type = _myType;
+		_myType->setType( this->_namespace.get(), this->_name, this->_kind );
 		return true;
 	}
 

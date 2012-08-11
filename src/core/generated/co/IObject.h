@@ -24,8 +24,6 @@ class IObject : public co::IService
 public:
 	virtual ~IObject() {;}
 
-	// Code From <c++ Block:
-	
 		/*!
 			Retrieves a service provided by this object by its type.
 			Result is undefined if the component provides more than one service of type 'T'.
@@ -47,8 +45,6 @@ public:
 		{
 			setServiceByName( this, receptacleName, service );
 		}
-	
-	// End Of c++> Block
 
 	virtual co::IComponent* getComponent() = 0;
 

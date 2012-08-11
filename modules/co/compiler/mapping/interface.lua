@@ -13,7 +13,7 @@ local function template( writer, c, t )
 
 	-- Field Accessors
 	for i, a in ipairs( t.fields ) do
-		writer( "\n\n\tvirtual ", t.formatInput( a.type ), " ", t.formatAccessor( "get", a.name ), "() = 0;" )
+		writer( "\n\n\tvirtual ", t.formatResult( a.type ), " ", t.formatAccessor( "get", a.name ), "() = 0;" )
 		if not a.isReadOnly then
 			writer( "\n\n\tvirtual void ", t.formatAccessor( "set", a.name ),
 						"( ", t.formatInput( a.type ), " ", a.name, " ) = 0;" )
@@ -22,7 +22,7 @@ local function template( writer, c, t )
 
 	-- Methods
 	for i, m in ipairs( t.methods ) do
-		writer( "\n\n\tvirtual ", t.formatInput( m.returnType ), " ", m.name, "(" )
+		writer( "\n\n\tvirtual ", t.formatResult( m.returnType ), " ", m.name, "(" )
 		local params = m.parameters
 		if #params > 0 then
 			writer( " " )

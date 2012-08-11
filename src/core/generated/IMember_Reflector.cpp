@@ -46,7 +46,7 @@ public:
 
 	co::Range<co::IAnnotation*> getAnnotations()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ) );
         return res.get< co::Range<co::IAnnotation*> >();
 	}
 
@@ -70,7 +70,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::IInterface* >( requestedType_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
 		return res.get< co::IAnnotation* >();
 	}
 
@@ -78,25 +78,25 @@ public:
 
 	co::uint16 getIndex()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 0 ) );
         return res.get< co::uint16 >();
 	}
 
 	co::MemberKind getKind()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 1 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 1 ) );
         return res.get< co::MemberKind >();
 	}
 
-	const std::string& getName()
+	std::string getName()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 2 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 2 ) );
         return res.get< const std::string& >();
 	}
 
 	co::ICompositeType* getOwner()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 3 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 3 ) );
         return res.get< co::ICompositeType* >();
 	}
 
@@ -154,10 +154,10 @@ public:
 		co::IMember* p = co::checkInstance<co::IMember>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::uint16 >( p->getIndex() ); break;
-		case 1:		value.set< co::MemberKind >( p->getKind() ); break;
-		case 2:		value.set< const std::string& >( p->getName() ); break;
-		case 3:		value.set< co::ICompositeType* >( p->getOwner() ); break;
+		case 0:		value = p->getIndex(); break;
+		case 1:		value = p->getKind(); break;
+		case 2:		value = p->getName(); break;
+		case 3:		value = p->getOwner(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

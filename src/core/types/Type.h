@@ -86,19 +86,19 @@ template<class Base>
 class Type : public Annotated<Base>, public TypeImpl
 {
 public:
-	const std::string& getName() { return _name; }
-	const std::string& getFullName() { return _fullName; }
+	std::string getName() { return _name; }
+	std::string getFullName() { return _fullName; }
 	INamespace* getNamespace() { return _namespace; }
 	TypeKind getKind() { return _kind; }
 
-	const Uuid& getFullSignature()
+	Uuid getFullSignature()
 	{
 		if( !_hasSignatures )
 			calculateSignatures( this );
 		return _fullSignature;
 	}
 	
-	const Uuid& getBinarySignature()
+	Uuid getBinarySignature()
 	{
 		if( !_hasSignatures )
 			calculateSignatures( this );

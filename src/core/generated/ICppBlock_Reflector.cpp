@@ -43,9 +43,9 @@ public:
 
 	// co.ICppBlock Methods:
 
-	const std::string& getValue()
+	std::string getValue()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::ICppBlock>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ICppBlock>( 0 ) );
         return res.get< const std::string& >();
 	}
 
@@ -110,7 +110,7 @@ public:
 		co::ICppBlock* p = co::checkInstance<co::ICppBlock>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< const std::string& >( p->getValue() ); break;
+		case 0:		value = p->getValue(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

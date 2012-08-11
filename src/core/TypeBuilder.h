@@ -60,7 +60,7 @@ public:
 	// ITypeBuilder methods:
 	INamespace* getNamespace();
 	TypeKind getKind();
-	const std::string& getTypeName();
+	std::string getTypeName();
 	void defineIdentifier( const std::string& name );
 	void defineField( const std::string& name, IType* type, bool isReadOnly );
 	void defineBaseType( IType* superType );

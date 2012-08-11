@@ -46,9 +46,7 @@ void TypeImpl::setType( INamespace* parent, const std::string& name, TypeKind ki
 	if( _namespace->getParentNamespace() )
 	{
 		// we're not in the global namespace
-		const std::string& namespaceFullName = _namespace->getFullName();
-		_fullName.reserve( namespaceFullName.length() + name.length() + 1 );
-		_fullName = namespaceFullName;
+		_fullName = _namespace->getFullName();
 		_fullName.push_back( '.' );
 	}
 

@@ -51,7 +51,7 @@ function M.formatAccessor( prefix, fieldName, suffix )
 	return prefix .. fieldName:sub( 1, 1 ):upper() .. fieldName:sub( 2 ) .. ( suffix or "" )
 end
 
-local function formatField( t )
+function M.formatField( t )
 	local kind = t.kind
 	if kind == 'TK_ANY' then
 		return "co::AnyValue"
@@ -59,7 +59,7 @@ local function formatField( t )
 		if t.elementType.kind == 'TK_INTERFACE' then
 			return "co::RefVector<" .. t.elementType.cppName .. ">"
 		else
-			return "std::vector<" .. formatField( t.elementType ) .. ">"
+			return "std::vector<" .. M.formatField( t.elementType ) .. ">"
 		end
 	elseif kind == 'TK_INTERFACE' then
 		return "co::RefPtr<" .. t.cppName .. ">"
@@ -68,10 +68,17 @@ local function formatField( t )
 	end
 end
 
-M.formatField = formatField
+function M.formatResult( t )
+	if not t then return "void" end
+	local kind = t.kind
+	if kind == 'TK_ARRAY' or kind == 'TK_INTERFACE' then
+		return M.formatInput( t )
+	else
+		return M.formatField( t )
+	end
+end
 
 function M.formatInput( t )
-	if not t then return "void" end
 	local kind = t.kind
 	if kind == 'TK_ARRAY' then
 		local elem = t.elementType
@@ -86,7 +93,7 @@ function M.formatInput( t )
 end
 
 function M.formatOutput( t )
-	return formatField( t ) .. "&"
+	return M.formatField( t ) .. "&"
 end
 
 function M.includeHeader( t, header )

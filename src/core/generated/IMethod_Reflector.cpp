@@ -48,7 +48,7 @@ public:
 
 	co::Range<co::IAnnotation*> getAnnotations()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ) );
         return res.get< co::Range<co::IAnnotation*> >();
 	}
 
@@ -72,7 +72,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::IInterface* >( requestedType_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
 		return res.get< co::IAnnotation* >();
 	}
 
@@ -80,25 +80,25 @@ public:
 
 	co::uint16 getIndex()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 0 ) );
         return res.get< co::uint16 >();
 	}
 
 	co::MemberKind getKind()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 1 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 1 ) );
         return res.get< co::MemberKind >();
 	}
 
-	const std::string& getName()
+	std::string getName()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 2 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 2 ) );
         return res.get< const std::string& >();
 	}
 
 	co::ICompositeType* getOwner()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 3 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 3 ) );
         return res.get< co::ICompositeType* >();
 	}
 
@@ -106,19 +106,19 @@ public:
 
 	co::Range<co::IException*> getExceptions()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IMethod>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IMethod>( 0 ) );
         return res.get< co::Range<co::IException*> >();
 	}
 
 	co::Range<co::IParameter*> getParameters()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IMethod>( 1 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IMethod>( 1 ) );
         return res.get< co::Range<co::IParameter*> >();
 	}
 
 	co::IType* getReturnType()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IMethod>( 2 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IMethod>( 2 ) );
         return res.get< co::IType* >();
 	}
 
@@ -176,9 +176,9 @@ public:
 		co::IMethod* p = co::checkInstance<co::IMethod>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::Range<co::IException*> >( p->getExceptions() ); break;
-		case 1:		value.set< co::Range<co::IParameter*> >( p->getParameters() ); break;
-		case 2:		value.set< co::IType* >( p->getReturnType() ); break;
+		case 0:		value = p->getExceptions(); break;
+		case 1:		value = p->getParameters(); break;
+		case 2:		value = p->getReturnType(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

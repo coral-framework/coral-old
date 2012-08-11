@@ -61,9 +61,9 @@ public:
 		co::CSLError* p = co::checkInstance<co::CSLError>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< const std::string& >( p->filename ); break;
-		case 1:		value.set< co::int32 >( p->line ); break;
-		case 2:		value.set< const std::string& >( p->message ); break;
+		case 0:		value = p->filename; break;
+		case 1:		value = p->line; break;
+		case 2:		value = p->message; break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

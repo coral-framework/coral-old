@@ -44,15 +44,15 @@ public:
 
 	// co.IMethodBuilder Methods:
 
-	const std::string& getMethodName()
+	std::string getMethodName()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IMethodBuilder>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IMethodBuilder>( 0 ) );
         return res.get< const std::string& >();
 	}
 
 	co::ITypeBuilder* getTypeBuilder()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IMethodBuilder>( 1 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IMethodBuilder>( 1 ) );
         return res.get< co::ITypeBuilder* >();
 	}
 
@@ -143,8 +143,8 @@ public:
 		co::IMethodBuilder* p = co::checkInstance<co::IMethodBuilder>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< const std::string& >( p->getMethodName() ); break;
-		case 1:		value.set< co::ITypeBuilder* >( p->getTypeBuilder() ); break;
+		case 0:		value = p->getMethodName(); break;
+		case 1:		value = p->getTypeBuilder(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

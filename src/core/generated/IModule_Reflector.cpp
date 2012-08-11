@@ -45,19 +45,19 @@ public:
 
 	co::INamespace* getNamespace()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 0 ) );
         return res.get< co::INamespace* >();
 	}
 
 	co::Range<co::IModulePart*> getParts()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 1 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 1 ) );
         return res.get< co::Range<co::IModulePart*> >();
 	}
 
 	co::int32 getRank()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 2 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 2 ) );
         return res.get< co::int32 >();
 	}
 
@@ -70,7 +70,7 @@ public:
 
 	co::ModuleState getState()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 3 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 3 ) );
         return res.get< co::ModuleState >();
 	}
 
@@ -164,10 +164,10 @@ public:
 		co::IModule* p = co::checkInstance<co::IModule>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::INamespace* >( p->getNamespace() ); break;
-		case 1:		value.set< co::Range<co::IModulePart*> >( p->getParts() ); break;
-		case 2:		value.set< co::int32 >( p->getRank() ); break;
-		case 3:		value.set< co::ModuleState >( p->getState() ); break;
+		case 0:		value = p->getNamespace(); break;
+		case 1:		value = p->getParts(); break;
+		case 2:		value = p->getRank(); break;
+		case 3:		value = p->getState(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

@@ -45,7 +45,7 @@ public:
 
 	bool getBinaryCompatibilityChecking()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 0 ) );
         return res.get< bool >();
 	}
 
@@ -58,13 +58,13 @@ public:
 
 	co::Range<co::IModulePartLoader*> getLoaders()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 1 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 1 ) );
         return res.get< co::Range<co::IModulePartLoader*> >();
 	}
 
 	co::Range<co::IModule*> getModules()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 2 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 2 ) );
         return res.get< co::Range<co::IModule*> >();
 	}
 
@@ -73,7 +73,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 0 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 0 ), range );
 		return res.get< co::IModule* >();
 	}
 
@@ -90,7 +90,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 2 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 2 ), range );
 		return res.get< bool >();
 	}
 
@@ -99,7 +99,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( moduleName_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 3 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 3 ), range );
 		return res.get< co::IModule* >();
 	}
 
@@ -165,9 +165,9 @@ public:
 		co::IModuleManager* p = co::checkInstance<co::IModuleManager>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< bool >( p->getBinaryCompatibilityChecking() ); break;
-		case 1:		value.set< co::Range<co::IModulePartLoader*> >( p->getLoaders() ); break;
-		case 2:		value.set< co::Range<co::IModule*> >( p->getModules() ); break;
+		case 0:		value = p->getBinaryCompatibilityChecking(); break;
+		case 1:		value = p->getLoaders(); break;
+		case 2:		value = p->getModules(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

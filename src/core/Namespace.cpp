@@ -73,12 +73,12 @@ void Namespace::removeType( IType* type )
 	CORAL_UNUSED( removed );
 }
 
-const std::string& Namespace::getName()
+std::string Namespace::getName()
 {
 	return _name;
 }
 
-const std::string& Namespace::getFullName()
+std::string Namespace::getFullName()
 {
 	return _fullName;
 }

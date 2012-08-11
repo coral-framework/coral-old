@@ -27,7 +27,7 @@ public:
 
 	virtual bool getIsOut() = 0;
 
-	virtual const std::string& getName() = 0;
+	virtual std::string getName() = 0;
 
 	virtual co::IType* getType() = 0;
 };

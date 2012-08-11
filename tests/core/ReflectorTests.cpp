@@ -75,7 +75,7 @@ TEST( ReflectorTests, basicReflectors )
 
 TEST( ReflectorTests, arrayReflectors )
 {
-	co::IType* type = co::getType( "co.IType[]" );
+	co::IType* type = co::getType( "string[]" );
 	ASSERT_TRUE( type != NULL );
 	ASSERT_EQ( type->getKind(), co::TK_ARRAY );
 
@@ -83,18 +83,39 @@ TEST( ReflectorTests, arrayReflectors )
 	ASSERT_TRUE( reflector != NULL );
 
 	EXPECT_EQ( type, reflector->getType() );
-	EXPECT_GT( reflector->getSize(), co::uint32( 0 ) );
+	ASSERT_EQ( reflector->getSize(), sizeof(std::vector<int>) );
 
-	EXPECT_THROW( reflector->createValues( NULL, 1 ), co::NotSupportedException );
-	EXPECT_THROW( reflector->copyValues( NULL, NULL, 1 ), co::NotSupportedException );
-	EXPECT_THROW( reflector->destroyValues( NULL, 1 ), co::NotSupportedException );
-	EXPECT_THROW( reflector->newInstance(), co::NotSupportedException );
-	EXPECT_THROW( reflector->newDynamicProxy( NULL ), co::NotSupportedException );
+	typedef std::vector<std::string> StrList;
 
-	// dummy arguments
+	StrList listA;
+	listA.push_back( "one" );
+	listA.push_back( "two" );
+	listA.push_back( "three" );
+	listA.push_back( "end" );
+
+	co::uint8 buffer[sizeof(std::vector<int>)];
+	StrList& listB = *reinterpret_cast<StrList*>( buffer );
+
+	// create an array with 2 strings
+	reflector->createValues( buffer, 3 );
+	ASSERT_EQ( listB.size(), 3 );
+	EXPECT_EQ( listB[0], "" );
+	EXPECT_EQ( listB[2], "" );
+
+	// copy array A onto B
+	reflector->copyValues( &listA, buffer, 0 );
+	ASSERT_EQ( listB.size(), 4 );
+	EXPECT_EQ( listB[0], "one" );
+	EXPECT_EQ( listB[3], "end" );
+
+	// destroy the array
+	EXPECT_NO_THROW( reflector->destroyValues( buffer, 0 ) );
+
+	// unsupported methods:
 	co::Any any;
 	co::Range<co::Any> anyRange;
-
+	EXPECT_THROW( reflector->newInstance(), co::NotSupportedException );
+	EXPECT_THROW( reflector->newDynamicProxy( NULL ), co::NotSupportedException );
 	EXPECT_THROW( reflector->getField( any, NULL, any ), co::NotSupportedException );
 	EXPECT_THROW( reflector->setField( any, NULL, any ), co::NotSupportedException );
 	EXPECT_THROW( reflector->invoke( any, NULL, anyRange, any ), co::NotSupportedException );
@@ -290,7 +311,7 @@ TEST( ReflectorTests, interfaceNamespace )
 	co::Any a1;
 
 	reflector->getField( coNS, nameField, a1 );
-	EXPECT_EQ( "co", a1.get<const std::string&>() );
+	EXPECT_EQ( "co", a1.get<std::string>() );
 
 	// cannot 'set' a read-only field
 	EXPECT_THROW( reflector->setField( coNS, nameField, a1 ), co::IllegalArgumentException );

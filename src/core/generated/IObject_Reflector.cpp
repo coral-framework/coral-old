@@ -45,7 +45,7 @@ public:
 
 	co::IComponent* getComponent()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::IObject>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IObject>( 0 ) );
         return res.get< co::IComponent* >();
 	}
 
@@ -54,7 +54,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::IPort* >( port_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 0 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 0 ), range );
 		return res.get< co::IService* >();
 	}
 
@@ -121,7 +121,7 @@ public:
 		co::IObject* p = co::checkInstance<co::IObject>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::IComponent* >( p->getComponent() ); break;
+		case 0:		value = p->getComponent(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

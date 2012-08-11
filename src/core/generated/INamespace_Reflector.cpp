@@ -46,37 +46,37 @@ public:
 
 	co::Range<co::INamespace*> getChildNamespaces()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 0 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 0 ) );
         return res.get< co::Range<co::INamespace*> >();
 	}
 
-	const std::string& getFullName()
+	std::string getFullName()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 1 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 1 ) );
         return res.get< const std::string& >();
 	}
 
 	co::IModule* getModule()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 2 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 2 ) );
         return res.get< co::IModule* >();
 	}
 
-	const std::string& getName()
+	std::string getName()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 3 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 3 ) );
         return res.get< const std::string& >();
 	}
 
 	co::INamespace* getParentNamespace()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 4 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 4 ) );
         return res.get< co::INamespace* >();
 	}
 
 	co::Range<co::IType*> getTypes()
 	{
-		co::Any res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 5 ) );
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 5 ) );
         return res.get< co::Range<co::IType*> >();
 	}
 
@@ -85,7 +85,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 0 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 0 ), range );
 		return res.get< co::INamespace* >();
 	}
 
@@ -95,7 +95,7 @@ public:
 		args[0].set< const std::string& >( name_ );
 		args[1].set< co::TypeKind >( typeKind_ );
 		co::Range<co::Any> range( args, 2 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 1 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 1 ), range );
 		return res.get< co::ITypeBuilder* >();
 	}
 
@@ -104,7 +104,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 2 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 2 ), range );
 		return res.get< co::INamespace* >();
 	}
 
@@ -113,7 +113,7 @@ public:
 		co::Any args[1];
 		args[0].set< const std::string& >( name_ );
 		co::Range<co::Any> range( args, 1 );
-		co::Any res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 3 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 3 ), range );
 		return res.get< co::IType* >();
 	}
 
@@ -171,12 +171,12 @@ public:
 		co::INamespace* p = co::checkInstance<co::INamespace>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::Range<co::INamespace*> >( p->getChildNamespaces() ); break;
-		case 1:		value.set< const std::string& >( p->getFullName() ); break;
-		case 2:		value.set< co::IModule* >( p->getModule() ); break;
-		case 3:		value.set< const std::string& >( p->getName() ); break;
-		case 4:		value.set< co::INamespace* >( p->getParentNamespace() ); break;
-		case 5:		value.set< co::Range<co::IType*> >( p->getTypes() ); break;
+		case 0:		value = p->getChildNamespaces(); break;
+		case 1:		value = p->getFullName(); break;
+		case 2:		value = p->getModule(); break;
+		case 3:		value = p->getName(); break;
+		case 4:		value = p->getParentNamespace(); break;
+		case 5:		value = p->getTypes(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

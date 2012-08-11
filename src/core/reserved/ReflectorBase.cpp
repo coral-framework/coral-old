@@ -82,19 +82,50 @@ void ReflectorBase::setServiceAt( IPort* receptacle, IService* )
 	raiseUnexpectedPortIndex();
 }
 
-void ReflectorBase::createValues( void*, size_t )
+void ReflectorBase::createValues( void* ptr, size_t numValues )
 {
-	raiseNotSupportedException();
+	TypeKind kind = getType()->getKind();
+	if( kind == TK_INTERFACE )
+	{
+		for( size_t i = 0; i < numValues; ++i )
+			new( reinterpret_cast<RefPtr<IService>*>( ptr ) + i ) RefPtr<IService>();
+	}
+	else
+	{
+		assert( false );
+		raiseNotSupportedException();
+	}
 }
 
-void ReflectorBase::copyValues( const void*, void*, size_t )
+void ReflectorBase::copyValues( const void* fromPtr, void* toPtr, size_t numValues )
 {
-	raiseNotSupportedException();
+	TypeKind kind = getType()->getKind();
+	if( kind == TK_INTERFACE )
+	{
+		for( size_t i = 0; i < numValues; ++i )
+			reinterpret_cast<RefPtr<IService>*>( toPtr )[i] =
+				reinterpret_cast<const RefPtr<IService>*>( fromPtr )[i];
+	}
+	else
+	{
+		assert( false );
+		raiseNotSupportedException();
+	}
 }
 
-void ReflectorBase::destroyValues( void*, size_t )
+void ReflectorBase::destroyValues( void* ptr, size_t numValues )
 {
-	raiseNotSupportedException();
+	TypeKind kind = getType()->getKind();
+	if( kind == TK_INTERFACE )
+	{
+		for( size_t i = 0; i < numValues; ++i )
+			reinterpret_cast<RefPtr<IService>*>( ptr )[i].~RefPtr();
+	}
+	else
+	{
+		assert( false );
+		raiseNotSupportedException();
+	}
 }
 
 IObject* ReflectorBase::newInstance()

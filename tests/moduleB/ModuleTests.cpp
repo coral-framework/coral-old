@@ -150,7 +150,7 @@ TEST( ModuleTests, crossModuleReflection )
 
 	std::vector<co::uint8> instanceMemory( reflector->getSize() );
 	void* instancePtr = &instanceMemory.front();
-	co::Any instanceAny( type, co::Any::VarIsPointer, instancePtr );
+	co::Any instanceAny( true, type, instancePtr );
 
 	EXPECT_NO_THROW( reflector->createValues( instancePtr, 1 ) );
 
@@ -174,8 +174,7 @@ TEST( ModuleTests, crossModuleReflection )
 	EXPECT_EQ( 7, a1.get<int>() );
 
 	// test exception catching
-	co::int32 garbage = -1;
-	instanceAny.set( garbage );
+	instanceAny = -0.1f;
 	try
 	{
 		reflector->getField( instanceAny, anInt8Field, a1 );
@@ -183,7 +182,7 @@ TEST( ModuleTests, crossModuleReflection )
 	}
 	catch( co::IllegalArgumentException& e )
 	{
-		EXPECT_EQ( "illegal instance type (moduleA.TestStruct expected, got (co::int32)-1)", e.getMessage() );
+		EXPECT_NE( std::string::npos, e.getMessage().find( "illegal instance type (moduleA.TestStruct expected, got (out float)" ) );
 	}
 
 	reflector->destroyValues( instancePtr, 1 );
@@ -277,7 +276,7 @@ TEST( ModuleTests, luaScriptedError )
 	{
 		EXPECT_EQ( 0, e.getMessage().find( "error obtaining a reflector for type"
 			" 'moduleB.LuaScriptedError' via provider '@lua.Scripted':" ) );
-		EXPECT_NE( std::string::npos, e.getMessage().find( "faulty.lua:1: '=' expected near 'script'" ) );
+		EXPECT_NE( std::string::npos, e.getMessage().find( "faulty.lua:1: syntax error near 'script'" ) );
 	}
 }
 

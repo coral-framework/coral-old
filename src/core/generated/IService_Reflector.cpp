@@ -96,9 +96,9 @@ public:
 		co::IService* p = co::checkInstance<co::IService>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::IPort* >( p->getFacet() ); break;
-		case 1:		value.set< co::IInterface* >( p->getInterface() ); break;
-		case 2:		value.set< co::IObject* >( p->getProvider() ); break;
+		case 0:		value = p->getFacet(); break;
+		case 1:		value = p->getInterface(); break;
+		case 2:		value = p->getProvider(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
