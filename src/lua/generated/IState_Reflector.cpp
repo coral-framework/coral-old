@@ -46,10 +46,10 @@ public:
 
 	// lua.IState Methods:
 
-	co::Range<lua::IInterceptor* const> getInterceptors()
+	co::Range<lua::IInterceptor*> getInterceptors()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<lua::IState>( 0 ) );
-        return res.get< co::Range<lua::IInterceptor* const> >();
+		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<lua::IState>( 0 ) );
+        return res.get< co::Range<lua::IInterceptor*> >();
 	}
 
 	void addInterceptor( lua::IInterceptor* interceptor_ )
@@ -68,7 +68,7 @@ public:
 		args[2].set< co::Range<co::Any> >( args_ );
 		args[3].set< co::Range<co::Any> >( results_ );
 		co::Range<co::Any> range( args, 4 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 1 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 1 ), range );
 		return res.get< co::int32 >();
 	}
 
@@ -84,7 +84,7 @@ public:
 		args[0].set< const std::string& >( name_ );
 		args[1].set< std::string& >( filename_ );
 		co::Range<co::Any> range( args, 2 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 3 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 3 ), range );
 		return res.get< bool >();
 	}
 
@@ -150,7 +150,7 @@ public:
 		lua::IState* p = co::checkInstance<lua::IState>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::Range<lua::IInterceptor* const> >( p->getInterceptors() ); break;
+		case 0:		value = p->getInterceptors(); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -190,7 +190,7 @@ public:
 					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
 					co::Range<co::Any> results_ = args[++argIndex].get< co::Range<co::Any> >();
 					argIndex = -1;
-					res.set< co::int32 >( p->callFunction( moduleName_, functionName_, args_, results_ ) );
+					res = p->callFunction( moduleName_, functionName_, args_, results_ );
 				}
 				break;
 			case 3:
@@ -203,7 +203,7 @@ public:
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					std::string& filename_ = args[++argIndex].get< std::string& >();
 					argIndex = -1;
-					res.set< bool >( p->findScript( name_, filename_ ) );
+					res = p->findScript( name_, filename_ );
 				}
 				break;
 			case 5:

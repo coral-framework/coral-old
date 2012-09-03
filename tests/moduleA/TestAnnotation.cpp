@@ -15,7 +15,7 @@ namespace moduleA {
 class TestAnnotation : public TestAnnotation_Base
 {
 public:
-	co::Any getA() { return _any; }
+	co::AnyValue getA() { return _any; }
 	void setA( co::Any a ) { _any = a; }
 
 	bool getB() { return _b; }
@@ -102,7 +102,7 @@ public:
 private:
 	double _value;
 
-	co::Any _any;
+	co::AnyValue _any;
 	bool _b;
 	co::int8 _i8;
 	co::uint8 _u8;

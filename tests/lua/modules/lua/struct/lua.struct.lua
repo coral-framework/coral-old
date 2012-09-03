@@ -40,7 +40,7 @@ function M:initialize( module )
 
 	-- test setting 'testEnum' with an invalid identifier
 	ASSERT_ERROR( function() testStruct.testEnum = "Fourth" end,
-		"invalid identifier 'Fourth' for enum moduleA.TestEnum" )
+		"no such identifier 'Fourth' in the enum" )
 
 	-- test getting fields of the innerStruct
 	ASSERT_EQ( testStruct.innerStruct.message, "" )

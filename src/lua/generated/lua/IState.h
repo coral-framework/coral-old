@@ -26,7 +26,7 @@ class IState : public co::IService
 public:
 	virtual ~IState() {;}
 
-	virtual co::Range<lua::IInterceptor* const> getInterceptors() = 0;
+	virtual co::Range<lua::IInterceptor*> getInterceptors() = 0;
 
 	virtual void addInterceptor( lua::IInterceptor* interceptor ) = 0;
 

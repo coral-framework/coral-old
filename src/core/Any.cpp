@@ -14,79 +14,39 @@
 #include <cstdlib>
 #include <sstream>
 
-#include <co/ISystem.h>
-#include <co/ITypeManager.h>
-
-/****************************************************************************/
-/* General Utility Functions                                                */
-/****************************************************************************/
-
-namespace co {
-
-inline co::uint8* getVectorData( const __any::State& s )
-{
-	std::vector<uint8>& pv = *reinterpret_cast<std::vector<uint8>*>( s.data.ptr );
-	return &pv[0];
-}
-
-inline uint32 getVectorSize( const __any::State& s )
-{
-	std::vector<uint8>& pv = *reinterpret_cast<std::vector<uint8>*>( s.data.ptr );
-	return pv.size() / s.type->getReflector()->getSize();
-}
-
-// avoid incorrect warning about breaking strict-aliasing rules in GCC 4.x
-template<typename T>
-inline T* reinterpretPtr( const void* ptr )
-{
-	return reinterpret_cast<T*>( const_cast<void*>( ptr ) );
-}
-
-void castScalar( TypeKind fromKind, const void* from, TypeKind toKind, void* to );
-
-} // namespace co
-
-#define THROW_ILLEGAL_CAST( from, to, MORE_MESSAGES ) \
-	{ std::stringstream sstream; \
-	sstream << "illegal cast from '" << from << "' to '" << to << "'" MORE_MESSAGES; \
-	throw co::IllegalCastException( sstream.str() ); }
-
 /****************************************************************************/
 /* Global iostream Insertion Operators                                      */
 /****************************************************************************/
 
 std::ostream& operator<<( std::ostream& out, const co::__any::State& s )
 {
-	if( s.kind == co::TK_NONE )
+	if( !s.type )
 		return out << co::TK_STRINGS[co::TK_NONE];
 
-	assert( s.type != NULL );
-
-	out << ( s.isIn ? "in " : "out " ) << s.type->getFullName();
-
-	if( s.kind == co::TK_ARRAY )
-		out << "[]";
-
-	return out;
+	return out << ( s.isIn ? "in " : "out " ) << s.type->getFullName();
 }
 
 std::ostream& operator<<( std::ostream& out, const co::Any& a )
 {
-	const co::__any::State& s = a.getState();
+	const co::__any::State& s = a.state;
 
 	// type info
 	out << "(" << s << ")";
 
-	assert( s.kind != co::TK_EXCEPTION && s.kind != co::TK_COMPONENT );
+	if( !s.type )
+		return out;
+
+	co::TypeKind k = s.type->getKind();
+	assert( k != co::TK_EXCEPTION && k != co::TK_COMPONENT );
 
 	// print pointer
-	if( !s.isIn || !co::isScalarType( s.kind ) )
+	if( !s.isIn || !co::isScalarType( k ) )
 	{
 		if( s.data.ptr == NULL )
 		{
 			out << "NULL";
 		}
-		else if( s.kind == co::TK_STRING )
+		else if( k == co::TK_STRING )
 		{
 			// special case: print strings up to 30 chars.
 			std::string str;
@@ -106,21 +66,20 @@ std::ostream& operator<<( std::ostream& out, const co::Any& a )
 	else
 	{
 		// print value
-		switch( s.kind )
+		switch( k )
 		{
-		case co::TK_NONE:		break;
-		case co::TK_BOOLEAN:	out << ( s.data.b ? "true" : "false" ); break;
-		case co::TK_INT8:		out << s.data.i8; break;
-		case co::TK_UINT8:		out << s.data.u8; break;
-		case co::TK_INT16:		out << s.data.i16; break;
-		case co::TK_UINT16:		out << s.data.u16; break;
-		case co::TK_INT32:		out << s.data.i32; break;
-		case co::TK_UINT32:		out << s.data.u32; break;
-		case co::TK_INT64:		out << s.data.i64; break;
-		case co::TK_UINT64:		out << s.data.u64; break;
-		case co::TK_FLOAT:		out << s.data.f; break;
-		case co::TK_DOUBLE:		out << s.data.d; break;
-		case co::TK_ENUM:		out << s.data.u32; break;
+		case co::TK_BOOL:	out << ( s.data.b ? "true" : "false" );	break;
+		case co::TK_INT8:	out << s.data.i8;	break;
+		case co::TK_UINT8:	out << s.data.u8;	break;
+		case co::TK_INT16:	out << s.data.i16;	break;
+		case co::TK_UINT16:	out << s.data.u16;	break;
+		case co::TK_INT32:	out << s.data.i32;	break;
+		case co::TK_UINT32:	out << s.data.u32;	break;
+		case co::TK_INT64:	out << s.data.i64;	break;
+		case co::TK_UINT64:	out << s.data.u64;	break;
+		case co::TK_FLOAT:	out << s.data.f;	break;
+		case co::TK_DOUBLE:	out << s.data.d;	break;
+		case co::TK_ENUM:	out << s.data.u32;	break;
 		default:
 			assert( false );
 		}
@@ -130,799 +89,10 @@ std::ostream& operator<<( std::ostream& out, const co::Any& a )
 }
 
 /****************************************************************************/
-/* co::Any                                                                  */
+/* Auxiliary Functions to Cast Between Scalar Types                         */
 /****************************************************************************/
 
 namespace co {
-
-void Any::clear()
-{
-	destroyObject();
-	_state = State();
-}
-
-uint32 Any::getSize() const
-{
-	if( _state.kind == TK_ARRAY )
-	{
-		return _state.isIn ? _state.size : getVectorSize( _state );
-	}	
-	return _state.type ? _state.type->getReflector()->getSize() : 0;
-}
-
-void Any::set( bool isIn, IType* type, const void* addr, size_t size )
-{
-	assert( type );
-
-	TypeKind kind = type->getKind();
-	assert( isDataType( kind ) );
-
-	if( kind == TK_ARRAY )
-		type = static_cast<IArray*>( type )->getElementType();
-
-	_state.type = type;
-	_state.size = size;
-	_state.kind = kind;
-	_state.isIn = isIn;
-
-	if( isIn && isScalarOrRefType( kind ) && addr )
-	{
-		if( kind <= TK_UINT8 )
-			_state.data.u8 = *reinterpret_cast<const uint8*>( addr );
-		else if( kind <= TK_UINT16 )
-			_state.data.u16 = *reinterpret_cast<const uint16*>( addr );
-		else if( kind <= TK_UINT32 || kind == TK_FLOAT || kind == TK_ENUM )
-			_state.data.u32 = *reinterpret_cast<const uint32*>( addr );
-		else
-			_state.data = *reinterpret_cast<const State::Data*>( addr );
-	}
-	else
-	{
-		_state.data.cptr = addr;
-	}
-}
-
-template<typename T>
-inline void putValue( void* ptr, const Any& value  )
-{
-	*reinterpret_cast<T*>( ptr ) = value.get<const T&>();
-}
-
-void Any::put( const Any& value ) const
-{
-	if( !isValid() || !isOut() )
-		throw IllegalStateException( "co::Any::put() requires a valid output variable" );
-
-	switch( _state.kind )
-	{
-	case TK_ANY:			putValue<Any>( _state.data.ptr, value ); break;
-	case TK_BOOLEAN:		putValue<bool>( _state.data.ptr, value ); break;
-	case TK_INT8:			putValue<int8>( _state.data.ptr, value ); break;
-	case TK_UINT8:			putValue<uint8>( _state.data.ptr, value ); break;
-	case TK_INT16:			putValue<int16>( _state.data.ptr, value ); break;
-	case TK_UINT16:			putValue<uint16>( _state.data.ptr, value ); break;
-	case TK_INT32:			putValue<int32>( _state.data.ptr, value ); break;
-	case TK_UINT32:			putValue<uint32>( _state.data.ptr, value ); break;
-	case TK_INT64:			putValue<int64>( _state.data.ptr, value ); break;
-	case TK_UINT64:			putValue<uint64>( _state.data.ptr, value ); break;
-	case TK_FLOAT:			putValue<float>( _state.data.ptr, value ); break;
-	case TK_DOUBLE:			putValue<double>( _state.data.ptr, value ); break;
-	case TK_STRING:			putValue<std::string>( _state.data.ptr, value ); break;
-
-	case TK_ARRAY:
-		throw Exception( "Any::put() NYI for arrays" );
-		break;
-
-	case TK_ENUM:			putValue<uint32>( _state.data.ptr, value ); break;
-	case TK_STRUCT:
-	case TK_NATIVECLASS:
-		if( value.getType() != getType() )
-			THROW_ILLEGAL_CAST( value._state, _state, );
-		getType()->getReflector()->copyValues( value._state.data.ptr,
-													_state.data.ptr, 1 );
-		break;
-		
-	case TK_INTERFACE:
-		if( !getInterface()->isSubTypeOf( value.getInterface() ) )
-			THROW_ILLEGAL_CAST( value._state, _state, );
-
-		*reinterpret_cast<RefPtr<IService>*>( _state.data.ptr ) = value.get<IService*>();
-		break;
-
-	default:
-		assert( false );
-	}
-}
-
-void Any::makeOut( IType* paramType )
-{
-	if( !paramType )
-	{
-		paramType = getType();
-		TypeKind kind = getKind();
-		if( kind == co::TK_ARRAY )
-			paramType = co::getSystem()->getTypes()->getArrayOf( paramType );
-	}
-
-	TypeKind paramKind = paramType->getKind();
-	switch( paramKind )
-	{
-	case TK_ANY:
-		if( _state.objectKind != TK_ANY )
-			createAny();
-		break;
-
-	case TK_BOOLEAN:
-		_state.objectKind = TK_BOOLEAN;
-		if( isValid() )
-			_object.data.b = get<bool>();
-		set<bool&>( _object.data.b );
-		break;
-
-	case TK_INT8:
-		_state.objectKind = TK_INT8;
-		if( isValid() )
-			_object.data.i8 = get<int8>();
-		set<int8&>( _object.data.i8 );
-		break;
-
-	case TK_UINT8:
-		_state.objectKind = TK_UINT8;
-		if( isValid() )
-			_object.data.u8 = get<uint8>();
-		set<uint8&>( _object.data.u8 );
-		break;
-
-	case TK_INT16:
-		_state.objectKind = TK_INT16;
-		if( isValid() )
-			_object.data.i16 = get<int16>();
-		set<int16&>( _object.data.i16 );
-		break;
-
-	case TK_UINT16:
-		_state.objectKind = TK_UINT16;
-		if( isValid() )
-			_object.data.u16 = get<uint16>();
-		set<uint16&>( _object.data.u16 );
-		break;
-
-	case TK_INT32:
-		_state.objectKind = TK_INT32;
-		if( isValid() )
-			_object.data.i32 = get<int32>();
-		set<int32&>( _object.data.i32 );
-		break;
-
-	case TK_UINT32:
-		_state.objectKind = TK_UINT32;
-		if( isValid() )
-			_object.data.u32 = get<uint32>();
-		set<uint32&>( _object.data.u32 );
-		break;
-
-	case TK_INT64:
-		_state.objectKind = TK_INT64;
-		if( isValid() )
-			_object.data.i64 = get<int64>();
-		set<int64&>( _object.data.i64 );
-		break;
-
-	case TK_UINT64:
-		_state.objectKind = TK_UINT64;
-		if( isValid() )
-			_object.data.u64 = get<uint64>();
-		set<uint64&>( _object.data.u64 );
-		break;
-
-	case TK_FLOAT:
-		_state.objectKind = TK_FLOAT;
-		if( isValid() )
-			_object.data.f = get<float>();
-		set<float&>( _object.data.f );
-		break;
-
-	case TK_DOUBLE:
-		_state.objectKind = TK_DOUBLE;
-		if( isValid() )
-			_object.data.d = get<double>();
-		set<double&>( _object.data.d );
-		break;
-
-	case TK_STRING:
-		if( isValid() )
-		{
-			assert( getKind() == TK_STRING );
-			if( isIn() )
-			{
-				const std::string& originalStr = get<const std::string&>();
-				createString() = originalStr;
-			}
-		}
-		else
-		{
-			createString();
-		}
-		break;
-
-	case TK_ARRAY:
-		if( isValid() )
-		{
-			size_t size = getSize();
-			void* prevData = _state.isIn ? _state.data.bytes : getVectorData( _state );
-			co::IType* elemType = static_cast<IArray*>( paramType )->getElementType();
-			set( false, paramType, &createArray( elemType, size ) );
-			void* newData = getVectorData( _state );
-			elemType->getReflector()->copyValues( prevData, newData, size );
-		}
-		else
-		{
-			set( false, paramType, &createArray( static_cast<IArray*>( paramType )->getElementType() ) );
-		}
-		break;
-
-	case TK_ENUM:
-		_state.objectKind = TK_ENUM;
-		if( isValid() )
-			_object.data.u32 = get<uint32>();
-		set( false, paramType, &_object.data.u32 );
-		break;
-
-	case TK_STRUCT:
-	case TK_NATIVECLASS:
-		if( isValid() )
-		{
-			assert( paramType == _state.type );
-			void* prev = _state.data.ptr;
-			createComplexValue( paramType );
-			_object.complex.reflector->copyValues( prev, _state.data.ptr, 1 );
-		}
-		else
-		{
-			createComplexValue( paramType );
-		}
-		break;
-
-	case TK_INTERFACE:
-		_state.objectKind = TK_INTERFACE;
-		_object.data.service = _state.data.service;
-		if( !_state.isIn && _object.data.service )
-			_object.data.service = *reinterpret_cast<IService**>( _object.data.service );
-		set( false, paramType, &_object.data.service );
-		break;
-
-	default:
-		assert( false );
-	}
-}
-
-void Any::makeIn()
-{
-	assert( isOut() );
-	if( _state.kind == TK_ANY )
-	{
-		// ugly hack to retain the object kind
-		uint8 objectKind = _state.objectKind;
-		_state = get<const Any&>().getState();
-		_state.objectKind = objectKind;
-	}
-	else if( isScalarOrRefType( _state.kind ) )
-	{
-		set( true, _state.type, _state.data.cptr );		
-	}
-}
-
-Any& Any::createAny()
-{
-	if( _state.objectKind == TK_ANY )
-	{
-		Any& any = *reinterpret_cast<Any*>( _object.data.ptr );
-		any.clear();
-		return any;
-	}
-
-	if( _state.objectKind != TK_NONE )
-		throw IllegalStateException( "co::Any::createAny() called while a co::Any contains an object" );
-
-	Any* res = new Any();
-
-	// preserve the current variable (if any) in the new co::Any
-	if( isValid() )
-		res->_state = _state;
-
-	_state.objectKind = TK_ANY;
-	_object.data.ptr = res;
-	set<Any&>( *res );
-
-	return *res;
-}
-
-std::string& Any::createString()
-{
-	destroyObject();
-	new( _object.stringArea ) std::string();
-	_state.objectKind = TK_STRING;
-	std::string& res = *reinterpretPtr<std::string>( _object.stringArea );
-	set<std::string&>( res );
-	return res;
-}
-
-Any::PseudoVector& Any::createArray( IType* elementType, size_t n )
-{
-	destroyObject();
-
-	_state.objectKind = TK_ARRAY;
-	_object.array.reflector = elementType->getReflector();
-	_object.array.reflector->serviceRetain();
-
-	PseudoVector* res = reinterpret_cast<PseudoVector*>( _object.array.vectorArea );
-	set( false, co::getArrayOf( elementType ), res );
-
-	if( n == 0 )
-	{
-		new( _object.array.vectorArea ) PseudoVector();
-		return *res;
-	}
-
-	switch( elementType->getKind() )
-	{
-	case TK_ANY:
-		new( _object.array.vectorArea ) std::vector<Any>( n );
-		break;
-
-	case TK_BOOLEAN:
-	case TK_INT8:
-	case TK_UINT8:
-	case TK_INT16:
-	case TK_UINT16:
-	case TK_INT32:
-	case TK_UINT32:
-	case TK_INT64:
-	case TK_UINT64:
-	case TK_FLOAT:
-	case TK_DOUBLE:
-	case TK_ENUM:
-		new( _object.array.vectorArea ) PseudoVector( _object.array.reflector->getSize() * n );
-		break;
-
-	case TK_STRING:
-		new( _object.array.vectorArea ) std::vector<std::string>( n );
-		break;
-
-	case TK_STRUCT:
-	case TK_NATIVECLASS:
-		new( _object.array.vectorArea ) PseudoVector( _object.array.reflector->getSize() * n );
-		_object.array.reflector->createValues( &res->front(), n );
-		break;
-
-	case TK_INTERFACE:
-		new( _object.array.vectorArea ) RefVector<IService>( n );
-		break;
-
-	default:
-		assert( false );
-	}
-
-	return *res;
-}
-
-void Any::swapArray( const Any& other )
-{
-	assert( _state.kind == TK_ARRAY && other._state.kind == TK_ARRAY );
-	assert( _state.type == other._state.type );
-	assert( _state.isIn == other._state.isIn );
-	assert( _state.isIn == false );
-	assert( _state.objectKind == TK_ARRAY ); // the array must be allocated in this co::Any
-	PseudoVector* myVec = reinterpret_cast<PseudoVector*>( _object.array.vectorArea );
-	PseudoVector* otherVec = reinterpret_cast<PseudoVector*>( other._state.data.ptr );
-	myVec->swap( *otherVec );
-}
-
-void* Any::createComplexValue( IType* type )
-{
-	destroyObject();
-
-	_object.complex.reflector = type->getReflector();
-	_object.complex.reflector->serviceRetain();
-
-	size_t size = _object.complex.reflector->getSize();
-
-	void* res;
-	if( size > INPLACE_CAPACITY )
-	{
-		_state.objectKind = TK_STRUCT;
-		res = _object.complex.ptr = malloc( size );
-	}
-	else
-	{
-		_state.objectKind = TK_NATIVECLASS;
-		res = _object.complex.inplaceArea;
-	}
-
-	_object.complex.reflector->createValues( res, 1 );
-	set( false, type, res );
-
-	return res;
-}
-
-void Any::destroyObject()
-{
-	switch( _state.objectKind )
-	{
-	case TK_NONE:
-		return;
-
-	case TK_ANY:
-		delete reinterpret_cast<Any*>( _object.data.ptr );
-		break;
-
-	case TK_STRING:
-		reinterpretPtr<std::string>( _object.stringArea )->~basic_string();
-		break;
-
-	case TK_ARRAY:
-		{
-			// call the destructor of each element
-			PseudoVector* pv = reinterpret_cast<PseudoVector*>( _object.array.vectorArea );
-			switch( _object.array.reflector->getType()->getKind() )
-			{
-			case TK_ANY:
-				reinterpret_cast<std::vector<Any>*>( pv )->~vector();
-				break;
-
-			case TK_BOOLEAN:
-			case TK_INT8:
-			case TK_UINT8:
-			case TK_INT16:
-			case TK_UINT16:
-			case TK_INT32:
-			case TK_UINT32:
-			case TK_INT64:
-			case TK_UINT64:
-			case TK_FLOAT:
-			case TK_DOUBLE:
-			case TK_ENUM:
-				pv->~vector();
-				break;
-
-			case TK_STRING:
-				reinterpret_cast<std::vector<std::string>*>( pv )->~vector();
-				break;
-
-			case TK_STRUCT:
-			case TK_NATIVECLASS:
-				{
-					size_t arraySize = pv->size();
-					if( arraySize > 0 )
-					{
-						size_t elementSize = _object.array.reflector->getSize();
-						assert( arraySize % elementSize == 0 );
-						_object.array.reflector->destroyValues( &pv->front(), arraySize / elementSize );
-					}
-					pv->~vector();
-				}
-				break;
-
-			case TK_INTERFACE:
-				reinterpret_cast<RefVector<IService>*>( pv )->~RefVector();
-				break;
-
-			default:
-				assert( false );
-			}
-			_object.array.reflector->serviceRelease();
-		}
-		break;
-
-	case TK_STRUCT:
-		_object.complex.reflector->destroyValues( _object.complex.ptr, 1 );
-		_object.complex.reflector->serviceRelease();
-		free( _object.complex.ptr );
-		break;
-
-	case TK_NATIVECLASS:
-		_object.complex.reflector->destroyValues( _object.complex.inplaceArea, 1 );
-		_object.complex.reflector->serviceRelease();
-		break;
-
-	default:
-		break;
-	}
-
-	_state.objectKind = TK_NONE;
-}
-
-void Any::swap( Any& other )
-{
-	State tmpState( _state );
-	TemporaryObjectData tmpObject( _object );
-
-	// copy 'other' to 'this'
-	_state = other._state;
-	_object = other._object;
-	if( _state.data.ptr == &other._object )
-		_state.data.ptr = &_object;
-
-	// copy 'this' to 'other'
-	other._state = tmpState;
-	other._object = tmpObject;
-	if( tmpState.data.ptr == &_object )
-		other._state.data.ptr = &other._object;
-}
-
-bool Any::operator==( const Any& other ) const
-{
-	if( _state.kind != other._state.kind || _state.type != other._state.type )
-		return false;
-
-	if( _state.kind == TK_NONE )
-		return true;
-
-	if( _state.isIn != other._state.isIn )
-		return false;
-
-	if( _state.kind == TK_ARRAY && isIn() && _state.size != other._state.size )
-		return false;
-
-	// pointer comparison
-	if( isOut() || !isScalarType( _state.kind ) )
-		return ( _state.data.ptr == other._state.data.ptr );
-
-	// value comparison
-	bool res = false;
-	switch( _state.kind )
-	{
-	case TK_BOOLEAN:	res = ( _state.data.b == other._state.data.b );		break;
-	case TK_INT8:
-	case TK_UINT8:		res = ( _state.data.u8 == other._state.data.u8 );	break;
-	case TK_INT16:
-	case TK_UINT16:		res = ( _state.data.u16 == other._state.data.u16 );	break;
-	case TK_INT32:
-	case TK_UINT32:		res = ( _state.data.u32 == other._state.data.u32 );	break;
-	case TK_INT64:
-	case TK_UINT64:		res = ( _state.data.u64 == other._state.data.u64 );	break;
-	case TK_FLOAT:		res = ( _state.data.f == other._state.data.f );		break;
-	case TK_DOUBLE:		res = ( _state.data.d == other._state.data.d );		break;
-	case TK_ENUM:		res = ( _state.data.u32 == other._state.data.u32 );	break;
-	default:
-		assert( false );
-	}
-
-	return res;
-}
-
-Any Any::operator[]( uint32 index ) const
-{
-	assert( _state.kind == TK_ARRAY );
-	assert( index < getSize() );
-	co::uint8* ptr;
-	if( _state.isIn )
-		ptr = _state.data.bytes;
-	else
-		ptr = getVectorData( _state );
-	ptr += index * _state.type->getReflector()->getSize();
-	return Any( _state.isIn, _state.type, ptr );
-}
-
-void Any::cast( const State& from, State& to )
-{
-	assert( from.type && to.type );
-
-	if( to.kind == TK_INTERFACE )
-	{
-		if( from.kind == TK_INTERFACE && ( to.isIn || !from.isIn )
-				&& from.getInterface()->isSubTypeOf( to.getInterface() ) )
-		{
-			// should we convert from 'out Itf' (RefPtr<Itf>*) to 'in Itf' (Itf*)?
-			if( to.isIn && !from.isIn )
-				to.data.service = *reinterpret_cast<IService**>( from.data.ptr );
-			else
-				to.data.ptr = from.data.ptr;
-			return;
-		}
-	}
-	else if( to.kind == TK_STRING )
-	{
-		if( from.kind == TK_STRING && ( to.isIn || !from.isIn ) )
-		{
-			to.data.ptr = from.data.ptr;
-			return;
-		}
-	}
-	else if( isScalarType( to.kind ) )
-	{
-		if( isScalarType( from.kind ) )
-		{
-			if( to.isIn )
-			{
-				const void* fromPtr = ( from.isIn ? &from.data.ptr : from.data.ptr );
-				castScalar( from.kind, fromPtr, to.kind, &to.data.ptr );
-				if( to.kind == TK_ENUM )
-				{
-					size_t numIds = static_cast<IEnum*>( to.type )->getIdentifiers().getSize();
-					if( to.data.u32 >= numIds )
-						THROW_ILLEGAL_CAST( from, to, << ": " << to.data.u32 <<
-							" is out of range for the enum" );
-				}
-				return;
-			}
-			else if( !from.isIn && to.type == from.type ) // casting to an 'out scalar' (T&)
-			{
-				to.data.ptr = from.data.ptr;
-				return;
-			}
-		}
-	}
-	else if( to.kind == TK_ANY || to.kind == TK_STRUCT || to.kind == TK_NATIVECLASS )
-	{
-		if( to.kind == from.kind && to.type == from.type && ( to.isIn || !from.isIn ) )
-		{
-			to.data.ptr = from.data.ptr;
-			return;
-		}
-	}
-	else if( to.kind == TK_ARRAY )
-	{
-		if( from.kind == TK_ARRAY )
-		{
-			if( to.isIn )
-			{
-				if( to.type == from.type || ( isPolymorphicType( to.type->getKind() )
-					&& to.type->getKind() == from.type->getKind()
-					&& from.getInterface()->isSubTypeOf( to.getInterface() ) ) )
-				{
-					if( from.isIn )
-					{
-						to.data.ptr = from.data.ptr;
-						to.size = from.size;
-					}
-					else
-					{
-						to.data.ptr = getVectorData( from );
-						to.size = getVectorSize( from );
-					}
-					return;
-				}
-			}
-			else if( !from.isIn && to.type == from.type ) // casting to an 'out array' (vector&)
-			{
-				to.data.ptr = from.data.ptr;
-				return;
-			}
-		}
-	}
-	else
-	{
-		assert( false );
-	}
-
-	THROW_ILLEGAL_CAST( from, to, );
-}
-
-void Any::copy( const Any& other )
-{
-	destroyObject();
-
-	_state = other._state;
-	_state.objectKind = TK_NONE;
-
-	// copy any temporary object from 'other'
-	if( other._state.objectKind != TK_NONE )
-	{
-		switch( other._state.objectKind )
-		{
-		case TK_ANY:
-			createAny() = *reinterpret_cast<Any*>( other._object.data.ptr );
-			break;
-		
-		case TK_BOOLEAN:
-		case TK_INT8:
-		case TK_UINT8:
-		case TK_INT16:
-		case TK_UINT16:
-		case TK_INT32:
-		case TK_UINT32:
-		case TK_INT64:
-		case TK_UINT64:
-		case TK_FLOAT:
-		case TK_DOUBLE:
-		case TK_ENUM:
-			_object.data = _state.data;
-			_state.data.ptr = &_object.data;
-			_state.objectKind = other._state.objectKind;
-			break;
-
-		case TK_STRING:
-			createString() = *reinterpretPtr<const std::string>( other._object.stringArea );
-			break;
-
-		case TK_ARRAY:
-			{
-				_state.objectKind = TK_ARRAY;
-				_object.array.reflector = other._object.array.reflector;
-				_object.array.reflector->serviceRetain();
-				IType* elementType = _object.array.reflector->getType();
-				switch( elementType->getKind() )
-				{
-				case TK_ANY:
-					new( _object.array.vectorArea ) std::vector<Any>(
-						*reinterpretPtr<const std::vector<Any> >( other._object.array.vectorArea ) );
-					break;
-
-				case TK_BOOLEAN:
-				case TK_INT8:
-				case TK_UINT8:
-				case TK_INT16:
-				case TK_UINT16:
-				case TK_INT32:
-				case TK_UINT32:
-				case TK_INT64:
-				case TK_UINT64:
-				case TK_FLOAT:
-				case TK_DOUBLE:
-				case TK_ENUM:
-					new( _object.array.vectorArea ) PseudoVector(
-							*reinterpretPtr<const PseudoVector>( other._object.array.vectorArea ) );
-					break;
-
-				case TK_STRING:
-					new( _object.array.vectorArea ) std::vector<std::string>(
-							*reinterpretPtr<const std::vector<std::string> >( other._object.array.vectorArea ) );
-					break;
-
-				case TK_STRUCT:
-				case TK_NATIVECLASS:
-					{
-						const PseudoVector* opv = reinterpret_cast<const PseudoVector*>( other._object.array.vectorArea );
-						size_t arraySize = opv->size();
-
-						new( _object.array.vectorArea ) PseudoVector( arraySize );
-						PseudoVector* pv = reinterpret_cast<PseudoVector*>( _object.array.vectorArea );
-
-						if( arraySize > 0 )
-						{
-							size_t elementSize = _object.array.reflector->getSize();
-							assert( arraySize % elementSize == 0 );
-							_object.complex.reflector->copyValues( &opv->front(), &pv->front(),
-																	arraySize / elementSize );
-						}
-					}
-					break;
-
-				case TK_INTERFACE:
-					new( _object.array.vectorArea ) RefVector<IService>(
-							*reinterpretPtr<const RefVector<IService> >( other._object.array.vectorArea ) );
-					break;
-
-				default:
-					assert( false );
-				}
-			}
-			break;
-
-		case TK_STRUCT:
-			other._object.complex.reflector->copyValues( other._object.complex.ptr,
-					createComplexValue( other._object.complex.reflector->getType() ), 1 );
-			break;
-
-		case TK_NATIVECLASS:
-			other._object.complex.reflector->copyValues( other._object.complex.inplaceArea,
-					createComplexValue( other._object.complex.reflector->getType() ), 1 );
-			break;
-
-		case TK_INTERFACE:
-			_object.data.service = other._object.data.service;
-			_state.data.ptr = &_object.data.service;
-			_state.objectKind = TK_INTERFACE;
-			break;
-
-		default:
-			break;
-		}
-	}
-
-	assert( _state.objectKind == other._state.objectKind );
-}
 
 template<typename From, typename To>
 inline void castScalar( const void* from, void* to )
@@ -935,19 +105,19 @@ inline void castScalar( TypeKind fromKind, const void* from, void* to )
 {
 	switch( fromKind )
 	{
-	case TK_BOOLEAN:	castScalar<bool, To>( from, to );	break;
-	case TK_INT8:		castScalar<int8, To>( from, to );	break;
-	case TK_UINT8:		castScalar<uint8, To>( from, to );	break;
-	case TK_INT16:		castScalar<int16, To>( from, to );	break;
-	case TK_UINT16:		castScalar<uint16, To>( from, to );	break;
-	case TK_INT32:		castScalar<int32, To>( from, to );	break;
-	case TK_UINT32:		castScalar<uint32, To>( from, to );	break;
-	case TK_INT64:		castScalar<int64, To>( from, to );	break;
-	case TK_UINT64:		castScalar<uint64, To>( from, to );	break;
-	case TK_FLOAT:		castScalar<float, To>( from, to );	break;
-	case TK_DOUBLE:		castScalar<double, To>( from, to );	break;
-	case TK_ENUM:		castScalar<uint32, To>( from, to );	break;
-	default:			assert( false );
+	case TK_BOOL:	castScalar<bool, To>( from, to );	break;
+	case TK_INT8:	castScalar<int8, To>( from, to );	break;
+	case TK_UINT8:	castScalar<uint8, To>( from, to );	break;
+	case TK_INT16:	castScalar<int16, To>( from, to );	break;
+	case TK_UINT16:	castScalar<uint16, To>( from, to );	break;
+	case TK_INT32:	castScalar<int32, To>( from, to );	break;
+	case TK_UINT32:	castScalar<uint32, To>( from, to );	break;
+	case TK_INT64:	castScalar<int64, To>( from, to );	break;
+	case TK_UINT64:	castScalar<uint64, To>( from, to );	break;
+	case TK_FLOAT:	castScalar<float, To>( from, to );	break;
+	case TK_DOUBLE:	castScalar<double, To>( from, to );	break;
+	case TK_ENUM:	castScalar<uint32, To>( from, to );	break;
+	default:		assert( false );
 	}
 }
 
@@ -956,19 +126,530 @@ void castScalar( TypeKind fromKind, const void* from, TypeKind toKind, void* to 
 	assert( isScalarType( toKind ) && isScalarType( fromKind ) );
 	switch( toKind )
 	{
-	case TK_BOOLEAN:	castScalar<bool>( fromKind, from, to );		break;
-	case TK_INT8:		castScalar<int8>( fromKind, from, to );		break;
-	case TK_UINT8:		castScalar<uint8>( fromKind, from, to );	break;
-	case TK_INT16:		castScalar<int16>( fromKind, from, to );	break;
-	case TK_UINT16:		castScalar<uint16>( fromKind, from, to );	break;
-	case TK_INT32:		castScalar<int32>( fromKind, from, to );	break;
-	case TK_UINT32:		castScalar<uint32>( fromKind, from, to );	break;
-	case TK_INT64:		castScalar<int64>( fromKind, from, to );	break;
-	case TK_UINT64:		castScalar<uint64>( fromKind, from, to );	break;
-	case TK_FLOAT:		castScalar<float>( fromKind, from, to );	break;
-	case TK_DOUBLE:		castScalar<double>( fromKind, from, to );	break;
-	case TK_ENUM:		castScalar<uint32>( fromKind, from, to );	break;
-	default:			assert( false );
+	case TK_BOOL:	castScalar<bool>( fromKind, from, to );		break;
+	case TK_INT8:	castScalar<int8>( fromKind, from, to );		break;
+	case TK_UINT8:	castScalar<uint8>( fromKind, from, to );	break;
+	case TK_INT16:	castScalar<int16>( fromKind, from, to );	break;
+	case TK_UINT16:	castScalar<uint16>( fromKind, from, to );	break;
+	case TK_INT32:	castScalar<int32>( fromKind, from, to );	break;
+	case TK_UINT32:	castScalar<uint32>( fromKind, from, to );	break;
+	case TK_INT64:	castScalar<int64>( fromKind, from, to );	break;
+	case TK_UINT64:	castScalar<uint64>( fromKind, from, to );	break;
+	case TK_FLOAT:	castScalar<float>( fromKind, from, to );	break;
+	case TK_DOUBLE:	castScalar<double>( fromKind, from, to );	break;
+	case TK_ENUM:	castScalar<uint32>( fromKind, from, to );	break;
+	default:		assert( false );
+	}
+}
+
+/****************************************************************************/
+/* General Utility Functions                                                */
+/****************************************************************************/
+
+inline bool isSubType( IType* sub, IType* super )
+{
+	return static_cast<IInterface*>( sub )->isSubTypeOf( static_cast<IInterface*>( super ) );
+}
+
+inline bool typesMatch( TypeKind kSub, TypeKind kSuper, IType* tSub, IType* tSuper )
+{
+	return tSub == tSuper ||
+		( isPolymorphicType( kSub ) && kSub == kSuper && isSubType( tSub, tSuper ) );
+}
+
+typedef std::vector<uint8> StdVector;
+
+inline co::uint8* getVectorData( void* ptr  )
+{
+	StdVector& pv = *reinterpret_cast<StdVector*>( ptr );
+	return &pv[0];
+}
+
+inline co::uint8* getVectorData( const __any::State& s )
+{
+	return getVectorData( s.data.ptr );
+}
+
+inline size_t getVectorSize( const __any::State& s )
+{
+	StdVector& pv = *reinterpret_cast<StdVector*>( s.data.ptr );
+	IType* elemType = static_cast<IArray*>( s.type )->getElementType();
+	return pv.size() / elemType->getReflector()->getSize();
+}
+
+#define THROW_ILLEGAL_CAST( from, to, MORE_MESSAGES ) \
+	{ std::stringstream sstream; \
+	sstream << "illegal cast from '" << from << "' to '" << to << "'" MORE_MESSAGES; \
+	throw co::IllegalCastException( sstream.str() ); }
+
+/****************************************************************************/
+/* co::Any                                                                  */
+/****************************************************************************/
+
+bool Any::isA( IType* type ) const
+{
+	assert( type );
+
+	if( !state.type )
+		return false;
+
+	if( state.type == type )
+		return true;
+
+	TypeKind k = state.type->getKind();
+	if( !isPolymorphicType( k ) )
+		return false;
+
+	return k == type->getKind() && isSubType( state.type, type );
+}
+
+Any Any::asIn() const
+{
+	if( state.isIn || !state.type )
+		return *this;
+
+	TypeKind k = state.type->getKind();
+	if( k == TK_ANY )
+		return reinterpret_cast<const AnyValue*>( state.data.ptr )->getAny().asIn();
+
+	if( k == TK_ARRAY )
+	{
+		size_t size = getVectorSize( state );
+		void* data = getVectorData( state );
+		return Any( true, state.type, data, size );
+	}
+
+	return Any( true, state.type, state.data.ptr );
+}
+
+size_t Any::getCount() const
+{
+	if( state.type && state.type->getKind() == TK_ARRAY )
+		return  state.isIn ? state.size : getVectorSize( state );
+
+	return 1;
+}
+
+size_t Any::getElementSize() const
+{
+	IType* type = state.type;
+	if( !type )
+		return 0;
+
+	if( type->getKind() == TK_ARRAY )
+		type = static_cast<IArray*>( type )->getElementType();
+
+	return type->getReflector()->getSize();
+}
+
+void Any::set( bool isIn, IType* type, const void* addr, size_t size )
+{
+	// type must be a valid data type
+	assert( type && isDataType( type->getKind() ) );
+
+	// we can point to a co::AnyValue, but not to another co::Any
+	assert( type->getKind() != TK_ANY || isIn == false );
+
+	state.type = type;
+	state.isIn = isIn;
+	state.size = size;
+	state.data.cptr = addr;
+
+	if( !isIn )
+		return;
+
+	TypeKind k = type->getKind();
+	switch( k )
+	{
+	case TK_BOOL: state.data.b = *reinterpret_cast<const bool*>( addr ); break;
+	case TK_INT8:
+	case TK_UINT8: state.data.u8 = *reinterpret_cast<const uint8*>( addr ); break;
+	case TK_INT16:
+	case TK_UINT16: state.data.u16 = *reinterpret_cast<const uint16*>( addr ); break;
+	case TK_INT32:
+	case TK_UINT32: state.data.u32 = *reinterpret_cast<const uint32*>( addr ); break;
+	case TK_INT64:
+	case TK_UINT64: state.data.u64 = *reinterpret_cast<const uint64*>( addr ); break;
+	case TK_FLOAT: state.data.f = *reinterpret_cast<const float*>( addr ); break;
+	case TK_DOUBLE: state.data.d = *reinterpret_cast<const double*>( addr ); break;
+	case TK_ENUM: state.data.u32 = *reinterpret_cast<const uint32*>( addr ); break;
+	case TK_INTERFACE: state.data.service = *reinterpret_cast<IService* const*>( addr ); break;
+	default:
+		assert( !isScalarType( k ) );
+	}
+	
+}
+
+template<typename T>
+inline void putValue( void* ptr, const Any& value  )
+{
+	*reinterpret_cast<T*>( ptr ) = value.get<const T&>();
+}
+
+void Any::put( const Any& value ) const
+{
+	if( !isValid() || !isOut() )
+		CORAL_THROW( IllegalStateException,
+			"cannot write to a '" << state << "' variable" );
+
+	TypeKind k = state.type->getKind();
+	switch( k )
+	{
+	case TK_ANY:
+		*reinterpret_cast<AnyValue*>( state.data.ptr ) = value;
+		break;
+
+	case TK_BOOL:	putValue<bool>( state.data.ptr, value );		break;
+	case TK_INT8:	putValue<int8>( state.data.ptr, value );		break;
+	case TK_UINT8:	putValue<uint8>( state.data.ptr, value );		break;
+	case TK_INT16:	putValue<int16>( state.data.ptr, value );		break;
+	case TK_UINT16:	putValue<uint16>( state.data.ptr, value );		break;
+	case TK_INT32:	putValue<int32>( state.data.ptr, value );		break;
+	case TK_UINT32:	putValue<uint32>( state.data.ptr, value );		break;
+	case TK_INT64:	putValue<int64>( state.data.ptr, value );		break;
+	case TK_UINT64:	putValue<uint64>( state.data.ptr, value );		break;
+	case TK_FLOAT:	putValue<float>( state.data.ptr, value );		break;
+	case TK_DOUBLE:	putValue<double>( state.data.ptr, value );		break;
+	case TK_STRING:	putValue<std::string>( state.data.ptr, value ); break;
+
+	case TK_ARRAY:
+		{
+			size_t count = value.getCount();
+			AnyValue arrayValue;
+			arrayValue.create( state.type, count );
+			Any array = arrayValue.getAny();
+			for( size_t i = 0; i < count; ++i )
+				array[i].put( value[i] );
+			swapArrays( array );
+		}
+		break;
+
+	case TK_ENUM:	putValue<uint32>( state.data.ptr, value ); break;
+
+	case TK_STRUCT:
+	case TK_NATIVECLASS:
+		if( value.getType() != getType() )
+			THROW_ILLEGAL_CAST( value.state, state, );
+		getType()->getReflector()->copyValues( value.state.data.ptr, state.data.ptr, 1 );
+		break;
+
+	case TK_INTERFACE:
+		{
+			IService* service = NULL;
+			if( value.isValid() )
+			{
+				TypeKind vK = value.getType()->getKind();
+				if( vK == TK_INTERFACE && isSubType( value.getType(), state.type ) )
+					service = value.get<IService*>();
+				else
+					THROW_ILLEGAL_CAST( value.state, state, );
+			}
+			*reinterpret_cast<RefPtr<IService>*>( state.data.ptr ) = service;
+		}
+		break;
+
+	default:
+		assert( false );
+	}
+}
+
+void Any::swapArrays( const Any& other ) const
+{
+	assert( state.type && state.type->getKind() == TK_ARRAY );
+	assert( state.type == other.state.type );
+	assert( !state.isIn && !other.state.isIn );
+	StdVector* myVec = reinterpret_cast<StdVector*>( state.data.ptr );
+	StdVector* otherVec = reinterpret_cast<StdVector*>( other.state.data.ptr );
+	myVec->swap( *otherVec );
+}
+
+bool Any::operator==( const Any& other ) const
+{
+	if( state.type != other.state.type )
+		return false;
+
+	if( state.type == NULL )
+		return true;
+
+	if( state.isIn != other.state.isIn )
+		return false;
+
+	TypeKind k = state.type->getKind();
+	if( state.isIn )
+	{
+		if( k == TK_ARRAY && state.size != other.state.size )
+			return false;
+
+		switch( k )
+		{
+		case TK_BOOL:	return state.data.b == other.state.data.b;
+		case TK_INT8:
+		case TK_UINT8:	return state.data.u8 == other.state.data.u8;
+		case TK_INT16:
+		case TK_UINT16:	return state.data.u16 == other.state.data.u16;
+		case TK_INT32:
+		case TK_UINT32:	return state.data.u32 == other.state.data.u32;
+		case TK_INT64:
+		case TK_UINT64:	return state.data.u64 == other.state.data.u64;
+		case TK_FLOAT:	return state.data.f == other.state.data.f;
+		case TK_DOUBLE:	return state.data.d == other.state.data.d;
+		case TK_ENUM:	return state.data.u32 == other.state.data.u32;
+		default:
+			assert( !isScalarType( k ) );
+		}
+	}
+
+	return state.data.ptr == other.state.data.ptr;
+}
+
+Any Any::operator[]( size_t index ) const
+{
+	assert( state.type && state.type->getKind() == TK_ARRAY );
+	assert( index < getCount() );
+	co::uint8* addr = state.data.bytes;
+	bool isIn = state.isIn;
+	if( !isIn )
+		addr = getVectorData( addr );
+	IType* elemType = static_cast<IArray*>( state.type )->getElementType();
+	addr += index * elemType->getReflector()->getSize();
+	return Any( isIn, elemType, addr );
+}
+
+void Any::cast( __any::State& to ) const
+{
+	assert( state.type && to.type );
+
+	TypeKind k = state.type->getKind();
+	TypeKind toK = to.type->getKind();
+
+	// if this contains an 'out any' we may have to dereference it
+	if( k == TK_ANY )
+	{
+		assert( state.isIn == false );
+		if( toK != TK_ANY )
+		{
+			reinterpret_cast<AnyValue*>( state.data.ptr )->getAny().cast( to );
+			return;
+		}
+	}
+
+	// are we casting to an 'in' or 'out' variable?
+	if( !to.isIn )
+	{
+		// casting to an 'out' variable: both types must match
+		if( state.isIn == false )
+		{
+			if( typesMatch( k, toK, state.type, to.type ) )
+			{
+				to.data.ptr = state.data.ptr;
+				return;
+			}
+		}
+	}
+	else if( !state.isIn ) // casting from an 'out' to an 'in' variable
+	{
+		// we must extract an 'in' var from the 'out' var to carry on the cast
+		return asIn().cast( to );
+	}
+	else // casting from an 'in' to an 'in' variable: conversions are possible
+	{
+		if( k == TK_ARRAY )
+		{
+			// check if both array element types match
+			if( toK == TK_ARRAY )
+			{
+				IType* fromET = static_cast<IArray*>( state.type )->getElementType();
+				IType* toET = static_cast<IArray*>( to.type )->getElementType();
+				if( typesMatch( fromET->getKind(), toET->getKind(), fromET, toET ) )
+				{
+					to.size = state.size;
+					to.data = state.data;
+					return;
+				}
+			}
+		}
+		else if( typesMatch( k, toK, state.type, to.type ) )
+		{
+			// value types match, no conversion necessary
+			to.data = state.data;
+			return;
+		}
+		else // check for possible conversions
+		{
+			if( isScalarType( toK ) )
+			{
+				if( isScalarType( k ) )
+				{
+					// scalar to scalar conversions
+					castScalar( k, &state.data, toK, &to.data );
+
+					// perform a range check for enums
+					if( toK == TK_ENUM )
+					{
+						IEnum* enumType = static_cast<IEnum*>( to.type );
+						if( to.data.u32 >= enumType->getIdentifiers().getSize() )
+							THROW_ILLEGAL_CAST( state, to, << ": " << to.data.u32
+											<< " is out of range for the enum" );
+					}
+
+					return;
+				}
+				else if( toK == TK_ENUM && k == TK_STRING )
+				{
+					// string to enum conversion
+					const std::string& str = *reinterpret_cast<std::string*>( state.data.ptr );
+					int32 value = static_cast<IEnum*>( to.type )->getValueOf( str );
+					if( value == -1 )
+						THROW_ILLEGAL_CAST( state, to, << ": no such identifier '"
+											<< str << "' in the enum" );
+					to.data.u32 = value;
+					return;
+				}
+			}
+		}
+	}
+
+	THROW_ILLEGAL_CAST( state, to, );
+}
+
+/****************************************************************************/
+/* co::AnyValue                                                             */
+/****************************************************************************/
+
+Any AnyValue::getAny() const
+{
+	if( !_type )
+		return Any();
+
+	assert( _type->getKind() != TK_ANY );
+
+	uint32 size = _type->getReflector()->getSize();
+	return __any::State( _type, ( size <= sizeof(_data) ? &_data : _data.ptr ) );
+}
+
+void AnyValue::clear()
+{
+	if( !_type )
+		return;
+
+	IReflector* reflector = _type->getReflector();
+	uint32 size = reflector->getSize();
+
+	if( size <= sizeof(_data) )
+	{
+		reflector->destroyValues( &_data, 1 );
+	}
+	else
+	{
+		reflector->destroyValues( _data.ptr, 1 );
+		free( _data.ptr );
+	}
+
+	_type = NULL;
+}
+
+void* AnyValue::create( IType* type, size_t n )
+{
+	assert( type );
+	clear();
+
+	assert( isDataType( type->getKind() ) && type->getKind() != TK_ANY );
+	assert( n == 1 || type->getKind() == TK_ARRAY );
+
+	_type = type;
+	IReflector* reflector = _type->getReflector();
+	uint32 size = reflector->getSize();
+
+	if( size <= sizeof(_data) )
+	{
+		reflector->createValues( &_data, n );
+		return &_data;
+	}
+
+	_data.ptr = malloc( size );
+	try
+	{
+		reflector->createValues( _data.ptr, n );
+	}
+	catch( ... )
+	{
+		free( _data.ptr );
+		_type = NULL;
+		_data.ptr = NULL;
+		throw;
+	}
+
+	return _data.ptr;
+}
+
+void AnyValue::convert( IType* type )
+{
+	if( _type == type )
+		return;
+
+	co::AnyValue temp;
+	temp.create( type );
+	if( isValid() )
+		temp.getAny().put( getAny() );
+	swap( temp );
+}
+
+void AnyValue::swap( AnyValue& other )
+{
+	IType* tmpType( other._type );
+	__any::Data tmpData( other._data );
+
+	other._type = _type;
+	other._data = _data;
+
+	_type = tmpType;
+	_data = tmpData;
+}
+
+void AnyValue::copy( const Any& any )
+{
+	if( !any.isValid() )
+	{
+		clear();
+		return;
+	}
+
+	Any in = any.asIn();
+	__any::State& s = in.state;
+
+	TypeKind k = s.type->getKind();
+	assert( k != TK_ANY );
+
+	void* ptr = create( s.type, k == TK_ARRAY ? s.size : 1 );
+	if( isScalarType( k ) )
+	{
+		_data = s.data;
+		return;
+	}
+
+	switch( k )
+	{
+	case TK_STRING:
+		*reinterpret_cast<std::string*>( ptr ) = *s.data.str;
+		break;
+
+	case TK_ARRAY:
+		assert( _type->getKind() == TK_ARRAY );
+		static_cast<IArray*>( _type )->getElementType()->getReflector()->
+			copyValues( s.data.ptr, getVectorData( ptr ), s.size );
+		break;
+
+	case TK_STRUCT:
+	case TK_NATIVECLASS:
+		_type->getReflector()->copyValues( s.data.ptr, ptr, 1 );
+		break;
+
+	case TK_INTERFACE:
+		*reinterpret_cast<RefPtr<IService>*>( ptr ) = s.data.service;
+		break;
+
+	default:
+		assert( false );
 	}
 }
 

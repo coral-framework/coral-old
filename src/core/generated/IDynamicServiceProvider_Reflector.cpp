@@ -57,7 +57,7 @@ public:
 		args[1].set< co::IField* >( field_ );
 		co::Range<co::Any> range( args, 2 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 1 ), range );
-		return res.get< co::Any >();
+		return res.get< co::AnyValue >();
 	}
 
 	co::AnyValue dynamicInvoke( co::int32 dynFacetId_, co::IMethod* method_, co::Range<co::Any> args_ )
@@ -68,7 +68,7 @@ public:
 		args[2].set< co::Range<co::Any> >( args_ );
 		co::Range<co::Any> range( args, 3 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 2 ), range );
-		return res.get< co::Any >();
+		return res.get< co::AnyValue >();
 	}
 
 	co::int32 dynamicRegisterService( co::IService* dynamicServiceProxy_ )
@@ -197,7 +197,7 @@ public:
 				{
 					co::int32 dynFacetId_ = args[++argIndex].get< co::int32 >();
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
-					co::Any value_ = args[++argIndex].get< co::Any >();
+					co::Any value_ = args[++argIndex];
 					argIndex = -1;
 					p->dynamicSetField( dynFacetId_, field_, value_ );
 				}

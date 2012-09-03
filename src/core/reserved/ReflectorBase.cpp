@@ -15,7 +15,9 @@
 
 namespace co {
 
-// ------ ReflectorBase provides a facet named 'reflector', of type co::IReflector ------ //
+/*****************************************************************************/
+/* ReflectorBase's 'reflector' facet, of type co::IReflector                 */
+/*****************************************************************************/
 
 IInterface* ReflectorBase_co_Reflector::getInterface()
 {
@@ -29,7 +31,9 @@ IPort* ReflectorBase_co_Reflector::getFacet()
 	return facet;
 }
 
-// ------ ReflectorBase ------ //
+/*****************************************************************************/
+/* ReflectorBase                                                             */
+/*****************************************************************************/
 
 ReflectorBase::ReflectorBase()
 {
@@ -199,5 +203,28 @@ void ReflectorBase::raiseNotSupportedException()
 	throw co::NotSupportedException( "operation not supported by this reflector" );
 }
 
+/*****************************************************************************/
+/* Auxiliary Functions                                                       */
+/*****************************************************************************/
+
+void* checkInstance( const Any& instance, ICompositeType* ct, IMember* member )
+{
+	assert( ct );
+
+	if( !instance.isA( ct ) )
+		CORAL_THROW( co::IllegalArgumentException, "illegal instance (" <<
+			ct->getFullName() << " expected, got " << instance.state << ")" );
+
+	if( !member )
+		throw co::IllegalArgumentException( "illegal null member" );
+
+	ICompositeType* owner = member->getOwner();
+	if( owner != ct )
+		CORAL_THROW( IllegalArgumentException, "member '" << member->getName()
+					<< "' belongs to '" << owner->getFullName()
+					<< "', not to '" << ct->getFullName() << "'" );
+
+	return instance.state.data.ptr;
+}
 
 } // namespace co

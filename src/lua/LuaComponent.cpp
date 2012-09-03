@@ -169,9 +169,9 @@ void LuaComponent::getMethod( lua_State* L, int t, co::int32 cookie )
 	assert( lua_isfunction( L, -1 ) );
 }
 
-co::Any LuaComponent::dynamicGetField( co::int32 cookie, co::IField* ai )
+co::AnyValue LuaComponent::dynamicGetField( co::int32 cookie, co::IField* ai )
 {
-	co::Any res;
+	co::AnyValue value;
 
 	__BEGIN_LUA_API_CODE__
 
@@ -180,11 +180,11 @@ co::Any LuaComponent::dynamicGetField( co::int32 cookie, co::IField* ai )
 	getMethod( L, -2, cookie );
 	lua_pushvalue( L, -3 ); // push the 'self' argument
 	LuaState::call( L, 1, 1 );
-	LuaState::getAny( L, -1, ai->getType(), res );
+	LuaState::getAny( L, -1, value );
 
 	__END_LUA_API_CODE__
 
-	return res;
+	return value;
 }
 
 void LuaComponent::dynamicSetField( co::int32 cookie, co::IField* ai, co::Any value )
@@ -201,9 +201,9 @@ void LuaComponent::dynamicSetField( co::int32 cookie, co::IField* ai, co::Any va
 	__END_LUA_API_CODE__
 }
 
-co::Any LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<co::Any> args )
+co::AnyValue LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<co::Any> args )
 {
-	co::Any res;
+	co::AnyValue res;
 
 	__BEGIN_LUA_API_CODE__
 
@@ -240,7 +240,7 @@ co::Any LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Rang
 	{
 		try
 		{
-			LuaState::getAny( L, idx++, returnType, res );
+			LuaState::getAny( L, idx++, res );
 		}
 		catch( std::exception& e )
 		{

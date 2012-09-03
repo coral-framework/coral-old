@@ -50,7 +50,7 @@ public:
 		co::Any args[1];
 		args[0].set< co::Range<std::string> >( args_ );
 		co::Range<co::Any> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<lua::ILauncher>( 0 ), range );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<lua::ILauncher>( 0 ), range );
 		return res.get< co::int32 >();
 	}
 
@@ -130,7 +130,7 @@ public:
 				{
 					co::Range<std::string> args_ = args[++argIndex].get< co::Range<std::string> >();
 					argIndex = -1;
-					res.set< co::int32 >( p->main( args_ ) );
+					res = p->main( args_ );
 				}
 				break;
 			default:

@@ -65,7 +65,7 @@ void SignatureCalculator::calculateSignatures()
 	switch( _type->getKind() )
 	{
 	case TK_ANY:
-	case TK_BOOLEAN:
+	case TK_BOOL:
 	case TK_INT8:
 	case TK_UINT8:
 	case TK_INT16:

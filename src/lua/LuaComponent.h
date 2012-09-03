@@ -35,9 +35,9 @@ public:
 	// co::IDynamicServiceProvider methods:
 	co::int32 dynamicRegisterService( co::IService* proxy );
 	co::IPort* dynamicGetFacet( co::int32 cookie );
-	co::Any dynamicGetField( co::int32 cookie, co::IField* ai );
+	co::AnyValue dynamicGetField( co::int32 cookie, co::IField* ai );
 	void dynamicSetField( co::int32 cookie, co::IField* ai, co::Any value );
-	co::Any dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<co::Any> args );
+	co::AnyValue dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<co::Any> args );
 
 	// co::IReflector methods:
 	co::uint32 getSize();

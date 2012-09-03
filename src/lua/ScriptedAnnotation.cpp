@@ -23,7 +23,7 @@ public:
 		// empty destructor
 	}
 
-	const std::string& getValue()
+	std::string getValue()
 	{
 		return _scriptName;
 	}

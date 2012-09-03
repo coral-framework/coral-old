@@ -43,6 +43,7 @@ TEST( ReflectorTests, basicReflectors )
 
 	// dummy arguments
 	co::Any any;
+	co::AnyValue value;
 	co::Range<co::Any> anyRange;
 
 	co::uint8 buffer1[sizeof(co::Any)];
@@ -67,9 +68,9 @@ TEST( ReflectorTests, basicReflectors )
 
 		EXPECT_THROW( reflector->newInstance(), co::NotSupportedException );
 		EXPECT_THROW( reflector->newDynamicProxy( NULL ), co::NotSupportedException );
-		EXPECT_THROW( reflector->getField( any, NULL, any ), co::NotSupportedException );
-		EXPECT_THROW( reflector->setField( any, NULL, any ), co::NotSupportedException );
-		EXPECT_THROW( reflector->invoke( any, NULL, anyRange, any ), co::NotSupportedException );
+		EXPECT_THROW( reflector->getField( any, NULL, value ), co::NotSupportedException );
+		EXPECT_THROW( reflector->setField( any, NULL, value ), co::NotSupportedException );
+		EXPECT_THROW( reflector->invoke( any, NULL, anyRange, value ), co::NotSupportedException );
 	}
 }
 
@@ -103,22 +104,23 @@ TEST( ReflectorTests, arrayReflectors )
 	EXPECT_EQ( listB[2], "" );
 
 	// copy array A onto B
-	reflector->copyValues( &listA, buffer, 0 );
+	reflector->copyValues( &listA, buffer, 1 );
 	ASSERT_EQ( listB.size(), 4 );
 	EXPECT_EQ( listB[0], "one" );
 	EXPECT_EQ( listB[3], "end" );
 
 	// destroy the array
-	EXPECT_NO_THROW( reflector->destroyValues( buffer, 0 ) );
+	EXPECT_NO_THROW( reflector->destroyValues( buffer, 1 ) );
 
 	// unsupported methods:
 	co::Any any;
+	co::AnyValue value;
 	co::Range<co::Any> anyRange;
 	EXPECT_THROW( reflector->newInstance(), co::NotSupportedException );
 	EXPECT_THROW( reflector->newDynamicProxy( NULL ), co::NotSupportedException );
-	EXPECT_THROW( reflector->getField( any, NULL, any ), co::NotSupportedException );
-	EXPECT_THROW( reflector->setField( any, NULL, any ), co::NotSupportedException );
-	EXPECT_THROW( reflector->invoke( any, NULL, anyRange, any ), co::NotSupportedException );
+	EXPECT_THROW( reflector->getField( any, NULL, value ), co::NotSupportedException );
+	EXPECT_THROW( reflector->setField( any, NULL, value ), co::NotSupportedException );
+	EXPECT_THROW( reflector->invoke( any, NULL, anyRange, value ), co::NotSupportedException );
 }
 
 TEST( ReflectorTests, reflectorComponent )
@@ -233,7 +235,7 @@ TEST( ReflectorTests, structSimple )
 
 	co::Any a1;
 	std::string str( "my message" );
-	a1.set<const std::string&>( str );
+	a1.set( str );
 
 	reflector->setField( s1, messageField, a1 );
 	EXPECT_EQ( "my message", s1.message );
@@ -243,17 +245,17 @@ TEST( ReflectorTests, structSimple )
 	EXPECT_EQ( "my filename", s1.filename );
 
 	// --- field getting:
-	co::Any res;
+	co::AnyValue v1, v2;
 
-	reflector->getField( s1, lineField, a1 );
-	reflector->getField( s2, lineField, res );
-	EXPECT_EQ( 7, a1.get<co::int32>() );
-	EXPECT_EQ( 0, res.get<co::int32>() );
+	reflector->getField( s1, lineField, v1 );
+	reflector->getField( s2, lineField, v2 );
+	EXPECT_EQ( 7, v1.get<co::int32>() );
+	EXPECT_EQ( 0, v2.get<co::int32>() );
 
-	reflector->getField( s1, messageField, a1 );
-	reflector->getField( s2, messageField, res );
-	EXPECT_EQ( "my message", a1.get<const std::string&>() );
-	EXPECT_EQ( "", res.get<const std::string&>() );
+	reflector->getField( s1, messageField, v1 );
+	reflector->getField( s2, messageField, v2 );
+	EXPECT_EQ( "my message", v1.get<const std::string&>() );
+	EXPECT_EQ( "", v2.get<const std::string&>() );
 
 	// --- in-place destruction:
 	reflector->destroyValues( &s1, 1 );
@@ -269,11 +271,11 @@ TEST( ReflectorTests, structExceptions )
 	co::uint8 memoryArea[sizeof(co::CSLError)];
 	co::CSLError& s1 = *reinterpret_cast<co::CSLError*>( memoryArea );
 
-	co::Any a1;
+	co::AnyValue v1;
 	co::IField* lineField = getField( type, "line" );
 
-	EXPECT_THROW( reflector->getField( type, lineField, a1 ), co::IllegalArgumentException );
-	EXPECT_THROW( reflector->getField( s1, NULL, a1 ), co::IllegalArgumentException );
+	EXPECT_THROW( reflector->getField( type, lineField, v1 ), co::IllegalArgumentException );
+	EXPECT_THROW( reflector->getField( s1, NULL, v1 ), co::IllegalArgumentException );
 }
 
 TEST( ReflectorTests, interfaceNamespace )
@@ -308,36 +310,36 @@ TEST( ReflectorTests, interfaceNamespace )
 	co::INamespace* coNS = co::getSystem()->getTypes()->findNamespace( "co" );
 
 	// --- field getting:
-	co::Any a1;
+	co::AnyValue v1, v2;
 
-	reflector->getField( coNS, nameField, a1 );
-	EXPECT_EQ( "co", a1.get<std::string>() );
+	reflector->getField( coNS, nameField, v1 );
+	EXPECT_EQ( "co", v1.get<std::string>() );
 
 	// cannot 'set' a read-only field
-	EXPECT_THROW( reflector->setField( coNS, nameField, a1 ), co::IllegalArgumentException );
+	EXPECT_THROW( reflector->setField( coNS, nameField, v1 ), co::IllegalArgumentException );
 
-	reflector->getField( coNS, typesField, a1 );
-	EXPECT_TRUE( a1.get< co::Range<co::IType*> >().getSize() > 10 );
-	EXPECT_EQ( "co.ArrayType", a1.get< co::Range<co::IType*> >().getFirst()->getFullName() );
+	reflector->getField( coNS, typesField, v1 );
+	EXPECT_TRUE( v1.get< co::Range<co::IType*> >().getSize() > 10 );
+	EXPECT_EQ( "co.ArrayType", v1.get< co::Range<co::IType*> >().getFirst()->getFullName() );
 
 	// --- calling method getType():
-	co::Any res;
-
 	std::string str( "INamespace" );
-	a1.set<std::string&>( str );
+	v1.set( str );
 
-	reflector->invoke( coNS, getTypeMethod, co::Range<co::Any>( &a1, 1 ), res );
-	EXPECT_EQ( type, res.get<co::IType*>() );
+	co::Any a1( v1 );
+
+	reflector->invoke( coNS, getTypeMethod, co::Range<co::Any>( &a1, 1 ), v2 );
+	EXPECT_EQ( type, v2.get<co::IType*>() );
 
 	// calling getType() with no argument should generate an exception
-	EXPECT_THROW( reflector->invoke( coNS, getTypeMethod, co::Range<co::Any>(), res ),
-					co::MissingInputException );
+	EXPECT_THROW( reflector->invoke( coNS, getTypeMethod,
+		co::Range<co::Any>(), v2 ), co::MissingInputException );
 
 	try
 	{
 		// try to call getType() passing a bool instead of a string
-		a1.set<bool>( false );
-		reflector->invoke( coNS, getTypeMethod, co::Range<co::Any>( &a1, 1 ), res );
+		v1.set( false );
+		reflector->invoke( coNS, getTypeMethod, co::Range<co::Any>( &a1, 1 ), v2 );
 		EXPECT_FALSE( true );
 	}
 	catch( co::IllegalCastException& e )
@@ -350,17 +352,17 @@ TEST( ReflectorTests, interfaceNamespace )
 	str = "MyTypeName";
 
 	// passing only 1 arg, when the method requires 2
-	args[0].set<std::string&>( str );
-	EXPECT_THROW( reflector->invoke( coNS, defineTypeMethod, co::Range<co::Any>( args, 1 ), res ),
+	args[0].set( str );
+	EXPECT_THROW( reflector->invoke( coNS, defineTypeMethod, co::Range<co::Any>( args, 1 ), v1 ),
 				 co::MissingInputException );
 
 	// ok, now we call the method properly, but with a 3rd, unecessary argument (it should work)
 	args[1].set( co::TK_STRUCT );
 	args[2].set( 1337 );
-	reflector->invoke( coNS, defineTypeMethod, co::Range<co::Any>( args, 3 ), res );
+	reflector->invoke( coNS, defineTypeMethod, co::Range<co::Any>( args, 3 ), v1 );
 
 	// alright, we should be able to retrieve a ITypeBuilder from res
-	co::RefPtr<co::ITypeBuilder> builder = res.get<co::ITypeBuilder*>();
+	co::RefPtr<co::ITypeBuilder> builder = v1.get<co::ITypeBuilder*>();
 	EXPECT_TRUE( builder.isValid() );
 
 	// cleanup
@@ -404,39 +406,40 @@ TEST( ReflectorTests, nativeClass )
 	ASSERT_TRUE( setStringMethod != NULL );
 
 	// --- both freshly constructed Uuids should be null; check this using 'isNull' and 'getString'
-	co::Any a1, res;
+	co::AnyValue v1, v2;
 
-	reflector->getField( u1, isNullField, a1 );
-	EXPECT_TRUE( a1.get<bool>() );
+	reflector->getField( u1, isNullField, v1 );
+	EXPECT_TRUE( v1.get<bool>() );
 
 	std::string str;
-	a1.set<std::string&>( str );
-	reflector->invoke( u2, getStringMethod, co::Range<co::Any>( &a1, 1 ), res );
+	co::Any a1( str );
+
+	reflector->invoke( u2, getStringMethod, co::Range<co::Any>( &a1, 1 ), v2 );
 	EXPECT_EQ( "00000000-0000-0000-0000000000000000", str );
 
 	// --- randomize u1, then copy its value to u2 via get/setString
-	reflector->invoke( u1, createRandomMethod, co::Range<co::Any>(), res );
-	reflector->getField( u1, isNullField, a1 );
-	EXPECT_FALSE( a1.get<bool>() );
+	reflector->invoke( u1, createRandomMethod, co::Range<co::Any>(), v1 );
+	reflector->getField( u1, isNullField, v1 );
+	EXPECT_FALSE( v1.get<bool>() );
 
 	EXPECT_NE( u1, u2 );
 
-	a1.set<std::string&>( str );
-	reflector->invoke( u1, getStringMethod, co::Range<co::Any>( &a1, 1 ), res );
-	reflector->invoke( u2, setStringMethod, co::Range<co::Any>( &a1, 1 ), res );
+	v1.set( str );
+	reflector->invoke( u1, getStringMethod, co::Range<co::Any>( &a1, 1 ), v2 );
+	reflector->invoke( u2, setStringMethod, co::Range<co::Any>( &a1, 1 ), v2 );
 
 	EXPECT_EQ( u1, u2 );
 
 	// --- clear u1 and it should be null again
-	reflector->invoke( u1, clearMethod, co::Range<co::Any>(), res );
-	reflector->getField( u1, isNullField, a1 );
-	EXPECT_TRUE( a1.get<bool>() );
+	reflector->invoke( u1, clearMethod, co::Range<co::Any>(), v1 );
+	reflector->getField( u1, isNullField, v1 );
+	EXPECT_TRUE( v1.get<bool>() );
 	EXPECT_NE( u1, u2 );
 
 	// --- set u2 with an invalid string and it should become null as well
 	str = "{invalid}";
-	a1.set<std::string&>( str );
-	reflector->invoke( u2, setStringMethod, co::Range<co::Any>( &a1, 1 ), res );
+	v1.set<std::string&>( str );
+	reflector->invoke( u2, setStringMethod, co::Range<co::Any>( &a1, 1 ), v2 );
 	EXPECT_EQ( u1, u2 );
 
 	// --- in-place destruction:

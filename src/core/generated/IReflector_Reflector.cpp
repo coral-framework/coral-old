@@ -212,7 +212,7 @@ public:
 			{
 			case 2:
 				{
-					co::Any instance_ = args[++argIndex].get< co::Any >();
+					co::Any instance_ = args[++argIndex];
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
 					co::AnyValue& value_ = args[++argIndex].get< co::AnyValue& >();
 					argIndex = -1;
@@ -221,7 +221,7 @@ public:
 				break;
 			case 3:
 				{
-					co::Any instance_ = args[++argIndex].get< co::Any >();
+					co::Any instance_ = args[++argIndex];
 					co::IMethod* method_ = args[++argIndex].get< co::IMethod* >();
 					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
 					co::AnyValue& returnValue_ = args[++argIndex].get< co::AnyValue& >();
@@ -250,9 +250,9 @@ public:
 				break;
 			case 7:
 				{
-					co::Any instance_ = args[++argIndex].get< co::Any >();
+					co::Any instance_ = args[++argIndex];
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
-					co::Any value_ = args[++argIndex].get< co::Any >();
+					co::Any value_ = args[++argIndex];
 					argIndex = -1;
 					p->setField( instance_, field_, value_ );
 				}

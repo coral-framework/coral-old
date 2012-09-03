@@ -12,7 +12,7 @@ enum TypeKind
 {
 	TK_NONE,
 	TK_ANY,
-	TK_BOOLEAN,
+	TK_BOOL,
 	TK_INT8,
 	TK_UINT8,
 	TK_INT16,

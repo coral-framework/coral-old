@@ -65,13 +65,13 @@ CORAL_EXPORT void setServiceByName( IObject* object, const std::string& receptac
 /****************************************************************************/
 
 //! Returns true for integer types.
-inline bool isIntegerType( TypeKind k ) { return k >= TK_BOOLEAN && k <= TK_UINT64; }
+inline bool isIntegerType( TypeKind k ) { return k >= TK_BOOL && k <= TK_UINT64; }
 
 //! Returns true for floating-point types.
 inline bool isFloatType( TypeKind k ) { return k >= TK_FLOAT && k <= TK_DOUBLE; }
 
 //! Returns true for integer and floating-point types.
-inline bool isNumericType( TypeKind k ) { return k >= TK_BOOLEAN && k <= TK_DOUBLE; }
+inline bool isNumericType( TypeKind k ) { return k >= TK_BOOL && k <= TK_DOUBLE; }
 
 //! Returns true for numeric and enumeration types.
 inline bool isScalarType( TypeKind k ) { return isNumericType( k ) || k == TK_ENUM; }
@@ -106,7 +106,7 @@ struct kindOf
 template<TypeKind k> struct kindOfBase { static const TypeKind kind = k; };
 
 // specializations for basic types:
-template<> struct kindOf<bool> : public kindOfBase<TK_BOOLEAN> {};
+template<> struct kindOf<bool> : public kindOfBase<TK_BOOL> {};
 template<> struct kindOf<int8> : public kindOfBase<TK_INT8> {};
 template<> struct kindOf<uint8> : public kindOfBase<TK_UINT8> {};
 template<> struct kindOf<int16> : public kindOfBase<TK_INT16> {};

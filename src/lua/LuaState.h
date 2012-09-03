@@ -69,13 +69,10 @@ public:
 	//@}
 
 	/*!
-		Gets any value from the Lua stack, using \a expectedType to help interpret it.
-		If \a expectedType is NULL, this method will try to directly fit any Lua value into \a any.
-		On the other hand, if the \a expectedType is a co::Any, the method will first call
-		co::Any::createAny() on \a any and then try to fit a Lua value into the temporary co::Any.
-		If the value at \a index has no convertion to Coral, raises a lua::Exception.
+		Retrieves the value at \a index in the Lua stack.
+		\throw lua::Exception if the value at \a index has no convertion to Coral.
 	 */
-	static void getAny( lua_State* L, int index, co::IType* expectedType, co::Any& any );
+	static void getAny( lua_State* L, int index, co::AnyValue& value );
 
 	/*!
 		Gets the value at \a index in the Lua stack and assigns it to \a outputVar.
@@ -88,7 +85,7 @@ public:
     LuaState();
 	virtual ~LuaState();
 
-	co::Range<lua::IInterceptor* const> getInterceptors();
+	co::Range<lua::IInterceptor*> getInterceptors();
 	void addInterceptor( lua::IInterceptor* interceptor );
 	void removeInterceptor( lua::IInterceptor* interceptor );
 
@@ -106,7 +103,7 @@ private:
 	static void pushInstancesTable( lua_State* L );
 
 	static void pushArray( lua_State* L, const co::Any& var );
-	static void toArray( lua_State* L, int index, co::IType* elementType, co::Any& var );
+	static void toArray( lua_State* L, int index, co::AnyValue& value );
 	
 	static co::int32 getEnumIdentifier( lua_State* L, int index, co::IEnum* enumType );
 

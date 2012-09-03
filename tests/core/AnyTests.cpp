@@ -10,54 +10,44 @@
 #include <co/IType.h>
 #include <co/ISystem.h>
 #include <co/IModule.h>
-#include <co/CSLError.h>
 #include <co/IObject.h>
-#include <co/INamespace.h>
 #include <co/IMember.h>
 #include <co/IStruct.h>
-#include <co/ITypeManager.h>
+#include <co/CSLError.h>
+#include <co/INamespace.h>
 #include <co/IInterface.h>
-#include <co/INativeClass.h>
+#include <co/IReflector.h>
 #include <co/IRecordType.h>
+#include <co/INativeClass.h>
+#include <co/ITypeManager.h>
 #include <co/IllegalCastException.h>
+#include <co/IllegalStateException.h>
 #include <co/reserved/Uuid.h>
 
-/******************************************************************************
- *	Performance / Portability Tests
- ******************************************************************************/
+/*****************************************************************************/
+/*  Performance / Portability Tests                                          */
+/*****************************************************************************/
 
 TEST( AnyTests, sizeOf )
 {
-	// we assume size_t has the size of a pointer
+	// we assume size_t is the size of a pointer
 	EXPECT_EQ( CORAL_POINTER_SIZE, sizeof(void*) );
 	EXPECT_EQ( sizeof(void*), sizeof(size_t) );
 
-	// make sure a co::Any is able to store all basic types inplace
-	EXPECT_GE( co::Any::INPLACE_CAPACITY, sizeof(co::Any::State::Data) );
-	EXPECT_GE( co::Any::INPLACE_CAPACITY, sizeof(std::string) );
-	EXPECT_GE( co::Any::INPLACE_CAPACITY, sizeof(sizeof(co::Any::PseudoVector)) );
+	// co::__any::Data should be the size of a double
+	EXPECT_EQ( sizeof(double), sizeof(co::__any::Data) );
+	EXPECT_EQ( 8, sizeof(double) );
 
-	/*
-		Make sure sizeof(co::Any::State) is as expected.
-		A co::Any::State instance contains a double, a pointer, a uint32 and 2 bytes.
-	 */
+	// make sure sizeof(co::__any::State) is as expected (2 ptrs + double)
 #if CORAL_POINTER_SIZE == 4
-	#if defined(CORAL_OS_UNIX)
-		// 32-bit system with 4-byte alignment
-		EXPECT_EQ( 20, sizeof(co::Any::State) );
-		EXPECT_EQ( 20 + co::Any::INPLACE_CAPACITY + sizeof(size_t), sizeof(co::Any) );
-	#else
-		// 32-bit system with 8-byte alignment
-		EXPECT_EQ( 24, sizeof(co::Any::State) );
-		EXPECT_EQ( 24 + co::Any::INPLACE_CAPACITY + sizeof(size_t) + 4, sizeof(co::Any) );
-	#endif
+	EXPECT_EQ( 16, sizeof(co::__any::State) );
 #elif CORAL_POINTER_SIZE == 8
-	// 64-bit system with 8-byte alignment
-	EXPECT_EQ( 24, sizeof(co::Any::State) );
-	EXPECT_EQ( 24 + co::Any::INPLACE_CAPACITY + sizeof(size_t), sizeof(co::Any) );
+	EXPECT_EQ( 24, sizeof(co::__any::State) );
 #else
-#error Huh, pointers are neither 32 nor 64 bit long?
+#error Pointers are neither 32 nor 64 bit long?
 #endif
+
+	EXPECT_EQ( sizeof(co::Any), sizeof(co::__any::State) );
 }
 
 TEST( AnyTests, stdVectorMemoryLayout )
@@ -85,11 +75,11 @@ TEST( AnyTests, stdVectorMemoryLayout )
 	ASSERT_EQ( 64, bytesVector.size() );
 }
 
-/******************************************************************************
- *	A 'constructor' test checks whether the co::Any is detecting the correct
- *	type for a variable passed to its constructor. It may also include basic
- *	retrieval tests for the values passed to the constructor.
- ******************************************************************************/
+/*****************************************************************************/
+/*  A 'constructor' test checks whether the co::Any is detecting the correct */
+/*  type for a variable passed to its constructor. It may also include basic */
+/*  retrieval tests for the values passed to the constructor.                */
+/*****************************************************************************/
 
 void EXPECT_ANY_STREQ( const co::Any& any, const char* str )
 {
@@ -101,28 +91,30 @@ void EXPECT_ANY_STREQ( const co::Any& any, const char* str )
 void EXPECT_ANY_TYPE_STREQ( const co::Any& any, const char* str )
 {
 	std::stringstream ss;
-	ss << any.getState();
+	ss << any.state;
 	EXPECT_STREQ( str, ss.str().c_str() );
 }
 
 template<typename T>
-void constructorValueTest( const co::TypeKind kind, const T& sampleValue, const char* expectedTypeName )
+void constructorValueTest( co::TypeKind kind, const T& sampleValue, const char* expectedTypeName )
 {
 	T v = sampleValue;
 	co::Any a1( v );
-	EXPECT_TRUE( a1.getKind() == kind );
+	ASSERT_TRUE( a1.isValid() );
 	EXPECT_FALSE( a1.isIn() );
 	EXPECT_TRUE( a1.isOut() );
-	EXPECT_EQ( sizeof(T), a1.getSize() );
+	EXPECT_EQ( kind, a1.getType()->getKind() );
+	EXPECT_EQ( sizeof(T), a1.getElementSize() );
 	EXPECT_EQ( a1.getType()->getFullName(), expectedTypeName );
 	EXPECT_EQ( v, a1.get<T>() );
 
 	const T cv = sampleValue;
 	co::Any a2( cv );
-	EXPECT_TRUE( a2.getKind() == kind );
+	ASSERT_TRUE( a2.isValid() );
 	EXPECT_TRUE( a2.isIn() );
 	EXPECT_FALSE( a2.isOut() );
-	EXPECT_EQ( sizeof(T), a2.getSize() );
+	EXPECT_EQ( kind, a2.getType()->getKind() );
+	EXPECT_EQ( sizeof(T), a2.getElementSize() );
 	EXPECT_EQ( a2.getType()->getFullName(), expectedTypeName );
 	EXPECT_EQ( cv, a2.get<T>() );
 }
@@ -132,72 +124,78 @@ void constructorPtrTest( const co::TypeKind kind, T* sampleValue, const char* ex
 {
 	T* p = sampleValue;
 	co::Any a3( p );
-	EXPECT_TRUE( a3.getKind() == kind );
+	ASSERT_TRUE( a3.isValid() );
 	EXPECT_TRUE( a3.isIn() );
 	EXPECT_FALSE( a3.isOut() );
-	EXPECT_EQ( sizeof(void*), a3.getSize() );
+	EXPECT_EQ( kind, a3.getType()->getKind() );
+	EXPECT_EQ( sizeof(void*), a3.getElementSize() );
 	EXPECT_EQ( a3.getType()->getFullName(), expectedTypeName );
 	EXPECT_EQ( p, a3.get<T*>() );
 
 	T* const pc = sampleValue;
 	co::Any a5;
 	a5.set<T* const>( pc );
-	EXPECT_TRUE( a5.getKind() == kind );
+	ASSERT_TRUE( a5.isValid() );
 	EXPECT_TRUE( a5.isIn() );
 	EXPECT_FALSE( a5.isOut() );
-	EXPECT_EQ( sizeof(void*), a5.getSize() );
+	EXPECT_EQ( kind, a5.getType()->getKind() );
+	EXPECT_EQ( sizeof(void*), a5.getElementSize() );
 	EXPECT_EQ( a5.getType()->getFullName(), expectedTypeName );
 	EXPECT_EQ( pc, a5.get<T* const>() );
 
 	co::RefPtr<T> refPtr( p );
 	co::Any a9( refPtr );
-	EXPECT_TRUE( a9.getKind() == kind );
+	ASSERT_TRUE( a9.isValid() );
 	EXPECT_FALSE( a9.isIn() );
 	EXPECT_TRUE( a9.isOut() );
-	EXPECT_EQ( sizeof(void*), a9.getSize() );
+	EXPECT_EQ( kind, a9.getType()->getKind() );
+	EXPECT_EQ( sizeof(void*), a9.getElementSize() );
 	EXPECT_EQ( a9.getType()->getFullName(), expectedTypeName );
 	EXPECT_EQ( &refPtr, &a9.get<co::RefPtr<T>&>() );
 }
 
 template<typename T>
-void constructorRefTest( const co::TypeKind kind, const T& sampleValue, const char* expectedTypeName )
+void constructorNonConstRefTest( const co::TypeKind kind, const T& sampleValue, const char* expectedTypeName )
 {
 	T v = sampleValue;
-
+	
 	co::Any a7;
 	a7.set<T&>( v );
-	EXPECT_TRUE( a7.getKind() == kind );
+	ASSERT_TRUE( a7.isValid() );
 	EXPECT_FALSE( a7.isIn() );
 	EXPECT_TRUE( a7.isOut() );
-	EXPECT_EQ( sizeof(T), a7.getSize() );
+	EXPECT_EQ( kind, a7.getType()->getKind() );
+	EXPECT_EQ( sizeof(T), a7.getElementSize() );
 	EXPECT_EQ( a7.getType()->getFullName(), expectedTypeName );
-	EXPECT_EQ( &v, &a7.get<T&>() );
-	EXPECT_EQ( v, a7.get<T>() );
+	EXPECT_EQ( v, a7.get<T&>() );
+}
+
+template<typename T>
+void constructorRefTest( const co::TypeKind kind, const T& sampleValue, const char* expectedTypeName )
+{
+	constructorNonConstRefTest<T>( kind, sampleValue, expectedTypeName );
+
+	T v = sampleValue;
 
 	co::Any a8;
 	a8.set<const T&>( v );
-	EXPECT_TRUE( a8.getKind() == kind );
+	ASSERT_TRUE( a8.isValid() );
 	EXPECT_TRUE( a8.isIn() );
 	EXPECT_FALSE( a8.isOut() );
-	EXPECT_EQ( sizeof(T), a8.getSize() );
+	EXPECT_EQ( kind, a8.getType()->getKind() );
+	EXPECT_EQ( sizeof(T), a8.getElementSize() );
 	EXPECT_EQ( a8.getType()->getFullName(), expectedTypeName );
-	EXPECT_EQ( v, a8.get<T>() );
+	EXPECT_EQ( v, a8.get<const T&>() );
 
 	// shouldn't be able to get a non-const ref
 	EXPECT_THROW( a8.get<T&>(), co::IllegalCastException );
 }
 
-template<typename T>
-void constructorTest( const co::TypeKind kind, const T& sampleValue, const char* expectedTypeName )
-{
-	constructorValueTest( kind, sampleValue, expectedTypeName );
-	constructorRefTest( kind, sampleValue, expectedTypeName );
-}
-
 TEST( AnyTests, constructDefault )
 {
 	co::Any defaultAny;
-	EXPECT_TRUE( defaultAny.getKind() == co::TK_NONE );
+	EXPECT_TRUE( defaultAny.isNull() );
+	EXPECT_FALSE( defaultAny.isValid() );
 	EXPECT_EQ( NULL, defaultAny.getType() );
 	EXPECT_ANY_TYPE_STREQ( defaultAny, "<none>" );
 
@@ -208,70 +206,71 @@ TEST( AnyTests, constructDefault )
 	EXPECT_TRUE( defaultAny != notDefaultAny );
 }
 
-TEST( AnyTests, constructAny )
+TEST( AnyTests, constructAnyValue )
 {
-	co::Any anAny( 3 );
-	constructorRefTest<co::Any>( co::TK_ANY, anAny, "any" );
+	co::AnyValue anAny( 3.14 );
+	constructorNonConstRefTest<co::AnyValue>( co::TK_ANY, anAny, "any" );
 }
 
 TEST( AnyTests, constructBool )
 {
-	constructorTest<bool>( co::TK_BOOLEAN, false, "bool" );
+	constructorValueTest<bool>( co::TK_BOOL, false, "bool" );
 }
 
 TEST( AnyTests, constructInt8 )
 {
-	constructorTest<co::int8>( co::TK_INT8, 0, "int8" );
+	constructorValueTest<co::int8>( co::TK_INT8, 0, "int8" );
 }
 
 TEST( AnyTests, constructUInt8 )
 {
-	constructorTest<co::uint8>( co::TK_UINT8, 0, "uint8" );
+	constructorValueTest<co::uint8>( co::TK_UINT8, 0, "uint8" );
 }
 
 TEST( AnyTests, constructInt16 )
 {
-	constructorTest<co::int16>( co::TK_INT16, 0, "int16" );
+	constructorValueTest<co::int16>( co::TK_INT16, 0, "int16" );
 }
 
 TEST( AnyTests, constructUInt16 )
 {
-	constructorTest<co::uint16>( co::TK_UINT16, 0, "uint16" );
+	constructorValueTest<co::uint16>( co::TK_UINT16, 0, "uint16" );
 }
 
 TEST( AnyTests, constructInt32 )
 {
-	constructorTest<co::int32>( co::TK_INT32, 0, "int32" );
+	constructorValueTest<co::int32>( co::TK_INT32, 0, "int32" );
 }
 
 TEST( AnyTests, constructUInt32 )
 {
-	constructorTest<co::uint32>( co::TK_UINT32, 0, "uint32" );
+	constructorValueTest<co::uint32>( co::TK_UINT32, 0, "uint32" );
 }
 
 TEST( AnyTests, constructInt64 )
 {
-	constructorTest<co::int64>( co::TK_INT64, 0, "int64" );
+	constructorValueTest<co::int64>( co::TK_INT64, 0, "int64" );
 }
 
 TEST( AnyTests, constructUInt64 )
 {
-	constructorTest<co::uint64>( co::TK_UINT64, 0, "uint64" );
+	constructorValueTest<co::uint64>( co::TK_UINT64, 0, "uint64" );
 }
 
 TEST( AnyTests, constructFloat )
 {
-	constructorTest<float>( co::TK_FLOAT, 0.0f, "float" );
+	constructorValueTest<float>( co::TK_FLOAT, 0.0f, "float" );
 }
 
 TEST( AnyTests, constructDouble )
 {
-	constructorTest<double>( co::TK_DOUBLE, 0.0, "double" );
+	constructorValueTest<double>( co::TK_DOUBLE, 0.0, "double" );
 }
 
 TEST( AnyTests, constructString )
 {
 	std::string str;
+	constructorValueTest<std::string>( co::TK_STRING, str, "string" );
 	constructorRefTest<std::string>( co::TK_STRING, str, "string" );
 }
 
@@ -279,19 +278,19 @@ TEST( AnyTests, constructArray )
 {
 	co::Range<co::int16> r1;
 	co::Any a1( r1 );
-	EXPECT_EQ( 0, a1.getSize() );
+	EXPECT_EQ( 0, a1.getCount() );
 	EXPECT_ANY_TYPE_STREQ( a1, "in int16[]" );
 
 	co::Range<std::string> r2;
 	co::Any a2( r2 );
-	EXPECT_EQ( 0, a2.getSize() );
+	EXPECT_EQ( 0, a2.getCount() );
 	EXPECT_ANY_TYPE_STREQ( a2, "in string[]" );
 
 	const int NUM_PATH_ENTRIES = 2;
 	co::Range<std::string> r3 = co::getPaths();
 
 	co::Any a3( r3 );
-	EXPECT_EQ( NUM_PATH_ENTRIES, a3.getSize() );
+	EXPECT_EQ( NUM_PATH_ENTRIES, a3.getCount() );
 	EXPECT_ANY_TYPE_STREQ( a3, "in string[]" );
 
 	ASSERT_EQ( NUM_PATH_ENTRIES, r3.getSize() );
@@ -307,7 +306,7 @@ TEST( AnyTests, constructArray )
 	co::RefVector<co::IInterface> r4;
 	co::Any a4;
 	a4.set<co::RefVector<co::IInterface>&>( r4 );
-	EXPECT_EQ( 0, a4.getSize() );
+	EXPECT_EQ( 0, a4.getCount() );
 	EXPECT_ANY_TYPE_STREQ( a4, "out co.IInterface[]" );
 
 	EXPECT_TRUE( co::TK_NATIVECLASS == co::kindOf<co::Uuid>::kind );
@@ -317,26 +316,26 @@ TEST( AnyTests, constructArray )
 	std::vector<co::Uuid> r5;
 	co::Any a5;
 	a5.set<std::vector<co::Uuid>&>( r5 );
-	EXPECT_EQ( 0, a5.getSize() );
+	EXPECT_EQ( 0, a5.getCount() );
 	EXPECT_ANY_TYPE_STREQ( a5, "out co.Uuid[]" );
 
 	std::vector<double> r6( 5, 4321 );
 	co::Any a6;
 	a6.set<std::vector<double>&>( r6 );
-	EXPECT_EQ( 5, a6.getSize() );
+	EXPECT_EQ( 5, a6.getCount() );
 	EXPECT_ANY_TYPE_STREQ( a6, "out double[]" );
 
 	double d = 7.5;
 	EXPECT_EQ( 5, a6.get<std::vector<double>&>().size() );
 	a6.get<std::vector<double>&>().push_back( d );
 	ASSERT_EQ( 6, r6.size() );
-	EXPECT_EQ( 6, a6.getSize() );
+	EXPECT_EQ( 6, a6.getCount() );
 	EXPECT_EQ( d, r6.back() );
 }
 
 TEST( AnyTests, constructEnum )
 {
-	constructorTest<co::TypeKind>( co::TK_ENUM, co::TK_COMPONENT, "co.TypeKind" );
+	constructorValueTest<co::TypeKind>( co::TK_ENUM, co::TK_ANY, "co.TypeKind" );
 }
 
 std::ostream& operator<<( std::ostream& out, const co::CSLError& v )
@@ -364,10 +363,10 @@ TEST( AnyTests, constructInterface )
 		co::getSystem()->getTypes()->getRootNS(), "co.INamespace" );
 }
 
-/******************************************************************************
- *	A 'set and get' test checks whether a value can be correctly stored and
- *	retrieved into/from a co::Any. It may also include basic coercion tests.
- ******************************************************************************/
+/*****************************************************************************/
+/*  A 'set and get' test checks whether a value can be correctly stored and  */
+/*  retrieved into/from a co::Any. It may also include basic coercion tests. */
+/*****************************************************************************/
 
 template<typename T>
 void setAndGetTest( T correctValue, T wrongValue )
@@ -608,10 +607,10 @@ TEST( AnyTests, setGetInterface )
 	}
 }
 
-/******************************************************************************
- *	A 'coercion' test checks whether a stored variable is correctly
- *	implicitly converted to a different type at retrieval time.
- ******************************************************************************/
+/*****************************************************************************/
+/*  A 'coercion' test checks whether a stored variable is correctle          */
+/*  implicitly converted to a different type at retrieval time.              */
+/*****************************************************************************/
 
 TEST( AnyTests, coercionsFromBool )
 {
@@ -746,7 +745,7 @@ TEST( MappingTests, coercionBetweenEnums )
 {
 	co::Any a0( co::TK_NONE );
 	co::Any a1( static_cast<short>( 1 ) );
-	co::Any a2( co::TK_BOOLEAN );
+	co::Any a2( co::TK_BOOL );
 	co::Any a3( co::TK_UINT32 );
 	co::Any a4( co::ModuleState_Integrated );
 	co::Any a5( co::__ModuleState__FORCE_SIZEOF_UINT32 );
@@ -766,14 +765,13 @@ TEST( MappingTests, coercionBetweenEnums )
 
 	EXPECT_EQ( 2, a2.get<co::int8>() );
 	EXPECT_EQ( co::ModuleState_Integrated, a2.get<co::ModuleState>() );
-	EXPECT_EQ( co::TK_BOOLEAN, a4.get<co::TypeKind>() );
+	EXPECT_EQ( co::TK_BOOL, a4.get<co::TypeKind>() );
 
 	EXPECT_EQ( 8, a3.get<co::uint64>() );
 	EXPECT_THROW( a3.get<co::ModuleState>(), co::IllegalCastException );
 
 	EXPECT_EQ( 4294967295U, a5.get<co::uint32>() );
 	EXPECT_THROW( a5.get<co::TypeKind>(), co::IllegalCastException );
-	EXPECT_THROW( a5.get<co::ModuleState>(), co::IllegalCastException );
 }
 
 TEST( AnyTests, coercionsFromInterface )
@@ -893,9 +891,9 @@ TEST( AnyTests, coercionsFromStdVector )
 	EXPECT_THROW( superVecAny.get<co::Range<co::IInterface*> >(), co::IllegalCastException );
 }
 
-/*******************************************************************************
- *	Tests for the custom variable setters and constructors
- ******************************************************************************/
+/*****************************************************************************/
+/*  Tests for the custom variable setters and constructors                   */
+/*****************************************************************************/
 
 TEST( AnyTests, setService )
 {
@@ -961,48 +959,11 @@ TEST( AnyTests, setArray )
 	EXPECT_EQ( automatic, manual );
 }
 
-/******************************************************************************
- *	Tests for the Temporary Objects API
- ******************************************************************************/
+/*****************************************************************************/
+/*  Tests for Swap                                                           */
+/*****************************************************************************/
 
-template<typename T>
-void testTemporaryComplexValue( const T& sample )
-{
-	co::Any a1;
-	a1.createComplexValue<T>();
-	ASSERT_NE( a1.get<T&>(), sample );
-
-	a1.get<T&>() = sample;
-	ASSERT_EQ( a1.get<T&>(), sample );
-
-	co::Any a2( a1 );
-	EXPECT_EQ( a2.get<T&>(), sample );
-	EXPECT_EQ( a1.get<T&>(), a2.get<T&>() );
-
-	EXPECT_EQ( a1.containsObject(), true );
-	EXPECT_EQ( a2.containsObject(), true );
-	a1.destroyObject();
-
-	EXPECT_EQ( a1.containsObject(), false );
-	EXPECT_EQ( a2.containsObject(), true );
-}
-
-TEST( AnyTests, temporaryComplexValues )
-{
-	testTemporaryComplexValue<co::Uuid>( co::Uuid::createRandom() );
-
-	co::CSLError cslError;
-	cslError.filename = "filename";
-	cslError.message = "msg";
-	cslError.line = 3;
-	testTemporaryComplexValue<co::CSLError>( cslError );
-}
-
-/******************************************************************************
- *	Tests for co::Any::swap()
- ******************************************************************************/
-
-TEST( AnyTests, swapValues )
+TEST( AnyTests, swap )
 {
 	co::IType* type = co::typeOf<co::IType>::get();
 
@@ -1022,84 +983,34 @@ TEST( AnyTests, swapValues )
 	EXPECT_EQ( type, c.get<co::IType*>() );
 }
 
-TEST( AnyTests, swapTemporaryObjects )
-{
-	co::IType* type = co::typeOf<co::IType>::get();
-	co::Any a( type );
-
-	co::Any b;
-	co::Uuid uuid( co::Uuid::createRandom() );
-	b.createComplexValue<co::Uuid>() = uuid;
-
-	co::Any c;
-	c.createString() = "hello world";
-
-	EXPECT_EQ( type, a.get<co::IType*>() );
-	EXPECT_EQ( uuid, b.get<co::Uuid&>() );
-	EXPECT_EQ( "hello world", c.get<const std::string&>() );
-
-	a.swap( b );
-	EXPECT_EQ( uuid, a.get<co::Uuid&>() );
-	EXPECT_EQ( type, b.get<co::IType*>() );
-	EXPECT_EQ( "hello world", c.get<const std::string&>() );
-
-	c.swap( b );
-	EXPECT_EQ( uuid, a.get<co::Uuid&>() );
-	EXPECT_EQ( "hello world", b.get<const std::string&>() );
-	EXPECT_EQ( type, c.get<co::IType*>() );
-}
-
-/******************************************************************************
- *	Tests for Reflective Array Accesses
- ******************************************************************************/
-
-#include <co/IReflector.h>
-
-co::uint32 getArraySize( const co::Any& array )
-{
-	assert( array.getKind() == co::TK_ARRAY );
-
-	const co::Any::State& s = array.getState();
-	if( array.isIn() )
-		return s.size;
-
-	co::Any::PseudoVector& pv = *reinterpret_cast<co::Any::PseudoVector*>( s.data.ptr );
-	return static_cast<co::uint32>( pv.size() ) / array.getType()->getReflector()->getSize();
-}
-
-co::uint8* getArrayPtr( const co::Any& array )
-{
-	assert( array.getKind() == co::TK_ARRAY );
-
-	const co::Any::State& s = array.getState();
-	if( array.isIn() )
-		return reinterpret_cast<co::uint8*>( s.data.ptr );
-
-	co::Any::PseudoVector& pv = *reinterpret_cast<co::Any::PseudoVector*>( s.data.ptr );
-	return &pv[0];
-}
-
-void getArrayElement( const co::Any& array, co::uint32 index, co::Any& element )
-{
-	co::IType* elementType = array.getType();
-	co::uint32 elementSize = elementType->getReflector()->getSize();
-	element.set( true, elementType, getArrayPtr( array ) + elementSize * index );
-}
+/*****************************************************************************/
+/*  Tests for Reflective Array Accesses                                      */
+/*****************************************************************************/
 
 TEST( AnyTests, accessRangeOfDoubles )
 {
 	double dblArray[] = { -7.75, 3.14, 1000 };
 	
-	co::Any array, element;
+	co::Any array;
 	array.set( co::Range<double>( dblArray, CORAL_ARRAY_LENGTH(dblArray) ) );
 
-	EXPECT_EQ( 3, getArraySize( array ) );
-	EXPECT_EQ( dblArray, reinterpret_cast<double*>( getArrayPtr( array ) ) );
+	ASSERT_TRUE( array.isValid() );
+	EXPECT_TRUE( array.isIn() );
+	EXPECT_EQ( co::TK_ARRAY, array.getType()->getKind() );
+
+	EXPECT_EQ( 3, array.getCount() );
+	EXPECT_EQ( sizeof(double), array.getElementSize() );
 
 	for( co::uint32 i = 0; i < CORAL_ARRAY_LENGTH(dblArray); ++i )
 	{
-		getArrayElement( array, i, element );
-		EXPECT_EQ( dblArray[i], element.get<double>() );
+		co::Any elem = array[i];
+		ASSERT_TRUE( elem.isValid() );
+		EXPECT_TRUE( elem.isIn() );
+		EXPECT_EQ( co::TK_DOUBLE, elem.getType()->getKind() );
+		EXPECT_EQ( dblArray[i], elem.get<double>() );
+
+		// cannot write to an 'in' array / element
+		EXPECT_THROW( elem.put( 3.14 ), co::IllegalStateException );
 	}
 }
 
@@ -1113,21 +1024,31 @@ TEST( AnyTests, accessRangeOfStructs )
 	cslErrorArray[1].message = "message2";
 	cslErrorArray[1].line = 9;
 
-	co::Any array, element;
+	co::Any array, elem;
 	array.set( co::Range<co::CSLError>( cslErrorArray, CORAL_ARRAY_LENGTH(cslErrorArray) ) );
 
-	EXPECT_EQ( 2, getArraySize( array ) );
-	EXPECT_EQ( cslErrorArray, reinterpret_cast<co::CSLError*>( getArrayPtr( array ) ) );
+	ASSERT_TRUE( array.isValid() );
+	EXPECT_TRUE( array.isIn() );
+	EXPECT_EQ( co::TK_ARRAY, array.getType()->getKind() );
 
-	getArrayElement( array, 0, element );
-	EXPECT_EQ( "filename1", element.get<const co::CSLError&>().filename );
-	EXPECT_EQ( "message1", element.get<const co::CSLError&>().message );
-	EXPECT_EQ( 5, element.get<const co::CSLError&>().line );
+	EXPECT_EQ( 2, array.getCount() );
+	EXPECT_EQ( sizeof(co::CSLError), array.getElementSize() );
 
-	getArrayElement( array, 1, element );
-	EXPECT_EQ( "filename2", element.get<const co::CSLError&>().filename );
-	EXPECT_EQ( "message2", element.get<const co::CSLError&>().message );
-	EXPECT_EQ( 9, element.get<const co::CSLError&>().line );
+	elem = array[0];
+	ASSERT_TRUE( elem.isValid() );
+	EXPECT_TRUE( elem.isIn() );
+	EXPECT_EQ( "co.CSLError", elem.getType()->getFullName() );
+	EXPECT_EQ( "filename1", elem.get<const co::CSLError&>().filename );
+	EXPECT_EQ( "message1", elem.get<const co::CSLError&>().message );
+	EXPECT_EQ( 5, elem.get<const co::CSLError&>().line );
+
+	elem = array[1];
+	ASSERT_TRUE( elem.isValid() );
+	EXPECT_TRUE( elem.isIn() );
+	EXPECT_EQ( "co.CSLError", elem.getType()->getFullName() );
+	EXPECT_EQ( "filename2", elem.get<const co::CSLError&>().filename );
+	EXPECT_EQ( "message2", elem.get<const co::CSLError&>().message );
+	EXPECT_EQ( 9, elem.get<const co::CSLError&>().line );
 }
 
 TEST( AnyTests, accessVectorOfStrings )
@@ -1138,21 +1059,31 @@ TEST( AnyTests, accessVectorOfStrings )
 	strVector.push_back( "omg" );
 	strVector.push_back( "great" );
 
-	co::Any array, element;
-	array.set( co::Range<std::string>( strVector ) );
+	co::Any array, elem;
+	array.set( strVector );
 
-	EXPECT_EQ( 4, getArraySize( array ) );
-	EXPECT_EQ( &strVector[0], reinterpret_cast<std::string*>( getArrayPtr( array ) ) );
+	ASSERT_TRUE( array.isValid() );
+	EXPECT_TRUE( array.isOut() );
+	EXPECT_EQ( co::TK_ARRAY, array.getType()->getKind() );
 
-	getArrayElement( array, 0, element );
-	EXPECT_EQ( "foo", element.get<const std::string&>() );
+	EXPECT_EQ( 4, array.getCount() );
 
-	getArrayElement( array, 1, element );
-	EXPECT_EQ( "bar", element.get<const std::string&>() );
+	elem = array[0];
+	ASSERT_TRUE( elem.isValid() );
+	EXPECT_TRUE( elem.isOut() );
+	EXPECT_EQ( co::TK_STRING, elem.getType()->getKind() );
+	EXPECT_EQ( "foo", elem.get<const std::string&>() );
 
-	getArrayElement( array, 2, element );
-	EXPECT_EQ( "omg", element.get<const std::string&>() );
+	elem = array[1];
+	EXPECT_EQ( "bar", elem.get<const std::string&>() );
 
-	getArrayElement( array, 3, element );
-	EXPECT_EQ( "great", element.get<const std::string&>() );
+	elem = array[2];
+	EXPECT_EQ( "omg", elem.get<const std::string&>() );
+
+	elem = array[3];
+	EXPECT_EQ( "great", elem.get<const std::string&>() );
+
+	// test writing to the array element
+	elem.put( std::string( "awesome" ) );
+	EXPECT_EQ( "awesome", strVector[3] );
 }

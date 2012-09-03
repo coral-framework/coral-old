@@ -563,11 +563,15 @@ void CompositeTypeBinding::getField( lua_State* L, const co::Any& instance )
 
 void CompositeTypeBinding::setField( lua_State* L, const co::Any& instance )
 {
+	co::AnyValue value;
+	LuaState::getAny( L, -1, value );
+
 	co::IField* field = checkField( L, -2 );
+	value.convertTo( field->getType() );
+
 	co::IReflector* reflector = field->getOwner()->getReflector();
-	co::Any value;
-	LuaState::getAny( L, -1, field->getType(), value );
-	reflector->setField( instance, field, value );
+	reflector->setField( instance, field, value.getAny() );
+
 	lua_pop( L, 2 );
 
 	// notify interceptors
@@ -601,7 +605,8 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 	__BEGIN_EXCEPTIONS_BARRIER__
 
 	// prepare the argument list
-	co::Any args[MAX_NUM_PARAMETERS];
+	co::AnyValue args[MAX_NUM_PARAMETERS];
+	co::Any plainAnyArgs[MAX_NUM_PARAMETERS];
 
 	int numRequiredArgs = numParams;
 	int numPassedArgs = lua_gettop( L ) - 1;
@@ -611,6 +616,8 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 	{
 		for( ; i < numParams; ++i )
 		{
+			plainAnyArgs[i].set( args[i] );
+
 			co::IParameter* paramInfo = paramList[i];
 			co::IType* paramType = paramInfo->getType();
 
@@ -627,11 +634,11 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 				{
 					// inout: allocate an 'out' var and set it with the 'in' value.
 					args[i].makeOut( paramType );
-					LuaState::getValue( L, i + 2, args[i] );
+					LuaState::getValue( L, i + 2, plainAnyArgs[i] );
 				}
 				else // only 'in'
 				{
-					LuaState::getAny( L, i + 2, paramType, args[i] );
+					LuaState::getAny( L, i + 2, args[i] );
 				}
 			}
 			else // only 'out'
@@ -662,7 +669,7 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 	tryGetInstance( L, 1, instance );
 	co::IReflector* reflector = method->getOwner()->getReflector();
 
-	co::Range<co::Any> argsRange( args, numParams );
+	co::Range<co::Any> argsRange( plainAnyArgs, numParams );
 	reflector->invoke( instance, method, argsRange, returnValue );
 
 	if( instance.getKind() == co::TK_INTERFACE )
@@ -686,7 +693,6 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 		if( paramList[i]->getIsOut() )
 		{
 			++numOut;
-			args[i].makeIn();
 			LuaState::push( L, args[i] );
 		}
 	}

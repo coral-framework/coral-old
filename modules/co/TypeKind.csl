@@ -5,7 +5,7 @@ enum TypeKind
 {
 	TK_NONE,			//< Invalid type kind.
 	TK_ANY,				//< The special 'any' (variant) type.
-	TK_BOOLEAN,			//< Boolean value; either true or false.
+	TK_BOOL,			//< Boolean value; either true or false.
 	TK_INT8,			//< 8-bit signed integer.
 	TK_UINT8,			//< 8-bit unsigned integer.
 	TK_INT16,			//< 16-bit signed integer.

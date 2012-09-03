@@ -166,7 +166,7 @@ public:
 		CORAL_UNUSED( interfaces );
 	}
 
-	co::Any testAnyReturn( co::Any param )
+	co::AnyValue testAnyReturn( co::Any param )
 	{
 		return param;
 	}

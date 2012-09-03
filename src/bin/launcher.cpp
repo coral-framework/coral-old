@@ -297,9 +297,8 @@ int main( int argc, char* argv[] )
 			while( ++index < argc )
 				args.push_back( argv[index] );
 
-			co::Any res;
-			co::Any arg;
-			arg.set<std::vector<std::string>&>( args );
+			co::AnyValue res;
+			co::Any arg( args );
 			reflector->invoke( service, method, co::Range<co::Any>( &arg, 1 ), res );
 
 			// if the result is a number, use it as the return status; otherwise, print it

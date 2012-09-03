@@ -37,7 +37,7 @@ TEST( NamespaceTests, defineType )
 
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_NONE ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_ANY ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_BOOLEAN ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_BOOL ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_INT8 ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_UINT8 ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_INT16 ), co::IllegalArgumentException );

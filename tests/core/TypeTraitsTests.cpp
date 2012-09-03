@@ -105,7 +105,7 @@ TEST( TypeTraitsTests, get )
 	EXPECT_TRUE(( isSame<getB::ValueType, bool*>::value ));
 	EXPECT_TRUE(( isSame<getB::PointedType, bool>::value ));
 	EXPECT_TRUE(( isSame<getB::CoreType, bool>::value ));
-	EXPECT_TRUE( getB::kind == co::TK_BOOLEAN );
+	EXPECT_TRUE( getB::kind == co::TK_BOOL );
 	EXPECT_FALSE( getB::isConst );
 	EXPECT_TRUE( getB::isPointer );
 	EXPECT_TRUE( getB::isPointerConst );
@@ -149,7 +149,7 @@ TEST( TypeTraitsTests, kindOf )
 {
 	EXPECT_TRUE( co::kindOf<std::exception>::kind == co::TK_NONE );
 
-	EXPECT_TRUE( co::kindOf<bool>::kind == co::TK_BOOLEAN );
+	EXPECT_TRUE( co::kindOf<bool>::kind == co::TK_BOOL );
 
 	EXPECT_TRUE( co::kindOf<int>::kind == co::TK_INT32 );
 
