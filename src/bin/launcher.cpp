@@ -304,7 +304,7 @@ int main( int argc, char* argv[] )
 			// if the result is a number, use it as the return status; otherwise, print it
 			if( res.isValid() )
 			{
-				if( res.getKind() >= co::TK_INT8 && res.getKind() <= co::TK_DOUBLE )
+				if( co::isNumericType( res.getType()->getKind() ) )
 					exitStatus = res.get<int>();
 				else
 					std::cout << "Method returned " << res;

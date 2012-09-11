@@ -60,7 +60,7 @@ public:
 		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 0 ), range );
 	}
 
-	co::int32 callFunction( const std::string& moduleName_, const std::string& functionName_, co::Range<co::Any> args_, co::Range<co::Any> results_ )
+	co::int32 call( const std::string& moduleName_, const std::string& functionName_, co::Range<co::Any> args_, co::Range<co::Any> results_ )
 	{
 		co::Any args[4];
 		args[0].set< const std::string& >( moduleName_ );
@@ -190,7 +190,7 @@ public:
 					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
 					co::Range<co::Any> results_ = args[++argIndex].get< co::Range<co::Any> >();
 					argIndex = -1;
-					res = p->callFunction( moduleName_, functionName_, args_, results_ );
+					res = p->call( moduleName_, functionName_, args_, results_ );
 				}
 				break;
 			case 3:

@@ -91,7 +91,7 @@ protected:
 
 #ifndef DOXYGEN
 
-void* checkInstance( const Any& any, ICompositeType* ct, IMember* member );
+CORAL_EXPORT void* checkInstance( const Any& any, ICompositeType* ct, IMember* member );
 
 template<typename T>
 T* checkInstance( const Any& any, IMember* member )

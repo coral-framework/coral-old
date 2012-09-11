@@ -15,7 +15,7 @@
 
 local isBasicType = {
 	TK_ANY		= true,
-	TK_BOOLEAN	= true,
+	TK_BOOL		= true,
 	TK_INT8		= true,
 	TK_UINT8	= true,
 	TK_INT16	= true,

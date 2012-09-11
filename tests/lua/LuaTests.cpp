@@ -221,8 +221,8 @@ TEST( LuaTests, callFunction )
 	results[2].set<co::int32&>( intVec[2] );
 	results[3].set<co::int32&>( intVec[3] );
 
-	ASSERT_NO_THROW( numRes = luaState->callFunction( "lua.scripts.sum", "",
-									co::Range<co::Any>( args, 4 ), resRange ) );
+	ASSERT_NO_THROW( numRes = luaState->call( "lua.scripts.sum", "",
+						co::Range<co::Any>( args, 4 ), resRange ) );
 
 	ASSERT_EQ( 1, numRes );
 	ASSERT_EQ( 11, intVec[0] );
@@ -232,8 +232,8 @@ TEST( LuaTests, callFunction )
 	 */
 
 	// passthrough() simply returns all of its args.
-	ASSERT_NO_THROW( numRes = luaState->callFunction( "lua.scripts.manyFunctions", "passthrough",
-									co::Range<co::Any>( args, 4 ), resRange ) );
+	ASSERT_NO_THROW( numRes = luaState->call( "lua.scripts.manyFunctions", "passthrough",
+						co::Range<co::Any>( args, 4 ), resRange ) );
 
 	ASSERT_EQ( 4, numRes );
 	ASSERT_EQ( 1, intVec[0] );
@@ -254,8 +254,8 @@ TEST( LuaTests, callFunction )
 	results[4].set<std::string&>( str1 );
 	results[5].set<co::Any&>( any2 );
 
-	ASSERT_NO_THROW( numRes = luaState->callFunction( "lua.scripts.manyFunctions", "constants",
-									co::Range<co::Any>(), resRange ) );
+	ASSERT_NO_THROW( numRes = luaState->call( "lua.scripts.manyFunctions", "constants",
+						co::Range<co::Any>(), resRange ) );
 
 	ASSERT_EQ( 6, numRes );
 	ASSERT_TRUE( !any1.isValid() );
@@ -269,7 +269,7 @@ TEST( LuaTests, callFunction )
 	results[0].set<std::string&>( str1 );
 	results[1].set<std::string&>( str2 );
 
-	ASSERT_NO_THROW( numRes = luaState->callFunction( "lua.scripts.manyFunctions", "constants2",
+	ASSERT_NO_THROW( numRes = luaState->call( "lua.scripts.manyFunctions", "constants2",
 						 co::Range<co::Any>(), co::Range<co::Any>( results, 2 ) ) );
 
 	ASSERT_EQ( 5, numRes );
@@ -282,20 +282,20 @@ TEST( LuaTests, callFunctionErrors )
 	co::RefPtr<lua::IState> luaState = co::getService<lua::IState>();
 	co::Range<co::Any> empty;
 
-	ASSERT_LUA_EXCEPTION( luaState->callFunction( "lua.scripts.doesNotExist", "nope", empty, empty ),
-							"module 'lua.scripts.doesNotExist' not found" );
+	ASSERT_LUA_EXCEPTION( luaState->call( "lua.scripts.doesNotExist", "nope", empty, empty ),
+						"module 'lua.scripts.doesNotExist' not found" );
 
-	ASSERT_LUA_EXCEPTION( luaState->callFunction( "lua.scripts.sum", "notATable", empty, empty ),
-							"module did not return a table" );
+	ASSERT_LUA_EXCEPTION( luaState->call( "lua.scripts.sum", "notATable", empty, empty ),
+						"module did not return a table" );
 
-	ASSERT_LUA_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions", "", empty, empty ),
-							"attempt to call a table value" );
+	ASSERT_LUA_EXCEPTION( luaState->call( "lua.scripts.manyFunctions", "", empty, empty ),
+						"attempt to call a table value" );
 
-	ASSERT_LUA_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions", "doesNotExist", empty, empty ),
-							"no such function" );
+	ASSERT_LUA_EXCEPTION( luaState->call( "lua.scripts.manyFunctions", "doesNotExist", empty, empty ),
+						"no such function" );
 
-	ASSERT_LUA_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions", "raiseError", empty, empty ),
-							"here is the error" );
+	ASSERT_LUA_EXCEPTION( luaState->call( "lua.scripts.manyFunctions", "raiseError", empty, empty ),
+						"here is the error" );
 }
 
 TEST( LuaTests, exceptionTypes )
@@ -313,22 +313,22 @@ TEST( LuaTests, exceptionTypes )
 
 	exceptionType = "no type given";
 	message = "ignored";
-	ASSERT_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions", "raiseError", argRange, empty ),
+	ASSERT_EXCEPTION( luaState->call( "lua.scripts.manyFunctions", "raiseError", argRange, empty ),
 						lua::Exception, "no type given" );
 
 	exceptionType = "co.IllegalArgumentException";
 	message = "and here is the msg";
-	ASSERT_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions", "raise", argRange, empty ),
+	ASSERT_EXCEPTION( luaState->call( "lua.scripts.manyFunctions", "raise", argRange, empty ),
 						co::IllegalArgumentException, "and here is the msg" );
 
 	exceptionType = "co.MissingInputException";
 	message = "message here";
-	ASSERT_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions", "raise", argRange, empty ),
+	ASSERT_EXCEPTION( luaState->call( "lua.scripts.manyFunctions", "raise", argRange, empty ),
 						co::MissingInputException, "message here" );
 
 	exceptionType = "invalid type";
 	message = "message";
-	ASSERT_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions", "raise", argRange, empty ),
+	ASSERT_EXCEPTION( luaState->call( "lua.scripts.manyFunctions", "raise", argRange, empty ),
 						lua::Exception, "error throwing an exception of type 'invalid type' from Lua" );
 }
 
@@ -338,8 +338,8 @@ TEST( LuaTests, preserveExceptionType )
 
 	co::Range<co::Any> empty;
 
-	ASSERT_EXCEPTION( luaState->callFunction( "lua.scripts.manyFunctions",
-		"causeIllegalStateException", empty, empty ), co::IllegalStateException, "not SystemState_None" );
+	ASSERT_EXCEPTION( luaState->call( "lua.scripts.manyFunctions", "causeIllegalStateException",
+						empty, empty ), co::IllegalStateException, "not SystemState_None" );
 }
 
 class PseudoInterceptor : public co::IService, public lua::IInterceptor
@@ -420,7 +420,7 @@ TEST( LuaTests, interceptor )
 	co::Any args[2];
 	args[0] = obj.get();
 	args[1].set<const std::string&>( annotation->getFacet()->getName() );
-	luaState->callFunction( "lua.interceptor", "get", co::Range<co::Any>( args, 2 ), co::Range<co::Any>() );
+	luaState->call( "lua.interceptor", "get", co::Range<co::Any>( args, 2 ), co::Range<co::Any>() );
 
 	ASSERT_GE( sg_interceptor.retained.size(), 2 );
 	EXPECT_EQ( sg_interceptor.retained[0], obj.get() );
@@ -435,7 +435,7 @@ TEST( LuaTests, interceptor )
 
 	// test the service call notifications
 	sg_interceptor.calls.clear();
-	luaState->callFunction( "lua.interceptor", "serviceCalls", co::Range<co::Any>(), co::Range<co::Any>() );
+	luaState->call( "lua.interceptor", "serviceCalls", co::Range<co::Any>(), co::Range<co::Any>() );
 
 	ASSERT_GE( sg_interceptor.calls.size(), 1 );
 	EXPECT_EQ( sg_interceptor.calls[0].service, co::getSystem() );
@@ -451,7 +451,7 @@ TEST( LuaTests, interceptor )
 
 	// test the object call notifications
 	sg_interceptor.calls.clear();
-	luaState->callFunction( "lua.interceptor", "objectCalls", co::Range<co::Any>(), co::Range<co::Any>() );
+	luaState->call( "lua.interceptor", "objectCalls", co::Range<co::Any>(), co::Range<co::Any>() );
 
 	ASSERT_GE( sg_interceptor.calls.size(), 3 );
 	EXPECT_EQ( sg_interceptor.calls[0].service, sg_interceptor.calls[2].service );
@@ -467,7 +467,7 @@ TEST( LuaTests, interceptor )
 	sg_interceptor.released.clear();
 
 	// make sure it is not intercepting anything anymore
-	luaState->callFunction( "lua.interceptor", "moreCalls", co::Range<co::Any>(), co::Range<co::Any>() );
+	luaState->call( "lua.interceptor", "moreCalls", co::Range<co::Any>(), co::Range<co::Any>() );
 
 	EXPECT_EQ( 0, sg_interceptor.calls.size() );
 	EXPECT_EQ( 0, sg_interceptor.retained.size() );

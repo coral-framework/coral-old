@@ -110,7 +110,7 @@ public:
 				writer( "\t", itf.formatResult( at ), " ", itf.formatAccessor( "get", a.name ), "()\n", [[
 	{
 		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<]], itf.cppName, [[>( ]], i - 1, [[ ) );
-        return res.get< ]], inputType, [[ >();
+        return res]], t.formatAnyGet( a.type ), [[;
 	}
 
 ]] )
@@ -155,7 +155,7 @@ public:
 				end
 				writer( "_provider->dynamicInvoke( _cookie, getMethod<", itf.cppName, ">( ", i - 1, " ), range );\n" )
 				if m.returnType then
-					writer( "\t\treturn res.get< ", itf.formatInput( m.returnType ), " >();\n" )
+					writer( "\t\treturn res", t.formatAnyGet( m.returnType ), ";\n" )
 				end
 				writer( "\t}\n\n" )
 			end
@@ -332,9 +332,9 @@ public:
 
 		for i, a in ipairs( t.fields ) do
 			if a.type.kind == 'TK_ARRAY' then
-				writer( "\t\tcase ", a.index, ":\t\tco::assign( value.get< ", t.formatInput( a.type ), " >(), p->", a.name, " ); break;\n" )
+				writer( "\t\tcase ", a.index, ":\t\tco::assign( value", t.formatAnyGet( a.type ), ", p->", a.name, " ); break;\n" )
 			else
-				writer( "\t\tcase ", a.index, ":\t\tp->", a.name, " = value.get< ", t.formatInput( a.type ), " >(); break;\n" )
+				writer( "\t\tcase ", a.index, ":\t\tp->", a.name, " = value", t.formatAnyGet( a.type ), "; break;\n" )
 			end
 		end
 
@@ -387,8 +387,9 @@ public:
 				if a.isReadOnly then
 					writer( "\t\tcase ", a.index, ":\t\traiseFieldIsReadOnly( field ); break;\n" )
 				else
-					writer( "\t\tcase ", a.index, ":\t\t", callPrefix, t.formatAccessor( "set", a.name ), "( ",
-						( t.kind == 'TK_NATIVECLASS' and "*p, " or "" ), "value.get< ", t.formatInput( a.type ), " >() ); break;\n" )
+					writer( "\t\tcase ", a.index, ":\t\t", callPrefix, t.formatAccessor( "set", a.name ), "( " )
+					if t.kind == 'TK_NATIVECLASS' then writer( "*p, " ) end
+					writer( "value", t.formatAnyGet( a.type ), " ); break;\n" )
 				end
 			end
 
@@ -425,7 +426,7 @@ public:
 				writer( "\t\t\tcase ", m.index, ":\n\t\t\t\t{\n" )
 				for i, p in ipairs( m.parameters ) do
 					local paramType = ( p.isOut and t.formatOutput or t.formatInput )( p.type )
-					writer( "\t\t\t\t\t", paramType, " ", p.name, "_ = args[++argIndex].get< ", paramType, " >();\n" )
+					writer( "\t\t\t\t\t", paramType, " ", p.name, "_ = args[++argIndex]", t.formatAnyGet( p.type, p.isOut ), ";\n" )
 				end
 				if #m.parameters > 0 then
 					writer( "\t\t\t\t\targIndex = -1;\n" )

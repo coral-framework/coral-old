@@ -14,21 +14,7 @@
 
 TEST( AnyValueTests, sizeOf )
 {
-	// make sure sizeof(co::AnyValue) is as expected (ptr + double)
-#if CORAL_POINTER_SIZE == 4
-	#if defined(CORAL_OS_UNIX)
-		// 32-bit system with 4-byte alignment
-		EXPECT_EQ( 12, sizeof(co::AnyValue) );
-	#else
-		// 32-bit system with 8-byte alignment
-		EXPECT_EQ( 16, sizeof(co::AnyValue) );
-	#endif
-#elif CORAL_POINTER_SIZE == 8
-	// 64-bit system with 8-byte alignment
-	EXPECT_EQ( 16, sizeof(co::AnyValue) );
-#else
-#error Pointers are neither 32 nor 64 bit long?
-#endif
+	EXPECT_EQ( sizeof(co::AnyValue), sizeof(co::Any) );
 }
 
 /*****************************************************************************/

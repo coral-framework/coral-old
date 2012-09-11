@@ -103,7 +103,7 @@ function M:initialize( module )
 	bc.target1 = bc.batman
 	ASSERT_EQ( bc.batman, bc.target1 )
 	ASSERT_ERROR( function() bc.target1 = bc.fruitBat end,
-		"illegal cast from 'in moduleA.IBat' to 'out moduleA.IHuman'" )
+		"illegal cast from 'moduleA.IBat' to 'moduleA.IHuman'" )
 	ASSERT_ERROR( function() return bc.target2 end, "missing method 'getTarget2Service'" )
 
 	-- test passing interfaces from within the component

@@ -92,7 +92,7 @@ end
 
 local typeKindToCpp = {
 	TK_ANY		= "co::Any",
-	TK_BOOLEAN	= "bool",
+	TK_BOOL		= "bool",
 	TK_INT8		= "co::int8",
 	TK_UINT8	= "co::uint8",
 	TK_INT16	= "co::int16",
@@ -116,7 +116,7 @@ end
 
 local typeKindToDoc = {
 	TK_ANY		= "co::Any",
-	TK_BOOLEAN	= "bool",
+	TK_BOOL		= "bool",
 	TK_INT8		= "int8",
 	TK_UINT8	= "uint8",
 	TK_INT16	= "int16",

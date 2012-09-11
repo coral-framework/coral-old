@@ -47,6 +47,13 @@ function M.closeNamespaces( writer, ns )
 	closeBlocks( writer, "namespace", ns )
 end
 
+function M.formatAnyGet( toType, isOut )
+	if toType.kind ~= 'TK_ANY' or isOut then
+		return ".get< " .. ( isOut and M.formatOutput or M.formatInput )( toType ) .. " >()"
+	end
+	return ""
+end
+
 function M.formatAccessor( prefix, fieldName, suffix )
 	return prefix .. fieldName:sub( 1, 1 ):upper() .. fieldName:sub( 2 ) .. ( suffix or "" )
 end
@@ -87,7 +94,7 @@ function M.formatInput( t )
 		return t.cppName .. "*"
 	elseif kind == 'TK_STRING' or kind == 'TK_STRUCT' or kind == 'TK_NATIVECLASS' then
 		return "const " .. t.cppName .. "&"
-	else -- ( kind >= co::TK_BOOLEAN && kind <= co::TK_DOUBLE ) || kind == co::TK_ENUM
+	else -- ( kind >= co::TK_BOOL && kind <= co::TK_DOUBLE ) || kind == co::TK_ENUM
 		return t.cppName
 	end
 end

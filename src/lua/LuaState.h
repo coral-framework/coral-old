@@ -62,7 +62,6 @@ public:
 	//! Pushes any Coral value onto the Lua stack.
 	//@{
 	static void push( lua_State* L, const co::Any& var );
-	static void push( lua_State* L, const co::Any& var, int depth );
 	static void push( lua_State* L, const std::string& str );
 	static void push( lua_State* L, co::IService* itf );
 	static void push( lua_State* L, co::IObject* object );
@@ -70,16 +69,9 @@ public:
 
 	/*!
 		Retrieves the value at \a index in the Lua stack.
-		\throw lua::Exception if the value at \a index has no convertion to Coral.
+		\throw lua::Exception if the value cannot be converted to a Coral value.
 	 */
-	static void getAny( lua_State* L, int index, co::AnyValue& value );
-
-	/*!
-		Gets the value at \a index in the Lua stack and assigns it to \a outputVar.
-		If the Lua value cannot be assigned to the var in \a outputVar, raises a lua::Exception.
-		\warning \a outputVar must be a valid output variable.
-	 */
-	static void getValue( lua_State* L, int index, const co::Any& outputVar );
+	static void get( lua_State* L, int index, co::AnyValue& value );
 
 public:
     LuaState();
@@ -91,7 +83,7 @@ public:
 
 	bool findScript( const std::string& name, std::string& filename );
 
-	co::int32 callFunction( const std::string& moduleName, const std::string& functionName,
+	co::int32 call( const std::string& moduleName, const std::string& functionName,
 		co::Range<co::Any> args, co::Range<co::Any> results );
 
 	void collectGarbage();

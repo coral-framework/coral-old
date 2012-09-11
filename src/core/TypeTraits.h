@@ -67,6 +67,9 @@ CORAL_EXPORT void setServiceByName( IObject* object, const std::string& receptac
 //! Returns true for integer types.
 inline bool isIntegerType( TypeKind k ) { return k >= TK_BOOL && k <= TK_UINT64; }
 
+//! Returns true for signed integer types.
+inline bool isSignedIntegerType( TypeKind k ) { return isIntegerType( k ) && ( k & 1 ) != 0; }
+
 //! Returns true for floating-point types.
 inline bool isFloatType( TypeKind k ) { return k >= TK_FLOAT && k <= TK_DOUBLE; }
 

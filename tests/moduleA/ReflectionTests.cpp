@@ -90,7 +90,7 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 	EXPECT_EQ( "co.IMethod", ts.typeArray[2]->getFullName() );
 
 	// --- field getting:
-	co::Any res;
+	co::AnyValue res;
 
 	reflector->getField( ts, aTypeField, res );
 	EXPECT_EQ( "co.IInterface", res.get<co::IService*>()->getInterface()->getFullName() );

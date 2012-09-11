@@ -187,79 +187,60 @@ void LuaState::call( lua_State* L, int numArgs, int numResults )
 
 void LuaState::push( lua_State* L, const co::Any& var )
 {
-	push( L, var, 0 );
-}
+	co::Any in = var.asIn();
+	const co::__any::State& s = in.state;
 
-void LuaState::push( lua_State* L, const co::Any& var, int depth )
-{
-	const co::Any::State& s = var.getState();
+	co::TypeKind k = s.type ? s.type->getKind() : co::TK_NONE;
+	assert( k != co::TK_ANY );
 
-	// dereference the variable, if necessary
-	const co::Any::State::Data* d = &s.data;
-	if( var.isOut() && co::isScalarOrRefType( s.kind ) )
-		d = reinterpret_cast<const co::Any::State::Data*>( d->ptr );
-
-	switch( s.kind )
+	switch( k )
 	{
 	case co::TK_NONE:
 		lua_pushnil( L );
 		break;
-	case co::TK_ANY:
-		if( depth > 1 )
-		{
-			/*
-				Since a co::Any may reference any other co::Any,
-				we must limit the number of indirections to avoid cycles.
-			 */
-			assert( false );
-			lua_pushnil( L );
-			break;
-		}
-		push( L, var.get<const co::Any&>(), depth + 1 );
-		break;
 	case co::TK_BOOL:
-		lua_pushboolean( L, d->b );
+		lua_pushboolean( L, s.data.b );
 		break;
 	case co::TK_INT8:
-		lua_pushnumber( L, d->i8 );
+		lua_pushnumber( L, s.data.i8 );
 		break;
 	case co::TK_UINT8:
-		lua_pushnumber( L, d->u8 );
+		lua_pushnumber( L, s.data.u8 );
 		break;
 	case co::TK_INT16:
-		lua_pushnumber( L, d->i16 );
+		lua_pushnumber( L, s.data.i16 );
 		break;
 	case co::TK_UINT16:
-		lua_pushnumber( L, d->u16 );
+		lua_pushnumber( L, s.data.u16 );
 		break;
 	case co::TK_INT32:
-		lua_pushnumber( L, d->i32 );
+		lua_pushnumber( L, s.data.i32 );
 		break;
 	case co::TK_UINT32:
-		lua_pushnumber( L, d->u32 );
+		lua_pushnumber( L, s.data.u32 );
 		break;
 	case co::TK_INT64:
-		lua_pushnumber( L, static_cast<lua_Number>( d->i64 ) );
+		lua_pushnumber( L, static_cast<lua_Number>( s.data.i64 ) );
 		break;
 	case co::TK_UINT64:
-		lua_pushnumber( L, static_cast<lua_Number>( d->u64 ) );
+		lua_pushnumber( L, static_cast<lua_Number>( s.data.u64 ) );
 		break;
 	case co::TK_FLOAT:
-		lua_pushnumber( L, d->f );
+		lua_pushnumber( L, s.data.f );
 		break;
 	case co::TK_DOUBLE:
-		lua_pushnumber( L, d->d );
+		lua_pushnumber( L, s.data.d );
 		break;
 	case co::TK_STRING:
-		push( L, var.get<const std::string&>() );
+		push( L, *s.data.str );
 		break;
 	case co::TK_ARRAY:
-		pushArray( L, var );
+		pushArray( L, in );
 		break;
 	case co::TK_ENUM:
 		{
 			co::Range<std::string> ids = static_cast<co::IEnum*>( s.type )->getIdentifiers();
-			co::uint32 id = d->u32;
+			co::uint32 id = s.data.u32;
 			if( id < ids.getSize() )
 				push( L, ids[id] );
 			else
@@ -271,13 +252,13 @@ void LuaState::push( lua_State* L, const co::Any& var, int depth )
 		}
 		break;
 	case co::TK_STRUCT:
-		StructBinding::push( L, static_cast<co::IStruct*>( s.type ), d->ptr );
+		StructBinding::push( L, static_cast<co::IStruct*>( s.type ), s.data.ptr );
 		break;
 	case co::TK_NATIVECLASS:
-		NativeClassBinding::push( L, static_cast<co::INativeClass*>( s.type ), d->ptr );
+		ClassBinding::push( L, static_cast<co::INativeClass*>( s.type ), s.data.ptr );
 		break;
 	case co::TK_INTERFACE:
-		push( L, d->service );
+		push( L, s.data.service );
 		break;
 	default:
 		assert( false );
@@ -335,7 +316,7 @@ void LuaState::push( lua_State* L, co::IObject* object )
 	pushInstance<ObjectBinding, co::IObject>( L, object );
 }
 
-void LuaState::getAny( lua_State* L, int index, co::AnyValue& value )
+void LuaState::get( lua_State* L, int index, co::AnyValue& value )
 {
 	switch( lua_type( L, index ) )
 	{
@@ -359,7 +340,7 @@ void LuaState::getAny( lua_State* L, int index, co::AnyValue& value )
 		{
 			size_t length;
 			const char* cstr = lua_tolstring( L, index, &length );
-			value.createString().assign( cstr, length );
+			value.create<std::string>().assign( cstr, length );
 		}
 		break;
 
@@ -377,8 +358,14 @@ void LuaState::getAny( lua_State* L, int index, co::AnyValue& value )
 				const char* unexpectedType = NULL;
 				if( tp != LUA_TUSERDATA )
 					unexpectedType = lua_typename( L, -1 );
-				else if( !CompositeTypeBinding::tryGetInstance( L, -1, value ) )
-					unexpectedType = "unknown userdata";
+				else
+				{
+					co::Any instance;
+					if( CompositeTypeBinding::tryGetInstance( L, -1, instance ) )
+						value = instance;
+					else
+						unexpectedType = "unknown userdata";
+				}
 				lua_pop( L, 1 );
 				if( unexpectedType )
 					CORAL_THROW( lua::Exception, "Coral object expected, got " << unexpectedType );
@@ -391,7 +378,7 @@ void LuaState::getAny( lua_State* L, int index, co::AnyValue& value )
 		break;
 
 	case LUA_TUSERDATA:
-		CompositeTypeBinding::getInstance( L, index, value );
+		value = CompositeTypeBinding::getInstance( L, index );
 		break;
 
 	case LUA_TTHREAD:
@@ -403,21 +390,13 @@ void LuaState::getAny( lua_State* L, int index, co::AnyValue& value )
 	}
 }
 
-void LuaState::getValue( lua_State* L, int index, const co::Any& var )
-{
-	assert( var.isValid() && var.isOut() );
-	co::AnyValue value;
-	getAny( L, index, value );
-	var.put( value );
-}
-
 bool LuaState::findScript( const std::string& name, std::string& filename )
 {
 	return findScript( getL(), name, filename );
 }
 
-co::int32 LuaState::callFunction( const std::string& moduleName, const std::string& functionName,
-									co::Range<co::Any> args, co::Range<co::Any> results )
+co::int32 LuaState::call( const std::string& moduleName, const std::string& functionName,
+							co::Range<co::Any> args, co::Range<co::Any> results )
 {
 	lua_State* L = getL();
 	int top = lua_gettop( L );
@@ -452,7 +431,19 @@ co::int32 LuaState::callFunction( const std::string& moduleName, const std::stri
 
 		int maxResults = std::min( numResults, static_cast<int>( results.getSize() ) );
 		for( int i = 0; i < maxResults; ++i )
-			getValue( L, top + i + 1, results[i] );
+		{
+			co::AnyValue value;
+			get( L, top + i + 1, value );
+
+			// all vars in results[] must be valid 'out' vars
+			const co::Any& dest = results[i];
+			assert( dest.isValid() && dest.isOut() );
+
+			if( dest.getType()->getKind() == co::TK_ANY )
+				value.swap( dest.get<co::AnyValue&>() );
+			else
+				dest.put( value.getAny() );
+		}
 
 		lua_settop( L, top );
 
@@ -500,10 +491,10 @@ void LuaState::pushInstancesTable( lua_State* L )
 
 void LuaState::pushArray( lua_State* L, const co::Any& array )
 {
-	assert( array.getKind() == co::TK_ARRAY );
-	co::uint32 size = array.getSize();
-	lua_createtable( L, size, 0 );
-	for( co::uint32 i = 0; i < size; ++i )
+	assert( array.isIn() && array.getType()->getKind() == co::TK_ARRAY );
+	size_t count = array.getCount();
+	lua_createtable( L, count, 0 );
+	for( size_t i = 0; i < count; ++i )
 	{
 		push( L, array[i] );
 		lua_rawseti( L, -2, i + 1 );
@@ -521,8 +512,11 @@ void LuaState::toArray( lua_State* L, int index, co::AnyValue& value )
 		return;
 	}
 
-	co::Any::PseudoVector& pv = value.createArray( co::typeOf<co::Any>::get(), len );
-	co::AnyValue* elements = reinterpret_cast<co::AnyValue*>( &pv[0] );
+	value.create( co::typeOf<co::Range<co::AnyValue> >::get() );
+
+	co::Any array = value.getAny();
+	array.resize( len );
+	co::AnyValue* elements = &array[0].get<co::AnyValue&>();
 
 	size_t i = 1;
 	int stackTop = lua_gettop( L );
@@ -532,7 +526,7 @@ void LuaState::toArray( lua_State* L, int index, co::AnyValue& value )
 		for( ; i <= len; ++i )
 		{
 			lua_rawgeti( L, index, i );
-			getAny( L, -1, elements[i - 1] );
+			get( L, -1, elements[i - 1] );
 			lua_settop( L, stackTop );
 		}
 	}

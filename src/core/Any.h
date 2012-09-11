@@ -52,17 +52,6 @@ union Data
 
 	// Constructors
 	Data() : d( 0 ) {;}
-	Data( bool b ) : b( b ) {;}
-	Data( int8 i8 ) : i8( i8 ) {;}
-	Data( uint8 u8 ) : u8( u8 ) {;}
-	Data( int16 i16 ) : i16( i16 ) {;}
-	Data( uint16 u16 ) : u16( u16 ) {;}
-	Data( int32 i32 ) : i32( i32 ) {;}
-	Data( uint32 u32 ) : u32( u32 ) {;}
-	Data( int64 i64 ) : i64( i64 ) {;}
-	Data( uint64 u64 ) : u64( u64 ) {;}
-	Data( float f ) : f( f ) {;}
-	Data( double d ) : d( d ) {;}
 	Data( const void* ptr ) : cptr( ptr ) {;}
 };
 
@@ -78,12 +67,12 @@ struct State
 #endif
 	Data data;		// Storage for primitives and pointers
 
-	// default constructor
-	State() : type() {;}
+	// Default constructor
+	State() : type(), isIn( false ), size( 0 ) {;}
 
-	// 'out' variable constructor
+	// Output variable constructor
 	State( IType* type, const void* ptr )
-		: type( type ), isIn( false ), data( ptr ) {;}
+		: type( type ), isIn( false ), size( 0 ), data( ptr ) {;}
 };
 
 template<typename T>
@@ -178,7 +167,9 @@ struct Variable<RefPtr<T>&>
 template<typename T>
 struct Variable<const RefPtr<T>&>
 {
-	inline static void tag( State& ) { static_assert( sizeof(T)<0, "illegal const RefPtr" ); }
+	typedef Variable<T* const&> AsPtr;
+	inline static void tag( State& s ) { AsPtr::tag( s ); }
+	inline static void set( State& s, const RefPtr<T>& v ) { AsPtr::set( s, v.get() ); }
 };
  
 template<typename T>
@@ -215,13 +206,17 @@ template<typename T> struct Variable<RefVector<T>&>
 template<typename T>
 struct Variable<const std::vector<T>&>
 {
-	inline static void tag( State& ) { static_assert( sizeof(T)<0, "illegal const std::vector" ); }
+	typedef Variable<Range<T>&> AsRange;
+	inline static void tag( State& s ) { AsRange::tag( s ); }
+	inline static void set( State& s, const std::vector<T>& v ) { AsRange::set( s, v ); }
 };
 
 template<typename T>
 struct Variable<const RefVector<T>&>
 {
-	inline static void tag( State& ) { static_assert( sizeof(T)<0, "illegal const co::RefVector" ); }
+	typedef Variable<Range<T*>&> AsRange;
+	inline static void tag( State& s ) { AsRange::tag( s ); }
+	inline static void set( State& s, const RefVector<T>& v ) { AsRange::set( s, v ); }
 };
 
 } // namespace __any
@@ -306,11 +301,11 @@ public:
 
 	//! Creates a reference to any non-const Coral variable.
 	template<typename T>
-	inline Any( T& var ) { set<T&>( var ); }
+	inline Any( T& var ) { set( var ); }
 
 	//! Creates a reference to any const Coral variable.
 	template<typename T>
-	inline Any( const T& var ) { set<const T&>( var ); }
+	inline Any( const T& var ) { set( var ); }
 
 	//! Creates a reference to any variable reflectively. \see set()
 	inline Any( bool isIn, IType* type, const void* addr, size_t size = 0 )
@@ -342,7 +337,7 @@ public:
 	//! Whether this co::Any references something (isn't null).
 	inline bool isValid() const { return state.type != NULL; }
 
-	//! Returns the type of variable in this co::Any (or NULL if it's empty).
+	//! Returns the type of the stored variable (or NULL for an empty co::Any).
 	inline IType* getType() const { return state.type; }
 
 	//! Whether the stored variable is in the 'input' format.
@@ -380,19 +375,19 @@ public:
 	template<typename T>
 	inline T get() const
 	{
-		__any::State s;
-		__any::Variable<T>::tag( s );
-		cast( s );
-		return __any::Variable<T>::get( s );
+		Any any;
+		__any::Variable<T>::tag( any.state );
+		cast( any.state );
+		return __any::Variable<T>::get( any.state );
 	}
 
 	template<typename T>
 	inline void get( T& v ) const
 	{
-		__any::State s;
-		__any::Variable<T&>::tag( s );
-		cast( s );
-		v = __any::Variable<T&>::get( s );
+		Any any;
+		__any::Variable<T&>::tag( any.state );
+		__any::Variable<T&>::set( any.state, v );
+		any.put( *this );
 	}
 
 	//@}
@@ -454,9 +449,7 @@ public:
 	//@}
 
 	/*!
-		Stores a \a value onto the location pointed to by an output variable.
-		If necessary, the \a value is converted to the output variable's
-		type when copied to its destination.
+		Stores \a value onto the location pointed to by this 'out' variable.
 		\throw IllegalStateException if this is not an output variable.
 		\throw IllegalCastException if \a value cannot be converted to
 					the output variable's type.
@@ -472,10 +465,21 @@ public:
 	}
 
 	/*!
-		Swaps the vector pointers of two co::Any's containing
-		'out arrays' of the same type.
+		\brief Swaps the vector pointers of two 'out arrays' of the same type.
 	 */
 	void swapArrays( const Any& other ) const;
+
+	/*!
+		\brief Resizes an 'out array' by inserting or erasing elements
+		from the vector. This basically mimics std::vector::resize().
+	 */
+	void resize( size_t n ) const;
+
+	//! Returns the array element at the given \a index.
+	Any at( size_t index ) const;
+
+	//! Index operator for access to array elements. \sa at().
+	inline Any operator[]( size_t index ) const { return at( index ); }
 
 	//! Equality test operator.
 	bool operator==( const Any& other ) const;
@@ -496,11 +500,7 @@ public:
 		return *this;
 	}
 
-	//! Index operator for reflective access to array elements.
-	Any operator[]( size_t index ) const;
-
 protected:
-	// Raises co::IllegalCastException when the cast is impossible.
 	void cast( __any::State& to ) const;
 };
 
@@ -511,48 +511,45 @@ class CORAL_EXPORT AnyValue
 {
 public:
 	//! Default constructor.
-	AnyValue() : _type( NULL ) {;}
+	AnyValue() {;}
 
 	template<typename T>
-	inline AnyValue( const T& var ) : _type( NULL )
+	inline AnyValue( const T& var )
 	{
 		copy( Any( var ) );
 	}
 
-	inline AnyValue( const Any& other ) : _type( NULL )
+	inline AnyValue( const Any& other )
 	{
 		copy( other );
 	}
 
 	//! Copy constructor.
-	inline AnyValue( const AnyValue& other ) : _type( NULL )
+	inline AnyValue( const AnyValue& other )
 	{
-		copy( other.getAny() );
+		copy( other._any );
 	}
 
 	//! Destructor.
 	inline ~AnyValue() { clear(); }
 
-	//! Whether this co::Any is empty (null).
-	inline bool isNull() const { return _type == NULL; }
+	//! Whether this co::AnyValue is empty (null).
+	inline bool isNull() const { return _any.isNull(); }
 
 	//! Whether this co::AnyValue contains a value (isn't null).
-	inline bool isValid() const { return _type != NULL; }
+	inline bool isValid() const { return _any.isValid(); }
+
+	//! Returns the type of the contained value (or NULL if this is empty).
+	inline IType* getType() const { return _any.getType(); }
 
 	//! Returns an 'out' co::Any that references this co::AnyValue's value.
-	Any getAny() const;
+	inline Any getAny() const { return _any; }
 
 	template<typename T>
-	inline T get() const
-	{
-		return getAny().get<T>();
-	}
+	inline T get() const { return _any.get<T>(); }
 
 	template<typename T>
-	inline void get( T& v ) const
-	{
-		return getAny().get<T>( v );
-	}
+	inline void get( T& v ) const { return _any.get<T>( v ); }
 
 	/*!
 		Destroys any stored value and makes this any null.
@@ -560,17 +557,13 @@ public:
 	void clear();
 
 	template<typename T>
-	inline void set( const T& var )
-	{
-		copy( Any( var ) );
-	}
+	inline void set( const T& var ) { copy( Any( var ) ); }
 
 	/*!
 		Creates a default-constructed instance of the given \a type.
-		If the type is an array, it's created with \a n elements.
 		\throw ???
 	 */
-	void* create( IType* type, size_t n = 1 );
+	void* create( IType* type );
 
 	/*!
 		Creates an instance of the complex value type \a T and makes this
@@ -591,14 +584,14 @@ public:
 	void convert( IType* type );
 
 	//! Swaps the contents of two co::AnyValue's.
-	void swap( AnyValue& other );
+	inline void swap( AnyValue& other ) { _any.swap( other._any ); }
 
 	//! Equality test operator.
 	inline bool operator==( const AnyValue& other ) const
 	{
-		return getAny() == other.getAny();
+		return _any == other._any;
 	}
-	
+
 	//! Inequality test operator.
 	inline bool operator!=( const AnyValue& other ) const
 	{
@@ -608,7 +601,7 @@ public:
 	//! Assignment operator.
 	inline AnyValue& operator=( const AnyValue& other )
 	{
-		copy( other.getAny() );
+		copy( other._any );
 		return *this;
 	}
 
@@ -623,8 +616,7 @@ private:
 	void copy( const Any& any );
 
 private:
-	IType* _type;
-	__any::Data _data;
+	Any _any;
 };
 
 #ifndef DOXYGEN
@@ -634,14 +626,22 @@ inline void swap( Any& a, Any& b ) { a.swap( b ); }
 inline void swap( AnyValue& a, AnyValue& b ) { a.swap( b ); }
 #endif // DOXYGEN
 
+// Automatically convert Range<AnyValue>'s to Range<Any>'s
+template<> struct RangeAdaptor<Any, const Range<AnyValue> >
+{
+	static const bool isValid = true;
+	static const Any* getData( const Range<AnyValue>& r ) { return reinterpret_cast<const Any*>( r.getStart() ); }
+	static size_t getSize( const Range<AnyValue>& r ) { return r.getSize(); }
+};
+
 } // namespace co
 
 #ifndef DOXYGEN
 
 // std::swap specialization for co::Any:
 namespace std {
-	template<> inline void swap( co::Any& a, co::Any& b ) { a.swap( b ); }
-	template<> inline void swap( co::AnyValue& a, co::AnyValue& b ) { a.swap( b ); }
+template<> inline void swap( co::Any& a, co::Any& b ) { a.swap( b ); }
+template<> inline void swap( co::AnyValue& a, co::AnyValue& b ) { a.swap( b ); }
 } // namespace std
 
 // Outputs the qualified type name of the variable in a co::__any::State.

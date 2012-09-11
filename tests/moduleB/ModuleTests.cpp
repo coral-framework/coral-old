@@ -162,7 +162,7 @@ TEST( ModuleTests, crossModuleReflection )
 	assert( anInt8Field );
 
 	// exercise the reflection API
-	co::Any a1, a2;
+	co::AnyValue a1, a2;
 
 	reflector->getField( instanceAny, anInt8Field, a1 );
 	EXPECT_EQ( 0, a1.get<int>() );
@@ -182,7 +182,7 @@ TEST( ModuleTests, crossModuleReflection )
 	}
 	catch( co::IllegalArgumentException& e )
 	{
-		EXPECT_NE( std::string::npos, e.getMessage().find( "illegal instance type (moduleA.TestStruct expected, got (out float)" ) );
+		EXPECT_EQ( "illegal instance (moduleA.TestStruct expected, got float)", e.getMessage() );
 	}
 
 	reflector->destroyValues( instancePtr, 1 );

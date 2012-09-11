@@ -243,7 +243,7 @@ int coPackage::genericNew( lua_State* L )
 	co::TypeKind kind = type->getKind();
 	if( kind == co::TK_STRUCT || kind == co::TK_NATIVECLASS )
 	{
-		ComplexValueBinding::push( L, type, NULL );
+		ValueBinding::push( L, type, NULL );
 	}
 	else if( kind == co::TK_COMPONENT )
 	{
@@ -270,9 +270,7 @@ int coPackage::newComponentType( lua_State* L )
 
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	co::Any any;
-	CompositeTypeBinding::getInstance( L, 1, any );
-	co::IComponent* ct = any.get<co::IComponent*>();
+	co::IComponent* ct = co::cast<co::IComponent>( ServiceBinding::getInstance( L, 1 ) );
 
 	lua_pushvalue( L, 2 );
 	int tableRef = luaL_ref( L, LUA_REGISTRYINDEX );
@@ -295,9 +293,7 @@ int coPackage::newComponentInstance( lua_State* L )
 
 	__BEGIN_EXCEPTIONS_BARRIER__
 
-	co::Any any;
-	CompositeTypeBinding::getInstance( L, 1, any );
-	co::IReflector* prototype = any.get<co::IReflector*>();
+	co::IReflector* prototype = co::cast<co::IReflector>( ServiceBinding::getInstance( L, 1 ) );
 	if( !prototype )
 		throw lua::Exception( "bad argument #1 to co.newComponentInstance (reflector expected)" );
 
@@ -337,26 +333,24 @@ co::ICompositeType* CompositeTypeBinding::getType( lua_State* L, int udataIdx )
 	return ct;
 }
 
-void CompositeTypeBinding::getInstance( lua_State* L, int udataIdx, co::Any& instance )
+co::Any CompositeTypeBinding::getInstance( lua_State* L, int udataIdx )
 {
+	co::Any instance;
 	if( !tryGetInstance( L, udataIdx, instance ) )
 		throw lua::Exception( "unknown userdata type" );
+	return instance;
 }
 
 bool CompositeTypeBinding::tryGetInstance( lua_State* L, int udataIdx, co::Any& instance )
 {
 	co::ICompositeType* ct = getType( L, udataIdx );
-	if( !ct ) return false;
+	if( !ct )
+		return false;
 
 	if( co::isValueType( ct->getKind() ) )
-	{
-		instance.set( false, ct, ComplexValueBinding::getInstance( L, udataIdx ) );
-	}
+		instance = ValueBinding::getInstance( L, udataIdx );
 	else
-	{
-		co::IService* service = ServiceBinding::getInstance( L, udataIdx );
-		instance.set( true, service->getInterface(), &service );
-	}
+		instance = ServiceBinding::getInstance( L, udataIdx );
 
 	return true;
 }
@@ -404,7 +398,7 @@ struct Metamethods
 
 static const Metamethods METAMETHODS_TABLE[] = {
 	{ StructBinding::index, StructBinding::newIndex, StructBinding::gc, StructBinding::toString },
-	{ NativeClassBinding::index, NativeClassBinding::newIndex, NativeClassBinding::gc, NativeClassBinding::toString },
+	{ ClassBinding::index, ClassBinding::newIndex, ClassBinding::gc, ClassBinding::toString },
 	{ ServiceBinding::index, ServiceBinding::newIndex, ServiceBinding::gc, ServiceBinding::toString },
 	{ ObjectBinding::index, ObjectBinding::newIndex, ObjectBinding::gc, ObjectBinding::toString }
 };
@@ -554,20 +548,21 @@ void CompositeTypeBinding::getField( lua_State* L, const co::Any& instance )
 	LuaState::push( L, value );
 
 	// notify interceptors
-	if( instance.getKind() == co::TK_INTERFACE )
+	if( instance.getType()->getKind() == co::TK_INTERFACE )
 	{
+		co::IService* service = instance.get<co::IService*>();
 		for( co::Range<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
-			r.getFirst()->postGetField( instance.getState().data.service, field, value );
+			r.getFirst()->postGetField( service, field, value );
 	}
 }
 
 void CompositeTypeBinding::setField( lua_State* L, const co::Any& instance )
 {
 	co::AnyValue value;
-	LuaState::getAny( L, -1, value );
+	LuaState::get( L, -1, value );
 
 	co::IField* field = checkField( L, -2 );
-	value.convertTo( field->getType() );
+	value.convert( field->getType() );
 
 	co::IReflector* reflector = field->getOwner()->getReflector();
 	reflector->setField( instance, field, value.getAny() );
@@ -575,10 +570,11 @@ void CompositeTypeBinding::setField( lua_State* L, const co::Any& instance )
 	lua_pop( L, 2 );
 
 	// notify interceptors
-	if( instance.getKind() == co::TK_INTERFACE )
+	if( instance.getType()->getKind() == co::TK_INTERFACE )
 	{
+		co::IService* service = instance.get<co::IService*>();
 		for( co::Range<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
-			r.getFirst()->postSetField( instance.getState().data.service, field, value );
+			r.getFirst()->postSetField( service, field, value );
 	}
 }
 
@@ -606,7 +602,6 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 
 	// prepare the argument list
 	co::AnyValue args[MAX_NUM_PARAMETERS];
-	co::Any plainAnyArgs[MAX_NUM_PARAMETERS];
 
 	int numRequiredArgs = numParams;
 	int numPassedArgs = lua_gettop( L ) - 1;
@@ -616,8 +611,6 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 	{
 		for( ; i < numParams; ++i )
 		{
-			plainAnyArgs[i].set( args[i] );
-
 			co::IParameter* paramInfo = paramList[i];
 			co::IType* paramType = paramInfo->getType();
 
@@ -630,22 +623,14 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 					continue;
 				}
 
-				if( paramInfo->getIsOut() )
-				{
-					// inout: allocate an 'out' var and set it with the 'in' value.
-					args[i].makeOut( paramType );
-					LuaState::getValue( L, i + 2, plainAnyArgs[i] );
-				}
-				else // only 'in'
-				{
-					LuaState::getAny( L, i + 2, args[i] );
-				}
+				LuaState::get( L, i + 2, args[i] );
 			}
 			else // only 'out'
 			{
 				--numRequiredArgs;
-				args[i].makeOut( paramType );
 			}
+
+			args[i].convert( paramType );
 		}
 	}
 	catch( const co::Exception& e )
@@ -665,18 +650,19 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 
 	// invoke the method
 	co::Any instance;
-	co::AnyValue returnValue;
 	tryGetInstance( L, 1, instance );
-	co::IReflector* reflector = method->getOwner()->getReflector();
 
-	co::Range<co::Any> argsRange( plainAnyArgs, numParams );
+	co::AnyValue returnValue;
+	co::Range<co::AnyValue> argsRange( args, numParams );
+
+	co::IReflector* reflector = method->getOwner()->getReflector();
 	reflector->invoke( instance, method, argsRange, returnValue );
 
-	if( instance.getKind() == co::TK_INTERFACE )
+	if( instance.getType()->getKind() == co::TK_INTERFACE )
 	{
+		co::IService* service = instance.get<co::IService*>();
 		for( co::Range<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
-			r.getFirst()->postInvoke( instance.getState().data.service,
-										method, argsRange, returnValue );
+			r.getFirst()->postInvoke( service, method, argsRange, returnValue );
 	}
 
 	// return result and output parameters
@@ -721,6 +707,13 @@ void ObjectBinding::create( lua_State* L, co::IObject* object )
 	// notify interceptors
 	for( co::Range<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
 		r.getFirst()->serviceRetained( object );
+}
+
+co::IObject* ObjectBinding::getInstance( lua_State* L, int index )
+{
+	co::IService* s = ServiceBinding::getInstance( L, index );
+	assert( s->getInterface() == co::typeOf<co::IObject>::get() );
+	return static_cast<co::IObject*>( s );
 }
 
 inline co::IPort* checkPort( lua_State* L, int index )
@@ -795,10 +788,13 @@ int ObjectBinding::newIndex( lua_State* L )
 			throw lua::MsgOnStackException();
 		}
 
+		co::AnyValue value;
+		LuaState::get( L, 3, value );
+	
 		co::RefPtr<co::IService> service;
-		co::Any any;
-		any.set( false, port->getType(), &service );
-		LuaState::getValue( L, 3, any );
+		value.get( service );
+
+		co::ensureIsA( service.get(), port->getType() );
 		object->setServiceAt( port, service.get() );
 
 		// notify interceptors
@@ -861,6 +857,11 @@ void ServiceBinding::create( lua_State* L, co::IService* service )
 	// notify interceptors
 	for( co::Range<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
 		r.getFirst()->serviceRetained( service );
+}
+
+co::IService* ServiceBinding::getInstance( lua_State* L, int index )
+{
+	return *reinterpret_cast<co::IService**>( lua_touserdata( L, index ) );
 }
 
 int ServiceBinding::index( lua_State* L )
@@ -943,7 +944,7 @@ int ServiceBinding::toString( lua_State* L )
 /*  Re-usable class for binding complex values to Lua                        */
 /*****************************************************************************/
 
-void ComplexValueBinding::push( lua_State* L, co::IType* type, void* instancePtr )
+void ValueBinding::push( lua_State* L, co::IType* type, void* instancePtr )
 {
 	assert( type->getKind() == co::TK_STRUCT || type->getKind() == co::TK_NATIVECLASS );
 
@@ -963,7 +964,14 @@ void ComplexValueBinding::push( lua_State* L, co::IType* type, void* instancePtr
 	lua_setmetatable( L, -2 );
 }
 
-int ComplexValueBinding::gc( lua_State* L )
+co::Any ValueBinding::getInstance( lua_State* L, int index )
+{
+	co::ICompositeType* ct = getType( L, index );
+	assert( ct && co::isValueType( ct->getKind() ) );
+	return co::Any( false, ct, lua_touserdata( L, index ) );
+}
+
+int ValueBinding::gc( lua_State* L )
 {
 	__BEGIN_EXCEPTIONS_BARRIER__
 
@@ -980,7 +988,7 @@ int ComplexValueBinding::gc( lua_State* L )
 	__END_EXCEPTIONS_BARRIER__
 }
 
-int ComplexValueBinding::toString( lua_State* L )
+int ValueBinding::toString( lua_State* L )
 {
 	co::ICompositeType* ct = getType( L, 1 );
 	assert( ct );
@@ -994,7 +1002,7 @@ int ComplexValueBinding::toString( lua_State* L )
 /*  Helper class for binding native classes to Lua                           */
 /*****************************************************************************/
 
-int NativeClassBinding::index( lua_State* L )
+int ClassBinding::index( lua_State* L )
 {
 	assert( lua_isstring( L, 2 ) );
 
@@ -1011,7 +1019,7 @@ int NativeClassBinding::index( lua_State* L )
 	__END_EXCEPTIONS_BARRIER__
 }
 
-int NativeClassBinding::newIndex( lua_State* L )
+int ClassBinding::newIndex( lua_State* L )
 {
 	assert( lua_isstring( L, 2 ) );
 

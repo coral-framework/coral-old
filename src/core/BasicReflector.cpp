@@ -92,25 +92,27 @@ public:
 
 	void createValues( void* ptr, size_t numValues )
 	{
-		createVector( ptr, numValues );
+		for( size_t i = 0; i < numValues; ++i )
+			new( reinterpret_cast<PseudoVector*>( ptr ) + i ) PseudoVector();
 	}
 
 	void copyValues( const void* fromPtr, void* toPtr, size_t numValues )
 	{
-		assert( numValues == 1 ); // not meaningful
-
-		destroyVector( toPtr );
-		const PseudoVector* fromV = reinterpret_cast<const PseudoVector*>( fromPtr );
-		size_t numElements = sizeToElements( fromV->size() );
-		PseudoVector* toV = createVector( toPtr, numElements );
-		if( numElements > 0 )
-			_elemReflector->copyValues( &fromV->front(), &toV->front(), numElements );
+		for( size_t i = 0; i < numValues; ++i )
+		{
+			Any toArray( false, _type, toPtr );
+			const PseudoVector* fromV = reinterpret_cast<const PseudoVector*>( fromPtr );
+			size_t numElements = sizeToElements( fromV->size() );
+			toArray.resize( numElements );
+			if( numElements > 0 )
+				_elemReflector->copyValues( &fromV->front(), toArray[0].state.data.ptr, numElements );
+		}
 	}
 
 	void destroyValues( void* ptr, size_t numValues )
 	{
-		assert( numValues == 1 ); // not meaningful
-		destroyVector( ptr );
+		for( size_t i = 0; i < numValues; ++i )
+			destroyVector( reinterpret_cast<PseudoVector*>( ptr ) + i );
 	}
 
 private:
@@ -137,7 +139,6 @@ private:
 			size_t numElements = sizeToElements( totalSize );
 			_elemReflector->destroyValues( &vec->front(), numElements );
 		}
-		
 		vec->~vector();
 	}
 

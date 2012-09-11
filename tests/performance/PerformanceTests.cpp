@@ -16,7 +16,7 @@
 
 const int MAX_ARGS = 8;
 
-static void fillArgs( co::Any* any, size_t count, size_t dim )
+static void fillArgs( co::AnyValue* any, size_t count, size_t dim )
 {
 	const int NUM_DIMS = 2;
 	static std::string sStrings[NUM_DIMS];
@@ -38,8 +38,8 @@ static void fillArgs( co::Any* any, size_t count, size_t dim )
 TEST( PerformanceTests, callLuaFunction )
 {
 	const int NUM_ARGS = MAX_ARGS;
-	co::Any args[NUM_ARGS];
-	co::Any results[NUM_ARGS];
+	co::AnyValue args[NUM_ARGS];
+	co::AnyValue results[NUM_ARGS];
 
 	std::string moduleName( "PerformanceTests" );
 	std::string functionName( "passthrough" );
@@ -50,12 +50,12 @@ TEST( PerformanceTests, callLuaFunction )
 	fillArgs( results, NUM_ARGS, 1 );
 
 	lua::IState* state = co::getService<lua::IState>();
+
+	co::Range<co::AnyValue> argsRange( args, NUM_ARGS );
+	co::Range<co::AnyValue> resultsRange( results, NUM_ARGS );
+
 	for( int i = 0; i < 1000; ++i )
-	{
-		state->callFunction( moduleName, functionName,
-				co::Range<co::Any>( args, NUM_ARGS ),
-				co::Range<co::Any>( results, NUM_ARGS ) );
-	}
+		state->call( moduleName, functionName, argsRange, resultsRange );
 }
 
 // --- Sanity Tests --- //

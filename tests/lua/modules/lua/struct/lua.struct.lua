@@ -75,7 +75,7 @@ function M:initialize( module )
 	ASSERT_EQ( 5, #ts.enumArray )
 	ASSERT_EQ( 'First', ts.enumArray[3] )
 
-	ASSERT_ERROR( function() ts.enumArray = { 3 } end, "integer '3' is out of range for enum moduleA.TestEnum" )
+	ASSERT_ERROR( function() ts.enumArray = { 3 } end, "3 is out of range for the enum" )
 
 	ts.typeArray = {}
 	ASSERT_EQ( 0, #ts.typeArray )

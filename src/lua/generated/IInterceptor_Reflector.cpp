@@ -5,10 +5,10 @@
 
 #include <lua/IInterceptor.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IPort.h>
-#include <co/IMethod.h>
 #include <co/IObject.h>
+#include <co/IPort.h>
 #include <co/IField.h>
+#include <co/IMethod.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -190,7 +190,7 @@ public:
 				{
 					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
-					co::Any value_ = args[++argIndex].get< co::Any >();
+					co::Any value_ = args[++argIndex];
 					argIndex = -1;
 					p->postGetField( service_, field_, value_ );
 				}
@@ -209,7 +209,7 @@ public:
 					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					co::IMethod* method_ = args[++argIndex].get< co::IMethod* >();
 					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
-					co::Any returnValue_ = args[++argIndex].get< co::Any >();
+					co::Any returnValue_ = args[++argIndex];
 					argIndex = -1;
 					p->postInvoke( service_, method_, args_, returnValue_ );
 				}
@@ -218,7 +218,7 @@ public:
 				{
 					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
-					co::Any value_ = args[++argIndex].get< co::Any >();
+					co::Any value_ = args[++argIndex];
 					argIndex = -1;
 					p->postSetField( service_, field_, value_ );
 				}

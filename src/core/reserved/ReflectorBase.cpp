@@ -211,9 +211,13 @@ void* checkInstance( const Any& instance, ICompositeType* ct, IMember* member )
 {
 	assert( ct );
 
-	if( !instance.isA( ct ) )
-		CORAL_THROW( co::IllegalArgumentException, "illegal instance (" <<
-			ct->getFullName() << " expected, got " << instance.state << ")" );
+	Any in = instance.asIn();
+	if( in.isNull() )
+		throw IllegalArgumentException( "illegal null instance" );
+
+	if( !in.isA( ct ) )
+		CORAL_THROW( IllegalArgumentException, "illegal instance (" << ct->getFullName()
+				<< " expected, got " << in.getType()->getFullName() << ")" );
 
 	if( !member )
 		throw co::IllegalArgumentException( "illegal null member" );
@@ -224,7 +228,7 @@ void* checkInstance( const Any& instance, ICompositeType* ct, IMember* member )
 					<< "' belongs to '" << owner->getFullName()
 					<< "', not to '" << ct->getFullName() << "'" );
 
-	return instance.state.data.ptr;
+	return in.state.data.ptr;
 }
 
 } // namespace co

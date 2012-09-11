@@ -96,9 +96,9 @@ void ensureIsA( IService* service, IInterface* type )
 {
 	assert( type );
 	if( service && !service->getInterface()->isSubTypeOf( type ) )
-		CORAL_THROW( IllegalCastException, "incompatible service ("
-					<< type->getFullName() << " expected, got "
-					<< service->getInterface()->getFullName() << ")" );
+		CORAL_THROW( IllegalCastException, "illegal cast from '"
+				<< service->getInterface()->getFullName() << "' to '"
+				<< type->getFullName() << "'" );
 }
 
 } // namespace co
