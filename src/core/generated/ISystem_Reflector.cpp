@@ -5,9 +5,9 @@
 
 #include <co/ISystem.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/ITypeManager.h>
-#include <co/IServiceManager.h>
 #include <co/IModuleManager.h>
+#include <co/IServiceManager.h>
+#include <co/ITypeManager.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>

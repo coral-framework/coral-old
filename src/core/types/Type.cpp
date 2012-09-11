@@ -25,7 +25,7 @@ IAnnotation* selectAnnotation( Range<IAnnotation*> annotations, IInterface* requ
 		throw IllegalArgumentException( "illegal null requestedType" );
 
 	for( ; annotations; annotations.popFirst() )
-		if( annotations.getFirst()->getInterface()->isSubTypeOf( requestedType ) )
+		if( annotations.getFirst()->getInterface()->isA( requestedType ) )
 			return annotations.getFirst();
 
 	return NULL;

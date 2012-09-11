@@ -146,15 +146,10 @@ void castScalar( TypeKind fromKind, const void* from, TypeKind toKind, void* to 
 /* General Utility Functions                                                */
 /****************************************************************************/
 
-inline bool isSubType( IType* sub, IType* super )
-{
-	return static_cast<IInterface*>( sub )->isSubTypeOf( static_cast<IInterface*>( super ) );
-}
-
 inline bool typesMatch( TypeKind kSub, TypeKind kSuper, IType* tSub, IType* tSuper )
 {
 	return tSub == tSuper ||
-		( isPolymorphicType( kSub ) && kSub == kSuper && isSubType( tSub, tSuper ) );
+		( isPolymorphicType( kSub ) && kSub == kSuper && tSub->isA( tSuper ) );
 }
 
 typedef std::vector<uint8> StdVector;
@@ -206,7 +201,7 @@ bool Any::isA( IType* type ) const
 		if( !isPolymorphicType( k ) )
 			return false;
 
-		return k == type->getKind() && isSubType( myType, type );
+		return k == type->getKind() && myType->isA( type );
 	}
 
 	return false;
@@ -384,7 +379,7 @@ void Any::put( const Any& value ) const
 			if( in.isValid() )
 			{
 				TypeKind vK = in.getType()->getKind();
-				if( vK == TK_INTERFACE && isSubType( in.getType(), state.type ) )
+				if( vK == TK_INTERFACE && in.getType()->isA( state.type ) )
 					service = in.get<IService*>();
 				else
 					THROW_ILLEGAL_CAST( in.state, state, );

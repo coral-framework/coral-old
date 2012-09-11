@@ -58,7 +58,7 @@ IService* getServiceByType( IObject* object, IInterface* type )
 	IComponent* component = object->getComponent();
 	Range<IPort*> facets = component->getFacets();
 	for( ; facets; facets.popFirst() )
-		if( facets.getFirst()->getType()->isSubTypeOf( type ) )
+		if( facets.getFirst()->getType()->isA( type ) )
 			return object->getServiceAt( facets.getFirst() );
 	CORAL_THROW( NoSuchPortException, "component '" << component->getFullName()
 		<< "' does not provide a facet of type '" << type->getFullName() << "'"  )
@@ -89,13 +89,13 @@ void setServiceByName( IObject* object, const std::string& receptacleName, IServ
 bool isA( IService* service, IInterface* type )
 {
 	assert( type );
-	return !service || service->getInterface()->isSubTypeOf( type );
+	return !service || service->getInterface()->isA( type );
 }
 
 void ensureIsA( IService* service, IInterface* type )
 {
 	assert( type );
-	if( service && !service->getInterface()->isSubTypeOf( type ) )
+	if( service && !service->getInterface()->isA( type ) )
 		CORAL_THROW( IllegalCastException, "illegal cast from '"
 				<< service->getInterface()->getFullName() << "' to '"
 				<< type->getFullName() << "'" );

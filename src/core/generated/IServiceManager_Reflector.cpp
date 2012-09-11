@@ -257,7 +257,7 @@ public:
 				{
 					co::IInterface* serviceType_ = args[++argIndex].get< co::IInterface* >();
 					argIndex = -1;
-					res.set< co::IService* >( p->getService( serviceType_ ) );
+					res = p->getService( serviceType_ );
 				}
 				break;
 			case 6:
@@ -265,7 +265,7 @@ public:
 					co::IInterface* serviceType_ = args[++argIndex].get< co::IInterface* >();
 					co::IService* client_ = args[++argIndex].get< co::IService* >();
 					argIndex = -1;
-					res.set< co::IService* >( p->getServiceForInstance( serviceType_, client_ ) );
+					res = p->getServiceForInstance( serviceType_, client_ );
 				}
 				break;
 			case 7:
@@ -273,7 +273,7 @@ public:
 					co::IInterface* serviceType_ = args[++argIndex].get< co::IInterface* >();
 					co::IInterface* clientType_ = args[++argIndex].get< co::IInterface* >();
 					argIndex = -1;
-					res.set< co::IService* >( p->getServiceForType( serviceType_, clientType_ ) );
+					res = p->getServiceForType( serviceType_, clientType_ );
 				}
 				break;
 			case 8:

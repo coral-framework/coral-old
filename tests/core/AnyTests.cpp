@@ -563,7 +563,7 @@ TEST( AnyTests, setGetInterface )
 		co::IInterface* output = any.get<co::IInterface*>();
 		EXPECT_TRUE( areSamePtr( input, output ) );
 		EXPECT_EQ( input->getProvider(), output->getProvider() );
-		EXPECT_TRUE( output->isSubTypeOf( co::typeOf<co::IService>::get() ) );
+		EXPECT_TRUE( output->isA( co::typeOf<co::IService>::get() ) );
 	}
 
 	// try to get a co::IService back (implicit upcasting)

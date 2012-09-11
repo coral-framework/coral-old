@@ -4,9 +4,9 @@
  */
 
 #include <co/IDynamicServiceProvider.h>
-#include <co/IField.h>
-#include <co/IPort.h>
 #include <co/IMethod.h>
+#include <co/IPort.h>
+#include <co/IField.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -57,7 +57,7 @@ public:
 		args[1].set< co::IField* >( field_ );
 		co::Range<co::Any> range( args, 2 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 1 ), range );
-		return res.get< co::AnyValue >();
+		return res;
 	}
 
 	co::AnyValue dynamicInvoke( co::int32 dynFacetId_, co::IMethod* method_, co::Range<co::Any> args_ )
@@ -68,7 +68,7 @@ public:
 		args[2].set< co::Range<co::Any> >( args_ );
 		co::Range<co::Any> range( args, 3 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 2 ), range );
-		return res.get< co::AnyValue >();
+		return res;
 	}
 
 	co::int32 dynamicRegisterService( co::IService* dynamicServiceProxy_ )
@@ -166,7 +166,7 @@ public:
 				{
 					co::int32 dynFacetId_ = args[++argIndex].get< co::int32 >();
 					argIndex = -1;
-					res.set< co::IPort* >( p->dynamicGetFacet( dynFacetId_ ) );
+					res = p->dynamicGetFacet( dynFacetId_ );
 				}
 				break;
 			case 1:
@@ -174,7 +174,7 @@ public:
 					co::int32 dynFacetId_ = args[++argIndex].get< co::int32 >();
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
 					argIndex = -1;
-					res.set< co::Any >( p->dynamicGetField( dynFacetId_, field_ ) );
+					res = p->dynamicGetField( dynFacetId_, field_ );
 				}
 				break;
 			case 2:
@@ -183,14 +183,14 @@ public:
 					co::IMethod* method_ = args[++argIndex].get< co::IMethod* >();
 					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
 					argIndex = -1;
-					res.set< co::Any >( p->dynamicInvoke( dynFacetId_, method_, args_ ) );
+					res = p->dynamicInvoke( dynFacetId_, method_, args_ );
 				}
 				break;
 			case 3:
 				{
 					co::IService* dynamicServiceProxy_ = args[++argIndex].get< co::IService* >();
 					argIndex = -1;
-					res.set< co::int32 >( p->dynamicRegisterService( dynamicServiceProxy_ ) );
+					res = p->dynamicRegisterService( dynamicServiceProxy_ );
 				}
 				break;
 			case 4:

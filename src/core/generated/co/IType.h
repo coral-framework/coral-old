@@ -9,6 +9,7 @@
 #include <co/TypeTraits.h>
 #include <co/Uuid.h>
 #include <co/TypeKind.h>
+#include <co/IType.h>
 #include <co/IAnnotated.h>
 
 // Forward Declarations:
@@ -43,6 +44,8 @@ public:
 	virtual co::IReflector* getReflector() = 0;
 
 	virtual void setReflector( co::IReflector* reflector ) = 0;
+
+	virtual bool isA( co::IType* type ) = 0;
 };
 
 } // namespace co

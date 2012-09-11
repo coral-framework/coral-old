@@ -5,10 +5,10 @@
 
 #include <co/IType.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IInterface.h>
-#include <co/IAnnotation.h>
 #include <co/IReflector.h>
+#include <co/IInterface.h>
 #include <co/INamespace.h>
+#include <co/IAnnotation.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -132,6 +132,15 @@ public:
 		_provider->dynamicSetField( _cookie, getField<co::IType>( 7 ), arg );
 	}
 
+	bool isA( co::IType* type_ )
+	{
+		co::Any args[1];
+		args[0].set< co::IType* >( type_ );
+		co::Range<co::Any> range( args, 1 );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IType>( 0 ), range );
+		return res.get< bool >();
+	}
+
 protected:
 	template<typename T>
 	co::IField* getField( co::uint32 index )
@@ -219,9 +228,34 @@ public:
 
 	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
-		co::checkInstance<co::IType>( instance, method );
-		raiseUnexpectedMemberIndex();
-		CORAL_UNUSED( args );
+		co::IType* p = co::checkInstance<co::IType>( instance, method );
+		checkNumArguments( method, args.getSize() );
+		int argIndex = -1;
+		try
+		{
+			switch( method->getIndex() )
+			{
+			case 8:
+				{
+					co::IType* type_ = args[++argIndex].get< co::IType* >();
+					argIndex = -1;
+					res = p->isA( type_ );
+				}
+				break;
+			default:
+				raiseUnexpectedMemberIndex();
+			}
+		}
+		catch( co::IllegalCastException& e )
+		{
+			if( argIndex == -1 )
+				throw; // just re-throw if the exception is not related to 'args'
+			raiseArgumentTypeException( method, argIndex, e );
+		}
+		catch( ... )
+		{
+			throw;
+		}
 		CORAL_UNUSED( res );
 	}
 };

@@ -5,14 +5,15 @@
 
 #include <co/IInterface.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IInterface.h>
-#include <co/IField.h>
-#include <co/IReflector.h>
-#include <co/INamespace.h>
-#include <co/IAnnotation.h>
-#include <co/IMember.h>
-#include <co/Uuid.h>
 #include <co/IMethod.h>
+#include <co/IReflector.h>
+#include <co/IAnnotation.h>
+#include <co/IInterface.h>
+#include <co/IType.h>
+#include <co/IMember.h>
+#include <co/INamespace.h>
+#include <co/Uuid.h>
+#include <co/IField.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -134,6 +135,15 @@ public:
 		_provider->dynamicSetField( _cookie, getField<co::IType>( 7 ), arg );
 	}
 
+	bool isA( co::IType* type_ )
+	{
+		co::Any args[1];
+		args[0].set< co::IType* >( type_ );
+		co::Range<co::Any> range( args, 1 );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IType>( 0 ), range );
+		return res.get< bool >();
+	}
+
 	// co.ICompositeType Methods:
 
 	co::Range<co::IMember*> getMembers()
@@ -185,15 +195,6 @@ public:
 	{
 		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IInterface>( 2 ) );
         return res.get< co::Range<co::IInterface*> >();
-	}
-
-	bool isSubTypeOf( co::IInterface* type_ )
-	{
-		co::Any args[1];
-		args[0].set< co::IInterface* >( type_ );
-		co::Range<co::Any> range( args, 1 );
-		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IInterface>( 0 ), range );
-		return res.get< bool >();
 	}
 
 protected:
@@ -273,34 +274,9 @@ public:
 
 	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
 	{
-		co::IInterface* p = co::checkInstance<co::IInterface>( instance, method );
-		checkNumArguments( method, args.getSize() );
-		int argIndex = -1;
-		try
-		{
-			switch( method->getIndex() )
-			{
-			case 3:
-				{
-					co::IInterface* type_ = args[++argIndex].get< co::IInterface* >();
-					argIndex = -1;
-					res.set< bool >( p->isSubTypeOf( type_ ) );
-				}
-				break;
-			default:
-				raiseUnexpectedMemberIndex();
-			}
-		}
-		catch( co::IllegalCastException& e )
-		{
-			if( argIndex == -1 )
-				throw; // just re-throw if the exception is not related to 'args'
-			raiseArgumentTypeException( method, argIndex, e );
-		}
-		catch( ... )
-		{
-			throw;
-		}
+		co::checkInstance<co::IInterface>( instance, method );
+		raiseUnexpectedMemberIndex();
+		CORAL_UNUSED( args );
 		CORAL_UNUSED( res );
 	}
 };

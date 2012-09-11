@@ -1,5 +1,5 @@
 /*
-	Basic type interface.
+	Describes a Coral type.
  */
 interface IType extends IAnnotated
 {
@@ -36,15 +36,25 @@ interface IType extends IAnnotated
 	readonly Uuid binarySignature;
 
 	/*
-		The type's reflector. Getting this field may cause the type's module to be loaded,
-		in order to instantiate a reflector. Therefore, getting this field may raise a
-		ModuleLoadException indicating that the reflector could not be obtained.
+		The currently set reflector for this type (which can be null).
+		Get field 'reflector' instead if you want a reflector to be loaded.
+	 */
+	readonly IReflector currentReflector;
+
+	/*
+		The type's reflector. Getting this field may cause the type's module
+		to be loaded in order to obtain the type's reflector.
+		\throw ModuleLoadException if the reflector could not be obtained.
 	 */
 	IReflector reflector;
 
 	/*
-		Similar to 'reflector', but getting this field never causes a reflector to be loaded.
-		This returns the currently set reflector, which can be null.
+		Returns whether this type is a specialization of a given \a type
+		(or conversely, whether \a type is a generalization of this type ).
+
+		For types that do not support inheritance, this returns true if and
+		only if \a super and \a this are the same type. Otherwise, it also
+		returns true if \a this type inherits from \a type.
 	 */
-	readonly IReflector currentReflector;
+	bool isA( in IType type );
 };

@@ -4,11 +4,11 @@
  */
 
 #include <co/IReflector.h>
-#include <co/IField.h>
-#include <co/IDynamicServiceProvider.h>
-#include <co/IType.h>
-#include <co/IObject.h>
 #include <co/IMethod.h>
+#include <co/IType.h>
+#include <co/IDynamicServiceProvider.h>
+#include <co/IObject.h>
+#include <co/IField.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -233,12 +233,12 @@ public:
 				{
 					co::IDynamicServiceProvider* dynamicProvider_ = args[++argIndex].get< co::IDynamicServiceProvider* >();
 					argIndex = -1;
-					res.set< co::IService* >( p->newDynamicProxy( dynamicProvider_ ) );
+					res = p->newDynamicProxy( dynamicProvider_ );
 				}
 				break;
 			case 5:
 				{
-					res.set< co::IObject* >( p->newInstance() );
+					res = p->newInstance();
 				}
 				break;
 			case 6:

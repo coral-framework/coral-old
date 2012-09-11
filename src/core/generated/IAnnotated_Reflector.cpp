@@ -164,7 +164,7 @@ public:
 				{
 					co::IInterface* requestedType_ = args[++argIndex].get< co::IInterface* >();
 					argIndex = -1;
-					res.set< co::IAnnotation* >( p->getAnnotation( requestedType_ ) );
+					res = p->getAnnotation( requestedType_ );
 				}
 				break;
 			default:

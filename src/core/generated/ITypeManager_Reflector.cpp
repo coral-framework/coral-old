@@ -5,11 +5,11 @@
 
 #include <co/ITypeManager.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/CSLError.h>
-#include <co/INamespace.h>
 #include <co/ITypeTransaction.h>
 #include <co/IType.h>
+#include <co/CSLError.h>
 #include <co/IArray.h>
+#include <co/INamespace.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -199,35 +199,35 @@ public:
 				{
 					const std::string& fullName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::INamespace* >( p->findNamespace( fullName_ ) );
+					res = p->findNamespace( fullName_ );
 				}
 				break;
 			case 3:
 				{
 					const std::string& fullName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::IType* >( p->findType( fullName_ ) );
+					res = p->findType( fullName_ );
 				}
 				break;
 			case 4:
 				{
 					co::IType* elementType_ = args[++argIndex].get< co::IType* >();
 					argIndex = -1;
-					res.set< co::IArray* >( p->getArrayOf( elementType_ ) );
+					res = p->getArrayOf( elementType_ );
 				}
 				break;
 			case 5:
 				{
 					const std::string& fullName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::INamespace* >( p->getNamespace( fullName_ ) );
+					res = p->getNamespace( fullName_ );
 				}
 				break;
 			case 6:
 				{
 					const std::string& typeName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::IType* >( p->getType( typeName_ ) );
+					res = p->getType( typeName_ );
 				}
 				break;
 			case 7:
@@ -235,7 +235,7 @@ public:
 					const std::string& typeName_ = args[++argIndex].get< const std::string& >();
 					std::vector<co::CSLError>& errorStack_ = args[++argIndex].get< std::vector<co::CSLError>& >();
 					argIndex = -1;
-					res.set< co::IType* >( p->loadType( typeName_, errorStack_ ) );
+					res = p->loadType( typeName_, errorStack_ );
 				}
 				break;
 			default:

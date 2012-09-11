@@ -25,6 +25,8 @@ class IAnnotated : public co::IService
 public:
 	virtual ~IAnnotated() {;}
 
+	// Code From <c++ Block:
+	
 		/*!
 			Returns this service's annotation for the specified type,
 			if such an annotation is present; else null.
@@ -34,6 +36,8 @@ public:
 		{
 			return static_cast<T*>( getAnnotation( co::typeOf<T>::get() ) );
 		}
+	
+	// End Of c++> Block
 
 	virtual co::Range<co::IAnnotation*> getAnnotations() = 0;
 

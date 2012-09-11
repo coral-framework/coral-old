@@ -296,7 +296,7 @@ function Compiler:hasCustomModulePart()
 	local modulePartItf = co.Type "co.IModulePart"
 	if t and t.kind == 'TK_COMPONENT' then
 		for i, facet in ipairs( t.facets ) do
-			if facet.type:isSubTypeOf( modulePartItf ) then
+			if facet.type:isA( modulePartItf ) then
 				if facet.name == 'part' then
 					return true
 				end

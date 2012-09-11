@@ -176,7 +176,7 @@ end
 function include.TK_INTERFACE( t, type )
 	if t.kind == 'TK_STRUCT' then
 		t:includeHeader( type )
-	elseif t.kind == 'TK_INTERFACE' and t.isSubTypeOf( t._type, type._type ) then
+	elseif t.kind == 'TK_INTERFACE' and t.isA( t._type, type._type ) then
 		t:includeHeader( type ) -- t inherits from type
 	else
 		t:addForwardDecl( type )

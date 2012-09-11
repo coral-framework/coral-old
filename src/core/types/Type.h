@@ -109,6 +109,8 @@ public:
 	void setReflector( IReflector* reflector ) { _reflector = reflector; }
 
 	IReflector* getCurrentReflector() { return _reflector.get(); }
+
+	bool isA( IType* type ) { return this == type; }
 };
 
 /*!

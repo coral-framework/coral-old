@@ -5,8 +5,8 @@
 
 #include <co/IModuleManager.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IModule.h>
 #include <co/IModulePartLoader.h>
+#include <co/IModule.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -199,7 +199,7 @@ public:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::IModule* >( p->findModule( moduleName_ ) );
+					res = p->findModule( moduleName_ );
 				}
 				break;
 			case 4:
@@ -213,14 +213,14 @@ public:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< bool >( p->isLoadable( moduleName_ ) );
+					res = p->isLoadable( moduleName_ );
 				}
 				break;
 			case 6:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::IModule* >( p->load( moduleName_ ) );
+					res = p->load( moduleName_ );
 				}
 				break;
 			case 7:

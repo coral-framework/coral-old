@@ -135,7 +135,7 @@ IPort* ServiceManager::findServiceFacet( IComponent* component, IInterface* serv
 	Range<IPort*> facets = component->getFacets();
 	for( ; facets; facets.popFirst() )
 	{
-		if( facets.getFirst()->getType()->isSubTypeOf( serviceType ) )
+		if( facets.getFirst()->getType()->isA( serviceType ) )
 			return facets.getFirst();
 	}
 	return NULL;

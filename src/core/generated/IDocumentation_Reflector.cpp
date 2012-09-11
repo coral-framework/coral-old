@@ -166,7 +166,7 @@ public:
 				{
 					const std::string& element_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< const std::string& >( p->getDocFor( element_ ) );
+					res = p->getDocFor( element_ );
 				}
 				break;
 			default:

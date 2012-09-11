@@ -5,9 +5,9 @@
 
 #include <co/INamespace.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IModule.h>
-#include <co/IType.h>
 #include <co/ITypeBuilder.h>
+#include <co/IType.h>
+#include <co/IModule.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -211,7 +211,7 @@ public:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::INamespace* >( p->defineChildNamespace( name_ ) );
+					res = p->defineChildNamespace( name_ );
 				}
 				break;
 			case 7:
@@ -219,21 +219,21 @@ public:
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					co::TypeKind typeKind_ = args[++argIndex].get< co::TypeKind >();
 					argIndex = -1;
-					res.set< co::ITypeBuilder* >( p->defineType( name_, typeKind_ ) );
+					res = p->defineType( name_, typeKind_ );
 				}
 				break;
 			case 8:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::INamespace* >( p->findChildNamespace( name_ ) );
+					res = p->findChildNamespace( name_ );
 				}
 				break;
 			case 9:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::IType* >( p->findType( name_ ) );
+					res = p->findType( name_ );
 				}
 				break;
 			default:

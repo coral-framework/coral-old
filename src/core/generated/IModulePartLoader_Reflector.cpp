@@ -136,14 +136,14 @@ public:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< bool >( p->canLoadModulePart( moduleName_ ) );
+					res = p->canLoadModulePart( moduleName_ );
 				}
 				break;
 			case 1:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::IModulePart* >( p->loadModulePart( moduleName_ ) );
+					res = p->loadModulePart( moduleName_ );
 				}
 				break;
 			default:

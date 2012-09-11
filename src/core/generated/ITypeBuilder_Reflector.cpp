@@ -7,8 +7,8 @@
 #include <co/IDynamicServiceProvider.h>
 #include <co/INamespace.h>
 #include <co/IInterface.h>
-#include <co/IMethodBuilder.h>
 #include <co/IType.h>
+#include <co/IMethodBuilder.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -201,7 +201,7 @@ public:
 			{
 			case 3:
 				{
-					res.set< co::IType* >( p->createType() );
+					res = p->createType();
 				}
 				break;
 			case 4:
@@ -231,7 +231,7 @@ public:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::IMethodBuilder* >( p->defineMethod( name_ ) );
+					res = p->defineMethod( name_ );
 				}
 				break;
 			case 8:

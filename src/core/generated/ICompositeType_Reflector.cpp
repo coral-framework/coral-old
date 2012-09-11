@@ -5,11 +5,12 @@
 
 #include <co/ICompositeType.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IAnnotation.h>
-#include <co/IReflector.h>
-#include <co/INamespace.h>
-#include <co/IMember.h>
 #include <co/IInterface.h>
+#include <co/INamespace.h>
+#include <co/IAnnotation.h>
+#include <co/IMember.h>
+#include <co/IType.h>
+#include <co/IReflector.h>
 #include <co/Uuid.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
@@ -134,6 +135,15 @@ public:
 		_provider->dynamicSetField( _cookie, getField<co::IType>( 7 ), arg );
 	}
 
+	bool isA( co::IType* type_ )
+	{
+		co::Any args[1];
+		args[0].set< co::IType* >( type_ );
+		co::Range<co::Any> range( args, 1 );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IType>( 0 ), range );
+		return res.get< bool >();
+	}
+
 	// co.ICompositeType Methods:
 
 	co::Range<co::IMember*> getMembers()
@@ -235,7 +245,7 @@ public:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::IMember* >( p->getMember( name_ ) );
+					res = p->getMember( name_ );
 				}
 				break;
 			default:

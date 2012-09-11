@@ -5,10 +5,11 @@
 
 #include <co/IEnum.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IAnnotation.h>
-#include <co/IReflector.h>
-#include <co/INamespace.h>
 #include <co/IInterface.h>
+#include <co/INamespace.h>
+#include <co/IAnnotation.h>
+#include <co/IType.h>
+#include <co/IReflector.h>
 #include <co/Uuid.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
@@ -133,6 +134,15 @@ public:
 		_provider->dynamicSetField( _cookie, getField<co::IType>( 7 ), arg );
 	}
 
+	bool isA( co::IType* type_ )
+	{
+		co::Any args[1];
+		args[0].set< co::IType* >( type_ );
+		co::Range<co::Any> range( args, 1 );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IType>( 0 ), range );
+		return res.get< bool >();
+	}
+
 	// co.IEnum Methods:
 
 	co::Range<std::string> getIdentifiers()
@@ -234,7 +244,7 @@ public:
 				{
 					const std::string& identifier_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::int32 >( p->getValueOf( identifier_ ) );
+					res = p->getValueOf( identifier_ );
 				}
 				break;
 			default:

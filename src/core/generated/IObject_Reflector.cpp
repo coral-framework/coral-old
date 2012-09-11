@@ -5,8 +5,8 @@
 
 #include <co/IObject.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IComponent.h>
 #include <co/IPort.h>
+#include <co/IComponent.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -151,7 +151,7 @@ public:
 				{
 					co::IPort* port_ = args[++argIndex].get< co::IPort* >();
 					argIndex = -1;
-					res.set< co::IService* >( p->getServiceAt( port_ ) );
+					res = p->getServiceAt( port_ );
 				}
 				break;
 			case 2:

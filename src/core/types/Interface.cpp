@@ -59,6 +59,18 @@ void Interface::updateSuperTypes()
 	assert( _superTypes[_numSuperTypes - 1]->getFullName() == "co.IService" );
 }
 
+bool Interface::isA( IType* type )
+{
+	if( type == this )
+		return true;
+
+	for( size_t i = 0; i < _numSuperTypes; ++i )
+		if( _superTypes[i] == type )
+			return true;
+
+	return false;
+}
+
 IMember* Interface::getMember( const std::string& name )
 {
 	IMember* res = ClassTypeImpl::getMember( name );
@@ -82,18 +94,6 @@ Range<IInterface*> Interface::getSuperTypes()
 Range<IInterface*> Interface::getSubTypes()
 {
 	return _subTypes;
-}
-
-bool Interface::isSubTypeOf( IInterface* type )
-{
-	if( type == this )
-		return true;
-
-	for( size_t i = 0; i < _numSuperTypes; ++i )
-		if( _superTypes[i] == type )
-			return true;
-
-	return false;
 }
 
 CORAL_EXPORT_COMPONENT( Interface, Interface );

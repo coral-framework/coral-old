@@ -5,10 +5,11 @@
 
 #include <co/IArray.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IAnnotation.h>
-#include <co/IReflector.h>
-#include <co/INamespace.h>
 #include <co/IInterface.h>
+#include <co/INamespace.h>
+#include <co/IAnnotation.h>
+#include <co/IType.h>
+#include <co/IReflector.h>
 #include <co/Uuid.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
@@ -131,6 +132,15 @@ public:
 		co::Any arg;
 		arg.set< co::IReflector* >( reflector_ );
 		_provider->dynamicSetField( _cookie, getField<co::IType>( 7 ), arg );
+	}
+
+	bool isA( co::IType* type_ )
+	{
+		co::Any args[1];
+		args[0].set< co::IType* >( type_ );
+		co::Range<co::Any> range( args, 1 );
+		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IType>( 0 ), range );
+		return res.get< bool >();
 	}
 
 	// co.IArray Methods:
