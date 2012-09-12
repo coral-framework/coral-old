@@ -37,7 +37,7 @@ public:
 	IModule* getModule();
 	IType* getType( const std::string& name );
 	INamespace* getChildNamespace( const std::string& name );
-	ITypeBuilder* defineType( const std::string& name, TypeKind typeKind );
+	ITypeBuilder* defineType( const std::string& name, TypeKind kind );
 	INamespace* defineChildNamespace( const std::string& name );
 
 private:

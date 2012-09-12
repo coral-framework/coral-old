@@ -64,7 +64,7 @@ void TypeBuilder::rollback()
 
 	_namespace->removeType( _type.get() );
 
-	_kind = TK_NONE;
+	_kind = TK_NULL;
 	_type = NULL;
 }
 
@@ -157,7 +157,7 @@ public:
 		assert( _myType == NULL );
 		_myType = new Type;
 		this->_type = _myType;
-		_myType->setType( this->_namespace.get(), this->_name, this->_kind );
+		_myType->setType( this->_kind, this->_name, this->_namespace.get() );
 		return true;
 	}
 
@@ -577,7 +577,7 @@ ITypeBuilder* TypeBuilder::create( TypeKind kind, INamespace* ns, const std::str
 class NoTypeBuilder : public TypeBuilder
 {
 public:
-	NoTypeBuilder() : TypeBuilder( TK_NONE )
+	NoTypeBuilder() : TypeBuilder( TK_NULL )
 	{;}
 
 	bool allocateType()

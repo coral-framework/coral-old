@@ -30,10 +30,16 @@ template<typename T> class RefPtr;
 template<typename T> class RefVector;
 
 /*!
-	Array that maps a TypeKind to a human-friendly string.
-	\warning always make sure ( index >= 0 && index <= co::TK_COMPONENT ).
+	Maps TypeKinds to either their names in CSL or a human-readable string.
+	\warning make sure ( index >= TK_NULL && index <= co::TK_COMPONENT ).
  */
 extern CORAL_EXPORT const std::string TK_STRINGS[];
+
+/*!
+	Maps the basic type kinds to their IType instances.
+	\warning make sure ( index >= TK_NULL && index <= co::TK_STRING ).
+ */
+extern CORAL_EXPORT IType* BASIC_TYPES[];
 
 
 /****************************************************************************/
@@ -65,34 +71,37 @@ CORAL_EXPORT void setServiceByName( IObject* object, const std::string& receptac
 /****************************************************************************/
 
 //! Returns true for integer types.
-inline bool isIntegerType( TypeKind k ) { return k >= TK_BOOL && k <= TK_UINT64; }
+inline bool isInteger( TypeKind k ) { return k >= TK_BOOL && k <= TK_UINT64; }
 
 //! Returns true for signed integer types.
-inline bool isSignedIntegerType( TypeKind k ) { return isIntegerType( k ) && ( k & 1 ) != 0; }
+inline bool isSignedInteger( TypeKind k ) { return isInteger( k ) && ( k & 1 ) != 0; }
 
 //! Returns true for floating-point types.
-inline bool isFloatType( TypeKind k ) { return k >= TK_FLOAT && k <= TK_DOUBLE; }
+inline bool isFloat( TypeKind k ) { return k >= TK_FLOAT && k <= TK_DOUBLE; }
 
 //! Returns true for integer and floating-point types.
-inline bool isNumericType( TypeKind k ) { return k >= TK_BOOL && k <= TK_DOUBLE; }
+inline bool isNumeric( TypeKind k ) { return k >= TK_BOOL && k <= TK_DOUBLE; }
 
 //! Returns true for numeric and enumeration types.
-inline bool isScalarType( TypeKind k ) { return isNumericType( k ) || k == TK_ENUM; }
+inline bool isScalar( TypeKind k ) { return isNumeric( k ) || k == TK_ENUM; }
 
 //! Returns true for value types (with deep copy semantics).
-inline bool isValueType( TypeKind k ) { return k > TK_NONE && k < TK_INTERFACE && k != TK_EXCEPTION; }
+inline bool isValue( TypeKind k ) { return k > TK_NULL && k < TK_INTERFACE && k != TK_EXCEPTION; }
 
 //! Returns true for reference types (with shallow copy semantics).
-inline bool isReferenceType( TypeKind k ) { return k == TK_INTERFACE; }
+inline bool isReference( TypeKind k ) { return k == TK_INTERFACE; }
 
 //! Returns whether it is possible to declare variables and fields of this type.
-inline bool isDataType( TypeKind k ) { return k > TK_NONE && k < TK_COMPONENT && k != TK_EXCEPTION; }
-
-//! Returns true for types that support subtyping (subtype polymorphism).
-inline bool isPolymorphicType( TypeKind k ) { return k == TK_INTERFACE; }
+inline bool isData( TypeKind k ) { return k > TK_NULL && k < TK_COMPONENT && k != TK_EXCEPTION; }
 
 //! Returns true for types whose variable is a scalar.
-inline bool isScalarOrRefType( TypeKind k ) { return isScalarType( k ) || isReferenceType( k ); }
+inline bool isScalarOrRef( TypeKind k ) { return isScalar( k ) || isReference( k ); }
+
+//! Returns true if users can define new types of this kind.
+inline bool isUserDefinable( TypeKind k ) { return k > TK_ARRAY && k <= TK_COMPONENT; }
+
+//! Returns true for types that support inheritance.
+inline bool isInheritable( TypeKind k ) { return k == TK_INTERFACE; }
 
 
 /****************************************************************************/
@@ -102,7 +111,7 @@ inline bool isScalarOrRefType( TypeKind k ) { return isScalarType( k ) || isRefe
 template<typename>
 struct kindOf
 {
-	static const TypeKind kind = TK_NONE;
+	static const TypeKind kind = TK_NULL;
 };
 
 //! Common implementation of co::kindOf<T>:
@@ -269,6 +278,27 @@ struct typeOf
 	}
 };
 
+template<typename T>
+struct typeOfBasic
+{
+	static const TypeKind kind = kindOf<T>::kind;
+	typedef IType Descriptor;
+	static Descriptor* get() { return BASIC_TYPES[kind]; }
+};
+
+// specializations for basic types:
+template<> struct typeOf<bool> : public typeOfBasic<bool> {};
+template<> struct typeOf<int8> : public typeOfBasic<int8> {};
+template<> struct typeOf<uint8> : public typeOfBasic<uint8> {};
+template<> struct typeOf<int16> : public typeOfBasic<int16> {};
+template<> struct typeOf<uint16> : public typeOfBasic<uint16> {};
+template<> struct typeOf<int32> : public typeOfBasic<int32> {};
+template<> struct typeOf<uint32> : public typeOfBasic<uint32> {};
+template<> struct typeOf<int64> : public typeOfBasic<int64> {};
+template<> struct typeOf<uint64>  : public typeOfBasic<uint64> {};
+template<> struct typeOf<float> : public typeOfBasic<float> {};
+template<> struct typeOf<double> : public typeOfBasic<double> {};
+template<> struct typeOf<std::string> : public typeOfBasic<std::string> {};
 
 /****************************************************************************/
 /* Basic RTTI functions                                                     */

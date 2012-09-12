@@ -3,8 +3,8 @@
  */
 enum TypeKind
 {
-	TK_NONE,			//< Invalid type kind.
-	TK_ANY,				//< The special 'any' (variant) type.
+	TK_NULL,			//< The null value.
+	TK_ANY,				//< Coral's any (variant type).
 	TK_BOOL,			//< Boolean value; either true or false.
 	TK_INT8,			//< 8-bit signed integer.
 	TK_UINT8,			//< 8-bit unsigned integer.
@@ -21,7 +21,7 @@ enum TypeKind
 	TK_ENUM,			//< Enumeration of constant identifiers.
 	TK_EXCEPTION,		//< Named exception that can be raised by methods.
 	TK_STRUCT,			//< Set of named fields of various types.
-	TK_NATIVECLASS,		//< Native class type.
+	TK_NATIVECLASS,		//< Native C++ value type.
 	TK_INTERFACE,		//< Interface type.
 	TK_COMPONENT		//< Component type.
 };

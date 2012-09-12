@@ -215,7 +215,7 @@ void* checkInstance( const Any& instance, ICompositeType* ct, IMember* member )
 	if( in.isNull() )
 		throw IllegalArgumentException( "illegal null instance" );
 
-	if( !in.isA( ct ) )
+	if( !in.getType()->isA( ct ) )
 		CORAL_THROW( IllegalArgumentException, "illegal instance (" << ct->getFullName()
 				<< " expected, got " << in.getType()->getFullName() << ")" );
 

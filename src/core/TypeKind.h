@@ -10,7 +10,7 @@ namespace co {
 
 enum TypeKind
 {
-	TK_NONE,
+	TK_NULL,
 	TK_ANY,
 	TK_BOOL,
 	TK_INT8,
@@ -30,7 +30,8 @@ enum TypeKind
 	TK_STRUCT,
 	TK_NATIVECLASS,
 	TK_INTERFACE,
-	TK_COMPONENT
+	TK_COMPONENT,
+	TK_UNKNOWN		// C++ only
 };
 
 } // namespace co

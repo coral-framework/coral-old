@@ -196,8 +196,8 @@ TEST( AnyTests, constructDefault )
 	co::Any defaultAny;
 	EXPECT_TRUE( defaultAny.isNull() );
 	EXPECT_FALSE( defaultAny.isValid() );
-	EXPECT_EQ( NULL, defaultAny.getType() );
-	EXPECT_ANY_TYPE_STREQ( defaultAny, "<none>" );
+	EXPECT_EQ( defaultAny.getType(), co::BASIC_TYPES[co::TK_NULL] );
+	EXPECT_ANY_TYPE_STREQ( defaultAny, "null" );
 
 	co::Any anotherDefaultAny;
 	EXPECT_TRUE( defaultAny == anotherDefaultAny );
@@ -629,7 +629,7 @@ TEST( AnyTests, coercionsFromBool )
 	EXPECT_EQ( 1.0, a2.get<double>() );
 
 	// to enum (co::TypeKind)
-	EXPECT_EQ( co::TK_NONE, a1.get<co::TypeKind>() );
+	EXPECT_EQ( co::TK_NULL, a1.get<co::TypeKind>() );
 	EXPECT_EQ( co::TK_ANY, a2.get<co::TypeKind>() );
 
 	// no conversion to string or 'reference-based' types
@@ -663,7 +663,7 @@ TEST( AnyTests, coercionsFromUInt64 )
 	EXPECT_EQ( static_cast<double>( co::MAX_UINT64 ), a2.get<double>() );
 
 	// to enum (co::TypeKind)
-	EXPECT_EQ( co::TK_NONE, a0.get<co::TypeKind>() );
+	EXPECT_EQ( co::TK_NULL, a0.get<co::TypeKind>() );
 	EXPECT_EQ( co::TK_COMPONENT, co::Any( 20 ).get<co::TypeKind>() );
 	EXPECT_THROW( a1.get<co::TypeKind>(), co::IllegalCastException );
 	EXPECT_THROW( a2.get<co::TypeKind>(), co::IllegalCastException );
@@ -698,7 +698,7 @@ TEST( AnyTests, coercionsFromDouble )
 	EXPECT_EQ( 3.14159265f, a1.get<float>() );
 
 	// to enum
-	EXPECT_EQ( co::TK_NONE, a0.get<co::TypeKind>() );
+	EXPECT_EQ( co::TK_NULL, a0.get<co::TypeKind>() );
 	EXPECT_EQ( co::TK_INT8, a1.get<co::TypeKind>() );
 	EXPECT_THROW( a2.get<co::TypeKind>(), co::IllegalCastException );
 
@@ -711,7 +711,7 @@ TEST( AnyTests, coercionsFromDouble )
 
 TEST( AnyTests, coercionsFromEnum )
 {
-	co::Any a0( co::TK_NONE );
+	co::Any a0( co::TK_NULL );
 	co::Any a1( co::TK_FLOAT );
 	co::Any a2( co::TK_COMPONENT );
 
@@ -743,7 +743,7 @@ TEST( AnyTests, coercionsFromEnum )
 
 TEST( MappingTests, coercionBetweenEnums )
 {
-	co::Any a0( co::TK_NONE );
+	co::Any a0( co::TK_NULL );
 	co::Any a1( static_cast<short>( 1 ) );
 	co::Any a2( co::TK_BOOL );
 	co::Any a3( co::TK_UINT32 );

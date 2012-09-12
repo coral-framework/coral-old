@@ -113,13 +113,15 @@ INamespace* Namespace::getChildNamespace( const std::string& name )
 	return findChildNamespace( name );
 }
 
-ITypeBuilder* Namespace::defineType( const std::string& name, TypeKind typeKind )
+ITypeBuilder* Namespace::defineType( const std::string& name, TypeKind kind )
 {
-	if( typeKind <= TK_ARRAY || typeKind > TK_COMPONENT )
-		CORAL_THROW( IllegalArgumentException, "'" << typeKind <<  "' is not a user-definable type kind." );
+	if( !isUserDefinable( kind ) )
+		CORAL_THROW( IllegalArgumentException, "'" << kind
+				<<  "' is not a user-definable type kind." );
 
 	if( !LexicalUtils::isValidIdentifier( name ) )
-		CORAL_THROW( IllegalNameException, "'" << name << "' is not a valid identifier." );
+		CORAL_THROW( IllegalNameException, "'" << name
+				<< "' is not a valid identifier." );
 
 	IType* type;
 	if( ( type = findType( name ) ) && type->getFullName() != "co.IService" )
@@ -129,7 +131,7 @@ ITypeBuilder* Namespace::defineType( const std::string& name, TypeKind typeKind 
 		throwClashingNamespace( name );
 
 	TypeManager* tm = static_cast<TypeManager*>( getSystem()->getTypes() );
-	ITypeBuilder* tb = TypeBuilder::create( typeKind, this, name );
+	ITypeBuilder* tb = TypeBuilder::create( kind, this, name );
 	tm->addTypeBuilder( tb );
 
 	return tb;

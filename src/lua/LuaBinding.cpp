@@ -347,7 +347,7 @@ bool CompositeTypeBinding::tryGetInstance( lua_State* L, int udataIdx, co::Any& 
 	if( !ct )
 		return false;
 
-	if( co::isValueType( ct->getKind() ) )
+	if( co::isValue( ct->getKind() ) )
 		instance = ValueBinding::getInstance( L, udataIdx );
 	else
 		instance = ServiceBinding::getInstance( L, udataIdx );
@@ -967,7 +967,7 @@ void ValueBinding::push( lua_State* L, co::IType* type, void* instancePtr )
 co::Any ValueBinding::getInstance( lua_State* L, int index )
 {
 	co::ICompositeType* ct = getType( L, index );
-	assert( ct && co::isValueType( ct->getKind() ) );
+	assert( ct && co::isValue( ct->getKind() ) );
 	return co::Any( false, ct, lua_touserdata( L, index ) );
 }
 

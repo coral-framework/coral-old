@@ -190,12 +190,12 @@ void LuaState::push( lua_State* L, const co::Any& var )
 	co::Any in = var.asIn();
 	const co::__any::State& s = in.state;
 
-	co::TypeKind k = s.type ? s.type->getKind() : co::TK_NONE;
+	co::TypeKind k = in.getKind();
 	assert( k != co::TK_ANY );
 
 	switch( k )
 	{
-	case co::TK_NONE:
+	case co::TK_NULL:
 		lua_pushnil( L );
 		break;
 	case co::TK_BOOL:

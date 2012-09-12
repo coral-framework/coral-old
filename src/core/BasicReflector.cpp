@@ -17,6 +17,16 @@ IType* BasicReflector::getType()
 	return _type;
 }
 
+// ------ NullReflector --------------------------------------------------------
+
+class NullReflector : public BasicReflector
+{
+public:
+	NullReflector( IType* t ) : BasicReflector( t ) {;}
+
+	uint32 getSize() { return 0; }
+};
+
 // ------ PODReflector ---------------------------------------------------------
 
 template<typename T>
@@ -171,6 +181,7 @@ IReflector* BasicReflector::create( IType* t )
 	IReflector* r = NULL;
 	switch( t->getKind() )
 	{
+	case TK_NULL:		r = new NullReflector( t );					break;
 	case TK_ANY:		r = new ClassReflector<AnyValue>( t );		break;
 	case TK_BOOL:		r = new PODReflector<bool>( t );			break;
 	case TK_INT8:		r = new PODReflector<int8>( t );			break;

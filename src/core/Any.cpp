@@ -20,10 +20,12 @@
 
 std::ostream& operator<<( std::ostream& out, const co::__any::State& s )
 {
-	if( !s.type )
-		return out << co::TK_STRINGS[co::TK_NONE];
+	assert( s.type );
 
-	return out << ( s.isIn ? "in " : "out " ) << s.type->getFullName();
+	if( s.type->getKind() != co::TK_NULL )
+		out << ( s.isIn ? "in " : "out " );
+
+	return out << s.type->getFullName();
 }
 
 std::ostream& operator<<( std::ostream& out, const co::Any& a )
@@ -33,15 +35,16 @@ std::ostream& operator<<( std::ostream& out, const co::Any& a )
 	// type info
 	out << "(" << s << ")";
 
-	if( !s.type )
+	if( a.isNull() )
 		return out;
 
-	co::TypeKind k = s.type->getKind();
-	assert( k != co::TK_EXCEPTION && k != co::TK_COMPONENT );
+	co::TypeKind k = a.getKind();;
+	assert( co::isData( k ) );
 
-	// print pointer
-	if( !s.isIn || !co::isScalarType( k ) )
+	// print contents
+	if( !s.isIn || !co::isScalar( k ) )
 	{
+		// print pointer
 		if( s.data.ptr == NULL )
 		{
 			out << "NULL";
@@ -63,9 +66,8 @@ std::ostream& operator<<( std::ostream& out, const co::Any& a )
 			out << s.data.ptr;
 		}
 	}
-	else
-	{
-		// print value
+	else // print value
+	{	
 		switch( k )
 		{
 		case co::TK_BOOL:	out << ( s.data.b ? "true" : "false" );	break;
@@ -123,7 +125,7 @@ inline void castScalar( const void* from, TypeKind toKind, void* to )
 
 void castScalar( TypeKind fromKind, const void* from, TypeKind toKind, void* to )
 {
-	assert( isScalarType( toKind ) && isScalarType( fromKind ) );
+	assert( isScalar( toKind ) && isScalar( fromKind ) );
 	switch( fromKind )
 	{
 	case TK_BOOL:	castScalar<bool>( from, toKind, to );	break;
@@ -149,7 +151,7 @@ void castScalar( TypeKind fromKind, const void* from, TypeKind toKind, void* to 
 inline bool typesMatch( TypeKind kSub, TypeKind kSuper, IType* tSub, IType* tSuper )
 {
 	return tSub == tSuper ||
-		( isPolymorphicType( kSub ) && kSub == kSuper && tSub->isA( tSuper ) );
+		( isInheritable( kSub ) && kSub == kSuper && tSub->isA( tSuper ) );
 }
 
 typedef std::vector<uint8> StdVector;
@@ -181,38 +183,15 @@ inline size_t getVectorSize( const __any::State& s )
 /* co::Any                                                                  */
 /****************************************************************************/
 
-bool Any::isA( IType* type ) const
-{
-	assert( type );
-
-	IType* myType = state.type;
-	while( myType )
-	{
-		if( myType == type )
-			return true;
-
-		TypeKind k = myType->getKind();
-		if( k == TK_ANY )
-		{
-			myType = reinterpret_cast<AnyValue*>( state.data.ptr )->getType();
-			continue;
-		}
-
-		if( !isPolymorphicType( k ) )
-			return false;
-
-		return k == type->getKind() && myType->isA( type );
-	}
-
-	return false;
-}
-
 Any Any::asIn() const
 {
-	if( state.isIn || !state.type )
+	if( isIn() )
 		return *this;
 
-	TypeKind k = state.type->getKind();
+	TypeKind k = getKind();
+	if( k == TK_NULL )
+		return Any();
+
 	if( k == TK_ANY )
 		return reinterpret_cast<const AnyValue*>( state.data.ptr )->getAny().asIn();
 
@@ -228,18 +207,15 @@ Any Any::asIn() const
 
 size_t Any::getCount() const
 {
-	if( state.type && state.type->getKind() == TK_ARRAY )
-		return  state.isIn ? state.size : getVectorSize( state );
+	if( getKind() == TK_ARRAY )
+		return state.isIn ? state.size : getVectorSize( state );
 
 	return 1;
 }
 
 size_t Any::getElementSize() const
 {
-	IType* type = state.type;
-	if( !type )
-		return 0;
-
+	IType* type = getType();
 	if( type->getKind() == TK_ARRAY )
 		type = static_cast<IArray*>( type )->getElementType();
 
@@ -249,7 +225,7 @@ size_t Any::getElementSize() const
 void Any::set( bool isIn, IType* type, const void* addr, size_t size )
 {
 	// type must be a valid data type
-	assert( type && isDataType( type->getKind() ) );
+	assert( type && isData( type->getKind() ) );
 
 	// we can point to a co::AnyValue, but not to another co::Any
 	assert( type->getKind() != TK_ANY || isIn == false );
@@ -279,7 +255,7 @@ void Any::set( bool isIn, IType* type, const void* addr, size_t size )
 	case TK_ENUM: state.data.u32 = *reinterpret_cast<const uint32*>( addr ); break;
 	case TK_INTERFACE: state.data.service = *reinterpret_cast<IService* const*>( addr ); break;
 	default:
-		assert( !isScalarType( k ) );
+		assert( !isScalar( k ) );
 	}
 }
 
@@ -296,7 +272,7 @@ void Any::put( const Any& value ) const
 			"cannot write to a '" << state << "' variable" );
 
 	Any in = value.asIn();
-	TypeKind k = getType()->getKind();
+	TypeKind k = getKind();
 	switch( k )
 	{
 	case TK_ANY:
@@ -318,10 +294,10 @@ void Any::put( const Any& value ) const
 
 	case TK_ARRAY:
 		resize( in.state.size );
-		if( !in.state.type )
+		if( in.isNull() )
 			break;
 
-		if( in.state.type->getKind() != TK_ARRAY )
+		if( in.getKind() != TK_ARRAY )
 			THROW_ILLEGAL_CAST( in.state, state, );
 
 		// are both arrays of the same exact type?
@@ -342,9 +318,9 @@ void Any::put( const Any& value ) const
 
 	case TK_ENUM:
 		{
-			TypeKind vK = in.isValid() ? in.getType()->getKind() : TK_NONE;
+			TypeKind vK = in.getKind();
 			IEnum* enumType = static_cast<IEnum*>( state.type );
-			if( isScalarType( vK ) )
+			if( isScalar( vK ) )
 			{
 				uint32 id = in.get<uint32>();
 				if( id >= enumType->getIdentifiers().getSize() )
@@ -378,8 +354,7 @@ void Any::put( const Any& value ) const
 			IService* service = NULL;
 			if( in.isValid() )
 			{
-				TypeKind vK = in.getType()->getKind();
-				if( vK == TK_INTERFACE && in.getType()->isA( state.type ) )
+				if( in.getType()->isA( state.type ) )
 					service = in.get<IService*>();
 				else
 					THROW_ILLEGAL_CAST( in.state, state, );
@@ -395,9 +370,9 @@ void Any::put( const Any& value ) const
 
 void Any::swapArrays( const Any& other ) const
 {
-	assert( state.type && state.type->getKind() == TK_ARRAY );
-	assert( state.type == other.state.type );
-	assert( !state.isIn && !other.state.isIn );
+	assert( getKind() == TK_ARRAY );
+	assert( getType() == other.getType() );
+	assert( isOut() && other.isOut() );
 	StdVector* myVec = reinterpret_cast<StdVector*>( state.data.ptr );
 	StdVector* otherVec = reinterpret_cast<StdVector*>( other.state.data.ptr );
 	myVec->swap( *otherVec );
@@ -405,7 +380,7 @@ void Any::swapArrays( const Any& other ) const
 
 void Any::resize( size_t n ) const
 {
-	assert( state.type && !state.isIn && state.type->getKind() == TK_ARRAY );
+	assert( isOut() && getKind() == TK_ARRAY );
 
 	StdVector& v = *reinterpret_cast<StdVector*>( state.data.ptr );
 	IType* elemType = static_cast<IArray*>( state.type )->getElementType();
@@ -452,7 +427,7 @@ void Any::resize( size_t n ) const
 
 Any Any::at( size_t index ) const
 {
-	assert( state.type && state.type->getKind() == TK_ARRAY );
+	assert( getKind() == TK_ARRAY );
 	assert( index < getCount() );
 
 	IType* elemType = static_cast<IArray*>( state.type )->getElementType();
@@ -468,16 +443,16 @@ Any Any::at( size_t index ) const
 
 bool Any::operator==( const Any& other ) const
 {
-	if( state.type != other.state.type )
+	if( getType() != other.getType() )
 		return false;
 
-	if( state.type == NULL )
+	if( isNull() )
 		return true;
 
 	if( state.isIn != other.state.isIn )
 		return false;
 
-	TypeKind k = state.type->getKind();
+	TypeKind k = getKind();
 	if( state.isIn )
 	{
 		if( k == TK_ARRAY && state.size != other.state.size )
@@ -498,7 +473,7 @@ bool Any::operator==( const Any& other ) const
 		case TK_DOUBLE:	return state.data.d == other.state.data.d;
 		case TK_ENUM:	return state.data.u32 == other.state.data.u32;
 		default:
-			assert( !isScalarType( k ) );
+			assert( !isScalar( k ) );
 		}
 	}
 
@@ -569,15 +544,15 @@ void Any::cast( __any::State& to ) const
 			if( toK == TK_INTERFACE ) // converting to an interface
 			{
 				// null to interface conversion
-				if( k == TK_NONE )
+				if( k == TK_NULL )
 				{
 					to.data.ptr = NULL;
 					return;
 				}
 			}
-			else if( isScalarType( toK ) ) // converting to a scalar
+			else if( isScalar( toK ) ) // converting to a scalar
 			{
-				if( isScalarType( k ) ) // from a scalar
+				if( isScalar( k ) ) // from a scalar
 				{
 					// scalar to scalar conversions
 					castScalar( k, &state.data, toK, &to.data );
@@ -605,10 +580,10 @@ void Any::cast( __any::State& to ) const
 											<< str << "' in the enum" );
 						to.data.u32 = value;
 					}
-					else if( co::isIntegerType( toK ) )
+					else if( co::isInteger( toK ) )
 					{
 						// string to integer conversion
-						if( isSignedIntegerType( toK ) )
+						if( isSignedInteger( toK ) )
 						{
 							long v = strtol( str.c_str(), NULL, 0 );
 							castScalar<long>( &v, toK, &to.data );
@@ -660,7 +635,7 @@ void AnyValue::clear()
 
 void* AnyValue::create( IType* type )
 {
-	assert( type && isDataType( type->getKind() ) );
+	assert( type && isData( type->getKind() ) );
 
 	clear();
 
@@ -704,11 +679,12 @@ void AnyValue::copy( const Any& any )
 	if( in.isNull() )
 	{
 		clear();
-		return;
 	}
-
-	create( in.getType() );
-	_any.put( in );
+	else
+	{
+		create( in.getType() );
+		_any.put( in );
+	}
 }
 
 } // namespace co

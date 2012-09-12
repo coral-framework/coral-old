@@ -172,7 +172,7 @@ IArray* TypeManager::getArrayOf( IType* elementType )
 					( kind == TK_EXCEPTION ? "exception" : "component" ) << "s are illegal" );
 
 	RefPtr<ArrayType> arrayType = new ArrayType;
-	arrayType->setType( ns, elementType->getName() + "[]", TK_ARRAY );
+	arrayType->setType( TK_ARRAY, elementType->getName() + "[]", ns );
 	arrayType->setElementType( elementType );
 
 	ns->addType( arrayType.get() );
@@ -219,30 +219,25 @@ IType* TypeManager::loadTypeOrThrow( const std::string& fullName )
 	return type;
 }
 
-void TypeManager::definePrimitiveType( Namespace* ns, const std::string& name, TypeKind kind )
-{
-	RefPtr<TypeComponent> type = new TypeComponent;
-	type->setType( ns, name, kind );
-	ns->addType( type.get() );
-}
-
 void TypeManager::defineBuiltInTypes()
 {
 	Namespace* rootNS = _rootNS.get();
 
-	// register all primitive types in the root namespace:
-	for( unsigned int i = TK_ANY; i <= TK_STRING; ++i )
-		definePrimitiveType( rootNS, TK_STRINGS[i], static_cast<TypeKind>( i ) );
+	// register all basic types in the root namespace:
+	for( TypeKind k = TK_NULL; k <= TK_STRING; ++k )
+	{
+		TypeComponent* type = static_cast<TypeComponent*>( BASIC_TYPES[k] );
+		type->setNamespace( rootNS );
+		rootNS->addType( type );
+	}
 
 	// pre-load the 'co.IService' type and all its dependencies
-	INamespace* coNS = rootNS->defineChildNamespace( "co" );
+	Namespace* coNS = static_cast<Namespace*>( rootNS->defineChildNamespace( "co" ) );
 	assert( coNS );
-	Namespace* castNS = static_cast<Namespace*>( coNS );
 
 	RefPtr<Interface> serviceType = new Interface;
-	serviceType->setType( coNS, "IService", TK_INTERFACE );
-
-	castNS->addType( serviceType.get() );
+	serviceType->setType( TK_INTERFACE, "IService", coNS );
+	coNS->addType( serviceType.get() );
 
 	loadTypeOrThrow( "co.IService" );
 }

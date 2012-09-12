@@ -68,7 +68,7 @@ struct State
 	Data data;		// Storage for primitives and pointers
 
 	// Default constructor
-	State() : type(), isIn( false ), size( 0 ) {;}
+	State() : type( BASIC_TYPES[TK_NULL] ), isIn( false ), size( 0 ) {;}
 
 	// Output variable constructor
 	State( IType* type, const void* ptr )
@@ -100,7 +100,7 @@ struct Tag
 	typedef typeOf<T> VT;
 	inline static void tag( State& s )
 	{
-		static_assert( VT::kind != TK_NONE, "unsupported type" );
+		static_assert( VT::kind != TK_NULL, "unsupported type" );
 		s.type = VT::get();
 		s.isIn = isIn;
 	}
@@ -319,37 +319,34 @@ public:
 	//! Constant copy constructor.
 	inline Any( const Any& other ) : state( other.state ) {;}
 
-	// Creates a co::Any from a state descriptor.
-	inline Any( const __any::State& state ) : state( state ) {;}
-
 	//! Destructor.
 	inline ~Any() {;}
 
 	//! Clears the co::Any (makes it null).
-	inline void clear() { state.type = NULL; }
+	inline void clear() { state.type = BASIC_TYPES[TK_NULL]; }
 
 	//! \name Variable Introspection
 	//@{
 
-	//! Whether this co::Any is empty (null).
-	inline bool isNull() const { return state.type == NULL; }
+	//! Whether this co::Any is null.
+	inline bool isNull() const { return state.type->getKind() == TK_NULL; }
 
-	//! Whether this co::Any references something (isn't null).
-	inline bool isValid() const { return state.type != NULL; }
+	//! Whether this co::Any is not null.
+	inline bool isValid() const { return !isNull(); }
 
-	//! Returns the type of the stored variable (or NULL for an empty co::Any).
+	//! Returns the type of the stored variable.
 	inline IType* getType() const { return state.type; }
 
-	//! Whether the stored variable is in the 'input' format.
+	//! Returns the kind of the stored variable.
+	inline TypeKind getKind() const { return state.type->getKind(); }
+
+	//! Whether the stored variable is in the 'input' form.
 	inline bool isIn() const { return state.isIn; }
 
-	//! Whether the stored variable is in the 'output' format.
+	//! Whether the stored variable is in the 'output' form.
 	inline bool isOut() const { return !state.isIn; }
 
-	//! Whether the stored variable is of the given type.
-	bool isA( IType* type ) const;
-
-	//! Returns the equivalent variable in 'input' format.
+	//! Returns the equivalent variable in the 'input' form.
 	Any asIn() const;
 
 	/*!
@@ -367,10 +364,9 @@ public:
 	size_t getElementSize() const;
 
 	/*!
-		Attempts to retrieve a stored variable, making the necessary casts whenever possible.
-
-		\throw co::IllegalCastException if there is no valid cast from the stored variable's
-				type to the requested type \a T.
+		Retrieves a stored variable.
+		\throw IllegalCastException if there is no valid conversion from the
+					stored variable's type to the requested type \a T.
 	 */
 	template<typename T>
 	inline T get() const
@@ -384,9 +380,7 @@ public:
 	template<typename T>
 	inline void get( T& v ) const
 	{
-		Any any;
-		__any::Variable<T&>::tag( any.state );
-		__any::Variable<T&>::set( any.state, v );
+		Any any( v );
 		any.put( *this );
 	}
 
@@ -533,14 +527,17 @@ public:
 	//! Destructor.
 	inline ~AnyValue() { clear(); }
 
-	//! Whether this co::AnyValue is empty (null).
+	//! Whether this co::AnyValue is null.
 	inline bool isNull() const { return _any.isNull(); }
 
-	//! Whether this co::AnyValue contains a value (isn't null).
+	//! Whether this co::AnyValue is not null.
 	inline bool isValid() const { return _any.isValid(); }
 
-	//! Returns the type of the contained value (or NULL if this is empty).
+	//! Returns the type of the contained value.
 	inline IType* getType() const { return _any.getType(); }
+
+	//! Returns the kind of the contained value.
+	inline TypeKind getKind() const { return _any.getKind(); }
 
 	//! Returns an 'out' co::Any that references this co::AnyValue's value.
 	inline Any getAny() const { return _any; }

@@ -4,6 +4,7 @@
  */
 
 #include "TypeTraits.h"
+#include "types/Type.h"
 #include <co/Coral.h>
 #include <co/IPort.h>
 #include <co/IObject.h>
@@ -17,7 +18,7 @@ namespace co {
 
 const std::string TK_STRINGS[] =
 {
-	"<none>",
+	"null",
 	"any",
 	"bool",
 	"int8",
@@ -39,6 +40,26 @@ const std::string TK_STRINGS[] =
 	"<interface>",
 	"<component>",
 	"<off by one!>"
+};
+
+#define NEW_TYPE( k ) new TypeComponent( k )
+
+IType* BASIC_TYPES[] =
+{
+	NEW_TYPE( TK_NULL ),
+	NEW_TYPE( TK_ANY ),
+	NEW_TYPE( TK_BOOL ),
+	NEW_TYPE( TK_INT8 ),
+	NEW_TYPE( TK_UINT8 ),
+	NEW_TYPE( TK_INT16 ),
+	NEW_TYPE( TK_UINT16 ),
+	NEW_TYPE( TK_INT32 ),
+	NEW_TYPE( TK_UINT32 ),
+	NEW_TYPE( TK_INT64 ),
+	NEW_TYPE( TK_UINT64 ),
+	NEW_TYPE( TK_FLOAT ),
+	NEW_TYPE( TK_DOUBLE ),
+	NEW_TYPE( TK_STRING )
 };
 
 IType* getTypeByLiteralName( const char* fullName )

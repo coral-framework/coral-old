@@ -33,24 +33,26 @@ IAnnotation* selectAnnotation( Range<IAnnotation*> annotations, IInterface* requ
 
 // ------ TypeImpl -------------------------------------------------------------
 
-void TypeImpl::setType( INamespace* parent, const std::string& name, TypeKind kind )
+void TypeImpl::setNamespace( INamespace* ns )
 {
-	assert( _kind == TK_NONE );
-	assert( _namespace == NULL );
-
-	_namespace = parent;
-	_name = name;
-	_kind = kind;
-
-	// compute our 'fullName'
-	if( _namespace->getParentNamespace() )
+	_namespace = ns;
+	if( _fullName.empty() )
 	{
-		// we're not in the global namespace
-		_fullName = _namespace->getFullName();
-		_fullName.push_back( '.' );
+		if( ns->getParentNamespace() ) // are we in the root ns?
+		{
+			_fullName = ns->getFullName();
+			_fullName.push_back( '.' );
+		}
+		_fullName.append( _name );
 	}
+}
 
-	_fullName.append( name );
+void TypeImpl::setType( TypeKind kind, const std::string& name, INamespace* ns )
+{
+	assert( _kind == TK_NULL );
+	_kind = kind;
+	_name = name;
+	setNamespace( ns );
 }
 
 IReflector* TypeImpl::getReflector( IType* myType )
@@ -142,6 +144,14 @@ void TypeImpl::calculateSignatures( IType* myType )
 }
 
 // ------ co.Type --------------------------------------------------------------
+
+TypeComponent::TypeComponent( TypeKind kind )
+{
+	_kind = kind;
+	_name = TK_STRINGS[kind];
+	_fullName = _name;
+	serviceRetain();
+}
 
 TypeComponent::~TypeComponent()
 {

@@ -147,7 +147,7 @@ TEST( TypeTraitsTests, get )
 
 TEST( TypeTraitsTests, kindOf )
 {
-	EXPECT_TRUE( co::kindOf<std::exception>::kind == co::TK_NONE );
+	EXPECT_TRUE( co::kindOf<std::exception>::kind == co::TK_NULL );
 
 	EXPECT_TRUE( co::kindOf<bool>::kind == co::TK_BOOL );
 
@@ -158,7 +158,7 @@ TEST( TypeTraitsTests, kindOf )
 	EXPECT_TRUE( co::kindOf<double>::kind == co::TK_DOUBLE );
 
 	EXPECT_TRUE( co::kindOf<std::string>::kind == co::TK_STRING );
-	EXPECT_TRUE( co::kindOf<const char*>::kind == co::TK_NONE );
+	EXPECT_TRUE( co::kindOf<const char*>::kind == co::TK_NULL );
 	
 	EXPECT_TRUE( co::kindOf<co::TypeKind>::kind == co::TK_ENUM );
 
@@ -184,7 +184,7 @@ TEST( TypeTraitsTests, nameOf )
 
 	EXPECT_STREQ( "co.TypeKind", co::nameOf<co::TypeKind>::get() );
 
-	EXPECT_STREQ( "<none>", co::nameOf<std::exception>::get() );
+	EXPECT_STREQ( "null", co::nameOf<std::exception>::get() );
 
 	EXPECT_STREQ( "float[]", co::nameOf<co::Range<float> >::get() );
 	EXPECT_STREQ( "string[]", co::nameOf<co::Range<std::string> >::get() );
