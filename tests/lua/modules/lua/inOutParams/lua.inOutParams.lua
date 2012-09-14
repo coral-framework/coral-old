@@ -63,6 +63,11 @@ function Component:testArrayOfAnys( a, b )
 	return { 3.2, nil }, { "str", false }
 end
 
+function Component:testFile( i )
+	ASSERT_FALSE( i.isOpen )
+	return i, i
+end
+
 function M:initialize( module )
 	local c = Component()
 	local shift = c.shift
