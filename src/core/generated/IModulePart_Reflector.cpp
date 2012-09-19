@@ -44,40 +44,45 @@ public:
 
 	void disintegrate( co::IModule* module_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IModule* >( module_ );
+		co::Any args[] = {
+			module_
+		};
 		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 0 ), range );
 	}
 
 	void dispose( co::IModule* module_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IModule* >( module_ );
+		co::Any args[] = {
+			module_
+		};
 		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 1 ), range );
 	}
 
 	void initialize( co::IModule* module_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IModule* >( module_ );
+		co::Any args[] = {
+			module_
+		};
 		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 2 ), range );
 	}
 
 	void integrate( co::IModule* module_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IModule* >( module_ );
+		co::Any args[] = {
+			module_
+		};
 		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 3 ), range );
 	}
 
 	void integratePresentation( co::IModule* module_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IModule* >( module_ );
+		co::Any args[] = {
+			module_
+		};
 		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 4 ), range );
 	}

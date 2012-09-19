@@ -42,7 +42,7 @@ public:
 
 	virtual co::INamespace* defineChildNamespace( const std::string& name ) = 0;
 
-	virtual co::ITypeBuilder* defineType( const std::string& name, co::TypeKind typeKind ) = 0;
+	virtual co::ITypeBuilder* defineType( const std::string& name, co::TypeKind kind ) = 0;
 
 	virtual co::INamespace* findChildNamespace( const std::string& name ) = 0;
 

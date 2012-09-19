@@ -5,8 +5,8 @@
 
 #include <co/IModule.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/INamespace.h>
 #include <co/IModulePart.h>
+#include <co/INamespace.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -63,8 +63,7 @@ public:
 
 	void setRank( co::int32 rank_ )
 	{
-		co::Any arg;
-		arg.set< co::int32 >( rank_ );
+		co::Any arg( rank_ );
 		_provider->dynamicSetField( _cookie, getField<co::IModule>( 2 ), arg );
 	}
 

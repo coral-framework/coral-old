@@ -5,11 +5,11 @@
 
 #include <co/ITypeManager.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/ITypeTransaction.h>
 #include <co/IType.h>
-#include <co/CSLError.h>
-#include <co/IArray.h>
 #include <co/INamespace.h>
+#include <co/IArray.h>
+#include <co/CSLError.h>
+#include <co/ITypeTransaction.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -60,8 +60,9 @@ public:
 
 	co::INamespace* findNamespace( const std::string& fullName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( fullName_ );
+		co::Any args[] = {
+			fullName_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 0 ), range );
 		return res.get< co::INamespace* >();
@@ -69,8 +70,9 @@ public:
 
 	co::IType* findType( const std::string& fullName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( fullName_ );
+		co::Any args[] = {
+			fullName_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 1 ), range );
 		return res.get< co::IType* >();
@@ -78,8 +80,9 @@ public:
 
 	co::IArray* getArrayOf( co::IType* elementType_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IType* >( elementType_ );
+		co::Any args[] = {
+			elementType_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 2 ), range );
 		return res.get< co::IArray* >();
@@ -87,8 +90,9 @@ public:
 
 	co::INamespace* getNamespace( const std::string& fullName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( fullName_ );
+		co::Any args[] = {
+			fullName_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 3 ), range );
 		return res.get< co::INamespace* >();
@@ -96,8 +100,9 @@ public:
 
 	co::IType* getType( const std::string& typeName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( typeName_ );
+		co::Any args[] = {
+			typeName_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 4 ), range );
 		return res.get< co::IType* >();
@@ -105,9 +110,10 @@ public:
 
 	co::IType* loadType( const std::string& typeName_, std::vector<co::CSLError>& errorStack_ )
 	{
-		co::Any args[2];
-		args[0].set< const std::string& >( typeName_ );
-		args[1].set< std::vector<co::CSLError>& >( errorStack_ );
+		co::Any args[] = {
+			typeName_,
+			errorStack_
+		};
 		co::Range<co::Any> range( args, 2 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 5 ), range );
 		return res.get< co::IType* >();

@@ -5,8 +5,8 @@
 
 #include <co/IModuleManager.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IModulePartLoader.h>
 #include <co/IModule.h>
+#include <co/IModulePartLoader.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -51,8 +51,7 @@ public:
 
 	void setBinaryCompatibilityChecking( bool binaryCompatibilityChecking_ )
 	{
-		co::Any arg;
-		arg.set< bool >( binaryCompatibilityChecking_ );
+		co::Any arg( binaryCompatibilityChecking_ );
 		_provider->dynamicSetField( _cookie, getField<co::IModuleManager>( 0 ), arg );
 	}
 
@@ -70,8 +69,9 @@ public:
 
 	co::IModule* findModule( const std::string& moduleName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( moduleName_ );
+		co::Any args[] = {
+			moduleName_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 0 ), range );
 		return res.get< co::IModule* >();
@@ -79,16 +79,18 @@ public:
 
 	void installLoader( co::IModulePartLoader* loader_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IModulePartLoader* >( loader_ );
+		co::Any args[] = {
+			loader_
+		};
 		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 1 ), range );
 	}
 
 	bool isLoadable( const std::string& moduleName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( moduleName_ );
+		co::Any args[] = {
+			moduleName_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 2 ), range );
 		return res.get< bool >();
@@ -96,8 +98,9 @@ public:
 
 	co::IModule* load( const std::string& moduleName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( moduleName_ );
+		co::Any args[] = {
+			moduleName_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 3 ), range );
 		return res.get< co::IModule* >();
@@ -105,8 +108,9 @@ public:
 
 	void uninstallLoader( co::IModulePartLoader* loader_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IModulePartLoader* >( loader_ );
+		co::Any args[] = {
+			loader_
+		};
 		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 4 ), range );
 	}

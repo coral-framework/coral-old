@@ -196,7 +196,7 @@ TEST( AnyTests, constructDefault )
 	co::Any defaultAny;
 	EXPECT_TRUE( defaultAny.isNull() );
 	EXPECT_FALSE( defaultAny.isValid() );
-	EXPECT_EQ( defaultAny.getType(), co::BASIC_TYPES[co::TK_NULL] );
+	EXPECT_EQ( defaultAny.getType(), co::BASIC_TYPES[co::TK_NULL].get() );
 	EXPECT_ANY_TYPE_STREQ( defaultAny, "null" );
 
 	co::Any anotherDefaultAny;
@@ -382,8 +382,8 @@ void setAndGetTest( T correctValue, T wrongValue )
 
 TEST( AnyTests, setGetAny )
 {
-	co::Any a1( 1 ), a2( 2 );
-	setAndGetTest<co::Any&>( a1, a2 );
+	co::AnyValue a1( 1 ), a2( 2 );
+	setAndGetTest<co::AnyValue&>( a1, a2 );
 }
 
 TEST( AnyTests, setGetBool )
@@ -639,9 +639,9 @@ TEST( AnyTests, coercionsFromBool )
 
 TEST( AnyTests, coercionsFromUInt64 )
 {
-	co::Any a0; a0.set<co::uint64>( 0 );
-	co::Any a1; a1.set<co::uint64>( co::MAX_INT16 );
-	co::Any a2; a2.set<co::uint64>( co::MAX_UINT64 );
+	co::Any a0; a0.setIn<co::uint64>( 0 );
+	co::Any a1; a1.setIn<co::uint64>( co::MAX_INT16 );
+	co::Any a2; a2.setIn<co::uint64>( co::MAX_UINT64 );
 
 	EXPECT_ANY_STREQ( a0, "(in uint64)0" );
 	EXPECT_ANY_STREQ( a1, "(in uint64)32767" );
@@ -991,8 +991,7 @@ TEST( AnyTests, accessRangeOfDoubles )
 {
 	double dblArray[] = { -7.75, 3.14, 1000 };
 	
-	co::Any array;
-	array.set( co::Range<double>( dblArray, CORAL_ARRAY_LENGTH(dblArray) ) );
+	co::Any array( co::Range<double>( dblArray, CORAL_ARRAY_LENGTH(dblArray) ) );
 
 	ASSERT_TRUE( array.isValid() );
 	EXPECT_TRUE( array.isIn() );
@@ -1024,8 +1023,8 @@ TEST( AnyTests, accessRangeOfStructs )
 	cslErrorArray[1].message = "message2";
 	cslErrorArray[1].line = 9;
 
-	co::Any array, elem;
-	array.set( co::Range<co::CSLError>( cslErrorArray, CORAL_ARRAY_LENGTH(cslErrorArray) ) );
+	co::Any elem;
+	co::Any array( co::Range<co::CSLError>( cslErrorArray, CORAL_ARRAY_LENGTH(cslErrorArray) ) );
 
 	ASSERT_TRUE( array.isValid() );
 	EXPECT_TRUE( array.isIn() );

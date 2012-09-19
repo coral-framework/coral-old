@@ -241,15 +241,15 @@ int coPackage::genericNew( lua_State* L )
 
 	co::IType* type = co::getType( typeName );
 	co::TypeKind kind = type->getKind();
-	if( kind == co::TK_STRUCT || kind == co::TK_NATIVECLASS )
-	{
-		ValueBinding::push( L, type, NULL );
-	}
-	else if( kind == co::TK_COMPONENT )
+	if( kind == co::TK_COMPONENT )
 	{
 		co::IReflector* reflector = type->getReflector();
 		co::RefPtr<co::IObject> c = reflector->newInstance();
 		LuaState::push( L, c.get() );
+	}
+	else if( co::isComplexValue( kind ) )
+	{
+		ValueBinding::push( L, type, NULL );
 	}
 	else
 	{
@@ -416,7 +416,7 @@ void CompositeTypeBinding::pushMetatable( lua_State* L, co::ICompositeType* ct, 
 		if( tag == co::TK_INTERFACE && ct->getFullName() == "co.IObject" )
 			tag = co::TK_COMPONENT;
 
-		assert( tag >= co::TK_STRUCT && tag <= co::TK_COMPONENT );
+		assert( co::isCustom( tag ) );
 		const Metamethods& mms = METAMETHODS_TABLE[tag - co::TK_STRUCT];
 
 		lua_pop( L, 1 );
@@ -946,7 +946,7 @@ int ServiceBinding::toString( lua_State* L )
 
 void ValueBinding::push( lua_State* L, co::IType* type, void* instancePtr )
 {
-	assert( type->getKind() == co::TK_STRUCT || type->getKind() == co::TK_NATIVECLASS );
+	assert( co::isComplexValue( type->getKind() ) );
 
 	co::IReflector* reflector = type->getReflector();
 	reflector->serviceRetain();

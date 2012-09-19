@@ -355,8 +355,8 @@ TEST( ReflectorTests, interfaceNamespace )
 				 co::MissingInputException );
 
 	// ok, now we call the method properly, but with a 3rd, unecessary argument (it should work)
-	args[1].set( co::TK_STRUCT );
-	args[2].set( 1337 );
+	args[1].setIn( co::TK_STRUCT );
+	args[2].setIn( 1337 );
 	reflector->invoke( coNS, defineTypeMethod, co::Range<co::Any>( args, 3 ), v1 );
 
 	// alright, we should be able to retrieve a ITypeBuilder from res

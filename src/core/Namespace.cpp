@@ -115,7 +115,7 @@ INamespace* Namespace::getChildNamespace( const std::string& name )
 
 ITypeBuilder* Namespace::defineType( const std::string& name, TypeKind kind )
 {
-	if( !isUserDefinable( kind ) )
+	if( !isCustom( kind ) )
 		CORAL_THROW( IllegalArgumentException, "'" << kind
 				<<  "' is not a user-definable type kind." );
 

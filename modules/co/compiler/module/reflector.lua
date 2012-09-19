@@ -106,7 +106,6 @@ public:
 			-- Field Accessors
 			for i, a in ipairs( itf.fields ) do
 				local at = a.type
-				local inputType = itf.formatInput( a.type )
 				writer( "\t", itf.formatResult( at ), " ", itf.formatAccessor( "get", a.name ), "()\n", [[
 	{
 		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<]], itf.cppName, [[>( ]], i - 1, [[ ) );
@@ -115,10 +114,9 @@ public:
 
 ]] )
 				if not a.isReadOnly then
-					writer( "\tvoid ", itf.formatAccessor( "set", a.name ), "( ", inputType, " ", a.name, "_ )\n", [[
+					writer( "\tvoid ", itf.formatAccessor( "set", a.name ), "( ", itf.formatInput( a.type ), " ", a.name, "_ )\n", [[
 	{
-		co::Any arg;
-		arg.set< ]], inputType, [[ >( ]], a.name, [[_ );
+		co::Any arg( ]], a.name, [[_ );
 		_provider->dynamicSetField( _cookie, getField<]], itf.cppName, [[>( ]], i - 1, [[ ), arg );
 	}
 
@@ -140,12 +138,12 @@ public:
 				end
 				writer( ")\n\t{\n" )
 				if #params > 0 then
-					writer( "\t\tco::Any args[", #params, "];\n" )
+					writer( "\t\tco::Any args[] = {" )
 					for i, p in ipairs( params ) do
-						local paramType = ( p.isOut and itf.formatOutput or itf.formatInput )( p.type )
-						writer( "\t\targs[", i - 1, "].set< ", paramType, " >( ", p.name, "_ );\n" )
+						if i > 1 then writer "," end
+						writer( "\n\t\t\t", p.name, "_" )
 					end
-					writer( "\t\tco::Range<co::Any> range( args, ", #params, " );\n" )
+					writer( "\n\t\t};\n\t\tco::Range<co::Any> range( args, ", #params, " );\n" )
 				else
 					writer( "\t\tco::Range<co::Any> range;\n" )
 				end

@@ -30,8 +30,7 @@ enum TypeKind
 	TK_STRUCT,
 	TK_NATIVECLASS,
 	TK_INTERFACE,
-	TK_COMPONENT,
-	TK_UNKNOWN		// C++ only
+	TK_COMPONENT
 };
 
 } // namespace co

@@ -279,9 +279,9 @@ public:
 		if( !type )
 			CORAL_THROW( IllegalArgumentException, "illegal null type" );
 
-		if( type->getKind() == TK_EXCEPTION || type->getKind() == TK_COMPONENT )
-			CORAL_THROW( IllegalArgumentException, ( type->getKind() == TK_EXCEPTION ?
-					"exception" : "component" ) << "s are illegal as field types" );
+		TypeKind fk = type->getKind();
+		if( !isData( fk ) )
+			CORAL_THROW( IllegalArgumentException, TK_STRINGS[fk] << "s are illegal as field types" );
 
 		// struct-specific checks
 		if( _kind == TK_STRUCT )
@@ -441,10 +441,10 @@ public:
 		if( !baseType )
 			CORAL_THROW( IllegalArgumentException, "illegal null baseType" );
 
-		co::TypeKind kind = baseType->getKind();
+		TypeKind kind = baseType->getKind();
 		if( kind != co::TK_INTERFACE )
-			CORAL_THROW( IllegalArgumentException, "illegal baseType (interface expected, got "
-							<< co::TK_STRINGS[kind] << ")" );
+			CORAL_THROW( IllegalArgumentException,
+					"illegal baseType (interface expected, got " << kind << ")" );
 
 		_baseType = static_cast<Interface*>( baseType );
 		_myType->setBaseType( _baseType );

@@ -50,53 +50,57 @@ public:
 
 	void setIsLazy( bool isLazy_ )
 	{
-		co::Any arg;
-		arg.set< bool >( isLazy_ );
+		co::Any arg( isLazy_ );
 		_provider->dynamicSetField( _cookie, getField<co::IServiceManager>( 0 ), arg );
 	}
 
 	void addService( co::IInterface* serviceType_, co::IService* service_ )
 	{
-		co::Any args[2];
-		args[0].set< co::IInterface* >( serviceType_ );
-		args[1].set< co::IService* >( service_ );
+		co::Any args[] = {
+			serviceType_,
+			service_
+		};
 		co::Range<co::Any> range( args, 2 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 0 ), range );
 	}
 
 	void addServiceForType( co::IInterface* serviceType_, co::IInterface* clientType_, co::IService* service_ )
 	{
-		co::Any args[3];
-		args[0].set< co::IInterface* >( serviceType_ );
-		args[1].set< co::IInterface* >( clientType_ );
-		args[2].set< co::IService* >( service_ );
+		co::Any args[] = {
+			serviceType_,
+			clientType_,
+			service_
+		};
 		co::Range<co::Any> range( args, 3 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 1 ), range );
 	}
 
 	void addServiceProvider( co::IInterface* serviceType_, const std::string& componentName_ )
 	{
-		co::Any args[2];
-		args[0].set< co::IInterface* >( serviceType_ );
-		args[1].set< const std::string& >( componentName_ );
+		co::Any args[] = {
+			serviceType_,
+			componentName_
+		};
 		co::Range<co::Any> range( args, 2 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 2 ), range );
 	}
 
 	void addServiceProviderForType( co::IInterface* serviceType_, co::IInterface* clientType_, const std::string& componentName_ )
 	{
-		co::Any args[3];
-		args[0].set< co::IInterface* >( serviceType_ );
-		args[1].set< co::IInterface* >( clientType_ );
-		args[2].set< const std::string& >( componentName_ );
+		co::Any args[] = {
+			serviceType_,
+			clientType_,
+			componentName_
+		};
 		co::Range<co::Any> range( args, 3 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 3 ), range );
 	}
 
 	co::IService* getService( co::IInterface* serviceType_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IInterface* >( serviceType_ );
+		co::Any args[] = {
+			serviceType_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 4 ), range );
 		return res.get< co::IService* >();
@@ -104,9 +108,10 @@ public:
 
 	co::IService* getServiceForInstance( co::IInterface* serviceType_, co::IService* client_ )
 	{
-		co::Any args[2];
-		args[0].set< co::IInterface* >( serviceType_ );
-		args[1].set< co::IService* >( client_ );
+		co::Any args[] = {
+			serviceType_,
+			client_
+		};
 		co::Range<co::Any> range( args, 2 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 5 ), range );
 		return res.get< co::IService* >();
@@ -114,9 +119,10 @@ public:
 
 	co::IService* getServiceForType( co::IInterface* serviceType_, co::IInterface* clientType_ )
 	{
-		co::Any args[2];
-		args[0].set< co::IInterface* >( serviceType_ );
-		args[1].set< co::IInterface* >( clientType_ );
+		co::Any args[] = {
+			serviceType_,
+			clientType_
+		};
 		co::Range<co::Any> range( args, 2 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 6 ), range );
 		return res.get< co::IService* >();
@@ -124,17 +130,19 @@ public:
 
 	void removeService( co::IInterface* serviceType_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IInterface* >( serviceType_ );
+		co::Any args[] = {
+			serviceType_
+		};
 		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 7 ), range );
 	}
 
 	void removeServiceForType( co::IInterface* serviceType_, co::IInterface* clientType_ )
 	{
-		co::Any args[2];
-		args[0].set< co::IInterface* >( serviceType_ );
-		args[1].set< co::IInterface* >( clientType_ );
+		co::Any args[] = {
+			serviceType_,
+			clientType_
+		};
 		co::Range<co::Any> range( args, 2 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 8 ), range );
 	}

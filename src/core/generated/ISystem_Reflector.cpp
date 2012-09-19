@@ -5,8 +5,8 @@
 
 #include <co/ISystem.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IModuleManager.h>
 #include <co/IServiceManager.h>
+#include <co/IModuleManager.h>
 #include <co/ITypeManager.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
@@ -70,8 +70,9 @@ public:
 
 	void setupBase( co::Range<std::string> requiredModules_ )
 	{
-		co::Any args[1];
-		args[0].set< co::Range<std::string> >( requiredModules_ );
+		co::Any args[] = {
+			requiredModules_
+		};
 		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 0 ), range );
 	}

@@ -5,9 +5,9 @@
 
 #include <co/ITypeBuilder.h>
 #include <co/IDynamicServiceProvider.h>
+#include <co/IType.h>
 #include <co/INamespace.h>
 #include <co/IInterface.h>
-#include <co/IType.h>
 #include <co/IMethodBuilder.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
@@ -72,34 +72,38 @@ public:
 
 	void defineBaseType( co::IType* baseType_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IType* >( baseType_ );
+		co::Any args[] = {
+			baseType_
+		};
 		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 1 ), range );
 	}
 
 	void defineField( const std::string& name_, co::IType* type_, bool isReadOnly_ )
 	{
-		co::Any args[3];
-		args[0].set< const std::string& >( name_ );
-		args[1].set< co::IType* >( type_ );
-		args[2].set< bool >( isReadOnly_ );
+		co::Any args[] = {
+			name_,
+			type_,
+			isReadOnly_
+		};
 		co::Range<co::Any> range( args, 3 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 2 ), range );
 	}
 
 	void defineIdentifier( const std::string& name_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( name_ );
+		co::Any args[] = {
+			name_
+		};
 		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 3 ), range );
 	}
 
 	co::IMethodBuilder* defineMethod( const std::string& name_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( name_ );
+		co::Any args[] = {
+			name_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 4 ), range );
 		return res.get< co::IMethodBuilder* >();
@@ -107,10 +111,11 @@ public:
 
 	void definePort( const std::string& name_, co::IInterface* type_, bool isFacet_ )
 	{
-		co::Any args[3];
-		args[0].set< const std::string& >( name_ );
-		args[1].set< co::IInterface* >( type_ );
-		args[2].set< bool >( isFacet_ );
+		co::Any args[] = {
+			name_,
+			type_,
+			isFacet_
+		};
 		co::Range<co::Any> range( args, 3 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 5 ), range );
 	}

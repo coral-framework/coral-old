@@ -51,8 +51,7 @@ public:
 
 	void setValue( const std::string& value_ )
 	{
-		co::Any arg;
-		arg.set< const std::string& >( value_ );
+		co::Any arg( value_ );
 		_provider->dynamicSetField( _cookie, getField<co::IInclude>( 0 ), arg );
 	}
 

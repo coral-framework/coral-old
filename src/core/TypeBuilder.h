@@ -27,7 +27,7 @@ class TypeBuilder : public TypeBuilder_Base
 public:
 	/*!
 		Factory method.
-		\pre kind >= TK_ENUM.
+		\pre isCustom( kind ).
 	 */
 	static ITypeBuilder* create( TypeKind kind, INamespace* ns, const std::string& name );
 

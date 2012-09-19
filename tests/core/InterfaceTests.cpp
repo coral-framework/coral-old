@@ -139,10 +139,10 @@ TEST( InterfaceTests, cyclicInheritance )
 TEST( InterfaceTests, invalidParameter )
 {
 	CSL_TEST_BEGIN( "InterfaceTests.InvalidDeclarations.invalidInterfaceWithComponentAsParameter" )
-	CSL_EXPECT_ERROR( "components cannot be passed as parameters", "invalidInterfaceWithComponentAsParameter.csl", 6 )
+	CSL_EXPECT_ERROR( "illegal parameter 'comp' of non-data type 'component'", "invalidInterfaceWithComponentAsParameter.csl", 6 )
 	CSL_TEST_END()
 
 	CSL_TEST_BEGIN( "InterfaceTests.InvalidDeclarations.invalidInterfaceWithExceptionAsParameter" )
-	CSL_EXPECT_ERROR( "exceptions cannot be passed as parameters", "invalidInterfaceWithExceptionAsParameter.csl", 6 )
+	CSL_EXPECT_ERROR( "illegal parameter 'ex' of non-data type 'exception'", "invalidInterfaceWithExceptionAsParameter.csl", 6 )
 	CSL_TEST_END()
 }

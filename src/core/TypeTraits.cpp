@@ -32,34 +32,32 @@ const std::string TK_STRINGS[] =
 	"float",
 	"double",
 	"string",
-	"<array>",
-	"<enum>",
-	"<exception>",
-	"<struct>",
-	"<native class>",
-	"<interface>",
-	"<component>",
+	"array",
+	"enum",
+	"exception",
+	"struct",
+	"native class",
+	"interface",
+	"component",
 	"<off by one!>"
 };
 
-#define NEW_TYPE( k ) new TypeComponent( k )
-
-IType* BASIC_TYPES[] =
+RefPtr<IType> BASIC_TYPES[] =
 {
-	NEW_TYPE( TK_NULL ),
-	NEW_TYPE( TK_ANY ),
-	NEW_TYPE( TK_BOOL ),
-	NEW_TYPE( TK_INT8 ),
-	NEW_TYPE( TK_UINT8 ),
-	NEW_TYPE( TK_INT16 ),
-	NEW_TYPE( TK_UINT16 ),
-	NEW_TYPE( TK_INT32 ),
-	NEW_TYPE( TK_UINT32 ),
-	NEW_TYPE( TK_INT64 ),
-	NEW_TYPE( TK_UINT64 ),
-	NEW_TYPE( TK_FLOAT ),
-	NEW_TYPE( TK_DOUBLE ),
-	NEW_TYPE( TK_STRING )
+	new TypeComponent( TK_NULL ),
+	new TypeComponent( TK_ANY ),
+	new TypeComponent( TK_BOOL ),
+	new TypeComponent( TK_INT8 ),
+	new TypeComponent( TK_UINT8 ),
+	new TypeComponent( TK_INT16 ),
+	new TypeComponent( TK_UINT16 ),
+	new TypeComponent( TK_INT32 ),
+	new TypeComponent( TK_UINT32 ),
+	new TypeComponent( TK_INT64 ),
+	new TypeComponent( TK_UINT64 ),
+	new TypeComponent( TK_FLOAT ),
+	new TypeComponent( TK_DOUBLE ),
+	new TypeComponent( TK_STRING )
 };
 
 IType* getTypeByLiteralName( const char* fullName )

@@ -30,7 +30,7 @@ template<typename T> class RefPtr;
 template<typename T> class RefVector;
 
 /*!
-	Maps TypeKinds to either their names in CSL or a human-readable string.
+	Maps TypeKinds to either their names in CSL.
 	\warning make sure ( index >= TK_NULL && index <= co::TK_COMPONENT ).
  */
 extern CORAL_EXPORT const std::string TK_STRINGS[];
@@ -39,8 +39,7 @@ extern CORAL_EXPORT const std::string TK_STRINGS[];
 	Maps the basic type kinds to their IType instances.
 	\warning make sure ( index >= TK_NULL && index <= co::TK_STRING ).
  */
-extern CORAL_EXPORT IType* BASIC_TYPES[];
-
+extern CORAL_EXPORT RefPtr<IType> BASIC_TYPES[];
 
 /****************************************************************************/
 /* Internal Helper Functions (to avoid type dependencies in template code)  */
@@ -97,11 +96,17 @@ inline bool isData( TypeKind k ) { return k > TK_NULL && k < TK_COMPONENT && k !
 //! Returns true for types whose variable is a scalar.
 inline bool isScalarOrRef( TypeKind k ) { return isScalar( k ) || isReference( k ); }
 
-//! Returns true if users can define new types of this kind.
-inline bool isUserDefinable( TypeKind k ) { return k > TK_ARRAY && k <= TK_COMPONENT; }
+//! Returns true if new types of this kind can be defined by users.
+inline bool isCustom( TypeKind k ) { return k > TK_ARRAY && k <= TK_COMPONENT; }
+
+//! Returns true for value types that require custom reflectors.
+inline bool isComplexValue( TypeKind k ) { return k == TK_STRUCT || k == TK_NATIVECLASS; }
 
 //! Returns true for types that support inheritance.
 inline bool isInheritable( TypeKind k ) { return k == TK_INTERFACE; }
+
+//! Returns true if a built-in IReflector is available for the type.
+inline bool hasBuiltInReflector( TypeKind k ) { return k < TK_STRUCT; }
 
 
 /****************************************************************************/
@@ -283,7 +288,7 @@ struct typeOfBasic
 {
 	static const TypeKind kind = kindOf<T>::kind;
 	typedef IType Descriptor;
-	static Descriptor* get() { return BASIC_TYPES[kind]; }
+	static Descriptor* get() { return reinterpret_cast<Descriptor**>( BASIC_TYPES )[kind]; }
 };
 
 // specializations for basic types:
@@ -335,5 +340,13 @@ inline SubType* cast( IService* service )
 }
 
 } // namespace co
+
+/*!
+	Outputs the string associated with a co::TypeKind. \relates co::TypeKind
+ */
+inline std::ostream& operator<<( std::ostream& out, co::TypeKind kind )
+{
+	return out << co::TK_STRINGS[kind];
+}
 
 #endif

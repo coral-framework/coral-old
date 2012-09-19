@@ -4,11 +4,11 @@
  */
 
 #include <co/IReflector.h>
-#include <co/IMethod.h>
 #include <co/IType.h>
-#include <co/IDynamicServiceProvider.h>
-#include <co/IObject.h>
 #include <co/IField.h>
+#include <co/IObject.h>
+#include <co/IDynamicServiceProvider.h>
+#include <co/IMethod.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -58,29 +58,32 @@ public:
 
 	void getField( co::Any instance_, co::IField* field_, co::AnyValue& value_ )
 	{
-		co::Any args[3];
-		args[0].set< co::Any >( instance_ );
-		args[1].set< co::IField* >( field_ );
-		args[2].set< co::AnyValue& >( value_ );
+		co::Any args[] = {
+			instance_,
+			field_,
+			value_
+		};
 		co::Range<co::Any> range( args, 3 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 0 ), range );
 	}
 
 	void invoke( co::Any instance_, co::IMethod* method_, co::Range<co::Any> args_, co::AnyValue& returnValue_ )
 	{
-		co::Any args[4];
-		args[0].set< co::Any >( instance_ );
-		args[1].set< co::IMethod* >( method_ );
-		args[2].set< co::Range<co::Any> >( args_ );
-		args[3].set< co::AnyValue& >( returnValue_ );
+		co::Any args[] = {
+			instance_,
+			method_,
+			args_,
+			returnValue_
+		};
 		co::Range<co::Any> range( args, 4 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 1 ), range );
 	}
 
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* dynamicProvider_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IDynamicServiceProvider* >( dynamicProvider_ );
+		co::Any args[] = {
+			dynamicProvider_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 2 ), range );
 		return res.get< co::IService* >();
@@ -95,18 +98,20 @@ public:
 
 	void raise( const std::string& message_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( message_ );
+		co::Any args[] = {
+			message_
+		};
 		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 4 ), range );
 	}
 
 	void setField( co::Any instance_, co::IField* field_, co::Any value_ )
 	{
-		co::Any args[3];
-		args[0].set< co::Any >( instance_ );
-		args[1].set< co::IField* >( field_ );
-		args[2].set< co::Any >( value_ );
+		co::Any args[] = {
+			instance_,
+			field_,
+			value_
+		};
 		co::Range<co::Any> range( args, 3 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 5 ), range );
 	}

@@ -204,22 +204,22 @@ TEST( LuaTests, callFunction )
 	co::int32 intVec[4] = { -1, -1, -1, -1 };
 
 	co::int32 numRes;
-	co::Any args[4];
-	co::Any results[6];
+	co::Any args[4], results[6];
 	co::Range<co::Any> resRange( results, 6 );
 
 	/*
 		Test calling a function returned by a module.
 		lua.plain.sum returns the summation of its arguments.
 	 */
-	args[0].set( 1 );
-	args[1].set( 2 );
-	args[2].set( 3 );
-	args[3].set( 5 );
-	results[0].set<co::int32&>( intVec[0] );
-	results[1].set<co::int32&>( intVec[1] );
-	results[2].set<co::int32&>( intVec[2] );
-	results[3].set<co::int32&>( intVec[3] );
+	args[0].setIn( 1 );
+	args[1].setIn( 2 );
+	args[2].setIn( 3 );
+	args[3].setIn( 5 );
+
+	results[0] = intVec[0];
+	results[1] = intVec[1];
+	results[2] = intVec[2];
+	results[3] = intVec[3];
 
 	ASSERT_NO_THROW( numRes = luaState->call( "lua.scripts.sum", "",
 						co::Range<co::Any>( args, 4 ), resRange ) );
@@ -245,14 +245,14 @@ TEST( LuaTests, callFunction )
 	bool b1, b2;
 	double d1;
 	std::string str1, str2;
-	co::Any any1, any2;
+	co::AnyValue any1, any2;
 
-	results[0].set<co::Any&>( any1 );
-	results[1].set<bool&>( b1 );
-	results[2].set<bool&>( b2 );
-	results[3].set<double&>( d1 );
-	results[4].set<std::string&>( str1 );
-	results[5].set<co::Any&>( any2 );
+	results[0] = any1;
+	results[1] = b1;
+	results[2] = b2;
+	results[3] = d1;
+	results[4] = str1;
+	results[5] = any2;
 
 	ASSERT_NO_THROW( numRes = luaState->call( "lua.scripts.manyFunctions", "constants",
 						co::Range<co::Any>(), resRange ) );
@@ -266,8 +266,8 @@ TEST( LuaTests, callFunction )
 	ASSERT_EQ( co::getSystem(), any2.get<co::IService*>() );
 
 	// test prunning the results
-	results[0].set<std::string&>( str1 );
-	results[1].set<std::string&>( str2 );
+	results[0] = str1;
+	results[1] = str2;
 
 	ASSERT_NO_THROW( numRes = luaState->call( "lua.scripts.manyFunctions", "constants2",
 						 co::Range<co::Any>(), co::Range<co::Any>( results, 2 ) ) );

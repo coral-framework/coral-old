@@ -21,6 +21,7 @@
 
 namespace co {
 
+class Any;
 class AnyValue;
 
 #ifndef DOXYGEN
@@ -68,7 +69,7 @@ struct State
 	Data data;		// Storage for primitives and pointers
 
 	// Default constructor
-	State() : type( BASIC_TYPES[TK_NULL] ), isIn( false ), size( 0 ) {;}
+	State() : type( BASIC_TYPES[TK_NULL].get() ), isIn( false ), size( 0 ) {;}
 
 	// Output variable constructor
 	State( IType* type, const void* ptr )
@@ -85,8 +86,8 @@ struct Ref
 template<typename T, TypeKind kind>
 struct Value
 {
-	inline static void set( State& s, const T& v ) { *reinterpret_cast<T*>( &s.data.ptr ) = v; }
-	inline static const T& get( State& s ) { return *reinterpret_cast<T*>( &s.data.ptr ); }
+	inline static void set( State& s, const T& v ) { *reinterpret_cast<T*>( &s.data ) = v; }
+	inline static const T& get( State& s ) { return *reinterpret_cast<T*>( &s.data ); }
 };
 
 template<typename T> struct Value<T, TK_ANY> : public Ref<const AnyValue> {};
@@ -130,6 +131,15 @@ struct Variable<const T&> : public Tag<T, true>
 };
 
 template<typename T>
+struct IllegalRecursiveAny
+{
+	inline static void tag( State& ) { static_assert( sizeof(T)<0, "illegal recursive co::Any" ); }
+};
+
+template<> struct Variable<Any&> : public IllegalRecursiveAny<Any&> {};
+template<> struct Variable<const Any&> : public IllegalRecursiveAny<const Any&> {};
+
+template<typename T>
 struct Variable<T* const&>
 {
 	typedef typeOf<T> IT;
@@ -171,7 +181,7 @@ struct Variable<const RefPtr<T>&>
 	inline static void tag( State& s ) { AsPtr::tag( s ); }
 	inline static void set( State& s, const RefPtr<T>& v ) { AsPtr::set( s, v.get() ); }
 };
- 
+
 template<typename T>
 struct Variable<const T* const&>
 {
@@ -323,7 +333,7 @@ public:
 	inline ~Any() {;}
 
 	//! Clears the co::Any (makes it null).
-	inline void clear() { state.type = BASIC_TYPES[TK_NULL]; }
+	inline void clear() { state.type = BASIC_TYPES[TK_NULL].get(); }
 
 	//! \name Variable Introspection
 	//@{
@@ -400,23 +410,16 @@ public:
 	 */
 
 	template<typename T>
-	inline void setIn( const T& var )
-	{
-		__any::Variable<const T&>::tag( state );
-		__any::Variable<const T&>::set( state, var );
-	}
-
-	template<typename T>
-	inline void set( const T& var )
-	{
-		setIn<T>( var );
-	}
-
-	template<typename T>
 	inline void set( T& var )
 	{
 		__any::Variable<T&>::tag( state );
 		__any::Variable<T&>::set( state, var );
+	}
+
+	template<typename T>
+	inline void setIn( const T& var )
+	{
+		set<const T&>( var );
 	}
 
 	//@}
@@ -482,6 +485,9 @@ public:
 	inline bool operator!=( const Any& other ) const { return !( *this == other ); }
 
 	//! Assignment operator.
+	template<typename T>
+	inline Any& operator=( T& v ) { set<T>( v ); return *this; }
+
 	inline Any& operator=( const Any& other )
 	{
 		state = other.state;

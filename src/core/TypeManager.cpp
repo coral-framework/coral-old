@@ -167,9 +167,8 @@ IArray* TypeManager::getArrayOf( IType* elementType )
 	if( kind == TK_ARRAY )
 		CORAL_THROW( IllegalArgumentException, "arrays of arrays are illegal" );
 
-	if( kind == TK_EXCEPTION || kind == TK_COMPONENT )
-		CORAL_THROW( IllegalArgumentException, "arrays of " <<
-					( kind == TK_EXCEPTION ? "exception" : "component" ) << "s are illegal" );
+	if( !isData( kind ) )
+		CORAL_THROW( IllegalArgumentException, "arrays of " << kind << "s are illegal" );
 
 	RefPtr<ArrayType> arrayType = new ArrayType;
 	arrayType->setType( TK_ARRAY, elementType->getName() + "[]", ns );
@@ -226,7 +225,7 @@ void TypeManager::defineBuiltInTypes()
 	// register all basic types in the root namespace:
 	for( TypeKind k = TK_NULL; k <= TK_STRING; ++k )
 	{
-		TypeComponent* type = static_cast<TypeComponent*>( BASIC_TYPES[k] );
+		TypeComponent* type = static_cast<TypeComponent*>( BASIC_TYPES[k].get() );
 		type->setNamespace( rootNS );
 		rootNS->addType( type );
 	}

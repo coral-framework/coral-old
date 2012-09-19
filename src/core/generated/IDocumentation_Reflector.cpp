@@ -51,24 +51,25 @@ public:
 
 	void setValue( const std::string& value_ )
 	{
-		co::Any arg;
-		arg.set< const std::string& >( value_ );
+		co::Any arg( value_ );
 		_provider->dynamicSetField( _cookie, getField<co::IDocumentation>( 0 ), arg );
 	}
 
 	void addDocFor( const std::string& element_, const std::string& text_ )
 	{
-		co::Any args[2];
-		args[0].set< const std::string& >( element_ );
-		args[1].set< const std::string& >( text_ );
+		co::Any args[] = {
+			element_,
+			text_
+		};
 		co::Range<co::Any> range( args, 2 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 0 ), range );
 	}
 
 	std::string getDocFor( const std::string& element_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( element_ );
+		co::Any args[] = {
+			element_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 1 ), range );
 		return res.get< const std::string& >();

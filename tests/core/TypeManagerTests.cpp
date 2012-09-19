@@ -99,11 +99,11 @@ struct TypeStatistics
 {
 	co::uint32 numNamespaces;
 	co::uint32 numTypes;
-	co::uint32 numComplexTypes; // # of structs, native classes, interfaces and components
+	co::uint32 numCustomTypes;
 	co::uint32 numTypesWithReflector;
 
 	TypeStatistics()
-		: numNamespaces( 0 ), numTypes( 0 ), numComplexTypes( 0 ), numTypesWithReflector( 0 )
+		: numNamespaces( 0 ), numTypes( 0 ), numCustomTypes( 0 ), numTypesWithReflector( 0 )
 	{;}
 
 	void traverse( co::INamespace* ns )
@@ -115,8 +115,8 @@ struct TypeStatistics
 			++numTypes;
 
 			co::IType* type = r.getFirst();
-			if( type->getKind() > co::TK_EXCEPTION )
-				++numComplexTypes;
+			if( isCustom( type->getKind() ) )
+				++numCustomTypes;
 
 			if( type->getReflector() )
 			   ++numTypesWithReflector;

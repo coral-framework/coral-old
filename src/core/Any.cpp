@@ -259,12 +259,6 @@ void Any::set( bool isIn, IType* type, const void* addr, size_t size )
 	}
 }
 
-template<typename T>
-inline void putValue( void* ptr, const Any& value  )
-{
-	*reinterpret_cast<T*>( ptr ) = value.get<const T&>();
-}
-
 void Any::put( const Any& value ) const
 {
 	if( !isValid() || !isOut() )
@@ -279,18 +273,23 @@ void Any::put( const Any& value ) const
 		*reinterpret_cast<AnyValue*>( state.data.ptr ) = in;
 		break;
 
-	case TK_BOOL:	putValue<bool>( state.data.ptr, in );			break;
-	case TK_INT8:	putValue<int8>( state.data.ptr, in );			break;
-	case TK_UINT8:	putValue<uint8>( state.data.ptr, in );			break;
-	case TK_INT16:	putValue<int16>( state.data.ptr, in );			break;
-	case TK_UINT16:	putValue<uint16>( state.data.ptr, in );			break;
-	case TK_INT32:	putValue<int32>( state.data.ptr, in );			break;
-	case TK_UINT32:	putValue<uint32>( state.data.ptr, in );			break;
-	case TK_INT64:	putValue<int64>( state.data.ptr, in );			break;
-	case TK_UINT64:	putValue<uint64>( state.data.ptr, in );			break;
-	case TK_FLOAT:	putValue<float>( state.data.ptr, in );			break;
-	case TK_DOUBLE:	putValue<double>( state.data.ptr, in );			break;
-	case TK_STRING:	putValue<std::string>( state.data.ptr, in );	break;
+	case TK_BOOL:
+	case TK_INT8:
+	case TK_UINT8:
+	case TK_INT16:
+	case TK_UINT16:
+	case TK_INT32:
+	case TK_UINT32:
+	case TK_INT64:
+	case TK_UINT64:
+	case TK_FLOAT:
+	case TK_DOUBLE:
+		castScalar( in.getKind(), &in.state.data, k, state.data.ptr );
+		break;
+
+	case TK_STRING:
+		*state.data.str = in.get<const std::string&>();
+		break;
 
 	case TK_ARRAY:
 		resize( in.state.size );

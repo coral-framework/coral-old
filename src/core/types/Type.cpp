@@ -60,9 +60,8 @@ IReflector* TypeImpl::getReflector( IType* myType )
 	if( _reflector.isValid() )
 		return _reflector.get();
 
-	if( _kind < TK_STRUCT )
+	if( hasBuiltInReflector( _kind ) )
 	{
-		// basic reflectors are instantiated on demand
 		_reflector = BasicReflector::create( myType );
 		return _reflector.get();
 	}
@@ -150,7 +149,6 @@ TypeComponent::TypeComponent( TypeKind kind )
 	_kind = kind;
 	_name = TK_STRINGS[kind];
 	_fullName = _name;
-	serviceRetain();
 }
 
 TypeComponent::~TypeComponent()

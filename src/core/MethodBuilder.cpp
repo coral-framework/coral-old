@@ -72,9 +72,9 @@ void MethodBuilder::defineParameter( const std::string& name, IType* type, bool 
 		CORAL_THROW( IllegalArgumentException, "illegal null parameter type" );
 
 	TypeKind kind = type->getKind();
-	if( kind == TK_EXCEPTION || kind == TK_COMPONENT )
-		CORAL_THROW( IllegalArgumentException, "illegal parameter '" << name << "' - " <<
-					( kind == TK_EXCEPTION ? "exceptions" : "components" ) << " cannot be passed as parameters" );
+	if( !isData( kind ) )
+		CORAL_THROW( IllegalArgumentException, "illegal parameter '"
+				<< name << "' of non-data type '" << kind << "'" );
 
 	if( !input && !output )
 		CORAL_THROW( IllegalArgumentException, "parameter is neither input nor output" );

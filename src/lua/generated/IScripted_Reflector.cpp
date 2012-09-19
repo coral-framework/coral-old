@@ -50,8 +50,9 @@ public:
 
 	void provideReflectorFor( co::IType* type_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IType* >( type_ );
+		co::Any args[] = {
+			type_
+		};
 		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicTypeProvider>( 0 ), range );
 	}
@@ -66,8 +67,7 @@ public:
 
 	void setValue( const std::string& value_ )
 	{
-		co::Any arg;
-		arg.set< const std::string& >( value_ );
+		co::Any arg( value_ );
 		_provider->dynamicSetField( _cookie, getField<lua::IScripted>( 0 ), arg );
 	}
 

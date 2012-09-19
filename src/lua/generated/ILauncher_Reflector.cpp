@@ -47,8 +47,9 @@ public:
 
 	co::int32 main( co::Range<std::string> args_ )
 	{
-		co::Any args[1];
-		args[0].set< co::Range<std::string> >( args_ );
+		co::Any args[] = {
+			args_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<lua::ILauncher>( 0 ), range );
 		return res.get< co::int32 >();

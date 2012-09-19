@@ -54,19 +54,21 @@ public:
 
 	void addInterceptor( lua::IInterceptor* interceptor_ )
 	{
-		co::Any args[1];
-		args[0].set< lua::IInterceptor* >( interceptor_ );
+		co::Any args[] = {
+			interceptor_
+		};
 		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 0 ), range );
 	}
 
 	co::int32 call( const std::string& moduleName_, const std::string& functionName_, co::Range<co::Any> args_, co::Range<co::Any> results_ )
 	{
-		co::Any args[4];
-		args[0].set< const std::string& >( moduleName_ );
-		args[1].set< const std::string& >( functionName_ );
-		args[2].set< co::Range<co::Any> >( args_ );
-		args[3].set< co::Range<co::Any> >( results_ );
+		co::Any args[] = {
+			moduleName_,
+			functionName_,
+			args_,
+			results_
+		};
 		co::Range<co::Any> range( args, 4 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 1 ), range );
 		return res.get< co::int32 >();
@@ -80,9 +82,10 @@ public:
 
 	bool findScript( const std::string& name_, std::string& filename_ )
 	{
-		co::Any args[2];
-		args[0].set< const std::string& >( name_ );
-		args[1].set< std::string& >( filename_ );
+		co::Any args[] = {
+			name_,
+			filename_
+		};
 		co::Range<co::Any> range( args, 2 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 3 ), range );
 		return res.get< bool >();
@@ -90,8 +93,9 @@ public:
 
 	void removeInterceptor( lua::IInterceptor* interceptor_ )
 	{
-		co::Any args[1];
-		args[0].set< lua::IInterceptor* >( interceptor_ );
+		co::Any args[] = {
+			interceptor_
+		};
 		co::Range<co::Any> range( args, 1 );
 		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 4 ), range );
 	}

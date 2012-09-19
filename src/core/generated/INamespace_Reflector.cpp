@@ -6,8 +6,8 @@
 #include <co/INamespace.h>
 #include <co/IDynamicServiceProvider.h>
 #include <co/ITypeBuilder.h>
-#include <co/IType.h>
 #include <co/IModule.h>
+#include <co/IType.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -82,18 +82,20 @@ public:
 
 	co::INamespace* defineChildNamespace( const std::string& name_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( name_ );
+		co::Any args[] = {
+			name_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 0 ), range );
 		return res.get< co::INamespace* >();
 	}
 
-	co::ITypeBuilder* defineType( const std::string& name_, co::TypeKind typeKind_ )
+	co::ITypeBuilder* defineType( const std::string& name_, co::TypeKind kind_ )
 	{
-		co::Any args[2];
-		args[0].set< const std::string& >( name_ );
-		args[1].set< co::TypeKind >( typeKind_ );
+		co::Any args[] = {
+			name_,
+			kind_
+		};
 		co::Range<co::Any> range( args, 2 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 1 ), range );
 		return res.get< co::ITypeBuilder* >();
@@ -101,8 +103,9 @@ public:
 
 	co::INamespace* findChildNamespace( const std::string& name_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( name_ );
+		co::Any args[] = {
+			name_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 2 ), range );
 		return res.get< co::INamespace* >();
@@ -110,8 +113,9 @@ public:
 
 	co::IType* findType( const std::string& name_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( name_ );
+		co::Any args[] = {
+			name_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 3 ), range );
 		return res.get< co::IType* >();
@@ -217,9 +221,9 @@ public:
 			case 7:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
-					co::TypeKind typeKind_ = args[++argIndex].get< co::TypeKind >();
+					co::TypeKind kind_ = args[++argIndex].get< co::TypeKind >();
 					argIndex = -1;
-					res = p->defineType( name_, typeKind_ );
+					res = p->defineType( name_, kind_ );
 				}
 				break;
 			case 8:

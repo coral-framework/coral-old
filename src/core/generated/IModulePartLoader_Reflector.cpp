@@ -44,8 +44,9 @@ public:
 
 	bool canLoadModulePart( const std::string& moduleName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( moduleName_ );
+		co::Any args[] = {
+			moduleName_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 0 ), range );
 		return res.get< bool >();
@@ -53,8 +54,9 @@ public:
 
 	co::IModulePart* loadModulePart( const std::string& moduleName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( moduleName_ );
+		co::Any args[] = {
+			moduleName_
+		};
 		co::Range<co::Any> range( args, 1 );
 		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 1 ), range );
 		return res.get< co::IModulePart* >();
