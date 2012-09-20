@@ -62,7 +62,7 @@
 	double num;
 	std::string* str;
 	const char* cstr;
-	co::Any* any;
+	co::AnyValue* any;
 }
 
 %token			END				0 "end of file"
@@ -359,10 +359,10 @@ port_kind
 	;
 
 exp
-	:	BOOLEAN			{ $$ = loader.newAny(); $$->setIn<bool>( $1 ); }
-	|	LITERAL			{ $$ = loader.newAny(); $$->setIn<std::string>( *$1 ); }
-	|	qualified_id	{ $$ = loader.newAny(); $$->setIn<std::string>( *$1 ); }
-	|	num_exp			{ $$ = loader.newAny(); $$->setIn<double>( $1 ); }
+	:	BOOLEAN			{ $$ = loader.newAny(); $$->set( $1 ); }
+	|	LITERAL			{ $$ = loader.newAny(); $$->set( *$1 ); }
+	|	qualified_id	{ $$ = loader.newAny(); $$->set( *$1 ); }
+	|	num_exp			{ $$ = loader.newAny(); $$->set( $1 ); }
 	;
 
 num_exp

@@ -416,7 +416,7 @@ void CompositeTypeBinding::pushMetatable( lua_State* L, co::ICompositeType* ct, 
 		if( tag == co::TK_INTERFACE && ct->getFullName() == "co.IObject" )
 			tag = co::TK_COMPONENT;
 
-		assert( co::isCustom( tag ) );
+		assert( co::isComposite( tag ) );
 		const Metamethods& mms = METAMETHODS_TABLE[tag - co::TK_STRUCT];
 
 		lua_pop( L, 1 );

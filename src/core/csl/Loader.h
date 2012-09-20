@@ -56,7 +56,7 @@ public:
 	void setError( Error* error );
 
 	//! Memory management:
-	co::Any* newAny();
+	co::AnyValue* newAny();
 	std::string* newString();
 	std::string* newString( const char* cstr );
 
@@ -175,7 +175,7 @@ private:
 	std::deque<AnnotationRecord> _annotations;
 
 	// memory pools
-	std::deque<co::Any> _anyPool;
+	std::deque<co::AnyValue> _anyPool;
 	std::deque<std::string> _stringPool;
 };
 

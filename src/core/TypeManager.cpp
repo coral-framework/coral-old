@@ -223,9 +223,10 @@ void TypeManager::defineBuiltInTypes()
 	Namespace* rootNS = _rootNS.get();
 
 	// register all basic types in the root namespace:
-	for( TypeKind k = TK_NULL; k <= TK_STRING; ++k )
+	for( TypeKind k = TK_NULL; k < TK_COUNT; ++k )
 	{
 		TypeComponent* type = static_cast<TypeComponent*>( BASIC_TYPES[k].get() );
+		if( !type ) continue;
 		type->setNamespace( rootNS );
 		rootNS->addType( type );
 	}

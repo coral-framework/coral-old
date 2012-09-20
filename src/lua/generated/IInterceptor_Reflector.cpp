@@ -5,8 +5,8 @@
 
 #include <lua/IInterceptor.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IField.h>
 #include <co/IObject.h>
+#include <co/IField.h>
 #include <co/IPort.h>
 #include <co/IMethod.h>
 #include <co/IllegalCastException.h>

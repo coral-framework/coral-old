@@ -4,24 +4,24 @@
 enum TypeKind
 {
 	TK_NULL,			//< The null value.
-	TK_ANY,				//< Coral's any (variant type).
 	TK_BOOL,			//< Boolean value; either true or false.
 	TK_INT8,			//< 8-bit signed integer.
-	TK_UINT8,			//< 8-bit unsigned integer.
 	TK_INT16,			//< 16-bit signed integer.
-	TK_UINT16,			//< 16-bit unsigned integer.
 	TK_INT32,			//< 32-bit signed integer.
-	TK_UINT32,			//< 32-bit unsigned integer.
 	TK_INT64,			//< 64-bit signed integer.
+	TK_UINT8,			//< 8-bit unsigned integer.
+	TK_UINT16,			//< 16-bit unsigned integer.
+	TK_UINT32,			//< 32-bit unsigned integer.
 	TK_UINT64,			//< 64-bit unsigned integer.
 	TK_FLOAT,			//< 32-bit (single-precision) IEEE 754 floating-point number.
 	TK_DOUBLE,			//< 64-bit (double-precision) IEEE 754 floating-point number.
-	TK_STRING,			//< 8-bit-clean string.
-	TK_ARRAY,			//< One-dimensional array of elements.
 	TK_ENUM,			//< Enumeration of constant identifiers.
-	TK_EXCEPTION,		//< Named exception that can be raised by methods.
+	TK_STRING,			//< 8-bit-clean string.
+	TK_ANY,				//< Coral's any (variant type).
+	TK_ARRAY,			//< One-dimensional array of elements.
 	TK_STRUCT,			//< Set of named fields of various types.
 	TK_NATIVECLASS,		//< Native C++ value type.
 	TK_INTERFACE,		//< Interface type.
-	TK_COMPONENT		//< Component type.
+	TK_COMPONENT,		//< Component type.
+	TK_EXCEPTION		//< Named exception that can be raised by methods.
 };

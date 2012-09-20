@@ -99,7 +99,7 @@ namespace co { namespace csl {
 	double num;
 	std::string* str;
 	const char* cstr;
-	co::Any* any;
+	co::AnyValue* any;
 
 
 

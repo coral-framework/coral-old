@@ -135,30 +135,45 @@ struct IllegalRecursiveAny
 {
 	inline static void tag( State& ) { static_assert( sizeof(T)<0, "illegal recursive co::Any" ); }
 };
-
 template<> struct Variable<Any&> : public IllegalRecursiveAny<Any&> {};
 template<> struct Variable<const Any&> : public IllegalRecursiveAny<const Any&> {};
 
-template<typename T>
-struct Variable<T* const&>
+template<TypeKind, bool isIn, typename T>
+struct Pointer
 {
-	typedef typeOf<T> IT;
+	typedef typeOf<T> TT;
 	inline static void tag( State& s )
 	{
-		static_assert( IT::kind == TK_INTERFACE, "illegal pointer to a non-interface type" );
-		s.type = IT::get();
+		static_assert( TT::kind == TK_NATIVECLASS, "unexpected pointer type" );
+		s.type = TT::get();
+		s.isIn = isIn;
+	}
+	inline static void set( State& s, const T& v ) { s.data.cptr = &v; }
+	inline static T& get( State& s ) { return *reinterpret_cast<T*>( s.data.ptr ); }
+};
+
+template<bool isIn, typename T>
+struct Pointer<TK_INTERFACE, isIn, T>
+{
+	typedef typeOf<T> TT;
+	inline static void tag( State& s )
+	{
+		s.type = TT::get();
 		s.isIn = true;
 	}
-	inline static void set( State& s, T* v )
+	inline static void set( State& s, T v )
 	{
 		if( v ) s.type = v->getInterface();
 		s.data.service = v;
 	}
-	inline static T* get( State& s ) { return static_cast<T*>( s.data.service ); }
+	inline static T get( State& s ) { return static_cast<T>( s.data.service ); }
 };
 
 template<typename T>
-struct Variable<T*&> : public Variable<T* const&> {};
+struct Variable<T*&> : public Pointer<kindOf<T*>::kind, false, T*> {};
+
+template<typename T>
+struct Variable<T* const&> : public Pointer<kindOf<T*>::kind, true, T*> {};
 
 template<typename T>
 struct Variable<RefPtr<T>&>
@@ -188,8 +203,7 @@ struct Variable<const T* const&>
 	inline static void tag( State& ) { static_assert( sizeof(T)<0, "illegal const pointer" ); }
 };
 
-template<typename T>
-struct Variable<const T*&> : public Variable<const T* const&> {};
+template<typename T> struct Variable<const T*&> : public Variable<const T* const&> {};
 
 template<typename T>
 struct Variable<const Range<T>&> : public Tag<Range<T>, true>

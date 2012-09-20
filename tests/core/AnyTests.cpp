@@ -206,12 +206,6 @@ TEST( AnyTests, constructDefault )
 	EXPECT_TRUE( defaultAny != notDefaultAny );
 }
 
-TEST( AnyTests, constructAnyValue )
-{
-	co::AnyValue anAny( 3.14 );
-	constructorNonConstRefTest<co::AnyValue>( co::TK_ANY, anAny, "any" );
-}
-
 TEST( AnyTests, constructBool )
 {
 	constructorValueTest<bool>( co::TK_BOOL, false, "bool" );
@@ -222,19 +216,9 @@ TEST( AnyTests, constructInt8 )
 	constructorValueTest<co::int8>( co::TK_INT8, 0, "int8" );
 }
 
-TEST( AnyTests, constructUInt8 )
-{
-	constructorValueTest<co::uint8>( co::TK_UINT8, 0, "uint8" );
-}
-
 TEST( AnyTests, constructInt16 )
 {
 	constructorValueTest<co::int16>( co::TK_INT16, 0, "int16" );
-}
-
-TEST( AnyTests, constructUInt16 )
-{
-	constructorValueTest<co::uint16>( co::TK_UINT16, 0, "uint16" );
 }
 
 TEST( AnyTests, constructInt32 )
@@ -242,14 +226,24 @@ TEST( AnyTests, constructInt32 )
 	constructorValueTest<co::int32>( co::TK_INT32, 0, "int32" );
 }
 
-TEST( AnyTests, constructUInt32 )
-{
-	constructorValueTest<co::uint32>( co::TK_UINT32, 0, "uint32" );
-}
-
 TEST( AnyTests, constructInt64 )
 {
 	constructorValueTest<co::int64>( co::TK_INT64, 0, "int64" );
+}
+
+TEST( AnyTests, constructUInt8 )
+{
+	constructorValueTest<co::uint8>( co::TK_UINT8, 0, "uint8" );
+}
+
+TEST( AnyTests, constructUInt16 )
+{
+	constructorValueTest<co::uint16>( co::TK_UINT16, 0, "uint16" );
+}
+
+TEST( AnyTests, constructUInt32 )
+{
+	constructorValueTest<co::uint32>( co::TK_UINT32, 0, "uint32" );
 }
 
 TEST( AnyTests, constructUInt64 )
@@ -267,11 +261,22 @@ TEST( AnyTests, constructDouble )
 	constructorValueTest<double>( co::TK_DOUBLE, 0.0, "double" );
 }
 
+TEST( AnyTests, constructEnum )
+{
+	constructorValueTest<co::TypeKind>( co::TK_ENUM, co::TK_ANY, "co.TypeKind" );
+}
+
 TEST( AnyTests, constructString )
 {
 	std::string str;
 	constructorValueTest<std::string>( co::TK_STRING, str, "string" );
 	constructorRefTest<std::string>( co::TK_STRING, str, "string" );
+}
+
+TEST( AnyTests, constructAnyValue )
+{
+	co::AnyValue anAny( 3.14 );
+	constructorNonConstRefTest<co::AnyValue>( co::TK_ANY, anAny, "any" );
 }
 
 TEST( AnyTests, constructArray )
@@ -331,11 +336,6 @@ TEST( AnyTests, constructArray )
 	ASSERT_EQ( 6, r6.size() );
 	EXPECT_EQ( 6, a6.getCount() );
 	EXPECT_EQ( d, r6.back() );
-}
-
-TEST( AnyTests, constructEnum )
-{
-	constructorValueTest<co::TypeKind>( co::TK_ENUM, co::TK_ANY, "co.TypeKind" );
 }
 
 std::ostream& operator<<( std::ostream& out, const co::CSLError& v )
@@ -630,7 +630,7 @@ TEST( AnyTests, coercionsFromBool )
 
 	// to enum (co::TypeKind)
 	EXPECT_EQ( co::TK_NULL, a1.get<co::TypeKind>() );
-	EXPECT_EQ( co::TK_ANY, a2.get<co::TypeKind>() );
+	EXPECT_EQ( co::TK_BOOL, a2.get<co::TypeKind>() );
 
 	// no conversion to string or 'reference-based' types
 	EXPECT_THROW( a1.get<std::string&>(), co::IllegalCastException );
@@ -664,7 +664,7 @@ TEST( AnyTests, coercionsFromUInt64 )
 
 	// to enum (co::TypeKind)
 	EXPECT_EQ( co::TK_NULL, a0.get<co::TypeKind>() );
-	EXPECT_EQ( co::TK_COMPONENT, co::Any( 20 ).get<co::TypeKind>() );
+	EXPECT_EQ( co::TK_EXCEPTION, co::Any( 20 ).get<co::TypeKind>() );
 	EXPECT_THROW( a1.get<co::TypeKind>(), co::IllegalCastException );
 	EXPECT_THROW( a2.get<co::TypeKind>(), co::IllegalCastException );
 
@@ -699,7 +699,7 @@ TEST( AnyTests, coercionsFromDouble )
 
 	// to enum
 	EXPECT_EQ( co::TK_NULL, a0.get<co::TypeKind>() );
-	EXPECT_EQ( co::TK_INT8, a1.get<co::TypeKind>() );
+	EXPECT_EQ( co::TK_INT16, a1.get<co::TypeKind>() );
 	EXPECT_THROW( a2.get<co::TypeKind>(), co::IllegalCastException );
 
 	// invalid retrieval: correct primitive, but it's a value, not a reference!
@@ -716,8 +716,8 @@ TEST( AnyTests, coercionsFromEnum )
 	co::Any a2( co::TK_COMPONENT );
 
 	EXPECT_ANY_STREQ( a0, "(in co.TypeKind)0" );
-	EXPECT_ANY_STREQ( a1, "(in co.TypeKind)11" );
-	EXPECT_ANY_STREQ( a2, "(in co.TypeKind)20" );
+	EXPECT_ANY_STREQ( a1, "(in co.TypeKind)10" );
+	EXPECT_ANY_STREQ( a2, "(in co.TypeKind)19" );
 
 	// to bool
 	EXPECT_FALSE( a0.get<bool>() );
@@ -726,13 +726,13 @@ TEST( AnyTests, coercionsFromEnum )
 
 	// to int16
 	EXPECT_EQ( 0, a0.get<co::int16>() );
-	EXPECT_EQ( 11, a1.get<co::int16>() );
-	EXPECT_EQ( 20, a2.get<co::int16>() );
+	EXPECT_EQ( 10, a1.get<co::int16>() );
+	EXPECT_EQ( 19, a2.get<co::int16>() );
 
 	// to float
 	EXPECT_EQ( 0.0f, a0.get<float>() );
-	EXPECT_EQ( 11.0f, a1.get<float>() );
-	EXPECT_EQ( 20.0f, a2.get<float>() );
+	EXPECT_EQ( 10.0f, a1.get<float>() );
+	EXPECT_EQ( 19.0f, a2.get<float>() );
 
 	// NOTE: if we had a second enum type in the core, we could
 	// test direct enum-to-enum coercion
@@ -741,11 +741,11 @@ TEST( AnyTests, coercionsFromEnum )
 	EXPECT_THROW( a0.get<co::TypeKind&>(), co::IllegalCastException );
 }
 
-TEST( MappingTests, coercionBetweenEnums )
+TEST( AnyTests, coercionBetweenEnums )
 {
 	co::Any a0( co::TK_NULL );
 	co::Any a1( static_cast<short>( 1 ) );
-	co::Any a2( co::TK_BOOL );
+	co::Any a2( co::TK_INT8 );
 	co::Any a3( co::TK_UINT32 );
 	co::Any a4( co::ModuleState_Integrated );
 	co::Any a5( co::__ModuleState__FORCE_SIZEOF_UINT32 );
@@ -760,12 +760,12 @@ TEST( MappingTests, coercionBetweenEnums )
 	EXPECT_EQ( 0, a0.get<short>() );
 	EXPECT_EQ( co::ModuleState_None, a0.get<co::ModuleState>() );
 
-	EXPECT_EQ( co::TK_ANY, a1.get<co::TypeKind>() );
+	EXPECT_EQ( co::TK_BOOL, a1.get<co::TypeKind>() );
 	EXPECT_EQ( co::ModuleState_Initialized, a1.get<co::ModuleState>() );
 
 	EXPECT_EQ( 2, a2.get<co::int8>() );
 	EXPECT_EQ( co::ModuleState_Integrated, a2.get<co::ModuleState>() );
-	EXPECT_EQ( co::TK_BOOL, a4.get<co::TypeKind>() );
+	EXPECT_EQ( co::TK_INT8, a4.get<co::TypeKind>() );
 
 	EXPECT_EQ( 8, a3.get<co::uint64>() );
 	EXPECT_THROW( a3.get<co::ModuleState>(), co::IllegalCastException );

@@ -115,9 +115,9 @@ void Loader::setError( Error* error )
 	_error = error;	
 }
 
-Any* Loader::newAny()
+AnyValue* Loader::newAny()
 {
-	_anyPool.push_back( Any() );
+	_anyPool.push_back( AnyValue() );
 	return &_anyPool.back();
 }
 
