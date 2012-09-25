@@ -141,26 +141,15 @@ template<> struct Variable<const Any&> : public IllegalRecursiveAny<const Any&> 
 template<TypeKind, bool isIn, typename T>
 struct Pointer
 {
-	typedef typeOf<T> TT;
-	inline static void tag( State& s )
-	{
-		static_assert( TT::kind == TK_NATIVECLASS, "unexpected pointer type" );
-		s.type = TT::get();
-		s.isIn = isIn;
-	}
-	inline static void set( State& s, const T& v ) { s.data.cptr = &v; }
-	inline static T& get( State& s ) { return *reinterpret_cast<T*>( s.data.ptr ); }
+	inline static void tag( State& ) { static_assert( sizeof(T)<0, "unexpected pointer type" ); }
 };
 
 template<bool isIn, typename T>
-struct Pointer<TK_INTERFACE, isIn, T>
+struct Pointer<TK_NATIVECLASS, isIn, T> : public Tag<T, isIn>, Ref<T> {};
+
+template<bool isIn, typename T>
+struct Pointer<TK_INTERFACE, isIn, T> : public Tag<T, true>
 {
-	typedef typeOf<T> TT;
-	inline static void tag( State& s )
-	{
-		s.type = TT::get();
-		s.isIn = true;
-	}
 	inline static void set( State& s, T v )
 	{
 		if( v ) s.type = v->getInterface();
@@ -169,11 +158,13 @@ struct Pointer<TK_INTERFACE, isIn, T>
 	inline static T get( State& s ) { return static_cast<T>( s.data.service ); }
 };
 
-template<typename T>
-struct Variable<T*&> : public Pointer<kindOf<T*>::kind, false, T*> {};
-
-template<typename T>
-struct Variable<T* const&> : public Pointer<kindOf<T*>::kind, true, T*> {};
+template<typename T> struct Variable<T*&> : public Pointer<kindOf<T*>::kind, false, T*> {};
+template<typename T> struct Variable<T* const&> : public Pointer<kindOf<T*>::kind, true, T* const> {};
+template<typename T> struct Variable<const T*&> : public Variable<const T* const&> {};
+template<typename T> struct Variable<const T* const&>
+{
+	inline static void tag( State& ) { static_assert( sizeof(T)<0, "illegal const pointer" ); }
+};
 
 template<typename T>
 struct Variable<RefPtr<T>&>
@@ -196,14 +187,6 @@ struct Variable<const RefPtr<T>&>
 	inline static void tag( State& s ) { AsPtr::tag( s ); }
 	inline static void set( State& s, const RefPtr<T>& v ) { AsPtr::set( s, v.get() ); }
 };
-
-template<typename T>
-struct Variable<const T* const&>
-{
-	inline static void tag( State& ) { static_assert( sizeof(T)<0, "illegal const pointer" ); }
-};
-
-template<typename T> struct Variable<const T*&> : public Variable<const T* const&> {};
 
 template<typename T>
 struct Variable<const Range<T>&> : public Tag<Range<T>, true>
@@ -395,10 +378,7 @@ public:
 	template<typename T>
 	inline T get() const
 	{
-		Any any;
-		__any::Variable<T>::tag( any.state );
-		cast( any.state );
-		return __any::Variable<T>::get( any.state );
+		return Getter<T>::get( *this );
 	}
 
 	template<typename T>
@@ -515,7 +495,37 @@ public:
 	}
 
 protected:
-	void cast( __any::State& to ) const;
+	void cast( Any& to ) const;
+
+	template<typename T>
+	struct GetByRef
+	{
+		inline static T get( const Any& in )
+		{
+			Any out;
+			__any::Variable<T>::tag( out.state );
+			in.cast( out );
+			return __any::Variable<T>::get( out.state );
+		}
+	};
+
+	template<typename T>
+	struct GetByCopy
+	{
+		inline static T get( const Any& in )
+		{
+			T v;
+			Any out( v );
+			out.put( in );
+			return v;
+		}
+	};
+
+	template<typename T> struct Getter : public GetByCopy<T> {};
+	template<typename T> struct Getter<T&> : public GetByRef<T&> {};
+	template<typename T> struct Getter<T*> : public GetByRef<T*> {};
+	template<typename T> struct Getter<T* const> : public GetByRef<T* const> {};
+	template<typename T> struct Getter<Range<T> > : public GetByRef<Range<T> > {};
 };
 
 /*!
@@ -662,7 +672,7 @@ template<> inline void swap( co::AnyValue& a, co::AnyValue& b ) { a.swap( b ); }
 } // namespace std
 
 // Outputs the qualified type name of the variable in a co::__any::State.
-CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::__any::State& s );
+CORAL_EXPORT std::ostream& operator<<( std::ostream& os, const co::__any::State& s );
 
 #endif // DOXYGEN
 
@@ -670,15 +680,15 @@ CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::__any::State
 	Outputs the variable type and value stored in a co::Any.
 	\relates co::Any
  */
-CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::Any& a );
+CORAL_EXPORT std::ostream& operator<<( std::ostream& os, const co::Any& a );
 
 /*!
 	Outputs the variable type and value stored in a co::AnyValue.
 	\relates co::AnyValue
  */
-inline std::ostream& operator<<( std::ostream& out, const co::AnyValue& v )
+inline std::ostream& operator<<( std::ostream& os, const co::AnyValue& v )
 {
-	return out << v.getAny();
+	return os << v.getAny();
 }
 
 #endif // _CO_ANY_H_

@@ -553,13 +553,12 @@ ITypeBuilder* TypeBuilder::create( TypeKind kind, INamespace* ns, const std::str
 	switch( kind )
 	{
 	case TK_ENUM:			tb = new EnumBuilder;			break;
-	case TK_EXCEPTION:		tb = new ExceptionTypeBuilder;	break;
 	case TK_STRUCT:			tb = new StructBuilder;			break;
 	case TK_NATIVECLASS:	tb = new NativeClassBuilder;	break;
 	case TK_INTERFACE:		tb = new InterfaceBuilder;		break;
 	case TK_COMPONENT:		tb = new ComponentBuilder;		break;
-	default:
-		assert( false );
+	case TK_EXCEPTION:		tb = new ExceptionTypeBuilder;	break;
+	default:				assert( false );
 	}
 
 	assert( tb );

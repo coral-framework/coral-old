@@ -177,32 +177,29 @@ public:
 IReflector* BasicReflector::create( IType* t )
 {
 	assert( t );
-
-	IReflector* r = NULL;
 	switch( t->getKind() )
 	{
-	case TK_NULL:		r = new NullReflector( t );					break;
-	case TK_ANY:		r = new ClassReflector<AnyValue>( t );		break;
-	case TK_BOOL:		r = new PODReflector<bool>( t );			break;
-	case TK_INT8:		r = new PODReflector<int8>( t );			break;
-	case TK_UINT8:		r = new PODReflector<uint8>( t );			break;
-	case TK_INT16:		r = new PODReflector<int16>( t );			break;
-	case TK_UINT16:		r = new PODReflector<uint16>( t );			break;
-	case TK_INT32:		r = new PODReflector<int32>( t );			break;
-	case TK_UINT32:		r = new PODReflector<uint32>( t );			break;
-	case TK_INT64:		r = new PODReflector<int64>( t );			break;
-	case TK_UINT64:		r = new PODReflector<uint64>( t );			break;
-	case TK_FLOAT:		r = new PODReflector<float>( t );			break;
-	case TK_DOUBLE:		r = new PODReflector<double>( t );			break;
-	case TK_STRING:		r = new ClassReflector<std::string>( t );	break;
-	case TK_ARRAY:		r = new ArrayReflector( t );				break;
-	case TK_ENUM:		r = new PODReflector<uint32>( t );			break;
-	case TK_COMPONENT:	r = new InternalComponentReflector( t );	break;
-	default: break;
+	case TK_NULL:		return new NullReflector( t );
+	case TK_BOOL:		return new PODReflector<bool>( t );
+	case TK_INT8:		return new PODReflector<int8>( t );
+	case TK_INT16:		return new PODReflector<int16>( t );
+	case TK_INT32:		return new PODReflector<int32>( t );
+	case TK_INT64:		return new PODReflector<int64>( t );
+	case TK_UINT8:		return new PODReflector<uint8>( t );
+	case TK_UINT16:		return new PODReflector<uint16>( t );
+	case TK_UINT32:		return new PODReflector<uint32>( t );
+	case TK_UINT64:		return new PODReflector<uint64>( t );
+	case TK_FLOAT:		return new PODReflector<float>( t );
+	case TK_DOUBLE:		return new PODReflector<double>( t );
+	case TK_ENUM:		return new PODReflector<uint32>( t );
+	case TK_STRING:		return new ClassReflector<std::string>( t );
+	case TK_ANY:		return new ClassReflector<AnyValue>( t );
+	case TK_ARRAY:		return new ArrayReflector( t );
+	case TK_COMPONENT:	return new InternalComponentReflector( t );
+	default:
+		assert( false );
 	}
-
-	assert( r );
-	return r;
+	throw NotSupportedException( "unexpected type kind" );
 }
 
 } // namespace co

@@ -64,42 +64,26 @@ void SignatureCalculator::calculateSignatures()
 
 	switch( _type->getKind() )
 	{
-	case TK_ANY:
-	case TK_BOOL:
-	case TK_INT8:
-	case TK_UINT8:
-	case TK_INT16:
-	case TK_UINT16:
-	case TK_INT32:
-	case TK_UINT32:
-	case TK_INT64:
-	case TK_UINT64:
-	case TK_FLOAT:
-	case TK_DOUBLE:
-	case TK_STRING:
-		// empty
-		break;
-	case TK_ARRAY:
-		fillArraySignatureData();
-		break;
-	case TK_ENUM:
-		fillEnumSignatureData();
-		break;
-	case TK_EXCEPTION:
-		// empty
-		break;
-	case TK_STRUCT:
-		fillStructSignatureData();
-		break;
-	case TK_NATIVECLASS:
-		fillNativeClassSignatureData();
-		break;
-	case TK_INTERFACE:
-		fillInterfaceSignatureData();
-		break;
-	case TK_COMPONENT:
-		fillComponentSignatureData();
-		break;
+	case TK_BOOL:			break;
+	case TK_INT8:			break;
+	case TK_INT16:			break;
+	case TK_INT32:			break;
+	case TK_INT64:			break;
+	case TK_UINT8:			break;
+	case TK_UINT16:			break;
+	case TK_UINT32:			break;
+	case TK_UINT64:			break;
+	case TK_FLOAT:			break;
+	case TK_DOUBLE:			break;
+	case TK_ENUM:			fillEnumSignatureData(); break;
+	case TK_STRING:			break;
+	case TK_ANY:			break;
+	case TK_ARRAY:			fillArraySignatureData(); break;
+	case TK_STRUCT:			fillStructSignatureData(); break;
+	case TK_NATIVECLASS:	fillNativeClassSignatureData(); break;
+	case TK_INTERFACE:		fillInterfaceSignatureData(); break;
+	case TK_COMPONENT:		fillComponentSignatureData(); break;
+	case TK_EXCEPTION:		break;
 	default:
 		assert( false );
 	}

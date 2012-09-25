@@ -197,7 +197,7 @@ TEST( AnyTests, constructDefault )
 	EXPECT_TRUE( defaultAny.isNull() );
 	EXPECT_FALSE( defaultAny.isValid() );
 	EXPECT_EQ( defaultAny.getType(), co::BASIC_TYPES[co::TK_NULL].get() );
-	EXPECT_ANY_TYPE_STREQ( defaultAny, "null" );
+	EXPECT_ANY_STREQ( defaultAny, "null: null" );
 
 	co::Any anotherDefaultAny;
 	EXPECT_TRUE( defaultAny == anotherDefaultAny );
@@ -268,15 +268,20 @@ TEST( AnyTests, constructEnum )
 
 TEST( AnyTests, constructString )
 {
-	std::string str;
+	std::string str( "foo" );
 	constructorValueTest<std::string>( co::TK_STRING, str, "string" );
 	constructorRefTest<std::string>( co::TK_STRING, str, "string" );
+	EXPECT_ANY_STREQ( co::Any( str ), "out string: \"foo\"" );
 }
 
 TEST( AnyTests, constructAnyValue )
 {
-	co::AnyValue anAny( 3.14 );
-	constructorNonConstRefTest<co::AnyValue>( co::TK_ANY, anAny, "any" );
+	co::AnyValue dblAny( 3.14 );
+	constructorNonConstRefTest<co::AnyValue>( co::TK_ANY, dblAny, "any" );
+	EXPECT_ANY_STREQ( dblAny, "out any: 3.14" );
+
+	co::AnyValue nullAny;
+	EXPECT_ANY_STREQ( nullAny, "out any: null" );
 }
 
 TEST( AnyTests, constructArray )
@@ -284,12 +289,12 @@ TEST( AnyTests, constructArray )
 	co::Range<co::int16> r1;
 	co::Any a1( r1 );
 	EXPECT_EQ( 0, a1.getCount() );
-	EXPECT_ANY_TYPE_STREQ( a1, "in int16[]" );
+	EXPECT_ANY_STREQ( a1, "in int16[]: {}" );
 
 	co::Range<std::string> r2;
 	co::Any a2( r2 );
 	EXPECT_EQ( 0, a2.getCount() );
-	EXPECT_ANY_TYPE_STREQ( a2, "in string[]" );
+	EXPECT_ANY_STREQ( a2, "in string[]: {}" );
 
 	const int NUM_PATH_ENTRIES = 2;
 	co::Range<std::string> r3 = co::getPaths();
@@ -312,23 +317,21 @@ TEST( AnyTests, constructArray )
 	co::Any a4;
 	a4.set<co::RefVector<co::IInterface>&>( r4 );
 	EXPECT_EQ( 0, a4.getCount() );
-	EXPECT_ANY_TYPE_STREQ( a4, "out co.IInterface[]" );
+	EXPECT_ANY_STREQ( a4, "out co.IInterface[]: {}" );
 
 	EXPECT_TRUE( co::TK_NATIVECLASS == co::kindOf<co::Uuid>::kind );
 	EXPECT_EQ( "co.Uuid", co::typeOf<co::Uuid>::get()->getFullName() );
 	EXPECT_STREQ( "co.Uuid", co::nameOf<co::Uuid>::get() );
 
 	std::vector<co::Uuid> r5;
-	co::Any a5;
-	a5.set<std::vector<co::Uuid>&>( r5 );
+	co::Any a5( r5 );
 	EXPECT_EQ( 0, a5.getCount() );
-	EXPECT_ANY_TYPE_STREQ( a5, "out co.Uuid[]" );
+	EXPECT_ANY_STREQ( a5, "out co.Uuid[]: {}" );
 
 	std::vector<double> r6( 5, 4321 );
-	co::Any a6;
-	a6.set<std::vector<double>&>( r6 );
+	co::Any a6( r6 );
 	EXPECT_EQ( 5, a6.getCount() );
-	EXPECT_ANY_TYPE_STREQ( a6, "out double[]" );
+	EXPECT_ANY_STREQ( a6, "out double[]: {4321, 4321, 4321, 4321, 4321}" );
 
 	double d = 7.5;
 	EXPECT_EQ( 5, a6.get<std::vector<double>&>().size() );
@@ -338,18 +341,14 @@ TEST( AnyTests, constructArray )
 	EXPECT_EQ( d, r6.back() );
 }
 
-std::ostream& operator<<( std::ostream& out, const co::CSLError& v )
-{
-	return out << "CSLError{ filename = '" << v.filename << "', msg = '" << v.message << "', line = " << v.line << "}";
-}
-
 TEST( AnyTests, constructStruct )
 {
 	co::CSLError cslError;
 	cslError.filename = "filename";
-	cslError.message = "message";
+	cslError.message = "msg";
 	cslError.line = 7;
 	constructorRefTest<co::CSLError>( co::TK_STRUCT, cslError, "co.CSLError" );
+	EXPECT_ANY_STREQ( cslError, "out co.CSLError: {filename = \"filename\", line = 7, message = \"msg\"}" );
 }
 
 TEST( AnyTests, constructNativeClass )
@@ -504,7 +503,7 @@ TEST( AnyTests, setGetArrays )
 
 	co::Any a3;
 	a3.set<std::vector<int>&>( intVec );
-	EXPECT_ANY_TYPE_STREQ( a3, "out int32[]" );
+	EXPECT_ANY_STREQ( a3, "out int32[]: {-1, 5, 7}" );
 
 	std::vector<int>& intVecRef = a3.get<std::vector<int>&>();
 
@@ -617,8 +616,12 @@ TEST( AnyTests, coercionsFromBool )
 	co::Any a1( false );
 	co::Any a2( true );
 
-	EXPECT_ANY_STREQ( a1, "(in bool)false" );
-	EXPECT_ANY_STREQ( a2, "(in bool)true" );
+	EXPECT_ANY_STREQ( a1, "in bool: false" );
+	EXPECT_ANY_STREQ( a2, "in bool: true" );
+
+	// to string
+	EXPECT_EQ( "false", a1.get<std::string>() );
+	EXPECT_EQ( "true", a2.get<std::string>() );
 
 	// to int16
 	EXPECT_EQ( 0, a1.get<co::int16>() );
@@ -643,9 +646,9 @@ TEST( AnyTests, coercionsFromUInt64 )
 	co::Any a1; a1.setIn<co::uint64>( co::MAX_INT16 );
 	co::Any a2; a2.setIn<co::uint64>( co::MAX_UINT64 );
 
-	EXPECT_ANY_STREQ( a0, "(in uint64)0" );
-	EXPECT_ANY_STREQ( a1, "(in uint64)32767" );
-	EXPECT_ANY_STREQ( a2, "(in uint64)18446744073709551615" );
+	EXPECT_ANY_STREQ( a0, "in uint64: 0" );
+	EXPECT_ANY_STREQ( a1, "in uint64: 32767" );
+	EXPECT_ANY_STREQ( a2, "in uint64: 18446744073709551615" );
 
 	// to bool
 	EXPECT_FALSE( a0.get<bool>() );
@@ -679,9 +682,9 @@ TEST( AnyTests, coercionsFromDouble )
 	co::Any a1( 3.141592653589 );
 	co::Any a2( -9.99 );
 
-	EXPECT_ANY_STREQ( a0, "(in double)0" );
-	EXPECT_ANY_STREQ( a1, "(in double)3.14159" );
-	EXPECT_ANY_STREQ( a2, "(in double)-9.99" );
+	EXPECT_ANY_STREQ( a0, "in double: 0" );
+	EXPECT_ANY_STREQ( a1, "in double: 3.14159" );
+	EXPECT_ANY_STREQ( a2, "in double: -9.99" );
 
 	// to bool
 	EXPECT_FALSE( a0.get<bool>() );
@@ -715,9 +718,9 @@ TEST( AnyTests, coercionsFromEnum )
 	co::Any a1( co::TK_FLOAT );
 	co::Any a2( co::TK_COMPONENT );
 
-	EXPECT_ANY_STREQ( a0, "(in co.TypeKind)0" );
-	EXPECT_ANY_STREQ( a1, "(in co.TypeKind)10" );
-	EXPECT_ANY_STREQ( a2, "(in co.TypeKind)19" );
+	EXPECT_ANY_STREQ( a0, "in co.TypeKind: TK_NULL" );
+	EXPECT_ANY_STREQ( a1, "in co.TypeKind: TK_FLOAT" );
+	EXPECT_ANY_STREQ( a2, "in co.TypeKind: TK_COMPONENT" );
 
 	// to bool
 	EXPECT_FALSE( a0.get<bool>() );
@@ -750,12 +753,12 @@ TEST( AnyTests, coercionBetweenEnums )
 	co::Any a4( co::ModuleState_Integrated );
 	co::Any a5( co::__ModuleState__FORCE_SIZEOF_UINT32 );
 
-	EXPECT_ANY_STREQ( a0, "(in co.TypeKind)0" );
-	EXPECT_ANY_STREQ( a1, "(in int16)1" );
-	EXPECT_ANY_STREQ( a2, "(in co.TypeKind)2" );
-	EXPECT_ANY_STREQ( a3, "(in co.TypeKind)8" );
-	EXPECT_ANY_STREQ( a4, "(in co.ModuleState)2" );
-	EXPECT_ANY_STREQ( a5, "(in co.ModuleState)4294967295" );
+	EXPECT_ANY_STREQ( a0, "in co.TypeKind: TK_NULL" );
+	EXPECT_ANY_STREQ( a1, "in int16: 1" );
+	EXPECT_ANY_STREQ( a2, "in co.TypeKind: TK_INT8" );
+	EXPECT_ANY_STREQ( a3, "in co.TypeKind: TK_UINT32" );
+	EXPECT_ANY_STREQ( a4, "in co.ModuleState: ModuleState_Integrated" );
+	EXPECT_ANY_STREQ( a5, "in co.ModuleState: <INVALID ID #4294967295>" );
 
 	EXPECT_EQ( 0, a0.get<short>() );
 	EXPECT_EQ( co::ModuleState_None, a0.get<co::ModuleState>() );
@@ -779,7 +782,7 @@ TEST( AnyTests, coercionsFromInterface )
 	co::Any a0( reinterpret_cast<co::IType*>( 0 ) );
 	co::Any a1( co::typeOf<co::INamespace>::get() );
 
-	EXPECT_ANY_STREQ( a0, "(in co.IType)NULL" );
+	EXPECT_ANY_STREQ( a0, "in co.IType: null" );
 	EXPECT_ANY_TYPE_STREQ( a1, "in co.IInterface" );
 
 	// to primitives (invalid retrievals):
@@ -854,7 +857,7 @@ TEST( AnyTests, coercionsFromStdVector )
 
 	co::Any intVecAny;
 	intVecAny.set<std::vector<int>&>( intVec );
-	EXPECT_ANY_TYPE_STREQ( intVecAny, "out int32[]" );
+	EXPECT_ANY_STREQ( intVecAny, "out int32[]: {-1, 5, 7}" );
 
 	// SubInterface*
 	std::vector<co::IInterface*> subVec;

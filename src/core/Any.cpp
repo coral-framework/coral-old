@@ -4,8 +4,9 @@
  */
 
 #include "Any.h"
-#include <co/IType.h>
 #include <co/IEnum.h>
+#include <co/IType.h>
+#include <co/IField.h>
 #include <co/INamespace.h>
 #include <co/IReflector.h>
 #include <co/IInterface.h>
@@ -14,111 +15,56 @@
 #include <cstdlib>
 #include <sstream>
 
-/****************************************************************************/
-/* Global iostream Insertion Operators                                      */
-/****************************************************************************/
-
-std::ostream& operator<<( std::ostream& out, const co::__any::State& s )
-{
-	assert( s.type );
-
-	if( s.type->getKind() != co::TK_NULL )
-		out << ( s.isIn ? "in " : "out " );
-
-	return out << s.type->getFullName();
-}
-
-std::ostream& operator<<( std::ostream& out, const co::Any& a )
-{
-	const co::__any::State& s = a.state;
-
-	// type info
-	out << "(" << s << ")";
-
-	if( a.isNull() )
-		return out;
-
-	co::TypeKind k = a.getKind();;
-	assert( co::isData( k ) );
-
-	// print contents
-	if( !s.isIn || !co::isScalar( k ) )
-	{
-		// print pointer
-		if( s.data.ptr == NULL )
-		{
-			out << "NULL";
-		}
-		else if( k == co::TK_STRING )
-		{
-			// special case: print strings up to 30 chars.
-			std::string str;
-			a.get( str );
-			if( str.length() > 30 )
-			{
-				str.resize( 27 );
-				str.append( "..." );
-			}
-			out << '"' << str << '"';
-		}
-		else
-		{
-			out << s.data.ptr;
-		}
-	}
-	else // print value
-	{	
-		switch( k )
-		{
-		case co::TK_BOOL:	out << ( s.data.b ? "true" : "false" );	break;
-		case co::TK_INT8:	out << s.data.i8;	break;
-		case co::TK_UINT8:	out << s.data.u8;	break;
-		case co::TK_INT16:	out << s.data.i16;	break;
-		case co::TK_UINT16:	out << s.data.u16;	break;
-		case co::TK_INT32:	out << s.data.i32;	break;
-		case co::TK_UINT32:	out << s.data.u32;	break;
-		case co::TK_INT64:	out << s.data.i64;	break;
-		case co::TK_UINT64:	out << s.data.u64;	break;
-		case co::TK_FLOAT:	out << s.data.f;	break;
-		case co::TK_DOUBLE:	out << s.data.d;	break;
-		case co::TK_ENUM:	out << s.data.u32;	break;
-		default:
-			assert( false );
-		}
-	}
-
-	return out;
-}
-
-/****************************************************************************/
-/* Auxiliary Functions to Cast Between Scalar Types                         */
-/****************************************************************************/
-
 namespace co {
 
+/****************************************************************************/
+/* Casting Between Scalar Types                                             */
+/****************************************************************************/
+
 template<typename From, typename To>
-inline void castScalar( const void* from, void* to )
+inline void cast( const void* from, void* to )
 {
 	*reinterpret_cast<To*>( to ) = static_cast<To>( *reinterpret_cast<const From*>( from ) );
 }
 
+template<typename To>
+inline void castTo( TypeKind fromKind, const void* from, void* to )
+{
+	switch( fromKind )
+	{
+	case TK_BOOL:	cast<bool, To>( from, to );		break;
+	case TK_INT8:	cast<int8, To>( from, to );		break;
+	case TK_INT16:	cast<int16, To>( from, to );	break;
+	case TK_INT32:	cast<int32, To>( from, to );	break;
+	case TK_INT64:	cast<int64, To>( from, to );	break;
+	case TK_UINT8:	cast<uint8, To>( from, to );	break;
+	case TK_UINT16:	cast<uint16, To>( from, to );	break;
+	case TK_UINT32:	cast<uint32, To>( from, to );	break;
+	case TK_UINT64:	cast<uint64, To>( from, to );	break;
+	case TK_FLOAT:	cast<float, To>( from, to );	break;
+	case TK_DOUBLE:	cast<double, To>( from, to );	break;
+	case TK_ENUM:	cast<uint32, To>( from, to );	break;
+	default:		assert( false );
+	}
+}
+
 template<typename From>
-inline void castScalar( const void* from, TypeKind toKind, void* to )
+inline void castFrom( const void* from, TypeKind toKind, void* to )
 {
 	switch( toKind )
 	{
-	case TK_BOOL:	castScalar<From, bool>( from, to );		break;
-	case TK_INT8:	castScalar<From, int8>( from, to );		break;
-	case TK_UINT8:	castScalar<From, uint8>( from, to );	break;
-	case TK_INT16:	castScalar<From, int16>( from, to );	break;
-	case TK_UINT16:	castScalar<From, uint16>( from, to );	break;
-	case TK_INT32:	castScalar<From, int32>( from, to );	break;
-	case TK_UINT32:	castScalar<From, uint32>( from, to );	break;
-	case TK_INT64:	castScalar<From, int64>( from, to );	break;
-	case TK_UINT64:	castScalar<From, uint64>( from, to );	break;
-	case TK_FLOAT:	castScalar<From, float>( from, to );	break;
-	case TK_DOUBLE:	castScalar<From, double>( from, to );	break;
-	case TK_ENUM:	castScalar<From, uint32>( from, to );	break;
+	case TK_BOOL:	cast<From, bool>( from, to );	break;
+	case TK_INT8:	cast<From, int8>( from, to );	break;
+	case TK_INT16:	cast<From, int16>( from, to );	break;
+	case TK_INT32:	cast<From, int32>( from, to );	break;
+	case TK_INT64:	cast<From, int64>( from, to );	break;
+	case TK_UINT8:	cast<From, uint8>( from, to );	break;
+	case TK_UINT16:	cast<From, uint16>( from, to );	break;
+	case TK_UINT32:	cast<From, uint32>( from, to );	break;
+	case TK_UINT64:	cast<From, uint64>( from, to );	break;
+	case TK_FLOAT:	cast<From, float>( from, to );	break;
+	case TK_DOUBLE:	cast<From, double>( from, to );	break;
+	case TK_ENUM:	cast<From, uint32>( from, to );	break;
 	default:		assert( false );
 	}
 }
@@ -128,18 +74,18 @@ void castScalar( TypeKind fromKind, const void* from, TypeKind toKind, void* to 
 	assert( isScalar( toKind ) && isScalar( fromKind ) );
 	switch( fromKind )
 	{
-	case TK_BOOL:	castScalar<bool>( from, toKind, to );	break;
-	case TK_INT8:	castScalar<int8>( from, toKind, to );	break;
-	case TK_UINT8:	castScalar<uint8>( from, toKind, to );	break;
-	case TK_INT16:	castScalar<int16>( from, toKind, to );	break;
-	case TK_UINT16:	castScalar<uint16>( from, toKind, to );	break;
-	case TK_INT32:	castScalar<int32>( from, toKind, to );	break;
-	case TK_UINT32:	castScalar<uint32>( from, toKind, to );	break;
-	case TK_INT64:	castScalar<int64>( from, toKind, to );	break;
-	case TK_UINT64:	castScalar<uint64>( from, toKind, to );	break;
-	case TK_FLOAT:	castScalar<float>( from, toKind, to );	break;
-	case TK_DOUBLE:	castScalar<double>( from, toKind, to );	break;
-	case TK_ENUM:	castScalar<uint32>( from, toKind, to );	break;
+	case TK_BOOL:	castFrom<bool>( from, toKind, to );		break;
+	case TK_INT8:	castFrom<int8>( from, toKind, to );		break;
+	case TK_INT16:	castFrom<int16>( from, toKind, to );	break;
+	case TK_INT32:	castFrom<int32>( from, toKind, to );	break;
+	case TK_INT64:	castFrom<int64>( from, toKind, to );	break;
+	case TK_UINT8:	castFrom<uint8>( from, toKind, to );	break;
+	case TK_UINT16:	castFrom<uint16>( from, toKind, to );	break;
+	case TK_UINT32:	castFrom<uint32>( from, toKind, to );	break;
+	case TK_UINT64:	castFrom<uint64>( from, toKind, to );	break;
+	case TK_FLOAT:	castFrom<float>( from, toKind, to );	break;
+	case TK_DOUBLE:	castFrom<double>( from, toKind, to );	break;
+	case TK_ENUM:	castFrom<uint32>( from, toKind, to );	break;
 	default:		assert( false );
 	}
 }
@@ -147,6 +93,98 @@ void castScalar( TypeKind fromKind, const void* from, TypeKind toKind, void* to 
 /****************************************************************************/
 /* General Utility Functions                                                */
 /****************************************************************************/
+
+template<typename T>
+inline bool isEqual( const void* p1, const void* p2 )
+{
+	return *reinterpret_cast<const T*>( p1 ) == *reinterpret_cast<const T*>( p2 );
+}
+
+template<typename T>
+inline void copy( const void* from, void* to )
+{
+	*reinterpret_cast<T*>( to ) = *reinterpret_cast<T const*>( from );
+}
+
+bool isTrue( const std::string& str )
+{
+	return str == "true";
+}
+
+void streamOut( std::ostream& os, const co::Any& in )
+{
+	TypeKind inK = in.getKind();
+	assert( in.isIn() || inK == TK_NULL );
+	switch( inK )
+	{
+	case TK_NULL:	os << "null"; break;
+	case TK_BOOL:	os << ( in.state.data.b ? "true" : "false" ); break;
+	case TK_INT8:	os << in.state.data.i8; break;
+	case TK_INT16:	os << in.state.data.i16; break;
+	case TK_INT32:	os << in.state.data.i32; break;
+	case TK_INT64:	os << in.state.data.i64; break;
+	case TK_UINT8:	os << in.state.data.u8; break;
+	case TK_UINT16:	os << in.state.data.u16; break;
+	case TK_UINT32:	os << in.state.data.u32; break;
+	case TK_UINT64:	os << in.state.data.u64; break;
+	case TK_FLOAT:	os << in.state.data.f; break;
+	case TK_DOUBLE:	os << in.state.data.d; break;
+	case TK_ENUM:
+		{
+			uint32 id = in.state.data.u32;
+			Range<std::string> ids = static_cast<IEnum*>( in.getType() )->getIdentifiers();
+			if( id < ids.getSize() )
+				os << ids[id];
+			else
+				os << "<INVALID ID #" << id << ">";
+		}
+		break;
+
+	case TK_STRING:
+		os << '"' << *in.state.data.str << '"';
+		break;
+
+	case TK_ARRAY:
+		os << "{";
+		for( size_t i = 0; i < in.state.size; ++i )
+		{
+			if( i > 0 ) os << ", ";
+			streamOut( os, in[i] );
+		}
+		os << "}";
+		break;
+
+	case TK_STRUCT:
+	case TK_NATIVECLASS:
+		os << "{";
+		{
+			IRecordType* recordType = static_cast<IRecordType*>( in.getType() );
+			IReflector* reflector = recordType->getReflector();
+			Range<IField*> fields = recordType->getFields();
+			AnyValue v;
+			for( size_t i = 0; i < fields.getSize(); ++i )
+			{
+				if( i > 0 ) os << ", ";
+				IField* f = fields[i];
+				os << f->getName() << " = ";
+				reflector->getField( in, f, v );
+				streamOut( os, v.getAny().asIn() );
+			}
+		}
+		os << "}";
+		break;
+
+	case TK_INTERFACE:
+		if( in.state.data.ptr )
+			os << '@' << in.state.data.ptr;
+		else
+			os << "null";
+		break;
+
+	default:
+		assert( false );
+	}
+}
 
 inline bool typesMatch( TypeKind kSub, TypeKind kSuper, IType* tSub, IType* tSuper )
 {
@@ -174,10 +212,8 @@ inline size_t getVectorSize( const __any::State& s )
 	return v.size() / elemType->getReflector()->getSize();
 }
 
-#define THROW_ILLEGAL_CAST( from, to, MORE_MESSAGES ) \
-	{ std::stringstream sstream; \
-	sstream << "illegal cast from '" << from << "' to '" << to << "'" MORE_MESSAGES; \
-	throw co::IllegalCastException( sstream.str() ); }
+#define THROW_NO_CONVERSION( from, to, MORE_MESSAGES ) \
+	CORAL_THROW(IllegalCastException, "no conversion from '" << from << "' to '" << to << "'" MORE_MESSAGES )
 
 /****************************************************************************/
 /* co::Any                                                                  */
@@ -241,19 +277,19 @@ void Any::set( bool isIn, IType* type, const void* addr, size_t size )
 	TypeKind k = type->getKind();
 	switch( k )
 	{
-	case TK_BOOL: state.data.b = *reinterpret_cast<const bool*>( addr ); break;
-	case TK_INT8:
-	case TK_UINT8: state.data.u8 = *reinterpret_cast<const uint8*>( addr ); break;
-	case TK_INT16:
-	case TK_UINT16: state.data.u16 = *reinterpret_cast<const uint16*>( addr ); break;
-	case TK_INT32:
-	case TK_UINT32: state.data.u32 = *reinterpret_cast<const uint32*>( addr ); break;
-	case TK_INT64:
-	case TK_UINT64: state.data.u64 = *reinterpret_cast<const uint64*>( addr ); break;
-	case TK_FLOAT: state.data.f = *reinterpret_cast<const float*>( addr ); break;
-	case TK_DOUBLE: state.data.d = *reinterpret_cast<const double*>( addr ); break;
-	case TK_ENUM: state.data.u32 = *reinterpret_cast<const uint32*>( addr ); break;
-	case TK_INTERFACE: state.data.service = *reinterpret_cast<IService* const*>( addr ); break;
+	case TK_BOOL:		copy<bool>( addr, &state.data ); break;
+	case TK_INT8:		copy<int8>( addr, &state.data ); break;
+	case TK_INT16:		copy<int16>( addr, &state.data ); break;
+	case TK_INT32:		copy<int32>( addr, &state.data ); break;
+	case TK_INT64:		copy<int64>( addr, &state.data ); break;
+	case TK_UINT8:		copy<uint8>( addr, &state.data ); break;
+	case TK_UINT16:		copy<uint16>( addr, &state.data ); break;
+	case TK_UINT32:		copy<uint32>( addr, &state.data ); break;
+	case TK_UINT64:		copy<uint64>( addr, &state.data ); break;
+	case TK_FLOAT:		copy<float>( addr, &state.data ); break;
+	case TK_DOUBLE:		copy<double>( addr, &state.data ); break;
+	case TK_ENUM:		copy<uint32>( addr, &state.data ); break;
+	case TK_INTERFACE:	copy<IService*>( addr, &state.data ); break;
 	default:
 		assert( !isScalar( k ) );
 	}
@@ -261,34 +297,120 @@ void Any::set( bool isIn, IType* type, const void* addr, size_t size )
 
 void Any::put( const Any& value ) const
 {
-	if( !isValid() || !isOut() )
+	TypeKind myK = getKind();
+	if( myK == TK_NULL || !isOut() )
 		CORAL_THROW( IllegalStateException,
 			"cannot write to a '" << state << "' variable" );
 
 	Any in = value.asIn();
-	TypeKind k = getKind();
-	switch( k )
+	TypeKind inK = in.getKind();
+
+	switch( myK )
 	{
-	case TK_ANY:
-		*reinterpret_cast<AnyValue*>( state.data.ptr ) = in;
+	case TK_BOOL:
+		if( isScalar( inK ) )
+			castTo<bool>( inK, &in.state.data, state.data.ptr );
+		else if( inK == TK_STRING )
+			*reinterpret_cast<bool*>( state.data.ptr ) = isTrue( *in.state.data.str );
+		else
+			THROW_NO_CONVERSION( in.state, state, );
 		break;
 
-	case TK_BOOL:
 	case TK_INT8:
-	case TK_UINT8:
 	case TK_INT16:
-	case TK_UINT16:
 	case TK_INT32:
-	case TK_UINT32:
 	case TK_INT64:
+		if( isScalar( inK ) )
+			castScalar( inK, &in.state.data, myK, state.data.ptr );
+		else if( inK == TK_STRING )
+		{
+			const std::string& str = *in.state.data.str;
+			long v = strtol( str.c_str(), NULL, 0 );
+			castFrom<long>( &v, myK, state.data.ptr );
+		}
+		else
+			THROW_NO_CONVERSION( in.state, state, );
+		break;
+
+	case TK_UINT8:
+	case TK_UINT16:
+	case TK_UINT32:
 	case TK_UINT64:
+		if( isScalar( inK ) )
+			castScalar( inK, &in.state.data, myK, state.data.ptr );
+		else if( inK == TK_STRING )
+		{
+			const std::string& str = *in.state.data.str;
+			unsigned long v = strtoul( str.c_str(), NULL, 0 );
+			castFrom<unsigned long>( &v, myK, state.data.ptr );
+		}
+		else
+			THROW_NO_CONVERSION( in.state, state, );
+		break;
+
 	case TK_FLOAT:
+		if( isScalar( inK ) )
+			castTo<float>( inK, &in.state.data, state.data.ptr );
+		else if( inK == TK_STRING )
+		{
+			float f = strtof( in.state.data.str->c_str(), NULL );
+			*reinterpret_cast<float*>( state.data.ptr ) = f;
+		}
+		else
+			THROW_NO_CONVERSION( in.state, state, );
+		break;
+
 	case TK_DOUBLE:
-		castScalar( in.getKind(), &in.state.data, k, state.data.ptr );
+		if( isScalar( inK ) )
+			castScalar( inK, &in.state.data, myK, state.data.ptr );
+		else if( inK == TK_STRING )
+		{
+			double d = strtod( in.state.data.str->c_str(), NULL );
+			*reinterpret_cast<double*>( state.data.ptr ) = d;
+		}
+		else
+			THROW_NO_CONVERSION( in.state, state, );
+		break;
+
+	case TK_ENUM:
+		{
+			IEnum* enumType = static_cast<IEnum*>( state.type );
+			if( isScalar( inK ) )
+			{
+				uint32 id;
+				castTo<uint32>( inK, &in.state.data, &id );
+				if( id >= enumType->getIdentifiers().getSize() )
+					THROW_NO_CONVERSION( in.state, state, << ": " << id
+									<< " is out of range for the enum" );
+				*reinterpret_cast<uint32*>( state.data.ptr ) = id;
+			}
+			else if( inK == TK_STRING )
+			{
+				const std::string& str = *in.state.data.str;
+				int32 id = enumType->getValueOf( str );
+				if( id == -1 )
+					THROW_NO_CONVERSION( in.state, state,
+						<< ": no such identifier '" << str << "' in the enum" );
+				*reinterpret_cast<uint32*>( state.data.ptr ) = id;
+			}
+			else
+				THROW_NO_CONVERSION( in.state, state, );
+		}
 		break;
 
 	case TK_STRING:
-		*state.data.str = in.get<const std::string&>();
+		if( inK == TK_STRING )
+			*state.data.str = *in.state.data.str;
+		else
+		{
+			std::stringstream ss;
+			streamOut( ss, in );
+			*state.data.str = ss.str();
+		}
+		break;
+
+	case TK_ANY:
+		*reinterpret_cast<AnyValue*>( state.data.ptr ) = in;
 		break;
 
 	case TK_ARRAY:
@@ -297,7 +419,7 @@ void Any::put( const Any& value ) const
 			break;
 
 		if( in.getKind() != TK_ARRAY )
-			THROW_ILLEGAL_CAST( in.state, state, );
+			THROW_NO_CONVERSION( in.state, state, );
 
 		// are both arrays of the same exact type?
 		if( getType() == in.getType() )
@@ -315,36 +437,10 @@ void Any::put( const Any& value ) const
 		}
 		break;
 
-	case TK_ENUM:
-		{
-			TypeKind vK = in.getKind();
-			IEnum* enumType = static_cast<IEnum*>( state.type );
-			if( isScalar( vK ) )
-			{
-				uint32 id = in.get<uint32>();
-				if( id >= enumType->getIdentifiers().getSize() )
-					THROW_ILLEGAL_CAST( in.state, state, << ": " << id
-									   << " is out of range for the enum" );
-				*reinterpret_cast<uint32*>( state.data.ptr ) = id;
-			}
-			else if( vK == TK_STRING )
-			{
-				const std::string& str = *in.state.data.str;
-				int32 id = enumType->getValueOf( str );
-				if( id == -1 )
-					THROW_ILLEGAL_CAST( in.state, state,
-						<< ": no such identifier '" << str << "' in the enum" );
-				*reinterpret_cast<uint32*>( state.data.ptr ) = id;
-			}
-			else
-				THROW_ILLEGAL_CAST( in.state, state, );
-		}
-		break;
-
 	case TK_STRUCT:
 	case TK_NATIVECLASS:
 		if( in.getType() != getType() )
-			THROW_ILLEGAL_CAST( in.state, state, );
+			THROW_NO_CONVERSION( in.state, state, );
 		getType()->getReflector()->copyValues( in.state.data.ptr, state.data.ptr, 1 );
 		break;
 
@@ -356,7 +452,7 @@ void Any::put( const Any& value ) const
 				if( in.getType()->isA( state.type ) )
 					service = in.get<IService*>();
 				else
-					THROW_ILLEGAL_CAST( in.state, state, );
+					THROW_NO_CONVERSION( in.state, state, );
 			}
 			*reinterpret_cast<RefPtr<IService>*>( state.data.ptr ) = service;
 		}
@@ -459,18 +555,18 @@ bool Any::operator==( const Any& other ) const
 
 		switch( k )
 		{
-		case TK_BOOL:	return state.data.b == other.state.data.b;
-		case TK_INT8:
-		case TK_UINT8:	return state.data.u8 == other.state.data.u8;
-		case TK_INT16:
-		case TK_UINT16:	return state.data.u16 == other.state.data.u16;
-		case TK_INT32:
-		case TK_UINT32:	return state.data.u32 == other.state.data.u32;
-		case TK_INT64:
-		case TK_UINT64:	return state.data.u64 == other.state.data.u64;
-		case TK_FLOAT:	return state.data.f == other.state.data.f;
-		case TK_DOUBLE:	return state.data.d == other.state.data.d;
-		case TK_ENUM:	return state.data.u32 == other.state.data.u32;
+		case TK_BOOL:	return isEqual<bool>( &state.data, &other.state.data );
+		case TK_INT8:	return isEqual<int8>( &state.data, &other.state.data );
+		case TK_INT16:	return isEqual<int16>( &state.data, &other.state.data );
+		case TK_INT32:	return isEqual<int32>( &state.data, &other.state.data );
+		case TK_INT64:	return isEqual<int64>( &state.data, &other.state.data );
+		case TK_UINT8:	return isEqual<uint8>( &state.data, &other.state.data );
+		case TK_UINT16:	return isEqual<uint16>( &state.data, &other.state.data );
+		case TK_UINT32:	return isEqual<uint32>( &state.data, &other.state.data );
+		case TK_UINT64:	return isEqual<uint64>( &state.data, &other.state.data );
+		case TK_FLOAT:	return isEqual<float>( &state.data, &other.state.data );
+		case TK_DOUBLE:	return isEqual<double>( &state.data, &other.state.data );
+		case TK_ENUM:	return isEqual<uint32>( &state.data, &other.state.data );
 		default:
 			assert( !isScalar( k ) );
 		}
@@ -479,138 +575,63 @@ bool Any::operator==( const Any& other ) const
 	return state.data.ptr == other.state.data.ptr;
 }
 
-void Any::cast( __any::State& to ) const
+void Any::cast( Any& to ) const
 {
-	assert( state.type && to.type );
+	TypeKind myK = getKind();
+	TypeKind toK = to.getKind();
 
-	TypeKind k = state.type->getKind();
-	TypeKind toK = to.type->getKind();
-
-	// if this contains an 'out any' we may have to dereference it
-	if( k == TK_ANY )
+	// if this contains a co::AnyValue we may have to dereference it
+	if( myK == TK_ANY && toK != TK_ANY )
 	{
-		assert( state.isIn == false );
-		if( toK != TK_ANY )
-		{
-			reinterpret_cast<AnyValue*>( state.data.ptr )->getAny().cast( to );
-			return;
-		}
+		assert( isOut() );
+		reinterpret_cast<AnyValue*>( state.data.ptr )->getAny().cast( to );
+		return;
 	}
 
 	// are we casting to an 'in' or 'out' variable?
-	if( !to.isIn )
+	if( to.isOut() )
 	{
 		// casting to an 'out' variable: both types must match
-		if( state.isIn == false )
+		if( isOut() )
 		{
-			if( typesMatch( k, toK, state.type, to.type ) )
+			if( typesMatch( myK, toK, state.type, to.state.type ) )
 			{
-				to.data.ptr = state.data.ptr;
+				to.state.data.ptr = state.data.ptr;
 				return;
 			}
 		}
 	}
-	else if( !state.isIn ) // casting from an 'out' to an 'in' variable
+	else if( isOut() ) // casting from an 'out' to an 'in' variable
 	{
 		// we must extract an 'in' var from the 'out' var to carry on the cast
 		return asIn().cast( to );
 	}
-	else // casting from an 'in' to an 'in' variable: conversions are possible
+	else // casting from an 'in' to an 'in' variable
 	{
-		if( k == TK_ARRAY )
+		if( myK == TK_ARRAY )
 		{
-			// check if both array element types match
 			if( toK == TK_ARRAY )
 			{
-				IType* fromET = static_cast<IArray*>( state.type )->getElementType();
-				IType* toET = static_cast<IArray*>( to.type )->getElementType();
-				if( typesMatch( fromET->getKind(), toET->getKind(), fromET, toET ) )
+				// check if both array element types match
+				IType* myET = static_cast<IArray*>( state.type )->getElementType();
+				IType* toET = static_cast<IArray*>( to.state.type )->getElementType();
+				if( typesMatch( myET->getKind(), toET->getKind(), myET, toET ) )
 				{
-					to.size = state.size;
-					to.data = state.data;
+					to.state.size = state.size;
+					to.state.data = state.data;
 					return;
 				}
 			}
 		}
-		else if( typesMatch( k, toK, state.type, to.type ) )
+		else if( typesMatch( myK, toK, state.type, to.state.type ) )
 		{
-			// value types match, no conversion necessary
-			to.data = state.data;
+			to.state.data = state.data;
 			return;
-		}
-		else // check for possible conversions
-		{
-			if( toK == TK_INTERFACE ) // converting to an interface
-			{
-				// null to interface conversion
-				if( k == TK_NULL )
-				{
-					to.data.ptr = NULL;
-					return;
-				}
-			}
-			else if( isScalar( toK ) ) // converting to a scalar
-			{
-				if( isScalar( k ) ) // from a scalar
-				{
-					// scalar to scalar conversions
-					castScalar( k, &state.data, toK, &to.data );
-
-					// range check enums
-					if( toK == TK_ENUM )
-					{
-						IEnum* enumType = static_cast<IEnum*>( to.type );
-						if( to.data.u32 >= enumType->getIdentifiers().getSize() )
-							THROW_ILLEGAL_CAST( state, to, << ": " << to.data.u32
-											<< " is out of range for the enum" );
-					}
-
-					return;
-				}
-				else if( k == TK_STRING ) // from a string
-				{
-					const std::string& str = *reinterpret_cast<std::string*>( state.data.ptr );
-					if( toK == TK_ENUM )
-					{
-						// string to enum conversion
-						int32 value = static_cast<IEnum*>( to.type )->getValueOf( str );
-						if( value == -1 )
-							THROW_ILLEGAL_CAST( state, to, << ": no such identifier '"
-											<< str << "' in the enum" );
-						to.data.u32 = value;
-					}
-					else if( co::isInteger( toK ) )
-					{
-						// string to integer conversion
-						if( isSignedInteger( toK ) )
-						{
-							long v = strtol( str.c_str(), NULL, 0 );
-							castScalar<long>( &v, toK, &to.data );
-						}
-						else
-						{
-							unsigned long v = strtoul( str.c_str(), NULL, 0 );
-							castScalar<unsigned long>( &v, toK, &to.data );
-						}
-					}
-					else
-					{
-						// string to double conversion
-						double d = strtod( str.c_str(), NULL );
-						if( toK == TK_DOUBLE )
-							to.data.d = d;
-						else if( toK == TK_FLOAT )
-							to.data.f = static_cast<float>( d );
-						else
-							assert( false );
-					}
-					return;
-				}
-			}
 		}
 	}
 
-	THROW_ILLEGAL_CAST( state, to, );
+	CORAL_THROW( IllegalCastException, "illegal cast from '" << state
+					<< "' to '" << to.state << "'" );
 }
 
 /****************************************************************************/
@@ -687,3 +708,23 @@ void AnyValue::copy( const Any& any )
 }
 
 } // namespace co
+
+/****************************************************************************/
+/* Global iostream Insertion Operators                                      */
+/****************************************************************************/
+
+std::ostream& operator<<( std::ostream& os, const co::__any::State& s )
+{
+	assert( s.type );
+	if( s.type->getKind() != co::TK_NULL )
+		os << ( s.isIn ? "in " : "out " );
+	return os << s.type->getFullName();
+}
+
+std::ostream& operator<<( std::ostream& os, const co::Any& a )
+{
+	os << a.state << ": ";
+	co::Any in = a.asIn();
+	streamOut( os, in );
+	return os;
+}
