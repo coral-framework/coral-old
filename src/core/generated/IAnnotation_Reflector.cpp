@@ -90,7 +90,7 @@ public:
 		return new co::IAnnotation_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::checkInstance<co::IAnnotation>( instance, field );
 		raiseUnexpectedMemberIndex();
@@ -104,7 +104,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
 	{
 		co::checkInstance<co::IAnnotation>( instance, method );
 		raiseUnexpectedMemberIndex();

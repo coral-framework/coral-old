@@ -5,9 +5,9 @@
 
 #include <co/ITypeBuilder.h>
 #include <co/IDynamicServiceProvider.h>
+#include <co/IInterface.h>
 #include <co/IType.h>
 #include <co/INamespace.h>
-#include <co/IInterface.h>
 #include <co/IMethodBuilder.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
@@ -47,27 +47,31 @@ public:
 
 	co::TypeKind getKind()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 0 ) );
-        return res.get< co::TypeKind >();
+		co::TypeKind res;
+		_provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 0 ), res );
+		return res;
 	}
 
 	co::INamespace* getNamespace()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 1 ) );
-        return res.get< co::INamespace* >();
+		co::RefPtr<co::INamespace> res;
+		_provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 1 ), res );
+		return res.get();
 	}
 
 	std::string getTypeName()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 2 ) );
-        return res.get< const std::string& >();
+		std::string res;
+		_provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 2 ), res );
+		return res;
 	}
 
 	co::IType* createType()
 	{
 		co::Range<co::Any> range;
-		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 0 ), range );
-		return res.get< co::IType* >();
+		co::RefPtr<co::IType> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 0 ), range, res );
+		return res.get();
 	}
 
 	void defineBaseType( co::IType* baseType_ )
@@ -76,7 +80,7 @@ public:
 			baseType_
 		};
 		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 1 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 1 ), range, co::Any() );
 	}
 
 	void defineField( const std::string& name_, co::IType* type_, bool isReadOnly_ )
@@ -87,7 +91,7 @@ public:
 			isReadOnly_
 		};
 		co::Range<co::Any> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 2 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 2 ), range, co::Any() );
 	}
 
 	void defineIdentifier( const std::string& name_ )
@@ -96,7 +100,7 @@ public:
 			name_
 		};
 		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 3 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 3 ), range, co::Any() );
 	}
 
 	co::IMethodBuilder* defineMethod( const std::string& name_ )
@@ -105,8 +109,9 @@ public:
 			name_
 		};
 		co::Range<co::Any> range( args, 1 );
-		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 4 ), range );
-		return res.get< co::IMethodBuilder* >();
+		co::RefPtr<co::IMethodBuilder> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 4 ), range, res );
+		return res.get();
 	}
 
 	void definePort( const std::string& name_, co::IInterface* type_, bool isFacet_ )
@@ -117,7 +122,7 @@ public:
 			isFacet_
 		};
 		co::Range<co::Any> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 5 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 5 ), range, co::Any() );
 	}
 
 protected:
@@ -169,14 +174,14 @@ public:
 		return new co::ITypeBuilder_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::ITypeBuilder* p = co::checkInstance<co::ITypeBuilder>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value = p->getKind(); break;
-		case 1:		value = p->getNamespace(); break;
-		case 2:		value = p->getTypeName(); break;
+		case 0:		value.put( p->getKind() ); break;
+		case 1:		value.put( p->getNamespace() ); break;
+		case 2:		value.put( p->getTypeName() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -195,7 +200,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
 	{
 		co::ITypeBuilder* p = co::checkInstance<co::ITypeBuilder>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -206,7 +211,7 @@ public:
 			{
 			case 3:
 				{
-					res = p->createType();
+					res.put( p->createType() );
 				}
 				break;
 			case 4:
@@ -236,7 +241,7 @@ public:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res = p->defineMethod( name_ );
+					res.put( p->defineMethod( name_ ) );
 				}
 				break;
 			case 8:

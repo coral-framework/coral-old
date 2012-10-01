@@ -56,14 +56,14 @@ public:
 			callDestructor( reinterpret_cast<co::CSLError*>( ptr ) + i );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::CSLError* p = co::checkInstance<co::CSLError>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value = p->filename; break;
-		case 1:		value = p->line; break;
-		case 2:		value = p->message; break;
+		case 0:		value.put( p->filename ); break;
+		case 1:		value.put( p->line ); break;
+		case 2:		value.put( p->message ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}

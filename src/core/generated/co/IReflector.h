@@ -62,9 +62,9 @@ public:
 
 	virtual co::IType* getType() = 0;
 
-	virtual void getField( co::Any instance, co::IField* field, co::AnyValue& value ) = 0;
+	virtual void getField( co::Any instance, co::IField* field, co::Any value ) = 0;
 
-	virtual void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& returnValue ) = 0;
+	virtual void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any returnValue ) = 0;
 
 	virtual co::IService* newDynamicProxy( co::IDynamicServiceProvider* dynamicProvider ) = 0;
 

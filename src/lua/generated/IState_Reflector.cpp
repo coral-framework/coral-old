@@ -48,8 +48,9 @@ public:
 
 	co::Range<lua::IInterceptor*> getInterceptors()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<lua::IState>( 0 ) );
-        return res.get< co::Range<lua::IInterceptor*> >();
+		co::RefVector<lua::IInterceptor> res;
+		_provider->dynamicGetField( _cookie, getField<lua::IState>( 0 ), res );
+		return res;
 	}
 
 	void addInterceptor( lua::IInterceptor* interceptor_ )
@@ -58,7 +59,7 @@ public:
 			interceptor_
 		};
 		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 0 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 0 ), range, co::Any() );
 	}
 
 	co::int32 call( const std::string& moduleName_, const std::string& functionName_, co::Range<co::Any> args_, co::Range<co::Any> results_ )
@@ -70,14 +71,15 @@ public:
 			results_
 		};
 		co::Range<co::Any> range( args, 4 );
-		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 1 ), range );
-		return res.get< co::int32 >();
+		co::int32 res;
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 1 ), range, res );
+		return res;
 	}
 
 	void collectGarbage()
 	{
 		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 2 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 2 ), range, co::Any() );
 	}
 
 	bool findScript( const std::string& name_, std::string& filename_ )
@@ -87,8 +89,9 @@ public:
 			filename_
 		};
 		co::Range<co::Any> range( args, 2 );
-		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 3 ), range );
-		return res.get< bool >();
+		bool res;
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 3 ), range, res );
+		return res;
 	}
 
 	void removeInterceptor( lua::IInterceptor* interceptor_ )
@@ -97,7 +100,7 @@ public:
 			interceptor_
 		};
 		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 4 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 4 ), range, co::Any() );
 	}
 
 protected:
@@ -149,12 +152,12 @@ public:
 		return new lua::IState_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		lua::IState* p = co::checkInstance<lua::IState>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value = p->getInterceptors(); break;
+		case 0:		value.put( p->getInterceptors() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -171,7 +174,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
 	{
 		lua::IState* p = co::checkInstance<lua::IState>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -194,7 +197,7 @@ public:
 					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
 					co::Range<co::Any> results_ = args[++argIndex].get< co::Range<co::Any> >();
 					argIndex = -1;
-					res = p->call( moduleName_, functionName_, args_, results_ );
+					res.put( p->call( moduleName_, functionName_, args_, results_ ) );
 				}
 				break;
 			case 3:
@@ -207,7 +210,7 @@ public:
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					std::string& filename_ = args[++argIndex].get< std::string& >();
 					argIndex = -1;
-					res = p->findScript( name_, filename_ );
+					res.put( p->findScript( name_, filename_ ) );
 				}
 				break;
 			case 5:

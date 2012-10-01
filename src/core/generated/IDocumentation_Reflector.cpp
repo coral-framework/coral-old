@@ -45,14 +45,14 @@ public:
 
 	std::string getValue()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IDocumentation>( 0 ) );
-        return res.get< const std::string& >();
+		std::string res;
+		_provider->dynamicGetField( _cookie, getField<co::IDocumentation>( 0 ), res );
+		return res;
 	}
 
 	void setValue( const std::string& value_ )
 	{
-		co::Any arg( value_ );
-		_provider->dynamicSetField( _cookie, getField<co::IDocumentation>( 0 ), arg );
+		_provider->dynamicSetField( _cookie, getField<co::IDocumentation>( 0 ), value_ );
 	}
 
 	void addDocFor( const std::string& element_, const std::string& text_ )
@@ -62,7 +62,7 @@ public:
 			text_
 		};
 		co::Range<co::Any> range( args, 2 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 0 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 0 ), range, co::Any() );
 	}
 
 	std::string getDocFor( const std::string& element_ )
@@ -71,8 +71,9 @@ public:
 			element_
 		};
 		co::Range<co::Any> range( args, 1 );
-		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 1 ), range );
-		return res.get< const std::string& >();
+		std::string res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 1 ), range, res );
+		return res;
 	}
 
 protected:
@@ -124,12 +125,12 @@ public:
 		return new co::IDocumentation_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::IDocumentation* p = co::checkInstance<co::IDocumentation>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value = p->getValue(); break;
+		case 0:		value.put( p->getValue() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -146,7 +147,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
 	{
 		co::IDocumentation* p = co::checkInstance<co::IDocumentation>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -167,7 +168,7 @@ public:
 				{
 					const std::string& element_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res = p->getDocFor( element_ );
+					res.put( p->getDocFor( element_ ) );
 				}
 				break;
 			default:

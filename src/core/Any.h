@@ -79,7 +79,7 @@ struct State
 template<typename T>
 struct Ref
 {
-	inline static void set( State& s, T& v ) { s.data.cptr = &v; }
+	inline static void set( State& s, const T& v ) { s.data.cptr = &v; }
 	inline static T& get( State& s ) { return *reinterpret_cast<T*>( s.data.ptr ); }
 };
 
@@ -90,10 +90,9 @@ struct Value
 	inline static const T& get( State& s ) { return *reinterpret_cast<T*>( &s.data ); }
 };
 
-template<typename T> struct Value<T, TK_ANY> : public Ref<const AnyValue> {};
-template<typename T> struct Value<T, TK_STRING> : public Ref<const T> {};
-template<typename T> struct Value<T, TK_STRUCT> : public Ref<const T> {};
-template<typename T> struct Value<T, TK_NATIVECLASS> : public Ref<const T> {};
+template<typename T> struct Value<T, TK_STRING> : public Ref<T> {};
+template<typename T> struct Value<T, TK_STRUCT> : public Ref<T> {};
+template<typename T> struct Value<T, TK_NATIVECLASS> : public Ref<T> {};
 
 template<typename T, bool isIn>
 struct Tag
@@ -129,6 +128,9 @@ struct Variable<const T&> : public Tag<T, true>
 	inline static void set( State& s, const T& v ) { ValueHelper::set( s, v ); }
 	inline static const T& get( State& s ) { return ValueHelper::get( s ); }
 };
+
+template<> struct Variable<const AnyValue&> : public Tag<AnyValue, false>, public Ref<AnyValue> {};
+template<> struct Variable<AnyValue&> : public Variable<const AnyValue&> {};
 
 template<typename T>
 struct IllegalRecursiveAny
@@ -445,7 +447,7 @@ public:
 		\throw IllegalCastException if \a value cannot be converted to
 					the output variable's type.
 	 */
-	void put( const Any& value ) const;
+	void put( Any value ) const;
 
 	//! Swaps the contents of two co::Any's.
 	inline void swap( Any& other )
@@ -537,15 +539,9 @@ public:
 	//! Default constructor.
 	AnyValue() {;}
 
-	template<typename T>
-	inline AnyValue( const T& var )
+	inline AnyValue( Any var )
 	{
-		copy( Any( var ) );
-	}
-
-	inline AnyValue( const Any& other )
-	{
-		copy( other );
+		copy( var );
 	}
 
 	//! Copy constructor.
@@ -583,8 +579,7 @@ public:
 	 */
 	void clear();
 
-	template<typename T>
-	inline void set( const T& var ) { copy( Any( var ) ); }
+	inline void set( Any var ) { copy( var ); }
 
 	/*!
 		Creates a default-constructed instance of the given \a type.
@@ -632,15 +627,14 @@ public:
 		return *this;
 	}
 
-	template<typename T>
-	inline AnyValue& operator=( const T& var )
+	inline AnyValue& operator=( Any var )
 	{
-		set<T>( var );
+		copy( var );
 		return *this;
 	}
 
 private:
-	void copy( const Any& any );
+	void copy( Any var );
 
 private:
 	Any _any;
@@ -652,14 +646,6 @@ template<> struct kindOf<AnyValue> { static const TypeKind kind = TK_ANY; };
 inline void swap( Any& a, Any& b ) { a.swap( b ); }
 inline void swap( AnyValue& a, AnyValue& b ) { a.swap( b ); }
 #endif // DOXYGEN
-
-// Automatically convert Range<AnyValue>'s to Range<Any>'s
-template<> struct RangeAdaptor<Any, const Range<AnyValue> >
-{
-	static const bool isValid = true;
-	static const Any* getData( const Range<AnyValue>& r ) { return reinterpret_cast<const Any*>( r.getStart() ); }
-	static size_t getSize( const Range<AnyValue>& r ) { return r.getSize(); }
-};
 
 } // namespace co
 

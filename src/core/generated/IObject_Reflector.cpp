@@ -45,8 +45,9 @@ public:
 
 	co::IComponent* getComponent()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IObject>( 0 ) );
-        return res.get< co::IComponent* >();
+		co::RefPtr<co::IComponent> res;
+		_provider->dynamicGetField( _cookie, getField<co::IObject>( 0 ), res );
+		return res.get();
 	}
 
 	co::IService* getServiceAt( co::IPort* port_ )
@@ -55,8 +56,9 @@ public:
 			port_
 		};
 		co::Range<co::Any> range( args, 1 );
-		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 0 ), range );
-		return res.get< co::IService* >();
+		co::RefPtr<co::IService> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 0 ), range, res );
+		return res.get();
 	}
 
 	void setServiceAt( co::IPort* receptacle_, co::IService* service_ )
@@ -66,7 +68,7 @@ public:
 			service_
 		};
 		co::Range<co::Any> range( args, 2 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 1 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 1 ), range, co::Any() );
 	}
 
 protected:
@@ -118,12 +120,12 @@ public:
 		return new co::IObject_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::IObject* p = co::checkInstance<co::IObject>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value = p->getComponent(); break;
+		case 0:		value.put( p->getComponent() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -140,7 +142,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
 	{
 		co::IObject* p = co::checkInstance<co::IObject>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -153,7 +155,7 @@ public:
 				{
 					co::IPort* port_ = args[++argIndex].get< co::IPort* >();
 					argIndex = -1;
-					res = p->getServiceAt( port_ );
+					res.put( p->getServiceAt( port_ ) );
 				}
 				break;
 			case 2:

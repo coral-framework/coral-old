@@ -5,9 +5,9 @@
 
 #include <co/IService.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IPort.h>
 #include <co/IInterface.h>
 #include <co/IObject.h>
+#include <co/IPort.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -91,14 +91,14 @@ public:
 		return new co::IService_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::IService* p = co::checkInstance<co::IService>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value = p->getFacet(); break;
-		case 1:		value = p->getInterface(); break;
-		case 2:		value = p->getProvider(); break;
+		case 0:		value.put( p->getFacet() ); break;
+		case 1:		value.put( p->getInterface() ); break;
+		case 2:		value.put( p->getProvider() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -117,7 +117,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
 	{
 		co::IService* p = co::checkInstance<co::IService>( instance, method );
 		checkNumArguments( method, args.getSize() );

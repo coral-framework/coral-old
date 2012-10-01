@@ -169,10 +169,8 @@ void LuaComponent::getMethod( lua_State* L, int t, co::int32 cookie )
 	assert( lua_isfunction( L, -1 ) );
 }
 
-co::AnyValue LuaComponent::dynamicGetField( co::int32 cookie, co::IField* ai )
+void LuaComponent::dynamicGetField( co::int32 cookie, co::IField* ai, co::Any var )
 {
-	co::AnyValue value;
-
 	__BEGIN_LUA_API_CODE__
 
 	pushFacetTable( L, cookie );
@@ -180,14 +178,12 @@ co::AnyValue LuaComponent::dynamicGetField( co::int32 cookie, co::IField* ai )
 	getMethod( L, -2, cookie );
 	lua_pushvalue( L, -3 ); // push the 'self' argument
 	LuaState::call( L, 1, 1 );
-	LuaState::get( L, -1, value );
+	LuaState::get( L, -1, var );
 
 	__END_LUA_API_CODE__
-
-	return value;
 }
 
-void LuaComponent::dynamicSetField( co::int32 cookie, co::IField* ai, co::Any value )
+void LuaComponent::dynamicSetField( co::int32 cookie, co::IField* ai, co::Any var )
 {
 	__BEGIN_LUA_API_CODE__
 
@@ -195,16 +191,14 @@ void LuaComponent::dynamicSetField( co::int32 cookie, co::IField* ai, co::Any va
 	pushAccessorName( L, "set", ai->getName() );
 	getMethod( L, -2, cookie );
 	lua_pushvalue( L, -3 ); // push the 'self' argument
-	LuaState::push( L, value );
+	LuaState::push( L, var );
 	LuaState::call( L, 2, 0 );
 
 	__END_LUA_API_CODE__
 }
 
-co::AnyValue LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<co::Any> args )
+void LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<co::Any> args, co::Any res )
 {
-	co::AnyValue res;
-
 	__BEGIN_LUA_API_CODE__
 
 	pushFacetTable( L, cookie );
@@ -269,8 +263,6 @@ co::AnyValue LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi, co:
 	}
 
 	__END_LUA_API_CODE__
-
-	return res;
 }
 
 co::uint32 LuaComponent::getSize()
@@ -328,7 +320,7 @@ co::IService* LuaComponent::newDynamicProxy( co::IDynamicServiceProvider* )
 	return NULL;
 }
 
-void LuaComponent::getField( co::Any, co::IField*, co::AnyValue& )
+void LuaComponent::getField( co::Any, co::IField*, co::Any )
 {
 	raiseNotSupportedException();
 }
@@ -338,7 +330,7 @@ void LuaComponent::setField( co::Any, co::IField*, co::Any )
 	raiseNotSupportedException();
 }
 
-void LuaComponent::invoke( co::Any, co::IMethod*, co::Range<co::Any>, co::AnyValue& )
+void LuaComponent::invoke( co::Any, co::IMethod*, co::Range<co::Any>, co::Any )
 {
 	raiseNotSupportedException();
 }

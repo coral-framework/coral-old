@@ -54,21 +54,21 @@ public:
 			type_
 		};
 		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicTypeProvider>( 0 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicTypeProvider>( 0 ), range, co::Any() );
 	}
 
 	// lua.IScripted Methods:
 
 	std::string getValue()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<lua::IScripted>( 0 ) );
-        return res.get< const std::string& >();
+		std::string res;
+		_provider->dynamicGetField( _cookie, getField<lua::IScripted>( 0 ), res );
+		return res;
 	}
 
 	void setValue( const std::string& value_ )
 	{
-		co::Any arg( value_ );
-		_provider->dynamicSetField( _cookie, getField<lua::IScripted>( 0 ), arg );
+		_provider->dynamicSetField( _cookie, getField<lua::IScripted>( 0 ), value_ );
 	}
 
 protected:
@@ -120,12 +120,12 @@ public:
 		return new lua::IScripted_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		lua::IScripted* p = co::checkInstance<lua::IScripted>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value = p->getValue(); break;
+		case 0:		value.put( p->getValue() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -142,7 +142,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
 	{
 		co::checkInstance<lua::IScripted>( instance, method );
 		raiseUnexpectedMemberIndex();

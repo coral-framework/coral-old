@@ -5,9 +5,9 @@
 
 #include <co/IMethodBuilder.h>
 #include <co/IDynamicServiceProvider.h>
+#include <co/IException.h>
 #include <co/IType.h>
 #include <co/ITypeBuilder.h>
-#include <co/IException.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -46,20 +46,22 @@ public:
 
 	std::string getMethodName()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IMethodBuilder>( 0 ) );
-        return res.get< const std::string& >();
+		std::string res;
+		_provider->dynamicGetField( _cookie, getField<co::IMethodBuilder>( 0 ), res );
+		return res;
 	}
 
 	co::ITypeBuilder* getTypeBuilder()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IMethodBuilder>( 1 ) );
-        return res.get< co::ITypeBuilder* >();
+		co::RefPtr<co::ITypeBuilder> res;
+		_provider->dynamicGetField( _cookie, getField<co::IMethodBuilder>( 1 ), res );
+		return res.get();
 	}
 
 	void createMethod()
 	{
 		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 0 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 0 ), range, co::Any() );
 	}
 
 	void defineException( co::IException* exceptionType_ )
@@ -68,7 +70,7 @@ public:
 			exceptionType_
 		};
 		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 1 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 1 ), range, co::Any() );
 	}
 
 	void defineParameter( const std::string& name_, co::IType* type_, bool input_, bool output_ )
@@ -80,7 +82,7 @@ public:
 			output_
 		};
 		co::Range<co::Any> range( args, 4 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 2 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 2 ), range, co::Any() );
 	}
 
 	void defineReturnType( co::IType* type_ )
@@ -89,7 +91,7 @@ public:
 			type_
 		};
 		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 3 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 3 ), range, co::Any() );
 	}
 
 protected:
@@ -141,13 +143,13 @@ public:
 		return new co::IMethodBuilder_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::IMethodBuilder* p = co::checkInstance<co::IMethodBuilder>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value = p->getMethodName(); break;
-		case 1:		value = p->getTypeBuilder(); break;
+		case 0:		value.put( p->getMethodName() ); break;
+		case 1:		value.put( p->getTypeBuilder() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -165,7 +167,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
 	{
 		co::IMethodBuilder* p = co::checkInstance<co::IMethodBuilder>( instance, method );
 		checkNumArguments( method, args.getSize() );

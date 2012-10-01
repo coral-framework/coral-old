@@ -295,15 +295,16 @@ void Any::set( bool isIn, IType* type, const void* addr, size_t size )
 	}
 }
 
-void Any::put( const Any& value ) const
+void Any::put( Any in ) const
 {
 	TypeKind myK = getKind();
 	if( myK == TK_NULL || !isOut() )
 		CORAL_THROW( IllegalStateException,
 			"cannot write to a '" << state << "' variable" );
 
-	Any in = value.asIn();
+	in = in.asIn();
 	TypeKind inK = in.getKind();
+	assert( inK != TK_ANY );
 
 	switch( myK )
 	{
@@ -693,17 +694,17 @@ void AnyValue::convert( IType* type )
 	swap( temp );
 }
 
-void AnyValue::copy( const Any& any )
+void AnyValue::copy( Any var )
 {
-	Any in = any.asIn();
-	if( in.isNull() )
+	var = var.asIn();
+	if( var.isNull() )
 	{
 		clear();
 	}
 	else
 	{
-		create( in.getType() );
-		_any.put( in );
+		create( var.getType() );
+		_any.put( var );
 	}
 }
 

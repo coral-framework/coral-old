@@ -61,17 +61,17 @@ public:
 
 	//! Pushes any Coral value onto the Lua stack.
 	//@{
-	static void push( lua_State* L, const co::Any& var );
+	static void push( lua_State* L, co::Any var );
 	static void push( lua_State* L, const std::string& str );
 	static void push( lua_State* L, co::IService* itf );
 	static void push( lua_State* L, co::IObject* object );
 	//@}
 
 	/*!
-		Retrieves the value at \a index in the Lua stack.
+		Puts the value at \a index in the Lua stack into \a var.
 		\throw lua::Exception if the value cannot be converted to a Coral value.
 	 */
-	static void get( lua_State* L, int index, co::AnyValue& value );
+	static void get( lua_State* L, int index, co::Any var );
 
 public:
     LuaState();
@@ -94,8 +94,8 @@ private:
 
 	static void pushInstancesTable( lua_State* L );
 
-	static void pushArray( lua_State* L, const co::Any& var );
-	static void toArray( lua_State* L, int index, co::AnyValue& value );
+	static void pushArray( lua_State* L, co::Any var );
+	static void getArray( lua_State* L, int index, co::Any array );
 	
 	static co::int32 getEnumIdentifier( lua_State* L, int index, co::IEnum* enumType );
 

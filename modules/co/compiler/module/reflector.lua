@@ -106,18 +106,20 @@ public:
 			-- Field Accessors
 			for i, a in ipairs( itf.fields ) do
 				local at = a.type
+				local resultType =
 				writer( "\t", itf.formatResult( at ), " ", itf.formatAccessor( "get", a.name ), "()\n", [[
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<]], itf.cppName, [[>( ]], i - 1, [[ ) );
-        return res]], t.formatAnyGet( a.type ), [[;
+		]], itf.formatField( at ), [[ res;
+		_provider->dynamicGetField( _cookie, getField<]], itf.cppName, [[>( ]], i - 1, [[ ), res );
+		return res]], at.kind == 'TK_INTERFACE' and ".get()" or "",[[;
 	}
 
 ]] )
 				if not a.isReadOnly then
 					writer( "\tvoid ", itf.formatAccessor( "set", a.name ), "( ", itf.formatInput( a.type ), " ", a.name, "_ )\n", [[
 	{
-		co::Any arg( ]], a.name, [[_ );
-		_provider->dynamicSetField( _cookie, getField<]], itf.cppName, [[>( ]], i - 1, [[ ), arg );
+		_provider->dynamicSetField( _cookie, getField<]],
+			itf.cppName, [[>( ]], i - 1, [[ ), ]], a.name, [[_ );
 	}
 
 ]] )
@@ -126,7 +128,8 @@ public:
 
 			-- Methods
 			for i, m in ipairs( itf.methods ) do
-				writer( "\t", itf.formatResult( m.returnType ), " ", m.name, "(" )
+				local rt = m.returnType
+				writer( "\t", itf.formatResult( rt ), " ", m.name, "(" )
 				local params = m.parameters
 				if #params > 0 then
 					writer( " " )
@@ -148,12 +151,12 @@ public:
 					writer( "\t\tco::Range<co::Any> range;\n" )
 				end
 				writer( "\t\t" )
-				if m.returnType then
-					writer( "co::AnyValue res = " )
+				if rt then
+					writer( itf.formatField( rt ), " res;\n\t\t" )
 				end
-				writer( "_provider->dynamicInvoke( _cookie, getMethod<", itf.cppName, ">( ", i - 1, " ), range );\n" )
-				if m.returnType then
-					writer( "\t\treturn res", t.formatAnyGet( m.returnType ), ";\n" )
+				writer( "_provider->dynamicInvoke( _cookie, getMethod<", itf.cppName, ">( ", i - 1, " ), range, ", rt and "res" or "co::Any()", " );\n" )
+				if rt then
+					writer( "\t\treturn res", rt.kind == 'TK_INTERFACE' and ".get()" or "", ";\n" )
 				end
 				writer( "\t}\n\n" )
 			end
@@ -306,14 +309,14 @@ public:
 
 		writer( [[
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		]], t.cppName, [[* p = co::checkInstance<]], t.cppName, [[>( instance, field );
 		switch( field->getIndex() )
 		{
 ]] )
 		for i, a in ipairs( t.fields ) do
-			writer( "\t\tcase ", a.index, ":\t\tvalue = p->", a.name, "; break;\n" )
+			writer( "\t\tcase ", a.index, ":\t\tvalue.put( p->", a.name, " ); break;\n" )
 		end
 
 		writer( [[
@@ -346,7 +349,7 @@ public:
 
 		local callPrefix = ( t.kind == 'TK_NATIVECLASS' and t.cppName .. "_Adapter::" or "p->" )
 
-		writer( "\n\tvoid getField( co::Any instance, co::IField* field, co::AnyValue& value )\n\t{\n" )
+		writer( "\n\tvoid getField( co::Any instance, co::IField* field, co::Any value )\n\t{\n" )
 
 		if #t.fields > 0 then
 			writer( "\t\t", t.cppName, [[* p = co::checkInstance<]], t.cppName, [[>( instance, field );
@@ -354,8 +357,8 @@ public:
 		{
 ]] )
 			for i, a in ipairs( t.fields ) do
-				writer( "\t\tcase ", a.index, ":\t\tvalue = ", callPrefix,
-					t.formatAccessor( "get", a.name ), "(", ( t.kind == 'TK_NATIVECLASS' and " *p " or "" ), "); break;\n" )
+				writer( "\t\tcase ", a.index, ":\t\tvalue.put( ", callPrefix,
+					t.formatAccessor( "get", a.name ), "(", ( t.kind == 'TK_NATIVECLASS' and " *p " or "" ), ") ); break;\n" )
 			end
 
 			writer [[
@@ -408,7 +411,7 @@ public:
 		writer [[
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
 	{
 ]]
 		if #t.methods > 0 then
@@ -431,7 +434,7 @@ public:
 				end
 				writer( "\t\t\t\t\t" )
 				if m.returnType then
-					writer( "res = " )
+					writer( "res.put( " )
 				end
 				writer( callPrefix, m.name )
 				if #m.parameters > 0 then
@@ -447,6 +450,9 @@ public:
 					writer( "( *p )" )
 				else
 					writer( "()" )
+				end
+				if m.returnType then
+					writer( " )" )
 				end
 				writer( ";\n\t\t\t\t}\n\t\t\t\tbreak;\n" )
 			end

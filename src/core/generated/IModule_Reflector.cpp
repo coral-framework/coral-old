@@ -5,8 +5,8 @@
 
 #include <co/IModule.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IModulePart.h>
 #include <co/INamespace.h>
+#include <co/IModulePart.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -45,68 +45,71 @@ public:
 
 	co::INamespace* getNamespace()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 0 ) );
-        return res.get< co::INamespace* >();
+		co::RefPtr<co::INamespace> res;
+		_provider->dynamicGetField( _cookie, getField<co::IModule>( 0 ), res );
+		return res.get();
 	}
 
 	co::Range<co::IModulePart*> getParts()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 1 ) );
-        return res.get< co::Range<co::IModulePart*> >();
+		co::RefVector<co::IModulePart> res;
+		_provider->dynamicGetField( _cookie, getField<co::IModule>( 1 ), res );
+		return res;
 	}
 
 	co::int32 getRank()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 2 ) );
-        return res.get< co::int32 >();
+		co::int32 res;
+		_provider->dynamicGetField( _cookie, getField<co::IModule>( 2 ), res );
+		return res;
 	}
 
 	void setRank( co::int32 rank_ )
 	{
-		co::Any arg( rank_ );
-		_provider->dynamicSetField( _cookie, getField<co::IModule>( 2 ), arg );
+		_provider->dynamicSetField( _cookie, getField<co::IModule>( 2 ), rank_ );
 	}
 
 	co::ModuleState getState()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IModule>( 3 ) );
-        return res.get< co::ModuleState >();
+		co::ModuleState res;
+		_provider->dynamicGetField( _cookie, getField<co::IModule>( 3 ), res );
+		return res;
 	}
 
 	void abort()
 	{
 		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 0 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 0 ), range, co::Any() );
 	}
 
 	void disintegrate()
 	{
 		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 1 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 1 ), range, co::Any() );
 	}
 
 	void dispose()
 	{
 		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 2 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 2 ), range, co::Any() );
 	}
 
 	void initialize()
 	{
 		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 3 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 3 ), range, co::Any() );
 	}
 
 	void integrate()
 	{
 		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 4 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 4 ), range, co::Any() );
 	}
 
 	void integratePresentation()
 	{
 		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 5 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 5 ), range, co::Any() );
 	}
 
 protected:
@@ -158,15 +161,15 @@ public:
 		return new co::IModule_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::IModule* p = co::checkInstance<co::IModule>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value = p->getNamespace(); break;
-		case 1:		value = p->getParts(); break;
-		case 2:		value = p->getRank(); break;
-		case 3:		value = p->getState(); break;
+		case 0:		value.put( p->getNamespace() ); break;
+		case 1:		value.put( p->getParts() ); break;
+		case 2:		value.put( p->getRank() ); break;
+		case 3:		value.put( p->getState() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -186,7 +189,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
 	{
 		co::IModule* p = co::checkInstance<co::IModule>( instance, method );
 		checkNumArguments( method, args.getSize() );

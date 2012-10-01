@@ -47,31 +47,32 @@ public:
 			dynFacetId_
 		};
 		co::Range<co::Any> range( args, 1 );
-		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 0 ), range );
-		return res.get< co::IPort* >();
+		co::RefPtr<co::IPort> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 0 ), range, res );
+		return res.get();
 	}
 
-	co::AnyValue dynamicGetField( co::int32 dynFacetId_, co::IField* field_ )
+	void dynamicGetField( co::int32 dynFacetId_, co::IField* field_, co::Any value_ )
 	{
 		co::Any args[] = {
 			dynFacetId_,
-			field_
+			field_,
+			value_
 		};
-		co::Range<co::Any> range( args, 2 );
-		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 1 ), range );
-		return res;
+		co::Range<co::Any> range( args, 3 );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 1 ), range, co::Any() );
 	}
 
-	co::AnyValue dynamicInvoke( co::int32 dynFacetId_, co::IMethod* method_, co::Range<co::Any> args_ )
+	void dynamicInvoke( co::int32 dynFacetId_, co::IMethod* method_, co::Range<co::Any> args_, co::Any result_ )
 	{
 		co::Any args[] = {
 			dynFacetId_,
 			method_,
-			args_
+			args_,
+			result_
 		};
-		co::Range<co::Any> range( args, 3 );
-		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 2 ), range );
-		return res;
+		co::Range<co::Any> range( args, 4 );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 2 ), range, co::Any() );
 	}
 
 	co::int32 dynamicRegisterService( co::IService* dynamicServiceProxy_ )
@@ -80,8 +81,9 @@ public:
 			dynamicServiceProxy_
 		};
 		co::Range<co::Any> range( args, 1 );
-		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 3 ), range );
-		return res.get< co::int32 >();
+		co::int32 res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 3 ), range, res );
+		return res;
 	}
 
 	void dynamicSetField( co::int32 dynFacetId_, co::IField* field_, co::Any value_ )
@@ -92,7 +94,7 @@ public:
 			value_
 		};
 		co::Range<co::Any> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 4 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 4 ), range, co::Any() );
 	}
 
 protected:
@@ -144,7 +146,7 @@ public:
 		return new co::IDynamicServiceProvider_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::checkInstance<co::IDynamicServiceProvider>( instance, field );
 		raiseUnexpectedMemberIndex();
@@ -158,7 +160,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
 	{
 		co::IDynamicServiceProvider* p = co::checkInstance<co::IDynamicServiceProvider>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -171,15 +173,16 @@ public:
 				{
 					co::int32 dynFacetId_ = args[++argIndex].get< co::int32 >();
 					argIndex = -1;
-					res = p->dynamicGetFacet( dynFacetId_ );
+					res.put( p->dynamicGetFacet( dynFacetId_ ) );
 				}
 				break;
 			case 1:
 				{
 					co::int32 dynFacetId_ = args[++argIndex].get< co::int32 >();
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
+					co::Any value_ = args[++argIndex];
 					argIndex = -1;
-					res = p->dynamicGetField( dynFacetId_, field_ );
+					p->dynamicGetField( dynFacetId_, field_, value_ );
 				}
 				break;
 			case 2:
@@ -187,15 +190,16 @@ public:
 					co::int32 dynFacetId_ = args[++argIndex].get< co::int32 >();
 					co::IMethod* method_ = args[++argIndex].get< co::IMethod* >();
 					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
+					co::Any result_ = args[++argIndex];
 					argIndex = -1;
-					res = p->dynamicInvoke( dynFacetId_, method_, args_ );
+					p->dynamicInvoke( dynFacetId_, method_, args_, result_ );
 				}
 				break;
 			case 3:
 				{
 					co::IService* dynamicServiceProxy_ = args[++argIndex].get< co::IService* >();
 					argIndex = -1;
-					res = p->dynamicRegisterService( dynamicServiceProxy_ );
+					res.put( p->dynamicRegisterService( dynamicServiceProxy_ ) );
 				}
 				break;
 			case 4:

@@ -51,9 +51,9 @@ public:
     void destroyValues( void* ptr, size_t numValues );
     IObject* newInstance();
     IService* newDynamicProxy( IDynamicServiceProvider* handler );
-    void getField( Any instance, IField* ai, AnyValue& value );
+    void getField( Any instance, IField* ai, Any value );
     void setField( Any instance, IField* ai, Any value );
-    void invoke( Any instance, IMethod* mi, Range<Any> args, AnyValue& returnValue );
+    void invoke( Any instance, IMethod* mi, Range<Any> args, Any returnValue );
 	void raise( const std::string& message );
 
 protected:

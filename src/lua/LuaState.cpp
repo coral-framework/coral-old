@@ -185,12 +185,12 @@ void LuaState::call( lua_State* L, int numArgs, int numResults )
 		raiseException( L, res );
 }
 
-void LuaState::push( lua_State* L, const co::Any& var )
+void LuaState::push( lua_State* L, co::Any var )
 {
-	co::Any in = var.asIn();
-	const co::__any::State& s = in.state;
+	var = var.asIn();
+	const co::__any::State& s = var.state;
 
-	co::TypeKind k = in.getKind();
+	co::TypeKind k = var.getKind();
 	assert( k != co::TK_ANY );
 
 	switch( k )
@@ -223,7 +223,7 @@ void LuaState::push( lua_State* L, const co::Any& var )
 		break;
 	case co::TK_STRING:	push( L, *s.data.str ); break;
 	case co::TK_ANY: assert( false );
-	case co::TK_ARRAY:	pushArray( L, in ); break;
+	case co::TK_ARRAY:	pushArray( L, var ); break;
 	case co::TK_STRUCT:
 		StructBinding::push( L, static_cast<co::IStruct*>( s.type ), s.data.ptr );
 		break;
@@ -289,31 +289,25 @@ void LuaState::push( lua_State* L, co::IObject* object )
 	pushInstance<ObjectBinding, co::IObject>( L, object );
 }
 
-void LuaState::get( lua_State* L, int index, co::AnyValue& value )
+void LuaState::get( lua_State* L, int index, co::Any var )
 {
+	assert( var.isOut() );
+
 	switch( lua_type( L, index ) )
 	{
-	case LUA_TNIL:
-		value.clear();
-		break;
-
-	case LUA_TBOOLEAN:
-		value = ( lua_toboolean( L, index ) != 0 );
-		break;
+	case LUA_TNIL: var.put( co::Any() ); break;
+	case LUA_TBOOLEAN: var.put( lua_toboolean( L, index ) != 0 ); break;
 
 	case LUA_TLIGHTUSERDATA:
 		throw lua::Exception( "no conversion from a Lua light userdata" );
 		break;
 
-	case LUA_TNUMBER:
-		value = lua_tonumber( L, index );
-		break;
-
+	case LUA_TNUMBER: var.put( lua_tonumber( L, index ) ); break;
 	case LUA_TSTRING:
 		{
-			size_t length;
-			const char* cstr = lua_tolstring( L, index, &length );
-			value.create<std::string>().assign( cstr, length );
+			size_t len;
+			const char* cstr = lua_tolstring( L, index, &len );
+			var.put( std::string( cstr, len ) );
 		}
 		break;
 
@@ -324,7 +318,17 @@ void LuaState::get( lua_State* L, int index, co::AnyValue& value )
 			if( tp == LUA_TNIL )
 			{
 				lua_pop( L, 1 );
-				toArray( L, index, value );
+				co::TypeKind k = var.getKind();
+				if( k != co::TK_ARRAY )
+				{
+					if( k != co::TK_ANY )
+						CORAL_THROW( lua::Exception, "no conversion from Lua array to '" << var.state << "'" );
+
+					co::AnyValue& av = var.get<co::AnyValue&>();
+					av.create<std::vector<co::AnyValue> >();
+					var = av.getAny();
+				}
+				getArray( L, index, var );
 			}
 			else
 			{
@@ -335,7 +339,7 @@ void LuaState::get( lua_State* L, int index, co::AnyValue& value )
 				{
 					co::Any instance;
 					if( CompositeTypeBinding::tryGetInstance( L, -1, instance ) )
-						value = instance;
+						var.put( instance );
 					else
 						unexpectedType = "unknown userdata";
 				}
@@ -351,7 +355,7 @@ void LuaState::get( lua_State* L, int index, co::AnyValue& value )
 		break;
 
 	case LUA_TUSERDATA:
-		value = CompositeTypeBinding::getInstance( L, index );
+		var.put( CompositeTypeBinding::getInstance( L, index ) );
 		break;
 
 	case LUA_TTHREAD:
@@ -462,7 +466,7 @@ void LuaState::pushInstancesTable( lua_State* L )
 	lua_rawgeti( L, LUA_REGISTRYINDEX, sm_instancesTableRegIdx );
 }
 
-void LuaState::pushArray( lua_State* L, const co::Any& array )
+void LuaState::pushArray( lua_State* L, co::Any array )
 {
 	assert( array.isIn() && array.getType()->getKind() == co::TK_ARRAY );
 	size_t count = array.getCount();
@@ -474,22 +478,15 @@ void LuaState::pushArray( lua_State* L, const co::Any& array )
 	}
 }
 
-void LuaState::toArray( lua_State* L, int index, co::AnyValue& value )
+void LuaState::getArray( lua_State* L, int index, co::Any array )
 {
 	assert( lua_type( L, index ) == LUA_TTABLE );
 
 	size_t len = lua_rawlen( L, index );
-	if( len == 0 )
-	{
-		value.clear();
-		return;
-	}
-
-	value.create( co::typeOf<co::Range<co::AnyValue> >::get() );
-
-	co::Any array = value.getAny();
 	array.resize( len );
-	co::AnyValue* elements = &array[0].get<co::AnyValue&>();
+
+	if( len == 0 )
+		return;
 
 	size_t i = 1;
 	int stackTop = lua_gettop( L );
@@ -499,7 +496,7 @@ void LuaState::toArray( lua_State* L, int index, co::AnyValue& value )
 		for( ; i <= len; ++i )
 		{
 			lua_rawgeti( L, index, i );
-			get( L, -1, elements[i - 1] );
+			get( L, -1, array[i - 1] );
 			lua_settop( L, stackTop );
 		}
 	}

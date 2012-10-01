@@ -48,8 +48,9 @@ public:
 			moduleName_
 		};
 		co::Range<co::Any> range( args, 1 );
-		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 0 ), range );
-		return res.get< bool >();
+		bool res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 0 ), range, res );
+		return res;
 	}
 
 	co::IModulePart* loadModulePart( const std::string& moduleName_ )
@@ -58,8 +59,9 @@ public:
 			moduleName_
 		};
 		co::Range<co::Any> range( args, 1 );
-		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 1 ), range );
-		return res.get< co::IModulePart* >();
+		co::RefPtr<co::IModulePart> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 1 ), range, res );
+		return res.get();
 	}
 
 protected:
@@ -111,7 +113,7 @@ public:
 		return new co::IModulePartLoader_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::checkInstance<co::IModulePartLoader>( instance, field );
 		raiseUnexpectedMemberIndex();
@@ -125,7 +127,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
 	{
 		co::IModulePartLoader* p = co::checkInstance<co::IModulePartLoader>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -138,14 +140,14 @@ public:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res = p->canLoadModulePart( moduleName_ );
+					res.put( p->canLoadModulePart( moduleName_ ) );
 				}
 				break;
 			case 1:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res = p->loadModulePart( moduleName_ );
+					res.put( p->loadModulePart( moduleName_ ) );
 				}
 				break;
 			default:

@@ -48,7 +48,7 @@ public:
 			module_
 		};
 		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 0 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 0 ), range, co::Any() );
 	}
 
 	void dispose( co::IModule* module_ )
@@ -57,7 +57,7 @@ public:
 			module_
 		};
 		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 1 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 1 ), range, co::Any() );
 	}
 
 	void initialize( co::IModule* module_ )
@@ -66,7 +66,7 @@ public:
 			module_
 		};
 		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 2 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 2 ), range, co::Any() );
 	}
 
 	void integrate( co::IModule* module_ )
@@ -75,7 +75,7 @@ public:
 			module_
 		};
 		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 3 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 3 ), range, co::Any() );
 	}
 
 	void integratePresentation( co::IModule* module_ )
@@ -84,7 +84,7 @@ public:
 			module_
 		};
 		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 4 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 4 ), range, co::Any() );
 	}
 
 protected:
@@ -136,7 +136,7 @@ public:
 		return new co::IModulePart_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::checkInstance<co::IModulePart>( instance, field );
 		raiseUnexpectedMemberIndex();
@@ -150,7 +150,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
 	{
 		co::IModulePart* p = co::checkInstance<co::IModulePart>( instance, method );
 		checkNumArguments( method, args.getSize() );

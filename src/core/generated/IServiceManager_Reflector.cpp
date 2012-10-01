@@ -44,14 +44,14 @@ public:
 
 	bool getIsLazy()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::IServiceManager>( 0 ) );
-        return res.get< bool >();
+		bool res;
+		_provider->dynamicGetField( _cookie, getField<co::IServiceManager>( 0 ), res );
+		return res;
 	}
 
 	void setIsLazy( bool isLazy_ )
 	{
-		co::Any arg( isLazy_ );
-		_provider->dynamicSetField( _cookie, getField<co::IServiceManager>( 0 ), arg );
+		_provider->dynamicSetField( _cookie, getField<co::IServiceManager>( 0 ), isLazy_ );
 	}
 
 	void addService( co::IInterface* serviceType_, co::IService* service_ )
@@ -61,7 +61,7 @@ public:
 			service_
 		};
 		co::Range<co::Any> range( args, 2 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 0 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 0 ), range, co::Any() );
 	}
 
 	void addServiceForType( co::IInterface* serviceType_, co::IInterface* clientType_, co::IService* service_ )
@@ -72,7 +72,7 @@ public:
 			service_
 		};
 		co::Range<co::Any> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 1 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 1 ), range, co::Any() );
 	}
 
 	void addServiceProvider( co::IInterface* serviceType_, const std::string& componentName_ )
@@ -82,7 +82,7 @@ public:
 			componentName_
 		};
 		co::Range<co::Any> range( args, 2 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 2 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 2 ), range, co::Any() );
 	}
 
 	void addServiceProviderForType( co::IInterface* serviceType_, co::IInterface* clientType_, const std::string& componentName_ )
@@ -93,7 +93,7 @@ public:
 			componentName_
 		};
 		co::Range<co::Any> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 3 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 3 ), range, co::Any() );
 	}
 
 	co::IService* getService( co::IInterface* serviceType_ )
@@ -102,8 +102,9 @@ public:
 			serviceType_
 		};
 		co::Range<co::Any> range( args, 1 );
-		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 4 ), range );
-		return res.get< co::IService* >();
+		co::RefPtr<co::IService> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 4 ), range, res );
+		return res.get();
 	}
 
 	co::IService* getServiceForInstance( co::IInterface* serviceType_, co::IService* client_ )
@@ -113,8 +114,9 @@ public:
 			client_
 		};
 		co::Range<co::Any> range( args, 2 );
-		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 5 ), range );
-		return res.get< co::IService* >();
+		co::RefPtr<co::IService> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 5 ), range, res );
+		return res.get();
 	}
 
 	co::IService* getServiceForType( co::IInterface* serviceType_, co::IInterface* clientType_ )
@@ -124,8 +126,9 @@ public:
 			clientType_
 		};
 		co::Range<co::Any> range( args, 2 );
-		co::AnyValue res = _provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 6 ), range );
-		return res.get< co::IService* >();
+		co::RefPtr<co::IService> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 6 ), range, res );
+		return res.get();
 	}
 
 	void removeService( co::IInterface* serviceType_ )
@@ -134,7 +137,7 @@ public:
 			serviceType_
 		};
 		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 7 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 7 ), range, co::Any() );
 	}
 
 	void removeServiceForType( co::IInterface* serviceType_, co::IInterface* clientType_ )
@@ -144,7 +147,7 @@ public:
 			clientType_
 		};
 		co::Range<co::Any> range( args, 2 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 8 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 8 ), range, co::Any() );
 	}
 
 protected:
@@ -196,12 +199,12 @@ public:
 		return new co::IServiceManager_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::IServiceManager* p = co::checkInstance<co::IServiceManager>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value = p->getIsLazy(); break;
+		case 0:		value.put( p->getIsLazy() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -218,7 +221,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
 	{
 		co::IServiceManager* p = co::checkInstance<co::IServiceManager>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -265,7 +268,7 @@ public:
 				{
 					co::IInterface* serviceType_ = args[++argIndex].get< co::IInterface* >();
 					argIndex = -1;
-					res = p->getService( serviceType_ );
+					res.put( p->getService( serviceType_ ) );
 				}
 				break;
 			case 6:
@@ -273,7 +276,7 @@ public:
 					co::IInterface* serviceType_ = args[++argIndex].get< co::IInterface* >();
 					co::IService* client_ = args[++argIndex].get< co::IService* >();
 					argIndex = -1;
-					res = p->getServiceForInstance( serviceType_, client_ );
+					res.put( p->getServiceForInstance( serviceType_, client_ ) );
 				}
 				break;
 			case 7:
@@ -281,7 +284,7 @@ public:
 					co::IInterface* serviceType_ = args[++argIndex].get< co::IInterface* >();
 					co::IInterface* clientType_ = args[++argIndex].get< co::IInterface* >();
 					argIndex = -1;
-					res = p->getServiceForType( serviceType_, clientType_ );
+					res.put( p->getServiceForType( serviceType_, clientType_ ) );
 				}
 				break;
 			case 8:

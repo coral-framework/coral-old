@@ -5,8 +5,8 @@
 
 #include <co/ISystem.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IServiceManager.h>
 #include <co/IModuleManager.h>
+#include <co/IServiceManager.h>
 #include <co/ITypeManager.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
@@ -46,26 +46,30 @@ public:
 
 	co::IModuleManager* getModules()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 0 ) );
-        return res.get< co::IModuleManager* >();
+		co::RefPtr<co::IModuleManager> res;
+		_provider->dynamicGetField( _cookie, getField<co::ISystem>( 0 ), res );
+		return res.get();
 	}
 
 	co::IServiceManager* getServices()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 1 ) );
-        return res.get< co::IServiceManager* >();
+		co::RefPtr<co::IServiceManager> res;
+		_provider->dynamicGetField( _cookie, getField<co::ISystem>( 1 ), res );
+		return res.get();
 	}
 
 	co::SystemState getState()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 2 ) );
-        return res.get< co::SystemState >();
+		co::SystemState res;
+		_provider->dynamicGetField( _cookie, getField<co::ISystem>( 2 ), res );
+		return res;
 	}
 
 	co::ITypeManager* getTypes()
 	{
-		co::AnyValue res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 3 ) );
-        return res.get< co::ITypeManager* >();
+		co::RefPtr<co::ITypeManager> res;
+		_provider->dynamicGetField( _cookie, getField<co::ISystem>( 3 ), res );
+		return res.get();
 	}
 
 	void setupBase( co::Range<std::string> requiredModules_ )
@@ -74,19 +78,19 @@ public:
 			requiredModules_
 		};
 		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 0 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 0 ), range, co::Any() );
 	}
 
 	void setupPresentation()
 	{
 		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 1 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 1 ), range, co::Any() );
 	}
 
 	void tearDown()
 	{
 		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 2 ), range );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 2 ), range, co::Any() );
 	}
 
 protected:
@@ -138,15 +142,15 @@ public:
 		return new co::ISystem_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::ISystem* p = co::checkInstance<co::ISystem>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value = p->getModules(); break;
-		case 1:		value = p->getServices(); break;
-		case 2:		value = p->getState(); break;
-		case 3:		value = p->getTypes(); break;
+		case 0:		value.put( p->getModules() ); break;
+		case 1:		value.put( p->getServices() ); break;
+		case 2:		value.put( p->getState() ); break;
+		case 3:		value.put( p->getTypes() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -166,7 +170,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
 	{
 		co::ISystem* p = co::checkInstance<co::ISystem>( instance, method );
 		checkNumArguments( method, args.getSize() );

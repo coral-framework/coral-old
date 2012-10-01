@@ -601,7 +601,8 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 	__BEGIN_EXCEPTIONS_BARRIER__
 
 	// prepare the argument list
-	co::AnyValue args[MAX_NUM_PARAMETERS];
+	co::Any args[MAX_NUM_PARAMETERS];
+	co::AnyValue values[MAX_NUM_PARAMETERS];
 
 	int numRequiredArgs = numParams;
 	int numPassedArgs = lua_gettop( L ) - 1;
@@ -611,9 +612,9 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 	{
 		for( ; i < numParams; ++i )
 		{
-			co::IParameter* paramInfo = paramList[i];
-			co::IType* paramType = paramInfo->getType();
+			args[i].set( values[i] );
 
+			co::IParameter* paramInfo = paramList[i];
 			if( paramInfo->getIsIn() )
 			{
 				if( numPassedArgs <= i )
@@ -630,7 +631,7 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 				--numRequiredArgs;
 			}
 
-			args[i].convert( paramType );
+			values[i].convert( paramInfo->getType() );
 		}
 	}
 	catch( const co::Exception& e )
@@ -653,7 +654,7 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 	tryGetInstance( L, 1, instance );
 
 	co::AnyValue returnValue;
-	co::Range<co::AnyValue> argsRange( args, numParams );
+	co::Range<co::Any> argsRange( args, numParams );
 
 	co::IReflector* reflector = method->getOwner()->getReflector();
 	reflector->invoke( instance, method, argsRange, returnValue );

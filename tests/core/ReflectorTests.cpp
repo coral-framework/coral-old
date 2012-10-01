@@ -436,7 +436,7 @@ TEST( ReflectorTests, nativeClass )
 
 	// --- set u2 with an invalid string and it should become null as well
 	str = "{invalid}";
-	v1.set<std::string&>( str );
+	v1 = str;
 	reflector->invoke( u2, setStringMethod, co::Range<co::Any>( &a1, 1 ), v2 );
 	EXPECT_EQ( u1, u2 );
 

@@ -58,12 +58,12 @@ public:
 			callDestructor( reinterpret_cast<co::Uuid*>( ptr ) + i );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::AnyValue& value )
+	void getField( co::Any instance, co::IField* field, co::Any value )
 	{
 		co::Uuid* p = co::checkInstance<co::Uuid>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value = co::Uuid_Adapter::getIsNull( *p ); break;
+		case 0:		value.put( co::Uuid_Adapter::getIsNull( *p ) ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -80,7 +80,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::AnyValue& res )
+	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
 	{
 		co::Uuid* p = co::checkInstance<co::Uuid>( instance, method );
 		checkNumArguments( method, args.getSize() );
