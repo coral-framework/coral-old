@@ -8,20 +8,30 @@ project( TESTS_CORE )
 # Build the tests_core executable
 ################################################################################
 
-# Gather files in the current directory
-file( GLOB HEADER_FILES *.h )
-file( GLOB SOURCE_FILES *.cpp )
-
-# Pass the CORAL_PATH as a precompiler definition
-set_property( DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
-	"CORAL_PATH=\"${CMAKE_SOURCE_DIR}/modules,${CMAKE_CURRENT_SOURCE_DIR}/data/csl\""
-	"TESTS_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data\""
-)
-
 include_directories(
 	${CORE_SOURCE_DIR}/generated
 	${CMAKE_SOURCE_DIR}/src
 )
+
+# Define compile-time parameters
+IF( UNIX )
+	find_file( LIBC_PATH
+		NAMES libc.so.6 libc.so libc.dylib
+		PATHS /lib /usr/lib PATH_SUFFIXES ${CMAKE_LIBRARY_ARCHITECTURE} )
+	find_file( LIBPTHREAD_PATH
+		NAMES libpthread.so.0 libpthread.so libpthread.dylib
+		PATHS /lib /usr/lib PATH_SUFFIXES ${CMAKE_LIBRARY_ARCHITECTURE} )
+ENDIF()
+set_property( DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
+	"CORAL_PATH=\"${CMAKE_SOURCE_DIR}/modules,${CMAKE_CURRENT_SOURCE_DIR}/data/csl\""
+	"TESTS_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data\""
+	"LIBC_PATH=\"${LIBC_PATH}\""
+	"LIBPTHREAD_PATH=\"${LIBPTHREAD_PATH}\""
+)
+
+# Gather files in the current directory
+file( GLOB HEADER_FILES *.h )
+file( GLOB SOURCE_FILES *.cpp )
 
 add_executable( tests_core EXCLUDE_FROM_ALL ${HEADER_FILES} ${SOURCE_FILES} )
 
