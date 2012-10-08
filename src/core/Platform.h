@@ -87,16 +87,14 @@
 
 #if defined(CORAL_CC_MSVC)
 	#define CORAL_CC_NAME "msvc"
-	#if _MSC_VER > 1600
+	#if _MSC_VER > 1700
 		#error "Your MSVC compiler was not recognized by this Coral version (maybe it's too new?)."
+	#elif _MSC_VER >= 1700
+		#define CORAL_CC_VERSION "11.0"
 	#elif _MSC_VER >= 1600
 		#define CORAL_CC_VERSION "10.0"
-	#elif _MSC_VER >= 1500
-		#define CORAL_CC_VERSION "9.0"
-	#elif _MSC_VER >= 1400
-		#define CORAL_CC_VERSION "8.0"
 	#else
-		#error "Coral requires Visual Studio 8 (2005) or newer."
+		#error "Coral requires Visual Studio 10 (2010) or newer."
 	#endif
 #elif defined(CORAL_CC_CLANG)
 	#define CORAL_CC_NAME "clang"

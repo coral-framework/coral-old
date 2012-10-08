@@ -207,8 +207,12 @@ macro( CORAL_TARGET_PROPERTIES targetName )
 		# Disable unavoidable MSVC warnings
 		add_definitions( "/wd4251" ) # type needs to have dll-interface to be used by clients
 		add_definitions( "/wd4275" ) # non dll-interface class used as base for dll-interface class
+		add_definitions( "/wd4521" ) # multiple copy constructors specified
+		add_definitions( "/wd4522" ) # multiple assignment operators specified
+		add_definitions( "/wd4800" ) # casting integers to bool
 		set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_DEFINITIONS
 				"_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_DEPRECATE" )
+		add_definitions( -D_VARIADIC_MAX=10 ) # defaults to 5, GTest requires 10
 	else()
 		# Hide all DSO symbols by default (Ref: http://gcc.gnu.org/wiki/Visibility)
 		set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_FLAGS "-fvisibility=hidden" )

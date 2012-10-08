@@ -197,7 +197,11 @@ typedef std::vector<uint8> StdVector;
 inline co::uint8* getVectorData( void* ptr  )
 {
 	StdVector& pv = *reinterpret_cast<StdVector*>( ptr );
+#if defined(CORAL_CC_MSVC)
+	return pv.empty() ? NULL : &pv[0]; // MSVC forbids &v[0] for empty vectors
+#else
 	return &pv[0];
+#endif
 }
 
 inline co::uint8* getVectorData( const __any::State& s )
@@ -208,6 +212,8 @@ inline co::uint8* getVectorData( const __any::State& s )
 inline size_t getVectorSize( const __any::State& s )
 {
 	StdVector& v = *reinterpret_cast<StdVector*>( s.data.ptr );
+	if( v.empty() )
+		return 0;
 	IType* elemType = static_cast<IArray*>( s.type )->getElementType();
 	return v.size() / elemType->getReflector()->getSize();
 }
@@ -348,26 +354,18 @@ void Any::put( Any in ) const
 		else
 			THROW_NO_CONVERSION( in.state, state, );
 		break;
-
+		
 	case TK_FLOAT:
-		if( isScalar( inK ) )
-			castTo<float>( inK, &in.state.data, state.data.ptr );
-		else if( inK == TK_STRING )
-		{
-			float f = strtof( in.state.data.str->c_str(), NULL );
-			*reinterpret_cast<float*>( state.data.ptr ) = f;
-		}
-		else
-			THROW_NO_CONVERSION( in.state, state, );
-		break;
-
 	case TK_DOUBLE:
 		if( isScalar( inK ) )
 			castScalar( inK, &in.state.data, myK, state.data.ptr );
 		else if( inK == TK_STRING )
 		{
 			double d = strtod( in.state.data.str->c_str(), NULL );
-			*reinterpret_cast<double*>( state.data.ptr ) = d;
+			if( myK == TK_DOUBLE )
+				*reinterpret_cast<double*>( state.data.ptr ) = d;
+			else
+				*reinterpret_cast<float*>( state.data.ptr ) = static_cast<float>( d );
 		}
 		else
 			THROW_NO_CONVERSION( in.state, state, );
@@ -487,13 +485,12 @@ void Any::resize( size_t n ) const
 	if( currentN == n )
 		return; // nothing to be done
 
-	uint8* addr = &v.front();
 	size_t newSize = n * elemSize;
 
 	if( n < currentN )
 	{
 		// reduce the vector size
-		elemReflector->destroyValues( addr + newSize, currentN - n );
+		elemReflector->destroyValues( &v[newSize], currentN - n );
 		v.resize( newSize );
 		return;
 	}
@@ -503,10 +500,11 @@ void Any::resize( size_t n ) const
 	{
 		// requires reallocation
 		StdVector tmp( newSize );
-		uint8* newAddr = &tmp.front();
+		uint8* newAddr = &tmp[0];
 		elemReflector->createValues( newAddr, n );
 		if( currentN > 0 )
 		{
+			uint8* addr = &v[0];
 			elemReflector->copyValues( addr, newAddr, currentN );
 			elemReflector->destroyValues( addr, currentN );
 		}
@@ -515,6 +513,7 @@ void Any::resize( size_t n ) const
 	else
 	{
 		// does not require reallocation
+		uint8* addr = &v[0];
 		v.resize( newSize );
 		assert( addr == &v.front() );
 		elemReflector->createValues( addr + currentSize, n - currentN );
@@ -722,10 +721,10 @@ std::ostream& operator<<( std::ostream& os, const co::__any::State& s )
 	return os << s.type->getFullName();
 }
 
-std::ostream& operator<<( std::ostream& os, const co::Any& a )
+std::ostream& operator<<( std::ostream& os, co::Any any )
 {
-	os << a.state << ": ";
-	co::Any in = a.asIn();
-	streamOut( os, in );
+	os << any.state << ": ";
+	any = any.asIn();
+	streamOut( os, any );
 	return os;
 }

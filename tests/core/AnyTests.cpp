@@ -35,8 +35,8 @@ TEST( AnyTests, sizeOf )
 	EXPECT_EQ( sizeof(void*), sizeof(size_t) );
 
 	// co::__any::Data should be the size of a double
-	EXPECT_EQ( sizeof(double), sizeof(co::__any::Data) );
 	EXPECT_EQ( 8, sizeof(double) );
+	EXPECT_EQ( sizeof(double), sizeof(co::__any::Data) );
 
 	// make sure sizeof(co::__any::State) is as expected (2 ptrs + double)
 #if CORAL_POINTER_SIZE == 4

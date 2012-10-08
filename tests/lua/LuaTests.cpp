@@ -342,7 +342,7 @@ TEST( LuaTests, preserveExceptionType )
 						empty, empty ), co::IllegalStateException, "not SystemState_None" );
 }
 
-class PseudoInterceptor : public co::IService, public lua::IInterceptor
+class PseudoInterceptor : public lua::IInterceptor
 {
 public:
 	PseudoInterceptor()
@@ -417,9 +417,8 @@ TEST( LuaTests, interceptor )
 	ASSERT_EQ( 0, sg_interceptor.retained.size() );
 	ASSERT_EQ( 0, sg_interceptor.released.size() );
 
-	co::Any args[2];
-	args[0] = obj.get();
-	args[1].set<const std::string&>( annotation->getFacet()->getName() );
+	std::string facetName = annotation->getFacet()->getName();
+	co::Any args[] = { obj.get(), facetName };
 	luaState->call( "lua.interceptor", "get", co::Range<co::Any>( args, 2 ), co::Range<co::Any>() );
 
 	ASSERT_GE( sg_interceptor.retained.size(), 2 );

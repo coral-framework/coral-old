@@ -93,13 +93,13 @@ protected:
 		Pops a light userdata (co::IField*) from the stack.
 		Pushes the corresponding field value of the given 'instance'.
 	 */
-	static void getField( lua_State* L, const co::Any& instance );
+	static void getField( lua_State* L, co::Any instance );
 
 	/*!
 		Pops a value and a light userdata (co::IField*) from the stack.
 		Assigns the value to the corresponding field of the given 'instance'.
 	 */
-	static void setField( lua_State* L, const co::Any& instance );
+	static void setField( lua_State* L, co::Any instance );
 
 	/*!
 		The lua_CFunction that dispatches method calls.

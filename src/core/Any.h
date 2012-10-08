@@ -59,7 +59,12 @@ union Data
 struct State
 {
 	IType* type;	// Variable Type
-	bool isIn : 1;	// True if the var is 'in'; False if it is 'out'
+#if defined(CORAL_CC_MSVC)
+	size_t // MSVC refuses to merge different-sized types in a bitfield
+#else
+	bool
+#endif
+		isIn : 1;	// True if the var is 'in'; False if it is 'out'
 	size_t size		// Only used for 'in' arrays and C-strings
 #if CORAL_POINTER_SIZE == 4
 		: 31;
@@ -162,11 +167,12 @@ struct Pointer<TK_INTERFACE, isIn, T> : public Tag<T, true>
 
 template<typename T> struct Variable<T*&> : public Pointer<kindOf<T*>::kind, false, T*> {};
 template<typename T> struct Variable<T* const&> : public Pointer<kindOf<T*>::kind, true, T* const> {};
-template<typename T> struct Variable<const T*&> : public Variable<const T* const&> {};
+
 template<typename T> struct Variable<const T* const&>
 {
 	inline static void tag( State& ) { static_assert( sizeof(T)<0, "illegal const pointer" ); }
 };
+template<typename T> struct Variable<const T*&> : public Variable<const T* const&> {};
 
 template<typename T>
 struct Variable<RefPtr<T>&>
@@ -323,10 +329,8 @@ public:
 	}
 
 	//! Copy constructor.
-	inline Any( Any& other ) : state( other.state ) {;}
-
-	//! Constant copy constructor.
 	inline Any( const Any& other ) : state( other.state ) {;}
+	inline Any( Any& other ) : state( other.state ) {;}
 
 	//! Destructor.
 	inline ~Any() {;}
@@ -483,18 +487,8 @@ public:
 	//! Assignment operator.
 	template<typename T>
 	inline Any& operator=( T& v ) { set<T>( v ); return *this; }
-
-	inline Any& operator=( const Any& other )
-	{
-		state = other.state;
-		return *this;
-	}
-
-	inline Any& operator=( Any& other )
-	{
-		state = other.state;
-		return *this;
-	}
+	inline Any& operator=( const Any& other ) { state = other.state; return *this; }
+	inline Any& operator=( Any& other ) { state = other.state; return *this; }
 
 protected:
 	void cast( Any& to ) const;
@@ -666,7 +660,7 @@ CORAL_EXPORT std::ostream& operator<<( std::ostream& os, const co::__any::State&
 	Outputs the variable type and value stored in a co::Any.
 	\relates co::Any
  */
-CORAL_EXPORT std::ostream& operator<<( std::ostream& os, const co::Any& a );
+CORAL_EXPORT std::ostream& operator<<( std::ostream& os, co::Any any );
 
 /*!
 	Outputs the variable type and value stored in a co::AnyValue.
