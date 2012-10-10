@@ -404,7 +404,7 @@ void Any::put( Any in ) const
 		{
 			std::stringstream ss;
 			streamOut( ss, in );
-			*state.data.str = ss.str();
+			ss.str().swap( *state.data.str );
 		}
 		break;
 
@@ -721,10 +721,8 @@ std::ostream& operator<<( std::ostream& os, const co::__any::State& s )
 	return os << s.type->getFullName();
 }
 
-std::ostream& operator<<( std::ostream& os, co::Any any )
+std::ostream& operator<<( std::ostream& os, const co::Any& any )
 {
-	os << any.state << ": ";
-	any = any.asIn();
-	streamOut( os, any );
+	streamOut( os, any.isIn() ? any : any.asIn() );
 	return os;
 }

@@ -16,26 +16,25 @@ namespace co {
 
 // Instructs a Range how to extract an array out of a custom container.
 template<typename T, typename C>
-struct RangeAdaptor
-{
-	typedef RangeAdaptor<T, const C> CA;
-	static const bool isValid = CA::isValid;
-	static const T* getData( const C& container ) { return CA::getData( container ); }
-	static size_t getSize( const C& container ) { return CA::getSize( container ); }
-};
-
-// We should always be able to create Ranges out of const containers.
-template<typename T, typename C>
-struct RangeAdaptor<T, const C>
+struct RangeAdapter
 {
 	static const bool isValid = false;
 	static const T* getData( const C& ) { return 0; }
 	static size_t getSize( const C& ) { return 0; }
 };
 
+// Specialization for statically-allocated arrays.
+template<typename T, typename E, size_t size>
+struct RangeAdapter<T, E[size]>
+{
+	static const bool isValid = true;
+	static const T* getData( const E array[size] ) { return array; }
+	static size_t getSize( const E[size] ) { return size; }
+};
+
 // Specialization for std::vectors of values.
 template<typename T, typename ET>
-struct RangeAdaptor<T, const std::vector<ET> >
+struct RangeAdapter<T, std::vector<ET> >
 {
 	static const bool isValid = true;
 	static const T* getData( const std::vector<ET>& v ) { return v.empty() ? NULL : &v[0]; }
@@ -44,7 +43,7 @@ struct RangeAdaptor<T, const std::vector<ET> >
 
 // Specialization for std::vectors of pointers (allows upcasts).
 template<typename T, typename ET>
-struct RangeAdaptor<T, std::vector<ET*> >
+struct RangeAdapter<T, std::vector<ET*> >
 {
 	static const bool isValid = true;
 	static const T* getData( const std::vector<ET*>& v )
@@ -114,26 +113,26 @@ public:
 	Range( const T* array, size_t size ) : _start( array ), _end( array + size )
 	{;}
 
+	/*!
+		Creates a range spanning the entire contents of an array-like container.
+		By default supports std::vector's and statically-allocated arrays.
+		Specialize the co::RangeAdapter struct to accept other types.
+		\tparam C a container class for which a co::RangeAdapter was defined.
+	 */
+	template<typename C>
+	Range( const C& container )
+	{
+		typedef RangeAdapter<T, C> Adaptor;
+		static_assert( Adaptor::isValid, "invalid container type for co::Range" );
+		_start = Adaptor::getData( container );
+		_end = _start + Adaptor::getSize( container );
+	}
+
 	//! Non-const copy constructor.
 	Range( Range& other ) : _start( other._start ), _end( other._end ) {;}
 
 	//! Const copy constructor.
 	Range( const Range& other ) : _start( other._start ), _end( other._end ) {;}
-
-	/*!
-		Creates a range spanning the entire contents of an array-like container.
-		By default, the only accepted container type is std::vector, but you may
-		specialize the co::RangeAdaptor struct to accept other container types.
-		\tparam C a container class for which a co::RangeAdaptor was defined.
-	 */
-	template<typename C>
-	Range( C& container )
-	{
-		typedef RangeAdaptor<T, C> Adaptor;
-		static_assert( Adaptor::isValid, "invalid container type for co::Range" );
-		_start = Adaptor::getData( container );
-		_end = _start + Adaptor::getSize( container );
-	}
 
 	//! Destructor.
 	inline ~Range() {;}
@@ -196,7 +195,7 @@ void assign( Range<T> source, C& container )
 
 /*!
 	\brief Performs a binary search on a sorted \a range using a comparison function.
- 
+
 	Returns \c true if a matching element is found, or \c false if the key is
 	not in the sorted range. In either case, the parameter \a pos is set to the
 	index where the element should be located in the sorted range.
@@ -229,7 +228,7 @@ bool binarySearch( Range<T> range, const Key& key, Comparator compare, size_t& p
 			// repeat search in right half
 			first = pos + 1;
 			if( pos == last ) break;
-		}		
+		}
 		else if( comp < 0 )
 		{
 			// repeat search in left half

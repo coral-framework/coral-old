@@ -322,6 +322,10 @@ public:
 	template<typename T>
 	inline Any( const T& var ) { set( var ); }
 
+	//! Creates a reference to a statically-allocated array.
+	template<typename T, size_t size>
+	inline Any( T(&array)[size] ) { setIn( Range<T>( array ) ); }
+
 	//! Creates a reference to any variable reflectively. \see set()
 	inline Any( bool isIn, IType* type, const void* addr, size_t size = 0 )
 	{
@@ -651,21 +655,15 @@ template<> inline void swap( co::Any& a, co::Any& b ) { a.swap( b ); }
 template<> inline void swap( co::AnyValue& a, co::AnyValue& b ) { a.swap( b ); }
 } // namespace std
 
-// Outputs the qualified type name of the variable in a co::__any::State.
-CORAL_EXPORT std::ostream& operator<<( std::ostream& os, const co::__any::State& s );
-
 #endif // DOXYGEN
 
-/*!
-	Outputs the variable type and value stored in a co::Any.
-	\relates co::Any
- */
-CORAL_EXPORT std::ostream& operator<<( std::ostream& os, co::Any any );
+//! Outputs the type of variable in a co::Any. Usage: "os << any.state". \relates co::Any
+CORAL_EXPORT std::ostream& operator<<( std::ostream& os, const co::__any::State& s );
 
-/*!
-	Outputs the variable type and value stored in a co::AnyValue.
-	\relates co::AnyValue
- */
+//! Outputs the value stored in a co::Any. \relates co::Any
+CORAL_EXPORT std::ostream& operator<<( std::ostream& os, const co::Any& any );
+
+//! Outputs the value stored in a co::AnyValue. \relates co::AnyValue
 inline std::ostream& operator<<( std::ostream& os, const co::AnyValue& v )
 {
 	return os << v.getAny();

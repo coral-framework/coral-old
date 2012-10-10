@@ -46,9 +46,9 @@ void Logger::setMinSeverity( LogLevel level )
 Logger::~Logger()
 {
 	Log log;
-	log.message = _os.str();
 	log.level = _level;
 	log.isDebug = _isDebug;
+	_os.str().swap( log.message );
 	sg_logHandler( log );
 }
 

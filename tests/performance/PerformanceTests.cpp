@@ -45,11 +45,8 @@ TEST( PerformanceTests, callLuaFunction )
 
 	lua::IState* state = co::getService<lua::IState>();
 
-	co::Range<co::Any> argsRange( args, NUM_ARGS );
-	co::Range<co::Any> resultsRange( results, NUM_ARGS );
-
 	for( int i = 0; i < 1000; ++i )
-		state->call( moduleName, functionName, argsRange, resultsRange );
+		state->call( moduleName, functionName, args, results );
 }
 
 // --- Sanity Tests --- //

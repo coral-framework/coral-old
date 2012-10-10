@@ -46,8 +46,8 @@ TEST( ReflectorTests, basicReflectors )
 	co::AnyValue value;
 	co::Range<co::Any> anyRange;
 
-	co::uint8 buffer1[sizeof(std::string)];
-	co::uint8 buffer2[sizeof(std::string)];
+	co::uint8 buffer1[sizeof(co::AnyValue)];
+	co::uint8 buffer2[sizeof(co::AnyValue)];
 
 	// make sure all types have a BasicReflector
 	for( int i = 0; i < NUM_TYPES; ++i )

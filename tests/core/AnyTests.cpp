@@ -81,17 +81,17 @@ TEST( AnyTests, stdVectorMemoryLayout )
 /*  retrieval tests for the values passed to the constructor.                */
 /*****************************************************************************/
 
-void EXPECT_ANY_STREQ( const co::Any& any, const char* str )
-{
-	std::stringstream ss;
-	ss << any;
-	EXPECT_STREQ( str, ss.str().c_str() );
-}
-
 void EXPECT_ANY_TYPE_STREQ( const co::Any& any, const char* str )
 {
 	std::stringstream ss;
 	ss << any.state;
+	EXPECT_STREQ( str, ss.str().c_str() );
+}
+
+void EXPECT_ANY_STREQ( const co::Any& any, const char* str )
+{
+	std::stringstream ss;
+	ss << any.state << ": " << any;
 	EXPECT_STREQ( str, ss.str().c_str() );
 }
 
@@ -993,9 +993,8 @@ TEST( AnyTests, swap )
 TEST( AnyTests, accessRangeOfDoubles )
 {
 	double dblArray[] = { -7.75, 3.14, 1000 };
-	
-	co::Any array( co::Range<double>( dblArray, CORAL_ARRAY_LENGTH(dblArray) ) );
 
+	co::Any array( dblArray );
 	ASSERT_TRUE( array.isValid() );
 	EXPECT_TRUE( array.isIn() );
 	EXPECT_EQ( co::TK_ARRAY, array.getType()->getKind() );
@@ -1027,7 +1026,7 @@ TEST( AnyTests, accessRangeOfStructs )
 	cslErrorArray[1].line = 9;
 
 	co::Any elem;
-	co::Any array( co::Range<co::CSLError>( cslErrorArray, CORAL_ARRAY_LENGTH(cslErrorArray) ) );
+	co::Any array( cslErrorArray );
 
 	ASSERT_TRUE( array.isValid() );
 	EXPECT_TRUE( array.isIn() );

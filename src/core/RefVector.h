@@ -101,9 +101,9 @@ public:
 
 #ifndef DOXYGEN
 
-// RangeAdaptor to extract an interface-pointer array out of a RefVector.
+// RangeAdapter to extract an interface-pointer array out of a RefVector.
 template<typename T, typename ET>
-struct RangeAdaptor<T, const RefVector<ET> >
+struct RangeAdapter<T, RefVector<ET> >
 {
 	static const bool isValid = true;
 	static const T* getData( const RefVector<ET>& v )
