@@ -4,8 +4,8 @@
  */
 
 #include <co/IDynamicServiceProvider.h>
-#include <co/IPort.h>
 #include <co/IField.h>
+#include <co/IPort.h>
 #include <co/IMethod.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
@@ -43,58 +43,36 @@ public:
 
 	co::IPort* dynamicGetFacet( co::int32 dynFacetId_ )
 	{
-		co::Any args[] = {
-			dynFacetId_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { dynFacetId_ };
 		co::RefPtr<co::IPort> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 0 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 0 ), args, res );
 		return res.get();
 	}
 
 	void dynamicGetField( co::int32 dynFacetId_, co::IField* field_, co::Any value_ )
 	{
-		co::Any args[] = {
-			dynFacetId_,
-			field_,
-			value_
-		};
-		co::Range<co::Any> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 1 ), range, co::Any() );
+		co::Any args[] = { dynFacetId_, field_, value_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 1 ), args, co::Any() );
 	}
 
 	void dynamicInvoke( co::int32 dynFacetId_, co::IMethod* method_, co::Range<co::Any> args_, co::Any result_ )
 	{
-		co::Any args[] = {
-			dynFacetId_,
-			method_,
-			args_,
-			result_
-		};
-		co::Range<co::Any> range( args, 4 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 2 ), range, co::Any() );
+		co::Any args[] = { dynFacetId_, method_, args_, result_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 2 ), args, co::Any() );
 	}
 
 	co::int32 dynamicRegisterService( co::IService* dynamicServiceProxy_ )
 	{
-		co::Any args[] = {
-			dynamicServiceProxy_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { dynamicServiceProxy_ };
 		co::int32 res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 3 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 3 ), args, res );
 		return res;
 	}
 
 	void dynamicSetField( co::int32 dynFacetId_, co::IField* field_, co::Any value_ )
 	{
-		co::Any args[] = {
-			dynFacetId_,
-			field_,
-			value_
-		};
-		co::Range<co::Any> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 4 ), range, co::Any() );
+		co::Any args[] = { dynFacetId_, field_, value_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 4 ), args, co::Any() );
 	}
 
 protected:

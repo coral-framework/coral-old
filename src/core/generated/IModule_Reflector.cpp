@@ -78,38 +78,38 @@ public:
 
 	void abort()
 	{
-		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 0 ), range, co::Any() );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 0 ), args, co::Any() );
 	}
 
 	void disintegrate()
 	{
-		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 1 ), range, co::Any() );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 1 ), args, co::Any() );
 	}
 
 	void dispose()
 	{
-		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 2 ), range, co::Any() );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 2 ), args, co::Any() );
 	}
 
 	void initialize()
 	{
-		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 3 ), range, co::Any() );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 3 ), args, co::Any() );
 	}
 
 	void integrate()
 	{
-		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 4 ), range, co::Any() );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 4 ), args, co::Any() );
 	}
 
 	void integratePresentation()
 	{
-		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 5 ), range, co::Any() );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModule>( 5 ), args, co::Any() );
 	}
 
 protected:

@@ -46,11 +46,8 @@ public:
 
 	void provideReflectorFor( co::IType* type_ )
 	{
-		co::Any args[] = {
-			type_
-		};
-		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicTypeProvider>( 0 ), range, co::Any() );
+		co::Any args[] = { type_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicTypeProvider>( 0 ), args, co::Any() );
 	}
 
 protected:

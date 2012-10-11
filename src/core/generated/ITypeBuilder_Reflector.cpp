@@ -5,10 +5,10 @@
 
 #include <co/ITypeBuilder.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IInterface.h>
-#include <co/IType.h>
 #include <co/INamespace.h>
+#include <co/IType.h>
 #include <co/IMethodBuilder.h>
+#include <co/IInterface.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -68,61 +68,42 @@ public:
 
 	co::IType* createType()
 	{
-		co::Range<co::Any> range;
+		co::Range<co::Any> args;
 		co::RefPtr<co::IType> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 0 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 0 ), args, res );
 		return res.get();
 	}
 
 	void defineBaseType( co::IType* baseType_ )
 	{
-		co::Any args[] = {
-			baseType_
-		};
-		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 1 ), range, co::Any() );
+		co::Any args[] = { baseType_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 1 ), args, co::Any() );
 	}
 
 	void defineField( const std::string& name_, co::IType* type_, bool isReadOnly_ )
 	{
-		co::Any args[] = {
-			name_,
-			type_,
-			isReadOnly_
-		};
-		co::Range<co::Any> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 2 ), range, co::Any() );
+		co::Any args[] = { name_, type_, isReadOnly_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 2 ), args, co::Any() );
 	}
 
 	void defineIdentifier( const std::string& name_ )
 	{
-		co::Any args[] = {
-			name_
-		};
-		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 3 ), range, co::Any() );
+		co::Any args[] = { name_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 3 ), args, co::Any() );
 	}
 
 	co::IMethodBuilder* defineMethod( const std::string& name_ )
 	{
-		co::Any args[] = {
-			name_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { name_ };
 		co::RefPtr<co::IMethodBuilder> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 4 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 4 ), args, res );
 		return res.get();
 	}
 
 	void definePort( const std::string& name_, co::IInterface* type_, bool isFacet_ )
 	{
-		co::Any args[] = {
-			name_,
-			type_,
-			isFacet_
-		};
-		co::Range<co::Any> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 5 ), range, co::Any() );
+		co::Any args[] = { name_, type_, isFacet_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 5 ), args, co::Any() );
 	}
 
 protected:

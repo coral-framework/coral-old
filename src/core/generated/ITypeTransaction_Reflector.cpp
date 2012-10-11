@@ -51,14 +51,14 @@ public:
 
 	void commit()
 	{
-		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeTransaction>( 0 ), range, co::Any() );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeTransaction>( 0 ), args, co::Any() );
 	}
 
 	void rollback()
 	{
-		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeTransaction>( 1 ), range, co::Any() );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeTransaction>( 1 ), args, co::Any() );
 	}
 
 protected:

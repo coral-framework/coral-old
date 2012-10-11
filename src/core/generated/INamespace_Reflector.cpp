@@ -5,9 +5,9 @@
 
 #include <co/INamespace.h>
 #include <co/IDynamicServiceProvider.h>
+#include <co/IModule.h>
 #include <co/ITypeBuilder.h>
 #include <co/IType.h>
-#include <co/IModule.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -88,46 +88,33 @@ public:
 
 	co::INamespace* defineChildNamespace( const std::string& name_ )
 	{
-		co::Any args[] = {
-			name_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { name_ };
 		co::RefPtr<co::INamespace> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 0 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 0 ), args, res );
 		return res.get();
 	}
 
 	co::ITypeBuilder* defineType( const std::string& name_, co::TypeKind kind_ )
 	{
-		co::Any args[] = {
-			name_,
-			kind_
-		};
-		co::Range<co::Any> range( args, 2 );
+		co::Any args[] = { name_, kind_ };
 		co::RefPtr<co::ITypeBuilder> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 1 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 1 ), args, res );
 		return res.get();
 	}
 
 	co::INamespace* findChildNamespace( const std::string& name_ )
 	{
-		co::Any args[] = {
-			name_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { name_ };
 		co::RefPtr<co::INamespace> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 2 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 2 ), args, res );
 		return res.get();
 	}
 
 	co::IType* findType( const std::string& name_ )
 	{
-		co::Any args[] = {
-			name_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { name_ };
 		co::RefPtr<co::IType> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 3 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 3 ), args, res );
 		return res.get();
 	}
 

@@ -74,23 +74,20 @@ public:
 
 	void setupBase( co::Range<std::string> requiredModules_ )
 	{
-		co::Any args[] = {
-			requiredModules_
-		};
-		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 0 ), range, co::Any() );
+		co::Any args[] = { requiredModules_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 0 ), args, co::Any() );
 	}
 
 	void setupPresentation()
 	{
-		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 1 ), range, co::Any() );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 1 ), args, co::Any() );
 	}
 
 	void tearDown()
 	{
-		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 2 ), range, co::Any() );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 2 ), args, co::Any() );
 	}
 
 protected:

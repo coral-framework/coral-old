@@ -47,12 +47,9 @@ public:
 
 	co::int32 main( co::Range<std::string> args_ )
 	{
-		co::Any args[] = {
-			args_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { args_ };
 		co::int32 res;
-		_provider->dynamicInvoke( _cookie, getMethod<lua::ILauncher>( 0 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<lua::ILauncher>( 0 ), args, res );
 		return res;
 	}
 

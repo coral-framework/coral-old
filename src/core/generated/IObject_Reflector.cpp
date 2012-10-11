@@ -52,23 +52,16 @@ public:
 
 	co::IService* getServiceAt( co::IPort* port_ )
 	{
-		co::Any args[] = {
-			port_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { port_ };
 		co::RefPtr<co::IService> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 0 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 0 ), args, res );
 		return res.get();
 	}
 
 	void setServiceAt( co::IPort* receptacle_, co::IService* service_ )
 	{
-		co::Any args[] = {
-			receptacle_,
-			service_
-		};
-		co::Range<co::Any> range( args, 2 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 1 ), range, co::Any() );
+		co::Any args[] = { receptacle_, service_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 1 ), args, co::Any() );
 	}
 
 protected:

@@ -55,52 +55,36 @@ public:
 
 	void addInterceptor( lua::IInterceptor* interceptor_ )
 	{
-		co::Any args[] = {
-			interceptor_
-		};
-		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 0 ), range, co::Any() );
+		co::Any args[] = { interceptor_ };
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 0 ), args, co::Any() );
 	}
 
 	co::int32 call( const std::string& moduleName_, const std::string& functionName_, co::Range<co::Any> args_, co::Range<co::Any> results_ )
 	{
-		co::Any args[] = {
-			moduleName_,
-			functionName_,
-			args_,
-			results_
-		};
-		co::Range<co::Any> range( args, 4 );
+		co::Any args[] = { moduleName_, functionName_, args_, results_ };
 		co::int32 res;
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 1 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 1 ), args, res );
 		return res;
 	}
 
 	void collectGarbage()
 	{
-		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 2 ), range, co::Any() );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 2 ), args, co::Any() );
 	}
 
 	bool findScript( const std::string& name_, std::string& filename_ )
 	{
-		co::Any args[] = {
-			name_,
-			filename_
-		};
-		co::Range<co::Any> range( args, 2 );
+		co::Any args[] = { name_, filename_ };
 		bool res;
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 3 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 3 ), args, res );
 		return res;
 	}
 
 	void removeInterceptor( lua::IInterceptor* interceptor_ )
 	{
-		co::Any args[] = {
-			interceptor_
-		};
-		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 4 ), range, co::Any() );
+		co::Any args[] = { interceptor_ };
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 4 ), args, co::Any() );
 	}
 
 protected:

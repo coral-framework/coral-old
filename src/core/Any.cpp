@@ -111,28 +111,45 @@ bool isTrue( const std::string& str )
 	return str == "true";
 }
 
-void streamOut( std::ostream& os, const co::Any& in )
+void streamOut( std::ostream& os, const co::Any& var )
 {
-	TypeKind inK = in.getKind();
-	assert( in.isIn() || inK == TK_NULL );
-	switch( inK )
+	TypeKind kind = var.getKind();
+	switch( kind )
 	{
 	case TK_NULL:	os << "null"; break;
-	case TK_BOOL:	os << ( in.state.data.b ? "true" : "false" ); break;
-	case TK_INT8:	os << in.state.data.i8; break;
-	case TK_INT16:	os << in.state.data.i16; break;
-	case TK_INT32:	os << in.state.data.i32; break;
-	case TK_INT64:	os << in.state.data.i64; break;
-	case TK_UINT8:	os << in.state.data.u8; break;
-	case TK_UINT16:	os << in.state.data.u16; break;
-	case TK_UINT32:	os << in.state.data.u32; break;
-	case TK_UINT64:	os << in.state.data.u64; break;
-	case TK_FLOAT:	os << in.state.data.f; break;
-	case TK_DOUBLE:	os << in.state.data.d; break;
+	case TK_BOOL:
+		{
+			bool v = var.isIn() ? var.state.data.b : var.state.data.deref->b;
+			os << ( v ? "true" : "false" );
+		}
+		break;
+
+	case TK_INT8:
+	case TK_INT16:
+	case TK_INT32:
+	case TK_UINT8:
+	case TK_UINT16:
+	case TK_UINT32:
+	case TK_FLOAT:
+	case TK_DOUBLE:
+		{
+			double scalar;
+			castTo<double>( kind, var.isIn() ? &var.state.data : var.state.data.ptr, &scalar );
+
+			// 16 digits, sign, point, and \0
+			char buffer[32];
+			sprintf( buffer, "%.15g", scalar );
+			os << buffer;
+		}
+		break;
+
+	case TK_INT64:	os << ( var.isIn() ? var.state.data.i64 : var.state.data.deref->i64 ); break;
+	case TK_UINT64: os << ( var.isIn() ? var.state.data.u64 : var.state.data.deref->u64 ); break;
+
 	case TK_ENUM:
 		{
-			uint32 id = in.state.data.u32;
-			Range<std::string> ids = static_cast<IEnum*>( in.getType() )->getIdentifiers();
+			uint32 id = var.state.data.u32;
+			Range<std::string> ids = static_cast<IEnum*>( var.getType() )->getIdentifiers();
 			if( id < ids.getSize() )
 				os << ids[id];
 			else
@@ -141,24 +158,29 @@ void streamOut( std::ostream& os, const co::Any& in )
 		break;
 
 	case TK_STRING:
-		os << '"' << *in.state.data.str << '"';
+		os << '"' << *var.state.data.str << '"';
 		break;
 
+	case TK_ANY: streamOut( os, var.asIn() ); break;
+
 	case TK_ARRAY:
-		os << "{";
-		for( size_t i = 0; i < in.state.size; ++i )
 		{
-			if( i > 0 ) os << ", ";
-			streamOut( os, in[i] );
+			Any in = var.asIn();
+			os << "{";
+			for( size_t i = 0; i < in.state.size; ++i )
+			{
+				if( i > 0 ) os << ", ";
+				streamOut( os, in[i] );
+			}
+			os << "}";
 		}
-		os << "}";
 		break;
 
 	case TK_STRUCT:
 	case TK_NATIVECLASS:
 		os << "{";
 		{
-			IRecordType* recordType = static_cast<IRecordType*>( in.getType() );
+			IRecordType* recordType = static_cast<IRecordType*>( var.getType() );
 			IReflector* reflector = recordType->getReflector();
 			Range<IField*> fields = recordType->getFields();
 			AnyValue v;
@@ -167,18 +189,21 @@ void streamOut( std::ostream& os, const co::Any& in )
 				if( i > 0 ) os << ", ";
 				IField* f = fields[i];
 				os << f->getName() << " = ";
-				reflector->getField( in, f, v );
-				streamOut( os, v.getAny().asIn() );
+				reflector->getField( var, f, v );
+				streamOut( os, v.getAny() );
 			}
 		}
 		os << "}";
 		break;
 
 	case TK_INTERFACE:
-		if( in.state.data.ptr )
-			os << '@' << in.state.data.ptr;
-		else
-			os << "null";
+		{
+			void* ptr = var.isIn() ? var.state.data.ptr : var.state.data.deref->ptr;
+			if( ptr )
+				os << '@' << ptr;
+			else
+				os << "null";
+		}
 		break;
 
 	default:
@@ -363,9 +388,9 @@ void Any::put( Any in ) const
 		{
 			double d = strtod( in.state.data.str->c_str(), NULL );
 			if( myK == TK_DOUBLE )
-				*reinterpret_cast<double*>( state.data.ptr ) = d;
+				state.data.deref->d = d;
 			else
-				*reinterpret_cast<float*>( state.data.ptr ) = static_cast<float>( d );
+				state.data.deref->f = static_cast<float>( d );
 		}
 		else
 			THROW_NO_CONVERSION( in.state, state, );
@@ -578,55 +603,67 @@ bool Any::operator==( const Any& other ) const
 void Any::cast( Any& to ) const
 {
 	TypeKind myK = getKind();
-	TypeKind toK = to.getKind();
-
-	// if this contains a co::AnyValue we may have to dereference it
-	if( myK == TK_ANY && toK != TK_ANY )
+	if( myK != TK_NULL )
 	{
-		assert( isOut() );
-		reinterpret_cast<AnyValue*>( state.data.ptr )->getAny().cast( to );
-		return;
-	}
+		TypeKind toK = to.getKind();
 
-	// are we casting to an 'in' or 'out' variable?
-	if( to.isOut() )
-	{
-		// casting to an 'out' variable: both types must match
-		if( isOut() )
+		// if this contains a co::AnyValue we may have to dereference it
+		if( myK == TK_ANY && toK != TK_ANY )
 		{
-			if( typesMatch( myK, toK, state.type, to.state.type ) )
-			{
-				to.state.data.ptr = state.data.ptr;
-				return;
-			}
+			assert( isOut() );
+			reinterpret_cast<AnyValue*>( state.data.ptr )->getAny().cast( to );
+			return;
 		}
-	}
-	else if( isOut() ) // casting from an 'out' to an 'in' variable
-	{
-		// we must extract an 'in' var from the 'out' var to carry on the cast
-		return asIn().cast( to );
-	}
-	else // casting from an 'in' to an 'in' variable
-	{
-		if( myK == TK_ARRAY )
+
+		// are we casting to an 'in' or 'out' variable?
+		if( to.isOut() )
 		{
-			if( toK == TK_ARRAY )
+			// casting to an 'out' variable: both types must match
+			if( isOut() )
 			{
-				// check if both array element types match
-				IType* myET = static_cast<IArray*>( state.type )->getElementType();
-				IType* toET = static_cast<IArray*>( to.state.type )->getElementType();
-				if( typesMatch( myET->getKind(), toET->getKind(), myET, toET ) )
+				if( typesMatch( myK, toK, state.type, to.state.type ) )
 				{
-					to.state.size = state.size;
-					to.state.data = state.data;
+					to.state.data.ptr = state.data.ptr;
 					return;
 				}
 			}
 		}
-		else if( typesMatch( myK, toK, state.type, to.state.type ) )
+		else if( isOut() ) // casting from an 'out' to an 'in' variable
 		{
-			to.state.data = state.data;
-			return;
+			// we must extract an 'in' var from the 'out' var to carry on the cast
+			return asIn().cast( to );
+		}
+		else // casting from an 'in' to an 'in' variable
+		{
+			if( toK == TK_INTERFACE )
+			{
+				if( myK == TK_INTERFACE &&
+				   ( state.data.ptr == NULL || state.type->isA( to.state.type ) ) )
+				{
+					to.state.data.ptr = state.data.ptr;
+					return;
+				}
+			}
+			else if( myK == TK_ARRAY )
+			{
+				if( toK == TK_ARRAY )
+				{
+					// check if both array element types match
+					IType* myET = static_cast<IArray*>( state.type )->getElementType();
+					IType* toET = static_cast<IArray*>( to.state.type )->getElementType();
+					if( typesMatch( myET->getKind(), toET->getKind(), myET, toET ) )
+					{
+						to.state.size = state.size;
+						to.state.data = state.data;
+						return;
+					}
+				}
+			}
+			else if( state.type == to.state.type )
+			{
+				to.state.data = state.data;
+				return;
+			}
 		}
 	}
 
@@ -723,6 +760,6 @@ std::ostream& operator<<( std::ostream& os, const co::__any::State& s )
 
 std::ostream& operator<<( std::ostream& os, const co::Any& any )
 {
-	streamOut( os, any.isIn() ? any : any.asIn() );
+	streamOut( os, any );
 	return os;
 }

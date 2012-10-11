@@ -6,8 +6,8 @@
 #include <co/IMethodBuilder.h>
 #include <co/IDynamicServiceProvider.h>
 #include <co/IException.h>
-#include <co/IType.h>
 #include <co/ITypeBuilder.h>
+#include <co/IType.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -60,38 +60,26 @@ public:
 
 	void createMethod()
 	{
-		co::Range<co::Any> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 0 ), range, co::Any() );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 0 ), args, co::Any() );
 	}
 
 	void defineException( co::IException* exceptionType_ )
 	{
-		co::Any args[] = {
-			exceptionType_
-		};
-		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 1 ), range, co::Any() );
+		co::Any args[] = { exceptionType_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 1 ), args, co::Any() );
 	}
 
 	void defineParameter( const std::string& name_, co::IType* type_, bool input_, bool output_ )
 	{
-		co::Any args[] = {
-			name_,
-			type_,
-			input_,
-			output_
-		};
-		co::Range<co::Any> range( args, 4 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 2 ), range, co::Any() );
+		co::Any args[] = { name_, type_, input_, output_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 2 ), args, co::Any() );
 	}
 
 	void defineReturnType( co::IType* type_ )
 	{
-		co::Any args[] = {
-			type_
-		};
-		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 3 ), range, co::Any() );
+		co::Any args[] = { type_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 3 ), args, co::Any() );
 	}
 
 protected:

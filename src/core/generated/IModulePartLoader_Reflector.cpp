@@ -44,23 +44,17 @@ public:
 
 	bool canLoadModulePart( const std::string& moduleName_ )
 	{
-		co::Any args[] = {
-			moduleName_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { moduleName_ };
 		bool res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 0 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 0 ), args, res );
 		return res;
 	}
 
 	co::IModulePart* loadModulePart( const std::string& moduleName_ )
 	{
-		co::Any args[] = {
-			moduleName_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { moduleName_ };
 		co::RefPtr<co::IModulePart> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 1 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 1 ), args, res );
 		return res.get();
 	}
 

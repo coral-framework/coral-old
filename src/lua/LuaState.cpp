@@ -313,7 +313,8 @@ void LuaState::get( lua_State* L, int index, co::Any var )
 
 	case LUA_TTABLE:
 		{
-			lua_getfield( L, index, "__coral" );
+			lua_pushliteral( L, "__coral" );
+			lua_rawget( L, index < 0 ? index - 1 : index );
 			int tp = lua_type( L, -1 );
 			if( tp == LUA_TNIL )
 			{

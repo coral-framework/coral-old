@@ -57,22 +57,15 @@ public:
 
 	void addDocFor( const std::string& element_, const std::string& text_ )
 	{
-		co::Any args[] = {
-			element_,
-			text_
-		};
-		co::Range<co::Any> range( args, 2 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 0 ), range, co::Any() );
+		co::Any args[] = { element_, text_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 0 ), args, co::Any() );
 	}
 
 	std::string getDocFor( const std::string& element_ )
 	{
-		co::Any args[] = {
-			element_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { element_ };
 		std::string res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 1 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 1 ), args, res );
 		return res;
 	}
 

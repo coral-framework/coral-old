@@ -4,11 +4,11 @@
  */
 
 #include <co/IReflector.h>
-#include <co/IMethod.h>
 #include <co/IField.h>
+#include <co/IMethod.h>
+#include <co/IDynamicServiceProvider.h>
 #include <co/IType.h>
 #include <co/IObject.h>
-#include <co/IDynamicServiceProvider.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -60,64 +60,42 @@ public:
 
 	void getField( co::Any instance_, co::IField* field_, co::Any value_ )
 	{
-		co::Any args[] = {
-			instance_,
-			field_,
-			value_
-		};
-		co::Range<co::Any> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 0 ), range, co::Any() );
+		co::Any args[] = { instance_, field_, value_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 0 ), args, co::Any() );
 	}
 
 	void invoke( co::Any instance_, co::IMethod* method_, co::Range<co::Any> args_, co::Any returnValue_ )
 	{
-		co::Any args[] = {
-			instance_,
-			method_,
-			args_,
-			returnValue_
-		};
-		co::Range<co::Any> range( args, 4 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 1 ), range, co::Any() );
+		co::Any args[] = { instance_, method_, args_, returnValue_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 1 ), args, co::Any() );
 	}
 
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* dynamicProvider_ )
 	{
-		co::Any args[] = {
-			dynamicProvider_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { dynamicProvider_ };
 		co::RefPtr<co::IService> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 2 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 2 ), args, res );
 		return res.get();
 	}
 
 	co::IObject* newInstance()
 	{
-		co::Range<co::Any> range;
+		co::Range<co::Any> args;
 		co::RefPtr<co::IObject> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 3 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 3 ), args, res );
 		return res.get();
 	}
 
 	void raise( const std::string& message_ )
 	{
-		co::Any args[] = {
-			message_
-		};
-		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 4 ), range, co::Any() );
+		co::Any args[] = { message_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 4 ), args, co::Any() );
 	}
 
 	void setField( co::Any instance_, co::IField* field_, co::Any value_ )
 	{
-		co::Any args[] = {
-			instance_,
-			field_,
-			value_
-		};
-		co::Range<co::Any> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 5 ), range, co::Any() );
+		co::Any args[] = { instance_, field_, value_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 5 ), args, co::Any() );
 	}
 
 	// These co::IReflector methods are not part of the reflection system:

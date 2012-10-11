@@ -50,6 +50,7 @@ union Data
 	co::uint8* bytes;
 	std::string* str;
 	IService* service;
+	Data* deref;
 
 	// Constructors
 	Data() : d( 0 ) {;}

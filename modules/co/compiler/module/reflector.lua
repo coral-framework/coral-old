@@ -141,20 +141,20 @@ public:
 				end
 				writer( ")\n\t{\n" )
 				if #params > 0 then
-					writer( "\t\tco::Any args[] = {" )
+					writer( "\t\tco::Any args[] = { " )
 					for i, p in ipairs( params ) do
-						if i > 1 then writer "," end
-						writer( "\n\t\t\t", p.name, "_" )
+						if i > 1 then writer ", " end
+						writer( p.name, "_" )
 					end
-					writer( "\n\t\t};\n\t\tco::Range<co::Any> range( args, ", #params, " );\n" )
+					writer( " };\n" )
 				else
-					writer( "\t\tco::Range<co::Any> range;\n" )
+					writer( "\t\tco::Range<co::Any> args;\n" )
 				end
 				writer( "\t\t" )
 				if rt then
 					writer( itf.formatField( rt ), " res;\n\t\t" )
 				end
-				writer( "_provider->dynamicInvoke( _cookie, getMethod<", itf.cppName, ">( ", i - 1, " ), range, ", rt and "res" or "co::Any()", " );\n" )
+				writer( "_provider->dynamicInvoke( _cookie, getMethod<", itf.cppName, ">( ", i - 1, " ), args, ", rt and "res" or "co::Any()", " );\n" )
 				if rt then
 					writer( "\t\treturn res", rt.kind == 'TK_INTERFACE' and ".get()" or "", ";\n" )
 				end

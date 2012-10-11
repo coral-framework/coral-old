@@ -683,7 +683,7 @@ TEST( AnyTests, coercionsFromDouble )
 	co::Any a2( -9.99 );
 
 	EXPECT_ANY_STREQ( a0, "in double: 0" );
-	EXPECT_ANY_STREQ( a1, "in double: 3.14159" );
+	EXPECT_ANY_STREQ( a1, "in double: 3.141592653589" );
 	EXPECT_ANY_STREQ( a2, "in double: -9.99" );
 
 	// to bool
@@ -790,12 +790,14 @@ TEST( AnyTests, coercionsFromInterface )
 	EXPECT_THROW( a1.get<co::int32>(), co::IllegalCastException );
 	EXPECT_THROW( a1.get<std::string&>(), co::IllegalCastException );
 	EXPECT_THROW( a0.get<co::TypeKind>(), co::IllegalCastException );
-	EXPECT_THROW( a0.get<co::INamespace*>(), co::IllegalCastException );
 
 	// valid coercions to super-types:
 	EXPECT_TRUE( a0.get<co::IService*>() == NULL );
 	EXPECT_TRUE( a1.get<co::IService*>() != NULL );
 	EXPECT_TRUE( a1.get<co::IType*>() != NULL );
+
+	// valid coercion from null to any type
+	EXPECT_TRUE( a0.get<co::INamespace*>() == NULL );
 }
 
 TEST( AnyTests, coercionsFromRange )

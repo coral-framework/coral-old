@@ -56,98 +56,62 @@ public:
 
 	void addService( co::IInterface* serviceType_, co::IService* service_ )
 	{
-		co::Any args[] = {
-			serviceType_,
-			service_
-		};
-		co::Range<co::Any> range( args, 2 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 0 ), range, co::Any() );
+		co::Any args[] = { serviceType_, service_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 0 ), args, co::Any() );
 	}
 
 	void addServiceForType( co::IInterface* serviceType_, co::IInterface* clientType_, co::IService* service_ )
 	{
-		co::Any args[] = {
-			serviceType_,
-			clientType_,
-			service_
-		};
-		co::Range<co::Any> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 1 ), range, co::Any() );
+		co::Any args[] = { serviceType_, clientType_, service_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 1 ), args, co::Any() );
 	}
 
 	void addServiceProvider( co::IInterface* serviceType_, const std::string& componentName_ )
 	{
-		co::Any args[] = {
-			serviceType_,
-			componentName_
-		};
-		co::Range<co::Any> range( args, 2 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 2 ), range, co::Any() );
+		co::Any args[] = { serviceType_, componentName_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 2 ), args, co::Any() );
 	}
 
 	void addServiceProviderForType( co::IInterface* serviceType_, co::IInterface* clientType_, const std::string& componentName_ )
 	{
-		co::Any args[] = {
-			serviceType_,
-			clientType_,
-			componentName_
-		};
-		co::Range<co::Any> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 3 ), range, co::Any() );
+		co::Any args[] = { serviceType_, clientType_, componentName_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 3 ), args, co::Any() );
 	}
 
 	co::IService* getService( co::IInterface* serviceType_ )
 	{
-		co::Any args[] = {
-			serviceType_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { serviceType_ };
 		co::RefPtr<co::IService> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 4 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 4 ), args, res );
 		return res.get();
 	}
 
 	co::IService* getServiceForInstance( co::IInterface* serviceType_, co::IService* client_ )
 	{
-		co::Any args[] = {
-			serviceType_,
-			client_
-		};
-		co::Range<co::Any> range( args, 2 );
+		co::Any args[] = { serviceType_, client_ };
 		co::RefPtr<co::IService> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 5 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 5 ), args, res );
 		return res.get();
 	}
 
 	co::IService* getServiceForType( co::IInterface* serviceType_, co::IInterface* clientType_ )
 	{
-		co::Any args[] = {
-			serviceType_,
-			clientType_
-		};
-		co::Range<co::Any> range( args, 2 );
+		co::Any args[] = { serviceType_, clientType_ };
 		co::RefPtr<co::IService> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 6 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 6 ), args, res );
 		return res.get();
 	}
 
 	void removeService( co::IInterface* serviceType_ )
 	{
-		co::Any args[] = {
-			serviceType_
-		};
-		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 7 ), range, co::Any() );
+		co::Any args[] = { serviceType_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 7 ), args, co::Any() );
 	}
 
 	void removeServiceForType( co::IInterface* serviceType_, co::IInterface* clientType_ )
 	{
-		co::Any args[] = {
-			serviceType_,
-			clientType_
-		};
-		co::Range<co::Any> range( args, 2 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 8 ), range, co::Any() );
+		co::Any args[] = { serviceType_, clientType_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 8 ), args, co::Any() );
 	}
 
 protected:

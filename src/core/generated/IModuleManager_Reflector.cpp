@@ -5,8 +5,8 @@
 
 #include <co/IModuleManager.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IModulePartLoader.h>
 #include <co/IModule.h>
+#include <co/IModulePartLoader.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -71,53 +71,38 @@ public:
 
 	co::IModule* findModule( const std::string& moduleName_ )
 	{
-		co::Any args[] = {
-			moduleName_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { moduleName_ };
 		co::RefPtr<co::IModule> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 0 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 0 ), args, res );
 		return res.get();
 	}
 
 	void installLoader( co::IModulePartLoader* loader_ )
 	{
-		co::Any args[] = {
-			loader_
-		};
-		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 1 ), range, co::Any() );
+		co::Any args[] = { loader_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 1 ), args, co::Any() );
 	}
 
 	bool isLoadable( const std::string& moduleName_ )
 	{
-		co::Any args[] = {
-			moduleName_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { moduleName_ };
 		bool res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 2 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 2 ), args, res );
 		return res;
 	}
 
 	co::IModule* load( const std::string& moduleName_ )
 	{
-		co::Any args[] = {
-			moduleName_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { moduleName_ };
 		co::RefPtr<co::IModule> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 3 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 3 ), args, res );
 		return res.get();
 	}
 
 	void uninstallLoader( co::IModulePartLoader* loader_ )
 	{
-		co::Any args[] = {
-			loader_
-		};
-		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 4 ), range, co::Any() );
+		co::Any args[] = { loader_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 4 ), args, co::Any() );
 	}
 
 protected:

@@ -5,11 +5,11 @@
 
 #include <co/IArray.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IAnnotation.h>
-#include <co/INamespace.h>
-#include <co/IInterface.h>
 #include <co/IReflector.h>
 #include <co/IType.h>
+#include <co/INamespace.h>
+#include <co/IInterface.h>
+#include <co/IAnnotation.h>
 #include <co/Uuid.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
@@ -61,21 +61,15 @@ public:
 
 	void addAnnotation( co::IAnnotation* annotation_ )
 	{
-		co::Any args[] = {
-			annotation_
-		};
-		co::Range<co::Any> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 0 ), range, co::Any() );
+		co::Any args[] = { annotation_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 0 ), args, co::Any() );
 	}
 
 	co::IAnnotation* getAnnotation( co::IInterface* requestedType_ )
 	{
-		co::Any args[] = {
-			requestedType_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { requestedType_ };
 		co::RefPtr<co::IAnnotation> res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), args, res );
 		return res.get();
 	}
 
@@ -144,12 +138,9 @@ public:
 
 	bool isA( co::IType* type_ )
 	{
-		co::Any args[] = {
-			type_
-		};
-		co::Range<co::Any> range( args, 1 );
+		co::Any args[] = { type_ };
 		bool res;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IType>( 0 ), range, res );
+		_provider->dynamicInvoke( _cookie, getMethod<co::IType>( 0 ), args, res );
 		return res;
 	}
 
