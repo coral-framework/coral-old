@@ -68,11 +68,9 @@ void SignatureCalculator::calculateSignatures()
 	case TK_INT8:			break;
 	case TK_INT16:			break;
 	case TK_INT32:			break;
-	case TK_INT64:			break;
 	case TK_UINT8:			break;
 	case TK_UINT16:			break;
 	case TK_UINT32:			break;
-	case TK_UINT64:			break;
 	case TK_FLOAT:			break;
 	case TK_DOUBLE:			break;
 	case TK_ENUM:			fillEnumSignatureData(); break;

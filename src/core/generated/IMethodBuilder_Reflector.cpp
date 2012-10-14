@@ -5,8 +5,8 @@
 
 #include <co/IMethodBuilder.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IException.h>
 #include <co/ITypeBuilder.h>
+#include <co/IException.h>
 #include <co/IType.h>
 #include <co/IMethod.h>
 #include <co/IField.h>

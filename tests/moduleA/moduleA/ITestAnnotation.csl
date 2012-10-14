@@ -13,8 +13,6 @@ interface ITestAnnotation extends co.IAnnotation
 	uint16 u16;
 	int32 i32;
 	uint32 u32;
-	int64 i64;
-	uint64 u64;
 	float flt;
 	double dbl;
 	string str;

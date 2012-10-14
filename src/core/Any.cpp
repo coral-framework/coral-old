@@ -36,11 +36,9 @@ inline void castTo( TypeKind fromKind, const void* from, void* to )
 	case TK_INT8:	cast<int8, To>( from, to );		break;
 	case TK_INT16:	cast<int16, To>( from, to );	break;
 	case TK_INT32:	cast<int32, To>( from, to );	break;
-	case TK_INT64:	cast<int64, To>( from, to );	break;
 	case TK_UINT8:	cast<uint8, To>( from, to );	break;
 	case TK_UINT16:	cast<uint16, To>( from, to );	break;
 	case TK_UINT32:	cast<uint32, To>( from, to );	break;
-	case TK_UINT64:	cast<uint64, To>( from, to );	break;
 	case TK_FLOAT:	cast<float, To>( from, to );	break;
 	case TK_DOUBLE:	cast<double, To>( from, to );	break;
 	case TK_ENUM:	cast<uint32, To>( from, to );	break;
@@ -57,11 +55,9 @@ inline void castFrom( const void* from, TypeKind toKind, void* to )
 	case TK_INT8:	cast<From, int8>( from, to );	break;
 	case TK_INT16:	cast<From, int16>( from, to );	break;
 	case TK_INT32:	cast<From, int32>( from, to );	break;
-	case TK_INT64:	cast<From, int64>( from, to );	break;
 	case TK_UINT8:	cast<From, uint8>( from, to );	break;
 	case TK_UINT16:	cast<From, uint16>( from, to );	break;
 	case TK_UINT32:	cast<From, uint32>( from, to );	break;
-	case TK_UINT64:	cast<From, uint64>( from, to );	break;
 	case TK_FLOAT:	cast<From, float>( from, to );	break;
 	case TK_DOUBLE:	cast<From, double>( from, to );	break;
 	case TK_ENUM:	cast<From, uint32>( from, to );	break;
@@ -78,11 +74,9 @@ void castScalar( TypeKind fromKind, const void* from, TypeKind toKind, void* to 
 	case TK_INT8:	castFrom<int8>( from, toKind, to );		break;
 	case TK_INT16:	castFrom<int16>( from, toKind, to );	break;
 	case TK_INT32:	castFrom<int32>( from, toKind, to );	break;
-	case TK_INT64:	castFrom<int64>( from, toKind, to );	break;
 	case TK_UINT8:	castFrom<uint8>( from, toKind, to );	break;
 	case TK_UINT16:	castFrom<uint16>( from, toKind, to );	break;
 	case TK_UINT32:	castFrom<uint32>( from, toKind, to );	break;
-	case TK_UINT64:	castFrom<uint64>( from, toKind, to );	break;
 	case TK_FLOAT:	castFrom<float>( from, toKind, to );	break;
 	case TK_DOUBLE:	castFrom<double>( from, toKind, to );	break;
 	case TK_ENUM:	castFrom<uint32>( from, toKind, to );	break;
@@ -142,9 +136,6 @@ void streamOut( std::ostream& os, const co::Any& var )
 			os << buffer;
 		}
 		break;
-
-	case TK_INT64:	os << ( var.isIn() ? var.state.data.i64 : var.state.data.deref->i64 ); break;
-	case TK_UINT64: os << ( var.isIn() ? var.state.data.u64 : var.state.data.deref->u64 ); break;
 
 	case TK_ENUM:
 		{
@@ -312,11 +303,9 @@ void Any::set( bool isIn, IType* type, const void* addr, size_t size )
 	case TK_INT8:		copy<int8>( addr, &state.data ); break;
 	case TK_INT16:		copy<int16>( addr, &state.data ); break;
 	case TK_INT32:		copy<int32>( addr, &state.data ); break;
-	case TK_INT64:		copy<int64>( addr, &state.data ); break;
 	case TK_UINT8:		copy<uint8>( addr, &state.data ); break;
 	case TK_UINT16:		copy<uint16>( addr, &state.data ); break;
 	case TK_UINT32:		copy<uint32>( addr, &state.data ); break;
-	case TK_UINT64:		copy<uint64>( addr, &state.data ); break;
 	case TK_FLOAT:		copy<float>( addr, &state.data ); break;
 	case TK_DOUBLE:		copy<double>( addr, &state.data ); break;
 	case TK_ENUM:		copy<uint32>( addr, &state.data ); break;
@@ -351,7 +340,6 @@ void Any::put( Any in ) const
 	case TK_INT8:
 	case TK_INT16:
 	case TK_INT32:
-	case TK_INT64:
 		if( isScalar( inK ) )
 			castScalar( inK, &in.state.data, myK, state.data.ptr );
 		else if( inK == TK_STRING )
@@ -367,7 +355,6 @@ void Any::put( Any in ) const
 	case TK_UINT8:
 	case TK_UINT16:
 	case TK_UINT32:
-	case TK_UINT64:
 		if( isScalar( inK ) )
 			castScalar( inK, &in.state.data, myK, state.data.ptr );
 		else if( inK == TK_STRING )
@@ -584,11 +571,9 @@ bool Any::operator==( const Any& other ) const
 		case TK_INT8:	return isEqual<int8>( &state.data, &other.state.data );
 		case TK_INT16:	return isEqual<int16>( &state.data, &other.state.data );
 		case TK_INT32:	return isEqual<int32>( &state.data, &other.state.data );
-		case TK_INT64:	return isEqual<int64>( &state.data, &other.state.data );
 		case TK_UINT8:	return isEqual<uint8>( &state.data, &other.state.data );
 		case TK_UINT16:	return isEqual<uint16>( &state.data, &other.state.data );
 		case TK_UINT32:	return isEqual<uint32>( &state.data, &other.state.data );
-		case TK_UINT64:	return isEqual<uint64>( &state.data, &other.state.data );
 		case TK_FLOAT:	return isEqual<float>( &state.data, &other.state.data );
 		case TK_DOUBLE:	return isEqual<double>( &state.data, &other.state.data );
 		case TK_ENUM:	return isEqual<uint32>( &state.data, &other.state.data );

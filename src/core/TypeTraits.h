@@ -53,10 +53,16 @@ CORAL_EXPORT IType* getTypeByLiteralName( const char* fullName );
 // Returns the kind of a 'type'.
 CORAL_EXPORT TypeKind getKind( IType* type );
 
-// Gets a service of the given 'type', provided by 'object'.
+// Attempts to retrieve a service of a certain 'type' from 'object'.
+CORAL_EXPORT IService* findServiceByType( IObject* object, IInterface* type );
+
+// Retrieves a service of a certain 'type' from 'object'. If impossible raises an exception.
 CORAL_EXPORT IService* getServiceByType( IObject* object, IInterface* type );
 
-// Gets a service from 'object' by its port name.
+// Attempts to retrieve a service from 'object' by its port name.
+CORAL_EXPORT IService* findServiceByName( IObject* object, const std::string& portName );
+
+// Retrieves a service from 'object' by its port name. If impossible raises an exception.
 CORAL_EXPORT IService* getServiceByName( IObject* object, const std::string& portName );
 
 // Binds a 'service' to the receptacle identified by 'receptacleName' in 'object'.
@@ -70,10 +76,10 @@ CORAL_EXPORT void setServiceByName( IObject* object, const std::string& receptac
 /****************************************************************************/
 
 //! Returns true for integer types.
-inline bool isInteger( TypeKind k ) { return k >= TK_BOOL && k <= TK_UINT64; }
+inline bool isInteger( TypeKind k ) { return k >= TK_BOOL && k <= TK_UINT32; }
 
 //! Returns true for signed integer types.
-inline bool isSignedInteger( TypeKind k ) { return k >= TK_BOOL && k <= TK_INT64; }
+inline bool isSignedInteger( TypeKind k ) { return k >= TK_BOOL && k <= TK_INT32; }
 
 //! Returns true for floating-point types.
 inline bool isFloat( TypeKind k ) { return k == TK_FLOAT || k == TK_DOUBLE; }
@@ -128,13 +134,11 @@ template<TypeKind k> struct kindOfBase { static const TypeKind kind = k; };
 // specializations for basic types:
 template<> struct kindOf<bool> : public kindOfBase<TK_BOOL> {};
 template<> struct kindOf<int8> : public kindOfBase<TK_INT8> {};
-template<> struct kindOf<uint8> : public kindOfBase<TK_UINT8> {};
 template<> struct kindOf<int16> : public kindOfBase<TK_INT16> {};
-template<> struct kindOf<uint16> : public kindOfBase<TK_UINT16> {};
 template<> struct kindOf<int32> : public kindOfBase<TK_INT32> {};
+template<> struct kindOf<uint8> : public kindOfBase<TK_UINT8> {};
+template<> struct kindOf<uint16> : public kindOfBase<TK_UINT16> {};
 template<> struct kindOf<uint32> : public kindOfBase<TK_UINT32> {};
-template<> struct kindOf<int64> : public kindOfBase<TK_INT64> {};
-template<> struct kindOf<uint64>  : public kindOfBase<TK_UINT64> {};
 template<> struct kindOf<float> : public kindOfBase<TK_FLOAT> {};
 template<> struct kindOf<double> : public kindOfBase<TK_DOUBLE> {};
 template<> struct kindOf<std::string> : public kindOfBase<TK_STRING> {};
@@ -265,8 +269,6 @@ template<> struct typeOf<int16> : public typeOfBasic<int16> {};
 template<> struct typeOf<uint16> : public typeOfBasic<uint16> {};
 template<> struct typeOf<int32> : public typeOfBasic<int32> {};
 template<> struct typeOf<uint32> : public typeOfBasic<uint32> {};
-template<> struct typeOf<int64> : public typeOfBasic<int64> {};
-template<> struct typeOf<uint64>  : public typeOfBasic<uint64> {};
 template<> struct typeOf<float> : public typeOfBasic<float> {};
 template<> struct typeOf<double> : public typeOfBasic<double> {};
 template<> struct typeOf<std::string> : public typeOfBasic<std::string> {};
@@ -316,4 +318,4 @@ inline std::ostream& operator<<( std::ostream& out, co::TypeKind kind )
 	return out << co::TK_STRINGS[kind];
 }
 
-#endif
+#endif // _CO_TYPETRAITS_H_

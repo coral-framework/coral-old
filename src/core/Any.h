@@ -39,8 +39,6 @@ union Data
 	uint16 u16;
 	int32 i32;
 	uint32 u32;
-	int64 i64;
-	uint64 u64;
 	float f;
 	double d;
 
@@ -258,7 +256,7 @@ struct Variable<const RefVector<T>&>
 
 	\par Values vs. References
 		For efficiency, this class only allows the storage of values for \c enums and <em>primitive types</em>
-		(i.e. \c bool, <tt>[u]int{8|16|32|64}</tt>, \c float and \c double). All other types must be stored and
+		(i.e. \c bool, <tt>[u]int{8|16|32}</tt>, \c float and \c double). All other types must be stored and
 		retrieved <em>by reference</em> (i.e. either as pointers or actual references), and the programmer must
 		guarantee referred objects outlive their co::Any instances.
 		\par

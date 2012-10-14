@@ -184,11 +184,9 @@ IReflector* BasicReflector::create( IType* t )
 	case TK_INT8:		return new PODReflector<int8>( t );
 	case TK_INT16:		return new PODReflector<int16>( t );
 	case TK_INT32:		return new PODReflector<int32>( t );
-	case TK_INT64:		return new PODReflector<int64>( t );
 	case TK_UINT8:		return new PODReflector<uint8>( t );
 	case TK_UINT16:		return new PODReflector<uint16>( t );
 	case TK_UINT32:		return new PODReflector<uint32>( t );
-	case TK_UINT64:		return new PODReflector<uint64>( t );
 	case TK_FLOAT:		return new PODReflector<float>( t );
 	case TK_DOUBLE:		return new PODReflector<double>( t );
 	case TK_ENUM:		return new PODReflector<uint32>( t );

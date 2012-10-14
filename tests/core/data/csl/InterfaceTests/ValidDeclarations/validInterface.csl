@@ -41,7 +41,7 @@ interface validInterface
 	raises Global.SameException;
 
 	string Foo6(out string nome1, in string nome2)
-	raises Global.SameException,  Global.OtherException, Global.AnotherException;
+		raises Global.SameException,  Global.OtherException, Global.AnotherException;
 
 	void Foo7(in string[] nomes);
 

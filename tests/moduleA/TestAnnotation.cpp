@@ -46,9 +46,6 @@ public:
 	co::int32 getI32() { return _i32; }
 	void setI32( co::int32 i32 ) { _i32 = i32; }
 
-	co::int64 getI64() { return _i64; }
-	void setI64( co::int64 i64 ) { _i64 = i64; }
-
 	co::int8 getI8() { return _i8; }
 	void setI8( co::int8 i8 ) { _i8 = i8; }
 
@@ -84,9 +81,6 @@ public:
 	co::uint32 getU32() { return _u32; }
 	void setU32( co::uint32 u32 ) { _u32 = u32; }
 
-	co::uint64 getU64() { return _u64; }
-	void setU64( co::uint64 u64 ) { _u64 = u64; }
-
 	co::uint8 getU8() { return _u8; }
 	void setU8( co::uint8 u8 ) { _u8 = u8; }
 
@@ -110,8 +104,6 @@ private:
 	co::uint16 _u16;
 	co::int32 _i32;
 	co::uint32 _u32;
-	co::int64 _i64;
-	co::uint64 _u64;
 	float _flt;
 	double _dbl;
 	std::string _str;
@@ -123,7 +115,7 @@ private:
 	co::CSLError _cslError;
 	co::Uuid _uuid;
 	Vec2D _vec2d;
-	
+
 	co::IType* _type;
 };
 

@@ -16,10 +16,7 @@ TEST( PlatformTests, sizeOfPrimitives )
 
 	EXPECT_EQ( 4, sizeof(co::int32) );
 	EXPECT_EQ( 4, sizeof(co::uint32) );
-
-	EXPECT_EQ( 8, sizeof(co::int64) );
-	EXPECT_EQ( 8, sizeof(co::uint64) );
-
 	EXPECT_EQ( 4, sizeof(float) );
+
 	EXPECT_EQ( 8, sizeof(double) );
 }

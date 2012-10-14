@@ -5,9 +5,9 @@
 
 #include <co/IField.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IInterface.h>
 #include <co/IAnnotation.h>
 #include <co/ICompositeType.h>
+#include <co/IInterface.h>
 #include <co/IType.h>
 #include <co/IMethod.h>
 #include <co/IllegalCastException.h>

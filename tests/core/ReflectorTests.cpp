@@ -28,8 +28,7 @@ TEST( ReflectorTests, basicReflectors )
 {
 	static const char* BASIC_TYPE_NAMES[] = {
 		"any", "bool", "int8", "uint8", "int16", "uint16", "int32", "uint32",
-		"int64", "uint64", "float", "double", "string",
-		"co.TypeKind",	// an enum
+		"float", "double", "string", "co.TypeKind"
 	};
 
 	const int NUM_TYPES = CORAL_ARRAY_LENGTH( BASIC_TYPE_NAMES );

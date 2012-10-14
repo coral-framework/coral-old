@@ -8,8 +8,6 @@ local function estimateFieldSize( t )
 		TK_UINT16		= co.Type.uint16.reflector.size,
 		TK_INT32		= co.Type.int32.reflector.size,
 		TK_UINT32		= co.Type.uint32.reflector.size,
-		TK_INT64		= co.Type.int64.reflector.size,
-		TK_UINT64		= co.Type.uint64.reflector.size,
 		TK_FLOAT		= co.Type.float.reflector.size,
 		TK_DOUBLE		= co.Type.double.reflector.size,
 		TK_STRING		= co.Type.string.reflector.size,

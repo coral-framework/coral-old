@@ -8,11 +8,9 @@ enum TypeKind
 	TK_INT8,			//< 8-bit signed integer.
 	TK_INT16,			//< 16-bit signed integer.
 	TK_INT32,			//< 32-bit signed integer.
-	TK_INT64,			//< 64-bit signed integer.
 	TK_UINT8,			//< 8-bit unsigned integer.
 	TK_UINT16,			//< 16-bit unsigned integer.
 	TK_UINT32,			//< 32-bit unsigned integer.
-	TK_UINT64,			//< 64-bit unsigned integer.
 	TK_FLOAT,			//< 32-bit (single-precision) IEEE 754 floating-point number.
 	TK_DOUBLE,			//< 64-bit (double-precision) IEEE 754 floating-point number.
 	TK_ENUM,			//< Enumeration of constant identifiers.

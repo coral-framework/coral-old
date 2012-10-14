@@ -27,8 +27,6 @@ TEST( TypeManagerTests, preDefinedTypes )
 	EXPECT_TRUE( tm->findType( "uint16" ) != NULL );
 	EXPECT_TRUE( tm->findType( "int32" ) != NULL );
 	EXPECT_TRUE( tm->findType( "uint32" ) != NULL );
-	EXPECT_TRUE( tm->findType( "int64" ) != NULL );
-	EXPECT_TRUE( tm->findType( "uint64" ) != NULL );
 	EXPECT_TRUE( tm->findType( "float" ) != NULL );
 	EXPECT_TRUE( tm->findType( "double" ) != NULL );
 	EXPECT_TRUE( tm->findType( "string" ) != NULL );

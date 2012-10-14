@@ -25,7 +25,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 35
+#define YY_FLEX_SUBMINOR_VERSION 37
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -70,7 +70,6 @@ typedef int flex_int32_t;
 typedef unsigned char flex_uint8_t; 
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
-#endif /* ! C99 */
 
 /* Limits of integral types. */
 #ifndef INT8_MIN
@@ -100,6 +99,8 @@ typedef unsigned int flex_uint32_t;
 #ifndef UINT32_MAX
 #define UINT32_MAX             (4294967295U)
 #endif
+
+#endif /* ! C99 */
 
 #endif /* ! FLEXINT_H */
 
@@ -225,7 +226,7 @@ void csl_free (void * ,yyscan_t yyscanner );
 
 /* Begin user sect3 */
 
-#define csl_wrap(n) 1
+#define csl_wrap(yyscanner) 1
 #define YY_SKIP_YYWRAP
 
 #define yytext_ptr yytext_r
@@ -282,6 +283,10 @@ char *csl_get_text (yyscan_t yyscanner );
 int csl_get_lineno (yyscan_t yyscanner );
 
 void csl_set_lineno (int line_number ,yyscan_t yyscanner );
+
+int csl_get_column  (yyscan_t yyscanner );
+
+void csl_set_column (int column_no ,yyscan_t yyscanner );
 
 YYSTYPE * csl_get_lval (yyscan_t yyscanner );
 
@@ -352,9 +357,9 @@ extern int csl_lex \
 #undef YY_DECL
 #endif
 
-#line 206 "CSL.l"
+#line 204 "CSL.l"
 
 
-#line 359 "scanner.hh"
+#line 364 "scanner.hh"
 #undef csl_IN_HEADER
 #endif /* csl_HEADER_H */

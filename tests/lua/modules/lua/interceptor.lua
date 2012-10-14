@@ -25,7 +25,7 @@ function M.objectCalls()
 end
 
 function M.moreCalls()
-	co.Type.uint64.reflector = co.Type.uint64.currentReflector
+	co.Type.uint32.reflector = co.Type.uint32.currentReflector
 end
 
 return M

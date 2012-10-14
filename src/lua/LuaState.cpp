@@ -197,14 +197,12 @@ void LuaState::push( lua_State* L, co::Any var )
 	{
 	case co::TK_NULL:	lua_pushnil( L ); break;
 	case co::TK_BOOL:	lua_pushboolean( L, s.data.b ); break;
-	case co::TK_INT8:	lua_pushnumber( L, s.data.i8 ); break;
-	case co::TK_INT16:	lua_pushnumber( L, s.data.i16 ); break;
-	case co::TK_INT32:	lua_pushnumber( L, s.data.i32 ); break;
-	case co::TK_INT64:	lua_pushnumber( L, static_cast<lua_Number>( s.data.i64 ) ); break;
-	case co::TK_UINT8:	lua_pushnumber( L, s.data.u8 ); break;
-	case co::TK_UINT16:	lua_pushnumber( L, s.data.u16 ); break;
-	case co::TK_UINT32:	lua_pushnumber( L, s.data.u32 ); break;
-	case co::TK_UINT64:	lua_pushnumber( L, static_cast<lua_Number>( s.data.u64 ) ); break;
+	case co::TK_INT8:	lua_pushinteger( L, s.data.i8 ); break;
+	case co::TK_INT16:	lua_pushinteger( L, s.data.i16 ); break;
+	case co::TK_INT32:	lua_pushinteger( L, s.data.i32 ); break;
+	case co::TK_UINT8:	lua_pushinteger( L, s.data.u8 ); break;
+	case co::TK_UINT16:	lua_pushinteger( L, s.data.u16 ); break;
+	case co::TK_UINT32:	lua_pushinteger( L, s.data.u32 ); break;
 	case co::TK_FLOAT:	lua_pushnumber( L, s.data.f ); break;
 	case co::TK_DOUBLE:	lua_pushnumber( L, s.data.d ); break;
 	case co::TK_ENUM:

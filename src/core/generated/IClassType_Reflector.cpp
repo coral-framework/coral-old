@@ -5,15 +5,15 @@
 
 #include <co/IClassType.h>
 #include <co/IDynamicServiceProvider.h>
+#include <co/IAnnotation.h>
 #include <co/IField.h>
 #include <co/IMethod.h>
-#include <co/IInterface.h>
-#include <co/IAnnotation.h>
 #include <co/Uuid.h>
 #include <co/IReflector.h>
+#include <co/INamespace.h>
+#include <co/IInterface.h>
 #include <co/IMember.h>
 #include <co/IType.h>
-#include <co/INamespace.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>

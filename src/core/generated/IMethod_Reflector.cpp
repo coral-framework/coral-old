@@ -5,12 +5,12 @@
 
 #include <co/IMethod.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IException.h>
-#include <co/IType.h>
+#include <co/IAnnotation.h>
+#include <co/ICompositeType.h>
 #include <co/IParameter.h>
 #include <co/IInterface.h>
-#include <co/ICompositeType.h>
-#include <co/IAnnotation.h>
+#include <co/IException.h>
+#include <co/IType.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>

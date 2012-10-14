@@ -20,8 +20,6 @@ function M:initialize( module )
 	-- test getting/setting an uint16
 	-- test getting/setting an int32
 	-- test getting/setting an uint32
-	-- test getting/setting an int64
-	-- test getting/setting an uint64
 	-- test getting/setting a float
 	-- test getting/setting a double
 

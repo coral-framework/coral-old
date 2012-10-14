@@ -226,11 +226,6 @@ TEST( AnyTests, constructInt32 )
 	constructorValueTest<co::int32>( co::TK_INT32, 0, "int32" );
 }
 
-TEST( AnyTests, constructInt64 )
-{
-	constructorValueTest<co::int64>( co::TK_INT64, 0, "int64" );
-}
-
 TEST( AnyTests, constructUInt8 )
 {
 	constructorValueTest<co::uint8>( co::TK_UINT8, 0, "uint8" );
@@ -244,11 +239,6 @@ TEST( AnyTests, constructUInt16 )
 TEST( AnyTests, constructUInt32 )
 {
 	constructorValueTest<co::uint32>( co::TK_UINT32, 0, "uint32" );
-}
-
-TEST( AnyTests, constructUInt64 )
-{
-	constructorValueTest<co::uint64>( co::TK_UINT64, 0, "uint64" );
 }
 
 TEST( AnyTests, constructFloat )
@@ -425,18 +415,6 @@ TEST( AnyTests, setGetUInt32 )
 {
 	setAndGetTest<co::uint32>( 0, -1 );
 	setAndGetTest<co::uint32>( co::MAX_UINT32, co::MAX_UINT32 - 1 );
-}
-
-TEST( AnyTests, setGetInt64 )
-{
-	setAndGetTest<co::int64>( co::MIN_INT64, co::MIN_INT64 + 1 );
-	setAndGetTest<co::int64>( co::MAX_INT64, co::MAX_INT64 - 1 );
-}
-
-TEST( AnyTests, setGetUInt64 )
-{
-	setAndGetTest<co::uint64>( 0, 1 );
-	setAndGetTest<co::uint64>( co::MAX_UINT64, co::MAX_UINT64 - 1 );
 }
 
 TEST( AnyTests, setGetFloat )
@@ -640,15 +618,15 @@ TEST( AnyTests, coercionsFromBool )
 	EXPECT_THROW( a1.get<co::Uuid&>(), co::IllegalCastException );
 }
 
-TEST( AnyTests, coercionsFromUInt64 )
+TEST( AnyTests, coercionsFromUInt32 )
 {
-	co::Any a0; a0.setIn<co::uint64>( 0 );
-	co::Any a1; a1.setIn<co::uint64>( co::MAX_INT16 );
-	co::Any a2; a2.setIn<co::uint64>( co::MAX_UINT64 );
+	co::Any a0; a0.setIn<co::uint32>( 0 );
+	co::Any a1; a1.setIn<co::uint32>( co::MAX_INT16 );
+	co::Any a2; a2.setIn<co::uint32>( co::MAX_UINT32 );
 
-	EXPECT_ANY_STREQ( a0, "in uint64: 0" );
-	EXPECT_ANY_STREQ( a1, "in uint64: 32767" );
-	EXPECT_ANY_STREQ( a2, "in uint64: 18446744073709551615" );
+	EXPECT_ANY_STREQ( a0, "in uint32: 0" );
+	EXPECT_ANY_STREQ( a1, "in uint32: 32767" );
+	EXPECT_ANY_STREQ( a2, "in uint32: 4294967295" );
 
 	// to bool
 	EXPECT_FALSE( a0.get<bool>() );
@@ -663,11 +641,11 @@ TEST( AnyTests, coercionsFromUInt64 )
 	// to double
 	EXPECT_EQ( 0.0, a0.get<double>() );
 	EXPECT_EQ( static_cast<double>( co::MAX_INT16 ), a1.get<double>() );
-	EXPECT_EQ( static_cast<double>( co::MAX_UINT64 ), a2.get<double>() );
+	EXPECT_EQ( static_cast<double>( co::MAX_UINT32 ), a2.get<double>() );
 
 	// to enum (co::TypeKind)
 	EXPECT_EQ( co::TK_NULL, a0.get<co::TypeKind>() );
-	EXPECT_EQ( co::TK_EXCEPTION, co::Any( 20 ).get<co::TypeKind>() );
+	EXPECT_EQ( co::TK_EXCEPTION, co::Any( 18 ).get<co::TypeKind>() );
 	EXPECT_THROW( a1.get<co::TypeKind>(), co::IllegalCastException );
 	EXPECT_THROW( a2.get<co::TypeKind>(), co::IllegalCastException );
 
@@ -729,13 +707,13 @@ TEST( AnyTests, coercionsFromEnum )
 
 	// to int16
 	EXPECT_EQ( 0, a0.get<co::int16>() );
-	EXPECT_EQ( 10, a1.get<co::int16>() );
-	EXPECT_EQ( 19, a2.get<co::int16>() );
+	EXPECT_EQ( 8, a1.get<co::int16>() );
+	EXPECT_EQ( 17, a2.get<co::int16>() );
 
 	// to float
 	EXPECT_EQ( 0.0f, a0.get<float>() );
-	EXPECT_EQ( 10.0f, a1.get<float>() );
-	EXPECT_EQ( 19.0f, a2.get<float>() );
+	EXPECT_EQ( 8.0f, a1.get<float>() );
+	EXPECT_EQ( 17.0f, a2.get<float>() );
 
 	// NOTE: if we had a second enum type in the core, we could
 	// test direct enum-to-enum coercion
@@ -770,7 +748,7 @@ TEST( AnyTests, coercionBetweenEnums )
 	EXPECT_EQ( co::ModuleState_Integrated, a2.get<co::ModuleState>() );
 	EXPECT_EQ( co::TK_INT8, a4.get<co::TypeKind>() );
 
-	EXPECT_EQ( 8, a3.get<co::uint64>() );
+	EXPECT_EQ( 7, a3.get<co::int16>() );
 	EXPECT_THROW( a3.get<co::ModuleState>(), co::IllegalCastException );
 
 	EXPECT_EQ( 4294967295U, a5.get<co::uint32>() );

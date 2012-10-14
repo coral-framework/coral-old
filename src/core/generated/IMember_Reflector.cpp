@@ -5,8 +5,8 @@
 
 #include <co/IMember.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/ICompositeType.h>
 #include <co/IAnnotation.h>
+#include <co/ICompositeType.h>
 #include <co/IInterface.h>
 #include <co/IMethod.h>
 #include <co/IField.h>

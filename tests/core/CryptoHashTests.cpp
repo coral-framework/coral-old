@@ -76,22 +76,22 @@ TEST( CryptoHashTests, convenienceMethods )
 
 	CryptoHash::Result resultA, resultB;
 	std::string textResultA, textResultB;
-	
+
 	double PI = 3.14159265;
 	hashA.addData( reinterpret_cast<const co::uint8*>( &PI ), sizeof(double) );
 	hashB.addData( PI );
-	
+
 	hashA.getResult( resultA );
 	resultA.toString( textResultA );
-	
+
 	hashB.getResult( resultB );
 	resultB.toString( textResultB );
-	
+
 	EXPECT_EQ( textResultA, textResultB );
-	
+
 	hashA.reset();
 	hashB.reset();
-	
+
 	co::uint32 v = 798643;
 
 	hashA.addData( reinterpret_cast<const co::uint8*>( &v ), sizeof(v) );

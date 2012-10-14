@@ -4,9 +4,9 @@
  */
 
 #include <co/IDynamicServiceProvider.h>
+#include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IPort.h>
-#include <co/IMethod.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>

@@ -23,11 +23,9 @@ const std::string TK_STRINGS[] =
 	"int8",
 	"int16",
 	"int32",
-	"int64",
 	"uint8",
 	"uint16",
 	"uint32",
-	"uint64",
 	"float",
 	"double",
 	"enum",
@@ -49,11 +47,9 @@ RefPtr<IType> BASIC_TYPES[] =
 	new TypeComponent( TK_INT8 ),
 	new TypeComponent( TK_INT16 ),
 	new TypeComponent( TK_INT32 ),
-	new TypeComponent( TK_INT64 ),
 	new TypeComponent( TK_UINT8 ),
 	new TypeComponent( TK_UINT16 ),
 	new TypeComponent( TK_UINT32 ),
-	new TypeComponent( TK_UINT64 ),
 	new TypeComponent( TK_FLOAT ),
 	new TypeComponent( TK_DOUBLE ),
 	NULL, // TK_ENUM
@@ -79,27 +75,41 @@ TypeKind getKind( IType* type )
 	return type->getKind();
 }
 
-IService* getServiceByType( IObject* object, IInterface* type )
+IService* findServiceByType( IObject* object, IInterface* type )
 {
 	assert( object && type );
-	IComponent* component = object->getComponent();
-	Range<IPort*> facets = component->getFacets();
+	Range<IPort*> facets = object->getComponent()->getFacets();
 	for( ; facets; facets.popFirst() )
 		if( facets.getFirst()->getType()->isA( type ) )
 			return object->getServiceAt( facets.getFirst() );
-	CORAL_THROW( NoSuchPortException, "component '" << component->getFullName()
-		<< "' does not provide a facet of type '" << type->getFullName() << "'"  )
+	return NULL;
+}
+
+IService* getServiceByType( IObject* object, IInterface* type )
+{
+	IService* res = findServiceByType( object, type );
+	if( !res )
+		CORAL_THROW( NoSuchPortException, "component "
+			<< object->getComponent()->getFullName()
+			<< " has no facet of type '" << type->getFullName() << "'"  )
+	return res;
+}
+
+IService* findServiceByName( IObject* object, const std::string& portName )
+{
+	assert( object );
+	IMember* port = object->getComponent()->getMember( portName );
+	return port ? object->getServiceAt( static_cast<IPort*>( port ) ) : NULL;
 }
 
 IService* getServiceByName( IObject* object, const std::string& portName )
 {
-	assert( object );
-	IComponent* component = object->getComponent();
-	IMember* port = component->getMember( portName );
-	if( !port )
-		CORAL_THROW( NoSuchPortException, "no such port '" << portName
-			<< "' in component '" << component->getFullName() << "'" );
-	return object->getServiceAt( static_cast<IPort*>( port ) );
+	IService* res = findServiceByName( object, portName );
+	if( !res )
+		CORAL_THROW( NoSuchPortException, "component "
+			<< object->getComponent()->getFullName()
+			<< " has no port named '" << portName << "'" );
+	return res;
 }
 
 void setServiceByName( IObject* object, const std::string& receptacleName, IService* service )

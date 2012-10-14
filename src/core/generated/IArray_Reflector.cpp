@@ -5,11 +5,11 @@
 
 #include <co/IArray.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IReflector.h>
-#include <co/IType.h>
-#include <co/INamespace.h>
-#include <co/IInterface.h>
 #include <co/IAnnotation.h>
+#include <co/IReflector.h>
+#include <co/IInterface.h>
+#include <co/INamespace.h>
+#include <co/IType.h>
 #include <co/Uuid.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
