@@ -102,21 +102,21 @@ public:
 		return new lua::ILauncher_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::Any value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::checkInstance<lua::ILauncher>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
-	void setField( co::Any instance, co::IField* field, co::Any value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::checkInstance<lua::ILauncher>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		lua::ILauncher* p = co::checkInstance<lua::ILauncher>( instance, method );
 		checkNumArguments( method, args.getSize() );

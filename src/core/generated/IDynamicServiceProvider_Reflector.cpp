@@ -4,9 +4,9 @@
  */
 
 #include <co/IDynamicServiceProvider.h>
-#include <co/IMethod.h>
-#include <co/IField.h>
 #include <co/IPort.h>
+#include <co/IField.h>
+#include <co/IMethod.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -49,13 +49,13 @@ public:
 		return res.get();
 	}
 
-	void dynamicGetField( co::int32 dynFacetId_, co::IField* field_, co::Any value_ )
+	void dynamicGetField( co::int32 dynFacetId_, co::IField* field_, const co::Any& value_ )
 	{
 		co::Any args[] = { dynFacetId_, field_, value_ };
 		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 1 ), args, co::Any() );
 	}
 
-	void dynamicInvoke( co::int32 dynFacetId_, co::IMethod* method_, co::Range<co::Any> args_, co::Any result_ )
+	void dynamicInvoke( co::int32 dynFacetId_, co::IMethod* method_, co::Range<co::Any> args_, const co::Any& result_ )
 	{
 		co::Any args[] = { dynFacetId_, method_, args_, result_ };
 		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 2 ), args, co::Any() );
@@ -69,7 +69,7 @@ public:
 		return res;
 	}
 
-	void dynamicSetField( co::int32 dynFacetId_, co::IField* field_, co::Any value_ )
+	void dynamicSetField( co::int32 dynFacetId_, co::IField* field_, const co::Any& value_ )
 	{
 		co::Any args[] = { dynFacetId_, field_, value_ };
 		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 4 ), args, co::Any() );
@@ -124,21 +124,21 @@ public:
 		return new co::IDynamicServiceProvider_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::Any value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::checkInstance<co::IDynamicServiceProvider>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
-	void setField( co::Any instance, co::IField* field, co::Any value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::checkInstance<co::IDynamicServiceProvider>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::IDynamicServiceProvider* p = co::checkInstance<co::IDynamicServiceProvider>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -158,7 +158,7 @@ public:
 				{
 					co::int32 dynFacetId_ = args[++argIndex].get< co::int32 >();
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
-					co::Any value_ = args[++argIndex];
+					const co::Any& value_ = args[++argIndex];
 					argIndex = -1;
 					p->dynamicGetField( dynFacetId_, field_, value_ );
 				}
@@ -168,7 +168,7 @@ public:
 					co::int32 dynFacetId_ = args[++argIndex].get< co::int32 >();
 					co::IMethod* method_ = args[++argIndex].get< co::IMethod* >();
 					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
-					co::Any result_ = args[++argIndex];
+					const co::Any& result_ = args[++argIndex];
 					argIndex = -1;
 					p->dynamicInvoke( dynFacetId_, method_, args_, result_ );
 				}
@@ -184,7 +184,7 @@ public:
 				{
 					co::int32 dynFacetId_ = args[++argIndex].get< co::int32 >();
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
-					co::Any value_ = args[++argIndex];
+					const co::Any& value_ = args[++argIndex];
 					argIndex = -1;
 					p->dynamicSetField( dynFacetId_, field_, value_ );
 				}

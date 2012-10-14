@@ -376,17 +376,17 @@ public:
 		released.push_back( service );
 	}
 
-	void postGetField( co::IService* service, co::IField* field, co::Any )
+	void postGetField( co::IService* service, co::IField* field, const co::Any& )
 	{
 		calls.push_back( CallInfo( service, field ) );
 	}
 
-	void postSetField( co::IService* service, co::IField* field, co::Any )
+	void postSetField( co::IService* service, co::IField* field, const co::Any& )
 	{
 		calls.push_back( CallInfo( service, field ) );
 	}
 
-	void postInvoke( co::IService* service, co::IMethod* method, co::Range<co::Any>, co::Any )
+	void postInvoke( co::IService* service, co::IMethod* method, co::Range<co::Any>, const co::Any& )
 	{
 		calls.push_back( CallInfo( service, method ) );
 	}

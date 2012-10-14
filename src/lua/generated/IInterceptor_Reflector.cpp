@@ -5,9 +5,9 @@
 
 #include <lua/IInterceptor.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IObject.h>
 #include <co/IField.h>
 #include <co/IPort.h>
+#include <co/IObject.h>
 #include <co/IMethod.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
@@ -47,7 +47,7 @@ public:
 
 	// lua.IInterceptor Methods:
 
-	void postGetField( co::IService* service_, co::IField* field_, co::Any value_ )
+	void postGetField( co::IService* service_, co::IField* field_, const co::Any& value_ )
 	{
 		co::Any args[] = { service_, field_, value_ };
 		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 0 ), args, co::Any() );
@@ -59,13 +59,13 @@ public:
 		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 1 ), args, co::Any() );
 	}
 
-	void postInvoke( co::IService* service_, co::IMethod* method_, co::Range<co::Any> args_, co::Any returnValue_ )
+	void postInvoke( co::IService* service_, co::IMethod* method_, co::Range<co::Any> args_, const co::Any& returnValue_ )
 	{
 		co::Any args[] = { service_, method_, args_, returnValue_ };
 		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 2 ), args, co::Any() );
 	}
 
-	void postSetField( co::IService* service_, co::IField* field_, co::Any value_ )
+	void postSetField( co::IService* service_, co::IField* field_, const co::Any& value_ )
 	{
 		co::Any args[] = { service_, field_, value_ };
 		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 3 ), args, co::Any() );
@@ -138,21 +138,21 @@ public:
 		return new lua::IInterceptor_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::Any value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::checkInstance<lua::IInterceptor>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
-	void setField( co::Any instance, co::IField* field, co::Any value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::checkInstance<lua::IInterceptor>( instance, field );
 		raiseUnexpectedMemberIndex();
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		lua::IInterceptor* p = co::checkInstance<lua::IInterceptor>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -165,7 +165,7 @@ public:
 				{
 					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
-					co::Any value_ = args[++argIndex];
+					const co::Any& value_ = args[++argIndex];
 					argIndex = -1;
 					p->postGetField( service_, field_, value_ );
 				}
@@ -184,7 +184,7 @@ public:
 					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					co::IMethod* method_ = args[++argIndex].get< co::IMethod* >();
 					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
-					co::Any returnValue_ = args[++argIndex];
+					const co::Any& returnValue_ = args[++argIndex];
 					argIndex = -1;
 					p->postInvoke( service_, method_, args_, returnValue_ );
 				}
@@ -193,7 +193,7 @@ public:
 				{
 					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
-					co::Any value_ = args[++argIndex];
+					const co::Any& value_ = args[++argIndex];
 					argIndex = -1;
 					p->postSetField( service_, field_, value_ );
 				}

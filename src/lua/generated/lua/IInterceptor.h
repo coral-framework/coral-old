@@ -29,13 +29,13 @@ class IInterceptor : public co::IService
 public:
 	virtual ~IInterceptor() {;}
 
-	virtual void postGetField( co::IService* service, co::IField* field, co::Any value ) = 0;
+	virtual void postGetField( co::IService* service, co::IField* field, const co::Any& value ) = 0;
 
 	virtual void postGetService( co::IObject* object, co::IPort* port, co::IService* service ) = 0;
 
-	virtual void postInvoke( co::IService* service, co::IMethod* method, co::Range<co::Any> args, co::Any returnValue ) = 0;
+	virtual void postInvoke( co::IService* service, co::IMethod* method, co::Range<co::Any> args, const co::Any& returnValue ) = 0;
 
-	virtual void postSetField( co::IService* service, co::IField* field, co::Any value ) = 0;
+	virtual void postSetField( co::IService* service, co::IField* field, const co::Any& value ) = 0;
 
 	virtual void postSetService( co::IObject* object, co::IPort* receptable, co::IService* service ) = 0;
 

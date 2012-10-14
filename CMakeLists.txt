@@ -20,7 +20,7 @@ set( CORAL_VERSION_PATCH	"0" )
 set( CORAL_VERSION "${CORAL_VERSION_MAJOR}.${CORAL_VERSION_MINOR}.${CORAL_VERSION_PATCH}" )
 
 # Code generation rules revision
-set( CORAL_COMPILER_OUTPUT_REVISION 13 )
+set( CORAL_COMPILER_OUTPUT_REVISION 14 )
 
 ################################################################################
 # Global Build Settings

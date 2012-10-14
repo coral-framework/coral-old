@@ -538,7 +538,7 @@ inline co::IField* checkField( lua_State* L, int index )
 	return static_cast<co::IField*>( member );
 }
 
-void CompositeTypeBinding::getField( lua_State* L,  co::Any instance )
+void CompositeTypeBinding::getField( lua_State* L,  const co::Any& instance )
 {
 	co::IField* field = checkField( L, -1 );
 	co::IReflector* reflector = field->getOwner()->getReflector();
@@ -556,7 +556,7 @@ void CompositeTypeBinding::getField( lua_State* L,  co::Any instance )
 	}
 }
 
-void CompositeTypeBinding::setField( lua_State* L, co::Any instance )
+void CompositeTypeBinding::setField( lua_State* L, const co::Any& instance )
 {
 	co::AnyValue value;
 	LuaState::get( L, -1, value );

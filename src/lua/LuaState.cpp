@@ -287,7 +287,7 @@ void LuaState::push( lua_State* L, co::IObject* object )
 	pushInstance<ObjectBinding, co::IObject>( L, object );
 }
 
-void LuaState::get( lua_State* L, int index, co::Any var )
+void LuaState::get( lua_State* L, int index, const co::Any& var )
 {
 	assert( var.isOut() );
 
@@ -318,16 +318,19 @@ void LuaState::get( lua_State* L, int index, co::Any var )
 			{
 				lua_pop( L, 1 );
 				co::TypeKind k = var.getKind();
-				if( k != co::TK_ARRAY )
+				if( k == co::TK_ARRAY )
+				{
+					getArray( L, index, var );
+				}
+				else
 				{
 					if( k != co::TK_ANY )
 						CORAL_THROW( lua::Exception, "no conversion from Lua array to '" << var.state << "'" );
 
 					co::AnyValue& av = var.get<co::AnyValue&>();
 					av.create<std::vector<co::AnyValue> >();
-					var = av.getAny();
+					getArray( L, index, av.getAny() );
 				}
-				getArray( L, index, var );
 			}
 			else
 			{
@@ -465,7 +468,7 @@ void LuaState::pushInstancesTable( lua_State* L )
 	lua_rawgeti( L, LUA_REGISTRYINDEX, sm_instancesTableRegIdx );
 }
 
-void LuaState::pushArray( lua_State* L, co::Any array )
+void LuaState::pushArray( lua_State* L, const co::Any& array )
 {
 	assert( array.isIn() && array.getType()->getKind() == co::TK_ARRAY );
 	size_t count = array.getCount();
@@ -477,7 +480,7 @@ void LuaState::pushArray( lua_State* L, co::Any array )
 	}
 }
 
-void LuaState::getArray( lua_State* L, int index, co::Any array )
+void LuaState::getArray( lua_State* L, int index, const co::Any& array )
 {
 	assert( lua_type( L, index ) == LUA_TTABLE );
 

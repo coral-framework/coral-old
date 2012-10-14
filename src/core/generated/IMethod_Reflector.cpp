@@ -5,12 +5,12 @@
 
 #include <co/IMethod.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IAnnotation.h>
-#include <co/ICompositeType.h>
-#include <co/IParameter.h>
-#include <co/IInterface.h>
-#include <co/IException.h>
 #include <co/IType.h>
+#include <co/IAnnotation.h>
+#include <co/IParameter.h>
+#include <co/IException.h>
+#include <co/IInterface.h>
+#include <co/ICompositeType.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
@@ -174,7 +174,7 @@ public:
 		return new co::IMethod_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::Any value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::IMethod* p = co::checkInstance<co::IMethod>( instance, field );
 		switch( field->getIndex() )
@@ -186,7 +186,7 @@ public:
 		}
 	}
 
-	void setField( co::Any instance, co::IField* field, co::Any value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::IMethod* p = co::checkInstance<co::IMethod>( instance, field );
 		switch( field->getIndex() )
@@ -200,7 +200,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::checkInstance<co::IMethod>( instance, method );
 		raiseUnexpectedMemberIndex();

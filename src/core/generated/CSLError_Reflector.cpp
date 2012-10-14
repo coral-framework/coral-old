@@ -56,7 +56,7 @@ public:
 			callDestructor( reinterpret_cast<co::CSLError*>( ptr ) + i );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::Any value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::CSLError* p = co::checkInstance<co::CSLError>( instance, field );
 		switch( field->getIndex() )
@@ -68,7 +68,7 @@ public:
 		}
 	}
 
-	void setField( co::Any instance, co::IField* field, co::Any value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::CSLError* p = co::checkInstance<co::CSLError>( instance, field );
 		switch( field->getIndex() )

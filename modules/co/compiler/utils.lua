@@ -92,7 +92,8 @@ function M.formatInput( t )
 		return "co::Range<" .. elem.cppName .. ( elem.kind == 'TK_INTERFACE' and '*' or '' ) .. ">"
 	elseif kind == 'TK_INTERFACE' then
 		return t.cppName .. "*"
-	elseif kind == 'TK_STRING' or kind == 'TK_STRUCT' or kind == 'TK_NATIVECLASS' then
+	elseif kind == 'TK_ANY' or kind == 'TK_STRING'
+		or kind == 'TK_STRUCT' or kind == 'TK_NATIVECLASS' then
 		return "const " .. t.cppName .. "&"
 	else -- ( kind >= co::TK_BOOL && kind <= co::TK_DOUBLE ) || kind == co::TK_ENUM
 		return t.cppName

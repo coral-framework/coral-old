@@ -16,7 +16,7 @@ class TestAnnotation : public TestAnnotation_Base
 {
 public:
 	co::AnyValue getA() { return _any; }
-	void setA( co::Any a ) { _any = a; }
+	void setA( const co::Any& a ) { _any = a; }
 
 	bool getB() { return _b; }
 	void setB( bool b ) { _b = b; }

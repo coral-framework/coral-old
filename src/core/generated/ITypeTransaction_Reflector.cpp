@@ -110,7 +110,7 @@ public:
 		return new co::ITypeTransaction_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::Any value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::ITypeTransaction* p = co::checkInstance<co::ITypeTransaction>( instance, field );
 		switch( field->getIndex() )
@@ -120,7 +120,7 @@ public:
 		}
 	}
 
-	void setField( co::Any instance, co::IField* field, co::Any value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::ITypeTransaction* p = co::checkInstance<co::ITypeTransaction>( instance, field );
 		switch( field->getIndex() )
@@ -132,7 +132,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::ITypeTransaction* p = co::checkInstance<co::ITypeTransaction>( instance, method );
 		checkNumArguments( method, args.getSize() );

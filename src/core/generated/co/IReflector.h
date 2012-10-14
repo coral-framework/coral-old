@@ -62,9 +62,9 @@ public:
 
 	virtual co::IType* getType() = 0;
 
-	virtual void getField( co::Any instance, co::IField* field, co::Any value ) = 0;
+	virtual void getField( const co::Any& instance, co::IField* field, const co::Any& value ) = 0;
 
-	virtual void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any returnValue ) = 0;
+	virtual void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& returnValue ) = 0;
 
 	virtual co::IService* newDynamicProxy( co::IDynamicServiceProvider* dynamicProvider ) = 0;
 
@@ -72,7 +72,7 @@ public:
 
 	virtual void raise( const std::string& message ) = 0;
 
-	virtual void setField( co::Any instance, co::IField* field, co::Any value ) = 0;
+	virtual void setField( const co::Any& instance, co::IField* field, const co::Any& value ) = 0;
 };
 
 } // namespace co

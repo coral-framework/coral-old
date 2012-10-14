@@ -4,11 +4,11 @@
  */
 
 #include <co/IReflector.h>
-#include <co/IObject.h>
-#include <co/IField.h>
-#include <co/IMethod.h>
-#include <co/IType.h>
 #include <co/IDynamicServiceProvider.h>
+#include <co/IType.h>
+#include <co/IMethod.h>
+#include <co/IField.h>
+#include <co/IObject.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -58,13 +58,13 @@ public:
 		return res.get();
 	}
 
-	void getField( co::Any instance_, co::IField* field_, co::Any value_ )
+	void getField( const co::Any& instance_, co::IField* field_, const co::Any& value_ )
 	{
 		co::Any args[] = { instance_, field_, value_ };
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 0 ), args, co::Any() );
 	}
 
-	void invoke( co::Any instance_, co::IMethod* method_, co::Range<co::Any> args_, co::Any returnValue_ )
+	void invoke( const co::Any& instance_, co::IMethod* method_, co::Range<co::Any> args_, const co::Any& returnValue_ )
 	{
 		co::Any args[] = { instance_, method_, args_, returnValue_ };
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 1 ), args, co::Any() );
@@ -92,7 +92,7 @@ public:
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 4 ), args, co::Any() );
 	}
 
-	void setField( co::Any instance_, co::IField* field_, co::Any value_ )
+	void setField( const co::Any& instance_, co::IField* field_, const co::Any& value_ )
 	{
 		co::Any args[] = { instance_, field_, value_ };
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 5 ), args, co::Any() );
@@ -164,7 +164,7 @@ public:
 		return new co::IReflector_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::Any value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::IReflector* p = co::checkInstance<co::IReflector>( instance, field );
 		switch( field->getIndex() )
@@ -175,7 +175,7 @@ public:
 		}
 	}
 
-	void setField( co::Any instance, co::IField* field, co::Any value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::IReflector* p = co::checkInstance<co::IReflector>( instance, field );
 		switch( field->getIndex() )
@@ -188,7 +188,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::IReflector* p = co::checkInstance<co::IReflector>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -199,19 +199,19 @@ public:
 			{
 			case 2:
 				{
-					co::Any instance_ = args[++argIndex];
+					const co::Any& instance_ = args[++argIndex];
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
-					co::Any value_ = args[++argIndex];
+					const co::Any& value_ = args[++argIndex];
 					argIndex = -1;
 					p->getField( instance_, field_, value_ );
 				}
 				break;
 			case 3:
 				{
-					co::Any instance_ = args[++argIndex];
+					const co::Any& instance_ = args[++argIndex];
 					co::IMethod* method_ = args[++argIndex].get< co::IMethod* >();
 					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
-					co::Any returnValue_ = args[++argIndex];
+					const co::Any& returnValue_ = args[++argIndex];
 					argIndex = -1;
 					p->invoke( instance_, method_, args_, returnValue_ );
 				}
@@ -237,9 +237,9 @@ public:
 				break;
 			case 7:
 				{
-					co::Any instance_ = args[++argIndex];
+					const co::Any& instance_ = args[++argIndex];
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
-					co::Any value_ = args[++argIndex];
+					const co::Any& value_ = args[++argIndex];
 					argIndex = -1;
 					p->setField( instance_, field_, value_ );
 				}

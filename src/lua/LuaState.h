@@ -71,7 +71,7 @@ public:
 		Puts the value at \a index in the Lua stack into \a var.
 		\throw lua::Exception if the value cannot be converted to a Coral value.
 	 */
-	static void get( lua_State* L, int index, co::Any var );
+	static void get( lua_State* L, int index, const co::Any& var );
 
 public:
     LuaState();
@@ -94,8 +94,8 @@ private:
 
 	static void pushInstancesTable( lua_State* L );
 
-	static void pushArray( lua_State* L, co::Any var );
-	static void getArray( lua_State* L, int index, co::Any array );
+	static void pushArray( lua_State* L, const co::Any& var );
+	static void getArray( lua_State* L, int index, const co::Any& array );
 	
 	static co::int32 getEnumIdentifier( lua_State* L, int index, co::IEnum* enumType );
 

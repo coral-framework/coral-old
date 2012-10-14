@@ -5,8 +5,8 @@
 
 #include <co/IService.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IInterface.h>
 #include <co/IPort.h>
+#include <co/IInterface.h>
 #include <co/IObject.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
@@ -91,7 +91,7 @@ public:
 		return new co::IService_Proxy( provider );
 	}
 
-	void getField( co::Any instance, co::IField* field, co::Any value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::IService* p = co::checkInstance<co::IService>( instance, field );
 		switch( field->getIndex() )
@@ -103,7 +103,7 @@ public:
 		}
 	}
 
-	void setField( co::Any instance, co::IField* field, co::Any value )
+	void setField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::IService* p = co::checkInstance<co::IService>( instance, field );
 		switch( field->getIndex() )
@@ -117,7 +117,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( co::Any instance, co::IMethod* method, co::Range<co::Any> args, co::Any res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::IService* p = co::checkInstance<co::IService>( instance, method );
 		checkNumArguments( method, args.getSize() );
