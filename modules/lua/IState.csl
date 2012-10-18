@@ -48,7 +48,7 @@ interface IState
 		\throw lua.Exception if one of the function results could not be assigned to
 					an output variable in \a results due to type incompatibilities.
 	 */
-	int32 callFunction( in string moduleName, in string functionName, in any[] args, in any[] results )
+	int32 call( in string moduleName, in string functionName, in any[] args, in any[] results )
 			raises Exception;
 
 	// Invokes a full cycle of the Lua garbage collector.

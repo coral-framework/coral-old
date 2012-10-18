@@ -34,7 +34,7 @@ public:
 	if #t.fields > 0 then
 		writer( "\t// ------ Fields ------\n" )
 		for i, a in ipairs( t.fields ) do
-			writer( "\n\tstatic ", t.formatInput( a.type ), " ", t.formatAccessor( "get", a.name ), "( ", t.cppName, "& instance );\n" )
+			writer( "\n\tstatic ", t.formatResult( a.type ), " ", t.formatAccessor( "get", a.name ), "( ", t.cppName, "& instance );\n" )
 			if not a.isReadOnly then
 				writer( "\tstatic void ", t.formatAccessor( "set", a.name ), "( ", t.cppName,
 					"& instance, ", t.formatInput( a.type ), " value );\n" )
@@ -45,7 +45,7 @@ public:
 	if #t.methods > 0 then
 		writer( "\n\t// ------ Methods ------\n" )
 		for i, m in ipairs( t.methods ) do
-			writer( "\n\tstatic ", t.formatInput( m.returnType ), " ", m.name, "( ", t.cppName, "& instance" )
+			writer( "\n\tstatic ", t.formatResult( m.returnType ), " ", m.name, "( ", t.cppName, "& instance" )
 			for i, p in ipairs( m.parameters ) do
 				writer( ", ", ( p.isOut and t.formatOutput or t.formatInput)( p.type ), " ", p.name )
 			end

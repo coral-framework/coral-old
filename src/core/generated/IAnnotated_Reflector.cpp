@@ -43,34 +43,30 @@ public:
 
 	// co.IAnnotated Methods:
 
-	co::Range<co::IAnnotation* const> getAnnotations()
+	co::Range<co::IAnnotation*> getAnnotations()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ) );
-        return res.get< co::Range<co::IAnnotation* const> >();
+		co::RefVector<co::IAnnotation> res;
+		_provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ), res );
+		return res;
 	}
 
-	void setAnnotations( co::Range<co::IAnnotation* const> annotations_ )
+	void setAnnotations( co::Range<co::IAnnotation*> annotations_ )
 	{
-		co::Any arg;
-		arg.set< co::Range<co::IAnnotation* const> >( annotations_ );
-		_provider->dynamicSetField( _cookie, getField<co::IAnnotated>( 0 ), arg );
+		_provider->dynamicSetField( _cookie, getField<co::IAnnotated>( 0 ), annotations_ );
 	}
 
 	void addAnnotation( co::IAnnotation* annotation_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IAnnotation* >( annotation_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 0 ), range );
+		co::Any args[] = { annotation_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 0 ), args, co::Any() );
 	}
 
 	co::IAnnotation* getAnnotation( co::IInterface* requestedType_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IInterface* >( requestedType_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
-		return res.get< co::IAnnotation* >();
+		co::Any args[] = { requestedType_ };
+		co::RefPtr<co::IAnnotation> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), args, res );
+		return res.get();
 	}
 
 protected:
@@ -122,12 +118,12 @@ public:
 		return new co::IAnnotated_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::IAnnotated* p = co::checkInstance<co::IAnnotated>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::Range<co::IAnnotation* const> >( p->getAnnotations() ); break;
+		case 0:		value.put( p->getAnnotations() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -137,14 +133,14 @@ public:
 		co::IAnnotated* p = co::checkInstance<co::IAnnotated>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		p->setAnnotations( value.get< co::Range<co::IAnnotation* const> >() ); break;
+		case 0:		p->setAnnotations( value.get< co::Range<co::IAnnotation*> >() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 		CORAL_UNUSED( p );
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::IAnnotated* p = co::checkInstance<co::IAnnotated>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -164,7 +160,7 @@ public:
 				{
 					co::IInterface* requestedType_ = args[++argIndex].get< co::IInterface* >();
 					argIndex = -1;
-					res.set< co::IAnnotation* >( p->getAnnotation( requestedType_ ) );
+					res.put( p->getAnnotation( requestedType_ ) );
 				}
 				break;
 			default:

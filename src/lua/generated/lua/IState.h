@@ -26,11 +26,11 @@ class IState : public co::IService
 public:
 	virtual ~IState() {;}
 
-	virtual co::Range<lua::IInterceptor* const> getInterceptors() = 0;
+	virtual co::Range<lua::IInterceptor*> getInterceptors() = 0;
 
 	virtual void addInterceptor( lua::IInterceptor* interceptor ) = 0;
 
-	virtual co::int32 callFunction( const std::string& moduleName, const std::string& functionName, co::Range<co::Any const> args, co::Range<co::Any const> results ) = 0;
+	virtual co::int32 call( const std::string& moduleName, const std::string& functionName, co::Range<co::Any> args, co::Range<co::Any> results ) = 0;
 
 	virtual void collectGarbage() = 0;
 

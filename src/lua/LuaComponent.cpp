@@ -76,7 +76,7 @@ void LuaComponent::setInstance( LuaComponent* prototype, int instanceTableRef )
 	_tableRef = instanceTableRef;
 
 	// create proxy interfaces for our facets
-	co::Range<co::IPort* const> facets = _componentType->getFacets();
+	co::Range<co::IPort*> facets = _componentType->getFacets();
 	int numFacets = static_cast<int>( facets.getSize() );
 	_facets = new co::IService*[numFacets];
 	for( int i = 0; i < numFacets; ++i )
@@ -169,7 +169,7 @@ void LuaComponent::getMethod( lua_State* L, int t, co::int32 cookie )
 	assert( lua_isfunction( L, -1 ) );
 }
 
-const co::Any& LuaComponent::dynamicGetField( co::int32 cookie, co::IField* ai )
+void LuaComponent::dynamicGetField( co::int32 cookie, co::IField* ai, const co::Any& var )
 {
 	__BEGIN_LUA_API_CODE__
 
@@ -178,14 +178,12 @@ const co::Any& LuaComponent::dynamicGetField( co::int32 cookie, co::IField* ai )
 	getMethod( L, -2, cookie );
 	lua_pushvalue( L, -3 ); // push the 'self' argument
 	LuaState::call( L, 1, 1 );
-	LuaState::getAny( L, -1, ai->getType(), _res );
+	LuaState::get( L, -1, var );
 
 	__END_LUA_API_CODE__
-
-	return _res;
 }
 
-void LuaComponent::dynamicSetField( co::int32 cookie, co::IField* ai, const co::Any& value )
+void LuaComponent::dynamicSetField( co::int32 cookie, co::IField* ai, const co::Any& var )
 {
 	__BEGIN_LUA_API_CODE__
 
@@ -193,14 +191,13 @@ void LuaComponent::dynamicSetField( co::int32 cookie, co::IField* ai, const co::
 	pushAccessorName( L, "set", ai->getName() );
 	getMethod( L, -2, cookie );
 	lua_pushvalue( L, -3 ); // push the 'self' argument
-	LuaState::push( L, value );
+	LuaState::push( L, var );
 	LuaState::call( L, 2, 0 );
 
 	__END_LUA_API_CODE__
 }
 
-const co::Any& LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi,
-											co::Range<co::Any const> args )
+void LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<co::Any> args, const co::Any& res )
 {
 	__BEGIN_LUA_API_CODE__
 
@@ -213,7 +210,7 @@ const co::Any& LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi,
 	int numOut = returnType ? 1 : 0;
 	int numIn = 1;
 
-	co::Range<co::IParameter* const> paramList = mi->getParameters();
+	co::Range<co::IParameter*> paramList = mi->getParameters();
 	assert( paramList.getSize() == args.getSize() );
 
 	int numArgs = static_cast<int>( args.getSize() );
@@ -232,21 +229,17 @@ const co::Any& LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi,
 	LuaState::call( L, numIn, numOut );
 
 	// get the function result, if needed
-	int idx = lua_gettop( L ) + 1 - numOut;
+	int outIdx = lua_gettop( L ) + 1 - numOut;
 	if( returnType )
 	{
 		try
 		{
-			LuaState::getAny( L, idx++, returnType, _res );
+			LuaState::get( L, outIdx++, res );
 		}
 		catch( std::exception& e )
 		{
 			CORAL_THROW( lua::Exception, "bad result for method '" << mi->getName() << "' (" << e.what() << ")" );
 		}
-	}
-	else
-	{
-		_res.clear();
 	}
 
 	// get other output values
@@ -256,18 +249,16 @@ const co::Any& LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi,
 		for( ; i < numArgs; ++i )
 		{
 			if( paramList[i]->getIsOut() )
-				LuaState::getValue( L, idx++, args[i] );
+				LuaState::get( L, outIdx++, args[i] );
 		}
 	}
 	catch( std::exception& e )
 	{
-		CORAL_THROW( lua::Exception, "bad result for parameter #" << i + 1 << " in method '"
-						<< mi->getName() << "' (" << e.what() << ")" );
+		CORAL_THROW( lua::Exception, "bad result for parameter #" << i + 1
+			<< " in method '" << mi->getName() << "' (" << e.what() << ")" );
 	}
 
 	__END_LUA_API_CODE__
-
-	return _res;
 }
 
 co::uint32 LuaComponent::getSize()
@@ -299,8 +290,7 @@ co::IObject* LuaComponent::newInstance()
 {
 	assert( _facets == NULL && _tableRef != LUA_NOREF );
 
-	co::Any any;
-
+	co::IObject* instance;
 	__BEGIN_LUA_API_CODE__
 
 	// call the component prototype table to produce a new instance
@@ -313,11 +303,11 @@ co::IObject* LuaComponent::newInstance()
 	LuaState::call( L, 1, 1 );
 
 	// extract the returned co::IObject
-	CompositeTypeBinding::getInstance( L, -1, any );
+	instance = ObjectBinding::getInstance( L, -1 );
 
 	__END_LUA_API_CODE__
 
-	return any.get<co::IObject*>();
+	return instance;
 }
 
 co::IService* LuaComponent::newDynamicProxy( co::IDynamicServiceProvider* )
@@ -326,7 +316,7 @@ co::IService* LuaComponent::newDynamicProxy( co::IDynamicServiceProvider* )
 	return NULL;
 }
 
-void LuaComponent::getField( const co::Any&, co::IField*, co::Any& )
+void LuaComponent::getField( const co::Any&, co::IField*, const co::Any& )
 {
 	raiseNotSupportedException();
 }
@@ -336,7 +326,7 @@ void LuaComponent::setField( const co::Any&, co::IField*, const co::Any& )
 	raiseNotSupportedException();
 }
 
-void LuaComponent::invoke( const co::Any&, co::IMethod*, co::Range<co::Any const>, co::Any& )
+void LuaComponent::invoke( const co::Any&, co::IMethod*, co::Range<co::Any>, const co::Any& )
 {
 	raiseNotSupportedException();
 }
@@ -352,7 +342,7 @@ co::IService* LuaComponent::dynamicGetService( co::IPort* port )
 		return _facets[port->getIndex()];
 
 	// call the Lua component to get a client interface
-	co::IService* res;
+	co::RefPtr<co::IService> service;
 	__BEGIN_LUA_API_CODE__
 
 	lua_rawgeti( L, LUA_REGISTRYINDEX, _tableRef );
@@ -361,15 +351,13 @@ co::IService* LuaComponent::dynamicGetService( co::IPort* port )
 	lua_pushvalue( L, -2 ); // push the 'self' argument
 	LuaState::call( L, 1, 1 );
 
-	co::Any any;
-	any.set<co::IService*&>( res );
-	LuaState::getValue( L, -1, any );
+	LuaState::get( L, -1, service );
 
 	__END_LUA_API_CODE__
 
 	// check interface compatibility
-	co::ensureIsA( res, port->getType() );
-	return res;
+	co::ensureIsA( service.get(), port->getType() );
+	return service.get();
 }
 
 void LuaComponent::dynamicSetService( co::IPort* receptacle, co::IService* instance )

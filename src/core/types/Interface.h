@@ -25,14 +25,16 @@ public:
 	void addSubType( IInterface* sub );
 	void updateSuperTypes();
 
+	// IType methods:
+	bool isA( IType* type );
+
 	// ICompositeType methods:
 	IMember* getMember( const std::string& name );
 
 	// IInterface methods:
 	IInterface* getBaseType();
-	Range<IInterface* const> getSuperTypes();
-	Range<IInterface* const> getSubTypes();
-	bool isSubTypeOf( IInterface* type );
+	Range<IInterface*> getSuperTypes();
+	Range<IInterface*> getSubTypes();
 
 private:
 	IInterface* _baseType;

@@ -45,9 +45,10 @@ interface INamespace
 
 		\throw IllegalNameException if \a name is not a valid identifier.
 		\throw IllegalNameException if \a name clashes with an existing type or child namespace.
-		\throw IllegalArgumentException if \a typeKind does not indicate a user-definable type.
+		\throw IllegalArgumentException if \a kind does not indicate a user-definable type.
 	 */
-	ITypeBuilder defineType( in string name, in TypeKind typeKind ) raises IllegalNameException, IllegalArgumentException;
+	ITypeBuilder defineType( in string name, in TypeKind kind )
+		raises IllegalNameException, IllegalArgumentException;
 
 	/*
 		Creates a child namespace with the specified \a name.

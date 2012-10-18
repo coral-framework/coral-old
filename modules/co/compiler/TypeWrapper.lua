@@ -92,15 +92,13 @@ end
 
 local typeKindToCpp = {
 	TK_ANY		= "co::Any",
-	TK_BOOLEAN	= "bool",
+	TK_BOOL		= "bool",
 	TK_INT8		= "co::int8",
 	TK_UINT8	= "co::uint8",
 	TK_INT16	= "co::int16",
 	TK_UINT16	= "co::uint16",
 	TK_INT32	= "co::int32",
 	TK_UINT32	= "co::uint32",
-	TK_INT64	= "co::int64",
-	TK_UINT64	= "co::uint64",
 	TK_FLOAT	= "float",
 	TK_DOUBLE	= "double",
 	TK_STRING	= "std::string",
@@ -116,15 +114,13 @@ end
 
 local typeKindToDoc = {
 	TK_ANY		= "co::Any",
-	TK_BOOLEAN	= "bool",
+	TK_BOOL		= "bool",
 	TK_INT8		= "int8",
 	TK_UINT8	= "uint8",
 	TK_INT16	= "int16",
 	TK_UINT16	= "uint16",
 	TK_INT32	= "int32",
 	TK_UINT32	= "uint32",
-	TK_INT64	= "int64",
-	TK_UINT64	= "uint64",
 	TK_FLOAT	= "float",
 	TK_DOUBLE	= "double",
 	TK_STRING	= "string",

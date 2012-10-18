@@ -55,7 +55,7 @@ TEST( ModuleTests, setupSystemRequiringModuleB )
 
 	// setup the system requiring moduleB
 	std::string requiredModule( "moduleB" );
-	system->setup( co::Range<std::string const>( &requiredModule, 1 ) );
+	system->setup( co::Range<std::string>( &requiredModule, 1 ) );
 
 	// now moduleA should have been loaded, as a dependency of moduleB
 	ASSERT_TRUE( system->getModules()->findModule( "moduleA" ) != NULL );
@@ -79,7 +79,7 @@ TEST( ModuleTests, systemAndModuleLifeCycles )
 
 	// setupBase() requiring moduleA
 	std::string requiredModule( "moduleA" );
-	system->setupBase( co::Range<std::string const>( &requiredModule, 1 ) );
+	system->setupBase( co::Range<std::string>( &requiredModule, 1 ) );
 
 	// moduleA should have been loaded, but not moduleB
 	co::IModule* moduleA = system->getModules()->findModule( "moduleA" );
@@ -150,7 +150,7 @@ TEST( ModuleTests, crossModuleReflection )
 
 	std::vector<co::uint8> instanceMemory( reflector->getSize() );
 	void* instancePtr = &instanceMemory.front();
-	co::Any instanceAny( type, co::Any::VarIsPointer, instancePtr );
+	co::Any instanceAny( true, type, instancePtr );
 
 	EXPECT_NO_THROW( reflector->createValues( instancePtr, 1 ) );
 
@@ -162,7 +162,7 @@ TEST( ModuleTests, crossModuleReflection )
 	assert( anInt8Field );
 
 	// exercise the reflection API
-	co::Any a1, a2;
+	co::AnyValue a1, a2;
 
 	reflector->getField( instanceAny, anInt8Field, a1 );
 	EXPECT_EQ( 0, a1.get<int>() );
@@ -174,8 +174,7 @@ TEST( ModuleTests, crossModuleReflection )
 	EXPECT_EQ( 7, a1.get<int>() );
 
 	// test exception catching
-	co::int32 garbage = -1;
-	instanceAny.set( garbage );
+	instanceAny = -0.1f;
 	try
 	{
 		reflector->getField( instanceAny, anInt8Field, a1 );
@@ -183,7 +182,7 @@ TEST( ModuleTests, crossModuleReflection )
 	}
 	catch( co::IllegalArgumentException& e )
 	{
-		EXPECT_EQ( "illegal instance type (moduleA.TestStruct expected, got (co::int32)-1)", e.getMessage() );
+		EXPECT_EQ( "illegal instance (moduleA.TestStruct expected, got float)", e.getMessage() );
 	}
 
 	reflector->destroyValues( instancePtr, 1 );
@@ -277,7 +276,7 @@ TEST( ModuleTests, luaScriptedError )
 	{
 		EXPECT_EQ( 0, e.getMessage().find( "error obtaining a reflector for type"
 			" 'moduleB.LuaScriptedError' via provider '@lua.Scripted':" ) );
-		EXPECT_NE( std::string::npos, e.getMessage().find( "faulty.lua:1: '=' expected near 'script'" ) );
+		EXPECT_NE( std::string::npos, e.getMessage().find( "faulty.lua:1: syntax error near 'script'" ) );
 	}
 }
 

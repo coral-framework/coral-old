@@ -105,20 +105,21 @@ public:
 
 			-- Field Accessors
 			for i, a in ipairs( itf.fields ) do
-				local inputType = itf.formatInput( a.type )
-				writer( "\t", inputType, " ", itf.formatAccessor( "get", a.name ), "()\n", [[
+				local at = a.type
+				local resultType =
+				writer( "\t", itf.formatResult( at ), " ", itf.formatAccessor( "get", a.name ), "()\n", [[
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<]], itf.cppName, [[>( ]], i - 1, [[ ) );
-        return res.get< ]], inputType, [[ >();
+		]], itf.formatField( at ), [[ res;
+		_provider->dynamicGetField( _cookie, getField<]], itf.cppName, [[>( ]], i - 1, [[ ), res );
+		return res]], at.kind == 'TK_INTERFACE' and ".get()" or "",[[;
 	}
 
 ]] )
 				if not a.isReadOnly then
-					writer( "\tvoid ", itf.formatAccessor( "set", a.name ), "( ", inputType, " ", a.name, "_ )\n", [[
+					writer( "\tvoid ", itf.formatAccessor( "set", a.name ), "( ", itf.formatInput( a.type ), " ", a.name, "_ )\n", [[
 	{
-		co::Any arg;
-		arg.set< ]], inputType, [[ >( ]], a.name, [[_ );
-		_provider->dynamicSetField( _cookie, getField<]], itf.cppName, [[>( ]], i - 1, [[ ), arg );
+		_provider->dynamicSetField( _cookie, getField<]],
+			itf.cppName, [[>( ]], i - 1, [[ ), ]], a.name, [[_ );
 	}
 
 ]] )
@@ -127,8 +128,8 @@ public:
 
 			-- Methods
 			for i, m in ipairs( itf.methods ) do
-				local formattedReturnType = itf.formatInput( m.returnType )
-				writer( "\t", formattedReturnType, " ", m.name, "(" )
+				local rt = m.returnType
+				writer( "\t", itf.formatResult( rt ), " ", m.name, "(" )
 				local params = m.parameters
 				if #params > 0 then
 					writer( " " )
@@ -140,22 +141,22 @@ public:
 				end
 				writer( ")\n\t{\n" )
 				if #params > 0 then
-					writer( "\t\tco::Any args[", #params, "];\n" )
+					writer( "\t\tco::Any args[] = { " )
 					for i, p in ipairs( params ) do
-						local paramType = ( p.isOut and itf.formatOutput or itf.formatInput )( p.type )
-						writer( "\t\targs[", i - 1, "].set< ", paramType, " >( ", p.name, "_ );\n" )
+						if i > 1 then writer ", " end
+						writer( p.name, "_" )
 					end
-					writer( "\t\tco::Range<co::Any const> range( args, ", #params, " );\n" )
+					writer( " };\n" )
 				else
-					writer( "\t\tco::Range<co::Any const> range;\n" )
+					writer( "\t\tco::Range<co::Any> args;\n" )
 				end
 				writer( "\t\t" )
-				if m.returnType then
-					writer( "const co::Any& res = " )
+				if rt then
+					writer( itf.formatField( rt ), " res;\n\t\t" )
 				end
-				writer( "_provider->dynamicInvoke( _cookie, getMethod<", itf.cppName, ">( ", i - 1, " ), range );\n" )
-				if m.returnType then
-					writer( "\t\treturn res.get< ", formattedReturnType, " >();\n" )
+				writer( "_provider->dynamicInvoke( _cookie, getMethod<", itf.cppName, ">( ", i - 1, " ), args, ", rt and "res" or "co::Any()", " );\n" )
+				if rt then
+					writer( "\t\treturn res", rt.kind == 'TK_INTERFACE' and ".get()" or "", ";\n" )
 				end
 				writer( "\t}\n\n" )
 			end
@@ -308,16 +309,14 @@ public:
 
 		writer( [[
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		]], t.cppName, [[* p = co::checkInstance<]], t.cppName, [[>( instance, field );
 		switch( field->getIndex() )
 		{
 ]] )
 		for i, a in ipairs( t.fields ) do
-			local inputType = t.formatInput( a.type )
-			local optionalGet = ( a.type.kind == 'TK_INTERFACE' and ".get()" or "" )
-			writer( "\t\tcase ", a.index, ":\t\tvalue.set< ", inputType, " >( p->", a.name, optionalGet, " ); break;\n" )
+			writer( "\t\tcase ", a.index, ":\t\tvalue.put( p->", a.name, " ); break;\n" )
 		end
 
 		writer( [[
@@ -334,9 +333,9 @@ public:
 
 		for i, a in ipairs( t.fields ) do
 			if a.type.kind == 'TK_ARRAY' then
-				writer( "\t\tcase ", a.index, ":\t\tco::assign( value.get< ", t.formatInput( a.type ), " >(), p->", a.name, " ); break;\n" )
+				writer( "\t\tcase ", a.index, ":\t\tco::assign( value", t.formatAnyGet( a.type ), ", p->", a.name, " ); break;\n" )
 			else
-				writer( "\t\tcase ", a.index, ":\t\tp->", a.name, " = value.get< ", t.formatInput( a.type ), " >(); break;\n" )
+				writer( "\t\tcase ", a.index, ":\t\tp->", a.name, " = value", t.formatAnyGet( a.type ), "; break;\n" )
 			end
 		end
 
@@ -350,7 +349,7 @@ public:
 
 		local callPrefix = ( t.kind == 'TK_NATIVECLASS' and t.cppName .. "_Adapter::" or "p->" )
 
-		writer( "\n\tvoid getField( const co::Any& instance, co::IField* field, co::Any& value )\n\t{\n" )
+		writer( "\n\tvoid getField( const co::Any& instance, co::IField* field, const co::Any& value )\n\t{\n" )
 
 		if #t.fields > 0 then
 			writer( "\t\t", t.cppName, [[* p = co::checkInstance<]], t.cppName, [[>( instance, field );
@@ -358,7 +357,7 @@ public:
 		{
 ]] )
 			for i, a in ipairs( t.fields ) do
-				writer( "\t\tcase ", a.index, ":\t\tvalue.set< ", t.formatInput( a.type ), " >( ", callPrefix,
+				writer( "\t\tcase ", a.index, ":\t\tvalue.put( ", callPrefix,
 					t.formatAccessor( "get", a.name ), "(", ( t.kind == 'TK_NATIVECLASS' and " *p " or "" ), ") ); break;\n" )
 			end
 
@@ -389,8 +388,9 @@ public:
 				if a.isReadOnly then
 					writer( "\t\tcase ", a.index, ":\t\traiseFieldIsReadOnly( field ); break;\n" )
 				else
-					writer( "\t\tcase ", a.index, ":\t\t", callPrefix, t.formatAccessor( "set", a.name ), "( ",
-						( t.kind == 'TK_NATIVECLASS' and "*p, " or "" ), "value.get< ", t.formatInput( a.type ), " >() ); break;\n" )
+					writer( "\t\tcase ", a.index, ":\t\t", callPrefix, t.formatAccessor( "set", a.name ), "( " )
+					if t.kind == 'TK_NATIVECLASS' then writer( "*p, " ) end
+					writer( "value", t.formatAnyGet( a.type ), " ); break;\n" )
 				end
 			end
 
@@ -411,7 +411,7 @@ public:
 		writer [[
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 ]]
 		if #t.methods > 0 then
@@ -427,14 +427,14 @@ public:
 				writer( "\t\t\tcase ", m.index, ":\n\t\t\t\t{\n" )
 				for i, p in ipairs( m.parameters ) do
 					local paramType = ( p.isOut and t.formatOutput or t.formatInput )( p.type )
-					writer( "\t\t\t\t\t", paramType, " ", p.name, "_ = args[++argIndex].get< ", paramType, " >();\n" )
+					writer( "\t\t\t\t\t", paramType, " ", p.name, "_ = args[++argIndex]", t.formatAnyGet( p.type, p.isOut ), ";\n" )
 				end
 				if #m.parameters > 0 then
 					writer( "\t\t\t\t\targIndex = -1;\n" )
 				end
 				writer( "\t\t\t\t\t" )
 				if m.returnType then
-					writer( "res.set< ", t.formatInput( m.returnType ), " >( " )
+					writer( "res.put( " )
 				end
 				writer( callPrefix, m.name )
 				if #m.parameters > 0 then

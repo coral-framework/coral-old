@@ -59,7 +59,7 @@ interface IReflector
 		\throw IllegalArgumentException if \a instance is not an instance of \a type.
 		\throw IllegalArgumentException if the \a field does not belong to this \a type.
 	 */
-	void getField( in any instance, in IField field, out any value )
+	void getField( in any instance, in IField field, in any value )
 		raises NotSupportedException, IllegalArgumentException;
 
 	/*
@@ -93,7 +93,7 @@ interface IReflector
 		\throw IllegalCastException if one of the arguments in \a args has no valid conversion to the actual
 			parameter type. Please refer to co::Any's documentation for more about type conversion rules.
 	 */
-	void invoke( in any instance, in IMethod method, in any[] args, out any returnValue )
+	void invoke( in any instance, in IMethod method, in any[] args, in any returnValue )
 		raises NotSupportedException, IllegalArgumentException, MissingInputException, IllegalCastException;
 
 	/*

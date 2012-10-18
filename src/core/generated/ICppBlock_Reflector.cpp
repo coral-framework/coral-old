@@ -43,17 +43,16 @@ public:
 
 	// co.ICppBlock Methods:
 
-	const std::string& getValue()
+	std::string getValue()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ICppBlock>( 0 ) );
-        return res.get< const std::string& >();
+		std::string res;
+		_provider->dynamicGetField( _cookie, getField<co::ICppBlock>( 0 ), res );
+		return res;
 	}
 
 	void setValue( const std::string& value_ )
 	{
-		co::Any arg;
-		arg.set< const std::string& >( value_ );
-		_provider->dynamicSetField( _cookie, getField<co::ICppBlock>( 0 ), arg );
+		_provider->dynamicSetField( _cookie, getField<co::ICppBlock>( 0 ), value_ );
 	}
 
 protected:
@@ -105,12 +104,12 @@ public:
 		return new co::ICppBlock_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::ICppBlock* p = co::checkInstance<co::ICppBlock>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< const std::string& >( p->getValue() ); break;
+		case 0:		value.put( p->getValue() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -127,7 +126,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::checkInstance<co::ICppBlock>( instance, method );
 		raiseUnexpectedMemberIndex();

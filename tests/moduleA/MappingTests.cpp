@@ -56,7 +56,7 @@ TEST( MappingTests, structFields )
 	ASSERT_EQ( moduleA::Second, dummyStruct.enumArray[0] );
 
 	dummyStruct.typeArray.push_back( NULL );
-	co::Range<co::IType* const> typeRange( dummyStruct.typeArray );
+	co::Range<co::IType*> typeRange( dummyStruct.typeArray );
 	ASSERT_EQ( 1, typeRange.getSize() );
 	ASSERT_EQ( dummyStruct.typeArray.front().get(), typeRange.getFirst() );
 }
@@ -121,7 +121,7 @@ TEST( MappingTests, interface )
 	moduleA::TestStruct testStruct;
 	testStruct.anInt16 = 42;
 	std::vector<co::int32> intVector( 1, 1 );
-	co::Range<co::int32 const> intList(  intVector );
+	co::Range<co::int32> intList(  intVector );
 
 	co::RefVector<moduleA::IDummy> interfaceRefVector;
 	interfaceRefVector.push_back( NULL );
@@ -129,7 +129,7 @@ TEST( MappingTests, interface )
 	std::vector<moduleA::IDummy*> interfaceVector;
 	interfaceVector.push_back( NULL );
 
-	co::Range<moduleA::IDummy* const> interfaceList( interfaceVector );
+	co::Range<moduleA::IDummy*> interfaceList( interfaceVector );
 
 	// Callling this method should NOT alter the parameters
 	ti->testInParameters( size, enumValue, text, testStruct, NULL, intList, interfaceList );
@@ -139,7 +139,7 @@ TEST( MappingTests, interface )
 	ASSERT_EQ( moduleA::Second, enumValue );
 	ASSERT_EQ( 42, testStruct.anInt16 );
 
-	moduleA::IDummy* dummyPtr = NULL;
+	co::RefPtr<moduleA::IDummy> dummyPtr;
 
 	// Callling this method should modify the parameters
 	ti->testOutParameters( size, enumValue, text, testStruct, dummyPtr, intVector, interfaceRefVector );

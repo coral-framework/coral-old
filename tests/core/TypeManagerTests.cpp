@@ -27,8 +27,6 @@ TEST( TypeManagerTests, preDefinedTypes )
 	EXPECT_TRUE( tm->findType( "uint16" ) != NULL );
 	EXPECT_TRUE( tm->findType( "int32" ) != NULL );
 	EXPECT_TRUE( tm->findType( "uint32" ) != NULL );
-	EXPECT_TRUE( tm->findType( "int64" ) != NULL );
-	EXPECT_TRUE( tm->findType( "uint64" ) != NULL );
 	EXPECT_TRUE( tm->findType( "float" ) != NULL );
 	EXPECT_TRUE( tm->findType( "double" ) != NULL );
 	EXPECT_TRUE( tm->findType( "string" ) != NULL );
@@ -99,30 +97,30 @@ struct TypeStatistics
 {
 	co::uint32 numNamespaces;
 	co::uint32 numTypes;
-	co::uint32 numComplexTypes; // # of structs, native classes, interfaces and components
+	co::uint32 numCustomTypes;
 	co::uint32 numTypesWithReflector;
 
 	TypeStatistics()
-		: numNamespaces( 0 ), numTypes( 0 ), numComplexTypes( 0 ), numTypesWithReflector( 0 )
+		: numNamespaces( 0 ), numTypes( 0 ), numCustomTypes( 0 ), numTypesWithReflector( 0 )
 	{;}
 
 	void traverse( co::INamespace* ns )
 	{
 		++numNamespaces;
 
-		for( co::Range<co::IType* const> r( ns->getTypes() ); r; r.popFirst() )
+		for( co::Range<co::IType*> r( ns->getTypes() ); r; r.popFirst() )
 		{
 			++numTypes;
 
 			co::IType* type = r.getFirst();
-			if( type->getKind() > co::TK_EXCEPTION )
-				++numComplexTypes;
+			if( isCustom( type->getKind() ) )
+				++numCustomTypes;
 
 			if( type->getReflector() )
 			   ++numTypesWithReflector;
 		}
 
-		for( co::Range<co::INamespace* const> r( ns->getChildNamespaces() ); r; r.popFirst() )
+		for( co::Range<co::INamespace*> r( ns->getChildNamespaces() ); r; r.popFirst() )
 			traverse( r.getFirst() );
 	}
 };

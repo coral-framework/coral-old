@@ -24,7 +24,7 @@ class ICompositeType : public co::IType
 public:
 	virtual ~ICompositeType() {;}
 
-	virtual co::Range<co::IMember* const> getMembers() = 0;
+	virtual co::Range<co::IMember*> getMembers() = 0;
 
 	virtual co::IMember* getMember( const std::string& name ) = 0;
 };

@@ -21,397 +21,216 @@
 
 namespace co {
 
+class Any;
+class AnyValue;
+
 #ifndef DOXYGEN
 
-//! Private namespace with auxiliary code for class co::Any.
+//! Private namespace with auxiliary code for co::Any.
 namespace __any {
+
+union Data
+{
+	// Storage for primitives:
+	bool b;
+	int8 i8;
+	uint8 u8;
+	int16 i16;
+	uint16 u16;
+	int32 i32;
+	uint32 u32;
+	float f;
+	double d;
+
+	// Multipurpose pointers:
+	void* ptr;
+	const void* cptr;
+	co::uint8* bytes;
+	std::string* str;
+	IService* service;
+	Data* deref;
+
+	// Constructors
+	Data() : d( 0 ) {;}
+	Data( const void* ptr ) : cptr( ptr ) {;}
+};
 
 struct State
 {
-	union Data
-	{
-		// Storage for primitive values:
-		bool b;
-		int8 i8;
-		uint8 u8;
-		int16 i16;
-		uint16 u16;
-		int32 i32;
-		uint32 u32;
-		int64 i64;
-		uint64 u64;
-		float f;
-		double d;
+	IType* type;	// Variable Type
+#if defined(CORAL_CC_MSVC)
+	size_t // MSVC refuses to merge different-sized types in a bitfield
+#else
+	bool
+#endif
+		isIn : 1;	// True if the var is 'in'; False if it is 'out'
+	size_t size		// Only used for 'in' arrays and C-strings
+#if CORAL_POINTER_SIZE == 4
+		: 31;
+#else
+		: 63;
+#endif
+	Data data;		// Storage for primitives and pointers
 
-		// Multipurpose pointers:
-		void* ptr;
-		const void* cptr;
-		IService* service;
-	}
-	data;
+	// Default constructor
+	State() : type( BASIC_TYPES[TK_NULL].get() ), isIn( false ), size( 0 ) {;}
 
-	// co::IType of the variable; or, if this is an array, the array's element type.
-	IType* type;
-
-	// convenience method to get 'type' downcasted to an IInterface
-	inline IInterface* getInterface() const { return static_cast<IInterface*>( type ); }
-
-	// only used if arrayKind is AK_Range
-	uint32 arraySize;
-
-	// the kind of variable we're holding
-	uint8 kind;
-
-	// facts about the variable type (or, if this is an array, the array element type):
-	uint8 isConst : 1;
-	uint8 isPointer : 1;
-	uint8 isPointerConst : 1;
-	uint8 isReference : 1;
-
-	// what array representation was provided
-	enum ArrayKind { AK_StdVector, AK_RefVector, AK_Range };
-	uint8 arrayKind;
-
-	// reserved for use in co::Any:
-	uint8 objectKind;
-};
-
-template<typename TT>
-struct PrepareBasic
-{
-	inline static void prepare( State& s )
-	{
-		s.kind = TT::kind;
-		s.isConst = TT::isConst;
-		s.isPointer = TT::isPointer;
-		s.isPointerConst = TT::isPointerConst;
-		s.isReference = TT::isReference;
-	}
-};
-
-template<typename TT>
-struct PrepareWithType
-{
-	inline static void prepare( State& s )
-	{
-		PrepareBasic<TT>::prepare( s );
-		s.type = typeOf<typename TT::CoreType>::get();
-	}
-};
-
-template<TypeKind kind, typename TT>
-struct PrepareStateFor
-{
-	inline static void prepare( State& s )
-	{
-		PrepareBasic<TT>::prepare( s );
-		s.type = NULL;
-	}
-};
-
-template<typename TT>
-struct PrepareStateFor<TK_ENUM, TT> : public PrepareWithType<TT> {};
-
-template<typename TT>
-struct PrepareStateFor<TK_STRUCT, TT> : public PrepareWithType<TT> {};
-
-template<typename TT>
-struct PrepareStateFor<TK_NATIVECLASS, TT> : public PrepareWithType<TT> {};
-
-template<typename TT>
-struct PrepareStateFor<TK_INTERFACE, TT> : public PrepareWithType<TT> {};
-
-template<typename T, typename ATT>
-struct PrepareStateForArray
-{
-	static_assert( sizeof(T)<0, "unsupported array representation" );
-};
-
-template<typename T, typename ATT>
-struct PrepareStateForArray<std::vector<T>, ATT>
-{
-	typedef traits::get<T> ETT; // traits for the array element type
-	inline static void prepare( State& s )
-	{
-		static_assert( ETT::kind != TK_ARRAY, "arrays of arrays are not supported" );
-		static_assert( ATT::isReference && !ATT::isPointer, "std::vectors must be passed by reference" );
-		s.type = typeOf<typename ETT::CoreType>::get();
-		s.isConst = ETT::isConst;
-		s.isPointer = ETT::isPointer;
-		s.isPointerConst = ETT::isPointerConst;
-		s.isReference = ETT::isReference;
-		s.arrayKind = State::AK_StdVector;
-	}
-};
-
-template<typename T, typename ATT>
-struct PrepareStateForArray<RefVector<T>, ATT>
-{
-	inline static void prepare( State& s )
-	{
-		static_assert( ATT::isReference && !ATT::isPointer, "co::RefVectors must be passed by reference" );
-		s.type = typeOf<T>::get();
-		s.isConst = false;
-		s.isPointer = true;
-		s.isPointerConst = true;
-		s.isReference = false;
-		s.arrayKind = State::AK_RefVector;
-	}
-};
-
-template<typename T, typename ATT>
-struct PrepareStateForArray<Range<T>, ATT>
-{
-	typedef traits::get<T> ETT; // traits for the array element type
-	inline static void prepare( State& s )
-	{
-		static_assert( ETT::kind != TK_ARRAY, "arrays of arrays are not supported" );
-		static_assert( !ATT::isPointer && !ATT::isReference, "co::Ranges must be passed by value" );
-		s.type = typeOf<typename ETT::CoreType>::get();
-		s.isConst = ETT::isConst;
-		s.isPointer = ETT::isPointer;
-		s.isPointerConst = ETT::isPointerConst;
-		s.isReference = ETT::isReference;
-		s.arrayKind = State::AK_Range;
-	}
-};
-
-template<typename ATT>
-struct PrepareStateFor<TK_ARRAY, ATT>
-{
-	inline static void prepare( State& s )
-	{
-		PrepareStateForArray<typename ATT::CoreType, ATT>::prepare( s );
-		s.kind = TK_ARRAY;
-	}
-};
-
-template<TypeKind kind, typename TT, typename T>
-struct PrepareStateForStorageOf
-{
-	inline static void prepare( State& s, T )
-	{
-		PrepareStateFor<kind, TT>::prepare( s );
-	}
-};
-
-template<typename TT, typename T>
-struct PrepareStateForStorageOf<TK_INTERFACE, TT, T*>
-{
-	inline static void prepare( State& s, T* v )
-	{
-		PrepareBasic<TT>::prepare( s );
-		s.type = v ? v->getInterface() : typeOf<T>::get();
-	}
-};
-
-template<typename TT, typename T>
-struct PrepareStateForStorageOf<TK_INTERFACE, TT, const T*>
-{
-	inline static void prepare( State& s, const T* v )
-	{
-		PrepareBasic<TT>::prepare( s );
-		s.type = v ? const_cast<T*>( v )->getInterface() : typeOf<T>::get();
-	}
-};
-
-template<TypeKind kind, typename T>
-struct ValueHelper
-{
-	// this is the final destination of all unrecognized values
-	static void store( State&, T ) { static_assert( sizeof(T)<0, "variable must be passed by reference" ); }
-	static T retrieve( State& ) { static_assert( sizeof(T)<0, "variable must be retrieved by reference" ); }
+	// Output variable constructor
+	State( IType* type, const void* ptr )
+		: type( type ), isIn( false ), size( 0 ), data( ptr ) {;}
 };
 
 template<typename T>
-struct ValueHelper<TK_ARRAY, T>
+struct Ref
 {
-	// std::vectors and co::RefVectors are handled by this case
-	static void store( State&, T ) { static_assert( sizeof(T)<0, "array type must be passed by reference" ); }
-	static T retrieve( State& ) { static_assert( sizeof(T)<0, "array type must be retrieved by reference" ); }
+	inline static void set( State& s, const T& v ) { s.data.cptr = &v; }
+	inline static T& get( State& s ) { return *reinterpret_cast<T*>( s.data.ptr ); }
 };
 
-template<typename T>
-struct ValueHelper<TK_ARRAY, Range<T> >
+template<typename T, TypeKind kind>
+struct Value
 {
-	// co::Ranges are handled by this case
-	inline static void store( State& s, Range<T>& v )
-	{
-		s.data.cptr = &( v.getFirst() );
-		size_t size = v.getSize();
-		assert( size < MAX_UINT32 );
-		s.arraySize = static_cast<uint32>( size );
-	}
+	inline static void set( State& s, const T& v ) { *reinterpret_cast<T*>( &s.data ) = v; }
+	inline static const T& get( State& s ) { return *reinterpret_cast<T*>( &s.data ); }
+};
 
-	inline static Range<T> retrieve( State& s )
+template<typename T> struct Value<T, TK_STRING> : public Ref<T> {};
+template<typename T> struct Value<T, TK_STRUCT> : public Ref<T> {};
+template<typename T> struct Value<T, TK_NATIVECLASS> : public Ref<T> {};
+
+template<typename T, bool isIn>
+struct Tag
+{
+	typedef typeOf<T> VT;
+	inline static void tag( State& s )
 	{
-		if( s.arrayKind == State::AK_Range )
-			return Range<T>( reinterpret_cast<T*>( s.data.ptr ), s.arraySize );
-		else
-			return Range<T>( *reinterpret_cast<std::vector<typename
-										traits::removeConst<T>::Type>*>( s.data.ptr ) );
+		static_assert( VT::kind != TK_NULL, "unsupported type" );
+		s.type = VT::get();
+		s.isIn = isIn;
 	}
 };
 
 template<typename T>
-struct ValueHelper<TK_ENUM, T>
+struct Variable
 {
-	// enums are handled by this case
-	inline static void store( State& s, T v ) { s.data.u32 = static_cast<uint32>( v ); }
-	inline static T retrieve( State& s ) { return static_cast<T>( s.data.u32 ); }
+	inline static void tag( State& s ) { Variable<const T&>::tag( s ); }
+	inline static void set( State& s, const T& v ) { Variable<const T&>::set( s, v ); }
+	inline static T get( State& s ) { return Variable<const T&>::get( s ); }
 };
 
 template<typename T>
-struct VariableHelper
+struct Variable<T&> : public Tag<T, false>
 {
-	// forward all unrecognized variables to ValueHelper
-	typedef traits::get<T> TT;
-	inline static void store( State& s, T v ) { ValueHelper<TT::kind, T>::store( s, v ); }
-	inline static T retrieve( State& s ) { return ValueHelper<TT::kind, T>::retrieve( s ); }
+	inline static void set( State& s, T& v ) { Ref<T>::set( s, v ); }
+	inline static T& get( State& s ) { return Ref<T>::get( s ); }
 };
 
 template<typename T>
-struct VariableHelper<const T>
+struct Variable<const T&> : public Tag<T, true>
 {
-	inline static void store( State& s, const T v ) { VariableHelper<T>::store( s, v ); }
-	inline static const T retrieve( State& s ) { return VariableHelper<T>::retrieve( s ); }
+	typedef Value<T, kindOf<T>::kind> ValueHelper;
+	inline static void set( State& s, const T& v ) { ValueHelper::set( s, v ); }
+	inline static const T& get( State& s ) { return ValueHelper::get( s ); }
+};
+
+template<> struct Variable<const AnyValue&> : public Tag<AnyValue, false>, public Ref<AnyValue> {};
+template<> struct Variable<AnyValue&> : public Variable<const AnyValue&> {};
+
+template<typename T>
+struct IllegalRecursiveAny
+{
+	inline static void tag( State& ) { static_assert( sizeof(T)<0, "illegal recursive co::Any" ); }
+};
+template<> struct Variable<Any&> : public IllegalRecursiveAny<Any&> {};
+template<> struct Variable<const Any&> : public IllegalRecursiveAny<const Any&> {};
+
+template<TypeKind, bool isIn, typename T>
+struct Pointer
+{
+	inline static void tag( State& ) { static_assert( sizeof(T)<0, "unexpected pointer type" ); }
+};
+
+template<bool isIn, typename T>
+struct Pointer<TK_NATIVECLASS, isIn, T> : public Tag<T, isIn>, Ref<T> {};
+
+template<bool isIn, typename T>
+struct Pointer<TK_INTERFACE, isIn, T> : public Tag<T, true>
+{
+	inline static void set( State& s, T v )
+	{
+		if( v ) s.type = v->getInterface();
+		s.data.service = v;
+	}
+	inline static T get( State& s ) { return static_cast<T>( s.data.service ); }
+};
+
+template<typename T> struct Variable<T*&> : public Pointer<kindOf<T*>::kind, false, T*> {};
+template<typename T> struct Variable<T* const&> : public Pointer<kindOf<T*>::kind, true, T* const> {};
+
+template<typename T> struct Variable<const T* const&>
+{
+	inline static void tag( State& ) { static_assert( sizeof(T)<0, "illegal const pointer" ); }
+};
+template<typename T> struct Variable<const T*&> : public Variable<const T* const&> {};
+
+template<typename T>
+struct Variable<RefPtr<T>&>
+{
+	typedef typeOf<T> IT;
+	inline static void tag( State& s )
+	{
+		static_assert( IT::kind == TK_INTERFACE, "illegal RefPtr to a non-interface type" );
+		s.type = IT::get();
+		s.isIn = false;
+	}
+	inline static void set( State& s, RefPtr<T>& v ) { s.data.ptr = &v; }
+	inline static RefPtr<T>& get( State& s ) { return *reinterpret_cast<RefPtr<T>*>( s.data.ptr ); }
 };
 
 template<typename T>
-struct VariableHelper<const T*>
+struct Variable<const RefPtr<T>&>
 {
-	inline static void store( State& s, const T* v ) { VariableHelper<T*>::store( s, const_cast<T*>( v ) ); }
-	inline static const T* retrieve( State& s ) { return VariableHelper<T*>::retrieve( s ); }
+	typedef Variable<T* const&> AsPtr;
+	inline static void tag( State& s ) { AsPtr::tag( s ); }
+	inline static void set( State& s, const RefPtr<T>& v ) { AsPtr::set( s, v.get() ); }
 };
 
 template<typename T>
-struct VariableHelper<T* const>
+struct Variable<const Range<T>&> : public Tag<Range<T>, true>
 {
-	inline static void store( State& s, T* const ptr ) { VariableHelper<T*>::store( s, const_cast<T*>( ptr ) ); }
-	inline static T* const retrieve( State& s ) { return VariableHelper<T*>::retrieve( s ); }
+	inline static void set( State& s, const Range<T>& v )
+	{
+		s.data.cptr = v.getStart();
+		s.size = v.getSize();
+	}
+	inline static Range<T> get( State& s )
+	{
+		return Range<T>( reinterpret_cast<T*>( s.data.ptr ), s.size );
+	}
+};
+
+template<typename T> struct Variable<Range<T>&> : public Variable<const Range<T>&> {};
+
+template<typename T> struct Variable<std::vector<T>&>
+	: public Tag<std::vector<T>, false>, public Ref<std::vector<T> > {};
+
+template<typename T> struct Variable<RefVector<T>&>
+	: public Tag<RefVector<T>, false>, public Ref<RefVector<T> > {};
+
+template<typename T>
+struct Variable<const std::vector<T>&>
+{
+	typedef Variable<Range<T>&> AsRange;
+	inline static void tag( State& s ) { AsRange::tag( s ); }
+	inline static void set( State& s, const std::vector<T>& v ) { AsRange::set( s, v ); }
 };
 
 template<typename T>
-struct VariableHelper<const T* const>
+struct Variable<const RefVector<T>&>
 {
-	inline static void store( State& s, const T* const ptr ) { VariableHelper<T*>::store( s, const_cast<T*>( ptr ) ); }
-	inline static const T* const retrieve( State& s ) { return VariableHelper<T*>::retrieve( s ); }
-};
-
-template<typename T>
-struct VariableHelper<const T&>
-{
-	inline static void store( State& s, const T& v ) { VariableHelper<T&>::store( s, const_cast<T&>( v ) ); }
-	inline static const T& retrieve( State& s ) { return VariableHelper<T&>::retrieve( s ); }
-};
-
-template<TypeKind kind, typename T>
-struct PointerHelper
-{
-	// handles general pointers & references
-	inline static void store( State& s, T* ptr ) { s.data.ptr = ptr; }
-	inline static T* retrieve( State& s ) { return reinterpret_cast<T*>( s.data.ptr ); }
-};
-
-template<typename T>
-struct PointerHelper<TK_INTERFACE, T>
-{
-	// handles services
-	inline static void store( State& s, T* ptr ) { s.data.service = ptr; }
-	inline static T* retrieve( State& s ) { return static_cast<T*>( s.data.service ); }
-};
-
-template<typename T>
-struct VariableHelper<T*>
-{
-	// all pointers are forwarded to PointerHelper
-	typedef traits::get<T> TT;
-	inline static void store( State& s, T* ptr ) { PointerHelper<TT::kind, T>::store( s, ptr ); }
-	inline static T* retrieve( State& s ) { return PointerHelper<TT::kind, T>::retrieve( s ); }
-};
-
-template<typename T>
-struct VariableHelper<T&>
-{
-	inline static void store( State& s, T& v ) { PointerHelper<TK_NONE, T>::store( s, &v ); }
-	inline static T& retrieve( State& s ) { return *PointerHelper<TK_NONE, T>::retrieve( s ); }
-};
-
-template<>
-struct VariableHelper<bool>
-{
-	inline static void store( State& s, bool v ) { s.data.b = v; }
-	inline static bool retrieve( State& s ) { return s.data.b; }
-};
-
-template<>
-struct VariableHelper<int8>
-{
-	inline static void store( State& s, int8 v ) { s.data.i8 = v; }
-	inline static int8 retrieve( State& s ) { return static_cast<int8>( s.data.i8 ); }
-};
-
-template<>
-struct VariableHelper<uint8>
-{
-	inline static void store( State& s, uint8 v ) { s.data.u8 = v; }
-	inline static uint8 retrieve( State& s ) { return static_cast<uint8>( s.data.u8 ); }
-};
-
-template<>
-struct VariableHelper<int16>
-{
-	inline static void store( State& s, int16 v ) { s.data.i16 = v; }
-	inline static int16 retrieve( State& s ) { return static_cast<int16>( s.data.i16 ); }
-};
-
-template<>
-struct VariableHelper<uint16>
-{
-	inline static void store( State& s, uint16 v ) { s.data.u16 = v; }
-	inline static uint16 retrieve( State& s ) { return static_cast<uint16>( s.data.u16 ); }
-};
-
-template<>
-struct VariableHelper<int32>
-{
-	inline static void store( State& s, int32 v ) { s.data.i32 = v; }
-	inline static int32 retrieve( State& s ) { return s.data.i32; }
-};
-
-template<>
-struct VariableHelper<uint32>
-{
-	inline static void store( State& s, uint32 v ) { s.data.u32 = v; }
-	inline static uint32 retrieve( State& s ) { return s.data.u32; }
-};
-
-template<>
-struct VariableHelper<int64>
-{
-	inline static void store( State& s, int64 v ) { s.data.i64 = v; }
-	inline static int64 retrieve( State& s ) { return s.data.i64; }
-};
-
-template<>
-struct VariableHelper<uint64>
-{
-	inline static void store( State& s, uint64 v ) { s.data.u64 = v; }
-	inline static uint64 retrieve( State& s ) { return s.data.u64; }
-};
-
-template<>
-struct VariableHelper<float>
-{
-	inline static void store( State& s, float v ) { s.data.f = v; }
-	inline static float retrieve( State& s ) { return s.data.f; }
-};
-
-template<>
-struct VariableHelper<double>
-{
-	inline static void store( State& s, double v ) { s.data.d = v; }
-	inline static double retrieve( State& s ) { return s.data.d; }
+	typedef Variable<Range<T*>&> AsRange;
+	inline static void tag( State& s ) { AsRange::tag( s ); }
+	inline static void set( State& s, const RefVector<T>& v ) { AsRange::set( s, v ); }
 };
 
 } // namespace __any
@@ -437,7 +256,7 @@ struct VariableHelper<double>
 
 	\par Values vs. References
 		For efficiency, this class only allows the storage of values for \c enums and <em>primitive types</em>
-		(i.e. \c bool, <tt>[u]int{8|16|32|64}</tt>, \c float and \c double). All other types must be stored and
+		(i.e. \c bool, <tt>[u]int{8|16|32}</tt>, \c float and \c double). All other types must be stored and
 		retrieved <em>by reference</em> (i.e. either as pointers or actual references), and the programmer must
 		guarantee referred objects outlive their co::Any instances.
 		\par
@@ -457,9 +276,8 @@ struct VariableHelper<double>
 		pass the array as a \c co::Range instead. Moreover, to prevent existing elements from being modified,
 		one should pass a \c co::Range of \c <b>const</b> elements.
 		\par
-		For instance, an array passed as a <tt>co::Range<const std::string></tt> is completely immutable &mdash;
-		as opposed to a <tt>std::vector<std::string></tt>, which is fully mutable. Somewhere in between, a
-		<tt>co::Range<std::string></tt> allows existing strings to be modified, but not the array length.
+		For instance, an array passed as a <tt>co::Range<std::string></tt> is completely immutable &mdash;
+		as opposed to a <tt>std::vector<std::string></tt>, which is fully mutable.
 		\par
 		Arrays represented by \c std::vectors or \c co::RefVectors must always be passed and retrieved
 		<b>by reference</b>, while \c co::Ranges must always be passed and retrieved <b>by value</b>.
@@ -468,9 +286,7 @@ struct VariableHelper<double>
 		retrieving \c co::Ranges the following coercion rules apply:
 		  - It is possible to retrieve a <tt>co::Range<\e ValueType></tt> from an array passed as a
 				<tt>std::vector<\e ValueType></tt>.
-		  - It is possible to retrieve a <tt>co::Range<const \e ValueType></tt> from an array passed as
-				either a <tt>co::Range<\e ValueType></tt> or a <tt>std::vector<\e ValueType></tt>.
-		  - It is possible to retrieve a <tt>co::Range<\e SuperType* const></tt> from an array
+		  - It is possible to retrieve a <tt>co::Range<\e SuperType*></tt> from an array
 				passed as either a <tt>co::Range<\e SubType* [const]></tt>, a
 				<tt>std::vector<\e SubType*></tt> or a <tt>co::RefVector<\e SubType></tt>.
 		\par
@@ -491,204 +307,95 @@ struct VariableHelper<double>
 class CORAL_EXPORT Any
 {
 public:
-	//! Alias to the struct that contains all info about a co::Any's var.
-	typedef __any::State State;
+	//! Variable state descriptor.
+	__any::State state;
 
-	//! A 'neutral' std::vector type.
-	typedef std::vector<uint8> PseudoVector;
+	//! Creates a null co::Any.
+	inline Any() : state() {;}
 
-	/*!
-		Flags that can be OR'ed together to describe variables in the Coral type system.
-		For use with the custom variable setters and constructors.
-	 */
-	enum VariableFlags
-	{
-		VarIsValue			= 0,		//!< Indicates the variable is a simple value.
-		VarIsConst			= 1 << 0,	//!< Indicates the referred value is 'const'.
-		VarIsPointer		= 1 << 1,	//!< Indicates the variable is a pointer.
-		VarIsPointerConst	= 1 << 2,	//!< Indicates the pointer is 'const' (implies VarIsPointer).
-		VarIsReference		= 1 << 3,	//!< Indicates the variable is a reference.
-	};
-
-	/*!
-		Enumeration of the supported array representations in the Coral type system.
-		For use with setArray() and its corresponding co::Any constructor.
-	 */
-	enum ArrayKind
-	{
-		AK_StdVector,	//!< Indicates the variable is a \c std::vector.
-		AK_RefVector,	//!< Indicates the variable is a \c co::RefVector (implies VarIsPointerConst).
-		AK_Range	//!< Indicates the variable is a \c co::Range.
-	};
-
-	/*!
-		Performance Settings:
-
-		MIN_CAPACITY: minimum number of bytes that should be storable in a co::Any
-		without resorting to dynamic memory allocation. For instance, if you want
-		your double-precision quaternion native class to be handled efficiently, set
-		this to 32. If you want your single-precision (float) 4x4 matrix class to
-		be handled efficiently, you could set this to 64. Please note that large
-		values lead to excessive memory consumption and performance degradation.
-		Settings this to less than 3*sizeof(void*) makes no sense on most platforms.
-
-		INPLACE_CAPACITY: actual number of bytes that can be stored in a co::Any
-		without resorting to dynamic memory allocation. Automatically set based
-		on MIN_CAPACITY and the size of other basic types.
-	 */
-	enum PerformanceSettings
-	{
-		MIN_CAPACITY = 4 * sizeof(double),
-		REQ_VEC_CAPACITY = sizeof(PseudoVector),
-		REQ_STR_CAPACITY = sizeof(std::string),
-		REQ_BASIC_CAPACITY = REQ_VEC_CAPACITY > REQ_STR_CAPACITY ? REQ_VEC_CAPACITY : REQ_STR_CAPACITY,
-		INPLACE_CAPACITY = MIN_CAPACITY > REQ_BASIC_CAPACITY ? MIN_CAPACITY : REQ_BASIC_CAPACITY
-	};
-
-public:
-	//! Creates an invalid co::Any.
-	inline Any() : _state()
-	{;}
-
-	/*!
-		\brief Template constructor that stores any variable supported by the Coral type system.
-
-		\warning Since the template variable \a T must be inferred by the compiler, this constructor
-			is subject to language limitations that will make it miss the fact that a variable's type
-			is 'const' and/or a reference. Please call set() instead, passing the variable's type explicitly,
-			if you must store a reference or a 'const' variable.
-	 */
+	//! Creates a reference to any non-const Coral variable.
 	template<typename T>
-	inline Any( T var ) :  _state()
-	{
-		set<T>( var );
-	}
+	inline Any( T& var ) { set( var ); }
 
-	/*!
-		\brief Constructor corresponding to a setService() call.
-		Please, see setService()'s documentation for more info.
-	 */
-	inline Any( IService* instance, IInterface* type ) : _state()
-	{
-		setService( instance, type );
-	}
+	//! Creates a reference to any const Coral variable.
+	template<typename T>
+	inline Any( const T& var ) { set( var ); }
 
-	/*!
-		\brief Constructor corresponding to a setVariable() call.
-		Please, see setVariable()'s documentation for more info.
-	 */
-	inline Any( IType* type, uint32 flags, void* ptr ) : _state()
-	{
-		setVariable( type, flags, ptr );
-	}
+	//! Creates a reference to a statically-allocated array.
+	template<typename T, size_t size>
+	inline Any( T(&array)[size] ) { setIn( Range<T>( array ) ); }
 
-	/*!
-		\brief Constructor corresponding to a setBasic() call.
-		Please, see setBasic()'s documentation for more info.
-	 */
-	inline Any( TypeKind kind, uint32 flags, void* ptr ) : _state()
+	//! Creates a reference to any variable reflectively. \see set()
+	inline Any( bool isIn, IType* type, const void* addr, size_t size = 0 )
 	{
-		setBasic( kind, flags, ptr );
-	}
-
-	/*!
-		\brief Constructor corresponding to a setArray() call.
-		Please, see setArray()'s documentation for more info.
-	 */
-	inline Any( ArrayKind arrayKind, IType* elementType, uint32 flags, void* ptr, size_t arraySize = 0 )
-		: _state()
-	{
-		setArray( arrayKind, elementType, flags, ptr, arraySize );
+		set( isIn, type, addr, size );
 	}
 
 	//! Copy constructor.
-	inline Any( const Any& other ) : _state()
-	{
-		copy( other );
-	}
+	inline Any( const Any& other ) : state( other.state ) {;}
+	inline Any( Any& other ) : state( other.state ) {;}
 
 	//! Destructor.
-	inline ~Any()
-	{
-		if( _state.objectKind != TK_NONE )
-			destroyObject();
-	}
+	inline ~Any() {;}
 
-	//! Clears any variable/object stored in the co::Any.
-	void clear();
+	//! Clears the co::Any (makes it null).
+	inline void clear() { state.type = BASIC_TYPES[TK_NULL].get(); }
 
 	//! \name Variable Introspection
 	//@{
 
-	//! Returns whether this co::Any was initialized.
-	inline bool isValid() const { return _state.kind != TK_NONE; }
+	//! Whether this co::Any is null.
+	inline bool isNull() const { return state.type->getKind() == TK_NULL; }
 
-	//! Returns the kind of variable stored in this object.
-	inline TypeKind getKind() const { return static_cast<TypeKind>( _state.kind ); }
+	//! Whether this co::Any is not null.
+	inline bool isValid() const { return !isNull(); }
 
-	//! Returns whether the variable stored in this object is 'const'.
-	inline bool isConst() const { return _state.isConst != 0; }
+	//! Returns the type of the stored variable.
+	inline IType* getType() const { return state.type; }
 
-	//! Returns whether the variable stored in this object is a pointer.
-	inline bool isPointer() const { return _state.isPointer != 0; }
+	//! Returns the kind of the stored variable.
+	inline TypeKind getKind() const { return state.type->getKind(); }
 
-	//! Returns whether the variable stored in this object is a pointer and the pointer is const.
-	inline bool isPointerConst() const { return _state.isPointerConst != 0; }
+	//! Whether the stored variable is in the 'input' form.
+	inline bool isIn() const { return state.isIn; }
 
-	//! Returns whether the variable stored in this object is a reference.
-	inline bool isReference() const { return _state.isReference != 0; }
+	//! Whether the stored variable is in the 'output' form.
+	inline bool isOut() const { return !state.isIn; }
+
+	//! Returns the equivalent variable in the 'input' form.
+	Any asIn() const;
 
 	/*!
-		For \c enums, \c structs and \c native \c classes, this returns the co::IType of the stored variable.
-		For \c arrays, this returns the array element type.
-		For \c interfaces you should call getInterface() instead.
-		For all other type kinds, this returns NULL.
+		\brief Returns the number of elements contained in this co::Any.
+		For arrays, this is the number of elements in the array; for other
+		types this is always 1.
 	 */
-	inline IType* getType() const { return _state.type; }
-
-	//! Returns the type of the stored service.
-	inline IInterface* getInterface() const
-	{
-		assert( _state.kind == TK_INTERFACE );
-		return static_cast<IInterface*>( _state.type );
-	}
+	size_t getCount() const;
 
 	/*!
-		Returns the size of the variable stored in this object; or, in the case of arrays,
-		by each array element. This method mimics the behavior of operator sizeof(): for pointers,
-		the result is always sizeof(void*). For references, the result is equivalent to the value's size.
-
-		This method may have to use the type's reflector to inquire the size of user-defined types;
-		therefore, it may throw exceptions.
+		\brief Returns the individual size of the elements in this co::Any.
+		For arrays, this is the size of each array element; for other types
+		this is the size reported by the type's reflector.
 	 */
-	int32 getSize() const;
+	size_t getElementSize() const;
 
 	/*!
-		Attempts to retrieve a stored variable, making the necessary casts whenever possible.
-
-		\throw co::IllegalCastException if there is no valid cast from the stored variable's
-				type to the requested type \a T.
+		Retrieves a stored variable.
+		\throw IllegalCastException if there is no valid conversion from the
+					stored variable's type to the requested type \a T.
 	 */
 	template<typename T>
 	inline T get() const
 	{
-		typedef traits::get<T> TT;
-
-		static_assert( TT::kind != TK_NONE, "T is not a valid Coral type" );
-		static_assert( TT::kind != TK_EXCEPTION, "cannot retrieve exceptions" );
-
-		Any temp;
-		__any::PrepareStateFor<TT::kind, TT>::prepare( temp._state );
-		temp.castFrom( _state );
-
-		return __any::VariableHelper<T>::retrieve( temp._state );
+		return Getter<T>::get( *this );
 	}
 
-	//! Provides read/write access to the internal state of a co::Any.
-	inline State& getState() { return _state; }
-
-	//! Provides read access to the internal state of a co::Any.
-	inline const State& getState() const { return _state; }
+	template<typename T>
+	inline void get( T& v ) const
+	{
+		Any any( v );
+		any.put( *this );
+	}
 
 	//@}
 	//! \name Automatic Variable Storage
@@ -704,16 +411,18 @@ public:
 		\warning If you don't specify the template variable \a T explicitly, due to language limitations
 			the compiler will generally miss the fact that a variable's type is 'const' and/or a reference.
 	 */
+
 	template<typename T>
-	inline void set( T var )
+	inline void set( T& var )
 	{
-		typedef traits::get<T> TT;
+		__any::Variable<T&>::tag( state );
+		__any::Variable<T&>::set( state, var );
+	}
 
-		static_assert( TT::kind != TK_NONE, "T is not a valid Coral type" );
-		static_assert( TT::kind != TK_EXCEPTION, "cannot store exceptions" );
-
-		__any::PrepareStateForStorageOf<TT::kind, TT, T>::prepare( _state, var );
-		__any::VariableHelper<T>::store( _state, var );
+	template<typename T>
+	inline void setIn( const T& var )
+	{
+		set<const T&>( var );
 	}
 
 	//@}
@@ -729,140 +438,48 @@ public:
 	//@{
 
 	/*!
-		Stores a service.
-
-		The \a type parameter is optional. When not given, it's extracted from the
-		\a service, which in this case cannot be NULL. Always provide the \a type
-		in places where \a service could be null.
-
-		This method does not take variable flags, variables are always pointers. If you
-		want to create a reference to a service pointer, use setVariable() instead.
+		Points to any variable supported by the Coral type system.
+		\param isIn Whether the variable is in the 'input' or 'output' form.
+		\param type Type of the variable.
+		\param addr Address of the value associated with the variable.
+		\param size Only used if the variable is an input array or a C-string.
 	 */
-	void setService( IService* service, IInterface* type = 0 );
-
-	/*!
-		Stores a single-value (non-array) variable.
-
-		\param type The variable's type.
-		\param flags One or more flags from the VariableFlags enum OR'ed together.
-					Please note that when \c VarIsPointer is specified, \a ptr should
-					be a pointer to the value, not a pointer to a pointer.
-		\param ptr The variable instance, which must really be an instance of \a type and
-					have the modifiers described in \a flags (otherwise, all hell will break
-					loose). If \a flags specifies \c VarIsReference, \a ptr cannot be null.
-	 */
-	void setVariable( IType* type, uint32 flags, void* ptr );
-
-	/*!
-		Alternative version of setVariable(), simplified for basic types.
-		Parameter 'kind' must range from co::TK_ANY to co::TK_STRING (i.e. types
-		that are uniquely identified by their co::TypeKind).
-	 */
-	void setBasic( TypeKind kind, uint32 flags, void* ptr );
-
-	/*!
-		Stores an array of any kind.
-
-		\param arrayKind The array representation being passed, which affects the expected
-					value of parameter \a ptr:
-					- \c AK_StdVector: \a ptr should be a pointer to a \c std::vector instance.
-					- \c AK_RefVector: \a ptr should be a pointer to a \c co::RefVector instance.
-					- \c AK_Range: \a ptr should be a pointer to the first array element,
-						while \a size should specify the number of elements in the range.
-		\param elementType The array element type.
-		\param flags Modifiers for the array elements.
-		\param ptr A pointer to the array instance, as described above.
-		\param size Only used if \a arrayKind is \c AK_Range.
-	 */
-	void setArray( ArrayKind arrayKind, IType* elementType, uint32 flags, void* ptr, size_t size = 0 );
-
-	//@}
-
-	//@}
-	//! \name Output Arguments
-	//@{
-
-	/*!
-		Prepares a co::Any for use as an 'out' argument of the specified type.
-		If the co::Any already contains a value, it will be preserved (if it's compatible).
-		Otherwise, a default-constructed, temporary object will be created.
-		\param paramType the 'out' parameter type.
-		\throw co::Exception if the co::Any's current value is incompatible with 'paramType'.
-		\sa makeIn()
-	 */
-	void makeOut( IType* paramType );
-
-	/*!
-		Should be used after a call to makeOut(), to return an argument to its 'in' condition.
-		For instance, variables of type <tt>co::int8&</tt> will be dereferenced to a <tt>co::int8</tt>.
-		\note This method does not raise exceptions.
-	 */
-	void makeIn();
+	void set( bool isIn, IType* type, const void* addr, size_t size = 0 );
 
 	//@}
 
 	/*!
-		\name Temporary Objects
-		A temporary object is created by calling one of the <em>createXXX()</em> methods.
-		The object will last while its enclosing co::Any is alive, or until
-		destroyObject() is called or another temporary object is created.
+		Stores \a value onto the location pointed to by this 'out' variable.
+		\throw IllegalStateException if this is not an output variable.
+		\throw IllegalCastException if \a value cannot be converted to
+					the output variable's type.
 	 */
-	//@{
+	void put( Any value ) const;
 
-	//! Returns whether this co::Any contains a temporary object.
-	inline bool containsObject() const { return _state.objectKind != TK_NONE; }
-
-	/*!
-		Creates a temporary co::Any instance and makes this co::Any reference it.
-		If the co::Any contains a variable at the time this method is called, it will
-		be preserved in (moved to) the temporary co::Any instance. However, the co::Any
-		must not contain a temporary object, or an exception will be thrown.
-	 */
-	Any& createAny();
-
-	//! Creates a temporary std::string instance and makes this co::Any reference it.
-	std::string& createString();
-
-	/*!
-		Creates a std::vector (or a co::RefVector, if \a elementType is an interface)
-		with \a n default-constructed elements of type \a elementType, and sets this
-		co::Any with a reference to the array.
-	 */
-	PseudoVector& createArray( IType* elementType, size_t n = 0 );
-
-	/*!
-		Swaps the temporary std::vector or co::RefVector contained in this
-		co::Any (i.e. created with createArray()) with a std::vector or
-		co::RefVector of the exact same type contained in another co::Any.
-	 */
-	void swapArray( const Any& other );
-
-	/*!
-		Creates an instance of the specified complex value \a type and makes
-		this co::Any reference it.
-	 */
-	void* createComplexValue( IType* type );
-
-	/*!
-		Creates an instance of the complex value type \a T and makes this
-		co::Any reference it.
-	 */
-	template<typename T>
-	inline T& createComplexValue()
+	//! Swaps the contents of two co::Any's.
+	inline void swap( Any& other )
 	{
-		return *reinterpret_cast<T*>( createComplexValue( typeOf<T>::get() ) );
+		__any::State tmp( state );
+		state = other.state;
+		other.state = tmp;
 	}
 
 	/*!
-		Calls the appropriate destructors and releases any memory allocated
-		for this co::Any's temporary object.
+		\brief Swaps the vector pointers of two 'out arrays' of the same type.
 	 */
-	void destroyObject();
+	void swapArrays( const Any& other ) const;
 
-	//@}
+	/*!
+		\brief Resizes an 'out array' by inserting or erasing elements
+		from the vector. This basically mimics std::vector::resize().
+	 */
+	void resize( size_t n ) const;
 
-	//! Swaps the contents of two co::Any's.
-	void swap( Any& other );
+	//! Returns the array element at the given \a index.
+	Any at( size_t index ) const;
+
+	//! Index operator for access to array elements. \sa at().
+	inline Any operator[]( size_t index ) const { return at( index ); }
 
 	//! Equality test operator.
 	bool operator==( const Any& other ) const;
@@ -871,59 +488,160 @@ public:
 	inline bool operator!=( const Any& other ) const { return !( *this == other ); }
 
 	//! Assignment operator.
-	inline Any& operator=( const Any& other )
+	template<typename T>
+	inline Any& operator=( T& v ) { set<T>( v ); return *this; }
+	inline Any& operator=( const Any& other ) { state = other.state; return *this; }
+	inline Any& operator=( Any& other ) { state = other.state; return *this; }
+
+protected:
+	void cast( Any& to ) const;
+
+	template<typename T>
+	struct GetByRef
 	{
-		copy( other );
+		inline static T get( const Any& in )
+		{
+			Any out;
+			__any::Variable<T>::tag( out.state );
+			in.cast( out );
+			return __any::Variable<T>::get( out.state );
+		}
+	};
+
+	template<typename T>
+	struct GetByCopy
+	{
+		inline static T get( const Any& in )
+		{
+			T v;
+			Any out( v );
+			out.put( in );
+			return v;
+		}
+	};
+
+	template<typename T> struct Getter : public GetByCopy<T> {};
+	template<typename T> struct Getter<T&> : public GetByRef<T&> {};
+	template<typename T> struct Getter<T*> : public GetByRef<T*> {};
+	template<typename T> struct Getter<T* const> : public GetByRef<T* const> {};
+	template<typename T> struct Getter<Range<T> > : public GetByRef<Range<T> > {};
+};
+
+/*!
+	????
+ */
+class CORAL_EXPORT AnyValue
+{
+public:
+	//! Default constructor.
+	AnyValue() {;}
+
+	inline AnyValue( Any var )
+	{
+		copy( var );
+	}
+
+	//! Copy constructor.
+	inline AnyValue( const AnyValue& other )
+	{
+		copy( other._any );
+	}
+
+	//! Destructor.
+	inline ~AnyValue() { clear(); }
+
+	//! Whether this co::AnyValue is null.
+	inline bool isNull() const { return _any.isNull(); }
+
+	//! Whether this co::AnyValue is not null.
+	inline bool isValid() const { return _any.isValid(); }
+
+	//! Returns the type of the contained value.
+	inline IType* getType() const { return _any.getType(); }
+
+	//! Returns the kind of the contained value.
+	inline TypeKind getKind() const { return _any.getKind(); }
+
+	//! Returns an 'out' co::Any that references this co::AnyValue's value.
+	inline Any getAny() const { return _any; }
+
+	template<typename T>
+	inline T get() const { return _any.get<T>(); }
+
+	template<typename T>
+	inline void get( T& v ) const { return _any.get<T>( v ); }
+
+	/*!
+		Destroys any stored value and makes this any null.
+	 */
+	void clear();
+
+	inline void set( Any var ) { copy( var ); }
+
+	/*!
+		Creates a default-constructed instance of the given \a type.
+		\throw ???
+	 */
+	void* create( IType* type );
+
+	/*!
+		Creates an instance of the complex value type \a T and makes this
+		co::Any reference it.
+	 */
+	template<typename T>
+	inline T& create()
+	{
+		return *reinterpret_cast<T*>( create( typeOf<T>::get() ) );
+	}
+
+	/*!
+		Converts the current value to the given \a type.
+		If the co::AnyValue is null this method works like create().
+		\throw IllegalCastException if the value cannot be converted
+					to the target \a type.
+	 */
+	void convert( IType* type );
+
+	//! Swaps the contents of two co::AnyValue's.
+	inline void swap( AnyValue& other ) { _any.swap( other._any ); }
+
+	//! Equality test operator.
+	inline bool operator==( const AnyValue& other ) const
+	{
+		return _any == other._any;
+	}
+
+	//! Inequality test operator.
+	inline bool operator!=( const AnyValue& other ) const
+	{
+		return !( *this == other );
+	}
+
+	//! Assignment operator.
+	inline AnyValue& operator=( const AnyValue& other )
+	{
+		copy( other._any );
+		return *this;
+	}
+
+	inline AnyValue& operator=( Any var )
+	{
+		copy( var );
 		return *this;
 	}
 
 private:
-	//! Used by setVariable()/setArray().
-	inline void setModifiers( uint32 flags );
-
-	//! Raises co::IllegalCastException when the cast is impossible.
-	void castFrom( const State& s );
-
-	/*!
-		Copies another co::Any's var. If the var points to an enclosed temporary
-		object, also copies the object and updates the var.
-	 */
-	void copy( const Any& other );
+	void copy( Any var );
 
 private:
-	/*
-		Describes the variable stored in the co::Any.
-
-		_state.objectKind holds the kind of temporary object currently allocated in
-		the co::Any (if any). For complex values, it assumes special meanings:
-			- TK_STRUCT: the CV is larger than INPLACE_CAPACITY and is heap-allocated.
-			- TK_NATIVECLASS: the CV fits in INPLACE_CAPACITY and is kept in place.
-	 */
-	State _state;
-
-	union TemporaryObjectData
-	{
-		State::Data data;
-		uint8 stringArea[sizeof(std::string)];
-		struct
-		{
-			uint8 vectorArea[sizeof(PseudoVector)];
-			IReflector* reflector;
-		}
-		array;
-		struct
-		{
-			union { void* ptr; uint8 inplaceArea[INPLACE_CAPACITY]; };
-			IReflector* reflector;
-		}
-		complex;
-	}
-	_object;
+	Any _any;
 };
 
 #ifndef DOXYGEN
 template<> struct kindOf<Any> { static const TypeKind kind = TK_ANY; };
+template<> struct kindOf<AnyValue> { static const TypeKind kind = TK_ANY; };
 inline void swap( Any& a, Any& b ) { a.swap( b ); }
+inline void swap( AnyValue& a, AnyValue& b ) { a.swap( b ); }
 #endif // DOXYGEN
 
 } // namespace co
@@ -931,17 +649,23 @@ inline void swap( Any& a, Any& b ) { a.swap( b ); }
 #ifndef DOXYGEN
 
 // std::swap specialization for co::Any:
-namespace std { template<> inline void swap( co::Any& a, co::Any& b ) { a.swap( b ); } }
-
-// Prints the complete C++ type name of the variable stored in a __any::State.
-CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::__any::State& s );
+namespace std {
+template<> inline void swap( co::Any& a, co::Any& b ) { a.swap( b ); }
+template<> inline void swap( co::AnyValue& a, co::AnyValue& b ) { a.swap( b ); }
+} // namespace std
 
 #endif // DOXYGEN
 
-/*!
-	Prints out the variable type and data stored in a co::Any.
-	\relates co::Any
- */
-CORAL_EXPORT std::ostream& operator<<( std::ostream& out, const co::Any& a );
+//! Outputs the type of variable in a co::Any. Usage: "os << any.state". \relates co::Any
+CORAL_EXPORT std::ostream& operator<<( std::ostream& os, const co::__any::State& s );
+
+//! Outputs the value stored in a co::Any. \relates co::Any
+CORAL_EXPORT std::ostream& operator<<( std::ostream& os, const co::Any& any );
+
+//! Outputs the value stored in a co::AnyValue. \relates co::AnyValue
+inline std::ostream& operator<<( std::ostream& os, const co::AnyValue& v )
+{
+	return os << v.getAny();
+}
 
 #endif // _CO_ANY_H_

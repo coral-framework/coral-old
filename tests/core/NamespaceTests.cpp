@@ -35,17 +35,15 @@ TEST( NamespaceTests, defineType )
 
 	// make sure these types are not user-definable
 
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_NONE ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_NULL ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_ANY ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_BOOLEAN ), co::IllegalArgumentException );
+	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_BOOL ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_INT8 ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_UINT8 ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_INT16 ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_UINT16 ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_INT32 ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_UINT32 ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_INT64 ), co::IllegalArgumentException );
-	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_UINT64 ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_FLOAT ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_DOUBLE ), co::IllegalArgumentException );
 	EXPECT_THROW( rootNS->defineType( "invalidTK", co::TK_STRING ), co::IllegalArgumentException );

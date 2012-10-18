@@ -193,7 +193,7 @@ void co::OS::makeAbs( std::string& path )
 	normalizePath( path );
 }
 
-bool co::OS::searchFile2( co::Range<const std::string> listA, co::Range<const std::string> listB,
+bool co::OS::searchFile2( co::Range<std::string> listA, co::Range<std::string> listB,
 						  std::string& path, std::string* partA, std::string* partB )
 {
 	assert( !listA.isEmpty() && !listB.isEmpty() );
@@ -201,9 +201,9 @@ bool co::OS::searchFile2( co::Range<const std::string> listA, co::Range<const st
 	std::string filePath;
 	filePath.reserve( 256 );
 
-	for( co::Range<const std::string> itA( listA ); itA; itA.popFirst() )
+	for( co::Range<std::string> itA( listA ); itA; itA.popFirst() )
 	{
-		for( co::Range<const std::string> itB( listB ); itB; itB.popFirst() )
+		for( co::Range<std::string> itB( listB ); itB; itB.popFirst() )
 		{
 			filePath.assign( itA.getFirst() );
 			if( *filePath.rbegin() != CORAL_OS_DIR_SEP )
@@ -225,9 +225,9 @@ bool co::OS::searchFile2( co::Range<const std::string> listA, co::Range<const st
 	return false;
 }
 
-bool co::OS::searchFile3( co::Range<const std::string> listA,
-						  co::Range<const std::string> listB,
-						  co::Range<const std::string> listC,
+bool co::OS::searchFile3( co::Range<std::string> listA,
+						  co::Range<std::string> listB,
+						  co::Range<std::string> listC,
 						  std::string& path, std::string* partA, std::string* partB, std::string* partC )
 {
 	assert( !listA.isEmpty() && !listB.isEmpty() && !listC.isEmpty() );
@@ -235,11 +235,11 @@ bool co::OS::searchFile3( co::Range<const std::string> listA,
 	std::string filePath;
 	filePath.reserve( 256 );
 
-	for( co::Range<const std::string> itC( listC ); itC; itC.popFirst() )
+	for( co::Range<std::string> itC( listC ); itC; itC.popFirst() )
 	{
-		for( co::Range<const std::string> itB( listB ); itB; itB.popFirst() )
+		for( co::Range<std::string> itB( listB ); itB; itB.popFirst() )
 		{
-			for( co::Range<const std::string> itA( listA ); itA; itA.popFirst() )
+			for( co::Range<std::string> itA( listA ); itA; itA.popFirst() )
 			{
 				filePath.assign( itA.getFirst() );
 				if( *filePath.rbegin() != CORAL_OS_DIR_SEP )

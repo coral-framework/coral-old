@@ -45,13 +45,12 @@ public:
 
 	// lua.ILauncher Methods:
 
-	co::int32 main( co::Range<std::string const> args_ )
+	co::int32 main( co::Range<std::string> args_ )
 	{
-		co::Any args[1];
-		args[0].set< co::Range<std::string const> >( args_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<lua::ILauncher>( 0 ), range );
-		return res.get< co::int32 >();
+		co::Any args[] = { args_ };
+		co::int32 res;
+		_provider->dynamicInvoke( _cookie, getMethod<lua::ILauncher>( 0 ), args, res );
+		return res;
 	}
 
 protected:
@@ -103,7 +102,7 @@ public:
 		return new lua::ILauncher_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::checkInstance<lua::ILauncher>( instance, field );
 		raiseUnexpectedMemberIndex();
@@ -117,7 +116,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		lua::ILauncher* p = co::checkInstance<lua::ILauncher>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -128,9 +127,9 @@ public:
 			{
 			case 0:
 				{
-					co::Range<std::string const> args_ = args[++argIndex].get< co::Range<std::string const> >();
+					co::Range<std::string> args_ = args[++argIndex].get< co::Range<std::string> >();
 					argIndex = -1;
-					res.set< co::int32 >( p->main( args_ ) );
+					res.put( p->main( args_ ) );
 				}
 				break;
 			default:

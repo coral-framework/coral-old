@@ -9,6 +9,7 @@
 #include <co/TypeTraits.h>
 #include <co/Uuid.h>
 #include <co/TypeKind.h>
+#include <co/IType.h>
 #include <co/IAnnotated.h>
 
 // Forward Declarations:
@@ -26,23 +27,25 @@ class IType : public co::IAnnotated
 public:
 	virtual ~IType() {;}
 
-	virtual const co::Uuid& getBinarySignature() = 0;
+	virtual co::Uuid getBinarySignature() = 0;
 
 	virtual co::IReflector* getCurrentReflector() = 0;
 
-	virtual const std::string& getFullName() = 0;
+	virtual std::string getFullName() = 0;
 
-	virtual const co::Uuid& getFullSignature() = 0;
+	virtual co::Uuid getFullSignature() = 0;
 
 	virtual co::TypeKind getKind() = 0;
 
-	virtual const std::string& getName() = 0;
+	virtual std::string getName() = 0;
 
 	virtual co::INamespace* getNamespace() = 0;
 
 	virtual co::IReflector* getReflector() = 0;
 
 	virtual void setReflector( co::IReflector* reflector ) = 0;
+
+	virtual bool isA( co::IType* type ) = 0;
 };
 
 } // namespace co

@@ -224,8 +224,8 @@ bool TypeLoader::findCSL( const std::string& typeName, std::string& fullPath, st
 	names[n].append( ".csl" );
 	++n;
 
-	bool succeeded = OS::searchFile2( getPaths(), Range<const std::string>( names, n ),
-											fullPath, NULL, &relativePath );
+	bool succeeded = OS::searchFile2( getPaths(), Range<std::string>( names, n ),
+										fullPath, NULL, &relativePath );
 	if( !succeeded )
 		CORAL_THROW( co::Exception, "type '" << typeName << "' was not found in the path" );
 

@@ -17,7 +17,7 @@ void Enum::addIdentifier( const std::string& identifier )
 	_identifiers.push_back( identifier );
 }
 
-Range<std::string const> Enum::getIdentifiers()
+Range<std::string> Enum::getIdentifiers()
 {
 	return _identifiers;
 }

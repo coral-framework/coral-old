@@ -44,20 +44,18 @@ public:
 
 	bool canLoadModulePart( const std::string& moduleName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( moduleName_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 0 ), range );
-		return res.get< bool >();
+		co::Any args[] = { moduleName_ };
+		bool res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 0 ), args, res );
+		return res;
 	}
 
 	co::IModulePart* loadModulePart( const std::string& moduleName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( moduleName_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 1 ), range );
-		return res.get< co::IModulePart* >();
+		co::Any args[] = { moduleName_ };
+		co::RefPtr<co::IModulePart> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 1 ), args, res );
+		return res.get();
 	}
 
 protected:
@@ -109,7 +107,7 @@ public:
 		return new co::IModulePartLoader_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::checkInstance<co::IModulePartLoader>( instance, field );
 		raiseUnexpectedMemberIndex();
@@ -123,7 +121,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::IModulePartLoader* p = co::checkInstance<co::IModulePartLoader>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -136,14 +134,14 @@ public:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< bool >( p->canLoadModulePart( moduleName_ ) );
+					res.put( p->canLoadModulePart( moduleName_ ) );
 				}
 				break;
 			case 1:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::IModulePart* >( p->loadModulePart( moduleName_ ) );
+					res.put( p->loadModulePart( moduleName_ ) );
 				}
 				break;
 			default:

@@ -5,8 +5,8 @@
 
 #include <co/IObject.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IComponent.h>
 #include <co/IPort.h>
+#include <co/IComponent.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -45,26 +45,23 @@ public:
 
 	co::IComponent* getComponent()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IObject>( 0 ) );
-        return res.get< co::IComponent* >();
+		co::RefPtr<co::IComponent> res;
+		_provider->dynamicGetField( _cookie, getField<co::IObject>( 0 ), res );
+		return res.get();
 	}
 
 	co::IService* getServiceAt( co::IPort* port_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IPort* >( port_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 0 ), range );
-		return res.get< co::IService* >();
+		co::Any args[] = { port_ };
+		co::RefPtr<co::IService> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 0 ), args, res );
+		return res.get();
 	}
 
 	void setServiceAt( co::IPort* receptacle_, co::IService* service_ )
 	{
-		co::Any args[2];
-		args[0].set< co::IPort* >( receptacle_ );
-		args[1].set< co::IService* >( service_ );
-		co::Range<co::Any const> range( args, 2 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 1 ), range );
+		co::Any args[] = { receptacle_, service_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 1 ), args, co::Any() );
 	}
 
 protected:
@@ -116,12 +113,12 @@ public:
 		return new co::IObject_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::IObject* p = co::checkInstance<co::IObject>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::IComponent* >( p->getComponent() ); break;
+		case 0:		value.put( p->getComponent() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -138,7 +135,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::IObject* p = co::checkInstance<co::IObject>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -151,7 +148,7 @@ public:
 				{
 					co::IPort* port_ = args[++argIndex].get< co::IPort* >();
 					argIndex = -1;
-					res.set< co::IService* >( p->getServiceAt( port_ ) );
+					res.put( p->getServiceAt( port_ ) );
 				}
 				break;
 			case 2:

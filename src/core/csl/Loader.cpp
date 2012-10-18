@@ -6,7 +6,7 @@
 #include "Loader.h"
 #include "scanner.hh"
 #include "parser.hh"
-#include "../Annotations.h"
+#include "Annotations.h"
 #include <co/IField.h>
 #include <co/IObject.h>
 #include <co/ICppBlock.h>
@@ -115,9 +115,9 @@ void Loader::setError( Error* error )
 	_error = error;	
 }
 
-Any* Loader::newAny()
+AnyValue* Loader::newAny()
 {
-	_anyPool.push_back( Any() );
+	_anyPool.push_back( AnyValue() );
 	return &_anyPool.back();
 }
 
@@ -411,7 +411,6 @@ IAnnotation* Loader::getAnnotationFrom( IObject* object )
 	if( !annotation )
 		CORAL_THROW( Exception, "component '" << object->getComponent()->getName()
 						<< "' does not provide an annotation" );
-
 	return annotation;
 }
 

@@ -85,28 +85,28 @@ TEST( OSTests, searchFile2 )
 	std::string filename, res;
 
 	filename = "file1.csl";
-	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<const std::string>( &filename, 1 ), res ) );
+	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<std::string>( &filename, 1 ), res ) );
 	EXPECT_TRUE( TestHelper::stringEndsWith( res, CORAL_OS_DIR_SEP_STR "file1.csl" ) );
 
 	filename = CORAL_OS_DIR_SEP_STR "file1.csl";
-	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<const std::string>( &filename, 1 ), res ) );
+	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<std::string>( &filename, 1 ), res ) );
 	EXPECT_TRUE( TestHelper::stringEndsWith( res, CORAL_OS_DIR_SEP_STR "file1.csl" ) );
 
 	filename = CORAL_OS_DIR_SEP_STR "file1.jpg";
-	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<const std::string>( &filename, 1 ), res ) );
+	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<std::string>( &filename, 1 ), res ) );
 	EXPECT_TRUE( TestHelper::stringEndsWith( res, CORAL_OS_DIR_SEP_STR "file1.jpg" ) );
 
 	filename = "dot.separated.folder" CORAL_OS_DIR_SEP_STR "file1.csl";
-	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<const std::string>( &filename, 1 ), res ) );
+	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<std::string>( &filename, 1 ), res ) );
 
 	filename = "dot.separated.folder.file1.csl";
-	EXPECT_FALSE( co::OS::searchFile2( coralPath, co::Range<const std::string>( &filename, 1 ), res ) );
+	EXPECT_FALSE( co::OS::searchFile2( coralPath, co::Range<std::string>( &filename, 1 ), res ) );
 
 	filename = "innerFolder" CORAL_OS_DIR_SEP_STR "file1.csl";
-	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<const std::string>( &filename, 1 ), res ) );
+	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<std::string>( &filename, 1 ), res ) );
 
 	filename = "innerFolder" CORAL_OS_DIR_SEP_STR "folder.csl";
-	EXPECT_FALSE( co::OS::searchFile2( coralPath, co::Range<const std::string>( &filename, 1 ), res ) );
+	EXPECT_FALSE( co::OS::searchFile2( coralPath, co::Range<std::string>( &filename, 1 ), res ) );
 }
 
 TEST( OSTests, searchFile2WithAmbiguities )
@@ -118,21 +118,21 @@ TEST( OSTests, searchFile2WithAmbiguities )
 	std::string filename, res;
 
 	filename = "file1.csl";
-	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<const std::string>( &filename, 1 ), res ) );
+	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<std::string>( &filename, 1 ), res ) );
 	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "misc" CORAL_OS_DIR_SEP_STR "file1.csl" ) );
 
 	filename = "file1.jpg";
-	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<const std::string>( &filename, 1 ), res ) );
+	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<std::string>( &filename, 1 ), res ) );
 	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "misc" CORAL_OS_DIR_SEP_STR "file1.jpg" ) );
 
 	filename = "file2.csl";
-	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<const std::string>( &filename, 1 ), res ) );
+	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<std::string>( &filename, 1 ), res ) );
 	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "innerFolder" CORAL_OS_DIR_SEP_STR "file2.csl" ) );
 
 	// invert the path order
 	std::swap( coralPath[0], coralPath[1] );
 	filename = "file1.csl";
-	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<const std::string>( &filename, 1 ), res ) );
+	EXPECT_TRUE( co::OS::searchFile2( coralPath, co::Range<std::string>( &filename, 1 ), res ) );
 	EXPECT_TRUE( TestHelper::stringEndsWith( res,  "innerFolder" CORAL_OS_DIR_SEP_STR "file1.csl" ) );
 }
 

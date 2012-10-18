@@ -4,8 +4,8 @@
  */
 
 #include <co/IDynamicServiceProvider.h>
-#include <co/IField.h>
 #include <co/IPort.h>
+#include <co/IField.h>
 #include <co/IMethod.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
@@ -43,51 +43,36 @@ public:
 
 	co::IPort* dynamicGetFacet( co::int32 dynFacetId_ )
 	{
-		co::Any args[1];
-		args[0].set< co::int32 >( dynFacetId_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 0 ), range );
-		return res.get< co::IPort* >();
+		co::Any args[] = { dynFacetId_ };
+		co::RefPtr<co::IPort> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 0 ), args, res );
+		return res.get();
 	}
 
-	const co::Any& dynamicGetField( co::int32 dynFacetId_, co::IField* field_ )
+	void dynamicGetField( co::int32 dynFacetId_, co::IField* field_, const co::Any& value_ )
 	{
-		co::Any args[2];
-		args[0].set< co::int32 >( dynFacetId_ );
-		args[1].set< co::IField* >( field_ );
-		co::Range<co::Any const> range( args, 2 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 1 ), range );
-		return res.get< const co::Any& >();
+		co::Any args[] = { dynFacetId_, field_, value_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 1 ), args, co::Any() );
 	}
 
-	const co::Any& dynamicInvoke( co::int32 dynFacetId_, co::IMethod* method_, co::Range<co::Any const> args_ )
+	void dynamicInvoke( co::int32 dynFacetId_, co::IMethod* method_, co::Range<co::Any> args_, const co::Any& result_ )
 	{
-		co::Any args[3];
-		args[0].set< co::int32 >( dynFacetId_ );
-		args[1].set< co::IMethod* >( method_ );
-		args[2].set< co::Range<co::Any const> >( args_ );
-		co::Range<co::Any const> range( args, 3 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 2 ), range );
-		return res.get< const co::Any& >();
+		co::Any args[] = { dynFacetId_, method_, args_, result_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 2 ), args, co::Any() );
 	}
 
 	co::int32 dynamicRegisterService( co::IService* dynamicServiceProxy_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IService* >( dynamicServiceProxy_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 3 ), range );
-		return res.get< co::int32 >();
+		co::Any args[] = { dynamicServiceProxy_ };
+		co::int32 res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 3 ), args, res );
+		return res;
 	}
 
 	void dynamicSetField( co::int32 dynFacetId_, co::IField* field_, const co::Any& value_ )
 	{
-		co::Any args[3];
-		args[0].set< co::int32 >( dynFacetId_ );
-		args[1].set< co::IField* >( field_ );
-		args[2].set< const co::Any& >( value_ );
-		co::Range<co::Any const> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 4 ), range );
+		co::Any args[] = { dynFacetId_, field_, value_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 4 ), args, co::Any() );
 	}
 
 protected:
@@ -139,7 +124,7 @@ public:
 		return new co::IDynamicServiceProvider_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::checkInstance<co::IDynamicServiceProvider>( instance, field );
 		raiseUnexpectedMemberIndex();
@@ -153,7 +138,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::IDynamicServiceProvider* p = co::checkInstance<co::IDynamicServiceProvider>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -166,38 +151,40 @@ public:
 				{
 					co::int32 dynFacetId_ = args[++argIndex].get< co::int32 >();
 					argIndex = -1;
-					res.set< co::IPort* >( p->dynamicGetFacet( dynFacetId_ ) );
+					res.put( p->dynamicGetFacet( dynFacetId_ ) );
 				}
 				break;
 			case 1:
 				{
 					co::int32 dynFacetId_ = args[++argIndex].get< co::int32 >();
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
+					const co::Any& value_ = args[++argIndex];
 					argIndex = -1;
-					res.set< const co::Any& >( p->dynamicGetField( dynFacetId_, field_ ) );
+					p->dynamicGetField( dynFacetId_, field_, value_ );
 				}
 				break;
 			case 2:
 				{
 					co::int32 dynFacetId_ = args[++argIndex].get< co::int32 >();
 					co::IMethod* method_ = args[++argIndex].get< co::IMethod* >();
-					co::Range<co::Any const> args_ = args[++argIndex].get< co::Range<co::Any const> >();
+					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
+					const co::Any& result_ = args[++argIndex];
 					argIndex = -1;
-					res.set< const co::Any& >( p->dynamicInvoke( dynFacetId_, method_, args_ ) );
+					p->dynamicInvoke( dynFacetId_, method_, args_, result_ );
 				}
 				break;
 			case 3:
 				{
 					co::IService* dynamicServiceProxy_ = args[++argIndex].get< co::IService* >();
 					argIndex = -1;
-					res.set< co::int32 >( p->dynamicRegisterService( dynamicServiceProxy_ ) );
+					res.put( p->dynamicRegisterService( dynamicServiceProxy_ ) );
 				}
 				break;
 			case 4:
 				{
 					co::int32 dynFacetId_ = args[++argIndex].get< co::int32 >();
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
-					const co::Any& value_ = args[++argIndex].get< const co::Any& >();
+					const co::Any& value_ = args[++argIndex];
 					argIndex = -1;
 					p->dynamicSetField( dynFacetId_, field_, value_ );
 				}

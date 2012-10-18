@@ -1,5 +1,5 @@
 /*
-** $Id: lapi.c,v 2.157 2011/11/16 18:51:36 roberto Exp $
+** $Id: lapi.c,v 2.164 2012/06/08 15:14:04 roberto Exp $
 ** Lua API
 ** See Copyright Notice in lua.h
 */
@@ -950,7 +950,7 @@ LUA_API int lua_pcallk (lua_State *L, int nargs, int nresults, int errfunc,
     ci->u.c.k = k;  /* save continuation */
     ci->u.c.ctx = ctx;  /* save context */
     /* save information for error recovery */
-    ci->u.c.extra = savestack(L, c.func);
+    ci->extra = savestack(L, c.func);
     ci->u.c.old_allowhook = L->allowhook;
     ci->u.c.old_errfunc = L->errfunc;
     L->errfunc = func;
@@ -968,13 +968,13 @@ LUA_API int lua_pcallk (lua_State *L, int nargs, int nresults, int errfunc,
 
 
 LUA_API int lua_load (lua_State *L, lua_Reader reader, void *data,
-                      const char *chunkname) {
+                      const char *chunkname, const char *mode) {
   ZIO z;
   int status;
   lua_lock(L);
   if (!chunkname) chunkname = "?";
   luaZ_init(L, &z, reader, data);
-  status = luaD_protectedparser(L, &z, chunkname);
+  status = luaD_protectedparser(L, &z, chunkname, mode);
   if (status == LUA_OK) {  /* no errors? */
     LClosure *f = clLvalue(L->top - 1);  /* get newly created function */
     if (f->nupvalues == 1) {  /* does it have one upvalue? */
@@ -1045,17 +1045,17 @@ LUA_API int lua_gc (lua_State *L, int what, int data) {
     }
     case LUA_GCSTEP: {
       if (g->gckind == KGC_GEN) {  /* generational mode? */
-        res = (g->lastmajormem == 0);  /* 1 if will do major collection */
+        res = (g->GCestimate == 0);  /* true if it will do major collection */
         luaC_forcestep(L);  /* do a single step */
       }
       else {
-        while (data-- >= 0) {
-          luaC_forcestep(L);
-          if (g->gcstate == GCSpause) {  /* end of cycle? */
-            res = 1;  /* signal it */
-            break;
-          }
-        }
+       lu_mem debt = cast(lu_mem, data) * 1024 - GCSTEPSIZE;
+       if (g->gcrunning)
+         debt += g->GCdebt;  /* include current debt */
+       luaE_setdebt(g, debt);
+       luaC_forcestep(L);
+       if (g->gcstate == GCSpause)  /* end of cycle? */
+         res = 1;  /* signal it */
       }
       break;
     }
@@ -1209,7 +1209,7 @@ static const char *aux_upvalue (StkId fi, int n, TValue **val,
 
 LUA_API const char *lua_getupvalue (lua_State *L, int funcindex, int n) {
   const char *name;
-  TValue *val = NULL;  /* initialized to avoid warnings */
+  TValue *val = NULL;  /* to avoid warnings */
   lua_lock(L);
   name = aux_upvalue(index2addr(L, funcindex), n, &val, NULL);
   if (name) {
@@ -1223,8 +1223,8 @@ LUA_API const char *lua_getupvalue (lua_State *L, int funcindex, int n) {
 
 LUA_API const char *lua_setupvalue (lua_State *L, int funcindex, int n) {
   const char *name;
-  TValue *val = NULL;  /* initialized to avoid warnings */
-  GCObject *owner = NULL;  /* initialized to avoid warnings */
+  TValue *val = NULL;  /* to avoid warnings */
+  GCObject *owner = NULL;  /* to avoid warnings */
   StkId fi;
   lua_lock(L);
   fi = index2addr(L, funcindex);

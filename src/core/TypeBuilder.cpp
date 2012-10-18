@@ -64,7 +64,7 @@ void TypeBuilder::rollback()
 
 	_namespace->removeType( _type.get() );
 
-	_kind = TK_NONE;
+	_kind = TK_NULL;
 	_type = NULL;
 }
 
@@ -78,7 +78,7 @@ TypeKind TypeBuilder::getKind()
 	return _kind;
 }
 
-const std::string& TypeBuilder::getTypeName()
+std::string TypeBuilder::getTypeName()
 {
 	return _name;
 }
@@ -156,8 +156,8 @@ public:
 	{
 		assert( _myType == NULL );
 		_myType = new Type;
-		_myType->setType( this->_namespace.get(), this->_name, this->_kind );
 		this->_type = _myType;
+		_myType->setType( this->_kind, this->_name, this->_namespace.get() );
 		return true;
 	}
 
@@ -258,7 +258,7 @@ public:
 
 	void validate()
 	{
-		Range<IMember* const> members = static_cast<ICompositeType*>( _type.get() )->getMembers();
+		Range<IMember*> members = static_cast<ICompositeType*>( _type.get() )->getMembers();
 		for( ; members; members.popFirst() )
 			checkForMemberClashes( members.getFirst() );
 	}
@@ -279,9 +279,9 @@ public:
 		if( !type )
 			CORAL_THROW( IllegalArgumentException, "illegal null type" );
 
-		if( type->getKind() == TK_EXCEPTION || type->getKind() == TK_COMPONENT )
-			CORAL_THROW( IllegalArgumentException, ( type->getKind() == TK_EXCEPTION ?
-					"exception" : "component" ) << "s are illegal as field types" );
+		TypeKind fk = type->getKind();
+		if( !isData( fk ) )
+			CORAL_THROW( IllegalArgumentException, TK_STRINGS[fk] << "s are illegal as field types" );
 
 		// struct-specific checks
 		if( _kind == TK_STRUCT )
@@ -441,10 +441,10 @@ public:
 		if( !baseType )
 			CORAL_THROW( IllegalArgumentException, "illegal null baseType" );
 
-		co::TypeKind kind = baseType->getKind();
+		TypeKind kind = baseType->getKind();
 		if( kind != co::TK_INTERFACE )
-			CORAL_THROW( IllegalArgumentException, "illegal baseType (interface expected, got "
-							<< co::TK_STRINGS[kind] << ")" );
+			CORAL_THROW( IllegalArgumentException,
+					"illegal baseType (interface expected, got " << kind << ")" );
 
 		_baseType = static_cast<Interface*>( baseType );
 		_myType->setBaseType( _baseType );
@@ -472,10 +472,10 @@ public:
 
 		// check for member clashes, considering all super types
 		IInterface* type = _myType;
-		Range<IInterface* const> superTypes = type->getSuperTypes();
+		Range<IInterface*> superTypes = type->getSuperTypes();
 		while( 1 )
 		{
-			Range<IMember* const> members = type->getMembers();
+			Range<IMember*> members = type->getMembers();
 			for( ; members; members.popFirst() )
 				checkForMemberClashes( members.getFirst() );
 
@@ -531,7 +531,7 @@ public:
 
 	void validate()
 	{
-		Range<IPort* const> ports = _myType->getPorts();
+		Range<IPort*> ports = _myType->getPorts();
 		IPort* lastPort = ports.getFirst();
 		for( ports.popFirst(); ports; ports.popFirst() )
 		{
@@ -553,13 +553,12 @@ ITypeBuilder* TypeBuilder::create( TypeKind kind, INamespace* ns, const std::str
 	switch( kind )
 	{
 	case TK_ENUM:			tb = new EnumBuilder;			break;
-	case TK_EXCEPTION:		tb = new ExceptionTypeBuilder;	break;
 	case TK_STRUCT:			tb = new StructBuilder;			break;
 	case TK_NATIVECLASS:	tb = new NativeClassBuilder;	break;
 	case TK_INTERFACE:		tb = new InterfaceBuilder;		break;
 	case TK_COMPONENT:		tb = new ComponentBuilder;		break;
-	default:
-		assert( false );
+	case TK_EXCEPTION:		tb = new ExceptionTypeBuilder;	break;
+	default:				assert( false );
 	}
 
 	assert( tb );
@@ -577,7 +576,7 @@ ITypeBuilder* TypeBuilder::create( TypeKind kind, INamespace* ns, const std::str
 class NoTypeBuilder : public TypeBuilder
 {
 public:
-	NoTypeBuilder() : TypeBuilder( TK_NONE )
+	NoTypeBuilder() : TypeBuilder( TK_NULL )
 	{;}
 
 	bool allocateType()

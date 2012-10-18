@@ -4,6 +4,7 @@
  */
 
 #include "TypeTraits.h"
+#include "types/Type.h"
 #include <co/Coral.h>
 #include <co/IPort.h>
 #include <co/IObject.h>
@@ -17,54 +18,50 @@ namespace co {
 
 const std::string TK_STRINGS[] =
 {
-	"<none>",
-	"any",
+	"null",
 	"bool",
 	"int8",
-	"uint8",
 	"int16",
-	"uint16",
 	"int32",
+	"uint8",
+	"uint16",
 	"uint32",
-	"int64",
-	"uint64",
 	"float",
 	"double",
+	"enum",
 	"string",
-	"<array>",
-	"<enum>",
-	"<exception>",
-	"<struct>",
-	"<native class>",
-	"<interface>",
-	"<component>",
+	"any",
+	"array",
+	"struct",
+	"native class",
+	"interface",
+	"component",
+	"exception",
 	"<off by one!>"
 };
 
-const std::string TK_STRINGS_CPP[] =
+RefPtr<IType> BASIC_TYPES[] =
 {
-	"<NONE>",
-	"co::Any",
-	"bool",
-	"co::int8",
-	"co::uint8",
-	"co::int16",
-	"co::uint16",
-	"co::int32",
-	"co::uint32",
-	"co::int64",
-	"co::uint64",
-	"float",
-	"double",
-	"std::string",
-	"<ARRAY>",
-	"<ENUM>",
-	"<EXCEPTION>",
-	"<STRUCT>",
-	"<NATIVE_CLASS>",
-	"<INTERFACE>",
-	"<COMPONENT>",
-	"<OFF_BY_ONE!>"
+	new TypeComponent( TK_NULL ),
+	new TypeComponent( TK_BOOL ),
+	new TypeComponent( TK_INT8 ),
+	new TypeComponent( TK_INT16 ),
+	new TypeComponent( TK_INT32 ),
+	new TypeComponent( TK_UINT8 ),
+	new TypeComponent( TK_UINT16 ),
+	new TypeComponent( TK_UINT32 ),
+	new TypeComponent( TK_FLOAT ),
+	new TypeComponent( TK_DOUBLE ),
+	NULL, // TK_ENUM
+	new TypeComponent( TK_STRING ),
+	new TypeComponent( TK_ANY ),
+	NULL, // TK_ARRAY
+	NULL, // TK_STRUCT
+	NULL, // TK_NATIVECLASS
+	NULL, // TK_INTERFACE
+	NULL, // TK_COMPONENT
+	NULL, // TK_EXCEPTION
+	NULL  // off by one
 };
 
 IType* getTypeByLiteralName( const char* fullName )
@@ -78,27 +75,41 @@ TypeKind getKind( IType* type )
 	return type->getKind();
 }
 
-IService* getServiceByType( IObject* object, IInterface* type )
+IService* findServiceByType( IObject* object, IInterface* type )
 {
 	assert( object && type );
-	IComponent* component = object->getComponent();
-	Range<IPort* const> facets = component->getFacets();
+	Range<IPort*> facets = object->getComponent()->getFacets();
 	for( ; facets; facets.popFirst() )
-		if( facets.getFirst()->getType()->isSubTypeOf( type ) )
+		if( facets.getFirst()->getType()->isA( type ) )
 			return object->getServiceAt( facets.getFirst() );
-	CORAL_THROW( NoSuchPortException, "component '" << component->getFullName()
-		<< "' does not provide a facet of type '" << type->getFullName() << "'"  )
+	return NULL;
+}
+
+IService* getServiceByType( IObject* object, IInterface* type )
+{
+	IService* res = findServiceByType( object, type );
+	if( !res )
+		CORAL_THROW( NoSuchPortException, "component "
+			<< object->getComponent()->getFullName()
+			<< " has no facet of type '" << type->getFullName() << "'"  )
+	return res;
+}
+
+IService* findServiceByName( IObject* object, const std::string& portName )
+{
+	assert( object );
+	IMember* port = object->getComponent()->getMember( portName );
+	return port ? object->getServiceAt( static_cast<IPort*>( port ) ) : NULL;
 }
 
 IService* getServiceByName( IObject* object, const std::string& portName )
 {
-	assert( object );
-	IComponent* component = object->getComponent();
-	IMember* port = component->getMember( portName );
-	if( !port )
-		CORAL_THROW( NoSuchPortException, "no such port '" << portName
-			<< "' in component '" << component->getFullName() << "'" );
-	return object->getServiceAt( static_cast<IPort*>( port ) );
+	IService* res = findServiceByName( object, portName );
+	if( !res )
+		CORAL_THROW( NoSuchPortException, "component "
+			<< object->getComponent()->getFullName()
+			<< " has no port named '" << portName << "'" );
+	return res;
 }
 
 void setServiceByName( IObject* object, const std::string& receptacleName, IService* service )
@@ -115,16 +126,16 @@ void setServiceByName( IObject* object, const std::string& receptacleName, IServ
 bool isA( IService* service, IInterface* type )
 {
 	assert( type );
-	return !service || service->getInterface()->isSubTypeOf( type );
+	return !service || service->getInterface()->isA( type );
 }
 
 void ensureIsA( IService* service, IInterface* type )
 {
 	assert( type );
-	if( service && !service->getInterface()->isSubTypeOf( type ) )
-		CORAL_THROW( IllegalCastException, "incompatible service ("
-					<< type->getFullName() << " expected, got "
-					<< service->getInterface()->getFullName() << ")" );
+	if( service && !service->getInterface()->isA( type ) )
+		CORAL_THROW( IllegalCastException, "illegal cast from '"
+				<< service->getInterface()->getFullName() << "' to '"
+				<< type->getFullName() << "'" );
 }
 
 } // namespace co

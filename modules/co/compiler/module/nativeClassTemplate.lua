@@ -1,26 +1,20 @@
 local function writeDefaultReturn( writer, t, returnType )
 	if not returnType then return end
 
-	local result = nil
-	local kind = returnType.kind
-	if kind == 'TK_INTERFACE' then
+	local result
+	if returnType.kind == 'TK_INTERFACE' then
 		result = "NULL"
-	elseif kind == 'TK_STRUCT' or kind == 'TK_NATIVECLASS' then
-		writer( "\tstatic ", returnType.cppName, " dummy;\n" )
-	elseif kind == 'TK_STRING' then
-		writer( "\tstatic std::string dummy;\n" )
-	elseif kind == 'TK_ANY' then
-		writer( "\tstatic co::Any dummy;\n" )
 	else
-		result = t.formatInput( returnType ) .. "()"
+		result = t.formatResult( returnType ) .. "()"
 	end
-	writer( "\treturn ", result and result or "dummy", ";\n" )
+
+	writer( "\treturn ", result, ";\n" )
 end
 
 local function writeMethodTemplate( writer, t, methodName, returnType, parameters )
 	writer( [[
 
-]], t.formatInput( returnType ), " ", t.name, "_Adapter::", methodName, "( ", t.cppName, "& instance" )
+]], t.formatResult( returnType ), " ", t.name, "_Adapter::", methodName, "( ", t.cppName, "& instance" )
 	if parameters then
 		for i, p in ipairs( parameters ) do
 			local paramType = ( p.isOut and t.formatOutput or t.formatInput )( p.type )

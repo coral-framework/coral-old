@@ -29,9 +29,9 @@ public:
 
 	virtual void setBinaryCompatibilityChecking( bool binaryCompatibilityChecking ) = 0;
 
-	virtual co::Range<co::IModulePartLoader* const> getLoaders() = 0;
+	virtual co::Range<co::IModulePartLoader*> getLoaders() = 0;
 
-	virtual co::Range<co::IModule* const> getModules() = 0;
+	virtual co::Range<co::IModule*> getModules() = 0;
 
 	virtual co::IModule* findModule( const std::string& moduleName ) = 0;
 

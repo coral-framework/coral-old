@@ -41,7 +41,6 @@ public:
 private:
 	IType* loadTypeOrThrow( const std::string& fullName );
 	IArray* defineArrayType( IType* elementType );
-	void definePrimitiveType( Namespace* ns, const std::string& name, TypeKind kind );
 	void defineBuiltInTypes();
 
 private:

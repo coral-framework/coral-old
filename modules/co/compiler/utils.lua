@@ -47,53 +47,61 @@ function M.closeNamespaces( writer, ns )
 	closeBlocks( writer, "namespace", ns )
 end
 
+function M.formatAnyGet( toType, isOut )
+	if toType.kind ~= 'TK_ANY' or isOut then
+		return ".get< " .. ( isOut and M.formatOutput or M.formatInput )( toType ) .. " >()"
+	end
+	return ""
+end
+
 function M.formatAccessor( prefix, fieldName, suffix )
 	return prefix .. fieldName:sub( 1, 1 ):upper() .. fieldName:sub( 2 ) .. ( suffix or "" )
 end
 
-function M.formatInput( t )
-	if not t then return "void" end
-	local kind = t.kind
-	if kind == 'TK_ARRAY' then
-		local elem = t.elementType
-		return "co::Range<" .. elem.cppName .. ( elem.kind == 'TK_INTERFACE' and '*' or '' ) .. " const>"
-	elseif kind == 'TK_INTERFACE' then
-		return t.cppName .. "*"
-	elseif kind == 'TK_STRING' or kind == 'TK_ANY' or kind == 'TK_STRUCT' or kind == 'TK_NATIVECLASS' then
-		return "const " .. t.cppName .. "&"
-	else -- ( kind >= co::TK_BOOLEAN && kind <= co::TK_DOUBLE ) || kind == co::TK_ENUM
-		return t.cppName
-	end
-end
-
-function M.formatOutput( t )
-	local kind = t.kind
-	if kind == 'TK_ARRAY' then
-		if t.elementType.kind == 'TK_INTERFACE' then
-			return "co::RefVector<" .. t.elementType.cppName .. ">&"
-		else
-			return "std::vector<" .. t.elementType.cppName .. ">&"
-		end
-	elseif kind == 'TK_INTERFACE' then
-		return t.cppName .. "*&"
-	else
-		return t.cppName .. "&"
-	end
-end
-
 function M.formatField( t )
 	local kind = t.kind
-	if kind == 'TK_ARRAY' then
+	if kind == 'TK_ANY' then
+		return "co::AnyValue"
+	elseif kind == 'TK_ARRAY' then
 		if t.elementType.kind == 'TK_INTERFACE' then
 			return "co::RefVector<" .. t.elementType.cppName .. ">"
 		else
-			return "std::vector<" .. t.elementType.cppName .. ">"
+			return "std::vector<" .. M.formatField( t.elementType ) .. ">"
 		end
 	elseif kind == 'TK_INTERFACE' then
 		return "co::RefPtr<" .. t.cppName .. ">"
 	else
 		return t.cppName
 	end
+end
+
+function M.formatResult( t )
+	if not t then return "void" end
+	local kind = t.kind
+	if kind == 'TK_ARRAY' or kind == 'TK_INTERFACE' then
+		return M.formatInput( t )
+	else
+		return M.formatField( t )
+	end
+end
+
+function M.formatInput( t )
+	local kind = t.kind
+	if kind == 'TK_ARRAY' then
+		local elem = t.elementType
+		return "co::Range<" .. elem.cppName .. ( elem.kind == 'TK_INTERFACE' and '*' or '' ) .. ">"
+	elseif kind == 'TK_INTERFACE' then
+		return t.cppName .. "*"
+	elseif kind == 'TK_ANY' or kind == 'TK_STRING'
+		or kind == 'TK_STRUCT' or kind == 'TK_NATIVECLASS' then
+		return "const " .. t.cppName .. "&"
+	else -- ( kind >= co::TK_BOOL && kind <= co::TK_DOUBLE ) || kind == co::TK_ENUM
+		return t.cppName
+	end
+end
+
+function M.formatOutput( t )
+	return M.formatField( t ) .. "&"
 end
 
 function M.includeHeader( t, header )
@@ -169,7 +177,7 @@ end
 function include.TK_INTERFACE( t, type )
 	if t.kind == 'TK_STRUCT' then
 		t:includeHeader( type )
-	elseif t.kind == 'TK_INTERFACE' and t.isSubTypeOf( t._type, type._type ) then
+	elseif t.kind == 'TK_INTERFACE' and t.isA( t._type, type._type ) then
 		t:includeHeader( type ) -- t inherits from type
 	else
 		t:addForwardDecl( type )

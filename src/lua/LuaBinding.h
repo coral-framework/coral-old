@@ -54,7 +54,7 @@ public:
 		to any valid Coral instance (service, object, native class, struct).
 		If the userdata is not a valid Coral object, raises a lua::Exception.
 	 */
-	static void getInstance( lua_State* L, int index, co::Any& instance );
+	static co::Any getInstance( lua_State* L, int index );
 
 	/*!
 		 Just like getInstance(), but does not raise exceptions. If the userdata
@@ -120,6 +120,9 @@ public:
 	//! Pushes a new instance of a co::IObject* userdata onto the stack.
 	static void create( lua_State* L, co::IObject* object );
 
+	//! Gets the pointer of a Coral object userdata.
+	static co::IObject* getInstance( lua_State* L, int index );
+
 	// --- Metamethods ---
 	static int index( lua_State* L );
 	static int newIndex( lua_State* L );
@@ -136,11 +139,8 @@ public:
 	//! Pushes a new service userdata onto the stack.
 	static void create( lua_State* L, co::IService* service );
 
-	//! Gets the pointer of a verified service userdata.
-	inline static co::IService* getInstance( lua_State* L, int index )
-	{
-		return *reinterpret_cast<co::IService**>( lua_touserdata( L, index ) );
-	}
+	//! Gets the pointer of a Coral service userdata.
+	static co::IService* getInstance( lua_State* L, int index );
 
 	// --- Metamethods ---
 	static int index( lua_State* L );
@@ -152,7 +152,7 @@ public:
 /*!
 	Re-usable class for binding complex values to Lua.
  */
-class ComplexValueBinding : public CompositeTypeBinding
+class ValueBinding : public CompositeTypeBinding
 {
 public:
 	/*!
@@ -162,11 +162,8 @@ public:
 	 */
 	static void push( lua_State* L, co::IType* type, void* instancePtr );
 
-	//! Gets the instance pointer of a verified Coral CV userdata.
-	inline static void* getInstance( lua_State* L, int index )
-	{
-		return lua_touserdata( L, index );
-	}
+	//! Gets the instance pointer of a Coral value userdata.
+	static co::Any getInstance( lua_State* L, int index );
 
 	// --- Metamethods ---
 	static int gc( lua_State* L );
@@ -176,7 +173,7 @@ public:
 /*!
 	Static class for binding native classes to Lua.
  */
-class NativeClassBinding : public ComplexValueBinding
+class ClassBinding : public ValueBinding
 {
 public:
 	// --- Metamethods ---
@@ -187,7 +184,7 @@ public:
 /*!
 	Static class for binding structs to Lua.
  */
-class StructBinding : public ComplexValueBinding
+class StructBinding : public ValueBinding
 {
 public:
 	// --- Metamethods ---

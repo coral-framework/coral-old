@@ -22,7 +22,7 @@ class ISystem;
 	All paths are guaranteed to be absolute pathnames.
 	\ingroup setup
  */
-CORAL_EXPORT Range<const std::string> getPaths();
+CORAL_EXPORT Range<std::string> getPaths();
 
 /*!
 	\brief Adds one or more type repositories for use by the system.
@@ -87,6 +87,14 @@ CORAL_EXPORT void shutdown();
 	\ingroup convenience
  */
 CORAL_EXPORT IType* getType( const std::string& fullName );
+
+/*!
+	\brief Utility function to get or create an IArray whose elements are of type \a elementType.
+	This is equivalent to calling: \code co::getSystem()->getTypes()->getArrayOf( elementType ) \endcode
+	Please refer to co::ITypeManager::getArrayOf() for the list of exceptions this function may throw.
+	\ingroup convenience
+ */
+CORAL_EXPORT IArray* getArrayOf( IType* elementType );
 
 /*!
 	\brief Utility function to instantiate a component given its full type name.
@@ -161,7 +169,7 @@ CORAL_EXPORT bool findFile( const std::string& moduleName, const std::string& fi
 
 /******************************************************************************
 
- Copyright (c) 2009-2011 Tecgraf, PUC-Rio.
+ Copyright (c) 2009-2012 Tecgraf, PUC-Rio.
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal

@@ -13,7 +13,7 @@ namespace moduleA {
 class FaultyAnnotation : public FaultyAnnotation_Base
 {
 public:
-	const std::string& getValue()
+	std::string getValue()
 	{
 		return co::getType( "moduleA.tests.FaultyType" )->getFullName();
 	}

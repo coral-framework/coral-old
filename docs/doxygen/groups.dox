@@ -88,58 +88,37 @@ CORAL_DLOG(WARNING) << "Using new multi-threaded code path";
 				Signed integer type guaranteed to be 16-bit on all platforms supported by Coral.
 			\typedef co::int32
 				Signed integer type guaranteed to be 32-bit on all platforms supported by Coral.
-			\typedef co::int64
-				Signed integer type guaranteed to be 64-bit on all platforms supported by Coral.
 			\typedef co::uint8
 				Unsigned integer type guaranteed to be 8-bit on all platforms supported by Coral.
 			\typedef co::uint16
 				Unsigned integer type guaranteed to be 16-bit on all platforms supported by Coral.
 			\typedef co::uint32
 				Unsigned integer type guaranteed to be 32-bit on all platforms supported by Coral.
-			\typedef co::uint64
-				Unsigned integer type guaranteed to be 64-bit on all platforms supported by Coral.
 			\typedef co::intptr
 				Signed integer type of the same size as a pointer.
 			\typedef co::uintptr
 				Unsigned integer type of the same size as a pointer.
 
 			\def USING_CORAL_INTEGER_TYPES
-			\def CORAL_INT64_C
-			\def CORAL_UINT64_C
 
 			\var co::MIN_INT8
 				Minimum value for an object of type co::int8.
-			\var co::MAX_INT8
-				Maximum value for an object of type co::int8.
 			\var co::MAX_UINT8
 				Maximum value for an object of type co::uint8.
 			\var co::MIN_INT16
 				Minimum value for an object of type co::int16.
-			\var co::MAX_INT16
-				Maximum value for an object of type co::int16.
 			\var co::MAX_UINT16
 				Maximum value for an object of type co::uint16.
 			\var co::MIN_INT32
 				Minimum value for an object of type co::int32.
-			\var co::MAX_INT32
-				Maximum value for an object of type co::int32.
 			\var co::MAX_UINT32
 				Maximum value for an object of type co::uint32.
-			\var co::MIN_INT64
-				Minimum value for an object of type co::int64.
-			\var co::MAX_INT64
-				Maximum value for an object of type co::int64.
-			\var co::MAX_UINT64
-				Maximum value for an object of type co::uint64.
-			\var co::MAX_UINT64
 		@}
 
 		\name Endian Conversion
 		@{
 			\fn uint16 co::endianSwap(uint16)
 			\fn uint32 co::endianSwap(uint32)
-			\fn uint64 co::endianSwap(uint64)
-			\fn uint64 co::endianSwap(uint64)
 			\fn co::fromBigEndian(T)
 			\fn co::fromLittleEndian(T)
 			\fn co::toBigEndian(T)

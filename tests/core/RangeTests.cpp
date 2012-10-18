@@ -11,7 +11,7 @@ TEST( RangeTests, staticIntArray )
 	int array[] = { 3, 5, 8, 13, 20 };
 
 	int i = 0;
-	for( co::Range<int> r( array, CORAL_ARRAY_LENGTH( array ) ); r; r.popFirst() )
+	for( co::Range<int> r( array ); r; r.popFirst() )
 	{
 		EXPECT_EQ( array[i++], r.getFirst() );
 	}
@@ -21,9 +21,9 @@ TEST( RangeTests, staticConstIntArray )
 {
 	const int array[] = { 3, 5, 8, 13, 20 };
 	
-	co::Range<const int> r( array, CORAL_ARRAY_LENGTH( array ) );
+	co::Range<int> r( array );
 	EXPECT_EQ( r.getSize(), 5 );
-	
+
 	int i = 0;
 	for( ; r; r.popFirst() )
 	{
@@ -57,7 +57,7 @@ TEST( RangeTests, constIntStdVector )
 	const std::vector<int> cv( v );
 	
 	int i = 0;
-	for( co::Range<const int> r( cv ); r; r.popFirst() )
+	for( co::Range<int> r( cv ); r; r.popFirst() )
 	{
 		EXPECT_EQ( v[i++], r.getFirst() );
 	}

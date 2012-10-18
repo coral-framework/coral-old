@@ -29,7 +29,7 @@ public:
 	void setIsOut( bool isOut );
 
 	// IParameter methods
-	const std::string& getName();
+	std::string getName();
 	IType* getType();
 	bool getIsIn();
 	bool getIsOut();

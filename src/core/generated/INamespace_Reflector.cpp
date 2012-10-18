@@ -44,77 +44,78 @@ public:
 
 	// co.INamespace Methods:
 
-	co::Range<co::INamespace* const> getChildNamespaces()
+	co::Range<co::INamespace*> getChildNamespaces()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 0 ) );
-        return res.get< co::Range<co::INamespace* const> >();
+		co::RefVector<co::INamespace> res;
+		_provider->dynamicGetField( _cookie, getField<co::INamespace>( 0 ), res );
+		return res;
 	}
 
-	const std::string& getFullName()
+	std::string getFullName()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 1 ) );
-        return res.get< const std::string& >();
+		std::string res;
+		_provider->dynamicGetField( _cookie, getField<co::INamespace>( 1 ), res );
+		return res;
 	}
 
 	co::IModule* getModule()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 2 ) );
-        return res.get< co::IModule* >();
+		co::RefPtr<co::IModule> res;
+		_provider->dynamicGetField( _cookie, getField<co::INamespace>( 2 ), res );
+		return res.get();
 	}
 
-	const std::string& getName()
+	std::string getName()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 3 ) );
-        return res.get< const std::string& >();
+		std::string res;
+		_provider->dynamicGetField( _cookie, getField<co::INamespace>( 3 ), res );
+		return res;
 	}
 
 	co::INamespace* getParentNamespace()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 4 ) );
-        return res.get< co::INamespace* >();
+		co::RefPtr<co::INamespace> res;
+		_provider->dynamicGetField( _cookie, getField<co::INamespace>( 4 ), res );
+		return res.get();
 	}
 
-	co::Range<co::IType* const> getTypes()
+	co::Range<co::IType*> getTypes()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::INamespace>( 5 ) );
-        return res.get< co::Range<co::IType* const> >();
+		co::RefVector<co::IType> res;
+		_provider->dynamicGetField( _cookie, getField<co::INamespace>( 5 ), res );
+		return res;
 	}
 
 	co::INamespace* defineChildNamespace( const std::string& name_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( name_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 0 ), range );
-		return res.get< co::INamespace* >();
+		co::Any args[] = { name_ };
+		co::RefPtr<co::INamespace> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 0 ), args, res );
+		return res.get();
 	}
 
-	co::ITypeBuilder* defineType( const std::string& name_, co::TypeKind typeKind_ )
+	co::ITypeBuilder* defineType( const std::string& name_, co::TypeKind kind_ )
 	{
-		co::Any args[2];
-		args[0].set< const std::string& >( name_ );
-		args[1].set< co::TypeKind >( typeKind_ );
-		co::Range<co::Any const> range( args, 2 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 1 ), range );
-		return res.get< co::ITypeBuilder* >();
+		co::Any args[] = { name_, kind_ };
+		co::RefPtr<co::ITypeBuilder> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 1 ), args, res );
+		return res.get();
 	}
 
 	co::INamespace* findChildNamespace( const std::string& name_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( name_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 2 ), range );
-		return res.get< co::INamespace* >();
+		co::Any args[] = { name_ };
+		co::RefPtr<co::INamespace> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 2 ), args, res );
+		return res.get();
 	}
 
 	co::IType* findType( const std::string& name_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( name_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 3 ), range );
-		return res.get< co::IType* >();
+		co::Any args[] = { name_ };
+		co::RefPtr<co::IType> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 3 ), args, res );
+		return res.get();
 	}
 
 protected:
@@ -166,17 +167,17 @@ public:
 		return new co::INamespace_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::INamespace* p = co::checkInstance<co::INamespace>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::Range<co::INamespace* const> >( p->getChildNamespaces() ); break;
-		case 1:		value.set< const std::string& >( p->getFullName() ); break;
-		case 2:		value.set< co::IModule* >( p->getModule() ); break;
-		case 3:		value.set< const std::string& >( p->getName() ); break;
-		case 4:		value.set< co::INamespace* >( p->getParentNamespace() ); break;
-		case 5:		value.set< co::Range<co::IType* const> >( p->getTypes() ); break;
+		case 0:		value.put( p->getChildNamespaces() ); break;
+		case 1:		value.put( p->getFullName() ); break;
+		case 2:		value.put( p->getModule() ); break;
+		case 3:		value.put( p->getName() ); break;
+		case 4:		value.put( p->getParentNamespace() ); break;
+		case 5:		value.put( p->getTypes() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -198,7 +199,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::INamespace* p = co::checkInstance<co::INamespace>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -211,29 +212,29 @@ public:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::INamespace* >( p->defineChildNamespace( name_ ) );
+					res.put( p->defineChildNamespace( name_ ) );
 				}
 				break;
 			case 7:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
-					co::TypeKind typeKind_ = args[++argIndex].get< co::TypeKind >();
+					co::TypeKind kind_ = args[++argIndex].get< co::TypeKind >();
 					argIndex = -1;
-					res.set< co::ITypeBuilder* >( p->defineType( name_, typeKind_ ) );
+					res.put( p->defineType( name_, kind_ ) );
 				}
 				break;
 			case 8:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::INamespace* >( p->findChildNamespace( name_ ) );
+					res.put( p->findChildNamespace( name_ ) );
 				}
 				break;
 			case 9:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::IType* >( p->findType( name_ ) );
+					res.put( p->findType( name_ ) );
 				}
 				break;
 			default:

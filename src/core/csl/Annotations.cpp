@@ -20,7 +20,7 @@ CppBlockAnnotation::~CppBlockAnnotation()
 	// empty destructor
 }
 
-const std::string& CppBlockAnnotation::getValue()
+std::string CppBlockAnnotation::getValue()
 {
 	return _value;
 }
@@ -44,7 +44,7 @@ DocumentationAnnotation::~DocumentationAnnotation()
 	// empty destructor
 }
 
-const std::string& DocumentationAnnotation::getValue()
+std::string DocumentationAnnotation::getValue()
 {
 	return _value;
 }
@@ -70,14 +70,11 @@ void DocumentationAnnotation::addDocFor( const std::string& element, const std::
 	}
 }
 
-const std::string& DocumentationAnnotation::getDocFor( const std::string& element )
+std::string DocumentationAnnotation::getDocFor( const std::string& element )
 {
-	static const std::string s_emptyString;
-
 	DocMap::iterator it = _docMap.find( element );
 	if( it == _docMap.end() )
-		return s_emptyString;
-
+		return std::string();
 	return it->second;
 }
 
@@ -88,7 +85,7 @@ CORAL_EXPORT_COMPONENT( DocumentationAnnotation, DocumentationAnnotation );
 class IncludeAnnotation : public IncludeAnnotation_Base
 {
 public:
-	const std::string& getValue()
+	std::string getValue()
 	{
 		return _value;
 	}

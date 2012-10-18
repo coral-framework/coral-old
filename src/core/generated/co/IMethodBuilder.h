@@ -25,7 +25,7 @@ class IMethodBuilder : public co::IService
 public:
 	virtual ~IMethodBuilder() {;}
 
-	virtual const std::string& getMethodName() = 0;
+	virtual std::string getMethodName() = 0;
 
 	virtual co::ITypeBuilder* getTypeBuilder() = 0;
 

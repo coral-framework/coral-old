@@ -87,16 +87,14 @@
 
 #if defined(CORAL_CC_MSVC)
 	#define CORAL_CC_NAME "msvc"
-	#if _MSC_VER > 1600
+	#if _MSC_VER > 1700
 		#error "Your MSVC compiler was not recognized by this Coral version (maybe it's too new?)."
+	#elif _MSC_VER >= 1700
+		#define CORAL_CC_VERSION "11.0"
 	#elif _MSC_VER >= 1600
 		#define CORAL_CC_VERSION "10.0"
-	#elif _MSC_VER >= 1500
-		#define CORAL_CC_VERSION "9.0"
-	#elif _MSC_VER >= 1400
-		#define CORAL_CC_VERSION "8.0"
 	#else
-		#error "Coral requires Visual Studio 8 (2005) or newer."
+		#error "Coral requires Visual Studio 10 (2010) or newer."
 	#endif
 #elif defined(CORAL_CC_CLANG)
 	#define CORAL_CC_NAME "clang"
@@ -133,8 +131,6 @@ namespace co {
 	typedef unsigned short		uint16;
 	typedef int					int32;
 	typedef unsigned			uint32;
-	typedef long long			int64;
-	typedef unsigned long long	uint64;
 	typedef int32				intptr;
 	typedef uint32				uintptr;
 #elif CORAL_POINTER_SIZE == 8
@@ -144,15 +140,6 @@ namespace co {
 	typedef unsigned short		uint16;
 	typedef int					int32;
 	typedef unsigned			uint32;
-	#ifdef CORAL_CC_MSVC
-		typedef long long			int64;
-		typedef unsigned long long	uint64;
-	#else
-		typedef long				int64;
-		typedef unsigned long		uint64;
-	#endif
-	typedef int64				intptr;
-	typedef uint64				uintptr;
 #else
 	#error Portable integers were not defined because CORAL_POINTER_SIZE is invalid.
 #endif
@@ -171,16 +158,6 @@ const int32		MIN_INT32	= -2147483647 - 1;
 const int32		MAX_INT32	=  2147483647;
 const uint32	MAX_UINT32	=  0xFFFFFFFF;
 
-#if defined(CORAL_CC_MSVC)
-const int64		MAX_INT64	= 0x7FFFFFFFFFFFFFFF;
-const uint64	MAX_UINT64	= 0xFFFFFFFFFFFFFFFF;
-#else
-const int64		MAX_INT64	= 0x7FFFFFFFFFFFFFFFLL;
-const uint64	MAX_UINT64	= 0xFFFFFFFFFFFFFFFFULL;
-#endif
-
-const int64		MIN_INT64	= -MAX_INT64 - 1;
-
 } // namespace co
 
 /*!
@@ -192,35 +169,15 @@ const int64		MIN_INT64	= -MAX_INT64 - 1;
 	using co::int8;		\
 	using co::int16;	\
 	using co::int32;	\
-	using co::int64;	\
 	using co::uint8;	\
 	using co::uint16;	\
-	using co::uint32;	\
-	using co::uint64;
+	using co::uint32;
 
 /*!
 	\brief Returns the number of elements in a statically-allocated array.
 	\param[in] array name of a statically-allocated array.
  */
 #define CORAL_ARRAY_LENGTH( array )	( sizeof( array ) / sizeof( array[0] ) )
-
-/*!
-	\def CORAL_INT64_C( c )
-	\brief Wraps the signed 64-bit integer literal 'c' in a platform-independent way.
-
-	\def CORAL_UINT64_C( uc )
-	\brief Wraps the unsigned 64-bit integer literal 'uc' in a platform-independent way.
- */
-#if defined(CORAL_OS_WIN) && !defined(CORAL_CC_GNU)
-	#define CORAL_INT64_C( c ) c ## i64
-	#define CORAL_UINT64_C( uc ) uc ## ui64
-#elif CORAL_POINTER_SIZE == 8 && !defined(CORAL_OS_MAC)
-	#define CORAL_INT64_C( c ) c ## L
-	#define CORAL_UINT64_C( uc ) uc ## UL
-#else
-	#define CORAL_INT64_C( c ) c ## LL
-	#define CORAL_UINT64_C( uc ) uc ## ULL
-#endif
 
 //! Supresses 'unused parameter' warnings.
 #define CORAL_UNUSED( x ) (void)x;

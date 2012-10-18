@@ -26,17 +26,20 @@ class IInterface;
 class IComponent;
 class INativeClass;
 template<typename T> class Range;
+template<typename T> class RefPtr;
 template<typename T> class RefVector;
 
 /*!
-	Array that maps a TypeKind to its Coral-style string representation.
-	Use with caution, always make sure ( index >= 0 && index <= co::TK_COMPONENT ).
+	Maps TypeKinds to either their names in CSL.
+	\warning make sure ( index >= 0 && index < co::TK_COUNT ).
  */
 extern CORAL_EXPORT const std::string TK_STRINGS[];
 
-//! Just like co::TK_STRINGS, but contains C++ style strings (e.g. 'co::Any' instead of 'any').
-extern CORAL_EXPORT const std::string TK_STRINGS_CPP[];
-
+/*!
+	Maps the basic type kinds to their IType (or NULL if not a basic type).
+	\warning make sure ( index >= 0 && index < co::TK_COUNT ).
+ */
+extern CORAL_EXPORT RefPtr<IType> BASIC_TYPES[];
 
 /****************************************************************************/
 /* Internal Helper Functions (to avoid type dependencies in template code)  */
@@ -50,10 +53,16 @@ CORAL_EXPORT IType* getTypeByLiteralName( const char* fullName );
 // Returns the kind of a 'type'.
 CORAL_EXPORT TypeKind getKind( IType* type );
 
-// Gets a service of the given 'type', provided by 'object'.
+// Attempts to retrieve a service of a certain 'type' from 'object'.
+CORAL_EXPORT IService* findServiceByType( IObject* object, IInterface* type );
+
+// Retrieves a service of a certain 'type' from 'object'. If impossible raises an exception.
 CORAL_EXPORT IService* getServiceByType( IObject* object, IInterface* type );
 
-// Gets a service from 'object' by its port name.
+// Attempts to retrieve a service from 'object' by its port name.
+CORAL_EXPORT IService* findServiceByName( IObject* object, const std::string& portName );
+
+// Retrieves a service from 'object' by its port name. If impossible raises an exception.
 CORAL_EXPORT IService* getServiceByName( IObject* object, const std::string& portName );
 
 // Binds a 'service' to the receptacle identified by 'receptacleName' in 'object'.
@@ -63,36 +72,86 @@ CORAL_EXPORT void setServiceByName( IObject* object, const std::string& receptac
 
 
 /****************************************************************************/
+/* Kind Trait Operators (to distinguish all kinds of types)                 */
+/****************************************************************************/
+
+//! Returns true for integer types.
+inline bool isInteger( TypeKind k ) { return k >= TK_BOOL && k <= TK_UINT32; }
+
+//! Returns true for signed integer types.
+inline bool isSignedInteger( TypeKind k ) { return k >= TK_BOOL && k <= TK_INT32; }
+
+//! Returns true for floating-point types.
+inline bool isFloat( TypeKind k ) { return k == TK_FLOAT || k == TK_DOUBLE; }
+
+//! Returns true for integer and floating-point types.
+inline bool isNumeric( TypeKind k ) { return k >= TK_BOOL && k <= TK_DOUBLE; }
+
+//! Returns true for numeric and enumeration types.
+inline bool isScalar( TypeKind k ) { return k >= TK_BOOL && k <= TK_ENUM; }
+
+//! Returns true for value types (with deep copy semantics).
+inline bool isValue( TypeKind k ) { return k > TK_NULL && k <= TK_NATIVECLASS; }
+
+//! Returns true for reference types (with shallow copy semantics).
+inline bool isReference( TypeKind k ) { return k == TK_INTERFACE; }
+
+//! Returns whether it is possible to declare variables and fields of this type.
+inline bool isData( TypeKind k ) { return k > TK_NULL && k <= TK_INTERFACE; }
+
+//! Returns true for types whose variable is a scalar.
+inline bool isScalarOrRef( TypeKind k ) { return isScalar( k ) || isReference( k ); }
+
+//! Returns true if new types of this kind can be defined by users.
+inline bool isCustom( TypeKind k ) { return k >= TK_STRUCT || k == TK_ENUM; }
+
+//! Returns true for value types that require custom reflectors.
+inline bool isComplexValue( TypeKind k ) { return k == TK_STRUCT || k == TK_NATIVECLASS; }
+
+//! Returns true for types that may contain members (ICompositeType).
+inline bool isComposite( TypeKind k ) { return k >= TK_STRUCT && k <= TK_COMPONENT; }
+
+//! Returns true for types that support inheritance.
+inline bool isInheritable( TypeKind k ) { return k == TK_INTERFACE; }
+
+//! Returns true if a built-in IReflector is available for the type.
+inline bool hasBuiltInReflector( TypeKind k ) { return k < TK_STRUCT; }
+
+
+/****************************************************************************/
 /* Type Traits: kindOf<T>::kind                                             */
 /****************************************************************************/
 
 template<typename>
 struct kindOf
 {
-	static const TypeKind kind = TK_NONE;
+	static const TypeKind kind = TK_NULL;
 };
 
 //! Common implementation of co::kindOf<T>:
 template<TypeKind k> struct kindOfBase { static const TypeKind kind = k; };
 
 // specializations for basic types:
-template<> struct kindOf<bool> : public kindOfBase<TK_BOOLEAN> {};
+template<> struct kindOf<bool> : public kindOfBase<TK_BOOL> {};
 template<> struct kindOf<int8> : public kindOfBase<TK_INT8> {};
-template<> struct kindOf<uint8> : public kindOfBase<TK_UINT8> {};
 template<> struct kindOf<int16> : public kindOfBase<TK_INT16> {};
-template<> struct kindOf<uint16> : public kindOfBase<TK_UINT16> {};
 template<> struct kindOf<int32> : public kindOfBase<TK_INT32> {};
+template<> struct kindOf<uint8> : public kindOfBase<TK_UINT8> {};
+template<> struct kindOf<uint16> : public kindOfBase<TK_UINT16> {};
 template<> struct kindOf<uint32> : public kindOfBase<TK_UINT32> {};
-template<> struct kindOf<int64> : public kindOfBase<TK_INT64> {};
-template<> struct kindOf<uint64>  : public kindOfBase<TK_UINT64> {};
 template<> struct kindOf<float> : public kindOfBase<TK_FLOAT> {};
 template<> struct kindOf<double> : public kindOfBase<TK_DOUBLE> {};
 template<> struct kindOf<std::string> : public kindOfBase<TK_STRING> {};
 
-// specialization for array types:
+// specialization for container types:
 template<typename T> struct kindOf<Range<T> > : public kindOfBase<TK_ARRAY> {};
+template<typename T> struct kindOf<RefPtr<T> > : public kindOf<T> {};
 template<typename T> struct kindOf<RefVector<T> > : public kindOfBase<TK_ARRAY> {};
 template<typename T> struct kindOf<std::vector<T> > : public kindOfBase<TK_ARRAY> {};
+
+// for unknown pointers, use the dereferenced type
+template<typename T> struct kindOf<T*> : public kindOf<T> {};
+template<typename T> struct kindOf<T* const> : public kindOf<T*> {};
 
 // specialization for co::TypeKind (must go here to avoid cyclic dependencies)
 template<> struct kindOf<TypeKind> : public kindOfBase<TK_ENUM> {};
@@ -122,35 +181,10 @@ namespace traits {
 struct FalseType { static const bool value = false; };
 struct TrueType { static const bool value = true; FalseType _[2]; };
 
-// Whether two types are the same type:
-template<typename, typename> struct isSame : public FalseType {};
-template<typename T> struct isSame<T, T> : public TrueType {};
-
-// Whether a type is 'const':
-template<typename> struct isConst : public FalseType {};
-template<typename T> struct isConst<T const> : public TrueType {};
-
-// Whether a type is a pointer:
-template<typename> struct isPointer : public FalseType {};
-template<typename T> struct isPointer<T*> : public TrueType {};
-template<typename T> struct isPointer<T* const> : public TrueType {};
-
-// Whether a type is a reference:
-template<typename> struct isReference : public FalseType {};
-template<typename T> struct isReference<T&> : public TrueType {};
-
-// Removes 'const' from a type:
-template<typename T> struct removeConst { typedef T Type; };
-template<typename T> struct removeConst<T const> { typedef T Type; };
-
 // Removes a pointer ('*') from a type:
 template<typename T> struct removePointer { typedef T Type; };
 template<typename T> struct removePointer<T*> { typedef T Type; };
 template<typename T> struct removePointer<T* const> { typedef T Type; };
-
-// Removes a reference ('&') from a type:
-template<typename T> struct removeReference { typedef T Type; };
-template<typename T> struct removeReference<T&> { typedef T Type; };
 
 // Whether a type D is a subtype of B.
 template<typename D, typename B>
@@ -159,25 +193,6 @@ struct isSubTypeOf
 	static TrueType test( const B* const );
 	static FalseType test( ... );
 	static const bool value = ( sizeof(test((D*)0)) == sizeof(TrueType) );
-};
-
-//! Utility struct to easily access information about a Coral type.
-template<typename T>
-struct get
-{
-	typedef T												Type;
-	typedef typename removeReference<T>::Type				ReferencedType;
-	typedef typename removeConst<ReferencedType>::Type		ValueType;
-	typedef typename removePointer<ReferencedType>::Type	PointedType;
-	typedef typename removeConst<PointedType>::Type			CoreType;
-
-	static const bool isConst = co::traits::isConst<PointedType>::value;
-	static const bool isPointer = co::traits::isPointer<ReferencedType>::value;
-	static const bool isPointerConst = co::traits::get<T>::isPointer
-							&& co::traits::isConst<ReferencedType>::value;
-	static const bool isReference = co::traits::isReference<T>::value;
-
-	static const TypeKind kind = co::kindOf<CoreType>::kind;
 };
 
 } // namespace traits
@@ -200,10 +215,9 @@ struct nameOf
 template<typename ET>
 struct nameOfArrayBase
 {
-	typedef typename traits::get<ET> ETT; // element type traits
 	static const char* get()
 	{
-		static const std::string s_name( std::string( nameOf<typename ETT::CoreType>::get() ) + "[]" );
+		static const std::string s_name( std::string( nameOf<ET>::get() ) + "[]" );
 		return s_name.c_str();
 	}
 };
@@ -212,6 +226,10 @@ struct nameOfArrayBase
 template<typename T> struct nameOf<Range<T> > : public nameOfArrayBase<T> {};
 template<typename T> struct nameOf<RefVector<T> > : public nameOfArrayBase<T> {};
 template<typename T> struct nameOf<std::vector<T> > : public nameOfArrayBase<T> {};
+
+// for unknown pointers, use the dereferenced type
+template<typename T> struct nameOf<T*> : public nameOf<T> {};
+template<typename T> struct nameOf<T* const> : public nameOf<T*> {};
 
 // specialization for co::TypeKind (must go here to avoid cyclic dependencies)
 template<> struct nameOf<TypeKind> { static const char* get() { return "co.TypeKind"; } };
@@ -234,6 +252,26 @@ struct typeOf
 		return static_cast<Descriptor*>( type );
 	}
 };
+
+template<typename T>
+struct typeOfBasic
+{
+	static const TypeKind kind = kindOf<T>::kind;
+	typedef IType Descriptor;
+	static Descriptor* get() { return reinterpret_cast<Descriptor**>( BASIC_TYPES )[kind]; }
+};
+
+// specializations for basic types:
+template<> struct typeOf<bool> : public typeOfBasic<bool> {};
+template<> struct typeOf<int8> : public typeOfBasic<int8> {};
+template<> struct typeOf<uint8> : public typeOfBasic<uint8> {};
+template<> struct typeOf<int16> : public typeOfBasic<int16> {};
+template<> struct typeOf<uint16> : public typeOfBasic<uint16> {};
+template<> struct typeOf<int32> : public typeOfBasic<int32> {};
+template<> struct typeOf<uint32> : public typeOfBasic<uint32> {};
+template<> struct typeOf<float> : public typeOfBasic<float> {};
+template<> struct typeOf<double> : public typeOfBasic<double> {};
+template<> struct typeOf<std::string> : public typeOfBasic<std::string> {};
 
 
 /****************************************************************************/
@@ -272,4 +310,12 @@ inline SubType* cast( IService* service )
 
 } // namespace co
 
-#endif
+/*!
+	Outputs the string associated with a co::TypeKind. \relates co::TypeKind
+ */
+inline std::ostream& operator<<( std::ostream& out, co::TypeKind kind )
+{
+	return out << co::TK_STRINGS[kind];
+}
+
+#endif // _CO_TYPETRAITS_H_

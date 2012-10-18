@@ -56,7 +56,7 @@ TEST( RefVectorTests, rawPtrVectorEquivalence )
 	refVec.push_back( &o2 );
 	refVec.push_back( &o3 );
 
-	co::Range<PseudoInterface* const> range( refVec );
+	co::Range<PseudoInterface*> range( refVec );
 	for( int i = 0; i < 3; ++i )
 	{
 		EXPECT_EQ( range.getFirst(), rawVec[i] );
@@ -70,7 +70,7 @@ TEST( RefVectorTests, rawPtrVectorWithEmptyRefVector )
 
 	EXPECT_EQ( emptyRefVec.size(), 0 );
 
-	co::Range<PseudoInterface* const> range( emptyRefVec );
+	co::Range<PseudoInterface*> range( emptyRefVec );
 	EXPECT_TRUE( range.isEmpty() );
 }
 
@@ -86,7 +86,7 @@ TEST( RefVectorTests, castedPtrRange )
 	refVec.push_back( &o2 );
 	refVec.push_back( &o3 );
 
-	co::Range<co::IService* const> range( refVec );
+	co::Range<co::IService*> range( refVec );
 	EXPECT_EQ( range.getSize(), 3 );
 
 	// invalid usage sample (causes compile-time error):

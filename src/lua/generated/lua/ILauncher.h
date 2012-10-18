@@ -19,7 +19,7 @@ class ILauncher : public co::IService
 public:
 	virtual ~ILauncher() {;}
 
-	virtual co::int32 main( co::Range<std::string const> args ) = 0;
+	virtual co::int32 main( co::Range<std::string> args ) = 0;
 };
 
 } // namespace lua

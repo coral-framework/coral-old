@@ -16,7 +16,6 @@
 
 namespace co {
 
-// forward declarations:
 class IllegalCastException;
 
 //! ReflectorBase provides a facet named 'reflector', of type co::IReflector.
@@ -52,9 +51,9 @@ public:
     void destroyValues( void* ptr, size_t numValues );
     IObject* newInstance();
     IService* newDynamicProxy( IDynamicServiceProvider* handler );
-    void getField( const Any& instance, IField* ai, Any& value );
+    void getField( const Any& instance, IField* ai, const Any& value );
     void setField( const Any& instance, IField* ai, const Any& value );
-    void invoke( const Any& instance, IMethod* mi, Range<Any const> args, Any& returnValue );
+    void invoke( const Any& instance, IMethod* mi, Range<Any> args, const Any& returnValue );
 	void raise( const std::string& message );
 
 protected:
@@ -82,7 +81,7 @@ protected:
 	 */
 	void raiseUnexpectedMemberIndex();
 
-	//! Raises co::NotSupportedException, e.g. for unimplemented methods.
+	//! Raises co::NotSupportedException, e.g. for nonimplemented methods.
 	void raiseNotSupportedException();
 };
 
@@ -92,67 +91,12 @@ protected:
 
 #ifndef DOXYGEN
 
-namespace {
-template<typename M> struct nullMemberMsg { static const char* get() { return "illegal null member"; } };
-template<> struct nullMemberMsg<IField> { static const char* get() { return "illegal null field"; } };
-template<> struct nullMemberMsg<IMethod> { static const char* get() { return "illegal null method"; } };
-}
-
-template<typename M>
-void checkMember( ICompositeType* ct, M* member )
-{
-	if( !member )
-		throw co::IllegalArgumentException( nullMemberMsg<M>::get() );
-
-	ICompositeType* owner = member->getOwner();
-	if( owner != ct )
-		CORAL_THROW( IllegalArgumentException, "member '" << member->getName()
-			<< "' belongs to '" << owner->getFullName()
-			<< "', not to '" << ct->getFullName() << "'" );
-}
-
-template<typename T, typename TType>
-struct CheckInstance
-{
-	static T* check( const Any& any, TType* type )
-	{
-		if( any.getKind() != kindOf<T>::kind || any.getType() != type )
-			CORAL_THROW( IllegalArgumentException, "illegal instance type ("
-				<< type->getFullName() << " expected, got " << any << ")" );
-
-		void* ptr = any.getState().data.ptr;
-		if( !ptr )
-			throw co::IllegalArgumentException( "illegal null instance" );
-
-		return reinterpret_cast<T*>( ptr );
-	}
-};
+CORAL_EXPORT void* checkInstance( const Any& any, ICompositeType* ct, IMember* member );
 
 template<typename T>
-struct CheckInstance<T, IInterface>
+T* checkInstance( const Any& any, IMember* member )
 {
-	static T* check( const Any& any, IInterface* type )
-	{
-		if( any.getKind() != TK_INTERFACE || !any.getInterface()->isSubTypeOf( type ) )
-			CORAL_THROW( IllegalArgumentException, "illegal instance type ("
-				<< type->getFullName() << " expected, got " << any << ")" );
-
-		IService* service = any.getState().data.service;
-		if( !service )
-			throw co::IllegalArgumentException( "illegal null instance" );
-
-		return static_cast<T*>( service );
-	}
-};
-
-template<typename T, typename M>
-T* checkInstance( const Any& any, M* member )
-{
-	typedef typeOf<T> typeOfT;
-	typedef typename typeOfT::Descriptor Descriptor;
-	Descriptor* type = typeOfT::get();
-	checkMember( type, member );
-	return CheckInstance<T, Descriptor>::check( any, type );
+	return reinterpret_cast<T*>( checkInstance( any, typeOf<T>::get(), member ) );
 }
 
 #endif

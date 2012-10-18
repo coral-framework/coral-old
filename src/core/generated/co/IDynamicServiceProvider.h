@@ -30,9 +30,9 @@ public:
 
 	virtual co::IPort* dynamicGetFacet( co::int32 dynFacetId ) = 0;
 
-	virtual const co::Any& dynamicGetField( co::int32 dynFacetId, co::IField* field ) = 0;
+	virtual void dynamicGetField( co::int32 dynFacetId, co::IField* field, const co::Any& value ) = 0;
 
-	virtual const co::Any& dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, co::Range<co::Any const> args ) = 0;
+	virtual void dynamicInvoke( co::int32 dynFacetId, co::IMethod* method, co::Range<co::Any> args, const co::Any& result ) = 0;
 
 	virtual co::int32 dynamicRegisterService( co::IService* dynamicServiceProxy ) = 0;
 

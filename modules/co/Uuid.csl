@@ -1,13 +1,12 @@
 /*
 	A 128-bit Universally Unique IDentifier (UUID).
  */
-//@co.Include( "co/reserved/Uuid.h" )
 native class Uuid
 {
 	<c++
-		namespace co {
-			class Uuid;
-		} // namespace co
+
+		#include <co/reserved/Uuid.h>
+
 	c++>
 
 	// True if this is the null UUID (that is, "00000000-0000-0000-0000000000000000").

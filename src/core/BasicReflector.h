@@ -20,9 +20,7 @@ class BasicReflector : public ReflectorBase
 public:
 	/*!
 		Factory method.
-
-		\pre \a type must be either of a non-user-definable kind,
-				or an internal component.
+		\pre \a type must be either a basic type or an internal component.
 	 */
 	static IReflector* create( IType* type );
 

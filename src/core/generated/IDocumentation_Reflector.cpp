@@ -43,35 +43,30 @@ public:
 
 	// co.IDocumentation Methods:
 
-	const std::string& getValue()
+	std::string getValue()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IDocumentation>( 0 ) );
-        return res.get< const std::string& >();
+		std::string res;
+		_provider->dynamicGetField( _cookie, getField<co::IDocumentation>( 0 ), res );
+		return res;
 	}
 
 	void setValue( const std::string& value_ )
 	{
-		co::Any arg;
-		arg.set< const std::string& >( value_ );
-		_provider->dynamicSetField( _cookie, getField<co::IDocumentation>( 0 ), arg );
+		_provider->dynamicSetField( _cookie, getField<co::IDocumentation>( 0 ), value_ );
 	}
 
 	void addDocFor( const std::string& element_, const std::string& text_ )
 	{
-		co::Any args[2];
-		args[0].set< const std::string& >( element_ );
-		args[1].set< const std::string& >( text_ );
-		co::Range<co::Any const> range( args, 2 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 0 ), range );
+		co::Any args[] = { element_, text_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 0 ), args, co::Any() );
 	}
 
-	const std::string& getDocFor( const std::string& element_ )
+	std::string getDocFor( const std::string& element_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( element_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 1 ), range );
-		return res.get< const std::string& >();
+		co::Any args[] = { element_ };
+		std::string res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDocumentation>( 1 ), args, res );
+		return res;
 	}
 
 protected:
@@ -123,12 +118,12 @@ public:
 		return new co::IDocumentation_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::IDocumentation* p = co::checkInstance<co::IDocumentation>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< const std::string& >( p->getValue() ); break;
+		case 0:		value.put( p->getValue() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -145,7 +140,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::IDocumentation* p = co::checkInstance<co::IDocumentation>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -166,7 +161,7 @@ public:
 				{
 					const std::string& element_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< const std::string& >( p->getDocFor( element_ ) );
+					res.put( p->getDocFor( element_ ) );
 				}
 				break;
 			default:

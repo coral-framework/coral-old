@@ -33,7 +33,7 @@ public:
 
 	virtual void postGetService( co::IObject* object, co::IPort* port, co::IService* service ) = 0;
 
-	virtual void postInvoke( co::IService* service, co::IMethod* method, co::Range<co::Any const> args, const co::Any& returnValue ) = 0;
+	virtual void postInvoke( co::IService* service, co::IMethod* method, co::Range<co::Any> args, const co::Any& returnValue ) = 0;
 
 	virtual void postSetField( co::IService* service, co::IField* field, const co::Any& value ) = 0;
 

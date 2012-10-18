@@ -5,10 +5,10 @@
 
 #include <co/ITypeBuilder.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/INamespace.h>
-#include <co/IInterface.h>
-#include <co/IMethodBuilder.h>
 #include <co/IType.h>
+#include <co/IMethodBuilder.h>
+#include <co/IInterface.h>
+#include <co/INamespace.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -47,72 +47,63 @@ public:
 
 	co::TypeKind getKind()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 0 ) );
-        return res.get< co::TypeKind >();
+		co::TypeKind res;
+		_provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 0 ), res );
+		return res;
 	}
 
 	co::INamespace* getNamespace()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 1 ) );
-        return res.get< co::INamespace* >();
+		co::RefPtr<co::INamespace> res;
+		_provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 1 ), res );
+		return res.get();
 	}
 
-	const std::string& getTypeName()
+	std::string getTypeName()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 2 ) );
-        return res.get< const std::string& >();
+		std::string res;
+		_provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 2 ), res );
+		return res;
 	}
 
 	co::IType* createType()
 	{
-		co::Range<co::Any const> range;
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 0 ), range );
-		return res.get< co::IType* >();
+		co::Range<co::Any> args;
+		co::RefPtr<co::IType> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 0 ), args, res );
+		return res.get();
 	}
 
 	void defineBaseType( co::IType* baseType_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IType* >( baseType_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 1 ), range );
+		co::Any args[] = { baseType_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 1 ), args, co::Any() );
 	}
 
 	void defineField( const std::string& name_, co::IType* type_, bool isReadOnly_ )
 	{
-		co::Any args[3];
-		args[0].set< const std::string& >( name_ );
-		args[1].set< co::IType* >( type_ );
-		args[2].set< bool >( isReadOnly_ );
-		co::Range<co::Any const> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 2 ), range );
+		co::Any args[] = { name_, type_, isReadOnly_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 2 ), args, co::Any() );
 	}
 
 	void defineIdentifier( const std::string& name_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( name_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 3 ), range );
+		co::Any args[] = { name_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 3 ), args, co::Any() );
 	}
 
 	co::IMethodBuilder* defineMethod( const std::string& name_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( name_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 4 ), range );
-		return res.get< co::IMethodBuilder* >();
+		co::Any args[] = { name_ };
+		co::RefPtr<co::IMethodBuilder> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 4 ), args, res );
+		return res.get();
 	}
 
 	void definePort( const std::string& name_, co::IInterface* type_, bool isFacet_ )
 	{
-		co::Any args[3];
-		args[0].set< const std::string& >( name_ );
-		args[1].set< co::IInterface* >( type_ );
-		args[2].set< bool >( isFacet_ );
-		co::Range<co::Any const> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 5 ), range );
+		co::Any args[] = { name_, type_, isFacet_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 5 ), args, co::Any() );
 	}
 
 protected:
@@ -164,14 +155,14 @@ public:
 		return new co::ITypeBuilder_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::ITypeBuilder* p = co::checkInstance<co::ITypeBuilder>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::TypeKind >( p->getKind() ); break;
-		case 1:		value.set< co::INamespace* >( p->getNamespace() ); break;
-		case 2:		value.set< const std::string& >( p->getTypeName() ); break;
+		case 0:		value.put( p->getKind() ); break;
+		case 1:		value.put( p->getNamespace() ); break;
+		case 2:		value.put( p->getTypeName() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -190,7 +181,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::ITypeBuilder* p = co::checkInstance<co::ITypeBuilder>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -201,7 +192,7 @@ public:
 			{
 			case 3:
 				{
-					res.set< co::IType* >( p->createType() );
+					res.put( p->createType() );
 				}
 				break;
 			case 4:
@@ -231,7 +222,7 @@ public:
 				{
 					const std::string& name_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::IMethodBuilder* >( p->defineMethod( name_ ) );
+					res.put( p->defineMethod( name_ ) );
 				}
 				break;
 			case 8:

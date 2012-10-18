@@ -40,7 +40,7 @@ function M:initialize( module )
 
 	-- test setting 'testEnum' with an invalid identifier
 	ASSERT_ERROR( function() testStruct.testEnum = "Fourth" end,
-		"invalid identifier 'Fourth' for enum moduleA.TestEnum" )
+		"no such identifier 'Fourth' in the enum" )
 
 	-- test getting fields of the innerStruct
 	ASSERT_EQ( testStruct.innerStruct.message, "" )
@@ -75,7 +75,7 @@ function M:initialize( module )
 	ASSERT_EQ( 5, #ts.enumArray )
 	ASSERT_EQ( 'First', ts.enumArray[3] )
 
-	ASSERT_ERROR( function() ts.enumArray = { 3 } end, "integer '3' is out of range for enum moduleA.TestEnum" )
+	ASSERT_ERROR( function() ts.enumArray = { 3 } end, "3 is out of range for the enum" )
 
 	ts.typeArray = {}
 	ASSERT_EQ( 0, #ts.typeArray )

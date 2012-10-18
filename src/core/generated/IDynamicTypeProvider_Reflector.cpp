@@ -46,10 +46,8 @@ public:
 
 	void provideReflectorFor( co::IType* type_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IType* >( type_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicTypeProvider>( 0 ), range );
+		co::Any args[] = { type_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicTypeProvider>( 0 ), args, co::Any() );
 	}
 
 protected:
@@ -101,7 +99,7 @@ public:
 		return new co::IDynamicTypeProvider_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::checkInstance<co::IDynamicTypeProvider>( instance, field );
 		raiseUnexpectedMemberIndex();
@@ -115,7 +113,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::IDynamicTypeProvider* p = co::checkInstance<co::IDynamicTypeProvider>( instance, method );
 		checkNumArguments( method, args.getSize() );

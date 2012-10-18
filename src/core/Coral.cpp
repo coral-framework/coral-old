@@ -26,7 +26,14 @@ static RefPtr<System> sg_system;
 static ITypeManager* sg_typeManager( NULL );
 static IServiceManager* sg_serviceManager( NULL );
 
-Range<const std::string> getPaths()
+inline ITypeManager* getTypeManager()
+{
+	if( !sg_typeManager )
+		sg_typeManager = getSystem()->getTypes();
+	return sg_typeManager;
+}
+
+Range<std::string> getPaths()
 {
 	return sg_paths;
 }
@@ -103,9 +110,12 @@ void shutdown()
 
 IType* getType( const std::string& fullName )
 {
-	if( !sg_typeManager )
-		sg_typeManager = getSystem()->getTypes();
-	return sg_typeManager->getType( fullName );
+	return getTypeManager()->getType( fullName );
+}
+
+IArray* getArrayOf( IType* elementType )
+{
+	return getTypeManager()->getArrayOf( elementType );
 }
 
 IObject* newInstance( const std::string& fullName )
@@ -142,8 +152,8 @@ bool findFile( const std::string& moduleName, const std::string& fileName, std::
 	std::string modulePath( moduleName );
 	OS::convertDotsToDirSeps( modulePath );
 	return OS::searchFile3( getPaths(),
-				Range<const std::string>( &modulePath, 1 ),
-				Range<const std::string>( &fileName, 1 ),
+				Range<std::string>( &modulePath, 1 ),
+				Range<std::string>( &fileName, 1 ),
 				filePath );
 }
 

@@ -5,11 +5,11 @@
 
 #include <co/ITypeManager.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/CSLError.h>
-#include <co/INamespace.h>
 #include <co/ITypeTransaction.h>
-#include <co/IType.h>
+#include <co/INamespace.h>
 #include <co/IArray.h>
+#include <co/IType.h>
+#include <co/CSLError.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -48,69 +48,64 @@ public:
 
 	co::INamespace* getRootNS()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 0 ) );
-        return res.get< co::INamespace* >();
+		co::RefPtr<co::INamespace> res;
+		_provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 0 ), res );
+		return res.get();
 	}
 
 	co::ITypeTransaction* getTransaction()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 1 ) );
-        return res.get< co::ITypeTransaction* >();
+		co::RefPtr<co::ITypeTransaction> res;
+		_provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 1 ), res );
+		return res.get();
 	}
 
 	co::INamespace* findNamespace( const std::string& fullName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( fullName_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 0 ), range );
-		return res.get< co::INamespace* >();
+		co::Any args[] = { fullName_ };
+		co::RefPtr<co::INamespace> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 0 ), args, res );
+		return res.get();
 	}
 
 	co::IType* findType( const std::string& fullName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( fullName_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 1 ), range );
-		return res.get< co::IType* >();
+		co::Any args[] = { fullName_ };
+		co::RefPtr<co::IType> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 1 ), args, res );
+		return res.get();
 	}
 
 	co::IArray* getArrayOf( co::IType* elementType_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IType* >( elementType_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 2 ), range );
-		return res.get< co::IArray* >();
+		co::Any args[] = { elementType_ };
+		co::RefPtr<co::IArray> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 2 ), args, res );
+		return res.get();
 	}
 
 	co::INamespace* getNamespace( const std::string& fullName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( fullName_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 3 ), range );
-		return res.get< co::INamespace* >();
+		co::Any args[] = { fullName_ };
+		co::RefPtr<co::INamespace> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 3 ), args, res );
+		return res.get();
 	}
 
 	co::IType* getType( const std::string& typeName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( typeName_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 4 ), range );
-		return res.get< co::IType* >();
+		co::Any args[] = { typeName_ };
+		co::RefPtr<co::IType> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 4 ), args, res );
+		return res.get();
 	}
 
 	co::IType* loadType( const std::string& typeName_, std::vector<co::CSLError>& errorStack_ )
 	{
-		co::Any args[2];
-		args[0].set< const std::string& >( typeName_ );
-		args[1].set< std::vector<co::CSLError>& >( errorStack_ );
-		co::Range<co::Any const> range( args, 2 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 5 ), range );
-		return res.get< co::IType* >();
+		co::Any args[] = { typeName_, errorStack_ };
+		co::RefPtr<co::IType> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 5 ), args, res );
+		return res.get();
 	}
 
 protected:
@@ -162,13 +157,13 @@ public:
 		return new co::ITypeManager_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::ITypeManager* p = co::checkInstance<co::ITypeManager>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::INamespace* >( p->getRootNS() ); break;
-		case 1:		value.set< co::ITypeTransaction* >( p->getTransaction() ); break;
+		case 0:		value.put( p->getRootNS() ); break;
+		case 1:		value.put( p->getTransaction() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -186,7 +181,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::ITypeManager* p = co::checkInstance<co::ITypeManager>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -199,35 +194,35 @@ public:
 				{
 					const std::string& fullName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::INamespace* >( p->findNamespace( fullName_ ) );
+					res.put( p->findNamespace( fullName_ ) );
 				}
 				break;
 			case 3:
 				{
 					const std::string& fullName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::IType* >( p->findType( fullName_ ) );
+					res.put( p->findType( fullName_ ) );
 				}
 				break;
 			case 4:
 				{
 					co::IType* elementType_ = args[++argIndex].get< co::IType* >();
 					argIndex = -1;
-					res.set< co::IArray* >( p->getArrayOf( elementType_ ) );
+					res.put( p->getArrayOf( elementType_ ) );
 				}
 				break;
 			case 5:
 				{
 					const std::string& fullName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::INamespace* >( p->getNamespace( fullName_ ) );
+					res.put( p->getNamespace( fullName_ ) );
 				}
 				break;
 			case 6:
 				{
 					const std::string& typeName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::IType* >( p->getType( typeName_ ) );
+					res.put( p->getType( typeName_ ) );
 				}
 				break;
 			case 7:
@@ -235,7 +230,7 @@ public:
 					const std::string& typeName_ = args[++argIndex].get< const std::string& >();
 					std::vector<co::CSLError>& errorStack_ = args[++argIndex].get< std::vector<co::CSLError>& >();
 					argIndex = -1;
-					res.set< co::IType* >( p->loadType( typeName_, errorStack_ ) );
+					res.put( p->loadType( typeName_, errorStack_ ) );
 				}
 				break;
 			default:

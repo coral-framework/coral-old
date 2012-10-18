@@ -58,7 +58,7 @@ bool moduleA::Vec2D_Adapter::equals( moduleA::Vec2D& self, const moduleA::Vec2D&
 	return self.x == other.x && self.y == other.y;
 }
 
-const moduleA::Vec2D& moduleA::Vec2D_Adapter::testInOut( moduleA::Vec2D& self,
+moduleA::Vec2D moduleA::Vec2D_Adapter::testInOut( moduleA::Vec2D& self,
 		const moduleA::Vec2D& a, moduleA::Vec2D& b, moduleA::Vec2D& c )
 {
 	c = b;
@@ -66,7 +66,7 @@ const moduleA::Vec2D& moduleA::Vec2D_Adapter::testInOut( moduleA::Vec2D& self,
 	return self;
 }
 
-co::IService* moduleA::Vec2D_Adapter::dummyMethod( moduleA::Vec2D&, const co::Any& in, co::Any& out )
+co::IService* moduleA::Vec2D_Adapter::dummyMethod( moduleA::Vec2D&, const co::Any& in, co::AnyValue& out )
 {
 	out = in;
 	return NULL;

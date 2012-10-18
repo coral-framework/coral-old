@@ -44,26 +44,30 @@ public:
 
 	bool getIsIn()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 0 ) );
-        return res.get< bool >();
+		bool res;
+		_provider->dynamicGetField( _cookie, getField<co::IParameter>( 0 ), res );
+		return res;
 	}
 
 	bool getIsOut()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 1 ) );
-        return res.get< bool >();
+		bool res;
+		_provider->dynamicGetField( _cookie, getField<co::IParameter>( 1 ), res );
+		return res;
 	}
 
-	const std::string& getName()
+	std::string getName()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 2 ) );
-        return res.get< const std::string& >();
+		std::string res;
+		_provider->dynamicGetField( _cookie, getField<co::IParameter>( 2 ), res );
+		return res;
 	}
 
 	co::IType* getType()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IParameter>( 3 ) );
-        return res.get< co::IType* >();
+		co::RefPtr<co::IType> res;
+		_provider->dynamicGetField( _cookie, getField<co::IParameter>( 3 ), res );
+		return res.get();
 	}
 
 protected:
@@ -115,15 +119,15 @@ public:
 		return new co::IParameter_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::IParameter* p = co::checkInstance<co::IParameter>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< bool >( p->getIsIn() ); break;
-		case 1:		value.set< bool >( p->getIsOut() ); break;
-		case 2:		value.set< const std::string& >( p->getName() ); break;
-		case 3:		value.set< co::IType* >( p->getType() ); break;
+		case 0:		value.put( p->getIsIn() ); break;
+		case 1:		value.put( p->getIsOut() ); break;
+		case 2:		value.put( p->getName() ); break;
+		case 3:		value.put( p->getType() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -143,7 +147,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::checkInstance<co::IParameter>( instance, method );
 		raiseUnexpectedMemberIndex();

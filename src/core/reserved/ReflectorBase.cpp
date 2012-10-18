@@ -15,7 +15,9 @@
 
 namespace co {
 
-// ------ ReflectorBase provides a facet named 'reflector', of type co::IReflector ------ //
+/*****************************************************************************/
+/* ReflectorBase's 'reflector' facet, of type co::IReflector                 */
+/*****************************************************************************/
 
 IInterface* ReflectorBase_co_Reflector::getInterface()
 {
@@ -29,7 +31,9 @@ IPort* ReflectorBase_co_Reflector::getFacet()
 	return facet;
 }
 
-// ------ ReflectorBase ------ //
+/*****************************************************************************/
+/* ReflectorBase                                                             */
+/*****************************************************************************/
 
 ReflectorBase::ReflectorBase()
 {
@@ -82,19 +86,50 @@ void ReflectorBase::setServiceAt( IPort* receptacle, IService* )
 	raiseUnexpectedPortIndex();
 }
 
-void ReflectorBase::createValues( void*, size_t )
+void ReflectorBase::createValues( void* ptr, size_t numValues )
 {
-	raiseNotSupportedException();
+	TypeKind kind = getType()->getKind();
+	if( kind == TK_INTERFACE )
+	{
+		for( size_t i = 0; i < numValues; ++i )
+			new( reinterpret_cast<RefPtr<IService>*>( ptr ) + i ) RefPtr<IService>();
+	}
+	else
+	{
+		assert( false );
+		raiseNotSupportedException();
+	}
 }
 
-void ReflectorBase::copyValues( const void*, void*, size_t )
+void ReflectorBase::copyValues( const void* fromPtr, void* toPtr, size_t numValues )
 {
-	raiseNotSupportedException();
+	TypeKind kind = getType()->getKind();
+	if( kind == TK_INTERFACE )
+	{
+		for( size_t i = 0; i < numValues; ++i )
+			reinterpret_cast<RefPtr<IService>*>( toPtr )[i] =
+				reinterpret_cast<const RefPtr<IService>*>( fromPtr )[i];
+	}
+	else
+	{
+		assert( false );
+		raiseNotSupportedException();
+	}
 }
 
-void ReflectorBase::destroyValues( void*, size_t )
+void ReflectorBase::destroyValues( void* ptr, size_t numValues )
 {
-	raiseNotSupportedException();
+	TypeKind kind = getType()->getKind();
+	if( kind == TK_INTERFACE )
+	{
+		for( size_t i = 0; i < numValues; ++i )
+			reinterpret_cast<RefPtr<IService>*>( ptr )[i].~RefPtr();
+	}
+	else
+	{
+		assert( false );
+		raiseNotSupportedException();
+	}
 }
 
 IObject* ReflectorBase::newInstance()
@@ -109,7 +144,7 @@ IService* ReflectorBase::newDynamicProxy( IDynamicServiceProvider* )
 	return NULL;
 }
 
-void ReflectorBase::getField( const Any&, IField*, Any& )
+void ReflectorBase::getField( const Any&, IField*, const Any& )
 {
 	raiseNotSupportedException();
 }
@@ -119,7 +154,7 @@ void ReflectorBase::setField( const Any&, IField*, const Any& )
 	raiseNotSupportedException();
 }
 
-void ReflectorBase::invoke( const Any&, IMethod*, Range<Any const>, Any& )
+void ReflectorBase::invoke( const Any&, IMethod*, Range<Any>, const Any& )
 {
 	raiseNotSupportedException();
 }
@@ -168,5 +203,32 @@ void ReflectorBase::raiseNotSupportedException()
 	throw co::NotSupportedException( "operation not supported by this reflector" );
 }
 
+/*****************************************************************************/
+/* Auxiliary Functions                                                       */
+/*****************************************************************************/
+
+void* checkInstance( const Any& instance, ICompositeType* ct, IMember* member )
+{
+	assert( ct );
+
+	Any in = instance.asIn();
+	if( in.isNull() )
+		throw IllegalArgumentException( "illegal null instance" );
+
+	if( !in.getType()->isA( ct ) )
+		CORAL_THROW( IllegalArgumentException, "illegal instance (" << ct->getFullName()
+				<< " expected, got " << in.getType()->getFullName() << ")" );
+
+	if( !member )
+		throw co::IllegalArgumentException( "illegal null member" );
+
+	ICompositeType* owner = member->getOwner();
+	if( owner != ct )
+		CORAL_THROW( IllegalArgumentException, "member '" << member->getName()
+					<< "' belongs to '" << owner->getFullName()
+					<< "', not to '" << ct->getFullName() << "'" );
+
+	return in.state.data.ptr;
+}
 
 } // namespace co

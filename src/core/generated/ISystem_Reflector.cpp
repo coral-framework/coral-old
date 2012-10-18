@@ -5,9 +5,9 @@
 
 #include <co/ISystem.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/ITypeManager.h>
-#include <co/IServiceManager.h>
 #include <co/IModuleManager.h>
+#include <co/IServiceManager.h>
+#include <co/ITypeManager.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -46,46 +46,48 @@ public:
 
 	co::IModuleManager* getModules()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 0 ) );
-        return res.get< co::IModuleManager* >();
+		co::RefPtr<co::IModuleManager> res;
+		_provider->dynamicGetField( _cookie, getField<co::ISystem>( 0 ), res );
+		return res.get();
 	}
 
 	co::IServiceManager* getServices()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 1 ) );
-        return res.get< co::IServiceManager* >();
+		co::RefPtr<co::IServiceManager> res;
+		_provider->dynamicGetField( _cookie, getField<co::ISystem>( 1 ), res );
+		return res.get();
 	}
 
 	co::SystemState getState()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 2 ) );
-        return res.get< co::SystemState >();
+		co::SystemState res;
+		_provider->dynamicGetField( _cookie, getField<co::ISystem>( 2 ), res );
+		return res;
 	}
 
 	co::ITypeManager* getTypes()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ISystem>( 3 ) );
-        return res.get< co::ITypeManager* >();
+		co::RefPtr<co::ITypeManager> res;
+		_provider->dynamicGetField( _cookie, getField<co::ISystem>( 3 ), res );
+		return res.get();
 	}
 
-	void setupBase( co::Range<std::string const> requiredModules_ )
+	void setupBase( co::Range<std::string> requiredModules_ )
 	{
-		co::Any args[1];
-		args[0].set< co::Range<std::string const> >( requiredModules_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 0 ), range );
+		co::Any args[] = { requiredModules_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 0 ), args, co::Any() );
 	}
 
 	void setupPresentation()
 	{
-		co::Range<co::Any const> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 1 ), range );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 1 ), args, co::Any() );
 	}
 
 	void tearDown()
 	{
-		co::Range<co::Any const> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 2 ), range );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 2 ), args, co::Any() );
 	}
 
 protected:
@@ -137,15 +139,15 @@ public:
 		return new co::ISystem_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::ISystem* p = co::checkInstance<co::ISystem>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::IModuleManager* >( p->getModules() ); break;
-		case 1:		value.set< co::IServiceManager* >( p->getServices() ); break;
-		case 2:		value.set< co::SystemState >( p->getState() ); break;
-		case 3:		value.set< co::ITypeManager* >( p->getTypes() ); break;
+		case 0:		value.put( p->getModules() ); break;
+		case 1:		value.put( p->getServices() ); break;
+		case 2:		value.put( p->getState() ); break;
+		case 3:		value.put( p->getTypes() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -165,7 +167,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::ISystem* p = co::checkInstance<co::ISystem>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -176,7 +178,7 @@ public:
 			{
 			case 4:
 				{
-					co::Range<std::string const> requiredModules_ = args[++argIndex].get< co::Range<std::string const> >();
+					co::Range<std::string> requiredModules_ = args[++argIndex].get< co::Range<std::string> >();
 					argIndex = -1;
 					p->setupBase( requiredModules_ );
 				}

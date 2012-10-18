@@ -23,8 +23,6 @@ Os tipos básicos de CSL são traduzidos para C++ seguindo a tabela abaixo:
 		<tr><td>uint16</td><td>co::uint16</td></tr>
 		<tr><td>int32</td><td>co::int32</td></tr>
 		<tr><td>uint32</td><td>co::uint32</td></tr>
-		<tr><td>int64</td><td>co::int64</td></tr>
-		<tr><td>uint64</td><td>co::uint64</td></tr>
 		<tr><td>float</td><td>float</td></tr>
 		<tr><td>double</td><td>double</td></tr>
 		<tr><td>string</td><td>std::string</td></tr>
@@ -492,7 +490,7 @@ component File
  */
 interface User
 {
-	readonly attribute uint64 id;
+	readonly attribute uint32 id;
 
 	attribute string email;
 
@@ -534,7 +532,7 @@ interface IServiceManager
 class User
 {
 public:
-	virtual co::uint64 getId() = 0;
+	virtual co::uint32 getId() = 0;
 
 	virtual const std::string& getEmail() = 0;
 	virtual void setEmail( const std::string& email ) = 0;

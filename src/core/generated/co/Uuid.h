@@ -8,9 +8,9 @@
 
 #include <co/TypeTraits.h>
 
-		namespace co {
-			class Uuid;
-		} // namespace co
+
+		#include <co/reserved/Uuid.h>
+
 	
 namespace co {
 template<> struct kindOf<co::Uuid> : public kindOfBase<TK_NATIVECLASS> {};

@@ -94,7 +94,7 @@ TEST( AnnotationTests, documentation )
 
 	EXPECT_EQ( "First annotation", doc->getValue() );
 
-	co::Range<co::IAnnotation* const> annotations = t->getAnnotations();
+	co::Range<co::IAnnotation*> annotations = t->getAnnotations();
 	ASSERT_EQ( 3, annotations.getSize() );
 	ASSERT_EQ( "co.IDocumentation", annotations[0]->getInterface()->getFullName() );
 	ASSERT_EQ( "co.IDocumentation", annotations[1]->getInterface()->getFullName() );
@@ -132,6 +132,6 @@ TEST( AnnotationTests, invalidValueType )
 {
 	CSL_TEST_BEGIN( "AnnotationTests.InvalidValueType1" )
 	CSL_EXPECT_ERROR( "error setting annotation field 'value'", "InvalidValueType1.csl", 1 )
-	CSL_EXPECT_ERROR( "illegal cast from 'double' to 'const std::string&'", "InvalidValueType1.csl", 1 )
+	CSL_EXPECT_ERROR( "illegal cast from 'in double' to 'in string'", "InvalidValueType1.csl", 1 )
 	CSL_TEST_END()
 }

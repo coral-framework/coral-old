@@ -17,8 +17,7 @@ Component.shift.testArrayOfAnys = Component.shift.testAny
 Component.shift.testArrayOfStructs = Component.shift.testAny
 
 function Component.noret:testAny( a, b )
-	local tp = type( a )
-	if tp == 'table' then
+	if type( a ) == 'table' then
 		ASSERT_EQ( #a, #b )
 		for i = 1, #a do
 			ASSERT_EQ( a[i], b[i] )
@@ -90,8 +89,6 @@ function M:initialize( module )
 	local x, y = const:testAny( 5.5, cslErrorB )
 	ASSERT_EQ( x, true )
 	ASSERT_EQ( y, "str" )
-
-	ASSERT_ERROR( function() const:testAny( 3, { 1, 2 } ) end, "unsupported conversion from a Lua table to a Coral 'any'" )
 
 	x, y = shift:testAny( cslErrorA, cslErrorB )
 	ASSERT_EQ( x.message, cslErrorA.message )

@@ -26,19 +26,19 @@ public:
 
 	//! Appends the given ports to the port list. After calling this method
 	//! the port list must be re-sorted using sortPorts().
-	void addPorts( Range<IPort* const> ports );
+	void addPorts( Range<IPort*> ports );
 
 	//! Sorts the port list by (isFacet, name) and updates _firstReceptacle.
 	void sortPorts();
 
 	// ICompositeType methods:
-	Range<IMember* const> getMembers();
+	Range<IMember*> getMembers();
 	IMember* getMember( const std::string& name );
 
 	// IComponent methods:
-	Range<IPort* const> getPorts();
-	Range<IPort* const> getFacets();
-	Range<IPort* const> getReceptacles();
+	Range<IPort*> getPorts();
+	Range<IPort*> getFacets();
+	Range<IPort*> getReceptacles();
 
 private:
 	RefVector<IPort> _ports; // dual sorted vector: facets first, then receptacles.

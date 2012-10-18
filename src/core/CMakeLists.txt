@@ -115,25 +115,22 @@ source_group( "@Generated" FILES ${GENERATED_MODULE_FILES} )
 source_group( "@Generated\\co" FILES ${MAPPING_HEADER_FILES} )
 
 file( GLOB moduleFiles Module*.* )
-source_group( "Module System" FILES ${moduleFiles} )
+source_group( "Modules" FILES ${moduleFiles} )
 
-file( GLOB typeFiles Annotations.* *Builder.* Namespace.* Signature* Type* Uuid* )
-source_group( "Type System" FILES ${typeFiles} )
+file( GLOB typeFiles Annotations* *Builder* Namespace* *Reflector* Signature* Type* Uuid* )
+source_group( "Types" FILES ${typeFiles} )
 
 file( GLOB cslFiles csl/*.h csl/*.cpp csl/*.hh csl/*.cc )
-source_group( "Type System\\CSL" FILES TypeLoader.h TypeLoader.cpp csl/CSL.l csl/CSL.y ${cslFiles} )
+source_group( "Types\\CSL" FILES TypeLoader.h TypeLoader.cpp csl/CSL.l csl/CSL.y ${cslFiles} )
 
-file( GLOB reflectionFiles Any.* *Reflector.* )
-source_group( "Type System\\Reflection" FILES Annotations.cpp ${reflectionFiles} )
-
-file( GLOB typesFiles types/*.h types/*.cpp )
-source_group( "Type System\\Types" FILES ${typesFiles} )
+file( GLOB typesFiles Annotations.* types/*.h types/*.cpp )
+source_group( "Types\\Descriptors" FILES ${typesFiles} )
 
 file( GLOB reservedFiles reserved/*.h reserved/*.cpp )
-source_group( "Reserved API" FILES ${reservedFiles} )
+source_group( "Reserved" FILES ${reservedFiles} )
 
 file( GLOB utilsFiles utils/*.h utils/*.cpp )
-SOURCE_GROUP( "Utility Classes" FILES ${utilsFiles} )
+SOURCE_GROUP( "Utility" FILES ${utilsFiles} )
 
 ################################################################################
 # Install Rules

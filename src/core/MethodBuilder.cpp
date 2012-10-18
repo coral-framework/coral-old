@@ -43,7 +43,7 @@ ITypeBuilder* MethodBuilder::getTypeBuilder()
 	return _typeBuilder.get();
 }
 
-const std::string& MethodBuilder::getMethodName()
+std::string MethodBuilder::getMethodName()
 {
 	return _name;
 }
@@ -64,7 +64,7 @@ void MethodBuilder::defineParameter( const std::string& name, IType* type, bool 
 	if( !LexicalUtils::isValidIdentifier( name ) )
 		CORAL_THROW( IllegalNameException, "parameter name '" << name << "' is not a valid identifier" );
 
-	for( Range<IParameter* const> r( _parameters ); r; r.popFirst() )
+	for( Range<IParameter*> r( _parameters ); r; r.popFirst() )
 		if( r.getFirst()->getName() == name )
 			CORAL_THROW( IllegalNameException, "parameter '" << name << "' defined twice in method '" << _name << "()'" );
 
@@ -72,9 +72,9 @@ void MethodBuilder::defineParameter( const std::string& name, IType* type, bool 
 		CORAL_THROW( IllegalArgumentException, "illegal null parameter type" );
 
 	TypeKind kind = type->getKind();
-	if( kind == TK_EXCEPTION || kind == TK_COMPONENT )
-		CORAL_THROW( IllegalArgumentException, "illegal parameter '" << name << "' - " <<
-					( kind == TK_EXCEPTION ? "exceptions" : "components" ) << " cannot be passed as parameters" );
+	if( !isData( kind ) )
+		CORAL_THROW( IllegalArgumentException, "illegal parameter '"
+				<< name << "' of non-data type '" << kind << "'" );
 
 	if( !input && !output )
 		CORAL_THROW( IllegalArgumentException, "parameter is neither input nor output" );

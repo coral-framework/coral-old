@@ -19,13 +19,13 @@
 
 namespace co {
 
-IAnnotation* selectAnnotation( Range<IAnnotation* const> annotations, IInterface* requestedType )
+IAnnotation* selectAnnotation( Range<IAnnotation*> annotations, IInterface* requestedType )
 {
 	if( !requestedType )
 		throw IllegalArgumentException( "illegal null requestedType" );
 
 	for( ; annotations; annotations.popFirst() )
-		if( annotations.getFirst()->getInterface()->isSubTypeOf( requestedType ) )
+		if( annotations.getFirst()->getInterface()->isA( requestedType ) )
 			return annotations.getFirst();
 
 	return NULL;
@@ -33,26 +33,26 @@ IAnnotation* selectAnnotation( Range<IAnnotation* const> annotations, IInterface
 
 // ------ TypeImpl -------------------------------------------------------------
 
-void TypeImpl::setType( INamespace* parent, const std::string& name, TypeKind kind )
+void TypeImpl::setNamespace( INamespace* ns )
 {
-	assert( _kind == TK_NONE );
-	assert( _namespace == NULL );
-
-	_namespace = parent;
-	_name = name;
-	_kind = kind;
-
-	// compute our 'fullName'
-	if( _namespace->getParentNamespace() )
+	_namespace = ns;
+	if( _fullName.empty() )
 	{
-		// we're not in the global namespace
-		const std::string& namespaceFullName = _namespace->getFullName();
-		_fullName.reserve( namespaceFullName.length() + name.length() + 1 );
-		_fullName = namespaceFullName;
-		_fullName.push_back( '.' );
+		if( ns->getParentNamespace() ) // are we in the root ns?
+		{
+			_fullName = ns->getFullName();
+			_fullName.push_back( '.' );
+		}
+		_fullName.append( _name );
 	}
+}
 
-	_fullName.append( name );
+void TypeImpl::setType( TypeKind kind, const std::string& name, INamespace* ns )
+{
+	assert( _kind == TK_NULL );
+	_kind = kind;
+	_name = name;
+	setNamespace( ns );
 }
 
 IReflector* TypeImpl::getReflector( IType* myType )
@@ -60,9 +60,8 @@ IReflector* TypeImpl::getReflector( IType* myType )
 	if( _reflector.isValid() )
 		return _reflector.get();
 
-	if( _kind < TK_STRUCT )
+	if( hasBuiltInReflector( _kind ) )
 	{
-		// basic reflectors are instantiated on demand
 		_reflector = BasicReflector::create( myType );
 		return _reflector.get();
 	}
@@ -144,6 +143,13 @@ void TypeImpl::calculateSignatures( IType* myType )
 }
 
 // ------ co.Type --------------------------------------------------------------
+
+TypeComponent::TypeComponent( TypeKind kind )
+{
+	_kind = kind;
+	_name = TK_STRINGS[kind];
+	_fullName = _name;
+}
 
 TypeComponent::~TypeComponent()
 {

@@ -14,11 +14,11 @@ interface IDynamicServiceProvider
 	IPort dynamicGetFacet( in int32 dynFacetId );
 
 	// Retrieves a field value from a dynamic service.
-	any dynamicGetField( in int32 dynFacetId, in IField field );
+	void dynamicGetField( in int32 dynFacetId, in IField field, in any value );
 
 	// Sets the value of a field in a dynamic service.
 	void dynamicSetField( in int32 dynFacetId, in IField field, in any value );
 
 	// Calls a method from a dynamic service.
-	any dynamicInvoke( in int32 dynFacetId, in IMethod method, in any[] args );
+	void dynamicInvoke( in int32 dynFacetId, in IMethod method, in any[] args, in any result );
 };

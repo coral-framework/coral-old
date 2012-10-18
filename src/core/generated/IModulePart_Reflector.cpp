@@ -44,42 +44,32 @@ public:
 
 	void disintegrate( co::IModule* module_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IModule* >( module_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 0 ), range );
+		co::Any args[] = { module_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 0 ), args, co::Any() );
 	}
 
 	void dispose( co::IModule* module_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IModule* >( module_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 1 ), range );
+		co::Any args[] = { module_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 1 ), args, co::Any() );
 	}
 
 	void initialize( co::IModule* module_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IModule* >( module_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 2 ), range );
+		co::Any args[] = { module_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 2 ), args, co::Any() );
 	}
 
 	void integrate( co::IModule* module_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IModule* >( module_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 3 ), range );
+		co::Any args[] = { module_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 3 ), args, co::Any() );
 	}
 
 	void integratePresentation( co::IModule* module_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IModule* >( module_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 4 ), range );
+		co::Any args[] = { module_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePart>( 4 ), args, co::Any() );
 	}
 
 protected:
@@ -131,7 +121,7 @@ public:
 		return new co::IModulePart_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::checkInstance<co::IModulePart>( instance, field );
 		raiseUnexpectedMemberIndex();
@@ -145,7 +135,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::IModulePart* p = co::checkInstance<co::IModulePart>( instance, method );
 		checkNumArguments( method, args.getSize() );

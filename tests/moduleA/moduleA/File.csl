@@ -6,18 +6,7 @@ native class File
 	<c++
 		#include <cstdio>
 		namespace moduleA {
-			class File
-			{
-			public:
-				File() : _f( NULL ) {;}
-				File( FILE* f ) : _f( f ) {;}
-				operator FILE*() { return _f; }
-				File& operator=( FILE* f ) { _f = f; return *this; }
-				bool operator==( FILE* f ) { return _f == f; }
-				bool operator!=( FILE* f ) { return !( *this == f ); }
-			private:
-				FILE* _f;
-			};
+			typedef FILE* File;
 		} // namespace moduleA
 	c++>
 

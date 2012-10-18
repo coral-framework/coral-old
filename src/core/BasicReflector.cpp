@@ -17,6 +17,16 @@ IType* BasicReflector::getType()
 	return _type;
 }
 
+// ------ NullReflector --------------------------------------------------------
+
+class NullReflector : public BasicReflector
+{
+public:
+	NullReflector( IType* t ) : BasicReflector( t ) {;}
+
+	uint32 getSize() { return 0; }
+};
+
 // ------ PODReflector ---------------------------------------------------------
 
 template<typename T>
@@ -45,7 +55,7 @@ public:
 	}
 };
 
-// ------ ClassReflector ---------------------------------------------------------
+// ------ ClassReflector -------------------------------------------------------
 
 template<typename T>
 class ClassReflector : public BasicReflector
@@ -79,9 +89,72 @@ public:
 class ArrayReflector : public BasicReflector
 {
 public:
-	ArrayReflector( IType* t ) : BasicReflector( t ) {;}
+	typedef std::vector<uint8> PseudoVector;
 
-	uint32 getSize() { return sizeof(std::vector<int>); }
+	ArrayReflector( IType* t ) : BasicReflector( t )
+	{
+		IType* elemType = static_cast<IArray*>( t )->getElementType();
+		_elemReflector = elemType->getReflector();
+		_elemSize = _elemReflector->getSize();
+	}
+
+	uint32 getSize() { return sizeof(PseudoVector); }
+
+	void createValues( void* ptr, size_t numValues )
+	{
+		for( size_t i = 0; i < numValues; ++i )
+			new( reinterpret_cast<PseudoVector*>( ptr ) + i ) PseudoVector();
+	}
+
+	void copyValues( const void* fromPtr, void* toPtr, size_t numValues )
+	{
+		for( size_t i = 0; i < numValues; ++i )
+		{
+			Any toArray( false, _type, toPtr );
+			const PseudoVector* fromV = reinterpret_cast<const PseudoVector*>( fromPtr );
+			size_t numElements = sizeToElements( fromV->size() );
+			toArray.resize( numElements );
+			if( numElements > 0 )
+				_elemReflector->copyValues( &fromV->front(), toArray[0].state.data.ptr, numElements );
+		}
+	}
+
+	void destroyValues( void* ptr, size_t numValues )
+	{
+		for( size_t i = 0; i < numValues; ++i )
+			destroyVector( reinterpret_cast<PseudoVector*>( ptr ) + i );
+	}
+
+private:
+	inline size_t sizeToElements( size_t totalSize )
+	{
+		assert( totalSize % _elemSize == 0 );
+		return totalSize / _elemSize;
+	}
+
+	PseudoVector* createVector( void* ptr, size_t numElements )
+	{
+		PseudoVector* vec = new( ptr ) PseudoVector( numElements * _elemSize );
+		if( numElements > 0 )
+			_elemReflector->createValues( &vec->front(), numElements );
+		return vec;
+	}
+
+	void destroyVector( void* ptr )
+	{
+		PseudoVector* vec = reinterpret_cast<PseudoVector*>( ptr );
+		size_t totalSize = vec->size();
+		if( totalSize > 0 )
+		{
+			size_t numElements = sizeToElements( totalSize );
+			_elemReflector->destroyValues( &vec->front(), numElements );
+		}
+		vec->~vector();
+	}
+
+private:
+	size_t _elemSize;
+	RefPtr<IReflector> _elemReflector;
 };
 
 // ------ InternalComponentReflector -------------------------------------------
@@ -104,31 +177,27 @@ public:
 IReflector* BasicReflector::create( IType* t )
 {
 	assert( t );
-	
-	IReflector* r = NULL;
 	switch( t->getKind() )
 	{
-	case TK_ANY:			r = new ClassReflector<Any>( t ); break;
-	case TK_BOOLEAN:		r = new PODReflector<bool>( t ); break;
-	case TK_INT8:			r = new PODReflector<int8>( t ); break;
-	case TK_UINT8:			r = new PODReflector<uint8>( t ); break;
-	case TK_INT16:			r = new PODReflector<int16>( t ); break;
-	case TK_UINT16:			r = new PODReflector<uint16>( t ); break;
-	case TK_INT32:			r = new PODReflector<int32>( t ); break;
-	case TK_UINT32:			r = new PODReflector<uint32>( t ); break;
-	case TK_INT64:			r = new PODReflector<int64>( t ); break;
-	case TK_UINT64:			r = new PODReflector<uint64>( t ); break;
-	case TK_FLOAT:			r = new PODReflector<float>( t ); break;
-	case TK_DOUBLE:			r = new PODReflector<double>( t ); break;
-	case TK_STRING:			r = new ClassReflector<std::string>( t ); break;
-	case TK_ARRAY:			r = new ArrayReflector( t ); break;
-	case TK_ENUM:			r = new PODReflector<uint32>( t ); break;
-	case TK_COMPONENT:		r = new InternalComponentReflector( t ); break;
-	default: break;
+	case TK_NULL:		return new NullReflector( t );
+	case TK_BOOL:		return new PODReflector<bool>( t );
+	case TK_INT8:		return new PODReflector<int8>( t );
+	case TK_INT16:		return new PODReflector<int16>( t );
+	case TK_INT32:		return new PODReflector<int32>( t );
+	case TK_UINT8:		return new PODReflector<uint8>( t );
+	case TK_UINT16:		return new PODReflector<uint16>( t );
+	case TK_UINT32:		return new PODReflector<uint32>( t );
+	case TK_FLOAT:		return new PODReflector<float>( t );
+	case TK_DOUBLE:		return new PODReflector<double>( t );
+	case TK_ENUM:		return new PODReflector<uint32>( t );
+	case TK_STRING:		return new ClassReflector<std::string>( t );
+	case TK_ANY:		return new ClassReflector<AnyValue>( t );
+	case TK_ARRAY:		return new ArrayReflector( t );
+	case TK_COMPONENT:	return new InternalComponentReflector( t );
+	default:
+		assert( false );
 	}
-
-	assert( r );
-	return r;
+	throw NotSupportedException( "unexpected type kind" );
 }
 
 } // namespace co

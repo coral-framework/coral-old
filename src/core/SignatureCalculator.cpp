@@ -64,42 +64,24 @@ void SignatureCalculator::calculateSignatures()
 
 	switch( _type->getKind() )
 	{
-	case TK_ANY:
-	case TK_BOOLEAN:
-	case TK_INT8:
-	case TK_UINT8:
-	case TK_INT16:
-	case TK_UINT16:
-	case TK_INT32:
-	case TK_UINT32:
-	case TK_INT64:
-	case TK_UINT64:
-	case TK_FLOAT:
-	case TK_DOUBLE:
-	case TK_STRING:
-		// empty
-		break;
-	case TK_ARRAY:
-		fillArraySignatureData();
-		break;
-	case TK_ENUM:
-		fillEnumSignatureData();
-		break;
-	case TK_EXCEPTION:
-		// empty
-		break;
-	case TK_STRUCT:
-		fillStructSignatureData();
-		break;
-	case TK_NATIVECLASS:
-		fillNativeClassSignatureData();
-		break;
-	case TK_INTERFACE:
-		fillInterfaceSignatureData();
-		break;
-	case TK_COMPONENT:
-		fillComponentSignatureData();
-		break;
+	case TK_BOOL:			break;
+	case TK_INT8:			break;
+	case TK_INT16:			break;
+	case TK_INT32:			break;
+	case TK_UINT8:			break;
+	case TK_UINT16:			break;
+	case TK_UINT32:			break;
+	case TK_FLOAT:			break;
+	case TK_DOUBLE:			break;
+	case TK_ENUM:			fillEnumSignatureData(); break;
+	case TK_STRING:			break;
+	case TK_ANY:			break;
+	case TK_ARRAY:			fillArraySignatureData(); break;
+	case TK_STRUCT:			fillStructSignatureData(); break;
+	case TK_NATIVECLASS:	fillNativeClassSignatureData(); break;
+	case TK_INTERFACE:		fillInterfaceSignatureData(); break;
+	case TK_COMPONENT:		fillComponentSignatureData(); break;
+	case TK_EXCEPTION:		break;
 	default:
 		assert( false );
 	}
@@ -119,7 +101,7 @@ void SignatureCalculator::fillArraySignatureData()
 void SignatureCalculator::fillEnumSignatureData()
 {
 	IEnum* enumType = static_cast<IEnum*>( _type );
-	Range<std::string const> range = enumType->getIdentifiers();
+	Range<std::string> range = enumType->getIdentifiers();
 	for( ; range; range.popFirst() )
 	{
 		addDataToSignatures( range.getFirst() );
@@ -132,7 +114,7 @@ void SignatureCalculator::fillEnumSignatureData()
 void SignatureCalculator::fillStructSignatureData()
 {
 	IStruct* structType = static_cast<IStruct*>( _type );
-	Range<IField* const> fields = structType->getFields();
+	Range<IField*> fields = structType->getFields();
 	for( ; fields; fields.popFirst() )
 	{
 		IField* ai = fields.getFirst();
@@ -172,7 +154,7 @@ void SignatureCalculator::fillComponentSignatureData()
 {
 	IComponent* component = static_cast<IComponent*>( _type );
 
-	Range<IPort* const> interfaces = component->getPorts();
+	Range<IPort*> interfaces = component->getPorts();
 	for( ; interfaces; interfaces.popFirst() )
 	{
 		IPort* itf = interfaces.getFirst();
@@ -192,7 +174,7 @@ void SignatureCalculator::fillClassTypeData()
 {
 	IClassType* classType = static_cast<IClassType*>( _type );
 
-	Range<IField* const> fields = classType->getFields();
+	Range<IField*> fields = classType->getFields();
 	for( ; fields; fields.popFirst() )
 	{
 		IField* ai = fields.getFirst();
@@ -204,7 +186,7 @@ void SignatureCalculator::fillClassTypeData()
 		addDataToSignatures( ai->getName() );
 	}
 
-	Range<IMethod* const> methods = classType->getMethods();
+	Range<IMethod*> methods = classType->getMethods();
 	for( ; methods; methods.popFirst() )
 	{
 		IMethod* mi = methods.getFirst();
@@ -217,7 +199,7 @@ void SignatureCalculator::fillClassTypeData()
 
 		addDataToSignatures( mi->getName() );
 
-		Range<IParameter* const> parameters = mi->getParameters();
+		Range<IParameter*> parameters = mi->getParameters();
 		for( ; parameters; parameters.popFirst() )
 		{
 			IParameter* pi = parameters.getFirst();

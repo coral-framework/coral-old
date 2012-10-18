@@ -44,49 +44,42 @@ public:
 
 	// co.IMethodBuilder Methods:
 
-	const std::string& getMethodName()
+	std::string getMethodName()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IMethodBuilder>( 0 ) );
-        return res.get< const std::string& >();
+		std::string res;
+		_provider->dynamicGetField( _cookie, getField<co::IMethodBuilder>( 0 ), res );
+		return res;
 	}
 
 	co::ITypeBuilder* getTypeBuilder()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IMethodBuilder>( 1 ) );
-        return res.get< co::ITypeBuilder* >();
+		co::RefPtr<co::ITypeBuilder> res;
+		_provider->dynamicGetField( _cookie, getField<co::IMethodBuilder>( 1 ), res );
+		return res.get();
 	}
 
 	void createMethod()
 	{
-		co::Range<co::Any const> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 0 ), range );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 0 ), args, co::Any() );
 	}
 
 	void defineException( co::IException* exceptionType_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IException* >( exceptionType_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 1 ), range );
+		co::Any args[] = { exceptionType_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 1 ), args, co::Any() );
 	}
 
 	void defineParameter( const std::string& name_, co::IType* type_, bool input_, bool output_ )
 	{
-		co::Any args[4];
-		args[0].set< const std::string& >( name_ );
-		args[1].set< co::IType* >( type_ );
-		args[2].set< bool >( input_ );
-		args[3].set< bool >( output_ );
-		co::Range<co::Any const> range( args, 4 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 2 ), range );
+		co::Any args[] = { name_, type_, input_, output_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 2 ), args, co::Any() );
 	}
 
 	void defineReturnType( co::IType* type_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IType* >( type_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 3 ), range );
+		co::Any args[] = { type_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 3 ), args, co::Any() );
 	}
 
 protected:
@@ -138,13 +131,13 @@ public:
 		return new co::IMethodBuilder_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::IMethodBuilder* p = co::checkInstance<co::IMethodBuilder>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< const std::string& >( p->getMethodName() ); break;
-		case 1:		value.set< co::ITypeBuilder* >( p->getTypeBuilder() ); break;
+		case 0:		value.put( p->getMethodName() ); break;
+		case 1:		value.put( p->getTypeBuilder() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -162,7 +155,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::IMethodBuilder* p = co::checkInstance<co::IMethodBuilder>( instance, method );
 		checkNumArguments( method, args.getSize() );

@@ -24,7 +24,7 @@ class IRecordType : public co::ICompositeType
 public:
 	virtual ~IRecordType() {;}
 
-	virtual co::Range<co::IField* const> getFields() = 0;
+	virtual co::Range<co::IField*> getFields() = 0;
 };
 
 } // namespace co

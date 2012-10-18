@@ -75,12 +75,12 @@ void ModuleManager::updateModules( ModuleState state )
 	}
 }
 
-Range<IModule* const> ModuleManager::getModules()
+Range<IModule*> ModuleManager::getModules()
 {
 	return _modules;
 }
 
-Range<IModulePartLoader* const> ModuleManager::getLoaders()
+Range<IModulePartLoader*> ModuleManager::getLoaders()
 {
 	return _loaders;
 }

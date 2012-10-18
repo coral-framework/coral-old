@@ -5,8 +5,8 @@
 
 #include <lua/IInterceptor.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IPort.h>
 #include <co/IField.h>
+#include <co/IPort.h>
 #include <co/IObject.h>
 #include <co/IMethod.h>
 #include <co/IllegalCastException.h>
@@ -49,69 +49,44 @@ public:
 
 	void postGetField( co::IService* service_, co::IField* field_, const co::Any& value_ )
 	{
-		co::Any args[3];
-		args[0].set< co::IService* >( service_ );
-		args[1].set< co::IField* >( field_ );
-		args[2].set< const co::Any& >( value_ );
-		co::Range<co::Any const> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 0 ), range );
+		co::Any args[] = { service_, field_, value_ };
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 0 ), args, co::Any() );
 	}
 
 	void postGetService( co::IObject* object_, co::IPort* port_, co::IService* service_ )
 	{
-		co::Any args[3];
-		args[0].set< co::IObject* >( object_ );
-		args[1].set< co::IPort* >( port_ );
-		args[2].set< co::IService* >( service_ );
-		co::Range<co::Any const> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 1 ), range );
+		co::Any args[] = { object_, port_, service_ };
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 1 ), args, co::Any() );
 	}
 
-	void postInvoke( co::IService* service_, co::IMethod* method_, co::Range<co::Any const> args_, const co::Any& returnValue_ )
+	void postInvoke( co::IService* service_, co::IMethod* method_, co::Range<co::Any> args_, const co::Any& returnValue_ )
 	{
-		co::Any args[4];
-		args[0].set< co::IService* >( service_ );
-		args[1].set< co::IMethod* >( method_ );
-		args[2].set< co::Range<co::Any const> >( args_ );
-		args[3].set< const co::Any& >( returnValue_ );
-		co::Range<co::Any const> range( args, 4 );
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 2 ), range );
+		co::Any args[] = { service_, method_, args_, returnValue_ };
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 2 ), args, co::Any() );
 	}
 
 	void postSetField( co::IService* service_, co::IField* field_, const co::Any& value_ )
 	{
-		co::Any args[3];
-		args[0].set< co::IService* >( service_ );
-		args[1].set< co::IField* >( field_ );
-		args[2].set< const co::Any& >( value_ );
-		co::Range<co::Any const> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 3 ), range );
+		co::Any args[] = { service_, field_, value_ };
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 3 ), args, co::Any() );
 	}
 
 	void postSetService( co::IObject* object_, co::IPort* receptable_, co::IService* service_ )
 	{
-		co::Any args[3];
-		args[0].set< co::IObject* >( object_ );
-		args[1].set< co::IPort* >( receptable_ );
-		args[2].set< co::IService* >( service_ );
-		co::Range<co::Any const> range( args, 3 );
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 4 ), range );
+		co::Any args[] = { object_, receptable_, service_ };
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 4 ), args, co::Any() );
 	}
 
 	void serviceReleased( co::IService* service_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IService* >( service_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 5 ), range );
+		co::Any args[] = { service_ };
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 5 ), args, co::Any() );
 	}
 
 	void serviceRetained( co::IService* service_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IService* >( service_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 6 ), range );
+		co::Any args[] = { service_ };
+		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 6 ), args, co::Any() );
 	}
 
 protected:
@@ -163,7 +138,7 @@ public:
 		return new lua::IInterceptor_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::checkInstance<lua::IInterceptor>( instance, field );
 		raiseUnexpectedMemberIndex();
@@ -177,7 +152,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		lua::IInterceptor* p = co::checkInstance<lua::IInterceptor>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -190,7 +165,7 @@ public:
 				{
 					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
-					const co::Any& value_ = args[++argIndex].get< const co::Any& >();
+					const co::Any& value_ = args[++argIndex];
 					argIndex = -1;
 					p->postGetField( service_, field_, value_ );
 				}
@@ -208,8 +183,8 @@ public:
 				{
 					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					co::IMethod* method_ = args[++argIndex].get< co::IMethod* >();
-					co::Range<co::Any const> args_ = args[++argIndex].get< co::Range<co::Any const> >();
-					const co::Any& returnValue_ = args[++argIndex].get< const co::Any& >();
+					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
+					const co::Any& returnValue_ = args[++argIndex];
 					argIndex = -1;
 					p->postInvoke( service_, method_, args_, returnValue_ );
 				}
@@ -218,7 +193,7 @@ public:
 				{
 					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					co::IField* field_ = args[++argIndex].get< co::IField* >();
-					const co::Any& value_ = args[++argIndex].get< const co::Any& >();
+					const co::Any& value_ = args[++argIndex];
 					argIndex = -1;
 					p->postSetField( service_, field_, value_ );
 				}

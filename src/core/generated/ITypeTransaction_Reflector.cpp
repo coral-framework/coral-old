@@ -42,22 +42,23 @@ public:
 
 	// co.ITypeTransaction Methods:
 
-	co::Range<co::ITypeBuilder* const> getTypeBuilders()
+	co::Range<co::ITypeBuilder*> getTypeBuilders()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::ITypeTransaction>( 0 ) );
-        return res.get< co::Range<co::ITypeBuilder* const> >();
+		co::RefVector<co::ITypeBuilder> res;
+		_provider->dynamicGetField( _cookie, getField<co::ITypeTransaction>( 0 ), res );
+		return res;
 	}
 
 	void commit()
 	{
-		co::Range<co::Any const> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeTransaction>( 0 ), range );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeTransaction>( 0 ), args, co::Any() );
 	}
 
 	void rollback()
 	{
-		co::Range<co::Any const> range;
-		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeTransaction>( 1 ), range );
+		co::Range<co::Any> args;
+		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeTransaction>( 1 ), args, co::Any() );
 	}
 
 protected:
@@ -109,12 +110,12 @@ public:
 		return new co::ITypeTransaction_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::ITypeTransaction* p = co::checkInstance<co::ITypeTransaction>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< co::Range<co::ITypeBuilder* const> >( p->getTypeBuilders() ); break;
+		case 0:		value.put( p->getTypeBuilders() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -131,7 +132,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::ITypeTransaction* p = co::checkInstance<co::ITypeTransaction>( instance, method );
 		checkNumArguments( method, args.getSize() );

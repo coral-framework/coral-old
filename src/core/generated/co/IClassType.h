@@ -24,7 +24,7 @@ class IClassType : public co::IRecordType
 public:
 	virtual ~IClassType() {;}
 
-	virtual co::Range<co::IMethod* const> getMethods() = 0;
+	virtual co::Range<co::IMethod*> getMethods() = 0;
 };
 
 } // namespace co

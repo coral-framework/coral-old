@@ -31,10 +31,10 @@ public:
 	// Code From <c++ Block:
 	
 		//! Convenience method to setup the entire system without requiring any module.
-		inline void setup() { setup( Range<std::string const>() ); }
+		inline void setup() { setup( Range<std::string>() ); }
 
 		//! Convenience method to setup the entire system.
-		inline void setup( Range<std::string const> requiredModules )
+		inline void setup( Range<std::string> requiredModules )
 		{
 			setupBase( requiredModules );
 			setupPresentation();
@@ -50,7 +50,7 @@ public:
 
 	virtual co::ITypeManager* getTypes() = 0;
 
-	virtual void setupBase( co::Range<std::string const> requiredModules ) = 0;
+	virtual void setupBase( co::Range<std::string> requiredModules ) = 0;
 
 	virtual void setupPresentation() = 0;
 

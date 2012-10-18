@@ -45,70 +45,64 @@ public:
 
 	bool getBinaryCompatibilityChecking()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 0 ) );
-        return res.get< bool >();
+		bool res;
+		_provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 0 ), res );
+		return res;
 	}
 
 	void setBinaryCompatibilityChecking( bool binaryCompatibilityChecking_ )
 	{
-		co::Any arg;
-		arg.set< bool >( binaryCompatibilityChecking_ );
-		_provider->dynamicSetField( _cookie, getField<co::IModuleManager>( 0 ), arg );
+		_provider->dynamicSetField( _cookie, getField<co::IModuleManager>( 0 ), binaryCompatibilityChecking_ );
 	}
 
-	co::Range<co::IModulePartLoader* const> getLoaders()
+	co::Range<co::IModulePartLoader*> getLoaders()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 1 ) );
-        return res.get< co::Range<co::IModulePartLoader* const> >();
+		co::RefVector<co::IModulePartLoader> res;
+		_provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 1 ), res );
+		return res;
 	}
 
-	co::Range<co::IModule* const> getModules()
+	co::Range<co::IModule*> getModules()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 2 ) );
-        return res.get< co::Range<co::IModule* const> >();
+		co::RefVector<co::IModule> res;
+		_provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 2 ), res );
+		return res;
 	}
 
 	co::IModule* findModule( const std::string& moduleName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( moduleName_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 0 ), range );
-		return res.get< co::IModule* >();
+		co::Any args[] = { moduleName_ };
+		co::RefPtr<co::IModule> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 0 ), args, res );
+		return res.get();
 	}
 
 	void installLoader( co::IModulePartLoader* loader_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IModulePartLoader* >( loader_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 1 ), range );
+		co::Any args[] = { loader_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 1 ), args, co::Any() );
 	}
 
 	bool isLoadable( const std::string& moduleName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( moduleName_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 2 ), range );
-		return res.get< bool >();
+		co::Any args[] = { moduleName_ };
+		bool res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 2 ), args, res );
+		return res;
 	}
 
 	co::IModule* load( const std::string& moduleName_ )
 	{
-		co::Any args[1];
-		args[0].set< const std::string& >( moduleName_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 3 ), range );
-		return res.get< co::IModule* >();
+		co::Any args[] = { moduleName_ };
+		co::RefPtr<co::IModule> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 3 ), args, res );
+		return res.get();
 	}
 
 	void uninstallLoader( co::IModulePartLoader* loader_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IModulePartLoader* >( loader_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 4 ), range );
+		co::Any args[] = { loader_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 4 ), args, co::Any() );
 	}
 
 protected:
@@ -160,14 +154,14 @@ public:
 		return new co::IModuleManager_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::IModuleManager* p = co::checkInstance<co::IModuleManager>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< bool >( p->getBinaryCompatibilityChecking() ); break;
-		case 1:		value.set< co::Range<co::IModulePartLoader* const> >( p->getLoaders() ); break;
-		case 2:		value.set< co::Range<co::IModule* const> >( p->getModules() ); break;
+		case 0:		value.put( p->getBinaryCompatibilityChecking() ); break;
+		case 1:		value.put( p->getLoaders() ); break;
+		case 2:		value.put( p->getModules() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -186,7 +180,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::IModuleManager* p = co::checkInstance<co::IModuleManager>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -199,7 +193,7 @@ public:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::IModule* >( p->findModule( moduleName_ ) );
+					res.put( p->findModule( moduleName_ ) );
 				}
 				break;
 			case 4:
@@ -213,14 +207,14 @@ public:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< bool >( p->isLoadable( moduleName_ ) );
+					res.put( p->isLoadable( moduleName_ ) );
 				}
 				break;
 			case 6:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					argIndex = -1;
-					res.set< co::IModule* >( p->load( moduleName_ ) );
+					res.put( p->load( moduleName_ ) );
 				}
 				break;
 			case 7:

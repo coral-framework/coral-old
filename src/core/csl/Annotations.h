@@ -21,7 +21,7 @@ public:
 
 	virtual ~CppBlockAnnotation();
 
-	const std::string& getValue();
+	std::string getValue();
 	void setValue( const std::string& value );
 
 private:
@@ -37,11 +37,11 @@ public:
 
 	virtual ~DocumentationAnnotation();
 
-	const std::string& getValue();
+	std::string getValue();
 	void setValue( const std::string& value );
 
 	void addDocFor( const std::string& element, const std::string& text );
-	const std::string& getDocFor( const std::string& element );
+	std::string getDocFor( const std::string& element );
 
 private:
 	std::string _value;

@@ -1,5 +1,5 @@
 /*
-** $Id: lmem.c,v 1.82 2011/09/20 19:25:23 roberto Exp $
+** $Id: lmem.c,v 1.84 2012/05/23 15:41:53 roberto Exp $
 ** Interface to Memory Manager
 ** See Copyright Notice in lua.h
 */
@@ -63,9 +63,8 @@ void *luaM_growaux_ (lua_State *L, void *block, int *size, size_t size_elems,
 }
 
 
-void *luaM_toobig (lua_State *L) {
+l_noret luaM_toobig (lua_State *L) {
   luaG_runerror(L, "memory allocation error: block too big");
-  return NULL;  /* to avoid warnings */
 }
 
 
@@ -95,22 +94,6 @@ void *luaM_realloc_ (lua_State *L, void *block, size_t osize, size_t nsize) {
   }
   lua_assert((nsize == 0) == (newblock == NULL));
   g->GCdebt = (g->GCdebt + nsize) - realosize;
-#if defined(TRACEMEM)
-  { /* auxiliary patch to monitor garbage collection.
-    ** To plot, gnuplot with following command:
-    ** plot TRACEMEM using 1:2 with lines, TRACEMEM using 1:3 with lines
-    */
-    static unsigned long total = 0;  /* our "time" */
-    static FILE *f = NULL;  /* output file */
-    total++;  /* "time" always grows */
-    if ((total % 200) == 0) {
-      if (f == NULL) f = fopen(TRACEMEM, "w");
-      fprintf(f, "%lu %u %d %d\n", total,
-              gettotalbytes(g), g->GCdebt, g->gcstate * 10000);
-    }
-  }
-#endif
-
   return newblock;
 }
 

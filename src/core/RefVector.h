@@ -31,7 +31,7 @@ public:
 	//! Gets a sub-range of this vector.
 	inline Range<T*> getRange( size_t first, size_t size )
 	{
-		return Range<T*>( size == 0 ? NULL : reinterpret_cast<T**>( &( (*this)[0] ) ) + first, size );
+		return Range<T*>( size == 0 ? NULL : reinterpret_cast<T**>( &(*this)[0] ) + first, size );
 	}
 
 	/*!
@@ -101,17 +101,17 @@ public:
 
 #ifndef DOXYGEN
 
-// RangeAdaptor to extract an interface-pointer array out of a RefVector.
+// RangeAdapter to extract an interface-pointer array out of a RefVector.
 template<typename T, typename ET>
-struct RangeAdaptor<T, RefVector<ET> >
+struct RangeAdapter<T, RefVector<ET> >
 {
 	static const bool isValid = true;
-	static const T* getData( RefVector<ET>& v )
+	static const T* getData( const RefVector<ET>& v )
 	{
 		static_assert( ( traits::isSubTypeOf<ET, typename traits::removePointer<T>::Type>::value ), "incompatible pointer types" );
-		return v.empty() ? NULL : reinterpret_cast<T*>( &v[0] );
+		return v.empty() ? NULL : reinterpret_cast<const T*>( &v[0] );
 	}
-	static size_t getSize( RefVector<ET>& v ) { return v.size(); }
+	static size_t getSize( const RefVector<ET>& v ) { return v.size(); }
 };
 
 #endif // DOXYGEN

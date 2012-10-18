@@ -17,7 +17,7 @@ void Method::setReturnType( IType* returnType )
 	_returnType = returnType;
 }
 
-void Method::setParameters( Range<IParameter* const> parameters )
+void Method::setParameters( Range<IParameter*> parameters )
 {
 	assert( _parameters.size() == 0 );
 	_parameters.reserve( parameters.getSize() );
@@ -25,7 +25,7 @@ void Method::setParameters( Range<IParameter* const> parameters )
 		_parameters.push_back( parameters.getFirst() );
 }
 
-void Method::setExceptions( Range<IException* const> exceptions )
+void Method::setExceptions( Range<IException*> exceptions )
 {
 	assert( _exceptions.size() == 0 );
 	_exceptions.reserve( exceptions.getSize() );
@@ -43,12 +43,12 @@ IType* Method::getReturnType()
 	return _returnType;
 }
 
-Range<IParameter* const> Method::getParameters()
+Range<IParameter*> Method::getParameters()
 {
 	return _parameters;
 }
 
-Range<IException* const> Method::getExceptions()
+Range<IException*> Method::getExceptions()
 {
 	return _exceptions;
 }

@@ -1,7 +1,7 @@
 local function writeMethod( writer, t, methodName, parameters, returnType, code )
 	writer( [[
 
-	]], t.formatInput( returnType ), [[ ]], methodName, "(" )
+	]], t.formatResult( returnType ), [[ ]], methodName, "(" )
 	if parameters and #parameters > 0 then
 		writer( " " )
 		for i, p in ipairs( parameters ) do

@@ -61,41 +61,30 @@ public:
 
 	//! Pushes any Coral value onto the Lua stack.
 	//@{
-	static void push( lua_State* L, const co::Any& var );
-	static void push( lua_State* L, const co::Any& var, int depth );
+	static void push( lua_State* L, co::Any var );
 	static void push( lua_State* L, const std::string& str );
 	static void push( lua_State* L, co::IService* itf );
 	static void push( lua_State* L, co::IObject* object );
 	//@}
 
 	/*!
-		Gets any value from the Lua stack, using \a expectedType to help interpret it.
-		If \a expectedType is NULL, this method will try to directly fit any Lua value into \a any.
-		On the other hand, if the \a expectedType is a co::Any, the method will first call
-		co::Any::createAny() on \a any and then try to fit a Lua value into the temporary co::Any.
-		If the value at \a index has no convertion to Coral, raises a lua::Exception.
+		Puts the value at \a index in the Lua stack into \a var.
+		\throw lua::Exception if the value cannot be converted to a Coral value.
 	 */
-	static void getAny( lua_State* L, int index, co::IType* expectedType, co::Any& any );
-
-	/*!
-		Gets the value at \a index in the Lua stack and assigns it to \a outputVar.
-		If the Lua value cannot be assigned to the var in \a outputVar, raises a lua::Exception.
-		\warning \a outputVar must be a valid output variable.
-	 */
-	static void getValue( lua_State* L, int index, const co::Any& outputVar );
+	static void get( lua_State* L, int index, const co::Any& var );
 
 public:
     LuaState();
 	virtual ~LuaState();
 
-	co::Range<lua::IInterceptor* const> getInterceptors();
+	co::Range<lua::IInterceptor*> getInterceptors();
 	void addInterceptor( lua::IInterceptor* interceptor );
 	void removeInterceptor( lua::IInterceptor* interceptor );
 
 	bool findScript( const std::string& name, std::string& filename );
 
-	co::int32 callFunction( const std::string& moduleName, const std::string& functionName,
-		co::Range<const co::Any> args, co::Range<const co::Any> results );
+	co::int32 call( const std::string& moduleName, const std::string& functionName,
+		co::Range<co::Any> args, co::Range<co::Any> results );
 
 	void collectGarbage();
 
@@ -106,7 +95,7 @@ private:
 	static void pushInstancesTable( lua_State* L );
 
 	static void pushArray( lua_State* L, const co::Any& var );
-	static void toArray( lua_State* L, int index, co::IType* elementType, co::Any& var );
+	static void getArray( lua_State* L, int index, const co::Any& array );
 	
 	static co::int32 getEnumIdentifier( lua_State* L, int index, co::IEnum* enumType );
 

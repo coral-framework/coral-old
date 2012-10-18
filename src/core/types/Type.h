@@ -16,7 +16,7 @@
 namespace co {
 
 //! Selects an annotation by type, considering generalizations.
-IAnnotation* selectAnnotation( Range<IAnnotation* const> annotations, IInterface* requestedType );
+IAnnotation* selectAnnotation( Range<IAnnotation*> annotations, IInterface* requestedType );
 
 /*!
 	Re-usable implementation of co::IAnnotated.
@@ -25,12 +25,12 @@ template<class Base>
 class Annotated : public Base
 {
 public:
-	Range<IAnnotation* const> getAnnotations()
+	Range<IAnnotation*> getAnnotations()
 	{
 		return _annotations;
 	}
 
-	void setAnnotations( Range<IAnnotation* const> annotations )
+	void setAnnotations( Range<IAnnotation*> annotations )
 	{
 		return co::assign( annotations, _annotations );
 	}
@@ -55,11 +55,15 @@ private:
 class TypeImpl
 {
 public:
-	inline TypeImpl() : _namespace( NULL ), _kind( TK_NONE ),
+	inline TypeImpl() : _namespace( NULL ), _kind( TK_NULL ),
 		_hasSignatures( false ), _isCalculatingSignatures( false )
 	{;}
 
-	void setType( INamespace* parent, const std::string& name, TypeKind kind );
+	// Places the type into its namespace (kind/name must already be set).
+	void setNamespace( INamespace* ns );
+
+	// Defines the type's kind, name and places it into its namespace.
+	void setType( TypeKind kind, const std::string& name, INamespace* ns );
 
 	IReflector* getReflector( IType* myType );
 	void setReflector( IReflector* reflector );
@@ -86,19 +90,19 @@ template<class Base>
 class Type : public Annotated<Base>, public TypeImpl
 {
 public:
-	const std::string& getName() { return _name; }
-	const std::string& getFullName() { return _fullName; }
+	std::string getName() { return _name; }
+	std::string getFullName() { return _fullName; }
 	INamespace* getNamespace() { return _namespace; }
 	TypeKind getKind() { return _kind; }
 
-	const Uuid& getFullSignature()
+	Uuid getFullSignature()
 	{
 		if( !_hasSignatures )
 			calculateSignatures( this );
 		return _fullSignature;
 	}
 	
-	const Uuid& getBinarySignature()
+	Uuid getBinarySignature()
 	{
 		if( !_hasSignatures )
 			calculateSignatures( this );
@@ -109,6 +113,8 @@ public:
 	void setReflector( IReflector* reflector ) { _reflector = reflector; }
 
 	IReflector* getCurrentReflector() { return _reflector.get(); }
+
+	bool isA( IType* type ) { return this == type; }
 };
 
 /*!
@@ -117,6 +123,12 @@ public:
 class TypeComponent : public Type<Type_Base>
 {
 public:
+	// Default constructor.
+	inline TypeComponent() {;}
+
+	// Constructor for basic types in the root namespace.
+	TypeComponent( TypeKind kind );
+
 	virtual ~TypeComponent();
 };
 

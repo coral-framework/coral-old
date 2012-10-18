@@ -117,9 +117,9 @@ bool ModulePartLoader::locateModuleLibrary( const std::string& moduleName, std::
 	OS::convertDotsToDirSeps( modulePath );
 
 	return OS::searchFile3( getPaths(),
-							Range<const std::string>( &modulePath, 1 ),
-							Range<const std::string>( &fileName, 1 ),
-							filename ? *filename : modulePath );
+				Range<std::string>( &modulePath, 1 ),
+				Range<std::string>( &fileName, 1 ),
+				filename ? *filename : modulePath );
 }
 
 void ModulePartLoader::resolveModuleFunctions( Library* lib, BootstrapFunctions& bf )

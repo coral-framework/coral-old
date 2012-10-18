@@ -5,8 +5,8 @@
 
 #include <co/IPort.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IInterface.h>
 #include <co/ICompositeType.h>
+#include <co/IInterface.h>
 #include <co/IAnnotation.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
@@ -44,74 +44,76 @@ public:
 
 	// co.IAnnotated Methods:
 
-	co::Range<co::IAnnotation* const> getAnnotations()
+	co::Range<co::IAnnotation*> getAnnotations()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ) );
-        return res.get< co::Range<co::IAnnotation* const> >();
+		co::RefVector<co::IAnnotation> res;
+		_provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ), res );
+		return res;
 	}
 
-	void setAnnotations( co::Range<co::IAnnotation* const> annotations_ )
+	void setAnnotations( co::Range<co::IAnnotation*> annotations_ )
 	{
-		co::Any arg;
-		arg.set< co::Range<co::IAnnotation* const> >( annotations_ );
-		_provider->dynamicSetField( _cookie, getField<co::IAnnotated>( 0 ), arg );
+		_provider->dynamicSetField( _cookie, getField<co::IAnnotated>( 0 ), annotations_ );
 	}
 
 	void addAnnotation( co::IAnnotation* annotation_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IAnnotation* >( annotation_ );
-		co::Range<co::Any const> range( args, 1 );
-		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 0 ), range );
+		co::Any args[] = { annotation_ };
+		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 0 ), args, co::Any() );
 	}
 
 	co::IAnnotation* getAnnotation( co::IInterface* requestedType_ )
 	{
-		co::Any args[1];
-		args[0].set< co::IInterface* >( requestedType_ );
-		co::Range<co::Any const> range( args, 1 );
-		const co::Any& res = _provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), range );
-		return res.get< co::IAnnotation* >();
+		co::Any args[] = { requestedType_ };
+		co::RefPtr<co::IAnnotation> res;
+		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), args, res );
+		return res.get();
 	}
 
 	// co.IMember Methods:
 
 	co::uint16 getIndex()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 0 ) );
-        return res.get< co::uint16 >();
+		co::uint16 res;
+		_provider->dynamicGetField( _cookie, getField<co::IMember>( 0 ), res );
+		return res;
 	}
 
 	co::MemberKind getKind()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 1 ) );
-        return res.get< co::MemberKind >();
+		co::MemberKind res;
+		_provider->dynamicGetField( _cookie, getField<co::IMember>( 1 ), res );
+		return res;
 	}
 
-	const std::string& getName()
+	std::string getName()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 2 ) );
-        return res.get< const std::string& >();
+		std::string res;
+		_provider->dynamicGetField( _cookie, getField<co::IMember>( 2 ), res );
+		return res;
 	}
 
 	co::ICompositeType* getOwner()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IMember>( 3 ) );
-        return res.get< co::ICompositeType* >();
+		co::RefPtr<co::ICompositeType> res;
+		_provider->dynamicGetField( _cookie, getField<co::IMember>( 3 ), res );
+		return res.get();
 	}
 
 	// co.IPort Methods:
 
 	bool getIsFacet()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IPort>( 0 ) );
-        return res.get< bool >();
+		bool res;
+		_provider->dynamicGetField( _cookie, getField<co::IPort>( 0 ), res );
+		return res;
 	}
 
 	co::IInterface* getType()
 	{
-		const co::Any& res = _provider->dynamicGetField( _cookie, getField<co::IPort>( 1 ) );
-        return res.get< co::IInterface* >();
+		co::RefPtr<co::IInterface> res;
+		_provider->dynamicGetField( _cookie, getField<co::IPort>( 1 ), res );
+		return res.get();
 	}
 
 protected:
@@ -163,13 +165,13 @@ public:
 		return new co::IPort_Proxy( provider );
 	}
 
-	void getField( const co::Any& instance, co::IField* field, co::Any& value )
+	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::IPort* p = co::checkInstance<co::IPort>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		value.set< bool >( p->getIsFacet() ); break;
-		case 1:		value.set< co::IInterface* >( p->getType() ); break;
+		case 0:		value.put( p->getIsFacet() ); break;
+		case 1:		value.put( p->getType() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 	}
@@ -187,7 +189,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any const> args, co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
 	{
 		co::checkInstance<co::IPort>( instance, method );
 		raiseUnexpectedMemberIndex();
