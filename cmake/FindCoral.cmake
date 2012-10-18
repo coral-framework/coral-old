@@ -1,23 +1,25 @@
 #	Find the Coral framework.
 #
-#	This module defines the following variables:
-#		CORAL_FOUND - Whether the Coral framework was found.
-#		CORAL_INCLUDE_DIRS - Directories for including the Coral headers.
-#		CORAL_LIBRARIES - Coral's optimized and debug libraries (whichever are available).
-#		CORAL_LAUNCHER - Path to the 'coral' executable.
-#
 #	The following variables are accepted as input:
 #		CORAL_ROOT (as a CMake or environment variable)
 #			- Directory where Coral was installed (the "install prefix").
 #		CORAL_PATH (as a CMake or environment variable)
-#			- List of extra Coral repositories that should be passed to the Coral Compiler.
+#			- List of extra module repositories that should be passed to the Coral Compiler.
+#
+#	This module defines the following variables:
+#		CORAL_FOUND - Whether the Coral framework was found.
+#		CORAL_ROOT - Absolute path to the Coral SDK root.
+#		CORAL_PATH - By default, contains "${CORAL_ROOT}/modules".
+#		CORAL_LIBRARIES - Coral's optimized and debug libraries (whichever are available).
+#		CORAL_INCLUDE_DIRS - Directories for including the Coral headers.
+#		CORAL_LAUNCHER - Path to the 'coral' executable.
 #
 #	The following utility functions simplify the task of invoking the Coral Compiler.
 #
 #	function CORAL_GENERATE_MODULE( generatedSourceFiles moduleName [extraDependency ...] )
 #		Generates source code, plus all required mappings, to implement the Coral module specified
 #		by moduleName. All files are generated in a dir named "generated", relative to the current
-#		CMake binary dir. Generated source files that should be added to the module's project are
+#		CMake binary dir. Generated source files that should be added to the module's target are
 #		added to the list variable indicated as the first parameter.
 #
 #	function CORAL_GENERATE_MAPPINGS( generatedHeaderFiles [typeName ...] )
@@ -32,13 +34,20 @@ cmake_minimum_required( VERSION 2.8.5 )
 # Initialization
 ################################################################################
 
+if( NOT CORAL_ROOT )
+	file( TO_CMAKE_PATH "$ENV{CORAL_ROOT}" CORAL_ROOT )
+	if( NOT CORAL_ROOT )
+		find_path( CORAL_ROOT coralc PATH_SUFFIXES .. PATHS ${CMAKE_MODULE_PATH} )
+		if( NOT CORAL_ROOT )
+			message( FATAL_ERROR "Could not determine the CORAL_ROOT" )
+		endif()
+	endif()
+endif()
+
 if( NOT CORAL_PATH )
-	if( ENV{CORAL_PATH} )
-		set( CORAL_PATH $ENV{CORAL_PATH} )
-	elseif( CORAL_ROOT )
+	file( TO_CMAKE_PATH "$ENV{CORAL_PATH}" CORAL_PATH )
+	if( NOT CORAL_PATH )
 		set( CORAL_PATH "${CORAL_ROOT}/modules" )
-	elseif( ENV{CORAL_ROOT} )
-		set( CORAL_PATH "$ENV{CORAL_ROOT}/modules" )
 	endif()
 endif()
 
@@ -222,27 +231,47 @@ endmacro( CORAL_TARGET )
 macro( CORAL_MODULE_TARGET moduleName targetName )
 	CORAL_TARGET( ${targetName} )
 
+	set_target_properties( ${targetName} PROPERTIES
+		PREFIX ""
+		OUTPUT_NAME "${moduleName}"
+	)
+
+	if( NOT CORAL_MODULE_OUTPUT_DIR )
+		set( CORAL_MODULE_OUTPUT_DIR "${CMAKE_BINARY_DIR}/modules" )
+	endif()
+
 	# Copy or generate the module library into /modules/${modulePath}/
 	string( REPLACE "." "/" modulePath ${moduleName} )
 	if( XCODE_VERSION OR MSVC_IDE )
 		# Copy the library after linking (makes sense for IDE's that create intermediate dirs)
-		file( MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/modules/${modulePath}" )
+		file( MAKE_DIRECTORY "${CORAL_MODULE_OUTPUT_DIR}/${modulePath}" )
 		if( XCODE_VERSION )
 			set( targetFileName "$(FULL_PRODUCT_NAME)" )
 		else()
 			set( targetFileName "$(TargetFileName)" ) # MSVC_IDE
 		endif()
 		add_custom_command( TARGET ${targetName} POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/${targetFileName}" "${CMAKE_BINARY_DIR}/modules/${modulePath}/"
+			COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/${targetFileName}" "${CORAL_MODULE_OUTPUT_DIR}/${modulePath}/"
 			COMMENT "Copying module '${moduleName}'..."
 		)
 	else()
 		# Create the library directly in the output dir
 		set_target_properties( ${targetName} PROPERTIES
-			LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/modules/${modulePath}"
+			LIBRARY_OUTPUT_DIRECTORY "${CORAL_MODULE_OUTPUT_DIR}/${modulePath}"
 		)
 	endif()
 endmacro( CORAL_MODULE_TARGET )
+
+################################################################################
+# Macro to build Coral modules comprised only of CSL types (no implementations).
+################################################################################
+macro( CORAL_BUILD_CSL_MODULE moduleName )
+	CORAL_GENERATE_MODULE( _GENERATED_SOURCES ${moduleName} )
+	include_directories( ${CORAL_INCLUDE_DIRS} "${CMAKE_CURRENT_BINARY_DIR}/generated" )
+	add_library( ${moduleName} MODULE EXCLUDE_FROM_ALL ${_GENERATED_SOURCES} )
+	CORAL_MODULE_TARGET( ${moduleName} ${moduleName} )
+	source_group( "@Generated" FILES ${_GENERATED_SOURCES} )
+endmacro( CORAL_BUILD_CSL_MODULE )
 
 ################################################################################
 # Macro to add a test target that invokes the Coral Launcher passing arguments.
@@ -272,15 +301,72 @@ macro( CORAL_TEST_ENVIRONMENT testName )
 endmacro( CORAL_TEST_ENVIRONMENT )
 
 ################################################################################
-# Macro to build Coral modules comprised only of CSL types (no implementations).
+# Macro to enable generation of 'test coverage' data for a target.
+# Only works on UNIX, and only if the CMake var 'TEST_COVERAGE' is enabled.
 ################################################################################
-macro( CORAL_BUILD_CSL_MODULE moduleName )
-	CORAL_GENERATE_MODULE( _GENERATED_SOURCES ${moduleName} )
-	include_directories( ${CORAL_INCLUDE_DIRS} "${CMAKE_CURRENT_BINARY_DIR}/generated" )
-	add_library( ${moduleName} MODULE EXCLUDE_FROM_ALL ${_GENERATED_SOURCES} )
-	CORAL_MODULE_TARGET( ${moduleName} ${moduleName} )
-	source_group( "@Generated" FILES ${_GENERATED_SOURCES} )
-endmacro( CORAL_BUILD_CSL_MODULE )
+macro( CORAL_ENABLE_TEST_COVERAGE targetName )
+	if( UNIX AND TEST_COVERAGE )
+		set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_FLAGS "-fprofile-arcs;-ftest-coverage" )
+		set_property( TARGET ${targetName} APPEND PROPERTY LINK_FLAGS "-fprofile-arcs;-ftest-coverage" )
+	endif()
+endmacro( CORAL_ENABLE_TEST_COVERAGE )
+
+################################################################################
+# Adds a file to the list of files to be cleaned in a directory
+################################################################################
+macro( CORAL_ADD_TO_MAKE_CLEAN filename )
+	set_property( DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${filename}" )
+endmacro( CORAL_ADD_TO_MAKE_CLEAN )
+
+################################################################################
+# Macro to create a custom target that generates documentation using Doxygen.
+# The target will configure_file() "${CMAKE_CURRENT_SOURCE_DIR}/${doxyfileName}"
+# then run Doxygen on the resulting file from within the current binary dir.
+# All extra macro arguments (${ARGN}) will be passed along to Doxygen.
+################################################################################
+macro( CORAL_GENERATE_DOXYGEN targetName doxyfileName )
+	find_package( Doxygen )
+	if( DOXYGEN_FOUND )
+		set( DOXYFILE_FOUND false )
+		if( EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${doxyfileName}" )
+			set( DOXYFILE_FOUND true )
+		endif()
+		if( DOXYFILE_FOUND )
+			message( STATUS "Setting up Doxygen target '${targetName}'..." )
+			configure_file( "${doxyfileName}" "${doxyfileName}.configured" )
+			add_custom_target( ${targetName}
+				COMMENT "Running Doxygen..."
+				WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+				COMMAND ${DOXYGEN_EXECUTABLE} "${doxyfileName}.configured" ${ARGN}
+			)
+			set_target_properties( ${targetName} PROPERTIES PROJECT_LABEL "Doxygen" )
+			# Read doxygen configuration file
+			file( READ "${CMAKE_CURRENT_BINARY_DIR}/${doxyfileName}.configured" DOXYFILE_CONTENTS )
+			string( REGEX REPLACE "\n" ";" DOXYFILE_LINES ${DOXYFILE_CONTENTS} )
+			# Parse .tag filename and add to list of files to delete if it exists
+			set( DOXYGEN_TAG_FILE )
+			set( DOXYGEN_OUTPUT_DIRECTORY )
+			set( DOXYGEN_HTML_OUTPUT )
+			foreach( DOXYLINE ${DOXYFILE_LINES} )
+				string( REGEX REPLACE ".*GENERATE_TAGFILE *= *([^^\n]+).*" "\\1" DOXYGEN_TAG_FILE "${DOXYLINE}" )
+				string( REGEX REPLACE ".*OUTPUT_DIRECTORY *= *([^^\n]+).*" "\\1" DOXYGEN_OUTPUT_DIRECTORY "${DOXYLINE}" )
+				string( REGEX REPLACE ".*HTML_OUTPUT *= *([^^\n]+).*" "\\1" DOXYGEN_HTML_OUTPUT "${DOXYLINE}" )
+			endforeach()
+			file( TO_CMAKE_PATH "${DOXYGEN_OUTPUT_DIRECTORY}" DOXYGEN_OUTPUT_DIRECTORY )
+			file( TO_CMAKE_PATH "${DOXYGEN_HTML_OUTPUT}" DOXYGEN_HTML_OUTPUT )
+			if( DOXYGEN_TAG_FILE )
+				CORAL_ADD_TO_MAKE_CLEAN( "${CMAKE_CURRENT_BINARY_DIR}/${DOXYGEN_TAG_FILE}" )
+			endif()
+			if( DOXYGEN_OUTPUT_DIRECTORY AND DOXYGEN_HTML_OUTPUT )
+				CORAL_ADD_TO_MAKE_CLEAN( "${DOXYGEN_OUTPUT_DIRECTORY}/${DOXYGEN_HTML_OUTPUT}" )
+			endif()
+		else( DOXYFILE_FOUND )
+			message( SEND_ERROR "Doxyfile not found - configuration error." )
+		endif( DOXYFILE_FOUND )
+	else( DOXYGEN_FOUND )
+		message( "Doxygen not found - documentation will not be generated." )
+	endif( DOXYGEN_FOUND )
+endmacro( CORAL_GENERATE_DOXYGEN )
 
 ################################################################################
 # Find the Coral Framework
@@ -288,8 +374,7 @@ endmacro( CORAL_BUILD_CSL_MODULE )
 function( _coral_find_program _name )
 	find_program( ${_name}
 		NAMES ${ARGN}
-		HINTS ".."
-		PATHS "${CORAL_ROOT}" ENV CORAL_ROOT
+		HINTS ${CORAL_ROOT} ".."
 		PATH_SUFFIXES "." "bin"
 	)
 	mark_as_advanced( ${_name} )
@@ -298,16 +383,14 @@ endfunction()
 function( _coral_find_library _name )
 	find_library( ${_name}
 		NAMES ${ARGN}
-		HINTS ".."
-		PATHS "${CORAL_ROOT}" ENV CORAL_ROOT
+		HINTS ${CORAL_ROOT} ".."
 		PATH_SUFFIXES "lib"
 	)
 	mark_as_advanced( ${_name} )
 endfunction()
 
 find_path( CORAL_INCLUDE_DIRS "co/Coral.h"
-	HINTS ".."
-	PATHS "${CORAL_ROOT}" ENV CORAL_ROOT
+	HINTS ${CORAL_ROOT} ".."
 	PATH_SUFFIXES "include"
 )
 

@@ -945,17 +945,8 @@ Any::PseudoVector& Any::createArray( IType* elementType, size_t n )
 
 	case TK_STRUCT:
 	case TK_NATIVECLASS:
-		{
-			size_t elementSize = _object.array.reflector->getSize();
-			new( _object.array.vectorArea ) PseudoVector( elementSize * n );
-
-			// call the constructor of each element
-			uint8* beginPtr = &res->front();
-			uint8* endPtr = beginPtr + ( elementSize * n );
-
-			for( uint8* p = beginPtr; p < endPtr; p += elementSize )
-				_object.array.reflector->createValue( p );
-		}
+		new( _object.array.vectorArea ) PseudoVector( _object.array.reflector->getSize() * n );
+		_object.array.reflector->createValues( &res->front(), n );
 		break;
 
 	case TK_INTERFACE:
@@ -1004,7 +995,7 @@ void* Any::createComplexValue( IType* type )
 		res = _object.complex.inplaceArea;
 	}
 
-	_object.complex.reflector->createValue( res );
+	_object.complex.reflector->createValues( res, 1 );
 	setVariable( type, Any::VarIsReference, res );
 
 	return res;
@@ -1060,14 +1051,9 @@ void Any::destroyObject()
 					size_t arraySize = pv->size();
 					if( arraySize > 0 )
 					{
-						uint8* beginPtr = &pv->front();
-						uint8* endPtr = beginPtr + arraySize;
-
 						size_t elementSize = _object.array.reflector->getSize();
 						assert( arraySize % elementSize == 0 );
-
-						for( uint8* p = beginPtr; p < endPtr; p += elementSize )
-							_object.array.reflector->destroyValue( p );
+						_object.array.reflector->destroyValues( &pv->front(), arraySize / elementSize );
 					}
 					pv->~vector();
 				}
@@ -1085,13 +1071,13 @@ void Any::destroyObject()
 		break;
 
 	case TK_STRUCT:
-		_object.complex.reflector->destroyValue( _object.complex.ptr );
+		_object.complex.reflector->destroyValues( _object.complex.ptr, 1 );
 		_object.complex.reflector->serviceRelease();
 		free( _object.complex.ptr );
 		break;
 
 	case TK_NATIVECLASS:
-		_object.complex.reflector->destroyValue( _object.complex.inplaceArea );
+		_object.complex.reflector->destroyValues( _object.complex.inplaceArea, 1 );
 		_object.complex.reflector->serviceRelease();
 		break;
 
@@ -1285,14 +1271,10 @@ void Any::copy( const Any& other )
 
 						if( arraySize > 0 )
 						{
-							const uint8* opvStart = &opv->front();
-							uint8* pvStart = &pv->front();
-
 							size_t elementSize = _object.array.reflector->getSize();
 							assert( arraySize % elementSize == 0 );
-
-							for( size_t offset = 0; offset < arraySize; offset += elementSize )
-								_object.complex.reflector->copyValue( opvStart + offset, pvStart + offset );
+							_object.complex.reflector->copyValues( &opv->front(), &pv->front(),
+																	arraySize / elementSize );
 						}
 					}
 					break;
@@ -1309,13 +1291,13 @@ void Any::copy( const Any& other )
 			break;
 
 		case TK_STRUCT:
-			other._object.complex.reflector->copyValue( other._object.complex.ptr,
-					createComplexValue( other._object.complex.reflector->getType() ) );
+			other._object.complex.reflector->copyValues( other._object.complex.ptr,
+					createComplexValue( other._object.complex.reflector->getType() ), 1 );
 			break;
 
 		case TK_NATIVECLASS:
-			other._object.complex.reflector->copyValue( other._object.complex.inplaceArea,
-					createComplexValue( other._object.complex.reflector->getType() ) );
+			other._object.complex.reflector->copyValues( other._object.complex.inplaceArea,
+					createComplexValue( other._object.complex.reflector->getType() ), 1 );
 			break;
 
 		default:

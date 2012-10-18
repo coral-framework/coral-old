@@ -45,7 +45,7 @@ TypeLoader::~TypeLoader()
 
 INamespace* getOrCreateChildNamespace( INamespace* parent, const std::string& name )
 {
-	INamespace* childNs = parent->getChildNamespace( name );
+	INamespace* childNs = parent->findChildNamespace( name );
 	if( childNs != NULL )
 		return childNs;
 	else

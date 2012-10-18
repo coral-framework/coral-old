@@ -82,17 +82,17 @@ void ReflectorBase::setServiceAt( IPort* receptacle, IService* )
 	raiseUnexpectedPortIndex();
 }
 
-void ReflectorBase::createValue( void* )
+void ReflectorBase::createValues( void*, size_t )
 {
 	raiseNotSupportedException();
 }
 
-void ReflectorBase::copyValue( const void*, void* )
+void ReflectorBase::copyValues( const void*, void*, size_t )
 {
 	raiseNotSupportedException();
 }
 
-void ReflectorBase::destroyValue( void* )
+void ReflectorBase::destroyValues( void*, size_t )
 {
 	raiseNotSupportedException();
 }

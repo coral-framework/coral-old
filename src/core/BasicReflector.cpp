@@ -27,17 +27,19 @@ public:
 
 	uint32 getSize() { return sizeof(T); }
 
-	void createValue( void* at )
+	void createValues( void* ptr, size_t numValues )
 	{
-		*reinterpret_cast<T*>( at ) = 0;
+		for( size_t i = 0; i < numValues; ++i )
+			reinterpret_cast<T*>( ptr )[i] = 0;
 	}
 
-	void copyValue( const void* from, void* to )
+	void copyValues( const void* fromPtr, void* toPtr, size_t numValues )
 	{
-		*reinterpret_cast<T*>( to ) = *reinterpret_cast<const T*>( from );
+		for( size_t i = 0; i < numValues; ++i )
+			reinterpret_cast<T*>( toPtr )[i] = reinterpret_cast<const T*>( fromPtr )[i];
 	}
-	
-	void destroyValue( void* )
+
+	void destroyValues( void*, size_t )
 	{
 		// NOP
 	}
@@ -53,21 +55,22 @@ public:
 
 	uint32 getSize() { return sizeof(T); }
 
-	void createValue( void* at )
+	void createValues( void* ptr, size_t numValues )
 	{
-		new( at ) T;
+		for( size_t i = 0; i < numValues; ++i )
+			new( reinterpret_cast<T*>( ptr ) + i ) T;
 	}
 
-	void copyValue( const void* from, void* to )
+	void copyValues( const void* fromPtr, void* toPtr, size_t numValues )
 	{
-		const T& fromObject = *reinterpret_cast<const T*>( from );
-		T& toObject = *reinterpret_cast<T*>( to );
-		toObject = fromObject;
+		for( size_t i = 0; i < numValues; ++i )
+			reinterpret_cast<T*>( toPtr )[i] = reinterpret_cast<const T*>( fromPtr )[i];
 	}
 
-	void destroyValue( void* at )
+	void destroyValues( void* ptr, size_t numValues )
 	{
-		callDestructor( reinterpret_cast<T*>( at ) );
+		for( size_t i = 0; i < numValues; ++i )
+			callDestructor( reinterpret_cast<T*>( ptr ) + i );
 	}
 };
 

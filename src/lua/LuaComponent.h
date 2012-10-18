@@ -42,9 +42,9 @@ public:
 	// co::IReflector methods:
 	co::uint32 getSize();
 	co::IType* getType();
-	void createValue( void* address );
-    void copyValue( const void* fromAddress, void* toAddress );
-    void destroyValue( void* address );
+	void createValues( void* ptr, size_t numValues );
+    void copyValues( const void* fromPtr, void* toPtr, size_t numValues );
+    void destroyValues( void* ptr, size_t numValues );
 	co::IObject* newInstance();
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider );
     void getField( const co::Any& instance, co::IField* ai, co::Any& value );

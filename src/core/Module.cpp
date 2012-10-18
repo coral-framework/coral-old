@@ -4,7 +4,6 @@
  */
 
 #include "Module.h"
-#include "utils/StringTokenizer.h"
 #include <co/Log.h>
 #include <co/Coral.h>
 #include <co/ISystem.h>
@@ -20,11 +19,11 @@ namespace co {
 
 const char* MODULE_STATE_STRINGS[] = {
 	"at an unknown state",
-	"initialized",
-	"integrated",
-	"running",
-	"disintegrated",
-	"disposed",
+	"loading [initialized]",
+	"loading [integrated]",
+	"loaded [running]",
+	"unloading [disintegrated]",
+	"unloaded [disposed]",
 	"aborted"
 };
 
@@ -42,22 +41,8 @@ Module::~Module()
 
 void Module::setName( const std::string& moduleName )
 {
-	// get or create a namespace for this module
-	INamespace* ns = getSystem()->getTypes()->getRootNS();
-
-	StringTokenizer st( moduleName, "." );
-	while( st.nextToken() )
-	{
-		INamespace* childNS = ns->getChildNamespace( st.getToken() );
-		if( !childNS )
-			childNS = ns->defineChildNamespace( st.getToken() );
-
-		ns = childNS;
-	}
-
-	_namespace = ns;
-
-	static_cast<Namespace*>( ns )->setModule( this );
+	_namespace = getSystem()->getTypes()->getNamespace( moduleName );
+	static_cast<Namespace*>( _namespace )->setModule( this );
 }
 
 void Module::addPart( IModulePart* modulePart )

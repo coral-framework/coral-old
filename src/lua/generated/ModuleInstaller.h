@@ -21,6 +21,7 @@ public:
 	{
 		TypeId_Component,
 		TypeId_Exception,
+		TypeId_IInterceptor,
 		TypeId_ILauncher,
 		TypeId_IScripted,
 		TypeId_IState,
@@ -68,6 +69,7 @@ private:
 // Module's reflector creation functions:
 co::IReflector* __createComponentReflector();
 co::IReflector* __createExceptionReflector();
+co::IReflector* __createIInterceptorReflector();
 co::IReflector* __createILauncherReflector();
 co::IReflector* __createIScriptedReflector();
 co::IReflector* __createIStateReflector();

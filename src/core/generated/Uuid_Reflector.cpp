@@ -40,19 +40,22 @@ public:
 		return sizeof(co::Uuid);
 	}
 
-	void createValue( void* address )
+	void createValues( void* ptr, size_t numValues )
 	{
-		new( address ) co::Uuid;
+		for( size_t i = 0; i < numValues; ++i )
+			new( reinterpret_cast<co::Uuid*>( ptr ) + i ) co::Uuid;
     }
 
-	void copyValue( const void* fromAddress, void* toAddress )
+	void copyValues( const void* fromPtr, void* toPtr, size_t numValues )
 	{
-		*reinterpret_cast<co::Uuid*>( toAddress ) = *reinterpret_cast<const co::Uuid*>( fromAddress );
+		for( size_t i = 0; i < numValues; ++i )
+			reinterpret_cast<co::Uuid*>( toPtr )[i] = reinterpret_cast<const co::Uuid*>( fromPtr )[i];
     }
 
-	void destroyValue( void* address )
+	void destroyValues( void* ptr, size_t numValues )
 	{
-		callDestructor( reinterpret_cast<co::Uuid*>( address ) );
+		for( size_t i = 0; i < numValues; ++i )
+			callDestructor( reinterpret_cast<co::Uuid*>( ptr ) + i );
 	}
 
 	void getField( const co::Any& instance, co::IField* field, co::Any& value )

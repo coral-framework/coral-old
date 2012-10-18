@@ -60,17 +60,13 @@ public:
 private:
 	bool locateModuleLibrary( const std::string& moduleName, std::string* filename = 0 )
 	{
-		const char* moduleBaseName = moduleName.c_str();
-		size_t lastDotPos = moduleName.rfind( '.' );
-		if( lastDotPos != std::string::npos )
-			moduleBaseName += ( lastDotPos + 1 );
-
+		// 'module.name' => 'module/name/module.name.lua'
 		std::string filePath;
-		filePath.reserve( moduleName.length() + ( moduleBaseName - moduleName.c_str() ) + 5 );
-		filePath = moduleName;
+		filePath.reserve( moduleName.length() * 2 + 5 );
+		filePath.assign( moduleName );
 		co::OS::convertDotsToDirSeps( filePath );
 		filePath.push_back( CORAL_OS_DIR_SEP );
-		filePath.append( moduleBaseName );
+		filePath.append( moduleName );
 		filePath.append( ".lua" );
 
 		return co::OS::searchFile2( co::getPaths(),

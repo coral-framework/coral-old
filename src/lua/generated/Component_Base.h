@@ -6,8 +6,8 @@
 #ifndef _LUA_COMPONENT_BASE_H_
 #define _LUA_COMPONENT_BASE_H_
 
-#include <co/IReflector.h>
 #include <co/IDynamicServiceProvider.h>
+#include <co/IReflector.h>
 #include <co/reserved/ComponentBase.h>
 
 namespace lua {

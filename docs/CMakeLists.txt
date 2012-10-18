@@ -1,18 +1,18 @@
 ################################################################################
-# Doxygen
+# Documentation Generation
 ################################################################################
 
-PROJECT( DOCS )
+project( DOCS )
 
-FIND_PROGRAM( NANOC "nanoc" )
+find_program( NANOC "nanoc" )
 
-IF( NANOC )
+if( NANOC )
 
 	# Generate the General Documentation
 
-	CONFIGURE_FILE( config.yaml.in ${CMAKE_CURRENT_SOURCE_DIR}/config.yaml )
+	configure_file( config.yaml.in "${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" )
 
-	ADD_CUSTOM_TARGET( docs-general
+	add_custom_target( docs-general
 		COMMAND ${NANOC} compile
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		COMMENT "Running nanoc to compile the general documentation..."
@@ -20,20 +20,20 @@ IF( NANOC )
 
 	# Generate the API Documentation
 
-	SET( CORAL_PATH
+	set( CORAL_PATH
 		"${CMAKE_SOURCE_DIR}/modules"
 		"${CMAKE_BINARY_DIR}/modules"
 	)
 
 	CORAL_GENERATE_DOX( docs-csl2dox co "${CMAKE_CURRENT_BINARY_DIR}/co" )
 
-	CORAL_GENERATE_DOXYGEN( docs doxygen/Doxyfile.in )
-	IF( DOXYGEN_FOUND )
-		ADD_DEPENDENCIES( docs docs-general docs-csl2dox )
-	ENDIF()
+	CORAL_GENERATE_DOXYGEN( docs "doxygen/Doxyfile.in" )
+	if( DOXYGEN_FOUND )
+		add_dependencies( docs docs-general docs-csl2dox )
+	endif()
 
-ELSE()
+else()
 
-	MESSAGE( "WARNING: nanoc not found - documentation generation has been disabled." )
+	message( "WARNING: nanoc not found - documentation generation has been disabled." )
 
-ENDIF()
+endif()

@@ -29,16 +29,16 @@ interface INamespace
 	readonly IModule module;
 
 	/*
-		Retrieves a type by name (case sensitive).
+		Searches this namespace for a loaded type with the given \a name (case sensitive).
 		Returns null if there is no type in this namespace with the given \a name.
 	 */
-	IType getType( in string name );
+	IType findType( in string name );
 
 	/*
-		Retrieves a child namespace by name (case sensitive).
-		Returns null if there is no child namespace with the given name.
+		Searches this namespace for a child namespace with the given \a name (case sensitive).
+		Returns null if there is no child namespace with the given \a name.
 	 */
-	INamespace getChildNamespace( in string name );
+	INamespace findChildNamespace( in string name );
 
 	/*
 		Creates an ITypeBuilder to define a type in this namespace.

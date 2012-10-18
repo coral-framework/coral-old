@@ -39,6 +39,8 @@ public:
 
 	virtual co::IArray* getArrayOf( co::IType* elementType ) = 0;
 
+	virtual co::INamespace* getNamespace( const std::string& fullName ) = 0;
+
 	virtual co::IType* getType( const std::string& typeName ) = 0;
 
 	virtual co::IType* loadType( const std::string& typeName, std::vector<co::CSLError>& errorStack ) = 0;

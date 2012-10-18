@@ -57,13 +57,13 @@ TEST( ReflectorTests, basicReflectors )
 		EXPECT_EQ( types[i], reflector->getType() );
 		EXPECT_GT( reflector->getSize(), co::uint32( 0 ) );
 
-		ASSERT_NO_THROW( reflector->createValue( buffer1 ) );
-		ASSERT_NO_THROW( reflector->createValue( buffer2 ) );
+		ASSERT_NO_THROW( reflector->createValues( buffer1, 1 ) );
+		ASSERT_NO_THROW( reflector->createValues( buffer2, 1 ) );
 
-		ASSERT_NO_THROW( reflector->copyValue( buffer2, buffer1 ) );
+		ASSERT_NO_THROW( reflector->copyValues( buffer2, buffer1, 1 ) );
 
-		ASSERT_NO_THROW( reflector->destroyValue( buffer1 ) );
-		ASSERT_NO_THROW( reflector->destroyValue( buffer2 ) );
+		ASSERT_NO_THROW( reflector->destroyValues( buffer1, 1 ) );
+		ASSERT_NO_THROW( reflector->destroyValues( buffer2, 1 ) );
 
 		EXPECT_THROW( reflector->newInstance(), co::NotSupportedException );
 		EXPECT_THROW( reflector->newDynamicProxy( NULL ), co::NotSupportedException );
@@ -85,9 +85,9 @@ TEST( ReflectorTests, arrayReflectors )
 	EXPECT_EQ( type, reflector->getType() );
 	EXPECT_GT( reflector->getSize(), co::uint32( 0 ) );
 
-	EXPECT_THROW( reflector->createValue( NULL ), co::NotSupportedException );
-	EXPECT_THROW( reflector->copyValue( NULL, NULL ), co::NotSupportedException );
-	EXPECT_THROW( reflector->destroyValue( NULL ), co::NotSupportedException );
+	EXPECT_THROW( reflector->createValues( NULL, 1 ), co::NotSupportedException );
+	EXPECT_THROW( reflector->copyValues( NULL, NULL, 1 ), co::NotSupportedException );
+	EXPECT_THROW( reflector->destroyValues( NULL, 1 ), co::NotSupportedException );
 	EXPECT_THROW( reflector->newInstance(), co::NotSupportedException );
 	EXPECT_THROW( reflector->newDynamicProxy( NULL ), co::NotSupportedException );
 
@@ -174,8 +174,8 @@ TEST( ReflectorTests, structSimple )
 	co::CSLError* s1 = reinterpret_cast<co::CSLError*>( memoryArea );
 	co::CSLError* s2 = reinterpret_cast<co::CSLError*>( memoryArea + sizeof(co::CSLError) );
 
-	reflector->createValue( s1 );
-	reflector->createValue( s2 );
+	reflector->createValues( s1, 1 );
+	reflector->createValues( s2, 1 );
 
 	EXPECT_EQ( 0, s1->line );
 	EXPECT_EQ( 0, s1->message.length() );
@@ -235,8 +235,8 @@ TEST( ReflectorTests, structSimple )
 	EXPECT_EQ( "", res.get<const std::string&>() );
 
 	// --- in-place destruction:
-	reflector->destroyValue( s1 );
-	reflector->destroyValue( s2 );
+	reflector->destroyValues( s1, 1 );
+	reflector->destroyValues( s2, 1 );
 }
 
 TEST( ReflectorTests, structExceptions )
@@ -276,7 +276,7 @@ TEST( ReflectorTests, interfaceNamespace )
 	ASSERT_TRUE( typesField != NULL );
 
 	// IType getType( in string name );
-	co::IMethod* getTypeMethod = getMethod( type, "getType" );
+	co::IMethod* getTypeMethod = getMethod( type, "findType" );
 	ASSERT_TRUE( getTypeMethod != NULL );
 
 	// ITypeBuilder defineType( in string name, in TypeKind typeKind, in ITypeTransaction transaction )
@@ -321,7 +321,7 @@ TEST( ReflectorTests, interfaceNamespace )
 	}
 	catch( co::IllegalCastException& e )
 	{
-		EXPECT_EQ( "invalid argument #1 to method getType(): illegal cast from 'bool' to 'const std::string&'", e.getMessage() );
+		EXPECT_EQ( "invalid argument #1 to method findType(): illegal cast from 'bool' to 'const std::string&'", e.getMessage() );
 	}
 
 	// --- calling method defineType():
@@ -372,7 +372,7 @@ TEST( ReflectorTests, nativeClass )
 
 	co::Uuid* u2 = reinterpret_cast<co::Uuid*>( memoryArea );
 
-	reflector->createValue( u2 );
+	reflector->createValues( u2, 1 );
 
 	EXPECT_EQ( u1, *u2 );
 
@@ -429,5 +429,5 @@ TEST( ReflectorTests, nativeClass )
 	EXPECT_EQ( u1, *u2 );
 
 	// --- in-place destruction:
-	reflector->destroyValue( u2 );
+	reflector->destroyValues( u2, 1 );
 }

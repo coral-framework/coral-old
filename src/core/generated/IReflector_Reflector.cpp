@@ -113,19 +113,19 @@ public:
 
 	// These co::IReflector methods are not part of the reflection system:
 
-	void createValue( void* )
+	void createValues( void*, size_t )
 	{
-		throw co::NotSupportedException( "co::IReflector::createValue() cannot be called through a proxy interface." );
+		throw co::NotSupportedException( "co::IReflector::createValues() cannot be called through a proxy" );
 	}
 
-	void copyValue( const void*, void* )
+	void copyValues( const void*, void*, size_t )
 	{
-		throw co::NotSupportedException( "co::IReflector::copyValue() cannot be called through a proxy interface." );
+		throw co::NotSupportedException( "co::IReflector::copyValues() cannot be called through a proxy" );
 	}
 
-	void destroyValue( void* )
+	void destroyValues( void*, size_t )
 	{
-		throw co::NotSupportedException( "co::IReflector::destroyValue() cannot be called through a proxy interface." );
+		throw co::NotSupportedException( "co::IReflector::destroyValues() cannot be called through a proxy" );
 	}
 
 protected:

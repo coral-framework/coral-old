@@ -52,7 +52,7 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 	// --- in-place allocation:
 	co::uint8 memoryArea[sizeof(moduleA::TestStruct)];
 	moduleA::TestStruct* ts = reinterpret_cast<moduleA::TestStruct*>( memoryArea );
-	reflector->createValue( ts );
+	reflector->createValues( ts, 1 );
 
 	EXPECT_FALSE( ts->aType.isValid() );
 	EXPECT_EQ( 0, ts->floatArray.size() );
@@ -109,7 +109,7 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 	EXPECT_EQ( 3.3f, res.get< co::Range<const float> >()[2] );
 
 	// --- in-place destruction:
-	reflector->destroyValue( ts );
+	reflector->destroyValues( ts, 1 );
 }
 
 TEST( ReflectionTests, getAndBindComponentInterfaces )

@@ -174,19 +174,19 @@ public:
 			writer [[
 	// These co::IReflector methods are not part of the reflection system:
 
-	void createValue( void* )
+	void createValues( void*, size_t )
 	{
-		throw co::NotSupportedException( "co::IReflector::createValue() cannot be called through a proxy interface." );
+		throw co::NotSupportedException( "co::IReflector::createValues() cannot be called through a proxy" );
 	}
 
-	void copyValue( const void*, void* )
+	void copyValues( const void*, void*, size_t )
 	{
-		throw co::NotSupportedException( "co::IReflector::copyValue() cannot be called through a proxy interface." );
+		throw co::NotSupportedException( "co::IReflector::copyValues() cannot be called through a proxy" );
 	}
 
-	void destroyValue( void* )
+	void destroyValues( void*, size_t )
 	{
-		throw co::NotSupportedException( "co::IReflector::destroyValue() cannot be called through a proxy interface." );
+		throw co::NotSupportedException( "co::IReflector::destroyValues() cannot be called through a proxy" );
 	}
 
 ]]
@@ -275,19 +275,22 @@ public:
 	elseif t.kind == 'TK_STRUCT' or t.kind == 'TK_NATIVECLASS' then
 		writer( [[
 
-	void createValue( void* address )
+	void createValues( void* ptr, size_t numValues )
 	{
-		new( address ) ]], t.cppName, [[;
+		for( size_t i = 0; i < numValues; ++i )
+			new( reinterpret_cast<]], t.cppName, [[*>( ptr ) + i ) ]], t.cppName, [[;
     }
 
-	void copyValue( const void* fromAddress, void* toAddress )
+	void copyValues( const void* fromPtr, void* toPtr, size_t numValues )
 	{
-		*reinterpret_cast<]], t.cppName, [[*>( toAddress ) = *reinterpret_cast<const ]], t.cppName, [[*>( fromAddress );
+		for( size_t i = 0; i < numValues; ++i )
+			reinterpret_cast<]], t.cppName, [[*>( toPtr )[i] = reinterpret_cast<const ]], t.cppName, [[*>( fromPtr )[i];
     }
 
-	void destroyValue( void* address )
+	void destroyValues( void* ptr, size_t numValues )
 	{
-		callDestructor( reinterpret_cast<]], t.cppName, [[*>( address ) );
+		for( size_t i = 0; i < numValues; ++i )
+			callDestructor( reinterpret_cast<]], t.cppName, [[*>( ptr ) + i );
 	}
 ]] )
 	elseif t.kind == 'TK_INTERFACE' then

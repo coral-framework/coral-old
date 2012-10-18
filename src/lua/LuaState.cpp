@@ -110,6 +110,21 @@ void LuaState::dumpStack( lua_State* L )
 	printf( "dumpStack -- END\n" );
 }
 
+co::Range<lua::IInterceptor* const> LuaState::getInterceptors()
+{
+	return CompositeTypeBinding::sm_interceptors;
+}
+
+void LuaState::addInterceptor( lua::IInterceptor* interceptor )
+{
+	return CompositeTypeBinding::addInterceptor( interceptor );
+}
+
+void LuaState::removeInterceptor( lua::IInterceptor* interceptor )
+{
+	return CompositeTypeBinding::removeInterceptor( interceptor );
+}
+
 bool LuaState::findScript( lua_State*, const std::string& name, std::string& filename )
 {
 	static const std::string s_extension( "lua" );
@@ -509,7 +524,7 @@ void LuaState::getValue( lua_State* L, int index, const co::Any& var )
 			if( actual != expected )
 				CORAL_THROW( lua::Exception, expected->getFullName() << " expected, got " <<
 					( actual ? actual->getFullName().c_str() : lua_typename( L, lua_type( L, index ) ) ) );
-			expected->getReflector()->copyValue( ComplexValueBinding::getInstance( L, index ), var.getState().data.ptr );
+			expected->getReflector()->copyValues( ComplexValueBinding::getInstance( L, index ), var.getState().data.ptr, 1 );
 		}
 		break;
 	case co::TK_INTERFACE:
@@ -647,11 +662,6 @@ void LuaState::pushArray( lua_State* L, const co::Any& var )
 {
 	const co::Any::State& s = var.getState();
 	assert( s.kind == co::TK_ARRAY );
-
-	if( s.data.ptr == NULL )
-	{
-		lua_pushnil( L );
-	}
 
 	co::TypeKind kind = static_cast<co::TypeKind>( s.type->getKind() );
 	assert( !s.isPointer || s.type->getKind() == co::TK_INTERFACE );

@@ -7,9 +7,9 @@
 #define _LUA_ILAUNCHER_H_
 
 #include <co/TypeTraits.h>
-#include <co/IService.h>
-#include <vector>
 #include <co/Range.h>
+#include <vector>
+#include <co/IService.h>
 
 // lua.ILauncher Mapping:
 namespace lua {

@@ -171,13 +171,13 @@ struct get
 	typedef typename removePointer<ReferencedType>::Type	PointedType;
 	typedef typename removeConst<PointedType>::Type			CoreType;
 
-	static const bool isConst = isConst<PointedType>::value;
-	static const bool isPointer = isPointer<ReferencedType>::value;
-	static const bool isPointerConst = traits::get<T>::isPointer
-							&& traits::isConst<ReferencedType>::value;
-	static const bool isReference = isReference<T>::value;
+	static const bool isConst = co::traits::isConst<PointedType>::value;
+	static const bool isPointer = co::traits::isPointer<ReferencedType>::value;
+	static const bool isPointerConst = co::traits::get<T>::isPointer
+							&& co::traits::isConst<ReferencedType>::value;
+	static const bool isReference = co::traits::isReference<T>::value;
 
-	static const TypeKind kind = kindOf<CoreType>::kind;
+	static const TypeKind kind = co::kindOf<CoreType>::kind;
 };
 
 } // namespace traits

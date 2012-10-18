@@ -166,6 +166,7 @@ void LuaComponent::getMethod( lua_State* L, int t, co::int32 cookie )
 			ss << ", facet '" << getFacetByCookie( cookie )->getName() << "'";
 		throw lua::Exception( ss.str() );
 	}
+	assert( lua_isfunction( L, -1 ) );
 }
 
 const co::Any& LuaComponent::dynamicGetField( co::int32 cookie, co::IField* ai )
@@ -279,17 +280,17 @@ co::IType* LuaComponent::getType()
 	return _componentType;
 }
 
-void LuaComponent::createValue( void* )
+void LuaComponent::createValues( void*, size_t )
 {
 	raiseNotSupportedException();
 }
 
-void LuaComponent::copyValue( const void*, void* )
+void LuaComponent::copyValues( const void*, void*, size_t )
 {
 	raiseNotSupportedException();
 }
 
-void LuaComponent::destroyValue( void* )
+void LuaComponent::destroyValues( void*, size_t )
 {
 	raiseNotSupportedException();
 }

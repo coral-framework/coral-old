@@ -32,29 +32,29 @@ public:
 
 	// Code From <c++ Block:
 	
-		//------ Manipulation of complex value instances (only available from C++) ------//
+		//------ Manipulation of Values (only available from C++) ------//
 
 		/*!
-			Constructs an instance of a struct or native class in the specified memory area.
-			\param[in] address memory address where the instance is to be constructed.
-			\throw NotSupportedException if the \a type is neither a struct nor a native class.
+			Constructs an array of values in the memory area starting at \a ptr.
+			\pre The memory area at \a ptr should be at least \a numValues * \a size bytes big.
+			\throw NotSupportedException if this \a type does not have a value form.
 		 */
-		virtual void createValue( void* address ) = 0;
+		virtual void createValues( void* ptr, size_t numValues ) = 0;
 
 		/*!
-			Sets the complex value at \a toAddress with a copy of the complex value at \a fromAddress.
-			The copy is done using the type's assignment operator.
-			\warning Both pointers must point to instances of this exact type.
+			Copies an array of \a numValues values from \a fromPtr to \a toPtr.
+			\note Each copy is done using the value's assignment operator.
+			\pre Both arrays must contain at least \a numValues properly constructed values of this type.
+			\throw NotSupportedException if this \a type does not have a value form.
 		 */
-		virtual void copyValue( const void* fromAddress, void* toAddress ) = 0;
+		virtual void copyValues( const void* fromPtr, void* toPtr, size_t numValues ) = 0;
 
 		/*!
-			Destroys the struct or native class instance located at \a address.
-			The instance should have been constructed using createValue().
-			\warning Expect the worst if \a address does not point to an instance of this type.
-			\throw NotSupportedException if the \a type is neither a struct nor a native class.
+			Destructs an array of \a numValues values starting at \a ptr.
+			\pre The array must contain at least \a numValues values constructed with createValues().
+			\throw NotSupportedException if this \a type does not have a value form.
 		 */
-		virtual void destroyValue( void* address ) = 0;
+		virtual void destroyValues( void* ptr, size_t numValues ) = 0;
 	
 	// End Of c++> Block
 

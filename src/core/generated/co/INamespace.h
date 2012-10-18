@@ -44,9 +44,9 @@ public:
 
 	virtual co::ITypeBuilder* defineType( const std::string& name, co::TypeKind typeKind ) = 0;
 
-	virtual co::INamespace* getChildNamespace( const std::string& name ) = 0;
+	virtual co::INamespace* findChildNamespace( const std::string& name ) = 0;
 
-	virtual co::IType* getType( const std::string& name ) = 0;
+	virtual co::IType* findType( const std::string& name ) = 0;
 };
 
 } // namespace co
