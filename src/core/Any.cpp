@@ -130,6 +130,11 @@ void streamOut( std::ostream& os, const co::Any& var )
 			double scalar;
 			castTo<double>( kind, var.isIn() ? &var.state.data : var.state.data.ptr, &scalar );
 
+			#ifdef CORAL_OS_WIN
+				// makes windows compatible with the rest of the world
+				_set_output_format( _TWO_DIGIT_EXPONENT );
+			#endif
+
 			// 16 digits, sign, point, and \0
 			char buffer[32];
 			sprintf( buffer, "%.15g", scalar );
