@@ -9,7 +9,7 @@
 //! \file OS.h Portable OS types, macros and functions.
 
 #include <co/Platform.h>
-#include <co/Range.h>
+#include <co/Slice.h>
 #include <string>
 
 #if defined(CORAL_OS_WIN)
@@ -83,8 +83,8 @@ public:
 
 		\return true if a file is found; false otherwise.
 	*/
-	static bool searchFile2( co::Range<std::string> listA,
-							 co::Range<std::string> listB,
+	static bool searchFile2( co::Slice<std::string> listA,
+							 co::Slice<std::string> listB,
 							 std::string& path,
 							 std::string* partA = 0,
 							 std::string* partB = 0 );
@@ -105,9 +105,9 @@ public:
 
 		\return true if a file is found; false otherwise.
 	*/
-	static bool searchFile3( co::Range<std::string> listA,
-							 co::Range<std::string> listB,
-							 co::Range<std::string> listC,
+	static bool searchFile3( co::Slice<std::string> listA,
+							 co::Slice<std::string> listB,
+							 co::Slice<std::string> listC,
 							 std::string& path,
 							 std::string* partA = 0,
 							 std::string* partB = 0,

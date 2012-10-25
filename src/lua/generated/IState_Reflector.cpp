@@ -46,11 +46,13 @@ public:
 
 	// lua.IState Methods:
 
-	co::Range<lua::IInterceptor*> getInterceptors()
+	co::TSlice<lua::IInterceptor*> getInterceptors()
 	{
-		co::RefVector<lua::IInterceptor> res;
+		typedef co::Temporary<std::vector<lua::IInterceptorRef> > Temporary;
+		std::unique_ptr<Temporary> temp( new Temporary );
+		auto& res = temp->value;
 		_provider->dynamicGetField( _cookie, getField<lua::IState>( 0 ), res );
-		return res;
+		return co::TSlice<lua::IInterceptor*>( res, temp.release() );
 	}
 
 	void addInterceptor( lua::IInterceptor* interceptor_ )
@@ -59,7 +61,7 @@ public:
 		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 0 ), args, co::Any() );
 	}
 
-	co::int32 call( const std::string& moduleName_, const std::string& functionName_, co::Range<co::Any> args_, co::Range<co::Any> results_ )
+	co::int32 call( const std::string& moduleName_, const std::string& functionName_, co::Slice<co::Any> args_, co::Slice<co::Any> results_ )
 	{
 		co::Any args[] = { moduleName_, functionName_, args_, results_ };
 		co::int32 res;
@@ -69,7 +71,7 @@ public:
 
 	void collectGarbage()
 	{
-		co::Range<co::Any> args;
+		co::Slice<co::Any> args;
 		_provider->dynamicInvoke( _cookie, getMethod<lua::IState>( 2 ), args, co::Any() );
 	}
 
@@ -158,7 +160,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		lua::IState* p = co::checkInstance<lua::IState>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -178,8 +180,8 @@ public:
 				{
 					const std::string& moduleName_ = args[++argIndex].get< const std::string& >();
 					const std::string& functionName_ = args[++argIndex].get< const std::string& >();
-					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
-					co::Range<co::Any> results_ = args[++argIndex].get< co::Range<co::Any> >();
+					co::Slice<co::Any> args_ = args[++argIndex].get< co::Slice<co::Any> >();
+					co::Slice<co::Any> results_ = args[++argIndex].get< co::Slice<co::Any> >();
 					argIndex = -1;
 					res.put( p->call( moduleName_, functionName_, args_, results_ ) );
 				}

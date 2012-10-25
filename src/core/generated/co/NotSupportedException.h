@@ -6,7 +6,7 @@
 #ifndef _CO_NOTSUPPORTEDEXCEPTION_H_
 #define _CO_NOTSUPPORTEDEXCEPTION_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/Exception.h>
 
 // co.NotSupportedException Mapping:

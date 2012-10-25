@@ -6,16 +6,16 @@
 #ifndef _CO_ITYPEBUILDER_H_
 #define _CO_ITYPEBUILDER_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/TypeKind.h>
 #include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
-	class IInterface;
-	class IMethodBuilder;
-	class INamespace;
-	class IType;
+	class IInterface; typedef co::RefPtr<IInterface> IInterfaceRef;
+	class IMethodBuilder; typedef co::RefPtr<IMethodBuilder> IMethodBuilderRef;
+	class INamespace; typedef co::RefPtr<INamespace> INamespaceRef;
+	class IType; typedef co::RefPtr<IType> ITypeRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -45,6 +45,8 @@ public:
 
 	virtual void definePort( const std::string& name, co::IInterface* type, bool isFacet ) = 0;
 };
+
+typedef co::RefPtr<ITypeBuilder> ITypeBuilderRef;
 
 } // namespace co
 

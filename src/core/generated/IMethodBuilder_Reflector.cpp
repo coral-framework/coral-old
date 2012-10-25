@@ -5,9 +5,9 @@
 
 #include <co/IMethodBuilder.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/ITypeBuilder.h>
 #include <co/IException.h>
 #include <co/IType.h>
+#include <co/ITypeBuilder.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -53,14 +53,14 @@ public:
 
 	co::ITypeBuilder* getTypeBuilder()
 	{
-		co::RefPtr<co::ITypeBuilder> res;
+		co::ITypeBuilderRef res;
 		_provider->dynamicGetField( _cookie, getField<co::IMethodBuilder>( 1 ), res );
 		return res.get();
 	}
 
 	void createMethod()
 	{
-		co::Range<co::Any> args;
+		co::Slice<co::Any> args;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IMethodBuilder>( 0 ), args, co::Any() );
 	}
 
@@ -155,7 +155,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::IMethodBuilder* p = co::checkInstance<co::IMethodBuilder>( instance, method );
 		checkNumArguments( method, args.getSize() );

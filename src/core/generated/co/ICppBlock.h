@@ -6,7 +6,7 @@
 #ifndef _CO_ICPPBLOCK_H_
 #define _CO_ICPPBLOCK_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IAnnotation.h>
 
 // co.ICppBlock Mapping:
@@ -21,6 +21,8 @@ public:
 
 	virtual void setValue( const std::string& value ) = 0;
 };
+
+typedef co::RefPtr<ICppBlock> ICppBlockRef;
 
 } // namespace co
 

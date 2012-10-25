@@ -6,19 +6,17 @@
 #ifndef _CO_IREFLECTOR_H_
 #define _CO_IREFLECTOR_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/Any.h>
-#include <co/Range.h>
-#include <vector>
 #include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
-	class IDynamicServiceProvider;
-	class IField;
-	class IMethod;
-	class IObject;
-	class IType;
+	class IDynamicServiceProvider; typedef co::RefPtr<IDynamicServiceProvider> IDynamicServiceProviderRef;
+	class IField; typedef co::RefPtr<IField> IFieldRef;
+	class IMethod; typedef co::RefPtr<IMethod> IMethodRef;
+	class IObject; typedef co::RefPtr<IObject> IObjectRef;
+	class IType; typedef co::RefPtr<IType> ITypeRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -64,7 +62,7 @@ public:
 
 	virtual void getField( const co::Any& instance, co::IField* field, const co::Any& value ) = 0;
 
-	virtual void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& returnValue ) = 0;
+	virtual void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& returnValue ) = 0;
 
 	virtual co::IService* newDynamicProxy( co::IDynamicServiceProvider* dynamicProvider ) = 0;
 
@@ -74,6 +72,8 @@ public:
 
 	virtual void setField( const co::Any& instance, co::IField* field, const co::Any& value ) = 0;
 };
+
+typedef co::RefPtr<IReflector> IReflectorRef;
 
 } // namespace co
 

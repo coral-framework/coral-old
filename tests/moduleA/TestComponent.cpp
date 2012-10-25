@@ -35,12 +35,12 @@ public:
 		_dummyInterface = dummyInterfaceField;
 	}
 
-	co::Range<IDummy*> getDummyInterfaces()
+	co::TSlice<IDummy*> getDummyInterfaces()
 	{
 		return _dummyInterfaces;
 	}
 
-	void setDummyInterfaces( co::Range<IDummy*> dummyInterfaces )
+	void setDummyInterfaces( co::Slice<IDummy*> dummyInterfaces )
 	{
 		_dummyInterfaces.clear();
 		for( ; dummyInterfaces; dummyInterfaces.popFirst() )
@@ -62,12 +62,12 @@ public:
 		return _readOnlyString;
 	}
 
-	co::Range<std::string> getNames()
+	co::TSlice<std::string> getNames()
 	{
-		return co::Range<std::string>( _names );
+		return co::Slice<std::string>( _names );
 	}
 
-	void setNames( co::Range<std::string> names )
+	void setNames( co::Slice<std::string> names )
 	{
 		_names.clear();
 		for( ; names; names.popFirst() )
@@ -99,12 +99,12 @@ public:
 		_testStruct = value;
 	}
 
-	co::Range<TestStruct> getTestStructArray()
+	co::TSlice<TestStruct> getTestStructArray()
 	{
 		return _testStructArray;
 	}
 
-	void setTestStructArray( co::Range<TestStruct> range )
+	void setTestStructArray( co::Slice<TestStruct> range )
 	{
 		_testStructArray.clear();
 		_testStructArray.reserve( range.getSize() );
@@ -114,8 +114,8 @@ public:
 
 	void testInParameters( float size, TestEnum enumValue,
 		const std::string& text, const TestStruct& testStruct,
-		IDummy* dummyInterface, co::Range<co::int32> intList,
-		co::Range<IDummy*> interfaces )
+		IDummy* dummyInterface, co::Slice<co::int32> intList,
+		co::Slice<IDummy*> interfaces )
 	{
 		size = -1;
 		enumValue = First;
@@ -143,8 +143,8 @@ public:
 
 	void testOutParameters( float& size, TestEnum& enumValue,
 		std::string& text, TestStruct& testStruct,
-		co::RefPtr<IDummy>& dummyInterface, std::vector<co::int32>& intList,
-		co::RefVector<IDummy>& interfaces )
+		IDummyRef& dummyInterface, std::vector<co::int32>& intList,
+		std::vector<IDummyRef>& interfaces )
 	{
 		size = -1;
 		enumValue = First;
@@ -173,9 +173,9 @@ public:
 
 	// co::ITypeTransaction methods:
 
-	co::Range<co::ITypeBuilder*> getTypeBuilders()
+	co::TSlice<co::ITypeBuilder*> getTypeBuilders()
 	{
-		return co::Range<co::ITypeBuilder*>();
+		return co::Slice<co::ITypeBuilder*>();
 	}
 
 	void commit()
@@ -210,15 +210,15 @@ protected:
 	}
 
 private:
-	co::RefPtr<co::IType> _type;
-	co::RefPtr<co::IInterface> _itf;
+	co::ITypeRef _type;
+	co::IInterfaceRef _itf;
 
-	co::RefPtr<IDummy> _dummyInterface;
+	IDummyRef _dummyInterface;
 	std::string _name;
 	std::string _readOnlyString;
 
 	std::vector<std::string> _names;
-	co::RefVector<IDummy> _dummyInterfaces;
+	std::vector<IDummyRef> _dummyInterfaces;
 	TestEnum _testEnum;
 	TestStruct _testStruct;
 	std::vector<TestStruct> _testStructArray;

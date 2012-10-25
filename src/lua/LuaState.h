@@ -77,14 +77,14 @@ public:
     LuaState();
 	virtual ~LuaState();
 
-	co::Range<lua::IInterceptor*> getInterceptors();
+	co::TSlice<lua::IInterceptor*> getInterceptors();
 	void addInterceptor( lua::IInterceptor* interceptor );
 	void removeInterceptor( lua::IInterceptor* interceptor );
 
 	bool findScript( const std::string& name, std::string& filename );
 
 	co::int32 call( const std::string& moduleName, const std::string& functionName,
-		co::Range<co::Any> args, co::Range<co::Any> results );
+		co::Slice<co::Any> args, co::Slice<co::Any> results );
 
 	void collectGarbage();
 

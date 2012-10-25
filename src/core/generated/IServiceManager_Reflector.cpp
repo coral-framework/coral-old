@@ -81,7 +81,7 @@ public:
 	co::IService* getService( co::IInterface* serviceType_ )
 	{
 		co::Any args[] = { serviceType_ };
-		co::RefPtr<co::IService> res;
+		co::IServiceRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 4 ), args, res );
 		return res.get();
 	}
@@ -89,7 +89,7 @@ public:
 	co::IService* getServiceForInstance( co::IInterface* serviceType_, co::IService* client_ )
 	{
 		co::Any args[] = { serviceType_, client_ };
-		co::RefPtr<co::IService> res;
+		co::IServiceRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 5 ), args, res );
 		return res.get();
 	}
@@ -97,7 +97,7 @@ public:
 	co::IService* getServiceForType( co::IInterface* serviceType_, co::IInterface* clientType_ )
 	{
 		co::Any args[] = { serviceType_, clientType_ };
-		co::RefPtr<co::IService> res;
+		co::IServiceRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IServiceManager>( 6 ), args, res );
 		return res.get();
 	}
@@ -185,7 +185,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::IServiceManager* p = co::checkInstance<co::IServiceManager>( instance, method );
 		checkNumArguments( method, args.getSize() );

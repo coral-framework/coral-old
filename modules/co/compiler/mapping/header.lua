@@ -6,7 +6,7 @@ local function template( writer, c, t )
 #ifndef _]], t.fullNameUpperUnderline, [[_H_
 #define _]], t.fullNameUpperUnderline, [[_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 ]] )
 
 	if t.kind == 'TK_NATIVECLASS' then

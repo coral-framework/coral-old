@@ -96,17 +96,17 @@ TEST( ReflectionTests, structGetSetInterfacesAndArrays )
 	EXPECT_EQ( "co.IInterface", res.get<co::IService*>()->getInterface()->getFullName() );
 
 	reflector->getField( ts, floatArrayField, res );
-	EXPECT_EQ( 0, res.get< co::Range<float> >().getSize() );
+	EXPECT_EQ( 0, res.get< co::Slice<float> >().getSize() );
 
 	ts.floatArray.push_back( 1.1f );
 	ts.floatArray.push_back( 2.2f );
 	ts.floatArray.push_back( 3.3f );
 
 	reflector->getField( ts, floatArrayField, res );
-	ASSERT_EQ( 3, res.get< co::Range<float> >().getSize() );
-	EXPECT_EQ( 1.1f, res.get< co::Range<float> >()[0] );
-	EXPECT_EQ( 2.2f, res.get< co::Range<float> >()[1] );
-	EXPECT_EQ( 3.3f, res.get< co::Range<float> >()[2] );
+	ASSERT_EQ( 3, res.get< co::Slice<float> >().getSize() );
+	EXPECT_EQ( 1.1f, res.get< co::Slice<float> >()[0] );
+	EXPECT_EQ( 2.2f, res.get< co::Slice<float> >()[1] );
+	EXPECT_EQ( 3.3f, res.get< co::Slice<float> >()[2] );
 
 	// --- in-place destruction:
 	reflector->destroyValues( &ts, 1 );

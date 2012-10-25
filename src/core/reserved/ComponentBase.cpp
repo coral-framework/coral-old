@@ -4,7 +4,7 @@
  */
 
 #include "ComponentBase.h"
-#include "../BasicReflector.h"
+#include "../types/BasicReflector.h"
 #include <co/Log.h>
 #include <co/Coral.h>
 #include <co/RefPtr.h>
@@ -18,7 +18,6 @@
 #include <co/IInterface.h>
 #include <co/ITypeTransaction.h>
 #include <co/NoSuchPortException.h>
-#include <sstream>
 
 namespace co {
 

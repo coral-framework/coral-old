@@ -6,7 +6,7 @@
 #ifndef _CO_IDOCUMENTATION_H_
 #define _CO_IDOCUMENTATION_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IAnnotation.h>
 
 // co.IDocumentation Mapping:
@@ -25,6 +25,8 @@ public:
 
 	virtual std::string getDocFor( const std::string& element ) = 0;
 };
+
+typedef co::RefPtr<IDocumentation> IDocumentationRef;
 
 } // namespace co
 

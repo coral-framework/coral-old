@@ -6,12 +6,12 @@
 #ifndef _CO_IFIELD_H_
 #define _CO_IFIELD_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IMember.h>
 
 // Forward Declarations:
 namespace co {
-	class IType;
+	class IType; typedef co::RefPtr<IType> ITypeRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -27,6 +27,8 @@ public:
 
 	virtual co::IType* getType() = 0;
 };
+
+typedef co::RefPtr<IField> IFieldRef;
 
 } // namespace co
 

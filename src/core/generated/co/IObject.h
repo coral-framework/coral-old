@@ -6,13 +6,13 @@
 #ifndef _CO_IOBJECT_H_
 #define _CO_IOBJECT_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
-	class IComponent;
-	class IPort;
+	class IComponent; typedef co::RefPtr<IComponent> IComponentRef;
+	class IPort; typedef co::RefPtr<IPort> IPortRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -79,6 +79,8 @@ public:
 
 	virtual void setServiceAt( co::IPort* receptacle, co::IService* service ) = 0;
 };
+
+typedef co::RefPtr<IObject> IObjectRef;
 
 } // namespace co
 

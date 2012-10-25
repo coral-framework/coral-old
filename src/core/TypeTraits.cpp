@@ -4,7 +4,7 @@
  */
 
 #include "TypeTraits.h"
-#include "types/Type.h"
+#include "types/descriptors/Type.h"
 #include <co/Coral.h>
 #include <co/IPort.h>
 #include <co/IObject.h>
@@ -78,7 +78,7 @@ TypeKind getKind( IType* type )
 IService* findServiceByType( IObject* object, IInterface* type )
 {
 	assert( object && type );
-	Range<IPort*> facets = object->getComponent()->getFacets();
+	TSlice<IPort*> facets = object->getComponent()->getFacets();
 	for( ; facets; facets.popFirst() )
 		if( facets.getFirst()->getType()->isA( type ) )
 			return object->getServiceAt( facets.getFirst() );

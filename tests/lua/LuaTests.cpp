@@ -205,7 +205,7 @@ TEST( LuaTests, callFunction )
 
 	co::int32 numRes;
 	co::Any args[4], results[6];
-	co::Range<co::Any> resRange( results, 6 );
+	co::Slice<co::Any> resRange( results, 6 );
 
 	/*
 		Test calling a function returned by a module.
@@ -222,7 +222,7 @@ TEST( LuaTests, callFunction )
 	results[3] = intVec[3];
 
 	ASSERT_NO_THROW( numRes = luaState->call( "lua.scripts.sum", "",
-						co::Range<co::Any>( args, 4 ), resRange ) );
+						co::Slice<co::Any>( args, 4 ), resRange ) );
 
 	ASSERT_EQ( 1, numRes );
 	ASSERT_EQ( 11, intVec[0] );
@@ -233,7 +233,7 @@ TEST( LuaTests, callFunction )
 
 	// passthrough() simply returns all of its args.
 	ASSERT_NO_THROW( numRes = luaState->call( "lua.scripts.manyFunctions", "passthrough",
-						co::Range<co::Any>( args, 4 ), resRange ) );
+						co::Slice<co::Any>( args, 4 ), resRange ) );
 
 	ASSERT_EQ( 4, numRes );
 	ASSERT_EQ( 1, intVec[0] );
@@ -255,7 +255,7 @@ TEST( LuaTests, callFunction )
 	results[5] = any2;
 
 	ASSERT_NO_THROW( numRes = luaState->call( "lua.scripts.manyFunctions", "constants",
-						co::Range<co::Any>(), resRange ) );
+						co::Slice<co::Any>(), resRange ) );
 
 	ASSERT_EQ( 6, numRes );
 	ASSERT_TRUE( !any1.isValid() );
@@ -270,7 +270,7 @@ TEST( LuaTests, callFunction )
 	results[1] = str2;
 
 	ASSERT_NO_THROW( numRes = luaState->call( "lua.scripts.manyFunctions", "constants2",
-						 co::Range<co::Any>(), co::Range<co::Any>( results, 2 ) ) );
+						 co::Slice<co::Any>(), co::Slice<co::Any>( results, 2 ) ) );
 
 	ASSERT_EQ( 5, numRes );
 	ASSERT_EQ( "one", str1 );
@@ -280,7 +280,7 @@ TEST( LuaTests, callFunction )
 TEST( LuaTests, callFunctionErrors )
 {
 	co::RefPtr<lua::IState> luaState = co::getService<lua::IState>();
-	co::Range<co::Any> empty;
+	co::Slice<co::Any> empty;
 
 	ASSERT_LUA_EXCEPTION( luaState->call( "lua.scripts.doesNotExist", "nope", empty, empty ),
 						"module 'lua.scripts.doesNotExist' not found" );
@@ -308,8 +308,8 @@ TEST( LuaTests, exceptionTypes )
 	args[0].set<const std::string&>( exceptionType );
 	args[1].set<const std::string&>( message );
 
-	co::Range<co::Any> empty;
-	co::Range<co::Any> argRange( args, 2 );
+	co::Slice<co::Any> empty;
+	co::Slice<co::Any> argRange( args, 2 );
 
 	exceptionType = "no type given";
 	message = "ignored";
@@ -336,7 +336,7 @@ TEST( LuaTests, preserveExceptionType )
 {
 	co::RefPtr<lua::IState> luaState = co::getService<lua::IState>();
 
-	co::Range<co::Any> empty;
+	co::Slice<co::Any> empty;
 
 	ASSERT_EXCEPTION( luaState->call( "lua.scripts.manyFunctions", "causeIllegalStateException",
 						empty, empty ), co::IllegalStateException, "not SystemState_None" );
@@ -386,7 +386,7 @@ public:
 		calls.push_back( CallInfo( service, field ) );
 	}
 
-	void postInvoke( co::IService* service, co::IMethod* method, co::Range<co::Any>, const co::Any& )
+	void postInvoke( co::IService* service, co::IMethod* method, co::Slice<co::Any>, const co::Any& )
 	{
 		calls.push_back( CallInfo( service, method ) );
 	}
@@ -419,7 +419,7 @@ TEST( LuaTests, interceptor )
 
 	std::string facetName = annotation->getFacet()->getName();
 	co::Any args[] = { obj.get(), facetName };
-	luaState->call( "lua.interceptor", "get", co::Range<co::Any>( args, 2 ), co::Range<co::Any>() );
+	luaState->call( "lua.interceptor", "get", co::Slice<co::Any>( args, 2 ), co::Slice<co::Any>() );
 
 	ASSERT_GE( sg_interceptor.retained.size(), 2 );
 	EXPECT_EQ( sg_interceptor.retained[0], obj.get() );
@@ -434,7 +434,7 @@ TEST( LuaTests, interceptor )
 
 	// test the service call notifications
 	sg_interceptor.calls.clear();
-	luaState->call( "lua.interceptor", "serviceCalls", co::Range<co::Any>(), co::Range<co::Any>() );
+	luaState->call( "lua.interceptor", "serviceCalls", co::Slice<co::Any>(), co::Slice<co::Any>() );
 
 	ASSERT_GE( sg_interceptor.calls.size(), 1 );
 	EXPECT_EQ( sg_interceptor.calls[0].service, co::getSystem() );
@@ -450,7 +450,7 @@ TEST( LuaTests, interceptor )
 
 	// test the object call notifications
 	sg_interceptor.calls.clear();
-	luaState->call( "lua.interceptor", "objectCalls", co::Range<co::Any>(), co::Range<co::Any>() );
+	luaState->call( "lua.interceptor", "objectCalls", co::Slice<co::Any>(), co::Slice<co::Any>() );
 
 	ASSERT_GE( sg_interceptor.calls.size(), 3 );
 	EXPECT_EQ( sg_interceptor.calls[0].service, sg_interceptor.calls[2].service );
@@ -466,7 +466,7 @@ TEST( LuaTests, interceptor )
 	sg_interceptor.released.clear();
 
 	// make sure it is not intercepting anything anymore
-	luaState->call( "lua.interceptor", "moreCalls", co::Range<co::Any>(), co::Range<co::Any>() );
+	luaState->call( "lua.interceptor", "moreCalls", co::Slice<co::Any>(), co::Slice<co::Any>() );
 
 	EXPECT_EQ( 0, sg_interceptor.calls.size() );
 	EXPECT_EQ( 0, sg_interceptor.retained.size() );

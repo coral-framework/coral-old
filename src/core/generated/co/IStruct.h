@@ -6,7 +6,7 @@
 #ifndef _CO_ISTRUCT_H_
 #define _CO_ISTRUCT_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IRecordType.h>
 
 // co.IStruct Mapping:
@@ -17,6 +17,8 @@ class IStruct : public co::IRecordType
 public:
 	virtual ~IStruct() {;}
 };
+
+typedef co::RefPtr<IStruct> IStructRef;
 
 } // namespace co
 

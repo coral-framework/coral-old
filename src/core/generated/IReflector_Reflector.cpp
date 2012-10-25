@@ -4,11 +4,11 @@
  */
 
 #include <co/IReflector.h>
-#include <co/IDynamicServiceProvider.h>
 #include <co/IType.h>
-#include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IObject.h>
+#include <co/IMethod.h>
+#include <co/IDynamicServiceProvider.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -53,7 +53,7 @@ public:
 
 	co::IType* getType()
 	{
-		co::RefPtr<co::IType> res;
+		co::ITypeRef res;
 		_provider->dynamicGetField( _cookie, getField<co::IReflector>( 1 ), res );
 		return res.get();
 	}
@@ -64,7 +64,7 @@ public:
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 0 ), args, co::Any() );
 	}
 
-	void invoke( const co::Any& instance_, co::IMethod* method_, co::Range<co::Any> args_, const co::Any& returnValue_ )
+	void invoke( const co::Any& instance_, co::IMethod* method_, co::Slice<co::Any> args_, const co::Any& returnValue_ )
 	{
 		co::Any args[] = { instance_, method_, args_, returnValue_ };
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 1 ), args, co::Any() );
@@ -73,15 +73,15 @@ public:
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* dynamicProvider_ )
 	{
 		co::Any args[] = { dynamicProvider_ };
-		co::RefPtr<co::IService> res;
+		co::IServiceRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 2 ), args, res );
 		return res.get();
 	}
 
 	co::IObject* newInstance()
 	{
-		co::Range<co::Any> args;
-		co::RefPtr<co::IObject> res;
+		co::Slice<co::Any> args;
+		co::IObjectRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IReflector>( 3 ), args, res );
 		return res.get();
 	}
@@ -188,7 +188,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::IReflector* p = co::checkInstance<co::IReflector>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -210,7 +210,7 @@ public:
 				{
 					const co::Any& instance_ = args[++argIndex];
 					co::IMethod* method_ = args[++argIndex].get< co::IMethod* >();
-					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
+					co::Slice<co::Any> args_ = args[++argIndex].get< co::Slice<co::Any> >();
 					const co::Any& returnValue_ = args[++argIndex];
 					argIndex = -1;
 					p->invoke( instance_, method_, args_, returnValue_ );

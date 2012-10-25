@@ -6,7 +6,7 @@
 #ifndef _CO_IANNOTATION_H_
 #define _CO_IANNOTATION_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IService.h>
 
 // co.IAnnotation Mapping:
@@ -17,6 +17,8 @@ class IAnnotation : public co::IService
 public:
 	virtual ~IAnnotation() {;}
 };
+
+typedef co::RefPtr<IAnnotation> IAnnotationRef;
 
 } // namespace co
 

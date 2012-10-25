@@ -139,7 +139,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::checkInstance<lua::IScripted>( instance, method );
 		raiseUnexpectedMemberIndex();

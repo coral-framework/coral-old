@@ -6,17 +6,15 @@
 #ifndef _CO_ISYSTEM_H_
 #define _CO_ISYSTEM_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/SystemState.h>
-#include <co/Range.h>
-#include <vector>
 #include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
-	class IModuleManager;
-	class IServiceManager;
-	class ITypeManager;
+	class IModuleManager; typedef co::RefPtr<IModuleManager> IModuleManagerRef;
+	class IServiceManager; typedef co::RefPtr<IServiceManager> IServiceManagerRef;
+	class ITypeManager; typedef co::RefPtr<ITypeManager> ITypeManagerRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -31,10 +29,10 @@ public:
 	// Code From <c++ Block:
 	
 		//! Convenience method to setup the entire system without requiring any module.
-		inline void setup() { setup( Range<std::string>() ); }
+		inline void setup() { setup( Slice<std::string>() ); }
 
 		//! Convenience method to setup the entire system.
-		inline void setup( Range<std::string> requiredModules )
+		inline void setup( Slice<std::string> requiredModules )
 		{
 			setupBase( requiredModules );
 			setupPresentation();
@@ -50,12 +48,14 @@ public:
 
 	virtual co::ITypeManager* getTypes() = 0;
 
-	virtual void setupBase( co::Range<std::string> requiredModules ) = 0;
+	virtual void setupBase( co::Slice<std::string> requiredModules ) = 0;
 
 	virtual void setupPresentation() = 0;
 
 	virtual void tearDown() = 0;
 };
+
+typedef co::RefPtr<ISystem> ISystemRef;
 
 } // namespace co
 

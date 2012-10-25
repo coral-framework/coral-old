@@ -6,7 +6,7 @@
 #ifndef _CO_UUID_H_
 #define _CO_UUID_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 
 
 		#include <co/reserved/Uuid.h>

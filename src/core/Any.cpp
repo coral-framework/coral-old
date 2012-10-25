@@ -4,6 +4,7 @@
  */
 
 #include "Any.h"
+#include <co/Slice.h>
 #include <co/IEnum.h>
 #include <co/IType.h>
 #include <co/IField.h>
@@ -145,7 +146,7 @@ void streamOut( std::ostream& os, const co::Any& var )
 	case TK_ENUM:
 		{
 			uint32 id = var.state.data.u32;
-			Range<std::string> ids = static_cast<IEnum*>( var.getType() )->getIdentifiers();
+			TSlice<std::string> ids = static_cast<IEnum*>( var.getType() )->getIdentifiers();
 			if( id < ids.getSize() )
 				os << ids[id];
 			else
@@ -178,7 +179,7 @@ void streamOut( std::ostream& os, const co::Any& var )
 		{
 			IRecordType* recordType = static_cast<IRecordType*>( var.getType() );
 			IReflector* reflector = recordType->getReflector();
-			Range<IField*> fields = recordType->getFields();
+			TSlice<IField*> fields = recordType->getFields();
 			AnyValue v;
 			for( size_t i = 0; i < fields.getSize(); ++i )
 			{

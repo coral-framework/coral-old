@@ -49,7 +49,7 @@ IServiceManager* System::getServices()
 	return _services.get();
 }
 
-void System::setupBase( Range<std::string> requiredModules )
+void System::setupBase( Slice<std::string> requiredModules )
 {
 	if( _state != SystemState_None )
 		throw IllegalStateException( "the system's state is not SystemState_None" );

@@ -6,13 +6,12 @@
 #ifndef _CO_ICLASSTYPE_H_
 #define _CO_ICLASSTYPE_H_
 
-#include <co/TypeTraits.h>
-#include <co/Range.h>
+#include <co/Common.h>
 #include <co/IRecordType.h>
 
 // Forward Declarations:
 namespace co {
-	class IMethod;
+	class IMethod; typedef co::RefPtr<IMethod> IMethodRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -24,8 +23,10 @@ class IClassType : public co::IRecordType
 public:
 	virtual ~IClassType() {;}
 
-	virtual co::Range<co::IMethod*> getMethods() = 0;
+	virtual co::TSlice<co::IMethod*> getMethods() = 0;
 };
+
+typedef co::RefPtr<IClassType> IClassTypeRef;
 
 } // namespace co
 

@@ -6,12 +6,12 @@
 #ifndef _CO_IMODULEPARTLOADER_H_
 #define _CO_IMODULEPARTLOADER_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
-	class IModulePart;
+	class IModulePart; typedef co::RefPtr<IModulePart> IModulePartRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -27,6 +27,8 @@ public:
 
 	virtual co::IModulePart* loadModulePart( const std::string& moduleName ) = 0;
 };
+
+typedef co::RefPtr<IModulePartLoader> IModulePartLoaderRef;
 
 } // namespace co
 

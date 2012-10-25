@@ -42,22 +42,24 @@ public:
 
 	// co.ITypeTransaction Methods:
 
-	co::Range<co::ITypeBuilder*> getTypeBuilders()
+	co::TSlice<co::ITypeBuilder*> getTypeBuilders()
 	{
-		co::RefVector<co::ITypeBuilder> res;
+		typedef co::Temporary<std::vector<co::ITypeBuilderRef> > Temporary;
+		std::unique_ptr<Temporary> temp( new Temporary );
+		auto& res = temp->value;
 		_provider->dynamicGetField( _cookie, getField<co::ITypeTransaction>( 0 ), res );
-		return res;
+		return co::TSlice<co::ITypeBuilder*>( res, temp.release() );
 	}
 
 	void commit()
 	{
-		co::Range<co::Any> args;
+		co::Slice<co::Any> args;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeTransaction>( 0 ), args, co::Any() );
 	}
 
 	void rollback()
 	{
-		co::Range<co::Any> args;
+		co::Slice<co::Any> args;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeTransaction>( 1 ), args, co::Any() );
 	}
 
@@ -132,7 +134,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::ITypeTransaction* p = co::checkInstance<co::ITypeTransaction>( instance, method );
 		checkNumArguments( method, args.getSize() );

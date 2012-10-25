@@ -45,7 +45,7 @@ public:
 
 	// lua.ILauncher Methods:
 
-	co::int32 main( co::Range<std::string> args_ )
+	co::int32 main( co::Slice<std::string> args_ )
 	{
 		co::Any args[] = { args_ };
 		co::int32 res;
@@ -116,7 +116,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		lua::ILauncher* p = co::checkInstance<lua::ILauncher>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -127,7 +127,7 @@ public:
 			{
 			case 0:
 				{
-					co::Range<std::string> args_ = args[++argIndex].get< co::Range<std::string> >();
+					co::Slice<std::string> args_ = args[++argIndex].get< co::Slice<std::string> >();
 					argIndex = -1;
 					res.put( p->main( args_ ) );
 				}

@@ -6,12 +6,12 @@
 #ifndef _CO_IMODULEPART_H_
 #define _CO_IMODULEPART_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
-	class IModule;
+	class IModule; typedef co::RefPtr<IModule> IModuleRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -33,6 +33,8 @@ public:
 
 	virtual void integratePresentation( co::IModule* module ) = 0;
 };
+
+typedef co::RefPtr<IModulePart> IModulePartRef;
 
 } // namespace co
 

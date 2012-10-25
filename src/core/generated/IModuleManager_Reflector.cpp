@@ -5,8 +5,8 @@
 
 #include <co/IModuleManager.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IModule.h>
 #include <co/IModulePartLoader.h>
+#include <co/IModule.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -55,24 +55,28 @@ public:
 		_provider->dynamicSetField( _cookie, getField<co::IModuleManager>( 0 ), binaryCompatibilityChecking_ );
 	}
 
-	co::Range<co::IModulePartLoader*> getLoaders()
+	co::TSlice<co::IModulePartLoader*> getLoaders()
 	{
-		co::RefVector<co::IModulePartLoader> res;
+		typedef co::Temporary<std::vector<co::IModulePartLoaderRef> > Temporary;
+		std::unique_ptr<Temporary> temp( new Temporary );
+		auto& res = temp->value;
 		_provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 1 ), res );
-		return res;
+		return co::TSlice<co::IModulePartLoader*>( res, temp.release() );
 	}
 
-	co::Range<co::IModule*> getModules()
+	co::TSlice<co::IModule*> getModules()
 	{
-		co::RefVector<co::IModule> res;
+		typedef co::Temporary<std::vector<co::IModuleRef> > Temporary;
+		std::unique_ptr<Temporary> temp( new Temporary );
+		auto& res = temp->value;
 		_provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 2 ), res );
-		return res;
+		return co::TSlice<co::IModule*>( res, temp.release() );
 	}
 
 	co::IModule* findModule( const std::string& moduleName_ )
 	{
 		co::Any args[] = { moduleName_ };
-		co::RefPtr<co::IModule> res;
+		co::IModuleRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 0 ), args, res );
 		return res.get();
 	}
@@ -94,7 +98,7 @@ public:
 	co::IModule* load( const std::string& moduleName_ )
 	{
 		co::Any args[] = { moduleName_ };
-		co::RefPtr<co::IModule> res;
+		co::IModuleRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModuleManager>( 3 ), args, res );
 		return res.get();
 	}
@@ -180,7 +184,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::IModuleManager* p = co::checkInstance<co::IModuleManager>( instance, method );
 		checkNumArguments( method, args.getSize() );

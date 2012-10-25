@@ -6,7 +6,7 @@
 #ifndef _LUA_ISCRIPTED_H_
 #define _LUA_ISCRIPTED_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IDynamicTypeProvider.h>
 
 // lua.IScripted Mapping:
@@ -21,6 +21,8 @@ public:
 
 	virtual void setValue( const std::string& value ) = 0;
 };
+
+typedef co::RefPtr<IScripted> IScriptedRef;
 
 } // namespace lua
 

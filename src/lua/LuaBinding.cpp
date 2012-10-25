@@ -67,7 +67,7 @@ static void handleException( lua_State* L )
 /*****************************************************************************/
 
 namespace {
-	co::RefVector<LuaComponent> sg_luaComponents;
+	std::vector<co::RefPtr<LuaComponent> > sg_luaComponents;
 }
 
 void coPackage::open( lua_State* L )
@@ -551,7 +551,7 @@ void CompositeTypeBinding::getField( lua_State* L,  const co::Any& instance )
 	if( instance.getType()->getKind() == co::TK_INTERFACE )
 	{
 		co::IService* service = instance.get<co::IService*>();
-		for( co::Range<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
+		for( co::Slice<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
 			r.getFirst()->postGetField( service, field, value );
 	}
 }
@@ -573,7 +573,7 @@ void CompositeTypeBinding::setField( lua_State* L, const co::Any& instance )
 	if( instance.getType()->getKind() == co::TK_INTERFACE )
 	{
 		co::IService* service = instance.get<co::IService*>();
-		for( co::Range<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
+		for( co::Slice<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
 			r.getFirst()->postSetField( service, field, value );
 	}
 }
@@ -585,7 +585,7 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 								lua_touserdata( L, lua_upvalueindex( 1 ) ) ) );
 
 	// get the method's list of parameters
-	co::Range<co::IParameter*> paramList = method->getParameters();
+	co::TSlice<co::IParameter*> paramList = method->getParameters();
 
 	/*
 		We currently set a hardcoded limit on the number of method parameters.
@@ -654,7 +654,7 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 	tryGetInstance( L, 1, instance );
 
 	co::AnyValue returnValue;
-	co::Range<co::Any> argsRange( args, numParams );
+	co::Slice<co::Any> argsRange( args, numParams );
 
 	co::IReflector* reflector = method->getOwner()->getReflector();
 	reflector->invoke( instance, method, argsRange, returnValue );
@@ -662,7 +662,7 @@ int CompositeTypeBinding::callMethod( lua_State* L )
 	if( instance.getType()->getKind() == co::TK_INTERFACE )
 	{
 		co::IService* service = instance.get<co::IService*>();
-		for( co::Range<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
+		for( co::Slice<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
 			r.getFirst()->postInvoke( service, method, argsRange, returnValue );
 	}
 
@@ -706,7 +706,7 @@ void ObjectBinding::create( lua_State* L, co::IObject* object )
 	lua_setmetatable( L, -2 );
 
 	// notify interceptors
-	for( co::Range<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
+	for( co::Slice<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
 		r.getFirst()->serviceRetained( object );
 }
 
@@ -755,7 +755,7 @@ int ObjectBinding::index( lua_State* L )
 		LuaState::push( L, service );
 
 		// notify interceptors
-		for( co::Range<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
+		for( co::Slice<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
 			r.getFirst()->postGetService( object, port, service );
 	}
 
@@ -799,7 +799,7 @@ int ObjectBinding::newIndex( lua_State* L )
 		object->setServiceAt( port, service.get() );
 
 		// notify interceptors
-		for( co::Range<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
+		for( co::Slice<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
 			r.getFirst()->postSetService( object, port, service.get() );
 	}
 
@@ -820,7 +820,7 @@ int ObjectBinding::gc( lua_State* L )
 	object->serviceRelease();
 
 	// notify interceptors
-	for( co::Range<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
+	for( co::Slice<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
 		r.getFirst()->serviceReleased( object );
 
 	return 0;
@@ -856,7 +856,7 @@ void ServiceBinding::create( lua_State* L, co::IService* service )
 	lua_setmetatable( L, -2 );
 
 	// notify interceptors
-	for( co::Range<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
+	for( co::Slice<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
 		r.getFirst()->serviceRetained( service );
 }
 
@@ -920,7 +920,7 @@ int ServiceBinding::gc( lua_State* L )
 	__BEGIN_EXCEPTIONS_BARRIER__
 
 	// notify interceptors
-	for( co::Range<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
+	for( co::Slice<IInterceptor*> r( sm_interceptors ); r; r.popFirst() )
 		r.getFirst()->serviceReleased( service );
 
 	service->serviceRelease();

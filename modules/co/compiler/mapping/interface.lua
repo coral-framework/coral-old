@@ -35,7 +35,7 @@ local function template( writer, c, t )
 		writer( ") = 0;" )
 	end
 
-	writer( "\n};\n" )
+	writer( "\n};\n\ntypedef co::RefPtr<", t.name,"> ", t.name, "Ref;\n" )
 end
 
 return template

@@ -7,15 +7,10 @@
 #define _CO_ANY_H_
 
 #include <co/Coral.h>
-#include <co/IService.h>
-#include <co/RefVector.h>
-#include <co/TypeTraits.h>
-
 #include <co/IEnum.h>
 #include <co/IArray.h>
 #include <co/IStruct.h>
 #include <co/IException.h>
-#include <co/IInterface.h>
 #include <co/IComponent.h>
 #include <co/INativeClass.h>
 
@@ -196,41 +191,40 @@ struct Variable<const RefPtr<T>&>
 };
 
 template<typename T>
-struct Variable<const Range<T>&> : public Tag<Range<T>, true>
+struct Variable<const Slice<T>&> : public Tag<Slice<T>, true>
 {
-	inline static void set( State& s, const Range<T>& v )
+	inline static void set( State& s, const Slice<T>& v )
 	{
-		s.data.cptr = v.getStart();
+		s.data.cptr = v.begin();
 		s.size = v.getSize();
 	}
-	inline static Range<T> get( State& s )
+	inline static Slice<T> get( State& s )
 	{
-		return Range<T>( reinterpret_cast<T*>( s.data.ptr ), s.size );
+		return Slice<T>( reinterpret_cast<T*>( s.data.ptr ), s.size );
 	}
 };
 
-template<typename T> struct Variable<Range<T>&> : public Variable<const Range<T>&> {};
+template<typename T> struct Variable<Slice<T>&> : public Variable<const Slice<T>&> {};
+template<typename T> struct Variable<TSlice<T>&> : public Variable<const Slice<T>&> {};
+template<typename T> struct Variable<const TSlice<T>&> : public Variable<const Slice<T>&> {};
 
 template<typename T> struct Variable<std::vector<T>&>
 	: public Tag<std::vector<T>, false>, public Ref<std::vector<T> > {};
 
-template<typename T> struct Variable<RefVector<T>&>
-	: public Tag<RefVector<T>, false>, public Ref<RefVector<T> > {};
-
 template<typename T>
 struct Variable<const std::vector<T>&>
 {
-	typedef Variable<Range<T>&> AsRange;
-	inline static void tag( State& s ) { AsRange::tag( s ); }
-	inline static void set( State& s, const std::vector<T>& v ) { AsRange::set( s, v ); }
+	typedef Variable<Slice<T>&> AsSlice;
+	inline static void tag( State& s ) { AsSlice::tag( s ); }
+	inline static void set( State& s, const std::vector<T>& v ) { AsSlice::set( s, v ); }
 };
 
 template<typename T>
-struct Variable<const RefVector<T>&>
+struct Variable<const std::vector<co::RefPtr<T> >&>
 {
-	typedef Variable<Range<T*>&> AsRange;
-	inline static void tag( State& s ) { AsRange::tag( s ); }
-	inline static void set( State& s, const RefVector<T>& v ) { AsRange::set( s, v ); }
+	typedef Variable<Slice<T*>&> AsSlice;
+	inline static void tag( State& s ) { AsSlice::tag( s ); }
+	inline static void set( State& s, const std::vector<co::RefPtr<T> >& v ) { AsSlice::set( s, v ); }
 };
 
 } // namespace __any
@@ -248,7 +242,7 @@ struct Variable<const RefVector<T>&>
 		- Type checks, including compliance with type const'ness.
 		- Automatic conversion between primitive values (boolean, arithmetic types and enum).
 		- Type-safe storage and retrieval of pointers and references.
-		- Storage and retrieval of arrays as pointers to \c std::vectors, \c co::RefVectors or \c co::Ranges.
+		- Storage and retrieval of arrays as pointers to \c std::vector's or \c co::Slice's.
 
 	\par What is NOT supported:
 		- Storing exceptions.
@@ -267,16 +261,15 @@ struct Variable<const RefVector<T>&>
 
 	\par Arrays
 		An array can be passed using three possible representations:
-		  -# A \c co::Range, which is the most generic representation but cannot be used to add/remove elements;
+		  -# A \c co::Slice, which is the most generic representation but cannot be used to add/remove elements;
 		  -# A \c std::vector, which is useful when the receiver needs to add/remove elements to/from the array;
-		  -# Or a \c co::RefVector, which is similar to a \c std::vector, but keeps active references to interfaces.
 		\par
 		These types are \e always considered to be \b mutable. In other words, all arrays passed as \c std::vectors
 		or \c co::RefVectors can have their contents changed. To prevent the addition/removal of elements, one should
-		pass the array as a \c co::Range instead. Moreover, to prevent existing elements from being modified,
-		one should pass a \c co::Range of \c <b>const</b> elements.
+		pass the array as a \c co::Slice instead. Moreover, to prevent existing elements from being modified,
+		one should pass a \c co::Slice of \c <b>const</b> elements.
 		\par
-		For instance, an array passed as a <tt>co::Range<std::string></tt> is completely immutable &mdash;
+		For instance, an array passed as a <tt>co::Slice<std::string></tt> is completely immutable &mdash;
 		as opposed to a <tt>std::vector<std::string></tt>, which is fully mutable.
 		\par
 		Arrays represented by \c std::vectors or \c co::RefVectors must always be passed and retrieved
@@ -284,10 +277,10 @@ struct Variable<const RefVector<T>&>
 		\par
 		Arrays must generally be retrieved by the exact same type they were passed. However, when
 		retrieving \c co::Ranges the following coercion rules apply:
-		  - It is possible to retrieve a <tt>co::Range<\e ValueType></tt> from an array passed as a
+		  - It is possible to retrieve a <tt>co::Slice<\e ValueType></tt> from an array passed as a
 				<tt>std::vector<\e ValueType></tt>.
-		  - It is possible to retrieve a <tt>co::Range<\e SuperType*></tt> from an array
-				passed as either a <tt>co::Range<\e SubType* [const]></tt>, a
+		  - It is possible to retrieve a <tt>co::Slice<\e SuperType*></tt> from an array
+				passed as either a <tt>co::Slice<\e SubType* [const]></tt>, a
 				<tt>std::vector<\e SubType*></tt> or a <tt>co::RefVector<\e SubType></tt>.
 		\par
 		Non-listed cases must be retrieved by exact type.
@@ -323,7 +316,7 @@ public:
 
 	//! Creates a reference to a statically-allocated array.
 	template<typename T, size_t size>
-	inline Any( T(&array)[size] ) { setIn( Range<T>( array ) ); }
+	inline Any( T(&array)[size] ) { setIn( Slice<T>( array ) ); }
 
 	//! Creates a reference to any variable reflectively. \see set()
 	inline Any( bool isIn, IType* type, const void* addr, size_t size = 0 )
@@ -524,7 +517,7 @@ protected:
 	template<typename T> struct Getter<T&> : public GetByRef<T&> {};
 	template<typename T> struct Getter<T*> : public GetByRef<T*> {};
 	template<typename T> struct Getter<T* const> : public GetByRef<T* const> {};
-	template<typename T> struct Getter<Range<T> > : public GetByRef<Range<T> > {};
+	template<typename T> struct Getter<Slice<T> > : public GetByRef<Slice<T> > {};
 };
 
 /*!
@@ -563,7 +556,7 @@ public:
 	inline TypeKind getKind() const { return _any.getKind(); }
 
 	//! Returns an 'out' co::Any that references this co::AnyValue's value.
-	inline Any getAny() const { return _any; }
+	inline const Any& getAny() const { return _any; }
 
 	template<typename T>
 	inline T get() const { return _any.get<T>(); }

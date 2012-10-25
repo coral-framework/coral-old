@@ -6,7 +6,7 @@
 #ifndef _CO_MODULESTATE_H_
 #define _CO_MODULESTATE_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 
 // co.ModuleState Mapping:
 namespace co {

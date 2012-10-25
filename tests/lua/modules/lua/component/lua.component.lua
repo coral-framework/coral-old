@@ -67,6 +67,10 @@ local TestComponent = co.Component{
 local testStruct = co.new "moduleA.TestStruct"
 testStruct.anInt16 = 23456;
 
+function TestComponent:getNames()
+	return { "Jimmy", "Jim", "James" }
+end
+
 function TestComponent.testItf:testOutParameters()
 	return 1.25, 'Second', "hello", testStruct, nil, { 1.5, 2.5, 3.5 }, nil
 end
@@ -122,6 +126,12 @@ function M:initialize( module )
 
 	-- TestComponent tests
 	local tc = co.new "lua.test.Component"
+	local names = tc.testItf.names
+	ASSERT_EQ( 3, #names )
+	ASSERT_EQ( "Jimmy", names[1] )
+	ASSERT_EQ( "Jim", names[2] )
+	ASSERT_EQ( "James", names[3] )
+
 	local size, enumValue, text, ts, dummyItf, intList, itfList = tc.testItf:testOutParameters()
 	ASSERT_EQ( 1.25, size )
 	ASSERT_EQ( 3, #intList )

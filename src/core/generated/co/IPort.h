@@ -6,12 +6,12 @@
 #ifndef _CO_IPORT_H_
 #define _CO_IPORT_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IMember.h>
 
 // Forward Declarations:
 namespace co {
-	class IInterface;
+	class IInterface; typedef co::RefPtr<IInterface> IInterfaceRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -27,6 +27,8 @@ public:
 
 	virtual co::IInterface* getType() = 0;
 };
+
+typedef co::RefPtr<IPort> IPortRef;
 
 } // namespace co
 

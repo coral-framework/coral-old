@@ -4,8 +4,8 @@
  */
 
 #include <co/IDynamicServiceProvider.h>
-#include <co/IPort.h>
 #include <co/IField.h>
+#include <co/IPort.h>
 #include <co/IMethod.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
@@ -44,7 +44,7 @@ public:
 	co::IPort* dynamicGetFacet( co::int32 dynFacetId_ )
 	{
 		co::Any args[] = { dynFacetId_ };
-		co::RefPtr<co::IPort> res;
+		co::IPortRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 0 ), args, res );
 		return res.get();
 	}
@@ -55,7 +55,7 @@ public:
 		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 1 ), args, co::Any() );
 	}
 
-	void dynamicInvoke( co::int32 dynFacetId_, co::IMethod* method_, co::Range<co::Any> args_, const co::Any& result_ )
+	void dynamicInvoke( co::int32 dynFacetId_, co::IMethod* method_, co::Slice<co::Any> args_, const co::Any& result_ )
 	{
 		co::Any args[] = { dynFacetId_, method_, args_, result_ };
 		_provider->dynamicInvoke( _cookie, getMethod<co::IDynamicServiceProvider>( 2 ), args, co::Any() );
@@ -138,7 +138,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::IDynamicServiceProvider* p = co::checkInstance<co::IDynamicServiceProvider>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -167,7 +167,7 @@ public:
 				{
 					co::int32 dynFacetId_ = args[++argIndex].get< co::int32 >();
 					co::IMethod* method_ = args[++argIndex].get< co::IMethod* >();
-					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
+					co::Slice<co::Any> args_ = args[++argIndex].get< co::Slice<co::Any> >();
 					const co::Any& result_ = args[++argIndex];
 					argIndex = -1;
 					p->dynamicInvoke( dynFacetId_, method_, args_, result_ );

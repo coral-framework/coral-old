@@ -6,7 +6,7 @@
 #ifndef _CO_IINCLUDE_H_
 #define _CO_IINCLUDE_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IAnnotation.h>
 
 // co.IInclude Mapping:
@@ -21,6 +21,8 @@ public:
 
 	virtual void setValue( const std::string& value ) = 0;
 };
+
+typedef co::RefPtr<IInclude> IIncludeRef;
 
 } // namespace co
 

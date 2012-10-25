@@ -7,8 +7,8 @@
 #include <co/ISystem.h>
 #include <co/Exception.h>
 #include <co/ITypeManager.h>
-#include <core/TypeLoader.h>
-#include <core/csl/Error.h>
+#include <core/types/TypeLoader.h>
+#include <core/types/csl/Error.h>
 #include <gtest/gtest.h>
 #include <sstream>
 

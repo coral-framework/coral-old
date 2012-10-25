@@ -6,8 +6,7 @@
 #ifndef _CO_IENUM_H_
 #define _CO_IENUM_H_
 
-#include <co/TypeTraits.h>
-#include <co/Range.h>
+#include <co/Common.h>
 #include <co/IType.h>
 
 // co.IEnum Mapping:
@@ -18,10 +17,12 @@ class IEnum : public co::IType
 public:
 	virtual ~IEnum() {;}
 
-	virtual co::Range<std::string> getIdentifiers() = 0;
+	virtual co::TSlice<std::string> getIdentifiers() = 0;
 
 	virtual co::int32 getValueOf( const std::string& identifier ) = 0;
 };
+
+typedef co::RefPtr<IEnum> IEnumRef;
 
 } // namespace co
 

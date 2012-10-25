@@ -6,13 +6,12 @@
 #ifndef _CO_ICOMPONENT_H_
 #define _CO_ICOMPONENT_H_
 
-#include <co/TypeTraits.h>
-#include <co/Range.h>
+#include <co/Common.h>
 #include <co/ICompositeType.h>
 
 // Forward Declarations:
 namespace co {
-	class IPort;
+	class IPort; typedef co::RefPtr<IPort> IPortRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -24,12 +23,14 @@ class IComponent : public co::ICompositeType
 public:
 	virtual ~IComponent() {;}
 
-	virtual co::Range<co::IPort*> getFacets() = 0;
+	virtual co::TSlice<co::IPort*> getFacets() = 0;
 
-	virtual co::Range<co::IPort*> getPorts() = 0;
+	virtual co::TSlice<co::IPort*> getPorts() = 0;
 
-	virtual co::Range<co::IPort*> getReceptacles() = 0;
+	virtual co::TSlice<co::IPort*> getReceptacles() = 0;
 };
+
+typedef co::RefPtr<IComponent> IComponentRef;
 
 } // namespace co
 

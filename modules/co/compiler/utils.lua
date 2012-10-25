@@ -63,13 +63,9 @@ function M.formatField( t )
 	if kind == 'TK_ANY' then
 		return "co::AnyValue"
 	elseif kind == 'TK_ARRAY' then
-		if t.elementType.kind == 'TK_INTERFACE' then
-			return "co::RefVector<" .. t.elementType.cppName .. ">"
-		else
-			return "std::vector<" .. M.formatField( t.elementType ) .. ">"
-		end
+		return "std::vector<" .. M.formatField( t.elementType ) .. ">"
 	elseif kind == 'TK_INTERFACE' then
-		return "co::RefPtr<" .. t.cppName .. ">"
+		return t.cppName .. "Ref"
 	else
 		return t.cppName
 	end
@@ -78,8 +74,15 @@ end
 function M.formatResult( t )
 	if not t then return "void" end
 	local kind = t.kind
-	if kind == 'TK_ARRAY' or kind == 'TK_INTERFACE' then
-		return M.formatInput( t )
+	if kind == 'TK_INTERFACE' then
+		return t.cppName .. "*"
+	elseif kind == 'TK_ARRAY' then
+		local elem = t.elementType
+		if elem.kind == 'TK_INTERFACE' then
+			return "co::TSlice<" .. elem.cppName .. "*>"
+		else
+			return "co::TSlice<" .. M.formatField( elem ) .. ">"
+		end
 	else
 		return M.formatField( t )
 	end
@@ -89,7 +92,7 @@ function M.formatInput( t )
 	local kind = t.kind
 	if kind == 'TK_ARRAY' then
 		local elem = t.elementType
-		return "co::Range<" .. elem.cppName .. ( elem.kind == 'TK_INTERFACE' and '*' or '' ) .. ">"
+		return "co::Slice<" .. elem.cppName .. ( elem.kind == 'TK_INTERFACE' and '*' or '' ) .. ">"
 	elseif kind == 'TK_INTERFACE' then
 		return t.cppName .. "*"
 	elseif kind == 'TK_ANY' or kind == 'TK_STRING'
@@ -143,7 +146,6 @@ function include.TK_ARRAY( t, type )
 			t:includeHeader( type )
 		end
 	else
-		t:includeHeader( "co/Range.h" )
 		t:includeType( type )
 	end
 end
@@ -241,7 +243,12 @@ function M.writeIncludesAndFwdDecls( t, writer )
 				end
 				lastNS = ns
 			end
-			writer( indent, type.kind == 'TK_STRUCT' and "struct " or "class ", type.name, ";\n" )
+			local name = type.name
+			if type.kind == 'TK_STRUCT' then
+				writer( indent, "struct ", name, ";\n" )
+			else
+				writer( indent, "class ", name, "; typedef co::RefPtr<", name, "> ", name, "Ref;\n" )
+			end
 		end
 
 		closeNamespacesUntilItContains( '' )

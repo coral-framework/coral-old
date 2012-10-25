@@ -6,7 +6,7 @@
 #ifndef _CO_IARRAY_H_
 #define _CO_IARRAY_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IType.h>
 
 // co.IArray Mapping:
@@ -19,6 +19,8 @@ public:
 
 	virtual co::IType* getElementType() = 0;
 };
+
+typedef co::RefPtr<IArray> IArrayRef;
 
 } // namespace co
 

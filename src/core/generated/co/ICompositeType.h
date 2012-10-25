@@ -6,13 +6,12 @@
 #ifndef _CO_ICOMPOSITETYPE_H_
 #define _CO_ICOMPOSITETYPE_H_
 
-#include <co/TypeTraits.h>
-#include <co/Range.h>
+#include <co/Common.h>
 #include <co/IType.h>
 
 // Forward Declarations:
 namespace co {
-	class IMember;
+	class IMember; typedef co::RefPtr<IMember> IMemberRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -24,10 +23,12 @@ class ICompositeType : public co::IType
 public:
 	virtual ~ICompositeType() {;}
 
-	virtual co::Range<co::IMember*> getMembers() = 0;
+	virtual co::TSlice<co::IMember*> getMembers() = 0;
 
 	virtual co::IMember* getMember( const std::string& name ) = 0;
 };
+
+typedef co::RefPtr<ICompositeType> ICompositeTypeRef;
 
 } // namespace co
 

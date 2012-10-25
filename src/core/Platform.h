@@ -94,7 +94,7 @@
 	#elif _MSC_VER >= 1600
 		#define CORAL_CC_VERSION "10.0"
 	#else
-		#error "Coral requires Visual Studio 10 (2010) or newer."
+		#error "Coral requires Visual Studio 2010 or newer."
 	#endif
 #elif defined(CORAL_CC_CLANG)
 	#define CORAL_CC_NAME "clang"

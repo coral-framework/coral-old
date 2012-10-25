@@ -7,26 +7,9 @@
 #include <co/Coral.h>
 #include <co/IArray.h>
 #include <co/Exception.h>
-#include <co/RefVector.h>
 #include <co/TypeTraits.h>
 #include <co/IInterface.h>
 #include <gtest/gtest.h>
-
-using namespace co::traits;
-
-TEST( TypeTraitsTests, isSubTypeOf )
-{
-	EXPECT_TRUE(( isSubTypeOf<int, int>::value ));
-	EXPECT_TRUE(( isSubTypeOf<const int, int>::value ));
-	EXPECT_TRUE(( isSubTypeOf<int, const int>::value ));
-	EXPECT_FALSE(( isSubTypeOf<short, int>::value ));
-	EXPECT_FALSE(( isSubTypeOf<int*, int>::value ));
-
-	EXPECT_TRUE(( isSubTypeOf<co::IInterface, co::IClassType>::value ));
-	EXPECT_TRUE(( isSubTypeOf<co::IInterface const, co::IClassType>::value ));
-	EXPECT_TRUE(( isSubTypeOf<co::IInterface, co::IClassType const>::value ));
-	EXPECT_FALSE(( isSubTypeOf<co::IClassType, co::IInterface>::value ));
-}
 
 TEST( TypeTraitsTests, kindOf )
 {
@@ -47,9 +30,9 @@ TEST( TypeTraitsTests, kindOf )
 
 	EXPECT_TRUE( co::kindOf<co::Exception>::kind == co::TK_EXCEPTION );
 
-	EXPECT_TRUE( co::kindOf<co::Range<float> >::kind == co::TK_ARRAY );
-	EXPECT_TRUE( co::kindOf<co::Range<std::string> >::kind == co::TK_ARRAY );
-	EXPECT_TRUE( co::kindOf<co::RefVector<co::IInterface> >::kind == co::TK_ARRAY );
+	EXPECT_TRUE( co::kindOf<co::Slice<float> >::kind == co::TK_ARRAY );
+	EXPECT_TRUE( co::kindOf<co::Slice<std::string> >::kind == co::TK_ARRAY );
+	EXPECT_TRUE( co::kindOf<std::vector<co::IInterfaceRef> >::kind == co::TK_ARRAY );
 	EXPECT_TRUE( co::kindOf<std::vector<const co::Uuid*> >::kind == co::TK_ARRAY );
 }
 
@@ -69,9 +52,9 @@ TEST( TypeTraitsTests, nameOf )
 
 	EXPECT_STREQ( "null", co::nameOf<std::exception>::get() );
 
-	EXPECT_STREQ( "float[]", co::nameOf<co::Range<float> >::get() );
-	EXPECT_STREQ( "string[]", co::nameOf<co::Range<std::string> >::get() );
-	EXPECT_STREQ( "co.IInterface[]", co::nameOf<co::RefVector<co::IInterface> >::get() );
+	EXPECT_STREQ( "float[]", co::nameOf<co::Slice<float> >::get() );
+	EXPECT_STREQ( "string[]", co::nameOf<co::Slice<std::string> >::get() );
+	EXPECT_STREQ( "co.IInterface[]", co::nameOf<std::vector<co::IInterfaceRef> >::get() );
 	EXPECT_STREQ( "co.Uuid[]", co::nameOf<std::vector<co::Uuid> >::get() );
 }
 
@@ -85,11 +68,11 @@ TEST( TypeTraitsTests, typeOf )
 
 	EXPECT_TRUE( co::typeOf<std::string>::get()->getKind() == co::TK_STRING );
 
-	EXPECT_EQ( co::TK_FLOAT, co::typeOf<co::Range<float> >::get()->getElementType()->getKind() );
-	EXPECT_EQ( co::TK_STRING, co::typeOf<co::Range<std::string> >::get()->getElementType()->getKind() );
+	EXPECT_EQ( co::TK_FLOAT, co::typeOf<co::Slice<float> >::get()->getElementType()->getKind() );
+	EXPECT_EQ( co::TK_STRING, co::typeOf<co::Slice<std::string> >::get()->getElementType()->getKind() );
 
 	co::IArray* at;
-	ASSERT_TRUE( NULL != ( at = co::typeOf<co::RefVector<co::IInterface> >::get() ) );
+	ASSERT_TRUE( NULL != ( at = co::typeOf<std::vector<co::IInterfaceRef> >::get() ) );
 	EXPECT_EQ( "co.IInterface", at->getElementType()->getFullName() );
 
 	ASSERT_TRUE( NULL != ( at = co::typeOf<std::vector<co::Uuid> >::get() ) );

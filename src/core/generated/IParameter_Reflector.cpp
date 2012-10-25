@@ -65,7 +65,7 @@ public:
 
 	co::IType* getType()
 	{
-		co::RefPtr<co::IType> res;
+		co::ITypeRef res;
 		_provider->dynamicGetField( _cookie, getField<co::IParameter>( 3 ), res );
 		return res.get();
 	}
@@ -147,7 +147,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::checkInstance<co::IParameter>( instance, method );
 		raiseUnexpectedMemberIndex();

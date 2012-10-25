@@ -1,3 +1,28 @@
+-- Prepares a var named 'res' of type rt for returning
+local function prepareResult( writer, rt )
+	if not rt then
+		-- nothing
+	elseif rt.kind == 'TK_ARRAY' then
+		writer( "\t\ttypedef co::Temporary<", rt:formatField(), [[ > Temporary;
+		std::unique_ptr<Temporary> temp( new Temporary );
+		auto& res = temp->value;
+]] )
+	else
+		writer( "\t\t", rt:formatField(), " res;\n" )
+	end
+end
+
+-- Writes the return statement for a result of type rt
+local function returnResult( writer, rt )
+	if not rt then
+		-- nothing
+	elseif rt.kind == 'TK_ARRAY' then
+		writer( "\t\treturn ", rt:formatResult(), "( res, temp.release() );\n" )
+	else
+		writer( "\t\treturn res", rt.kind == 'TK_INTERFACE' and ".get()" or "", ";\n" )
+	end
+end
+
 local function template( writer, c, t )
 	c.header( writer, c, "Reflection code generated for type '", t.fullName, "'" )
 
@@ -106,15 +131,12 @@ public:
 			-- Field Accessors
 			for i, a in ipairs( itf.fields ) do
 				local at = a.type
-				local resultType =
-				writer( "\t", itf.formatResult( at ), " ", itf.formatAccessor( "get", a.name ), "()\n", [[
-	{
-		]], itf.formatField( at ), [[ res;
-		_provider->dynamicGetField( _cookie, getField<]], itf.cppName, [[>( ]], i - 1, [[ ), res );
-		return res]], at.kind == 'TK_INTERFACE' and ".get()" or "",[[;
-	}
+				writer( "\t", at:formatResult(), " ", itf.formatAccessor( "get", a.name ), "()\n\t{\n" )
+				prepareResult( writer, at )
+				writer( "\t\t_provider->dynamicGetField( _cookie, getField<", itf.cppName, ">( ", i - 1, " ), res );\n" )
+				returnResult( writer, at )
+				writer( "\t}\n\n" )
 
-]] )
 				if not a.isReadOnly then
 					writer( "\tvoid ", itf.formatAccessor( "set", a.name ), "( ", itf.formatInput( a.type ), " ", a.name, "_ )\n", [[
 	{
@@ -148,16 +170,12 @@ public:
 					end
 					writer( " };\n" )
 				else
-					writer( "\t\tco::Range<co::Any> args;\n" )
+					writer( "\t\tco::Slice<co::Any> args;\n" )
 				end
-				writer( "\t\t" )
-				if rt then
-					writer( itf.formatField( rt ), " res;\n\t\t" )
-				end
-				writer( "_provider->dynamicInvoke( _cookie, getMethod<", itf.cppName, ">( ", i - 1, " ), args, ", rt and "res" or "co::Any()", " );\n" )
-				if rt then
-					writer( "\t\treturn res", rt.kind == 'TK_INTERFACE' and ".get()" or "", ";\n" )
-				end
+				prepareResult( writer, rt )
+				writer( "\t\t_provider->dynamicInvoke( _cookie, getMethod<",
+					itf.cppName, ">( ", i - 1, " ), args, ", rt and "res" or "co::Any()", " );\n" )
+				returnResult( writer, rt )
 				writer( "\t}\n\n" )
 			end
 		end
@@ -411,7 +429,7 @@ public:
 		writer [[
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 ]]
 		if #t.methods > 0 then

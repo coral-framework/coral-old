@@ -6,13 +6,13 @@
 #ifndef _CO_IMEMBER_H_
 #define _CO_IMEMBER_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/MemberKind.h>
 #include <co/IAnnotated.h>
 
 // Forward Declarations:
 namespace co {
-	class ICompositeType;
+	class ICompositeType; typedef co::RefPtr<ICompositeType> ICompositeTypeRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -32,6 +32,8 @@ public:
 
 	virtual co::ICompositeType* getOwner() = 0;
 };
+
+typedef co::RefPtr<IMember> IMemberRef;
 
 } // namespace co
 

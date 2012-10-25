@@ -6,7 +6,7 @@
 #ifndef _LUA_EXCEPTION_H_
 #define _LUA_EXCEPTION_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/Exception.h>
 
 // lua.Exception Mapping:

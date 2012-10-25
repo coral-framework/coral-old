@@ -59,7 +59,7 @@ public:
 		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 1 ), args, co::Any() );
 	}
 
-	void postInvoke( co::IService* service_, co::IMethod* method_, co::Range<co::Any> args_, const co::Any& returnValue_ )
+	void postInvoke( co::IService* service_, co::IMethod* method_, co::Slice<co::Any> args_, const co::Any& returnValue_ )
 	{
 		co::Any args[] = { service_, method_, args_, returnValue_ };
 		_provider->dynamicInvoke( _cookie, getMethod<lua::IInterceptor>( 2 ), args, co::Any() );
@@ -152,7 +152,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		lua::IInterceptor* p = co::checkInstance<lua::IInterceptor>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -183,7 +183,7 @@ public:
 				{
 					co::IService* service_ = args[++argIndex].get< co::IService* >();
 					co::IMethod* method_ = args[++argIndex].get< co::IMethod* >();
-					co::Range<co::Any> args_ = args[++argIndex].get< co::Range<co::Any> >();
+					co::Slice<co::Any> args_ = args[++argIndex].get< co::Slice<co::Any> >();
 					const co::Any& returnValue_ = args[++argIndex];
 					argIndex = -1;
 					p->postInvoke( service_, method_, args_, returnValue_ );

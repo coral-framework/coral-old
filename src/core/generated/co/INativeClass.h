@@ -6,7 +6,7 @@
 #ifndef _CO_INATIVECLASS_H_
 #define _CO_INATIVECLASS_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IClassType.h>
 
 // co.INativeClass Mapping:
@@ -17,6 +17,8 @@ class INativeClass : public co::IClassType
 public:
 	virtual ~INativeClass() {;}
 };
+
+typedef co::RefPtr<INativeClass> INativeClassRef;
 
 } // namespace co
 

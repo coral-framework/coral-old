@@ -6,15 +6,14 @@
 #ifndef _CO_IMODULE_H_
 #define _CO_IMODULE_H_
 
-#include <co/TypeTraits.h>
-#include <co/Range.h>
+#include <co/Common.h>
 #include <co/ModuleState.h>
 #include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
-	class IModulePart;
-	class INamespace;
+	class IModulePart; typedef co::RefPtr<IModulePart> IModulePartRef;
+	class INamespace; typedef co::RefPtr<INamespace> INamespaceRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -28,7 +27,7 @@ public:
 
 	virtual co::INamespace* getNamespace() = 0;
 
-	virtual co::Range<co::IModulePart*> getParts() = 0;
+	virtual co::TSlice<co::IModulePart*> getParts() = 0;
 
 	virtual co::int32 getRank() = 0;
 
@@ -48,6 +47,8 @@ public:
 
 	virtual void integratePresentation() = 0;
 };
+
+typedef co::RefPtr<IModule> IModuleRef;
 
 } // namespace co
 

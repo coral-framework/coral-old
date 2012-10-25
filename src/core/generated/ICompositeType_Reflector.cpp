@@ -6,12 +6,12 @@
 #include <co/ICompositeType.h>
 #include <co/IDynamicServiceProvider.h>
 #include <co/IMember.h>
-#include <co/INamespace.h>
-#include <co/IAnnotation.h>
-#include <co/IInterface.h>
 #include <co/IType.h>
-#include <co/Uuid.h>
+#include <co/INamespace.h>
+#include <co/IInterface.h>
 #include <co/IReflector.h>
+#include <co/Uuid.h>
+#include <co/IAnnotation.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -48,14 +48,16 @@ public:
 
 	// co.IAnnotated Methods:
 
-	co::Range<co::IAnnotation*> getAnnotations()
+	co::TSlice<co::IAnnotation*> getAnnotations()
 	{
-		co::RefVector<co::IAnnotation> res;
+		typedef co::Temporary<std::vector<co::IAnnotationRef> > Temporary;
+		std::unique_ptr<Temporary> temp( new Temporary );
+		auto& res = temp->value;
 		_provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ), res );
-		return res;
+		return co::TSlice<co::IAnnotation*>( res, temp.release() );
 	}
 
-	void setAnnotations( co::Range<co::IAnnotation*> annotations_ )
+	void setAnnotations( co::Slice<co::IAnnotation*> annotations_ )
 	{
 		_provider->dynamicSetField( _cookie, getField<co::IAnnotated>( 0 ), annotations_ );
 	}
@@ -69,7 +71,7 @@ public:
 	co::IAnnotation* getAnnotation( co::IInterface* requestedType_ )
 	{
 		co::Any args[] = { requestedType_ };
-		co::RefPtr<co::IAnnotation> res;
+		co::IAnnotationRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), args, res );
 		return res.get();
 	}
@@ -85,7 +87,7 @@ public:
 
 	co::IReflector* getCurrentReflector()
 	{
-		co::RefPtr<co::IReflector> res;
+		co::IReflectorRef res;
 		_provider->dynamicGetField( _cookie, getField<co::IType>( 1 ), res );
 		return res.get();
 	}
@@ -120,14 +122,14 @@ public:
 
 	co::INamespace* getNamespace()
 	{
-		co::RefPtr<co::INamespace> res;
+		co::INamespaceRef res;
 		_provider->dynamicGetField( _cookie, getField<co::IType>( 6 ), res );
 		return res.get();
 	}
 
 	co::IReflector* getReflector()
 	{
-		co::RefPtr<co::IReflector> res;
+		co::IReflectorRef res;
 		_provider->dynamicGetField( _cookie, getField<co::IType>( 7 ), res );
 		return res.get();
 	}
@@ -147,17 +149,19 @@ public:
 
 	// co.ICompositeType Methods:
 
-	co::Range<co::IMember*> getMembers()
+	co::TSlice<co::IMember*> getMembers()
 	{
-		co::RefVector<co::IMember> res;
+		typedef co::Temporary<std::vector<co::IMemberRef> > Temporary;
+		std::unique_ptr<Temporary> temp( new Temporary );
+		auto& res = temp->value;
 		_provider->dynamicGetField( _cookie, getField<co::ICompositeType>( 0 ), res );
-		return res;
+		return co::TSlice<co::IMember*>( res, temp.release() );
 	}
 
 	co::IMember* getMember( const std::string& name_ )
 	{
 		co::Any args[] = { name_ };
-		co::RefPtr<co::IMember> res;
+		co::IMemberRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ICompositeType>( 0 ), args, res );
 		return res.get();
 	}
@@ -233,7 +237,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::ICompositeType* p = co::checkInstance<co::ICompositeType>( instance, method );
 		checkNumArguments( method, args.getSize() );

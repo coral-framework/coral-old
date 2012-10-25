@@ -132,7 +132,7 @@ IService* ServiceManager::getServiceForType( IInterface* serviceType, IInterface
 
 IPort* ServiceManager::findServiceFacet( IComponent* component, IInterface* serviceType )
 {
-	Range<IPort*> facets = component->getFacets();
+	TSlice<IPort*> facets = component->getFacets();
 	for( ; facets; facets.popFirst() )
 	{
 		if( facets.getFirst()->getType()->isA( serviceType ) )
@@ -280,7 +280,7 @@ ServiceManager::LazyService* ServiceManager::findCustomService( ServiceRecord& r
 	if( it != rec.custom.end() )
 		return &it->second;
 
-	Range<IInterface*> superTypes = clientType->getSuperTypes();
+	TSlice<IInterface*> superTypes = clientType->getSuperTypes();
 	for( ; superTypes; superTypes.popFirst() )
 	{
 		// check if a custom service instance was provided for this clientType

@@ -43,14 +43,16 @@ public:
 
 	// co.IAnnotated Methods:
 
-	co::Range<co::IAnnotation*> getAnnotations()
+	co::TSlice<co::IAnnotation*> getAnnotations()
 	{
-		co::RefVector<co::IAnnotation> res;
+		typedef co::Temporary<std::vector<co::IAnnotationRef> > Temporary;
+		std::unique_ptr<Temporary> temp( new Temporary );
+		auto& res = temp->value;
 		_provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ), res );
-		return res;
+		return co::TSlice<co::IAnnotation*>( res, temp.release() );
 	}
 
-	void setAnnotations( co::Range<co::IAnnotation*> annotations_ )
+	void setAnnotations( co::Slice<co::IAnnotation*> annotations_ )
 	{
 		_provider->dynamicSetField( _cookie, getField<co::IAnnotated>( 0 ), annotations_ );
 	}
@@ -64,7 +66,7 @@ public:
 	co::IAnnotation* getAnnotation( co::IInterface* requestedType_ )
 	{
 		co::Any args[] = { requestedType_ };
-		co::RefPtr<co::IAnnotation> res;
+		co::IAnnotationRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), args, res );
 		return res.get();
 	}
@@ -133,14 +135,14 @@ public:
 		co::IAnnotated* p = co::checkInstance<co::IAnnotated>( instance, field );
 		switch( field->getIndex() )
 		{
-		case 0:		p->setAnnotations( value.get< co::Range<co::IAnnotation*> >() ); break;
+		case 0:		p->setAnnotations( value.get< co::Slice<co::IAnnotation*> >() ); break;
 		default:	raiseUnexpectedMemberIndex();
 		}
 		CORAL_UNUSED( p );
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::IAnnotated* p = co::checkInstance<co::IAnnotated>( instance, method );
 		checkNumArguments( method, args.getSize() );

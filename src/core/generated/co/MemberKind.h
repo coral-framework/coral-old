@@ -6,7 +6,7 @@
 #ifndef _CO_MEMBERKIND_H_
 #define _CO_MEMBERKIND_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 
 // co.MemberKind Mapping:
 namespace co {

@@ -8,7 +8,7 @@
 
 #include <co/Platform.h>
 #include <co/TypeKind.h>
-#include <algorithm>
+#include <type_traits>
 #include <string>
 #include <vector>
 
@@ -25,9 +25,8 @@ class IException;
 class IInterface;
 class IComponent;
 class INativeClass;
-template<typename T> class Range;
+template<typename T> class Slice;
 template<typename T> class RefPtr;
-template<typename T> class RefVector;
 
 /*!
 	Maps TypeKinds to either their names in CSL.
@@ -144,9 +143,8 @@ template<> struct kindOf<double> : public kindOfBase<TK_DOUBLE> {};
 template<> struct kindOf<std::string> : public kindOfBase<TK_STRING> {};
 
 // specialization for container types:
-template<typename T> struct kindOf<Range<T> > : public kindOfBase<TK_ARRAY> {};
+template<typename T> struct kindOf<Slice<T> > : public kindOfBase<TK_ARRAY> {};
 template<typename T> struct kindOf<RefPtr<T> > : public kindOf<T> {};
-template<typename T> struct kindOf<RefVector<T> > : public kindOfBase<TK_ARRAY> {};
 template<typename T> struct kindOf<std::vector<T> > : public kindOfBase<TK_ARRAY> {};
 
 // for unknown pointers, use the dereferenced type
@@ -156,9 +154,9 @@ template<typename T> struct kindOf<T* const> : public kindOf<T*> {};
 // specialization for co::TypeKind (must go here to avoid cyclic dependencies)
 template<> struct kindOf<TypeKind> : public kindOfBase<TK_ENUM> {};
 
-	
+
 /****************************************************************************/
-/* Template mapping of each TypeKind to its descriptor interface            */
+/* co::typeDescriptorFor<TypeKind>::Type maps a TK to its descriptor type   */
 /****************************************************************************/
 
 template<TypeKind> struct typeDescriptorFor { typedef IType Type; };
@@ -169,33 +167,6 @@ template<> struct typeDescriptorFor<TK_STRUCT> { typedef IStruct Type; };
 template<> struct typeDescriptorFor<TK_NATIVECLASS> { typedef INativeClass Type; };
 template<> struct typeDescriptorFor<TK_INTERFACE> { typedef IInterface Type; };
 template<> struct typeDescriptorFor<TK_COMPONENT> { typedef IComponent Type; };
-
-
-/****************************************************************************/
-/* Type Traits - TR1/boost style type operators                             */
-/****************************************************************************/
-
-namespace traits {
-
-// The special 'false' and 'true' types:
-struct FalseType { static const bool value = false; };
-struct TrueType { static const bool value = true; FalseType _[2]; };
-
-// Removes a pointer ('*') from a type:
-template<typename T> struct removePointer { typedef T Type; };
-template<typename T> struct removePointer<T*> { typedef T Type; };
-template<typename T> struct removePointer<T* const> { typedef T Type; };
-
-// Whether a type D is a subtype of B.
-template<typename D, typename B>
-struct isSubTypeOf
-{
-	static TrueType test( const B* const );
-	static FalseType test( ... );
-	static const bool value = ( sizeof(test((D*)0)) == sizeof(TrueType) );
-};
-
-} // namespace traits
 
 
 /****************************************************************************/
@@ -223,13 +194,13 @@ struct nameOfArrayBase
 };
 
 // specialization for array types:
-template<typename T> struct nameOf<Range<T> > : public nameOfArrayBase<T> {};
-template<typename T> struct nameOf<RefVector<T> > : public nameOfArrayBase<T> {};
+template<typename T> struct nameOf<Slice<T> > : public nameOfArrayBase<T> {};
 template<typename T> struct nameOf<std::vector<T> > : public nameOfArrayBase<T> {};
 
-// for unknown pointers, use the dereferenced type
+// if necessary dereference pointer types
 template<typename T> struct nameOf<T*> : public nameOf<T> {};
 template<typename T> struct nameOf<T* const> : public nameOf<T*> {};
+template<typename T> struct nameOf<RefPtr<T> > : public nameOf<T> {};
 
 // specialization for co::TypeKind (must go here to avoid cyclic dependencies)
 template<> struct nameOf<TypeKind> { static const char* get() { return "co.TypeKind"; } };

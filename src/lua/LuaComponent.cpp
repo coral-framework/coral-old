@@ -76,7 +76,7 @@ void LuaComponent::setInstance( LuaComponent* prototype, int instanceTableRef )
 	_tableRef = instanceTableRef;
 
 	// create proxy interfaces for our facets
-	co::Range<co::IPort*> facets = _componentType->getFacets();
+	co::TSlice<co::IPort*> facets = _componentType->getFacets();
 	int numFacets = static_cast<int>( facets.getSize() );
 	_facets = new co::IService*[numFacets];
 	for( int i = 0; i < numFacets; ++i )
@@ -197,7 +197,7 @@ void LuaComponent::dynamicSetField( co::int32 cookie, co::IField* ai, const co::
 	__END_LUA_API_CODE__
 }
 
-void LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<co::Any> args, const co::Any& res )
+void LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Slice<co::Any> args, const co::Any& res )
 {
 	__BEGIN_LUA_API_CODE__
 
@@ -210,7 +210,7 @@ void LuaComponent::dynamicInvoke( co::int32 cookie, co::IMethod* mi, co::Range<c
 	int numOut = returnType ? 1 : 0;
 	int numIn = 1;
 
-	co::Range<co::IParameter*> paramList = mi->getParameters();
+	co::TSlice<co::IParameter*> paramList = mi->getParameters();
 	assert( paramList.getSize() == args.getSize() );
 
 	int numArgs = static_cast<int>( args.getSize() );
@@ -326,7 +326,7 @@ void LuaComponent::setField( const co::Any&, co::IField*, const co::Any& )
 	raiseNotSupportedException();
 }
 
-void LuaComponent::invoke( const co::Any&, co::IMethod*, co::Range<co::Any>, const co::Any& )
+void LuaComponent::invoke( const co::Any&, co::IMethod*, co::Slice<co::Any>, const co::Any& )
 {
 	raiseNotSupportedException();
 }

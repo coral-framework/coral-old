@@ -53,7 +53,7 @@ public:
 	co::IModulePart* loadModulePart( const std::string& moduleName_ )
 	{
 		co::Any args[] = { moduleName_ };
-		co::RefPtr<co::IModulePart> res;
+		co::IModulePartRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IModulePartLoader>( 1 ), args, res );
 		return res.get();
 	}
@@ -121,7 +121,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::IModulePartLoader* p = co::checkInstance<co::IModulePartLoader>( instance, method );
 		checkNumArguments( method, args.getSize() );

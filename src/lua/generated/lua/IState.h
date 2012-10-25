@@ -6,15 +6,13 @@
 #ifndef _LUA_ISTATE_H_
 #define _LUA_ISTATE_H_
 
-#include <co/TypeTraits.h>
-#include <co/Range.h>
+#include <co/Common.h>
 #include <co/Any.h>
-#include <vector>
 #include <co/IService.h>
 
 // Forward Declarations:
 namespace lua {
-	class IInterceptor;
+	class IInterceptor; typedef co::RefPtr<IInterceptor> IInterceptorRef;
 } // namespace lua
 // End Of Forward Declarations
 
@@ -26,11 +24,11 @@ class IState : public co::IService
 public:
 	virtual ~IState() {;}
 
-	virtual co::Range<lua::IInterceptor*> getInterceptors() = 0;
+	virtual co::TSlice<lua::IInterceptor*> getInterceptors() = 0;
 
 	virtual void addInterceptor( lua::IInterceptor* interceptor ) = 0;
 
-	virtual co::int32 call( const std::string& moduleName, const std::string& functionName, co::Range<co::Any> args, co::Range<co::Any> results ) = 0;
+	virtual co::int32 call( const std::string& moduleName, const std::string& functionName, co::Slice<co::Any> args, co::Slice<co::Any> results ) = 0;
 
 	virtual void collectGarbage() = 0;
 
@@ -38,6 +36,8 @@ public:
 
 	virtual void removeInterceptor( lua::IInterceptor* interceptor ) = 0;
 };
+
+typedef co::RefPtr<IState> IStateRef;
 
 } // namespace lua
 

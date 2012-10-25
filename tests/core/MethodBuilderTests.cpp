@@ -60,7 +60,7 @@ TEST( MethodBuilderTests, theTest )
 
 	ASSERT_EQ( 3, mInfo->getParameters().getSize() );
 
-	co::Range<co::IParameter*> params = mInfo->getParameters();
+	co::TSlice<co::IParameter*> params = mInfo->getParameters();
 	co::IParameter* p = params.getFirst();
 	ASSERT_EQ( "p1", p->getName() );
 	ASSERT_EQ( stringType, p->getType() );

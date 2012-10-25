@@ -6,16 +6,12 @@
 #ifndef _CO_ISERVICE_H_
 #define _CO_ISERVICE_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 
 namespace co {
 
-USING_CORAL_INTEGER_TYPES;
-
 // Forward Decls:
 class IPort;
-class IObject;
-class IInterface;
 
 /*!
 	The co.IService interface, implicitly inherited by all interfaces.
@@ -36,9 +32,10 @@ public:
 	virtual void serviceRelease() = 0;
 };
 
+typedef RefPtr<IService> IServiceRef;
+
 template<> struct kindOf<IService> : public kindOfBase<TK_INTERFACE> {};
 template<> struct nameOf<IService> { static const char* get() { return "co.IService"; } };
-
 
 } // namespace co
 

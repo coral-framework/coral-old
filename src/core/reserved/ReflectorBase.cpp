@@ -154,7 +154,7 @@ void ReflectorBase::setField( const Any&, IField*, const Any& )
 	raiseNotSupportedException();
 }
 
-void ReflectorBase::invoke( const Any&, IMethod*, Range<Any>, const Any& )
+void ReflectorBase::invoke( const Any&, IMethod*, Slice<Any>, const Any& )
 {
 	raiseNotSupportedException();
 }

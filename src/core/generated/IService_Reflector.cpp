@@ -5,9 +5,9 @@
 
 #include <co/IService.h>
 #include <co/IDynamicServiceProvider.h>
+#include <co/IObject.h>
 #include <co/IPort.h>
 #include <co/IInterface.h>
-#include <co/IObject.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -117,7 +117,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::IService* p = co::checkInstance<co::IService>( instance, method );
 		checkNumArguments( method, args.getSize() );

@@ -6,11 +6,10 @@
 #ifndef _SYSTEM_H_
 #define _SYSTEM_H_
 
-#include "TypeManager.h"
-#include "ModuleManager.h"
-#include "ServiceManager.h"
 #include "System_Base.h"
-#include <co/RefPtr.h>
+#include "ServiceManager.h"
+#include "modules/ModuleManager.h"
+#include "types/TypeManager.h"
 
 namespace co {
 
@@ -31,7 +30,7 @@ public:
 	ITypeManager* getTypes();
 	IModuleManager* getModules();
 	IServiceManager* getServices();
-	void setupBase( Range<std::string> requiredModules );
+	void setupBase( Slice<std::string> requiredModules );
 	void setupPresentation();
 	void tearDown();
 

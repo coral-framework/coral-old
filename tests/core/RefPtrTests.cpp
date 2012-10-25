@@ -3,7 +3,6 @@
  * See Copyright Notice in Coral.h
  */
 
-#include <co/RefVector.h>
 #include <co/IService.h>
 #include <gtest/gtest.h>
 
@@ -143,4 +142,20 @@ TEST( RefPtrTests, structFields )
 
 	EXPECT_EQ( objA->getRefCount(), 2 );
 	EXPECT_EQ( objB->getRefCount(), 4 );
+}
+
+TEST( RefPtrTests, sliceUpcast )
+{
+	PseudoInterface o1, o2, o3;
+	o1.serviceRetain();
+	o2.serviceRetain();
+	o3.serviceRetain();
+
+	std::vector<co::RefPtr<PseudoInterface> > refVec;
+	refVec.push_back( &o1 );
+	refVec.push_back( &o2 );
+	refVec.push_back( &o3 );
+
+	co::Slice<co::IService*> range( refVec );
+	EXPECT_EQ( range.getSize(), 3 );
 }

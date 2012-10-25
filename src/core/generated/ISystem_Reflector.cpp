@@ -46,14 +46,14 @@ public:
 
 	co::IModuleManager* getModules()
 	{
-		co::RefPtr<co::IModuleManager> res;
+		co::IModuleManagerRef res;
 		_provider->dynamicGetField( _cookie, getField<co::ISystem>( 0 ), res );
 		return res.get();
 	}
 
 	co::IServiceManager* getServices()
 	{
-		co::RefPtr<co::IServiceManager> res;
+		co::IServiceManagerRef res;
 		_provider->dynamicGetField( _cookie, getField<co::ISystem>( 1 ), res );
 		return res.get();
 	}
@@ -67,12 +67,12 @@ public:
 
 	co::ITypeManager* getTypes()
 	{
-		co::RefPtr<co::ITypeManager> res;
+		co::ITypeManagerRef res;
 		_provider->dynamicGetField( _cookie, getField<co::ISystem>( 3 ), res );
 		return res.get();
 	}
 
-	void setupBase( co::Range<std::string> requiredModules_ )
+	void setupBase( co::Slice<std::string> requiredModules_ )
 	{
 		co::Any args[] = { requiredModules_ };
 		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 0 ), args, co::Any() );
@@ -80,13 +80,13 @@ public:
 
 	void setupPresentation()
 	{
-		co::Range<co::Any> args;
+		co::Slice<co::Any> args;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 1 ), args, co::Any() );
 	}
 
 	void tearDown()
 	{
-		co::Range<co::Any> args;
+		co::Slice<co::Any> args;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ISystem>( 2 ), args, co::Any() );
 	}
 
@@ -167,7 +167,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::ISystem* p = co::checkInstance<co::ISystem>( instance, method );
 		checkNumArguments( method, args.getSize() );
@@ -178,7 +178,7 @@ public:
 			{
 			case 4:
 				{
-					co::Range<std::string> requiredModules_ = args[++argIndex].get< co::Range<std::string> >();
+					co::Slice<std::string> requiredModules_ = args[++argIndex].get< co::Slice<std::string> >();
 					argIndex = -1;
 					p->setupBase( requiredModules_ );
 				}

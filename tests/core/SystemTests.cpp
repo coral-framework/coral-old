@@ -11,19 +11,19 @@
 
 TEST( SystemTests, coralPathDirsAreUnique )
 {
-	co::Range<std::string> pathsA = co::getPaths();
+	co::Slice<std::string> pathsA = co::getPaths();
 	ASSERT_GT( pathsA.getSize(), static_cast<size_t>( 0 ) );
 
 	// adding the same dirs again shouldn't change the CORAL_PATH
 	std::string morePaths;
-	for( co::Range<std::string> it( pathsA ); it; it.popFirst() )
+	for( co::Slice<std::string> it( pathsA ); it; it.popFirst() )
 	{
 		morePaths.append( it.getFirst() );
 		morePaths.append( ";" );
 	}
 	co::addPath( morePaths );
 
-	co::Range<std::string> pathsB = co::getPaths();
+	co::Slice<std::string> pathsB = co::getPaths();
 	EXPECT_EQ( pathsA.getSize(), pathsB.getSize() );
 }
 

@@ -6,12 +6,12 @@
 #ifndef _CO_IDYNAMICTYPEPROVIDER_H_
 #define _CO_IDYNAMICTYPEPROVIDER_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IAnnotation.h>
 
 // Forward Declarations:
 namespace co {
-	class IType;
+	class IType; typedef co::RefPtr<IType> ITypeRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -25,6 +25,8 @@ public:
 
 	virtual void provideReflectorFor( co::IType* type ) = 0;
 };
+
+typedef co::RefPtr<IDynamicTypeProvider> IDynamicTypeProviderRef;
 
 } // namespace co
 

@@ -5,10 +5,10 @@
 
 #include <co/ITypeManager.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/ITypeTransaction.h>
-#include <co/INamespace.h>
-#include <co/IArray.h>
 #include <co/IType.h>
+#include <co/INamespace.h>
+#include <co/ITypeTransaction.h>
+#include <co/IArray.h>
 #include <co/CSLError.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
@@ -48,14 +48,14 @@ public:
 
 	co::INamespace* getRootNS()
 	{
-		co::RefPtr<co::INamespace> res;
+		co::INamespaceRef res;
 		_provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 0 ), res );
 		return res.get();
 	}
 
 	co::ITypeTransaction* getTransaction()
 	{
-		co::RefPtr<co::ITypeTransaction> res;
+		co::ITypeTransactionRef res;
 		_provider->dynamicGetField( _cookie, getField<co::ITypeManager>( 1 ), res );
 		return res.get();
 	}
@@ -63,7 +63,7 @@ public:
 	co::INamespace* findNamespace( const std::string& fullName_ )
 	{
 		co::Any args[] = { fullName_ };
-		co::RefPtr<co::INamespace> res;
+		co::INamespaceRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 0 ), args, res );
 		return res.get();
 	}
@@ -71,7 +71,7 @@ public:
 	co::IType* findType( const std::string& fullName_ )
 	{
 		co::Any args[] = { fullName_ };
-		co::RefPtr<co::IType> res;
+		co::ITypeRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 1 ), args, res );
 		return res.get();
 	}
@@ -79,7 +79,7 @@ public:
 	co::IArray* getArrayOf( co::IType* elementType_ )
 	{
 		co::Any args[] = { elementType_ };
-		co::RefPtr<co::IArray> res;
+		co::IArrayRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 2 ), args, res );
 		return res.get();
 	}
@@ -87,7 +87,7 @@ public:
 	co::INamespace* getNamespace( const std::string& fullName_ )
 	{
 		co::Any args[] = { fullName_ };
-		co::RefPtr<co::INamespace> res;
+		co::INamespaceRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 3 ), args, res );
 		return res.get();
 	}
@@ -95,7 +95,7 @@ public:
 	co::IType* getType( const std::string& typeName_ )
 	{
 		co::Any args[] = { typeName_ };
-		co::RefPtr<co::IType> res;
+		co::ITypeRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 4 ), args, res );
 		return res.get();
 	}
@@ -103,7 +103,7 @@ public:
 	co::IType* loadType( const std::string& typeName_, std::vector<co::CSLError>& errorStack_ )
 	{
 		co::Any args[] = { typeName_, errorStack_ };
-		co::RefPtr<co::IType> res;
+		co::ITypeRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeManager>( 5 ), args, res );
 		return res.get();
 	}
@@ -181,7 +181,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::ITypeManager* p = co::checkInstance<co::ITypeManager>( instance, method );
 		checkNumArguments( method, args.getSize() );

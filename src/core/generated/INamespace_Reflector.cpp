@@ -5,9 +5,9 @@
 
 #include <co/INamespace.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IModule.h>
-#include <co/IType.h>
 #include <co/ITypeBuilder.h>
+#include <co/IType.h>
+#include <co/IModule.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -44,11 +44,13 @@ public:
 
 	// co.INamespace Methods:
 
-	co::Range<co::INamespace*> getChildNamespaces()
+	co::TSlice<co::INamespace*> getChildNamespaces()
 	{
-		co::RefVector<co::INamespace> res;
+		typedef co::Temporary<std::vector<co::INamespaceRef> > Temporary;
+		std::unique_ptr<Temporary> temp( new Temporary );
+		auto& res = temp->value;
 		_provider->dynamicGetField( _cookie, getField<co::INamespace>( 0 ), res );
-		return res;
+		return co::TSlice<co::INamespace*>( res, temp.release() );
 	}
 
 	std::string getFullName()
@@ -60,7 +62,7 @@ public:
 
 	co::IModule* getModule()
 	{
-		co::RefPtr<co::IModule> res;
+		co::IModuleRef res;
 		_provider->dynamicGetField( _cookie, getField<co::INamespace>( 2 ), res );
 		return res.get();
 	}
@@ -74,22 +76,24 @@ public:
 
 	co::INamespace* getParentNamespace()
 	{
-		co::RefPtr<co::INamespace> res;
+		co::INamespaceRef res;
 		_provider->dynamicGetField( _cookie, getField<co::INamespace>( 4 ), res );
 		return res.get();
 	}
 
-	co::Range<co::IType*> getTypes()
+	co::TSlice<co::IType*> getTypes()
 	{
-		co::RefVector<co::IType> res;
+		typedef co::Temporary<std::vector<co::ITypeRef> > Temporary;
+		std::unique_ptr<Temporary> temp( new Temporary );
+		auto& res = temp->value;
 		_provider->dynamicGetField( _cookie, getField<co::INamespace>( 5 ), res );
-		return res;
+		return co::TSlice<co::IType*>( res, temp.release() );
 	}
 
 	co::INamespace* defineChildNamespace( const std::string& name_ )
 	{
 		co::Any args[] = { name_ };
-		co::RefPtr<co::INamespace> res;
+		co::INamespaceRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 0 ), args, res );
 		return res.get();
 	}
@@ -97,7 +101,7 @@ public:
 	co::ITypeBuilder* defineType( const std::string& name_, co::TypeKind kind_ )
 	{
 		co::Any args[] = { name_, kind_ };
-		co::RefPtr<co::ITypeBuilder> res;
+		co::ITypeBuilderRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 1 ), args, res );
 		return res.get();
 	}
@@ -105,7 +109,7 @@ public:
 	co::INamespace* findChildNamespace( const std::string& name_ )
 	{
 		co::Any args[] = { name_ };
-		co::RefPtr<co::INamespace> res;
+		co::INamespaceRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 2 ), args, res );
 		return res.get();
 	}
@@ -113,7 +117,7 @@ public:
 	co::IType* findType( const std::string& name_ )
 	{
 		co::Any args[] = { name_ };
-		co::RefPtr<co::IType> res;
+		co::ITypeRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::INamespace>( 3 ), args, res );
 		return res.get();
 	}
@@ -199,7 +203,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::INamespace* p = co::checkInstance<co::INamespace>( instance, method );
 		checkNumArguments( method, args.getSize() );

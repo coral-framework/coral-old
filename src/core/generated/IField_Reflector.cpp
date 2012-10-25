@@ -5,10 +5,10 @@
 
 #include <co/IField.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IInterface.h>
+#include <co/ICompositeType.h>
 #include <co/IType.h>
 #include <co/IAnnotation.h>
-#include <co/ICompositeType.h>
+#include <co/IInterface.h>
 #include <co/IMethod.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
@@ -44,14 +44,16 @@ public:
 
 	// co.IAnnotated Methods:
 
-	co::Range<co::IAnnotation*> getAnnotations()
+	co::TSlice<co::IAnnotation*> getAnnotations()
 	{
-		co::RefVector<co::IAnnotation> res;
+		typedef co::Temporary<std::vector<co::IAnnotationRef> > Temporary;
+		std::unique_ptr<Temporary> temp( new Temporary );
+		auto& res = temp->value;
 		_provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ), res );
-		return res;
+		return co::TSlice<co::IAnnotation*>( res, temp.release() );
 	}
 
-	void setAnnotations( co::Range<co::IAnnotation*> annotations_ )
+	void setAnnotations( co::Slice<co::IAnnotation*> annotations_ )
 	{
 		_provider->dynamicSetField( _cookie, getField<co::IAnnotated>( 0 ), annotations_ );
 	}
@@ -65,7 +67,7 @@ public:
 	co::IAnnotation* getAnnotation( co::IInterface* requestedType_ )
 	{
 		co::Any args[] = { requestedType_ };
-		co::RefPtr<co::IAnnotation> res;
+		co::IAnnotationRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IAnnotated>( 1 ), args, res );
 		return res.get();
 	}
@@ -95,7 +97,7 @@ public:
 
 	co::ICompositeType* getOwner()
 	{
-		co::RefPtr<co::ICompositeType> res;
+		co::ICompositeTypeRef res;
 		_provider->dynamicGetField( _cookie, getField<co::IMember>( 3 ), res );
 		return res.get();
 	}
@@ -111,7 +113,7 @@ public:
 
 	co::IType* getType()
 	{
-		co::RefPtr<co::IType> res;
+		co::ITypeRef res;
 		_provider->dynamicGetField( _cookie, getField<co::IField>( 1 ), res );
 		return res.get();
 	}
@@ -189,7 +191,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::checkInstance<co::IField>( instance, method );
 		raiseUnexpectedMemberIndex();

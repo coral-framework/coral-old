@@ -6,13 +6,12 @@
 #ifndef _CO_ITYPETRANSACTION_H_
 #define _CO_ITYPETRANSACTION_H_
 
-#include <co/TypeTraits.h>
-#include <co/Range.h>
+#include <co/Common.h>
 #include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
-	class ITypeBuilder;
+	class ITypeBuilder; typedef co::RefPtr<ITypeBuilder> ITypeBuilderRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -24,12 +23,14 @@ class ITypeTransaction : public co::IService
 public:
 	virtual ~ITypeTransaction() {;}
 
-	virtual co::Range<co::ITypeBuilder*> getTypeBuilders() = 0;
+	virtual co::TSlice<co::ITypeBuilder*> getTypeBuilders() = 0;
 
 	virtual void commit() = 0;
 
 	virtual void rollback() = 0;
 };
+
+typedef co::RefPtr<ITypeTransaction> ITypeTransactionRef;
 
 } // namespace co
 

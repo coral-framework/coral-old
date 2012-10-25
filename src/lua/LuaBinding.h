@@ -68,7 +68,7 @@ public:
 	static void releaseBindings( lua_State* L );
 	
 	// TODO: refactor by moving all state into LuaState
-	typedef co::RefVector<IInterceptor> InterceptorList;
+	typedef std::vector<IInterceptorRef> InterceptorList;
 	static InterceptorList sm_interceptors;
 	static void addInterceptor( IInterceptor* interceptor );
 	static void removeInterceptor( IInterceptor* interceptor );

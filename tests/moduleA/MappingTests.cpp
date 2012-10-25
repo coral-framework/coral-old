@@ -7,6 +7,7 @@
 
 #include <co/Coral.h>
 #include <co/IObject.h>
+#include <moduleA/File.h>
 #include <moduleA/Vec2D.h>
 #include <moduleA/TestEnum.h>
 #include <moduleA/TestStruct.h>
@@ -56,7 +57,7 @@ TEST( MappingTests, structFields )
 	ASSERT_EQ( moduleA::Second, dummyStruct.enumArray[0] );
 
 	dummyStruct.typeArray.push_back( NULL );
-	co::Range<co::IType*> typeRange( dummyStruct.typeArray );
+	co::Slice<co::IType*> typeRange( dummyStruct.typeArray );
 	ASSERT_EQ( 1, typeRange.getSize() );
 	ASSERT_EQ( dummyStruct.typeArray.front().get(), typeRange.getFirst() );
 }
@@ -121,15 +122,15 @@ TEST( MappingTests, interface )
 	moduleA::TestStruct testStruct;
 	testStruct.anInt16 = 42;
 	std::vector<co::int32> intVector( 1, 1 );
-	co::Range<co::int32> intList(  intVector );
+	co::Slice<co::int32> intList(  intVector );
 
-	co::RefVector<moduleA::IDummy> interfaceRefVector;
+	std::vector<moduleA::IDummyRef> interfaceRefVector;
 	interfaceRefVector.push_back( NULL );
 
 	std::vector<moduleA::IDummy*> interfaceVector;
 	interfaceVector.push_back( NULL );
 
-	co::Range<moduleA::IDummy*> interfaceList( interfaceVector );
+	co::Slice<moduleA::IDummy*> interfaceList( interfaceVector );
 
 	// Callling this method should NOT alter the parameters
 	ti->testInParameters( size, enumValue, text, testStruct, NULL, intList, interfaceList );
@@ -175,12 +176,29 @@ TEST( MappingTests, namespaces )
 	ASSERT_EQ( 3, moduleA::Continent::Country::State::Sparks );
 }
 
+TEST( MappingTests, kindOf )
+{
+	EXPECT_TRUE( co::TK_STRUCT == co::kindOf<moduleA::TestStruct>::kind );
+	EXPECT_TRUE( co::TK_STRUCT == co::kindOf<moduleA::TestStruct*>::kind );
+	EXPECT_TRUE( co::TK_STRUCT == co::kindOf<moduleA::TestStruct**>::kind );
+
+	EXPECT_TRUE( co::TK_INTERFACE == co::kindOf<moduleA::IDummy>::kind );
+	EXPECT_TRUE( co::TK_INTERFACE == co::kindOf<moduleA::IDummy*>::kind );
+	EXPECT_TRUE( co::TK_INTERFACE == co::kindOf<moduleA::IDummy**>::kind );
+
+	EXPECT_TRUE( co::TK_NULL == co::kindOf<FILE>::kind );
+	EXPECT_TRUE( co::TK_NATIVECLASS == co::kindOf<FILE*>::kind );
+	EXPECT_TRUE( co::TK_NATIVECLASS == co::kindOf<FILE**>::kind );
+	EXPECT_TRUE( co::TK_NATIVECLASS == co::kindOf<FILE***>::kind );
+}
+
 TEST( MappingTests, nameOf )
 {
- 	EXPECT_STREQ( "moduleA.TestNamespaces", co::nameOf<moduleA::TestNamespaces>::get() );
- 	EXPECT_STREQ( "moduleA.Continent.Country.China", co::nameOf<moduleA::Continent::Country::China>::get() );
- 	EXPECT_STREQ( "moduleA.IDummy", co::nameOf<moduleA::IDummy>::get() );
- 	EXPECT_STREQ( "moduleA.TestStruct", co::nameOf<moduleA::TestStruct>::get() );
- 	EXPECT_STREQ( "moduleA.TestEnum", co::nameOf<moduleA::TestEnum>::get() );
- 	EXPECT_STREQ( "moduleA.TestException", co::nameOf<moduleA::TestException>::get() );
+	EXPECT_STREQ( "moduleA.TestNamespaces", co::nameOf<moduleA::TestNamespaces>::get() );
+	EXPECT_STREQ( "moduleA.Continent.Country.China", co::nameOf<moduleA::Continent::Country::China>::get() );
+	EXPECT_STREQ( "moduleA.IDummy", co::nameOf<moduleA::IDummy>::get() );
+	EXPECT_STREQ( "moduleA.TestStruct", co::nameOf<moduleA::TestStruct>::get() );
+	EXPECT_STREQ( "moduleA.TestEnum", co::nameOf<moduleA::TestEnum>::get() );
+	EXPECT_STREQ( "moduleA.TestException", co::nameOf<moduleA::TestException>::get() );
+	EXPECT_STREQ( "moduleA.File", co::nameOf<FILE*>::get() );
 }

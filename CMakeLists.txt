@@ -20,16 +20,13 @@ set( CORAL_VERSION_PATCH	"0" )
 set( CORAL_VERSION "${CORAL_VERSION_MAJOR}.${CORAL_VERSION_MINOR}.${CORAL_VERSION_PATCH}" )
 
 # Code generation rules revision
-set( CORAL_COMPILER_OUTPUT_REVISION 14 )
+set( CORAL_COMPILER_OUTPUT_REVISION 15 )
 
 ################################################################################
 # Global Build Settings
 ################################################################################
 
-if( MSVC )
-	# Disable unavoidable MSVC warnings
-	add_definitions( "/wd4251" )
-else()
+if( NOT MSVC )
 	# Enable extra GCC warnings for extra-nice code
 	add_definitions( -Wall -Wextra -Wunused -Wwrite-strings -Wno-ignored-qualifiers )
 	# For C++ sources only:

@@ -6,14 +6,14 @@
 #ifndef _CO_IMETHODBUILDER_H_
 #define _CO_IMETHODBUILDER_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
-	class IException;
-	class IType;
-	class ITypeBuilder;
+	class IException; typedef co::RefPtr<IException> IExceptionRef;
+	class IType; typedef co::RefPtr<IType> ITypeRef;
+	class ITypeBuilder; typedef co::RefPtr<ITypeBuilder> ITypeBuilderRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -37,6 +37,8 @@ public:
 
 	virtual void defineReturnType( co::IType* type ) = 0;
 };
+
+typedef co::RefPtr<IMethodBuilder> IMethodBuilderRef;
 
 } // namespace co
 

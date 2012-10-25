@@ -253,15 +253,6 @@ end
 function traverse.TK_STRUCT( t )
 	for i, field in ipairs( t.fields ) do
 		t:includeType( field.type )
-		if field.type.kind == 'TK_INTERFACE' then
-			t:includeHeader( "co/RefPtr.h" )
-		elseif field.type.kind == 'TK_ARRAY' then
-			if field.type.elementType.kind == 'TK_INTERFACE' then
-				t:includeHeader( "co/RefVector.h" )
-			else
-				t:includeHeader( "vector" )
-			end
-		end
 	end
 end
 
@@ -277,13 +268,6 @@ local function traverseClassType( t )
 		end
 		for i, p in ipairs( m.parameters ) do
 			t:includeType( p.type )
-			if p.type.kind == 'TK_ARRAY' then
-				if p.type.elementType.kind == 'TK_INTERFACE' then
-					t:includeHeader( "co/RefVector.h" )
-				else
-					t:includeHeader( "vector" )
-				end
-			end
 		end
 	end
 end

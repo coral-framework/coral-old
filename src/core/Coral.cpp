@@ -33,7 +33,7 @@ inline ITypeManager* getTypeManager()
 	return sg_typeManager;
 }
 
-Range<std::string> getPaths()
+Slice<std::string> getPaths()
 {
 	return sg_paths;
 }
@@ -152,8 +152,8 @@ bool findFile( const std::string& moduleName, const std::string& fileName, std::
 	std::string modulePath( moduleName );
 	OS::convertDotsToDirSeps( modulePath );
 	return OS::searchFile3( getPaths(),
-				Range<std::string>( &modulePath, 1 ),
-				Range<std::string>( &fileName, 1 ),
+				Slice<std::string>( &modulePath, 1 ),
+				Slice<std::string>( &fileName, 1 ),
 				filePath );
 }
 

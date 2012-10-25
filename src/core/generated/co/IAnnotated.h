@@ -6,14 +6,13 @@
 #ifndef _CO_IANNOTATED_H_
 #define _CO_IANNOTATED_H_
 
-#include <co/TypeTraits.h>
-#include <co/Range.h>
+#include <co/Common.h>
 #include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
-	class IAnnotation;
-	class IInterface;
+	class IAnnotation; typedef co::RefPtr<IAnnotation> IAnnotationRef;
+	class IInterface; typedef co::RefPtr<IInterface> IInterfaceRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -39,14 +38,16 @@ public:
 	
 	// End Of c++> Block
 
-	virtual co::Range<co::IAnnotation*> getAnnotations() = 0;
+	virtual co::TSlice<co::IAnnotation*> getAnnotations() = 0;
 
-	virtual void setAnnotations( co::Range<co::IAnnotation*> annotations ) = 0;
+	virtual void setAnnotations( co::Slice<co::IAnnotation*> annotations ) = 0;
 
 	virtual void addAnnotation( co::IAnnotation* annotation ) = 0;
 
 	virtual co::IAnnotation* getAnnotation( co::IInterface* requestedType ) = 0;
 };
+
+typedef co::RefPtr<IAnnotated> IAnnotatedRef;
 
 } // namespace co
 

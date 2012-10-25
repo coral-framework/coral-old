@@ -26,7 +26,7 @@ public:
 		// empty
 	}
 
-	co::int32 main( co::Range<std::string> args )
+	co::int32 main( co::Slice<std::string> args )
 	{
 		if( args.isEmpty() )
 			throw lua::Exception( "lua.Launcher must receive a Lua script name as argument" );

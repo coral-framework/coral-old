@@ -7,8 +7,8 @@
 #include <co/IDynamicServiceProvider.h>
 #include <co/IType.h>
 #include <co/IMethodBuilder.h>
-#include <co/IInterface.h>
 #include <co/INamespace.h>
+#include <co/IInterface.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -54,7 +54,7 @@ public:
 
 	co::INamespace* getNamespace()
 	{
-		co::RefPtr<co::INamespace> res;
+		co::INamespaceRef res;
 		_provider->dynamicGetField( _cookie, getField<co::ITypeBuilder>( 1 ), res );
 		return res.get();
 	}
@@ -68,8 +68,8 @@ public:
 
 	co::IType* createType()
 	{
-		co::Range<co::Any> args;
-		co::RefPtr<co::IType> res;
+		co::Slice<co::Any> args;
+		co::ITypeRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 0 ), args, res );
 		return res.get();
 	}
@@ -95,7 +95,7 @@ public:
 	co::IMethodBuilder* defineMethod( const std::string& name_ )
 	{
 		co::Any args[] = { name_ };
-		co::RefPtr<co::IMethodBuilder> res;
+		co::IMethodBuilderRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::ITypeBuilder>( 4 ), args, res );
 		return res.get();
 	}
@@ -181,7 +181,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::ITypeBuilder* p = co::checkInstance<co::ITypeBuilder>( instance, method );
 		checkNumArguments( method, args.getSize() );

@@ -6,12 +6,12 @@
 #ifndef _CO_IPARAMETER_H_
 #define _CO_IPARAMETER_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
-	class IType;
+	class IType; typedef co::RefPtr<IType> ITypeRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -31,6 +31,8 @@ public:
 
 	virtual co::IType* getType() = 0;
 };
+
+typedef co::RefPtr<IParameter> IParameterRef;
 
 } // namespace co
 

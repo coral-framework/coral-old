@@ -34,6 +34,7 @@ cmake_minimum_required( VERSION 2.8.5 )
 # Initialization
 ################################################################################
 
+# Initialize CORAL_ROOT
 if( NOT CORAL_ROOT )
 	file( TO_CMAKE_PATH "$ENV{CORAL_ROOT}" CORAL_ROOT )
 	if( NOT CORAL_ROOT )
@@ -44,6 +45,7 @@ if( NOT CORAL_ROOT )
 	endif()
 endif()
 
+# Initialize CORAL_PATH
 if( NOT CORAL_PATH )
 	file( TO_CMAKE_PATH "$ENV{CORAL_PATH}" CORAL_PATH )
 	if( NOT CORAL_PATH )
@@ -51,18 +53,32 @@ if( NOT CORAL_PATH )
 	endif()
 endif()
 
+# Set default output dir for module libraries
+if( NOT CORAL_MODULE_OUTPUT_DIR )
+	set( CORAL_MODULE_OUTPUT_DIR "${CMAKE_BINARY_DIR}/modules" )
+endif()
+
 if( APPLE )
 	# On OSX use only the standard 64-bit architecture by default
 	set( CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_64_BIT)" )
 endif()
 
-# Require minimal support for C++11 (static_assert, TR1, etc)
+# Require minimal support for C++11
 if( MSVC )
+	# On Windows require VS 2010+
 	if( MSVC_VERSION LESS 1600 )
-		message( FATAL_ERROR "Coral currently requires Visual Studio 2010 or greater." )
+		message( FATAL_ERROR "Coral requires Visual Studio 2010 or newer." )
+	endif()
+elseif( APPLE )
+	# On OSX require Clang 3.0+
+	if( XCODE_VERSION )
+		set( CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11" )
+		set( CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++" )
+	else()
+		set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++" )
 	endif()
 else()
-	# Requires GCC 4.3+
+	# On Linux require GCC 4.5+
 	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" )
 endif()
 
@@ -191,16 +207,18 @@ macro( CORAL_TARGET_PROPERTIES targetName )
 	# Targets built in 'RelWithDebInfo' mode are considered in 'release' mode
 	set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_DEFINITIONS_RELWITHDEBINFO "NDEBUG" )
 
-	if( WIN32 )
-		# Generate executables in /bin and shared libs (but not module libs) in /lib
-		get_target_property( _targetType ${targetName} TYPE )
-		if( NOT _targetType STREQUAL "MODULE_LIBRARY" )
-			set_target_properties( ${targetName} PROPERTIES
-				RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-				LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-				ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-			)
-		endif()
+	# Generate executables in /bin and libs (but not modules) in /lib
+	get_target_property( _targetType ${targetName} TYPE )
+	if( _targetType STREQUAL "EXECUTABLE" )
+		set_target_properties( ${targetName} PROPERTIES
+			RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+		)
+	elseif( NOT _targetType STREQUAL "MODULE_LIBRARY" )
+		set_target_properties( ${targetName} PROPERTIES
+			RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+			LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+			ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+		)
 	endif()
 
 	if( MSVC )
@@ -224,8 +242,6 @@ endmacro( CORAL_TARGET_PROPERTIES )
 ################################################################################
 macro( CORAL_TARGET targetName )
 	CORAL_TARGET_PROPERTIES( ${targetName} )
-
-	# Link with the Coral library
 	target_link_libraries( ${targetName} ${CORAL_LIBRARIES} )
 endmacro( CORAL_TARGET )
 
@@ -239,10 +255,6 @@ macro( CORAL_MODULE_TARGET moduleName targetName )
 		PREFIX ""
 		OUTPUT_NAME "${moduleName}"
 	)
-
-	if( NOT CORAL_MODULE_OUTPUT_DIR )
-		set( CORAL_MODULE_OUTPUT_DIR "${CMAKE_BINARY_DIR}/modules" )
-	endif()
 
 	# Copy or generate the module library into /modules/${modulePath}/
 	string( REPLACE "." "/" modulePath ${moduleName} )
@@ -278,6 +290,17 @@ macro( CORAL_BUILD_CSL_MODULE moduleName )
 endmacro( CORAL_BUILD_CSL_MODULE )
 
 ################################################################################
+# Macro to set env vars for a test executable so it finds the Coral library.
+################################################################################
+macro( CORAL_TEST_ENVIRONMENT testName )
+	set_property( TEST ${testName} APPEND PROPERTY ENVIRONMENT
+		PATH=${CORAL_ROOT}/lib
+		LD_LIBRARY_PATH=${CORAL_ROOT}/lib
+		DYLD_LIBRARY_PATH=${CORAL_ROOT}/lib
+	)
+endmacro( CORAL_TEST_ENVIRONMENT )
+
+################################################################################
 # Macro to add a test target that invokes the Coral Launcher passing arguments.
 ################################################################################
 macro( CORAL_ADD_TEST testName )
@@ -288,21 +311,8 @@ macro( CORAL_ADD_TEST testName )
 	endif()
 	CORAL_GET_PATH_STRING( coralPathStr )
 	add_test( NAME ${testName} COMMAND ${coralLauncherMode} -p "${coralPathStr}" ${ARGN} )
+	CORAL_TEST_ENVIRONMENT( ${testName} )
 endmacro( CORAL_ADD_TEST )
-
-################################################################################
-# Macro to set env vars for a test executable so it finds the Coral library.
-################################################################################
-macro( CORAL_TEST_ENVIRONMENT testName )
-	if( NOT CORAL_ROOT )
-		set( CORAL_ROOT $ENV{CORAL_ROOT} )
-	endif()
-	set_property( TEST ${testName} APPEND PROPERTY ENVIRONMENT
-		PATH=${CORAL_ROOT}/lib
-		LD_LIBRARY_PATH=${CORAL_ROOT}/lib
-		DYLD_LIBRARY_PATH=${CORAL_ROOT}/lib
-	)
-endmacro( CORAL_TEST_ENVIRONMENT )
 
 ################################################################################
 # Macro to enable generation of 'test coverage' data for a target.

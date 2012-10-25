@@ -45,7 +45,7 @@ public:
 
 	co::IComponent* getComponent()
 	{
-		co::RefPtr<co::IComponent> res;
+		co::IComponentRef res;
 		_provider->dynamicGetField( _cookie, getField<co::IObject>( 0 ), res );
 		return res.get();
 	}
@@ -53,7 +53,7 @@ public:
 	co::IService* getServiceAt( co::IPort* port_ )
 	{
 		co::Any args[] = { port_ };
-		co::RefPtr<co::IService> res;
+		co::IServiceRef res;
 		_provider->dynamicInvoke( _cookie, getMethod<co::IObject>( 0 ), args, res );
 		return res.get();
 	}
@@ -135,7 +135,7 @@ public:
 		CORAL_UNUSED( value );
 	}
 
-	void invoke( const co::Any& instance, co::IMethod* method, co::Range<co::Any> args, const co::Any& res )
+	void invoke( const co::Any& instance, co::IMethod* method, co::Slice<co::Any> args, const co::Any& res )
 	{
 		co::IObject* p = co::checkInstance<co::IObject>( instance, method );
 		checkNumArguments( method, args.getSize() );

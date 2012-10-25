@@ -6,15 +6,15 @@
 #ifndef _CO_CSLERROR_H_
 #define _CO_CSLERROR_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 
 // co.CSLError Mapping:
 namespace co {
 
 struct CSLError
 {
-	std::string filename; // estimated size of 8 bytes
-	std::string message; // estimated size of 8 bytes
+	std::string filename; // estimated size of 24 bytes
+	std::string message; // estimated size of 24 bytes
 	co::int32 line; // estimated size of 4 bytes
 
 	//! Default constructor.

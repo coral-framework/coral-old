@@ -6,7 +6,7 @@
 #ifndef _CO_IEXCEPTION_H_
 #define _CO_IEXCEPTION_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/IType.h>
 
 // co.IException Mapping:
@@ -17,6 +17,8 @@ class IException : public co::IType
 public:
 	virtual ~IException() {;}
 };
+
+typedef co::RefPtr<IException> IExceptionRef;
 
 } // namespace co
 

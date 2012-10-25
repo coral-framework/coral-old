@@ -22,10 +22,6 @@ set( CORAL_LAUNCHER_FLAGS "" )
 CORAL_GET_PATH_STRING( coralPathStr )
 set_property( DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_PATH=\"${coralPathStr}\"" )
 
-# Get the list of source files for the 'core' library
-GET_PROPERTY( CORE_HEADER_FILES DIRECTORY ${CORE_SOURCE_DIR} PROPERTY HEADER_FILES )
-GET_PROPERTY( CORE_SOURCE_FILES DIRECTORY ${CORE_SOURCE_DIR} PROPERTY SOURCE_FILES )
-
 include_directories(
 	${CMAKE_SOURCE_DIR}/src
 	${CMAKE_CURRENT_BINARY_DIR}/generated
@@ -33,8 +29,9 @@ include_directories(
 )
 
 # Create the test executable
+get_property( CORE_SOURCES DIRECTORY ${CORE_SOURCE_DIR} PROPERTY SOURCES )
 add_definitions( -DBUILDING_CORAL_CORE )
-add_executable( tests_regen EXCLUDE_FROM_ALL ${CORE_HEADER_FILES} ${CORE_SOURCE_FILES} ${_GENERATED_FILES} Main.cpp
+add_executable( tests_regen EXCLUDE_FROM_ALL ${CORE_SOURCES} ${_GENERATED_FILES} Main.cpp
 	# Select a few tests from tests_core to run again in tests_regen
 	../core/AnyTests.cpp
 	../core/ReflectorTests.cpp
@@ -50,7 +47,7 @@ target_link_libraries( tests_regen ${GTEST_LIBRARIES} )
 
 if( NOT MSVC )
 	# Disable warnings for auto-generated code
-	set_property( SOURCE "${CORE_SOURCE_DIR}/csl/scanner.cc" APPEND PROPERTY COMPILE_FLAGS "-Wno-unused-parameter" )
+	set_property( SOURCE "${CORE_SOURCE_DIR}/types/csl/scanner.cc" APPEND PROPERTY COMPILE_FLAGS "-Wno-unused-parameter" )
 endif()
 
 IF( UNIX )
@@ -70,4 +67,4 @@ add_test(
 # Source Groups
 ################################################################################
 
-source_group( "@Core" FILES ${CORE_HEADER_FILES} ${CORE_SOURCE_FILES} )
+source_group( "@Core" FILES ${CORE_SOURCES} )

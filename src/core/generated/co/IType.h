@@ -6,7 +6,7 @@
 #ifndef _CO_ITYPE_H_
 #define _CO_ITYPE_H_
 
-#include <co/TypeTraits.h>
+#include <co/Common.h>
 #include <co/Uuid.h>
 #include <co/TypeKind.h>
 #include <co/IType.h>
@@ -14,8 +14,8 @@
 
 // Forward Declarations:
 namespace co {
-	class INamespace;
-	class IReflector;
+	class INamespace; typedef co::RefPtr<INamespace> INamespaceRef;
+	class IReflector; typedef co::RefPtr<IReflector> IReflectorRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -47,6 +47,8 @@ public:
 
 	virtual bool isA( co::IType* type ) = 0;
 };
+
+typedef co::RefPtr<IType> ITypeRef;
 
 } // namespace co
 

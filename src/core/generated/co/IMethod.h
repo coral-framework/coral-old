@@ -6,15 +6,14 @@
 #ifndef _CO_IMETHOD_H_
 #define _CO_IMETHOD_H_
 
-#include <co/TypeTraits.h>
-#include <co/Range.h>
+#include <co/Common.h>
 #include <co/IMember.h>
 
 // Forward Declarations:
 namespace co {
-	class IException;
-	class IParameter;
-	class IType;
+	class IException; typedef co::RefPtr<IException> IExceptionRef;
+	class IParameter; typedef co::RefPtr<IParameter> IParameterRef;
+	class IType; typedef co::RefPtr<IType> ITypeRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -26,12 +25,14 @@ class IMethod : public co::IMember
 public:
 	virtual ~IMethod() {;}
 
-	virtual co::Range<co::IException*> getExceptions() = 0;
+	virtual co::TSlice<co::IException*> getExceptions() = 0;
 
-	virtual co::Range<co::IParameter*> getParameters() = 0;
+	virtual co::TSlice<co::IParameter*> getParameters() = 0;
 
 	virtual co::IType* getReturnType() = 0;
 };
+
+typedef co::RefPtr<IMethod> IMethodRef;
 
 } // namespace co
 

@@ -6,6 +6,7 @@
 #include "CSLTester.h"
 #include <co/IMember.h>
 #include <co/ICppBlock.h>
+#include <co/IInterface.h>
 #include <co/IDocumentation.h>
 #include <gtest/gtest.h>
 
@@ -94,7 +95,7 @@ TEST( AnnotationTests, documentation )
 
 	EXPECT_EQ( "First annotation", doc->getValue() );
 
-	co::Range<co::IAnnotation*> annotations = t->getAnnotations();
+	co::TSlice<co::IAnnotation*> annotations = t->getAnnotations();
 	ASSERT_EQ( 3, annotations.getSize() );
 	ASSERT_EQ( "co.IDocumentation", annotations[0]->getInterface()->getFullName() );
 	ASSERT_EQ( "co.IDocumentation", annotations[1]->getInterface()->getFullName() );

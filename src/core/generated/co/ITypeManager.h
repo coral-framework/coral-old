@@ -6,18 +6,16 @@
 #ifndef _CO_ITYPEMANAGER_H_
 #define _CO_ITYPEMANAGER_H_
 
-#include <co/TypeTraits.h>
-#include <co/Range.h>
-#include <vector>
+#include <co/Common.h>
 #include <co/IService.h>
 
 // Forward Declarations:
 namespace co {
 	struct CSLError;
-	class IArray;
-	class INamespace;
-	class IType;
-	class ITypeTransaction;
+	class IArray; typedef co::RefPtr<IArray> IArrayRef;
+	class INamespace; typedef co::RefPtr<INamespace> INamespaceRef;
+	class IType; typedef co::RefPtr<IType> ITypeRef;
+	class ITypeTransaction; typedef co::RefPtr<ITypeTransaction> ITypeTransactionRef;
 } // namespace co
 // End Of Forward Declarations
 
@@ -45,6 +43,8 @@ public:
 
 	virtual co::IType* loadType( const std::string& typeName, std::vector<co::CSLError>& errorStack ) = 0;
 };
+
+typedef co::RefPtr<ITypeManager> ITypeManagerRef;
 
 } // namespace co
 

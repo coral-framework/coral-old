@@ -6,8 +6,9 @@
 #ifndef _CO_CORAL_H_
 #define _CO_CORAL_H_
 
+#include <co/Common.h>
+#include <co/IService.h>
 #include <co/IInterface.h>
-#include <co/Range.h>
 
 namespace co {
 
@@ -22,7 +23,7 @@ class ISystem;
 	All paths are guaranteed to be absolute pathnames.
 	\ingroup setup
  */
-CORAL_EXPORT Range<std::string> getPaths();
+CORAL_EXPORT Slice<std::string> getPaths();
 
 /*!
 	\brief Adds one or more type repositories for use by the system.
@@ -128,7 +129,7 @@ CORAL_EXPORT IService* getServiceForInstance( IInterface* serviceType, IService*
 template<typename T>
 inline T* getService()
 {
-	return static_cast<T*>( getServiceForType( co::typeOf<T>::get(), NULL ) );
+	return static_cast<T*>( getServiceForType( typeOf<T>::get(), NULL ) );
 }
 
 /*!
@@ -138,9 +139,9 @@ inline T* getService()
 	\ingroup convenience
  */
 template<typename T>
-inline T* getService( co::IInterface* clientType )
+inline T* getService( IInterface* clientType )
 {
-	return static_cast<T*>( getServiceForType( co::typeOf<T>::get(), clientType ) );
+	return static_cast<T*>( getServiceForType( typeOf<T>::get(), clientType ) );
 }
 
 /*!
@@ -150,9 +151,9 @@ inline T* getService( co::IInterface* clientType )
 	\ingroup convenience
  */
 template<typename T>
-inline T* getService( co::IService* clientInstance )
+inline T* getService( IService* clientInstance )
 {
-	return static_cast<T*>( getServiceForInstance( co::typeOf<T>::get(), clientInstance ) );
+	return static_cast<T*>( getServiceForInstance( typeOf<T>::get(), clientInstance ) );
 }
 
 /*!
