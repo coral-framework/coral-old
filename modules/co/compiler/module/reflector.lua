@@ -68,11 +68,13 @@ local function template( writer, c, t )
 
 	writer( "#include <co/reserved/ReflectorBase.h>\n" )
 
+	writer( "#include <memory>\n" )
+
 	if t.fields then
 		writer( "#include <sstream>\n" )
 	end
 
-	writer( "#include <cassert>\n\n" )
+	writer "\n"
 
 	c.revisionCheck( writer, c, t )
 

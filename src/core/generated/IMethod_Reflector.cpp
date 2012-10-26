@@ -5,19 +5,19 @@
 
 #include <co/IMethod.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IException.h>
 #include <co/ICompositeType.h>
-#include <co/IAnnotation.h>
-#include <co/IInterface.h>
-#include <co/IParameter.h>
+#include <co/IException.h>
 #include <co/IType.h>
+#include <co/IAnnotation.h>
+#include <co/IParameter.h>
+#include <co/IInterface.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/ReflectorBase.h>
+#include <memory>
 #include <sstream>
-#include <cassert>
 
 namespace co {
 

@@ -5,7 +5,7 @@
 
 #include <co/NoSuchPortException.h>
 #include <co/reserved/ReflectorBase.h>
-#include <cassert>
+#include <memory>
 
 namespace co {
 

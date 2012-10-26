@@ -6,16 +6,16 @@
 #include <co/IField.h>
 #include <co/IDynamicServiceProvider.h>
 #include <co/ICompositeType.h>
-#include <co/IType.h>
-#include <co/IAnnotation.h>
 #include <co/IInterface.h>
+#include <co/IAnnotation.h>
+#include <co/IType.h>
 #include <co/IMethod.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/ReflectorBase.h>
+#include <memory>
 #include <sstream>
-#include <cassert>
 
 namespace co {
 

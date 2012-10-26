@@ -5,22 +5,22 @@
 
 #include <co/IComponent.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IMember.h>
-#include <co/IType.h>
 #include <co/IPort.h>
 #include <co/IInterface.h>
+#include <co/INamespace.h>
+#include <co/IType.h>
 #include <co/IReflector.h>
 #include <co/IAnnotation.h>
 #include <co/Uuid.h>
-#include <co/INamespace.h>
+#include <co/IMember.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/ReflectorBase.h>
+#include <memory>
 #include <sstream>
-#include <cassert>
 
 namespace co {
 

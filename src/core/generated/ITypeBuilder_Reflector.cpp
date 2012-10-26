@@ -5,8 +5,8 @@
 
 #include <co/ITypeBuilder.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IType.h>
 #include <co/IMethodBuilder.h>
+#include <co/IType.h>
 #include <co/INamespace.h>
 #include <co/IInterface.h>
 #include <co/IMethod.h>
@@ -15,8 +15,8 @@
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
 #include <co/reserved/ReflectorBase.h>
+#include <memory>
 #include <sstream>
-#include <cassert>
 
 namespace co {
 
