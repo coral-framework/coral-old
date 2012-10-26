@@ -14,14 +14,14 @@ include_directories(
 )
 
 # Define compile-time parameters
-IF( UNIX )
+if( UNIX )
 	find_file( LIBC_PATH
 		NAMES libc.so.6 libc.so libc.dylib
 		PATHS /lib /usr/lib PATH_SUFFIXES ${CMAKE_LIBRARY_ARCHITECTURE} )
 	find_file( LIBPTHREAD_PATH
 		NAMES libpthread.so.0 libpthread.so libpthread.dylib
 		PATHS /lib /usr/lib PATH_SUFFIXES ${CMAKE_LIBRARY_ARCHITECTURE} )
-ENDIF()
+endif()
 set_property( DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
 	"CORAL_PATH=\"${CMAKE_SOURCE_DIR}/modules,${CMAKE_CURRENT_SOURCE_DIR}/data/csl\""
 	"TESTS_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data\""
@@ -51,6 +51,7 @@ add_test(
 	NAME tests_core
 	COMMAND $<TARGET_FILE:tests_core> --gtest_output=xml:../output/TestsCore$<CONFIGURATION>.xml
 )
+CORAL_TEST_ENVIRONMENT( tests_core )
 
 ################################################################################
 # If Valgrind is available, repeat the test checking for memory leaks

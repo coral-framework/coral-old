@@ -42,6 +42,7 @@ add_test(
 	NAME tests_performance
 	COMMAND $<TARGET_FILE:tests_performance> --gtest_output=xml:../output/TestsPerformance$<CONFIGURATION>.xml
 )
+CORAL_TEST_ENVIRONMENT( tests_performance )
 
 ################################################################################
 # Source Groups

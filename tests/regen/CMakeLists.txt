@@ -62,6 +62,7 @@ add_test(
 	NAME tests_regen
 	COMMAND $<TARGET_FILE:tests_regen> --gtest_output=xml:../output/TestsRegeneration$<CONFIGURATION>.xml
 )
+CORAL_TEST_ENVIRONMENT( tests_regen )
 
 ################################################################################
 # Source Groups

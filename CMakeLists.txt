@@ -34,8 +34,9 @@ if( NOT MSVC )
 endif()
 
 # Include our CMake package so we can use all CORAL_*() macros
-set( CORAL_ROOT "${CMAKE_SOURCE_DIR}" )
-set( CORAL_LAUNCHER launcher )
+set( CORAL_ROOT ${CMAKE_SOURCE_DIR} )
+set( CORAL_BIN_ROOT ${CMAKE_BINARY_DIR} )
+set( CORAL_LAUNCHER coral )
 set( CORAL_LIBRARIES core )
 find_package( Coral QUIET )
 

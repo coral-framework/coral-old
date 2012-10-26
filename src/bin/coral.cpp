@@ -15,9 +15,9 @@
 
 enum Mode
 {
+	Mode_Auto,
 	Mode_Debug,
-	Mode_Release,
-	Mode_Auto
+	Mode_Release
 };
 
 Mode resolveMode( const char* str )
@@ -55,9 +55,9 @@ int main( int argc, char* argv[] )
 	// add entries to the CORAL_PATH environment variable
 	prependToEnvVar( "CORAL_PATH", coralPath );
 
-	// set the OS-specific var that enables the system to locate the coral library
-	std::string libDir( rootDir );
-	libDir += CORAL_OS_DIR_SEP_STR "lib" CORAL_OS_PATH_SEP_STR;
+	// set the OS-specific var that enables us to locate the coral library
+	std::string libDir = properties.getProperty( "libdir", rootDir + CORAL_OS_DIR_SEP_STR "lib" );
+	libDir.append( CORAL_OS_PATH_SEP_STR );
 #if defined(CORAL_OS_WIN)
 	prependToEnvVar( "PATH", libDir );
 #elif defined(CORAL_OS_LINUX)
@@ -93,47 +93,29 @@ int main( int argc, char* argv[] )
 	}
 
 	// determine the launcher executable that should be used
-	std::string launcher;
-
-	std::string launcherRelease( rootDir );
-	launcherRelease.append( CORAL_OS_DIR_SEP_STR "bin" CORAL_OS_DIR_SEP_STR "launcher" EXE_SUFFIX );
-
-	std::string launcherDebug( rootDir );
-	launcherDebug.append( CORAL_OS_DIR_SEP_STR "bin" CORAL_OS_DIR_SEP_STR "launcher_debug" EXE_SUFFIX );
-
-	switch( mode )
+	std::string launcher = properties.getProperty( "launcher" );
+	if( launcher.empty() )
 	{
-	case Mode_Debug:
-		launcher = properties.getProperty( "launcher_debug", launcherDebug );
-		break;
+		std::string dirs[] = {
+			properties.getProperty( "bindir", rootDir + CORAL_OS_DIR_SEP_STR "bin" ),
+			rootDir
+		};
 
-	case Mode_Release:
-		launcher = properties.getProperty( "launcher", launcherRelease );
-		break;
+		std::string names[] = {
+			properties.getProperty( "launcher", "launcher" EXE_SUFFIX ),
+			properties.getProperty( "launcher_debug", "launcher_debug" EXE_SUFFIX )
+		};
 
-	case Mode_Auto:
-		/*
-			Automatically choose a launcher executable. Search priority:
-				1) bin/launcher
-				2) bin/launcher_debug
-				3) launcher
-				4) launcher_debug
-		 */
-
-		if( co::OS::isFile( launcherRelease ) )
-			launcher = launcherRelease;
-		else if( co::OS::isFile( launcherDebug ) )
-			launcher = launcherDebug;
-		else
+		co::Slice<std::string> selectedNames;
+		switch( mode )
 		{
-			launcher = rootDir + ( CORAL_OS_DIR_SEP_STR "launcher" EXE_SUFFIX );
-			if( !co::OS::isFile( launcher ) )
-				launcher = rootDir + ( CORAL_OS_DIR_SEP_STR "launcher_debug" EXE_SUFFIX );
+		case Mode_Auto:		selectedNames = names; break;
+		case Mode_Debug:	selectedNames = co::Slice<std::string>( names + 1, 1 ); break;
+		case Mode_Release:	selectedNames = co::Slice<std::string>( names, 1 ); break;
+		default: assert(false);
 		}
-		break;
-
-	default:
-		assert( false );
+	
+		co::OS::searchFile2( dirs, selectedNames, launcher );
 	}
 
 	if( !co::OS::isFile( launcher ) )

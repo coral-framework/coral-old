@@ -4,6 +4,14 @@
 
 project( BIN )
 
+# Add a coral.properties file to the ${CMAKE_BINARY_DIR}/bin dir to
+# instruct the coral executable where to find the coral library
+configure_file( coral.properties.in "${CORAL_BINARY_DIR}/bin/coral.properties" )
+
+################################################################################
+# Common Settings
+################################################################################
+
 include_directories( ${CMAKE_SOURCE_DIR}/src ${CORE_SOURCE_DIR}/generated )
 
 set( EXTRA_SOURCES

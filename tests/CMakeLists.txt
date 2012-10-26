@@ -53,6 +53,7 @@ add_test( NAME launcher COMMAND launcher -p ${CORAL_PATH_STR} lua.Launcher noscr
 set_tests_properties( launcher PROPERTIES
 	PASS_REGULAR_EXPRESSION "launch script 'noscript' could not be found in the path"
 )
+CORAL_TEST_ENVIRONMENT( launcher )
 
 # Test the Launcher Front End
 add_test( NAME coral COMMAND coral -p ${CORAL_PATH_STR} lua.Launcher noscript )

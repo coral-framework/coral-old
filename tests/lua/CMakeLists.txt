@@ -49,10 +49,11 @@ add_test(
 	NAME tests_lua
 	COMMAND $<TARGET_FILE:tests_lua> --gtest_output=xml:../output/TestsLua$<CONFIGURATION>.xml
 )
+CORAL_TEST_ENVIRONMENT( tests_lua )
 
 CORAL_ADD_TEST( launch_lua_component lua.launcher.Component one two three )
 set_tests_properties( launch_lua_component PROPERTIES
-	PASS_REGULAR_EXPRESSION "ARGS:	one two three"
+	PASS_REGULAR_EXPRESSION "ARGS: one two three"
 )
 
 ################################################################################

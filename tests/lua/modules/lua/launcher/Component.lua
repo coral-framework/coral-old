@@ -5,7 +5,7 @@ function Component:main( args )
 		return -1
 	end
 
-	print( "ARGS:", table.concat( args, " " ) )
+	print( "ARGS: " .. table.concat( args, " " ) )
 
 	return 0
 end

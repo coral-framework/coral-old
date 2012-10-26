@@ -53,6 +53,11 @@ if( NOT CORAL_PATH )
 	endif()
 endif()
 
+# CORAL_BIN_ROOT is equivalent to CORAL_ROOT, except when building coral
+if( NOT CORAL_BIN_ROOT )
+	set( CORAL_BIN_ROOT ${CORAL_ROOT} )
+endif()
+
 # Set default output dir for module libraries
 if( NOT CORAL_MODULE_OUTPUT_DIR )
 	set( CORAL_MODULE_OUTPUT_DIR "${CMAKE_BINARY_DIR}/modules" )
@@ -84,6 +89,13 @@ endif()
 
 # Launcher arguments to invoke the coral compiler
 set( CORAL_COMPILER_ARGS --csl acd co.compiler.Compile )
+
+# Populate CORAL_CONFIG_SUFFIXES with "", "_DEBUG", etc. for all config types.
+foreach( config ${CMAKE_CONFIGURATION_TYPES} )
+	string( TOUPPER "${config}" config )
+	list( APPEND CORAL_CONFIG_SUFFIXES "_${config}" )
+endforeach()
+set( CORAL_CONFIG_SUFFIXES "" ${CORAL_CONFIG_SUFFIXES} ) # prepend the empty suffix
 
 ################################################################################
 # Function to get the current CORAL_PATH as a comma-separated string
@@ -208,16 +220,14 @@ macro( CORAL_TARGET_PROPERTIES targetName )
 	set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_DEFINITIONS_RELWITHDEBINFO "NDEBUG" )
 
 	# Generate executables in /bin and libs (but not modules) in /lib
-	get_target_property( _targetType ${targetName} TYPE )
-	if( _targetType STREQUAL "EXECUTABLE" )
+	get_target_property( targetType ${targetName} TYPE )
+	if( targetType STREQUAL "EXECUTABLE" )
 		set_target_properties( ${targetName} PROPERTIES
-			RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+			OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin"
 		)
-	elseif( NOT _targetType STREQUAL "MODULE_LIBRARY" )
+	elseif( NOT targetType STREQUAL "MODULE_LIBRARY" )
 		set_target_properties( ${targetName} PROPERTIES
-			RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-			LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-			ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+			OUTPUT_DIR "${CMAKE_BINARY_DIR}/lib"
 		)
 	endif()
 
@@ -235,6 +245,16 @@ macro( CORAL_TARGET_PROPERTIES targetName )
 		# Hide all DSO symbols by default (Ref: http://gcc.gnu.org/wiki/Visibility)
 		set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_FLAGS "-fvisibility=hidden" )
 	endif()
+
+	# Enforce the same output dirs for all config types.
+	get_target_property( outputDir ${targetName} OUTPUT_DIR )
+	foreach( suffix IN LISTS CORAL_CONFIG_SUFFIXES )
+		set_target_properties( ${targetName} PROPERTIES
+			RUNTIME_OUTPUT_DIRECTORY${suffix} "${outputDir}"
+			LIBRARY_OUTPUT_DIRECTORY${suffix} "${outputDir}"
+			ARCHIVE_OUTPUT_DIRECTORY${suffix} "${outputDir}"
+		)
+	endforeach()
 endmacro( CORAL_TARGET_PROPERTIES )
 
 ################################################################################
@@ -249,33 +269,13 @@ endmacro( CORAL_TARGET )
 # Macro to set common build options for Coral Module targets.
 ################################################################################
 macro( CORAL_MODULE_TARGET moduleName targetName )
-	CORAL_TARGET( ${targetName} )
-
+	string( REPLACE "." "/" modulePath ${moduleName} )
 	set_target_properties( ${targetName} PROPERTIES
 		PREFIX ""
 		OUTPUT_NAME "${moduleName}"
+		OUTPUT_DIR "${CORAL_MODULE_OUTPUT_DIR}/${modulePath}"
 	)
-
-	# Copy or generate the module library into /modules/${modulePath}/
-	string( REPLACE "." "/" modulePath ${moduleName} )
-	if( XCODE_VERSION OR MSVC_IDE )
-		# Copy the library after linking (makes sense for IDE's that create intermediate dirs)
-		file( MAKE_DIRECTORY "${CORAL_MODULE_OUTPUT_DIR}/${modulePath}" )
-		if( XCODE_VERSION )
-			set( targetFileName "$(FULL_PRODUCT_NAME)" )
-		else()
-			set( targetFileName "$(TargetFileName)" ) # MSVC_IDE
-		endif()
-		add_custom_command( TARGET ${targetName} POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/${targetFileName}" "${CORAL_MODULE_OUTPUT_DIR}/${modulePath}/"
-			COMMENT "Copying module '${moduleName}'..."
-		)
-	else()
-		# Create the library directly in the output dir
-		set_target_properties( ${targetName} PROPERTIES
-			LIBRARY_OUTPUT_DIRECTORY "${CORAL_MODULE_OUTPUT_DIR}/${modulePath}"
-		)
-	endif()
+	CORAL_TARGET( ${targetName} )
 endmacro( CORAL_MODULE_TARGET )
 
 ################################################################################
@@ -294,9 +294,9 @@ endmacro( CORAL_BUILD_CSL_MODULE )
 ################################################################################
 macro( CORAL_TEST_ENVIRONMENT testName )
 	set_property( TEST ${testName} APPEND PROPERTY ENVIRONMENT
-		PATH=${CORAL_ROOT}/lib
-		LD_LIBRARY_PATH=${CORAL_ROOT}/lib
-		DYLD_LIBRARY_PATH=${CORAL_ROOT}/lib
+		PATH=${CORAL_BIN_ROOT}/lib
+		LD_LIBRARY_PATH=${CORAL_BIN_ROOT}/lib
+		DYLD_LIBRARY_PATH=${CORAL_BIN_ROOT}/lib
 	)
 endmacro( CORAL_TEST_ENVIRONMENT )
 
@@ -304,13 +304,8 @@ endmacro( CORAL_TEST_ENVIRONMENT )
 # Macro to add a test target that invokes the Coral Launcher passing arguments.
 ################################################################################
 macro( CORAL_ADD_TEST testName )
-	if( CORAL_LAUNCHER STREQUAL "launcher" )
-		set( coralLauncherMode ${CORAL_LAUNCHER} )
-	else()
-		set( coralLauncherMode ${CORAL_LAUNCHER} --mode $<CONFIGURATION> )
-	endif()
 	CORAL_GET_PATH_STRING( coralPathStr )
-	add_test( NAME ${testName} COMMAND ${coralLauncherMode} -p "${coralPathStr}" ${ARGN} )
+	add_test( NAME ${testName} COMMAND ${CORAL_LAUNCHER} --mode $<CONFIGURATION> -p "${coralPathStr}" ${ARGN} )
 	CORAL_TEST_ENVIRONMENT( ${testName} )
 endmacro( CORAL_ADD_TEST )
 
@@ -388,7 +383,7 @@ endmacro( CORAL_GENERATE_DOXYGEN )
 function( _coral_find_program _name )
 	find_program( ${_name}
 		NAMES ${ARGN}
-		HINTS ${CORAL_ROOT} ".."
+		HINTS ${CORAL_BIN_ROOT} ".."
 		PATH_SUFFIXES "." "bin"
 	)
 	mark_as_advanced( ${_name} )
@@ -397,7 +392,7 @@ endfunction()
 function( _coral_find_library _name )
 	find_library( ${_name}
 		NAMES ${ARGN}
-		HINTS ${CORAL_ROOT} ".."
+		HINTS ${CORAL_BIN_ROOT} ".."
 		PATH_SUFFIXES "lib"
 	)
 	mark_as_advanced( ${_name} )

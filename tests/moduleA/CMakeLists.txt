@@ -62,6 +62,7 @@ add_test(
 	NAME tests_moduleA
 	COMMAND $<TARGET_FILE:tests_moduleA> --gtest_output=xml:../output/TestsModuleA$<CONFIGURATION>.xml
 )
+CORAL_TEST_ENVIRONMENT( tests_moduleA )
 
 ################################################################################
 # If Valgrind is available, repeat the test checking for memory leaks
