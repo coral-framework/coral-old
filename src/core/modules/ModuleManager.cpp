@@ -15,8 +15,8 @@
 #include <co/IllegalStateException.h>
 #include <co/ModuleLoadException.h>
 #include <co/IllegalArgumentException.h>
+#include <algorithm>
 #include <sstream>
-#include <iostream>
 
 namespace co {
 

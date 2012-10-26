@@ -17,6 +17,7 @@
 #include <co/ModuleLoadException.h>
 #include <co/IllegalArgumentException.h>
 #include <lua/Exception.h>
+#include <algorithm>
 #include <cstring>
 #include <sstream>
 

@@ -11,6 +11,7 @@
 #include <co/IReflector.h>
 #include <co/reserved/OS.h>
 #include <co/reserved/LibraryManager.h>
+#include <algorithm>
 
 namespace co {
 

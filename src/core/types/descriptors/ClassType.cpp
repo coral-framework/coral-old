@@ -9,6 +9,7 @@
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IInterface.h>
+#include <algorithm>
 
 namespace co {
 

@@ -8,5 +8,6 @@
 
 #include <co/Slice.h>
 #include <co/RefPtr.h>
+#include <memory>
 
 #endif // _CO_COMMON_H_

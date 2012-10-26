@@ -5,6 +5,7 @@
 
 #include "Component.h"
 #include "Port.h"
+#include <algorithm>
 
 namespace co {
 
