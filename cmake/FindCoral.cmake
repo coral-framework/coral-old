@@ -91,11 +91,11 @@ endif()
 set( CORAL_COMPILER_ARGS --csl acd co.compiler.Compile )
 
 # Populate CORAL_CONFIG_SUFFIXES with "", "_DEBUG", etc. for all config types.
-foreach( config ${CMAKE_CONFIGURATION_TYPES} )
+foreach( config IN LISTS ${CMAKE_CONFIGURATION_TYPES} ITEMS "${CMAKE_BUILD_TYPE}" )
 	string( TOUPPER "${config}" config )
 	list( APPEND CORAL_CONFIG_SUFFIXES "_${config}" )
 endforeach()
-set( CORAL_CONFIG_SUFFIXES "" ${CORAL_CONFIG_SUFFIXES} ) # prepend the empty suffix
+list( REMOVE_DUPLICATES CORAL_CONFIG_SUFFIXES )
 
 ################################################################################
 # Function to get the current CORAL_PATH as a comma-separated string
