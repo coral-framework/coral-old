@@ -2,35 +2,35 @@
 # Lua Module (fully integrates Coral and Lua)
 ################################################################################
 
-PROJECT( MODULE_LUA )
+project( MODULE_LUA )
 
 ################################################################################
 # Build the 'lua' module library
 ################################################################################
 
 # Compile the embedded Lua libraries into a static library
-ADD_SUBDIRECTORY( libs )
+add_subdirectory( libs )
 
-INCLUDE_DIRECTORIES( libs libs/lua generated ${CORE_SOURCE_DIR}/generated )
+include_directories( libs libs/lua generated ${CORE_SOURCE_DIR}/generated )
 
-FILE( GLOB HEADER_FILES *.h )
+file( GLOB HEADER_FILES *.h )
 FILE( GLOB SOURCE_FILES *.cpp )
 
-ADD_LIBRARY( lua MODULE ${HEADER_FILES} ${SOURCE_FILES} "generated/__AllInOne.cpp" )
+add_library( lua MODULE ${HEADER_FILES} ${SOURCE_FILES} "generated/__AllInOne.cpp" )
 
 CORAL_MODULE_TARGET( "lua" lua )
 
-SET_TARGET_PROPERTIES( lua PROPERTIES
+set_target_properties( lua PROPERTIES
 	PROJECT_LABEL "Module Lua"
 )
 
-TARGET_LINK_LIBRARIES( lua lualibs )
+target_link_libraries( lua lualibs )
 
 ################################################################################
 # Custom target to re-generate the Lua module files using the Coral compiler
 ################################################################################
 
-ADD_CUSTOM_TARGET( lua_regen
+add_custom_target( lua_regen
 	COMMAND ${CORAL_LAUNCHER} -p "${CMAKE_SOURCE_DIR}/modules,${CMAKE_BINARY_DIR}/modules"
 		--no-abi-checks co.compiler.Compile -g lua
 	DEPENDS ${CORAL_LAUNCHER}
@@ -43,8 +43,10 @@ ADD_CUSTOM_TARGET( lua_regen
 ################################################################################
 
 # install shared library
-INSTALL( TARGETS lua DESTINATION modules/lua COMPONENT "Lua Module" )
-INSTALL( FILES ${CMAKE_BINARY_DIR}/modules/lua/lua_debug.pdb DESTINATION modules/lua CONFIGURATIONS Debug COMPONENT "Lua Module" OPTIONAL )
+install( TARGETS lua DESTINATION modules/lua COMPONENT "Lua Module" )
+install( FILES ${CMAKE_BINARY_DIR}/modules/lua/lua_debug.pdb
+	DESTINATION modules/lua CONFIGURATIONS Debug COMPONENT "Lua Module" OPTIONAL )
 
 # install CSL files
-INSTALL( DIRECTORY ${CMAKE_SOURCE_DIR}/modules/lua DESTINATION modules CONFIGURATIONS Release RelWithDebInfo COMPONENT "Lua Module" )
+install( DIRECTORY ${CMAKE_SOURCE_DIR}/modules/lua DESTINATION modules
+	CONFIGURATIONS Release MinSizeRel RelWithDebInfo COMPONENT "Lua Module" )

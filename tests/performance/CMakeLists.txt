@@ -24,7 +24,7 @@ set_property( DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS "CORAL_PATH=\"${CORA
 
 # Create the test executable
 add_executable( tests_performance EXCLUDE_FROM_ALL Main.cpp PerformanceTests.cpp ${_GENERATED_FILES} )
-add_dependencies( tests_performance lua )
+add_dependencies( tests_performance coral )
 
 CORAL_TARGET( tests_performance )
 

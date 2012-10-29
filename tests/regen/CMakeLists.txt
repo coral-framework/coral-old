@@ -36,6 +36,7 @@ add_executable( tests_regen EXCLUDE_FROM_ALL ${CORE_SOURCES} ${_GENERATED_FILES}
 	../core/AnyTests.cpp
 	../core/ReflectorTests.cpp
 )
+add_dependencies( tests_regen coral )
 
 CORAL_TARGET_PROPERTIES( tests_regen )
 

@@ -24,6 +24,7 @@ file( GLOB _HEADERS *.h )
 file( GLOB _SOURCES *Adapter.cpp Test*.cpp *Annotation.cpp )
 
 add_library( moduleA MODULE EXCLUDE_FROM_ALL ${_HEADERS} ${_SOURCES} ${_GENERATED_FILES} )
+add_dependencies( moduleA coral )
 
 CORAL_MODULE_TARGET( "moduleA" moduleA )
 

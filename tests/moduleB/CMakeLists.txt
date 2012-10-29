@@ -24,6 +24,7 @@ CORAL_GENERATE_MODULE( _GENERATED_FILES moduleB
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/generated )
 
 add_library( moduleB MODULE EXCLUDE_FROM_ALL ModulePart.cpp ${_GENERATED_FILES} )
+add_dependencies( moduleB coral )
 
 CORAL_MODULE_TARGET( "moduleB" moduleB )
 
@@ -44,7 +45,7 @@ file( GLOB TEST_SOURCE_FILES *Tests.cpp )
 
 # Create test executable
 add_executable( tests_moduleB EXCLUDE_FROM_ALL Main.cpp ${TEST_SOURCE_FILES} )
-add_dependencies( tests_moduleB moduleB lua )
+add_dependencies( tests_moduleB moduleB )
 
 CORAL_TARGET( tests_moduleB )
 

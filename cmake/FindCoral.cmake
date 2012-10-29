@@ -213,13 +213,16 @@ endfunction()
 # Macro to set common properties for all targets.
 ################################################################################
 macro( CORAL_TARGET_PROPERTIES targetName )
-	# Artifacts always get a '_debug' suffix when built in debug mode
-	set_property( TARGET ${targetName} PROPERTY DEBUG_POSTFIX "_debug" )
+	# Artifacts always get config-specific a suffix, except in release mode:
+	set_target_properties( ${targetName} PROPERTIES
+		DEBUG_POSTFIX "_debug"
+		MINSIZEREL_POSTFIX "_minrel"
+		RELWITHDEBINFO_POSTFIX "_dbgrel"
+	)
 
-	# Targets built in 'RelWithDebInfo' mode are considered in 'release' mode
 	set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_DEFINITIONS_RELWITHDEBINFO "NDEBUG" )
 
-	# Generate executables in /bin and libs (but not modules) in /lib
+	# Generate executables in /bin and libraries (but not modules) in /lib
 	get_target_property( targetType ${targetName} TYPE )
 	if( targetType STREQUAL "EXECUTABLE" )
 		set_target_properties( ${targetName} PROPERTIES
@@ -246,9 +249,14 @@ macro( CORAL_TARGET_PROPERTIES targetName )
 		set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_FLAGS "-fvisibility=hidden" )
 	endif()
 
-	# Enforce the same output dirs for all config types.
+	# Adjust settings on a per-config-type basis
 	get_target_property( outputDir ${targetName} OUTPUT_DIR )
 	foreach( suffix IN LISTS CORAL_CONFIG_SUFFIXES )
+		# Targets built in "Rel" configs must be considered in 'release' mode
+		if( suffix MATCHES "REL" )
+			set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_DEFINITIONS${suffix} "NDEBUG" )
+		endif()
+		# Enforce the same output dirs for all config types.
 		set_target_properties( ${targetName} PROPERTIES
 			RUNTIME_OUTPUT_DIRECTORY${suffix} "${outputDir}"
 			LIBRARY_OUTPUT_DIRECTORY${suffix} "${outputDir}"
