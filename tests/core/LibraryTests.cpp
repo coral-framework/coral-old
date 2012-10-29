@@ -38,24 +38,13 @@ public:
 		libOneValidSymbols.push_back( "CreateIcon" );
 		libOneValidSymbols.push_back( "CreateMenu" );
 
-#elif defined(CORAL_OS_MAC)
-
-		libcPath = "/usr/lib/libc.dylib";
-		libOnePath = "/usr/lib/libpthread.dylib";
-		libTwoPath = libcPath;
-		invalidLibPath = TESTS_DATA_DIR "/invalidLibrary.dylib";
-
-		libOneValidSymbols.push_back( "pthread_mutex_init" );
-		libOneValidSymbols.push_back( "pthread_mutex_destroy" );
-		libOneValidSymbols.push_back( "pthread_cond_wait" );
-		libOneValidSymbols.push_back( "pthread_equal" );
-
 #else // UNIX
 
-		libcPath = "/lib/libc.so.6";
-		libOnePath = "/lib/libpthread.so.0";
+		libcPath = LIBC_PATH;
+		libOnePath = LIBPTHREAD_PATH;
 		libTwoPath = libcPath;
 		invalidLibPath = TESTS_DATA_DIR "/invalidLibrary.so";
+printf( "LIB1 = %s\nLIB2 = %s\n", libOnePath.c_str(), libTwoPath.c_str() );
 
 		libOneValidSymbols.push_back( "pthread_mutex_init" );
 		libOneValidSymbols.push_back( "pthread_mutex_destroy" );

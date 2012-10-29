@@ -12,10 +12,20 @@ PROJECT( TESTS_CORE )
 FILE( GLOB HEADER_FILES *.h )
 FILE( GLOB SOURCE_FILES *.cpp )
 
-# Pass the CORAL_PATH as a precompiler definition
+# Define compile-time parameters
+IF( UNIX )
+	find_file( LIBC_PATH
+		NAMES libc.so.6 libc.so libc.dylib
+		PATHS /lib /usr/lib PATH_SUFFIXES ${CMAKE_LIBRARY_ARCHITECTURE} )
+	find_file( LIBPTHREAD_PATH
+		NAMES libpthread.so.0 libpthread.so libpthread.dylib
+		PATHS /lib /usr/lib PATH_SUFFIXES ${CMAKE_LIBRARY_ARCHITECTURE} )
+ENDIF()
 SET_PROPERTY( DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
 	"CORAL_PATH=\"${CMAKE_SOURCE_DIR}/modules,${CMAKE_CURRENT_SOURCE_DIR}/data/csl\""
 	"TESTS_DATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data\""
+	"LIBC_PATH=\"${LIBC_PATH}\""
+	"LIBPTHREAD_PATH=\"${LIBPTHREAD_PATH}\""
 )
 
 INCLUDE_DIRECTORIES(
