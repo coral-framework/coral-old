@@ -755,7 +755,7 @@ TEST( AnyTests, coercionBetweenEnums )
 	EXPECT_THROW( a5.get<co::TypeKind>(), co::IllegalCastException );
 }
 
-TEST( AnyTests, coercionsFromInterface )
+TEST( AnyTests, coercionsFromServices )
 {
 	co::Any a0( reinterpret_cast<co::IType*>( 0 ) );
 	co::Any a1( co::typeOf<co::INamespace>::get() );
@@ -776,9 +776,21 @@ TEST( AnyTests, coercionsFromInterface )
 
 	// valid coercion from null to any type
 	EXPECT_TRUE( a0.get<co::INamespace*>() == NULL );
+
+	// try coercions from a RefPtr
+	co::ITypeRef typeRef( co::typeOf<co::INamespace>::get() );
+	co::Any aRef( typeRef );
+
+	EXPECT_NE( a1, aRef );
+	EXPECT_EQ( a1, aRef.asIn() );
+
+	EXPECT_EQ( typeRef, aRef.get<co::ITypeRef&>() );
+	EXPECT_THROW( aRef.get<co::IServiceRef&>(), co::IllegalCastException );
+	EXPECT_EQ( typeRef.get(), aRef.get<co::IType*>() );
+	EXPECT_EQ( typeRef.get(), aRef.get<co::IService*>() );
 }
 
-TEST( AnyTests, coercionsFromRange )
+TEST( AnyTests, coercionsFromSlice )
 {
 	// ValueType
 	co::Slice<float> valueRange;
@@ -872,6 +884,41 @@ TEST( AnyTests, coercionsFromStdVector )
 
 	// ILLEGAL: std::vector<SuperInterface*> -> co::Slice<SubInterface*>
 	EXPECT_THROW( superVecAny.get<co::Slice<co::IInterface*> >(), co::IllegalCastException );
+}
+
+TEST( AnyTests, putService )
+{
+	co::ITypeRef typeRef; co::Any aTypeRef( typeRef );
+
+	co::IService* service = co::typeOf<co::IService>::get();
+	co::IServiceRef ref( service );
+
+	aTypeRef.put( service );
+	EXPECT_EQ( typeRef.get(), service );
+
+	aTypeRef.put( co::Any() );
+	EXPECT_FALSE( typeRef );
+
+	aTypeRef.put( ref );
+	EXPECT_EQ( typeRef.get(), ref.get() );
+}
+
+TEST( AnyTests, putConversions )
+{
+	std::string str; co::Any aStr( str );
+	double dbl; co::Any aDbl( dbl );
+	
+	aStr.put( 3.14 );
+	EXPECT_EQ( "3.14", str );
+	
+	aDbl.put( str );
+	EXPECT_EQ( 3.14, dbl );
+	
+	aStr.put( true );
+	EXPECT_EQ( "true", str );
+	
+	aDbl.put( false );
+	EXPECT_EQ( 0, dbl );
 }
 
 /*****************************************************************************/

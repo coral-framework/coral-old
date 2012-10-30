@@ -208,12 +208,6 @@ void streamOut( std::ostream& os, const co::Any& var )
 	}
 }
 
-inline bool typesMatch( TypeKind kSub, TypeKind kSuper, IType* tSub, IType* tSuper )
-{
-	return tSub == tSuper ||
-		( isInheritable( kSub ) && kSub == kSuper && tSub->isA( tSuper ) );
-}
-
 typedef std::vector<uint8> StdVector;
 
 inline co::uint8* getVectorData( void* ptr  )
@@ -252,21 +246,23 @@ Any Any::asIn() const
 	if( isIn() )
 		return *this;
 
-	TypeKind k = getKind();
-	if( k == TK_NULL )
+	switch( getKind() )
+	{
+	case TK_NULL:
 		return Any();
 
-	if( k == TK_ANY )
-		return reinterpret_cast<const AnyValue*>( state.data.ptr )->getAny().asIn();
+	case TK_ANY:
+		return reinterpret_cast<AnyValue*>( state.data.ptr )->getAny().asIn();
 
-	if( k == TK_ARRAY )
-	{
-		size_t size = getVectorSize( state );
-		void* data = getVectorData( state );
-		return Any( true, state.type, data, size );
+	case TK_ARRAY:
+		return Any( true, state.type, getVectorData( state ), getVectorSize( state ) );
+
+	case TK_INTERFACE:
+		return Any( state.data.deref->service );
+
+	default:
+		return Any( true, state.type, state.data.ptr );
 	}
-
-	return Any( true, state.type, state.data.ptr );
 }
 
 size_t Any::getCount() const
@@ -610,13 +606,10 @@ void Any::cast( Any& to ) const
 		if( to.isOut() )
 		{
 			// casting to an 'out' variable: both types must match
-			if( isOut() )
+			if( isOut() && state.type == to.state.type )
 			{
-				if( typesMatch( myK, toK, state.type, to.state.type ) )
-				{
-					to.state.data.ptr = state.data.ptr;
-					return;
-				}
+				to.state.data.ptr = state.data.ptr;
+				return;
 			}
 		}
 		else if( isOut() ) // casting from an 'out' to an 'in' variable
@@ -642,7 +635,7 @@ void Any::cast( Any& to ) const
 					// check if both array element types match
 					IType* myET = static_cast<IArray*>( state.type )->getElementType();
 					IType* toET = static_cast<IArray*>( to.state.type )->getElementType();
-					if( typesMatch( myET->getKind(), toET->getKind(), myET, toET ) )
+					if( myET == toET || ( myET->getKind() == TK_INTERFACE && myET->isA( toET ) ) )
 					{
 						to.state.size = state.size;
 						to.state.data = state.data;

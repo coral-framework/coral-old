@@ -6,8 +6,6 @@
 #ifndef _CO_REFPTR_H_
 #define _CO_REFPTR_H_
 
-#include <ostream>
-
 namespace co {
 
 /*!
@@ -19,7 +17,7 @@ class RefPtr
 {
 public:
 	//! Creates an invalid (null) RefPtr.
-	inline RefPtr() : _ptr( 0 )
+	inline RefPtr() : _ptr( nullptr )
 	{;}
 
 	//! Initializes the RefPtr to reference a given service.
@@ -39,7 +37,7 @@ public:
 	{
 		tryRelease();
 		#ifndef CORAL_NDEBUG
-		_ptr = 0;
+		_ptr = nullptr;
 		#endif
 	}
 
@@ -109,10 +107,10 @@ public:
 	inline T* operator->() const { return _ptr; }
 
 	//! Invalid (i.e. null) pointer test operator.
-	inline bool operator!() const { return _ptr == 0; }
+	inline bool operator!() const { return _ptr == nullptr; }
 
 	//! Returns whether we have a valid service pointer (i.e. not null).
-	inline bool isValid() const { return _ptr != 0; }
+	inline bool isValid() const { return _ptr != nullptr; }
 
 private:
 	inline void tryRetain() { if( _ptr ) _ptr->serviceRetain(); }
@@ -123,14 +121,5 @@ private:
 };
 
 } // namespace co
-
-#ifndef DOXYGEN
-//! Output stream operator overload.
-template<typename T>
-inline std::ostream& operator << ( std::ostream& stream, const co::RefPtr<T>& rp )
-{
-	return stream << "co::RefPtr( " << rp.get() << " )";
-}
-#endif
 
 #endif // _CO_REFPTR_H_

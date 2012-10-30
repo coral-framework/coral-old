@@ -75,11 +75,7 @@ TEST( LibraryTests, simpleLoading )
 	// load and unload lib one
 	co::Library libOne( getData().libOnePath );
 	EXPECT_FALSE( libOne.isLoaded() );
-#if 1
-	try{ libOne.load(); }catch( std::exception& e ) { FAIL() << e.what(); }
-#else
 	EXPECT_NO_THROW( libOne.load() );
-#endif
 	EXPECT_TRUE( libOne.isLoaded() );
 	EXPECT_NO_THROW( libOne.unload() );
 	EXPECT_FALSE( libOne.isLoaded() );

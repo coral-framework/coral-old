@@ -13,6 +13,7 @@
 #include <co/IException.h>
 #include <co/IComponent.h>
 #include <co/INativeClass.h>
+#include <ostream>
 
 namespace co {
 
