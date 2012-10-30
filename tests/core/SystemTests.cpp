@@ -37,7 +37,7 @@ TEST( SystemTests, startupShutdown )
 	co::RefPtr<co::ISystem> system2 = co::getSystem();
 	ASSERT_TRUE( system2.isValid() );
 
-	ASSERT_NE( system1, system2 );
+	ASSERT_NE( system1.get(), system2.get() );
 
 	// system1 will be destroyed at the end of this test, system2 will remain
 }
