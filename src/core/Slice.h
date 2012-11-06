@@ -240,14 +240,9 @@ public:
 	inline TSlice( const C& container )
 		: Slice<T>( container ), _temp( nullptr ) {;}
 
-	//! Overload that takes a non-const container.
-	template<typename C>
-	inline TSlice( C& container )
-		: Slice<T>( container ), _temp( nullptr ) {;}
-
 	//! Overload that implicitly takes ownership of a temporary container.
 	template<typename C>
-	inline TSlice( C&& container )
+	inline TSlice( const C&& container )
 		: Slice<T>( container ), _temp( nullptr )
 	{
 		co::Temporary<C>* temp = new Temporary<C>;
