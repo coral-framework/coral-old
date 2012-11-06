@@ -64,7 +64,7 @@ public:
 
 	co::TSlice<std::string> getNames()
 	{
-		return co::Slice<std::string>( _names );
+		return _names;
 	}
 
 	void setNames( co::Slice<std::string> names )
@@ -175,7 +175,7 @@ public:
 
 	co::TSlice<co::ITypeBuilder*> getTypeBuilders()
 	{
-		return co::Slice<co::ITypeBuilder*>();
+		return co::TSlice<co::ITypeBuilder*>();
 	}
 
 	void commit()

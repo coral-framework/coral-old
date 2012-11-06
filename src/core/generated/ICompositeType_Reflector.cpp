@@ -5,13 +5,13 @@
 
 #include <co/ICompositeType.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/Uuid.h>
+#include <co/IMember.h>
+#include <co/IInterface.h>
+#include <co/IAnnotation.h>
 #include <co/IReflector.h>
 #include <co/INamespace.h>
-#include <co/IAnnotation.h>
-#include <co/IMember.h>
+#include <co/Uuid.h>
 #include <co/IType.h>
-#include <co/IInterface.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -52,7 +52,7 @@ public:
 	{
 		std::vector<co::IAnnotationRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::IAnnotation*>( res );
 	}
 
 	void setAnnotations( co::Slice<co::IAnnotation*> annotations_ )
@@ -151,7 +151,7 @@ public:
 	{
 		std::vector<co::IMemberRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::ICompositeType>( 0 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::IMember*>( res );
 	}
 
 	co::IMember* getMember( const std::string& name_ )

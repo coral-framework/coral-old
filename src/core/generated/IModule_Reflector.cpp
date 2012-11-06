@@ -5,8 +5,8 @@
 
 #include <co/IModule.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/INamespace.h>
 #include <co/IModulePart.h>
+#include <co/INamespace.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -54,7 +54,7 @@ public:
 	{
 		std::vector<co::IModulePartRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IModule>( 1 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::IModulePart*>( res );
 	}
 
 	co::int32 getRank()

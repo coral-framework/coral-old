@@ -10,7 +10,14 @@ local function returnResult( writer, rt )
 	if not rt then
 		-- nothing
 	elseif rt.kind == 'TK_ARRAY' then
-		writer( "\t\treturn std::move( res );\n" )
+		writer( "\t\treturn co::moveToSlice<" )
+		local elem = rt.elementType
+		if elem.kind == 'TK_INTERFACE' then
+			writer( elem.cppName, "*" )
+		else
+			writer( elem:formatField() )
+		end
+		writer( ">( res );\n" )
 	else
 		writer( "\t\treturn res", rt.kind == 'TK_INTERFACE' and ".get()" or "", ";\n" )
 	end

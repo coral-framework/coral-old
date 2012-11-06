@@ -5,8 +5,8 @@
 
 #include <co/IModuleManager.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IModule.h>
 #include <co/IModulePartLoader.h>
+#include <co/IModule.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -59,14 +59,14 @@ public:
 	{
 		std::vector<co::IModulePartLoaderRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 1 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::IModulePartLoader*>( res );
 	}
 
 	co::TSlice<co::IModule*> getModules()
 	{
 		std::vector<co::IModuleRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 2 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::IModule*>( res );
 	}
 
 	co::IModule* findModule( const std::string& moduleName_ )

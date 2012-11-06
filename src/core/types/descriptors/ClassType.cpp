@@ -92,28 +92,28 @@ IMember* ClassTypeImpl::getMember( const std::string& name )
 	return NULL;
 }
 
-Slice<IField*> ClassTypeImpl::getFields()
+TSlice<IField*> ClassTypeImpl::getFields()
 {
 	assert( _firstMethodPos != size_t( -1 ) );
 
 	if( _firstMethodPos < 1 )
-		return Slice<IField*>();
+		return TSlice<IField*>();
 
 	// create an array range downcasting IMember* to IField*
-	return Slice<IField*>(
+	return TSlice<IField*>(
 		reinterpret_cast<IField**>( &_members.front() ), _firstMethodPos );
 }
 
-Slice<IMethod*> ClassTypeImpl::getMethods()
+TSlice<IMethod*> ClassTypeImpl::getMethods()
 {
 	assert( _firstMethodPos != size_t( -1 ) );
 
 	size_t membersSize = _members.size();
 	if( _firstMethodPos >= membersSize )
-		return Slice<IMethod*>();
+		return TSlice<IMethod*>();
 
 	// create an array range downcasting IMember* to IMethod*
-	return Slice<IMethod*>( reinterpret_cast<IMethod**>(
+	return TSlice<IMethod*>( reinterpret_cast<IMethod**>(
 		&_members.front() + _firstMethodPos ), membersSize - _firstMethodPos );
 }
 

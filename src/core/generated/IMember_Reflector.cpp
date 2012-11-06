@@ -5,9 +5,9 @@
 
 #include <co/IMember.h>
 #include <co/IDynamicServiceProvider.h>
+#include <co/ICompositeType.h>
 #include <co/IAnnotation.h>
 #include <co/IInterface.h>
-#include <co/ICompositeType.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -48,7 +48,7 @@ public:
 	{
 		std::vector<co::IAnnotationRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::IAnnotation*>( res );
 	}
 
 	void setAnnotations( co::Slice<co::IAnnotation*> annotations_ )

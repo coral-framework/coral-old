@@ -147,7 +147,7 @@ TEST( TSliceTests, temporaryVector )
 	EXPECT_EQ( vec.size(), 5 );
 	EXPECT_EQ( vec[4], -1 );
 
-	co::TSlice<int> ts( std::move( vec ) );
+	co::TSlice<int> ts( co::moveToSlice<int>( vec ) );
 	EXPECT_TRUE( ts.getTemporary() );
 	EXPECT_TRUE( vec.empty() );
 	EXPECT_EQ( ts.getSize(), 5 );
@@ -162,7 +162,7 @@ TEST( TSliceTests, temporaryRefVector )
 	std::vector<co::RefPtr<PseudoService>> vec( 5, service );
 	EXPECT_EQ( 5, service->getRefCount() );
 	{
-		co::TSlice<PseudoService*> ts( std::move( vec ) );
+		co::TSlice<PseudoService*> ts( co::moveToSlice<PseudoService*>( vec ) );
 		ASSERT_FALSE( wasDestroyed );
 		EXPECT_EQ( 5, service->getRefCount() );
 	}

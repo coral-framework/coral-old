@@ -103,9 +103,9 @@ TSlice<IPort*> Component::getFacets()
 	assert( _firstReceptacle != size_t( -1 ) );
 
 	if( _firstReceptacle < 1 )
-		return Slice<IPort*>();
+		return TSlice<IPort*>();
 
-	return Slice<IPort*>( reinterpret_cast<IPort**>( &_ports.front() ), _firstReceptacle );
+	return TSlice<IPort*>( reinterpret_cast<IPort**>( &_ports.front() ), _firstReceptacle );
 }
 
 TSlice<IPort*> Component::getReceptacles()
@@ -114,9 +114,9 @@ TSlice<IPort*> Component::getReceptacles()
 
 	size_t numItfs = _ports.size();
 	if( _firstReceptacle >= numItfs )
-		return Slice<IPort*>();
+		return TSlice<IPort*>();
 
-	return Slice<IPort*>( reinterpret_cast<IPort**>(
+	return TSlice<IPort*>( reinterpret_cast<IPort**>(
 		&_ports.front() + _firstReceptacle ), numItfs - _firstReceptacle );
 }
 

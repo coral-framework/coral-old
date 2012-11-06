@@ -5,15 +5,15 @@
 
 #include <co/INativeClass.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/INamespace.h>
-#include <co/IType.h>
-#include <co/IField.h>
 #include <co/IMember.h>
 #include <co/IInterface.h>
-#include <co/Uuid.h>
-#include <co/IReflector.h>
+#include <co/IType.h>
 #include <co/IAnnotation.h>
+#include <co/IReflector.h>
+#include <co/IField.h>
 #include <co/IMethod.h>
+#include <co/Uuid.h>
+#include <co/INamespace.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -52,7 +52,7 @@ public:
 	{
 		std::vector<co::IAnnotationRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::IAnnotation*>( res );
 	}
 
 	void setAnnotations( co::Slice<co::IAnnotation*> annotations_ )
@@ -151,7 +151,7 @@ public:
 	{
 		std::vector<co::IMemberRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::ICompositeType>( 0 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::IMember*>( res );
 	}
 
 	co::IMember* getMember( const std::string& name_ )
@@ -168,7 +168,7 @@ public:
 	{
 		std::vector<co::IFieldRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IRecordType>( 0 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::IField*>( res );
 	}
 
 	// co.IClassType Methods:
@@ -177,7 +177,7 @@ public:
 	{
 		std::vector<co::IMethodRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IClassType>( 0 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::IMethod*>( res );
 	}
 
 	// co.INativeClass Methods:

@@ -240,24 +240,6 @@ public:
 	inline TSlice( C& container )
 		: Slice<T>( container ), _temp( nullptr ) {;}
 
-	template<typename C>
-	inline TSlice( const C& container )
-		: Slice<T>( container ), _temp( nullptr ) {;}
-
-	template<typename C>
-	inline TSlice( const C&& container )
-		: Slice<T>( container ), _temp( nullptr ) {;}
-
-	//! Overload that implicitly takes ownership of a temporary container.
-	template<typename C>
-	inline TSlice( C&& container )
-		: Slice<T>( container ), _temp( nullptr )
-	{
-		co::Temporary<C>* temp = new Temporary<C>;
-		temp->value = std::move( container );
-		_temp = temp;
-	}
-
 	//! Overload that explicitly takes ownership of a temporary object.
 	template<typename C>
 	inline TSlice( C& container, ITemporary* temp )
@@ -286,6 +268,14 @@ public:
 private:
 	ITemporary* _temp;
 };
+
+template<typename T, typename C>
+inline TSlice<T> moveToSlice( C& container )
+{
+	Temporary<C>* t = new Temporary<C>;
+	t->value = std::move( container );
+	return TSlice<T>( t->value, t );
+}
 
 
 /******************************************************************************/

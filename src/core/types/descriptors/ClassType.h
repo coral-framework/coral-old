@@ -36,10 +36,10 @@ public:
 	IMember* getMember( const std::string& name );
 
 	// IRecordType methods:
-	Slice<IField*> getFields();
+	TSlice<IField*> getFields();
 
 	// IClassType methods:
-	Slice<IMethod*> getMethods();
+	TSlice<IMethod*> getMethods();
 
 protected:
 	typedef std::vector<IMemberRef> MembersVector;

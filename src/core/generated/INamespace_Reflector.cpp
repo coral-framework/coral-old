@@ -5,9 +5,9 @@
 
 #include <co/INamespace.h>
 #include <co/IDynamicServiceProvider.h>
+#include <co/ITypeBuilder.h>
 #include <co/IModule.h>
 #include <co/IType.h>
-#include <co/ITypeBuilder.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -48,7 +48,7 @@ public:
 	{
 		std::vector<co::INamespaceRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::INamespace>( 0 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::INamespace*>( res );
 	}
 
 	std::string getFullName()
@@ -83,7 +83,7 @@ public:
 	{
 		std::vector<co::ITypeRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::INamespace>( 5 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::IType*>( res );
 	}
 
 	co::INamespace* defineChildNamespace( const std::string& name_ )

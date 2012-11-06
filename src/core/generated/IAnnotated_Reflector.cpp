@@ -47,7 +47,7 @@ public:
 	{
 		std::vector<co::IAnnotationRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::IAnnotation*>( res );
 	}
 
 	void setAnnotations( co::Slice<co::IAnnotation*> annotations_ )

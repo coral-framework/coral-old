@@ -46,7 +46,7 @@ public:
 	{
 		std::vector<co::ITypeBuilderRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::ITypeTransaction>( 0 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::ITypeBuilder*>( res );
 	}
 
 	void commit()

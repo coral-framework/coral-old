@@ -5,12 +5,12 @@
 
 #include <co/IMethod.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IType.h>
-#include <co/IParameter.h>
-#include <co/IInterface.h>
-#include <co/IException.h>
-#include <co/IAnnotation.h>
 #include <co/ICompositeType.h>
+#include <co/IException.h>
+#include <co/IInterface.h>
+#include <co/IAnnotation.h>
+#include <co/IParameter.h>
+#include <co/IType.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
@@ -50,7 +50,7 @@ public:
 	{
 		std::vector<co::IAnnotationRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::IAnnotation*>( res );
 	}
 
 	void setAnnotations( co::Slice<co::IAnnotation*> annotations_ )
@@ -108,14 +108,14 @@ public:
 	{
 		std::vector<co::IExceptionRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IMethod>( 0 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::IException*>( res );
 	}
 
 	co::TSlice<co::IParameter*> getParameters()
 	{
 		std::vector<co::IParameterRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IMethod>( 1 ), res );
-		return std::move( res );
+		return co::moveToSlice<co::IParameter*>( res );
 	}
 
 	co::IType* getReturnType()

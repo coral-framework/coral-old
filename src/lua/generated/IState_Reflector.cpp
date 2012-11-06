@@ -50,7 +50,7 @@ public:
 	{
 		std::vector<lua::IInterceptorRef> res;
 		_provider->dynamicGetField( _cookie, getField<lua::IState>( 0 ), res );
-		return std::move( res );
+		return co::moveToSlice<lua::IInterceptor*>( res );
 	}
 
 	void addInterceptor( lua::IInterceptor* interceptor_ )

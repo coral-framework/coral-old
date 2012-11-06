@@ -88,7 +88,7 @@ IInterface* Interface::getBaseType()
 
 TSlice<IInterface*> Interface::getSuperTypes()
 {
-	return Slice<IInterface*>( _superTypes, _numSuperTypes );
+	return TSlice<IInterface*>( _superTypes, _numSuperTypes );
 }
 
 TSlice<IInterface*> Interface::getSubTypes()
