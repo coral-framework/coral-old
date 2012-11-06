@@ -5,14 +5,14 @@
 
 #include <co/IRecordType.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IInterface.h>
-#include <co/IAnnotation.h>
-#include <co/IField.h>
-#include <co/IType.h>
-#include <co/IReflector.h>
 #include <co/INamespace.h>
 #include <co/Uuid.h>
+#include <co/IReflector.h>
+#include <co/IField.h>
+#include <co/IAnnotation.h>
 #include <co/IMember.h>
+#include <co/IType.h>
+#include <co/IInterface.h>
 #include <co/IMethod.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
@@ -50,11 +50,9 @@ public:
 
 	co::TSlice<co::IAnnotation*> getAnnotations()
 	{
-		typedef co::Temporary<std::vector<co::IAnnotationRef> > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
+		std::vector<co::IAnnotationRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ), res );
-		return co::TSlice<co::IAnnotation*>( res, temp.release() );
+		return std::move( res );
 	}
 
 	void setAnnotations( co::Slice<co::IAnnotation*> annotations_ )
@@ -151,11 +149,9 @@ public:
 
 	co::TSlice<co::IMember*> getMembers()
 	{
-		typedef co::Temporary<std::vector<co::IMemberRef> > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
+		std::vector<co::IMemberRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::ICompositeType>( 0 ), res );
-		return co::TSlice<co::IMember*>( res, temp.release() );
+		return std::move( res );
 	}
 
 	co::IMember* getMember( const std::string& name_ )
@@ -170,11 +166,9 @@ public:
 
 	co::TSlice<co::IField*> getFields()
 	{
-		typedef co::Temporary<std::vector<co::IFieldRef> > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
+		std::vector<co::IFieldRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IRecordType>( 0 ), res );
-		return co::TSlice<co::IField*>( res, temp.release() );
+		return std::move( res );
 	}
 
 protected:

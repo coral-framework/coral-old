@@ -52,11 +52,9 @@ public:
 
 	co::TSlice<co::IModulePart*> getParts()
 	{
-		typedef co::Temporary<std::vector<co::IModulePartRef> > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
+		std::vector<co::IModulePartRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IModule>( 1 ), res );
-		return co::TSlice<co::IModulePart*>( res, temp.release() );
+		return std::move( res );
 	}
 
 	co::int32 getRank()

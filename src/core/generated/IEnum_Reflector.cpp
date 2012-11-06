@@ -6,11 +6,11 @@
 #include <co/IEnum.h>
 #include <co/IDynamicServiceProvider.h>
 #include <co/INamespace.h>
-#include <co/IType.h>
 #include <co/IReflector.h>
-#include <co/IInterface.h>
-#include <co/IAnnotation.h>
 #include <co/Uuid.h>
+#include <co/IAnnotation.h>
+#include <co/IType.h>
+#include <co/IInterface.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -49,11 +49,9 @@ public:
 
 	co::TSlice<co::IAnnotation*> getAnnotations()
 	{
-		typedef co::Temporary<std::vector<co::IAnnotationRef> > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
+		std::vector<co::IAnnotationRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ), res );
-		return co::TSlice<co::IAnnotation*>( res, temp.release() );
+		return std::move( res );
 	}
 
 	void setAnnotations( co::Slice<co::IAnnotation*> annotations_ )
@@ -150,11 +148,9 @@ public:
 
 	co::TSlice<std::string> getIdentifiers()
 	{
-		typedef co::Temporary<std::vector<std::string> > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
+		std::vector<std::string> res;
 		_provider->dynamicGetField( _cookie, getField<co::IEnum>( 0 ), res );
-		return co::TSlice<std::string>( res, temp.release() );
+		return std::move( res );
 	}
 
 	co::int32 getValueOf( const std::string& identifier_ )

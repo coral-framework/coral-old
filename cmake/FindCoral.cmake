@@ -91,10 +91,11 @@ endif()
 set( CORAL_COMPILER_ARGS --csl acd co.compiler.Compile )
 
 # Populate CORAL_CONFIG_SUFFIXES with "", "_DEBUG", etc. for all config types.
-foreach( config IN LISTS ${CMAKE_CONFIGURATION_TYPES} ITEMS "${CMAKE_BUILD_TYPE}" )
+foreach( config IN LISTS CMAKE_CONFIGURATION_TYPES ITEMS ${CMAKE_BUILD_TYPE} )
 	string( TOUPPER "${config}" config )
 	list( APPEND CORAL_CONFIG_SUFFIXES "_${config}" )
 endforeach()
+set( CORAL_CONFIG_SUFFIXES "" ${CORAL_CONFIG_SUFFIXES} ) # prepend the empty suffix
 list( REMOVE_DUPLICATES CORAL_CONFIG_SUFFIXES )
 
 ################################################################################

@@ -5,8 +5,8 @@
 
 #include <co/IReflector.h>
 #include <co/IMethod.h>
-#include <co/IField.h>
 #include <co/IType.h>
+#include <co/IField.h>
 #include <co/IDynamicServiceProvider.h>
 #include <co/IObject.h>
 #include <co/IllegalCastException.h>

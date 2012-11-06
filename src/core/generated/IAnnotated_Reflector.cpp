@@ -45,11 +45,9 @@ public:
 
 	co::TSlice<co::IAnnotation*> getAnnotations()
 	{
-		typedef co::Temporary<std::vector<co::IAnnotationRef> > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
+		std::vector<co::IAnnotationRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ), res );
-		return co::TSlice<co::IAnnotation*>( res, temp.release() );
+		return std::move( res );
 	}
 
 	void setAnnotations( co::Slice<co::IAnnotation*> annotations_ )

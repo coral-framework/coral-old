@@ -1,13 +1,6 @@
 -- Prepares a var named 'res' of type rt for returning
 local function prepareResult( writer, rt )
-	if not rt then
-		-- nothing
-	elseif rt.kind == 'TK_ARRAY' then
-		writer( "\t\ttypedef co::Temporary<", rt:formatField(), [[ > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
-]] )
-	else
+	if rt then
 		writer( "\t\t", rt:formatField(), " res;\n" )
 	end
 end
@@ -17,7 +10,7 @@ local function returnResult( writer, rt )
 	if not rt then
 		-- nothing
 	elseif rt.kind == 'TK_ARRAY' then
-		writer( "\t\treturn ", rt:formatResult(), "( res, temp.release() );\n" )
+		writer( "\t\treturn std::move( res );\n" )
 	else
 		writer( "\t\treturn res", rt.kind == 'TK_INTERFACE' and ".get()" or "", ";\n" )
 	end

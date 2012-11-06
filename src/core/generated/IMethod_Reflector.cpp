@@ -5,12 +5,12 @@
 
 #include <co/IMethod.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/ICompositeType.h>
-#include <co/IException.h>
 #include <co/IType.h>
-#include <co/IAnnotation.h>
 #include <co/IParameter.h>
 #include <co/IInterface.h>
+#include <co/IException.h>
+#include <co/IAnnotation.h>
+#include <co/ICompositeType.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
@@ -48,11 +48,9 @@ public:
 
 	co::TSlice<co::IAnnotation*> getAnnotations()
 	{
-		typedef co::Temporary<std::vector<co::IAnnotationRef> > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
+		std::vector<co::IAnnotationRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IAnnotated>( 0 ), res );
-		return co::TSlice<co::IAnnotation*>( res, temp.release() );
+		return std::move( res );
 	}
 
 	void setAnnotations( co::Slice<co::IAnnotation*> annotations_ )
@@ -108,20 +106,16 @@ public:
 
 	co::TSlice<co::IException*> getExceptions()
 	{
-		typedef co::Temporary<std::vector<co::IExceptionRef> > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
+		std::vector<co::IExceptionRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IMethod>( 0 ), res );
-		return co::TSlice<co::IException*>( res, temp.release() );
+		return std::move( res );
 	}
 
 	co::TSlice<co::IParameter*> getParameters()
 	{
-		typedef co::Temporary<std::vector<co::IParameterRef> > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
+		std::vector<co::IParameterRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IMethod>( 1 ), res );
-		return co::TSlice<co::IParameter*>( res, temp.release() );
+		return std::move( res );
 	}
 
 	co::IType* getReturnType()

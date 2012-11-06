@@ -57,20 +57,16 @@ public:
 
 	co::TSlice<co::IModulePartLoader*> getLoaders()
 	{
-		typedef co::Temporary<std::vector<co::IModulePartLoaderRef> > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
+		std::vector<co::IModulePartLoaderRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 1 ), res );
-		return co::TSlice<co::IModulePartLoader*>( res, temp.release() );
+		return std::move( res );
 	}
 
 	co::TSlice<co::IModule*> getModules()
 	{
-		typedef co::Temporary<std::vector<co::IModuleRef> > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
+		std::vector<co::IModuleRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::IModuleManager>( 2 ), res );
-		return co::TSlice<co::IModule*>( res, temp.release() );
+		return std::move( res );
 	}
 
 	co::IModule* findModule( const std::string& moduleName_ )

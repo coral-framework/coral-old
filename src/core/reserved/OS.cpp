@@ -196,11 +196,7 @@ void co::OS::makeAbs( std::string& path )
 bool co::OS::searchFile2( co::Slice<std::string> listA, co::Slice<std::string> listB,
 						  std::string& path, std::string* partA, std::string* partB )
 {
-	assert( !listA.isEmpty() && !listB.isEmpty() );
-
 	std::string filePath;
-	filePath.reserve( 256 );
-
 	for( co::Slice<std::string> itA( listA ); itA; itA.popFirst() )
 	{
 		for( co::Slice<std::string> itB( listB ); itB; itB.popFirst() )
@@ -221,7 +217,6 @@ bool co::OS::searchFile2( co::Slice<std::string> listA, co::Slice<std::string> l
 			}
 		}
 	}
-
 	return false;
 }
 
@@ -230,11 +225,7 @@ bool co::OS::searchFile3( co::Slice<std::string> listA,
 						  co::Slice<std::string> listC,
 						  std::string& path, std::string* partA, std::string* partB, std::string* partC )
 {
-	assert( !listA.isEmpty() && !listB.isEmpty() && !listC.isEmpty() );
-
 	std::string filePath;
-	filePath.reserve( 256 );
-
 	for( co::Slice<std::string> itC( listC ); itC; itC.popFirst() )
 	{
 		for( co::Slice<std::string> itB( listB ); itB; itB.popFirst() )
@@ -262,6 +253,5 @@ bool co::OS::searchFile3( co::Slice<std::string> listA,
 			}
 		}
 	}
-
 	return false;
 }

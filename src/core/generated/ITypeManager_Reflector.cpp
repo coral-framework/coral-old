@@ -5,10 +5,10 @@
 
 #include <co/ITypeManager.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/ITypeTransaction.h>
 #include <co/INamespace.h>
-#include <co/IType.h>
+#include <co/ITypeTransaction.h>
 #include <co/IArray.h>
+#include <co/IType.h>
 #include <co/CSLError.h>
 #include <co/IMethod.h>
 #include <co/IField.h>

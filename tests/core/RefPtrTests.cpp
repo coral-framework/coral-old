@@ -3,51 +3,21 @@
  * See Copyright Notice in Coral.h
  */
 
-#include <co/IService.h>
+#include "PseudoService.h"
 #include <gtest/gtest.h>
-
-namespace {
-
-class PseudoInterface : public co::IService
-{
-public:
-	PseudoInterface( bool* setToTrueWhenDestroyed = 0 ) :
-		_setToTrueWhenDestroyed( setToTrueWhenDestroyed ), _refCount( 0 )
-	{;}
-
-	virtual ~PseudoInterface()
-	{
-		if( _setToTrueWhenDestroyed )
-			*_setToTrueWhenDestroyed = true;
-	}
-
-	inline co::int32 getRefCount() const { return _refCount; }
-
-	co::IInterface* getInterface() { return 0; }
-	co::IObject* getProvider() { return 0; }
-	co::IPort* getFacet() { return 0; }
-	void serviceRetain() { ++_refCount; }
-	void serviceRelease() { if( --_refCount <= 0 ) delete this; }
-
-private:
-	bool* _setToTrueWhenDestroyed;
-	co::int32 _refCount;
-};
-
-} // anonymous namespace
 
 TEST( RefPtrTests, size )
 {
-	EXPECT_EQ( sizeof(void*), sizeof(co::RefPtr<PseudoInterface>) );
+	EXPECT_EQ( sizeof(void*), sizeof(co::RefPtr<PseudoService>) );
 }
 
 TEST( RefPtrTests, validity )
 {
-	co::RefPtr<PseudoInterface> ptr;
+	co::RefPtr<PseudoService> ptr;
 	EXPECT_TRUE( !ptr );
 	EXPECT_FALSE( ptr.isValid() );
 
-	ptr = new PseudoInterface;
+	ptr = new PseudoService;
 	EXPECT_FALSE( !ptr );
 	EXPECT_TRUE( ptr.isValid() );
 
@@ -59,10 +29,10 @@ TEST( RefPtrTests, validity )
 TEST( RefPtrTests, release )
 {
 	bool objDestroyed = false;
-	PseudoInterface *obj = new PseudoInterface( &objDestroyed );
+	PseudoService *obj = new PseudoService( &objDestroyed );
 	{
 		obj->serviceRetain();
-		co::RefPtr<PseudoInterface> ptr = obj;
+		co::RefPtr<PseudoService> ptr = obj;
 	}
 
 	ASSERT_FALSE( objDestroyed );
@@ -71,7 +41,7 @@ TEST( RefPtrTests, release )
 
 	bool anonymousInstanceDestroyed = false;
 	{
-		co::RefPtr<PseudoInterface>( new PseudoInterface( &anonymousInstanceDestroyed ) );
+		co::RefPtr<PseudoService>( new PseudoService( &anonymousInstanceDestroyed ) );
 	}
 	EXPECT_TRUE( anonymousInstanceDestroyed );
 
@@ -80,12 +50,12 @@ TEST( RefPtrTests, release )
 TEST( RefPtrTests, swap )
 {
 	bool objDestroyed = false;
-	PseudoInterface *obj = new PseudoInterface( &objDestroyed );
+	PseudoService *obj = new PseudoService( &objDestroyed );
 
-	co::RefPtr<PseudoInterface> ptr1;
+	co::RefPtr<PseudoService> ptr1;
 	{
 		using std::swap;
-		co::RefPtr<PseudoInterface> ptr2( obj );
+		co::RefPtr<PseudoService> ptr2( obj );
 		ptr2.swap( ptr1 );
 		swap( ptr1, ptr2 );
 		ptr2.swap( ptr1 );
@@ -98,18 +68,18 @@ TEST( RefPtrTests, swap )
 
 struct TripleRefs
 {
-	co::RefPtr<PseudoInterface> ref1;
-	co::RefPtr<PseudoInterface> ref2;
-	co::RefPtr<PseudoInterface> ref3;
+	co::RefPtr<PseudoService> ref1;
+	co::RefPtr<PseudoService> ref2;
+	co::RefPtr<PseudoService> ref3;
 };
 
 TEST( RefPtrTests, structFields )
 {
 	bool destroyedA = false;
-	PseudoInterface *objA = new PseudoInterface( &destroyedA );
+	PseudoService *objA = new PseudoService( &destroyedA );
 
 	bool destroyedB = false;
-	PseudoInterface *objB = new PseudoInterface( &destroyedB );
+	PseudoService *objB = new PseudoService( &destroyedB );
 
 	TripleRefs structOne;
 
@@ -146,12 +116,12 @@ TEST( RefPtrTests, structFields )
 
 TEST( RefPtrTests, sliceUpcast )
 {
-	PseudoInterface o1, o2, o3;
+	PseudoService o1, o2, o3;
 	o1.serviceRetain();
 	o2.serviceRetain();
 	o3.serviceRetain();
 
-	std::vector<co::RefPtr<PseudoInterface> > refVec;
+	std::vector<co::RefPtr<PseudoService> > refVec;
 	refVec.push_back( &o1 );
 	refVec.push_back( &o2 );
 	refVec.push_back( &o3 );

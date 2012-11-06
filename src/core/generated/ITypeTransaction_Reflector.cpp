@@ -44,11 +44,9 @@ public:
 
 	co::TSlice<co::ITypeBuilder*> getTypeBuilders()
 	{
-		typedef co::Temporary<std::vector<co::ITypeBuilderRef> > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
+		std::vector<co::ITypeBuilderRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::ITypeTransaction>( 0 ), res );
-		return co::TSlice<co::ITypeBuilder*>( res, temp.release() );
+		return std::move( res );
 	}
 
 	void commit()

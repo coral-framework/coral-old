@@ -25,7 +25,7 @@
 #include <co/reserved/Uuid.h>
 
 /*****************************************************************************/
-/*  Performance / Portability Tests                                          */
+/* Performance and Portability Tests                                         */
 /*****************************************************************************/
 
 TEST( AnyTests, sizeOf )
@@ -76,9 +76,9 @@ TEST( AnyTests, stdVectorMemoryLayout )
 }
 
 /*****************************************************************************/
-/*  A 'constructor' test checks whether the co::Any is detecting the correct */
-/*  type for a variable passed to its constructor. It may also include basic */
-/*  retrieval tests for the values passed to the constructor.                */
+/* A 'constructor' test checks whether the co::Any is detecting the correct  */
+/* type for a variable passed to its constructor. It may also include basic  */
+/* retrieval tests for the values passed to the constructor.                 */
 /*****************************************************************************/
 
 void EXPECT_ANY_TYPE_STREQ( const co::Any& any, const char* str )
@@ -353,8 +353,8 @@ TEST( AnyTests, constructInterface )
 }
 
 /*****************************************************************************/
-/*  A 'set and get' test checks whether a value can be correctly stored and  */
-/*  retrieved into/from a co::Any. It may also include basic coercion tests. */
+/* A 'set and get' test checks whether a value can be correctly stored and   */
+/* retrieved into/from a co::Any. It may also include basic coercion tests.  */
 /*****************************************************************************/
 
 template<typename T>
@@ -585,8 +585,8 @@ TEST( AnyTests, setGetInterface )
 }
 
 /*****************************************************************************/
-/*  A 'coercion' test checks whether a stored variable is correctle          */
-/*  implicitly converted to a different type at retrieval time.              */
+/* A 'coercion' test checks whether a stored variable is correctle           */
+/* implicitly converted to a different type at retrieval time.               */
 /*****************************************************************************/
 
 TEST( AnyTests, coercionsFromBool )
@@ -922,7 +922,7 @@ TEST( AnyTests, putConversions )
 }
 
 /*****************************************************************************/
-/*  Tests for the custom variable setters and constructors                   */
+/* Tests for the custom variable setters and constructors                    */
 /*****************************************************************************/
 
 TEST( AnyTests, setService )
@@ -990,7 +990,7 @@ TEST( AnyTests, setArray )
 }
 
 /*****************************************************************************/
-/*  Tests for Swap                                                           */
+/* Tests for Swap                                                            */
 /*****************************************************************************/
 
 TEST( AnyTests, swap )
@@ -1014,7 +1014,7 @@ TEST( AnyTests, swap )
 }
 
 /*****************************************************************************/
-/*  Tests for Reflective Array Accesses                                      */
+/* Tests for Reflective Array Accesses                                       */
 /*****************************************************************************/
 
 TEST( AnyTests, accessRangeOfDoubles )

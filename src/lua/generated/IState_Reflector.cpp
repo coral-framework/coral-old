@@ -48,11 +48,9 @@ public:
 
 	co::TSlice<lua::IInterceptor*> getInterceptors()
 	{
-		typedef co::Temporary<std::vector<lua::IInterceptorRef> > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
+		std::vector<lua::IInterceptorRef> res;
 		_provider->dynamicGetField( _cookie, getField<lua::IState>( 0 ), res );
-		return co::TSlice<lua::IInterceptor*>( res, temp.release() );
+		return std::move( res );
 	}
 
 	void addInterceptor( lua::IInterceptor* interceptor_ )

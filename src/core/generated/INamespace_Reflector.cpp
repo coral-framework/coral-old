@@ -5,9 +5,9 @@
 
 #include <co/INamespace.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/ITypeBuilder.h>
 #include <co/IModule.h>
 #include <co/IType.h>
+#include <co/ITypeBuilder.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>
@@ -46,11 +46,9 @@ public:
 
 	co::TSlice<co::INamespace*> getChildNamespaces()
 	{
-		typedef co::Temporary<std::vector<co::INamespaceRef> > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
+		std::vector<co::INamespaceRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::INamespace>( 0 ), res );
-		return co::TSlice<co::INamespace*>( res, temp.release() );
+		return std::move( res );
 	}
 
 	std::string getFullName()
@@ -83,11 +81,9 @@ public:
 
 	co::TSlice<co::IType*> getTypes()
 	{
-		typedef co::Temporary<std::vector<co::ITypeRef> > Temporary;
-		std::unique_ptr<Temporary> temp( new Temporary );
-		auto& res = temp->value;
+		std::vector<co::ITypeRef> res;
 		_provider->dynamicGetField( _cookie, getField<co::INamespace>( 5 ), res );
-		return co::TSlice<co::IType*>( res, temp.release() );
+		return std::move( res );
 	}
 
 	co::INamespace* defineChildNamespace( const std::string& name_ )

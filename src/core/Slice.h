@@ -230,21 +230,31 @@ public:
 		: Slice<T>( array, size ), _temp( nullptr ) {;}
 
 	/*!
-		Creates a slice spanning the entire contents of a compatible \a container.
-		By default supports std::vector's and statically-allocated arrays.
-		Specialize the co::Slicer struct to accept other types.
-		\tparam C a container class for which a co::Slicer was defined.
+		Creates a slice spanning the entire contents of a \a container.
+		By default supports std::vector and statically-allocated arrays.
+		Specialize co::Slicer to add support for other container types.
+		\tparam C a container type supported by co::Slicer.
 	 */
+	//@{
 	template<typename C>
-	inline TSlice( const C& container )
+	inline TSlice( C& container )
 		: Slice<T>( container ), _temp( nullptr ) {;}
 
-	/*!
-		Overload that accepts ownership of a temporary object.
-	 */
+	//! Overload that implicitly takes ownership of a temporary container.
 	template<typename C>
-	inline TSlice( const C& container, ITemporary* temp )
+	inline TSlice( C&& container )
+		: Slice<T>( container ), _temp( nullptr )
+	{
+		co::Temporary<C>* temp = new Temporary<C>;
+		temp->value = std::move( container );
+		_temp = temp;
+	}
+
+	//! Overload that explicitly takes ownership of a temporary object.
+	template<typename C>
+	inline TSlice( C& container, ITemporary* temp )
 		: Slice<T>( container ), _temp( temp ) {;}
+	//@}
 
 	//! Non-const copy constructor.
 	inline TSlice( TSlice& ) { /* Error - NonCopyable */ }

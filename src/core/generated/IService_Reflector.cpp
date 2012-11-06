@@ -5,8 +5,8 @@
 
 #include <co/IService.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IPort.h>
 #include <co/IObject.h>
+#include <co/IPort.h>
 #include <co/IInterface.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
