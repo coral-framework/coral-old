@@ -237,12 +237,20 @@ public:
 	 */
 	//@{
 	template<typename C>
+	inline TSlice( C& container )
+		: Slice<T>( container ), _temp( nullptr ) {;}
+
+	template<typename C>
 	inline TSlice( const C& container )
+		: Slice<T>( container ), _temp( nullptr ) {;}
+
+	template<typename C>
+	inline TSlice( const C&& container )
 		: Slice<T>( container ), _temp( nullptr ) {;}
 
 	//! Overload that implicitly takes ownership of a temporary container.
 	template<typename C>
-	inline TSlice( const C&& container )
+	inline TSlice( C&& container )
 		: Slice<T>( container ), _temp( nullptr )
 	{
 		co::Temporary<C>* temp = new Temporary<C>;
