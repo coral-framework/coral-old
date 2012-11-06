@@ -237,6 +237,11 @@ public:
 	 */
 	//@{
 	template<typename C>
+	inline TSlice( const C& container )
+		: Slice<T>( container ), _temp( nullptr ) {;}
+
+	//! Overload that takes a non-const container.
+	template<typename C>
 	inline TSlice( C& container )
 		: Slice<T>( container ), _temp( nullptr ) {;}
 
