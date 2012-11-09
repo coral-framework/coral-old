@@ -214,9 +214,6 @@ template<typename T>
 class TSlice : public Slice<T>, public NonCopyable
 {
 public:
-	//typedef typename ArrayOf<T, kindOf<T>::kind>::VectorType VectorType;
-
-public:
 	//! Creates a default empty array slice.
 	inline TSlice() : _temp( nullptr ) {;}
 
@@ -265,8 +262,11 @@ public:
 	//! Destructor.
 	inline ~TSlice() { if( _temp ) delete _temp; }
 
+	//! Returns this TSlice casted as a simple Slice.
+	inline const Slice<T>& asSlice() const { return *static_cast<const Slice<T>*>( this ); }
+
 	//! Returns our temporary object, if any.
-	inline ITemporary* getTemporary() { return _temp; }
+	inline ITemporary* getTemporary() const { return _temp; }
 
 private:
 	ITemporary* _temp;
