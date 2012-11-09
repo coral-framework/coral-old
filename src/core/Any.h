@@ -360,6 +360,13 @@ public:
 	Any asIn() const;
 
 	/*!
+		\brief Returns whether two co::Any's contain equal values.
+		Performs a value comparison by derefering both variables.
+		The dereferenced values must be of the exact same type.
+	 */
+	bool equals( const Any& other ) const;
+
+	/*!
 		\brief Returns the number of elements contained in this co::Any.
 		For arrays, this is the number of elements in the array; for other
 		types this is always 1.
@@ -475,7 +482,7 @@ public:
 	//! Index operator for access to array elements. \sa at().
 	inline Any operator[]( size_t index ) const { return at( index ); }
 
-	//! Equality test operator.
+	//! Tests whether \a this and \a other refer to the same variable.
 	bool operator==( const Any& other ) const;
 
 	//! Inequality test operator.
@@ -599,17 +606,11 @@ public:
 	//! Swaps the contents of two co::AnyValue's.
 	inline void swap( AnyValue& other ) { _any.swap( other._any ); }
 
-	//! Equality test operator.
-	inline bool operator==( const AnyValue& other ) const
-	{
-		return _any == other._any;
-	}
+	//! Tests whether our value equals that of \a other.
+	inline bool operator==( const AnyValue& other ) const { return _any.equals( other.getAny() ); }
 
 	//! Inequality test operator.
-	inline bool operator!=( const AnyValue& other ) const
-	{
-		return !( *this == other );
-	}
+	inline bool operator!=( const AnyValue& other ) const { return !( *this == other ); }
 
 	//! Assignment operator.
 	inline AnyValue& operator=( const AnyValue& other )

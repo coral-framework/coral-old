@@ -210,6 +210,11 @@ public:
 		throw co::NotSupportedException( "co::IReflector::destroyValues() cannot be called through a proxy" );
 	}
 
+	bool compareValues( const void*, const void*, size_t )
+	{
+		throw co::NotSupportedException( "co::IReflector::compareValues() cannot be called through a proxy" );
+	}
+
 ]]
 		end
 
@@ -313,6 +318,14 @@ public:
 		for( size_t i = 0; i < numValues; ++i )
 			callDestructor( reinterpret_cast<]], t.cppName, [[*>( ptr ) + i );
 	}
+
+	bool compareValues( const void* a, const void* b, size_t numValues )
+	{
+		for( size_t i = 0; i < numValues; ++i )
+			if( !( reinterpret_cast<const ]], t.cppName, [[*>( a )[i] == reinterpret_cast<const ]], t.cppName, [[*>( b )[i] ) )
+				return false;
+		return true;
+    }
 ]] )
 	elseif t.kind == 'TK_INTERFACE' then
 		writer( [[

@@ -265,6 +265,31 @@ Any Any::asIn() const
 	}
 }
 
+bool Any::equals( const Any& other ) const
+{
+	Any a( asIn() ), b( other.asIn() );
+	if( a.getType() != b.getType() )
+		return false;
+
+	size_t count( 1 );
+	TypeKind kind = a.getKind();
+	if( kind == TK_ARRAY )
+	{
+		count = a.state.size;
+		if( count != b.state.size )
+			return false;
+	}
+
+	__any::Data *pA( &a.state.data ), *pB( &b.state.data );
+	if( !isScalarOrRef( kind ) )
+	{
+		pA = pA->deref;
+		pB = pB->deref;
+	}
+
+	return a.getType()->getReflector()->compareValues( pA, pB, count );
+}
+
 size_t Any::getCount() const
 {
 	if( getKind() == TK_ARRAY )

@@ -53,6 +53,12 @@ public:
 			\throw NotSupportedException if this \a type does not have a value form.
 		 */
 		virtual void destroyValues( void* ptr, size_t numValues ) = 0;
+
+		/*!
+			Returns true if and only if a0 == b0, a1 == b1, ... aN == bN.
+			\throw NotSupportedException if this \a type does not have a value form.
+		 */
+		virtual bool compareValues( const void* a, const void* b, size_t numValues ) = 0;
 	
 	// End Of c++> Block
 

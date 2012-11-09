@@ -5,10 +5,10 @@
 
 #include <co/ITypeBuilder.h>
 #include <co/IDynamicServiceProvider.h>
+#include <co/IType.h>
 #include <co/INamespace.h>
 #include <co/IInterface.h>
 #include <co/IMethodBuilder.h>
-#include <co/IType.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>

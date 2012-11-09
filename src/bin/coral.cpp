@@ -69,7 +69,12 @@ int main( int argc, char* argv[] )
 #endif
 
 	// determine in which mode to run the launcher
-	Mode mode = Mode_Auto;
+#ifdef CORAL_NDEBUG
+	Mode mode = Mode_Auto;	// default is auto in release build
+#else
+	Mode mode = Mode_Debug;	// default is debug in debug builds
+#endif
+
 	const std::string& modeProperty = properties.getProperty( "mode" );
 	if( !modeProperty.empty() )
 		mode = resolveMode( modeProperty.c_str() );

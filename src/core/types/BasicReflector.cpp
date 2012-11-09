@@ -53,6 +53,14 @@ public:
 	{
 		// NOP
 	}
+
+	bool compareValues( const void* a, const void* b, size_t numValues )
+	{
+		for( size_t i = 0; i < numValues; ++i )
+			if( reinterpret_cast<const T*>( a )[i] != reinterpret_cast<const T*>( b )[i] )
+				return false;
+		return true;
+	}
 };
 
 // ------ ClassReflector -------------------------------------------------------
@@ -81,6 +89,14 @@ public:
 	{
 		for( size_t i = 0; i < numValues; ++i )
 			callDestructor( reinterpret_cast<T*>( ptr ) + i );
+	}
+
+	bool compareValues( const void* a, const void* b, size_t numValues )
+	{
+		for( size_t i = 0; i < numValues; ++i )
+			if( reinterpret_cast<const T*>( a )[i] != reinterpret_cast<const T*>( b )[i] )
+				return false;
+		return true;
 	}
 };
 
@@ -123,6 +139,19 @@ public:
 	{
 		for( size_t i = 0; i < numValues; ++i )
 			destroyVector( reinterpret_cast<PseudoVector*>( ptr ) + i );
+	}
+
+	bool compareValues( const void* a, const void* b, size_t numValues )
+	{
+		for( size_t i = 0; i < numValues; ++i )
+		{
+			const PseudoVector* pvA = reinterpret_cast<const PseudoVector*>( a ) + i;
+			const PseudoVector* pvB = reinterpret_cast<const PseudoVector*>( b ) + i;
+			size_t size = pvA->size();
+			if( size != pvB->size() || !_elemReflector->compareValues( &pvA[0], &pvB[0], size ) )
+				return false;
+		}
+		return true;
 	}
 
 private:

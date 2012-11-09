@@ -5,10 +5,10 @@
 
 #include <co/IReflector.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IField.h>
-#include <co/IObject.h>
 #include <co/IMethod.h>
 #include <co/IType.h>
+#include <co/IField.h>
+#include <co/IObject.h>
 #include <co/IllegalCastException.h>
 #include <co/MissingInputException.h>
 #include <co/IllegalArgumentException.h>
@@ -113,6 +113,11 @@ public:
 	void destroyValues( void*, size_t )
 	{
 		throw co::NotSupportedException( "co::IReflector::destroyValues() cannot be called through a proxy" );
+	}
+
+	bool compareValues( const void*, const void*, size_t )
+	{
+		throw co::NotSupportedException( "co::IReflector::compareValues() cannot be called through a proxy" );
 	}
 
 protected:

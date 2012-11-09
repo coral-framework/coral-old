@@ -58,6 +58,14 @@ public:
 			callDestructor( reinterpret_cast<co::Uuid*>( ptr ) + i );
 	}
 
+	bool compareValues( const void* a, const void* b, size_t numValues )
+	{
+		for( size_t i = 0; i < numValues; ++i )
+			if( !( reinterpret_cast<const co::Uuid*>( a )[i] == reinterpret_cast<const co::Uuid*>( b )[i] ) )
+				return false;
+		return true;
+    }
+
 	void getField( const co::Any& instance, co::IField* field, const co::Any& value )
 	{
 		co::Uuid* p = co::checkInstance<co::Uuid>( instance, field );

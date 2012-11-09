@@ -286,6 +286,12 @@ void LuaComponent::destroyValues( void*, size_t )
 	raiseNotSupportedException();
 }
 
+bool LuaComponent::compareValues( const void*, const void*, size_t )
+{
+	raiseNotSupportedException();
+	return false;
+}
+
 co::IObject* LuaComponent::newInstance()
 {
 	assert( _facets == NULL && _tableRef != LUA_NOREF );

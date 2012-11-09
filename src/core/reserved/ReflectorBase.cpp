@@ -132,6 +132,23 @@ void ReflectorBase::destroyValues( void* ptr, size_t numValues )
 	}
 }
 
+bool ReflectorBase::compareValues( const void* a, const void* b, size_t numValues )
+{
+	TypeKind kind = getType()->getKind();
+	if( kind == TK_INTERFACE )
+	{
+		for( size_t i = 0; i < numValues; ++i )
+			if( reinterpret_cast<const RefPtr<IService>*>( a )[i] !=
+				reinterpret_cast<const RefPtr<IService>*>( b )[i] )
+				return false;
+		return true;
+	}
+
+	assert( false );
+	raiseNotSupportedException();
+	return false;
+}
+
 IObject* ReflectorBase::newInstance()
 {
 	raiseNotSupportedException();

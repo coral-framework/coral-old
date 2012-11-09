@@ -10,6 +10,8 @@
 
 namespace co {
 
+template<typename T> class TSlice;
+
 #ifndef DOXYGEN
 
 // Instructs Coral how to take a Slice<T> out of a container C.
@@ -66,7 +68,12 @@ struct Slicer<T, std::vector<co::RefPtr<ET> > >
 	static size_t getSize( const std::vector<co::RefPtr<ET> >& v ) { return v.size(); }
 };
 
-template<typename T> class TSlice;
+// For safety, slicing a TSlice is illegal
+template<typename T, typename ET>
+struct Slicer<T, co::TSlice<ET> >
+{
+	static const bool isValid = false;
+};
 
 #endif // DOXYGEN
 
@@ -112,10 +119,6 @@ public:
 	//! Creates a slice from an \a array containing \a size elements.
 	inline Slice( const T* array, size_t size )
 		: _begin( array ), _end( array + size ) {;}
-
-	//! Creates a slice from a TSlice of the same type.
-	inline Slice( const TSlice<T>& t )
-		: _begin( t._begin ), _end( t._end ) {;}
 
 	/*!
 		Creates a slice spanning the entire contents of a compatible \a container.
@@ -301,10 +304,7 @@ void assign( Slice<T> slice, C& container )
 	not in the sorted slice. In either case, the parameter \a pos is set to the
 	index where the element should be located in the sorted slice.
 
-	The search relies on a key-based comparison function, which is more
-	flexible (and often more efficient) than element-based STL comparators.
-
-	The comparison function is defined is follows:
+	The search relies on a key-based comparison function, defined is follows:
 		\code int compare( const Key& key, const T& element ) \endcode
 		- returns \b zero when <tt>key == element</tt>
 		- returns \b <tt><0</tt> when <tt>key < element</tt>
@@ -313,28 +313,22 @@ void assign( Slice<T> slice, C& container )
 template<typename T, typename Key, typename Comparator>
 bool binarySearch( Slice<T> slice, const Key& key, Comparator compare, size_t& pos )
 {
-	pos = slice.getSize();
-	if( pos == 0 )
-		return false;
-
-	size_t first = 0, last = pos - 1;
-	while( 1 )
+	size_t first = 0;
+	ptrdiff_t count = slice.getSize() - 0;
+	while( count > 0 )
 	{
-		pos = ( first + last ) / 2;
+		ptrdiff_t step = count / 2;
+		pos = first + step;
 		int comp = compare( key, slice[pos] );
 		if( comp > 0 )
 		{
-			// repeat search in right half
-			first = pos + 1;
-			if( pos == last ) break;
+			// search in right half
+			first = ++pos;
+			count -= step + 1;
 		}
 		else if( comp < 0 )
-		{
-			// repeat search in left half
-			if( pos == 0 ) break;
-			last = pos - 1;
-		}
-		else return true;
+			count = step; // search in left half
+		else return true; // found
 	}
 	pos = first;
 	return false;

@@ -36,24 +36,25 @@ public:
 	virtual ~ReflectorBase();
 
 	// co::IService methods:
-    IObject* getProvider();
-    void serviceRetain();
-    void serviceRelease();
+	IObject* getProvider();
+	void serviceRetain();
+	void serviceRelease();
 
     // co::IObject methods:
-    IComponent* getComponent();
-    IService* getServiceAt( IPort* );
-    void setServiceAt( IPort*, IService* );
+	IComponent* getComponent();
+	IService* getServiceAt( IPort* );
+	void setServiceAt( IPort*, IService* );
 
 	// co::IReflector methods:
 	void createValues( void* ptr, size_t numValues );
-    void copyValues( const void* fromPtr, void* toPtr, size_t numValues );
-    void destroyValues( void* ptr, size_t numValues );
-    IObject* newInstance();
-    IService* newDynamicProxy( IDynamicServiceProvider* handler );
-    void getField( const Any& instance, IField* ai, const Any& value );
-    void setField( const Any& instance, IField* ai, const Any& value );
-    void invoke( const Any& instance, IMethod* mi, Slice<Any> args, const Any& returnValue );
+	void copyValues( const void* fromPtr, void* toPtr, size_t numValues );
+	void destroyValues( void* ptr, size_t numValues );
+	bool compareValues( const void* a, const void* b, size_t numValues );
+	IObject* newInstance();
+	IService* newDynamicProxy( IDynamicServiceProvider* handler );
+	void getField( const Any& instance, IField* ai, const Any& value );
+	void setField( const Any& instance, IField* ai, const Any& value );
+	void invoke( const Any& instance, IMethod* mi, Slice<Any> args, const Any& returnValue );
 	void raise( const std::string& message );
 
 protected:

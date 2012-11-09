@@ -5,8 +5,8 @@
 
 #include <co/IModule.h>
 #include <co/IDynamicServiceProvider.h>
-#include <co/IModulePart.h>
 #include <co/INamespace.h>
+#include <co/IModulePart.h>
 #include <co/IMethod.h>
 #include <co/IField.h>
 #include <co/IllegalCastException.h>

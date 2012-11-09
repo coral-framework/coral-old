@@ -45,6 +45,7 @@ public:
 	void createValues( void* ptr, size_t numValues );
     void copyValues( const void* fromPtr, void* toPtr, size_t numValues );
     void destroyValues( void* ptr, size_t numValues );
+    bool compareValues( const void* a, const void* b, size_t numValues );
 	co::IObject* newInstance();
 	co::IService* newDynamicProxy( co::IDynamicServiceProvider* provider );
     void getField( const co::Any& instance, co::IField* ai, const co::Any& var );

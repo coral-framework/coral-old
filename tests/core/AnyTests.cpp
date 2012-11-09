@@ -585,8 +585,28 @@ TEST( AnyTests, setGetInterface )
 }
 
 /*****************************************************************************/
-/* A 'coercion' test checks whether a stored variable is correctle           */
-/* implicitly converted to a different type at retrieval time.               */
+/* Equality Tests                                                            */
+/*****************************************************************************/
+
+TEST( AnyTests, equals )
+{
+	std::string str( "foo" );
+	co::Any aStr( str );
+
+	// comparison between in/out vars works
+	EXPECT_TRUE( aStr.isOut() );
+	EXPECT_TRUE( aStr.equals( std::string( "foo" ) ) );
+	EXPECT_FALSE( aStr.equals( std::string( "bar" ) ) );
+
+	// values must be of the exact same type
+	double dbl( 3.14 );
+	co::Any aDbl( dbl ), aFlt( 3.14f );
+	EXPECT_FALSE( aDbl.equals( aFlt ) );
+	EXPECT_TRUE( aFlt.equals( 3.14f ) );
+}
+
+/*****************************************************************************/
+/* Coercion Tests - verify implicit value conversions at retrieval time      */
 /*****************************************************************************/
 
 TEST( AnyTests, coercionsFromBool )
