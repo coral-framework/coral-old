@@ -271,13 +271,15 @@ bool Any::equals( const Any& other ) const
 	if( a.getType() != b.getType() )
 		return false;
 
-	size_t count( 1 );
 	TypeKind kind = a.getKind();
 	if( kind == TK_ARRAY )
 	{
-		count = a.state.size;
+		size_t count = a.state.size;
 		if( count != b.state.size )
 			return false;
+
+		IType* elemType = static_cast<IArray*>( a.getType() )->getElementType();
+		return elemType->getReflector()->compareValues( a.state.data.ptr, b.state.data.ptr, count );
 	}
 
 	__any::Data *pA( &a.state.data ), *pB( &b.state.data );
@@ -287,7 +289,7 @@ bool Any::equals( const Any& other ) const
 		pB = pB->deref;
 	}
 
-	return a.getType()->getReflector()->compareValues( pA, pB, count );
+	return a.getType()->getReflector()->compareValues( pA, pB, 1 );
 }
 
 size_t Any::getCount() const

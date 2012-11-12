@@ -603,6 +603,19 @@ TEST( AnyTests, equals )
 	co::Any aDbl( dbl ), aFlt( 3.14f );
 	EXPECT_FALSE( aDbl.equals( aFlt ) );
 	EXPECT_TRUE( aFlt.equals( 3.14f ) );
+
+	// array comparisons
+	int intArray[] = { 1, 2, 3 };
+	co::Any aIntArray( intArray );
+
+	std::vector<int> intVec( 3 );
+	intVec[0] = 1; intVec[1] = 2; intVec[2] = 3;
+	co::Any aIntVec( intVec );
+
+	EXPECT_TRUE( aIntArray.equals( aIntVec ) );
+
+	intVec.push_back( 4 );
+	EXPECT_FALSE( aIntArray.equals( aIntVec ) );
 }
 
 /*****************************************************************************/
