@@ -8,6 +8,7 @@
 
 #include <co/TypeTraits.h>
 #include <exception>
+#include <sstream>
 
 namespace co {
 
