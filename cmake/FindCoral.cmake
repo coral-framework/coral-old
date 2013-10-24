@@ -217,8 +217,8 @@ macro( CORAL_TARGET_PROPERTIES targetName )
 	# Artifacts always get config-specific a suffix, except in release mode:
 	set_target_properties( ${targetName} PROPERTIES
 		DEBUG_POSTFIX "_debug"
-		MINSIZEREL_POSTFIX "_minrel"
-		RELWITHDEBINFO_POSTFIX "_dbgrel"
+		MINSIZEREL_POSTFIX ""
+		RELWITHDEBINFO_POSTFIX ""
 	)
 
 	set_property( TARGET ${targetName} APPEND PROPERTY COMPILE_DEFINITIONS_RELWITHDEBINFO "NDEBUG" )
